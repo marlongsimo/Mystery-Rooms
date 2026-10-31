@@ -1,5 +1,5 @@
 /*
- * STATIONEN 4–7 – VORLÄUFIGE FASSUNG
+ * STATIONEN 5–7 – VORLÄUFIGE FASSUNG
  * Die Rätsel stammen aus dem Prototyp und sind bereits spielbar,
  * die Räume haben aber noch keine gezeichnete Szene. Sie werden nach und nach
  * nach dem Vorbild der Rezeption (01-rezeption.js) ausgebaut.
@@ -12,8 +12,6 @@
   const note = (title, text) => ({ title, kind: "note", html: `<p>${text}</p>` });
 
   Object.assign(N.docs, {
-    bauakte: note("Bauliche Veränderungen – Oktober 2009", "„Der westliche Servicetunnel ist nach außen hin als dauerhaft verschlossen zu dokumentieren. Eine tatsächliche Stilllegung wird nicht vorgenommen.“<br><br>Unterzeichnet: <b>Viktor Lehn</b>, Eigentümer"),
-    entschluesselt: note("Entschlüsselte Nachricht", "DER WESTGANG IST OFFEN"),
     kameraprotokoll: note("Überwachungsprotokoll 14.10.2009", "23:17 – Stromausfall in der Lobby.<br>Notstrom springt an.<br><b>23:24</b> – Sechs Personen verlassen das Gebäude durch ein Tor im Westen.<br>Danach: Elias Voss betritt allein das Managerbüro und nimmt ein Buch aus dem Regal."),
     aufnahme_elias: note("Tonaufnahme von Elias", "„Falls jemand diese Aufnahme gefunden hat, ist es endlich an der Zeit, die Wahrheit zu erfahren. Der Keller ist der Schlüssel. Nicht die Tür, die Sie sehen. Die Tür, die Sie niemals sehen sollten.“"),
     wartungsplan: note("Wartungsplan Technikkeller", "Generator → C → A → D → B → Westtor.<br>Der westliche Servicetunnel ist weiterhin an den Notstrom angeschlossen."),
@@ -21,21 +19,6 @@
   });
 
   const rooms = [
-    {
-      id: "archiv", name: "Hotelarchiv", title: "Das Hotelarchiv", kicker: "ERDGESCHOSS / VERWALTUNG",
-      story: "Zwischen Personalakten und vergilbten Zeitungsartikeln liegt ein Brief, der keinen Sinn ergibt. Der Schreibtisch hat ein Fach mit Buchstabenschloss.",
-      cards: [["✉", "Brief"], ["▤", "Bauakte"], ["⌕", "Personalakten"], ["▭", "Schreibtisch"]],
-      puzzle: {
-        type: "text", title: "Das Buchstabenschloss",
-        prompt: "Das Fach öffnet sich nur mit dem richtigen Satz. Der Brief enthält nur eine Zeile. Auf der Rückseite steht: „Der Verfasser war seiner Zeit immer drei Schritte voraus.“",
-        clue: "GHU ZHVWJDQJ LVW RIIHQ",
-        answers: ["DER WESTGANG IST OFFEN"],
-        objective: "Entschlüssle den Brief.",
-        hints: ["Der Text verwendet eine sehr alte, bekannte Methode, Buchstaben zu verschlüsseln.", "Jeder Buchstabe wurde um dieselbe Anzahl an Stellen im Alphabet verschoben.", "Gehe bei jedem Buchstaben drei Stellen im Alphabet zurück: G → D, H → E, U → R …"],
-        success: "Das Fach springt auf. Darin liegt eine Akte mit dem Titel „Bauliche Veränderungen – Oktober 2009“.",
-        onSolve: [{ doc: "entschluesselt" }, { doc: "bauakte" }],
-      },
-    },
     {
       id: "ueberwachung", name: "Überwachungsraum", title: "Der Überwachungsraum", kicker: "UNTERGESCHOSS / SICHERHEIT",
       story: "Vier Monitore zeigen Standbilder aus der Nacht des 14. Oktober 2009. Das System verlangt die Aufnahmen in der richtigen Reihenfolge.",

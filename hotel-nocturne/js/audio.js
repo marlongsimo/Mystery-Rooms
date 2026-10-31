@@ -100,6 +100,7 @@
     steps_far: () => { [0, 0.45, 0.9, 1.3].forEach((t, i) => noise({ d: 0.06, v: 0.12 - i * 0.025, freq: 250, type: "lowpass", delay: t })); },
     gate: () => { noise({ d: 0.05, v: 0.4, freq: 2500 }); tone({ f: 310, type: "square", d: 0.3, v: 0.03, delay: 0.03 }); tone({ f: 120, type: "sawtooth", d: 0.8, v: 0.03, delay: 0.2, slide: -40 }); },
     drip: () => { tone({ f: 1800 + Math.random() * 700, d: 0.09, v: 0.035, slide: -900 }); },
+    creak: () => { tone({ f: 140 + Math.random() * 60, type: "sawtooth", d: 0.35, v: 0.015, slide: -50 }); },
     thunder: () => { noise({ d: 2.6, v: 0.5, freq: 160, type: "lowpass" }); noise({ d: 1.4, v: 0.35, freq: 90, type: "lowpass", delay: 0.3 }); },
   };
 
@@ -198,6 +199,15 @@
       if (name === "tick") {
         let odd = false;
         ambientTimer = setInterval(() => { odd = !odd; if (!document.hidden) noise({ d: 0.012, v: odd ? 0.05 : 0.035, freq: odd ? 5000 : 4200 }); }, 1000);
+      }
+      if (name === "hum") { // fast Stille: Lampenbrummen und gelegentliches Holzknacken
+        const next = () => {
+          ambientTimer = setTimeout(() => {
+            if (!document.hidden) { tone({ f: 100, d: 2.4, v: 0.006 }); if (Math.random() < 0.35) sounds.creak(); }
+            if (ambientName === "hum") next();
+          }, 2400 + Math.random() * 3000);
+        };
+        next();
       }
       if (name === "drip") {
         const next = () => {

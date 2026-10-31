@@ -15,6 +15,8 @@ Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:
 - **Mara** wurde 1991 geboren: 2009 ist sie 18 (Schal zum achtzehnten Geburtstag), heute 35.
 - **Höhenlage:** Der westliche Servicetunnel beginnt im **Westflügel auf Erdgeschosshöhe** und führt über eine Rampe hinaus zu Tor W2. Das Untergeschoss (Gepäcklager, Technik) liegt tiefer und stand in jener Nacht kniehoch unter Wasser. Deshalb war der Westgang der einzige sichere Weg.
 
+**Maras Beweggrund (trägt die ganze Geschichte):** Beweise, die Elias’ Tochter findet, würde jedes Gericht als gefälscht abtun. Mara braucht eine **unabhängige Zeugin** – deshalb hat sie die Spielerin eingeladen. Sie geht ihr voraus, öffnet Wege und legt Dinge bereit (Schritte hinter der Gepäckklappe, das Blatt in Zimmer 217, die warme Lampe im Archiv, das aufgeschlagene Protokollbuch, die Kratzspuren an Fach W: sie hat nur geprüft, ob es noch verschlossen ist), **rührt die Beweise selbst aber nie an**. Im Finale spricht sie das aus.
+
 **Begriffe – überall gleich verwenden:**
 - **Westlicher Servicetunnel** – der Fluchtweg unter dem Westflügel. In Elias’ Briefen heißt er kurz **„Westgang“**; beides meint dasselbe.
 - **Tor W2** – das äußere Tor am Ende dieses Tunnels.
@@ -158,31 +160,33 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 **Klang:** Raumgeräusch Tropfen und Rohrbrummen; Effekte Rumpeln, entfernte Schritte, Gitter, Truhe, Papier.
 
-### Raum 4 – Hotelarchiv · Erdgeschoss · ca. 14 Min.
+### Raum 4 – Hotelarchiv · Erdgeschoss · *gebaut* · ca. 15 Min.
 
-**Was die Spielerin erfährt:** Der Westtunnel war **nie stillgelegt**. Lehn hat Dokumente gefälscht.
+**Was die Spielerin erfährt:** Der Westgang war nie stillgelegt. Viktor Lehn hat die Stilllegung nur auf dem Papier angeordnet und ein Prüfprotokoll gefälscht. Tomasz hat die Wahrheit dokumentiert, Elias hat das Band von Kamera 3 versteckt.
+
+**Stimmung:** Trocken und still – der erste Raum ohne Regen. Die Leselampe brennt bereits, ihr Schirm ist noch warm.
 
 **Blickrichtungen**
-- **Nord · Tür und Wandregal:** Ordner nach Jahren, gerahmter Bauplan von **1998**, das **Protokollbuch 2009** (Liste aller Prüfprotokolle mit Nummer, Datum und Gegenstand).
-- **Ost · Schreibtisch:** alte Schreibmaschine, daneben offen die **Chiffrierscheibe**, der verschlüsselte Brief und ein Schreibtischfach mit Buchstabenschloss.
-- **Süd · Aktenschrank A–Z:** 26 kleine Schubladen, eine davon klemmt (W).
-- **West · Planschrank:** zwei Prüfprotokolle zum Westtunnel, Personalakten.
+- **Nord · Eingang:** Milchglastür (anfangs offen) zum Gepäcklager, Wandregal mit Jahresordnern 2001–2009 (2009 auffallend dünn), darin das **Protokollbuch 2009**, ein leerer Lesetisch.
+- **Ost · Schreibtisch:** Leselampe, Schreibmaschine („Hiermit kündige ich zum –“), Brief von Tomasz, **Chiffrierscheibe**, Schreibtischfach mit acht Buchstabenrädern („Wohin?“).
+- **Süd · Aktenschrank:** 26 Schubladen A–Z, **W** klemmt (frische Kratzspuren), Karton „Personal 2009“, quer darauf die Akte „Voss, E.“.
+- **West · Planschrank:** Protokolle A und B, abgeschlossene untere Planschublade, Stahltür „Sicherheitsbereich UG“ mit PIN-Feld.
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 11 | **Drei Schritte voraus** | Werkzeug (neu) | Brief „GHU ZHVWJDQJ LVW RIIHQ“, Rückseite: „Der Verfasser war seiner Zeit immer drei Schritte voraus.“ Neben der Schreibmaschine liegt offen eine **Chiffrierscheibe**, die man drehen kann; erst mit ihr lässt sich der Brief entschlüsseln. | **DER WESTGANG IST OFFEN** → Schreibtischfach mit Bauakte (Lehns Anweisung, den Tunnel nur auf dem Papier zu schließen) |
-| 12 | **Echt oder gefälscht** | Dokumentenanalyse | Zwei Prüfprotokolle zum Tunnel. **Protokoll A (Lehn), Nr. PR-09/117:** „Servicetunnel West stillgelegt, technische Prüfung entfällt“, datiert **31.09.2009**, ohne Prüfstempel, Vermerk „Prüfung durch Eigentümer“. **Protokoll B (Tomasz), Nr. PR-09/118:** „Prüfung 28.09.2009: Tunnel voll funktionsfähig, Tor W2 öffnet nur mit Notstrom. Schaltfolge Notstrom → Tor W2: C – A – D – B“, mit Prüfstempel. Das **Protokollbuch** im Wandregal führt PR-09/117 als *„Aufzug, Jahresprüfung“*. Zwei Fragen: ① Welches Protokoll ist gefälscht? ② Welche **zwei** Belege beweisen es? (Auswahl aus fünf: Datum · Protokollnummer · fehlende Unterschrift · anderes Papier · Tintenfarbe) | ① **Protokoll A** ② **Datum** (31. September gibt es nicht) + **Protokollnummer** (gehört laut Protokollbuch zur Aufzugsprüfung) |
-| 13 | **Fach W** | Suche + Raum 3 | Die zerrissene Notiz nennt „Fach W“. Die Schublade W klemmt; mit dem Schraubendreher lässt sie sich aufhebeln. Darin: **Backup-Band Kamera 3** und Tomasz’ Personalakte mit dem Vermerk „Sicherheitsraum: PIN = Gründungsjahr des Hauses“. | Band + **PIN 1897** (steht auf der Reservierung: „SEIT 1897“) |
+| 11a | **Chiffrierscheibe** | Werkzeug | Außen Geheimtext, innen Klartext; inneren Ring drehen, „Text prüfen“. Anzeige nur für den ersten Buchstaben (G → ?). Stellung −3: „Falsche Richtung“. | Stellung 3: DER WESTGANG IST OFFEN |
+| 11b | **Schreibtischfach** | Buchstabenräder (8) | „Wohin?“ – Rückmeldungen für OFFENIST, ZHVWJDQJ, sonst „Wohin wollte Tomasz Elias führen?“ | **WESTGANG** → Bauakte Okt. 2009 (Beweis) |
+| 12 | **Echt oder gefälscht** | Auswahl in zwei Stufen | ① A oder B ② genau zwei von fünf Belegen. Rückmeldungen: B gewählt / 0 Treffer / 1 Treffer. | **A** · **Datum + Protokollnummer** → Bestandsplan 1998 (Tunnel, Rampe, Tor W2, „gegr. 1897“); Tomasz’ Protokoll wird Beweis |
+| 13 | **Fach W** | Mechanik + Raum 1 und 3 | Schraubendreher an Schublade W. | Backup-Band Kamera 3 (Beweis) + Zettel „Tomasz’ alte Regel“ |
+| – | *Übergang: PIN-Tür* | Code | Tomasz’ Personalakte: „PIN = Gründungsjahr des Hauses“. Die PIN funktioniert jederzeit; der Raum gilt erst mit Fach W als abgeschlossen. Rückmeldungen für 2009 und 1998. | **1897** → Raum 5 |
 
-**Belohnung:** Echtes Prüfprotokoll (mit der Schaltfolge für den Keller), Backup-Band, PIN.
-**Übergang:** Treppe ins UG → Sicherheitsraum mit PIN-Tür.
+**Nachrichten (Mara, ohne Namen):** nach dem Schreibtischfach *„Lehn hat nach jener Nacht alles verschwinden lassen, was ihm schaden konnte. Fast alles.“* · nach Fach W *„Siebzehn Jahre. Und es lag die ganze Zeit hier.“*
 
-**Hinweise**
-- *11:* (1) Eine sehr alte Methode, Buchstaben zu verschieben. Auf dem Schreibtisch liegt ein Werkzeug dafür. (2) Jeder Buchstabe ist um drei Stellen verschoben. Stelle die Scheibe auf 3. (3) DER WESTGANG IST OFFEN.
-- *12:* (1) Vergleiche Datum und Nummer beider Protokolle – und schau, was das Protokollbuch zu den Nummern sagt. (2) Wie viele Tage hat der September? Und welche Prüfung ist im Protokollbuch unter PR-09/117 eingetragen? (3) Protokoll A ist gefälscht. Belege: das Datum 31.09. und die Nummer PR-09/117, die zur Aufzugsprüfung gehört.
-- *13:* (1) Die zerrissene Notiz aus dem Gepäcklager nennt ein Fach. (2) Schublade W im Aktenschrank (Süden) klemmt. Du hast Werkzeug. (3) Benutze den Schraubendreher an Schublade W. Die PIN ist das Gründungsjahr: 1897.
+**Ereignis:** Nach Rätsel 12 ist beim nächsten Blick nach Norden die Milchglastür zu, und das Protokollbuch liegt aufgeschlagen bei PR-09/117 auf dem Lesetisch. Die Tür bleibt jederzeit benutzbar.
 
----
+**Geheimnis:** Elias’ Personalakte – Belobigung 2006 („alle Gäste unversehrt evakuiert“), mit Bleistift: *„Er hat es wieder getan.“*
+
+**Klang:** fast Stille – Lampenbrummen, gelegentliches Holzknacken.
 
 ### Raum 5 – Überwachungsraum · Untergeschoss · ca. 14 Min.
 

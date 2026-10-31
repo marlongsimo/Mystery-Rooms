@@ -34,7 +34,7 @@
     v: 2, started: false, finished: false,
     current: N.rooms[0].id, unlocked: [N.rooms[0].id], visited: [N.rooms[0].id], completed: [], views: {},
     solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
-    secrets: [], pending: [], hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
+    secrets: [], pending: [], evidence: [], hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
   });
   let S = fresh();
   function load() {
@@ -90,6 +90,7 @@
       if (a.sound) A.play(a.sound);
       if (a.message) addMessage(a.message);
       if (a.unlock) add(S.unlocked, a.unlock);
+      if (a.evidence) { add(S.evidence, a.evidence); if (N.docs[a.evidence]) addDoc(a.evidence); } // Beweis für den Abschlussbericht
       if (a.remove) { S.inventory = S.inventory.filter((x) => x !== a.remove); if (selected === a.remove) selected = null; }
       if (a.later) { // verzögerte Aktionen, z. B. etwas rumpelt erst nach ein paar Sekunden
         const roomId = S.current;
@@ -330,7 +331,8 @@
   function docHtml(id) {
     const d = N.docs[id];
     if (!d.pages) return paper(d.kind, d.html);
-    return d.pages.map((h, i) => `${i ? `<p class="page-label">Rückseite</p>` : ""}${paper(d.kind, h)}`).join("");
+    const label = (i) => (d.pageLabels ? d.pageLabels[i] : i ? "Rückseite" : "");
+    return d.pages.map((h, i) => `${label(i) ? `<p class="page-label">${esc(label(i))}</p>` : ""}${paper(d.kind, h)}`).join("");
   }
 
   /* ---------- Hotspots ---------- */
@@ -404,9 +406,28 @@
     if (p.type === "text") return `<form class="lock lock-text">${head}<div class="text-row"><input class="text-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Lösung eingeben" aria-label="Lösung"><button class="submit-button">Prüfen</button></div>${fb}</form>`;
     if (p.type === "multi") return `<form class="lock lock-multi">${head}${p.fields.map((f, i) => `<label class="multi-field"><span>${i + 1}. ${esc(f.label)}</span><input class="text-input" autocomplete="off" spellcheck="false"></label>`).join("")}<button class="submit-button wide">Tresor öffnen</button>${fb}</form>`;
     if (p.type === "wheels") {
-      return `<div class="lock lock-wheels">${head}<p class="muted small">Tippe auf ein Rad, um den Buchstaben direkt zu wählen – oder drehe mit ▲ ▼.</p><div class="wheels" role="group" aria-label="Buchstabenräder">${Array.from({ length: p.length }, (_, i) => `<div class="wheel"><button type="button" data-wheel="${i}" data-dir="-1" aria-label="Rad ${i + 1} zurück">▲</button><button type="button" class="wheel-letter" data-pick="${i}" aria-label="Rad ${i + 1}: Buchstabe wählen">A</button><button type="button" data-wheel="${i}" data-dir="1" aria-label="Rad ${i + 1} weiter">▼</button></div>`).join("")}</div>
+      return `<div class="lock lock-wheels">${head}<p class="muted small">Tippe auf ein Rad, um den Buchstaben direkt zu wählen – oder drehe mit ▲ ▼.</p><div class="wheels${p.length > 5 ? " many" : ""}" role="group" aria-label="Buchstabenräder">${Array.from({ length: p.length }, (_, i) => `<div class="wheel"><button type="button" data-wheel="${i}" data-dir="-1" aria-label="Rad ${i + 1} zurück">▲</button><button type="button" class="wheel-letter" data-pick="${i}" aria-label="Rad ${i + 1}: Buchstabe wählen">A</button><button type="button" data-wheel="${i}" data-dir="1" aria-label="Rad ${i + 1} weiter">▼</button></div>`).join("")}</div>
         <div class="wheel-picker hidden" role="group" aria-label="Buchstabe wählen">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => `<button type="button" data-letter="${c}">${c}</button>`).join("")}</div>
         <button type="button" class="submit-button wide" data-wheels-open>Öffnen</button>${fb}</div>`;
+    }
+    if (p.type === "cipher") {
+      const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const pos = (i, r) => { const a = (i / 26) * 2 * Math.PI - Math.PI / 2; return [150 + r * Math.cos(a), 150 + r * Math.sin(a)]; };
+      const ring = (r, cls) => ABC.split("").map((c, i) => { const [x, y] = pos(i, r); return `<text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" class="${cls}">${c}</text>`; }).join("");
+      return `<div class="lock lock-cipher">${head}
+        <p class="muted small">Außen: Buchstaben des Briefs. Innen: was sie bedeuten. Drehe den inneren Ring.</p>
+        <svg viewBox="0 0 300 300" class="cipher-disc" aria-hidden="true">
+          <circle cx="150" cy="150" r="146" class="disc-outer"/><circle cx="150" cy="150" r="106" class="disc-inner"/><circle cx="150" cy="150" r="70" class="disc-hub"/>
+          ${ring(128, "outer-l")}<g class="inner-ring">${ring(88, "inner-l")}</g>
+          <path d="M150 2 l-7 -0 l7 14 l7 -14 z" class="disc-mark"/><text x="150" y="156" class="disc-center">NOCTURNE</text>
+        </svg>
+        <p class="cipher-readout" aria-live="polite"></p>
+        <div class="button-row cipher-buttons"><button type="button" class="ghost-button" data-turn="-1" aria-label="Inneren Ring nach links drehen">↺</button><button type="button" class="ghost-button" data-turn="1" aria-label="Inneren Ring nach rechts drehen">↻</button><button type="button" class="submit-button" data-cipher-check>Text prüfen</button></div>${fb}</div>`;
+    }
+    if (p.type === "choice") {
+      return `<form class="lock lock-choice">${head}${p.steps.map((st, si) => `<fieldset class="choice-step"><legend>${si + 1}. ${esc(st.question)}</legend>
+        ${st.options.map((o) => `<label class="choice-opt"><input type="${st.pick === 1 ? "radio" : "checkbox"}" name="step${si}" value="${o.id}"><span>${esc(o.label)}</span></label>`).join("")}</fieldset>`).join("")}
+        <button class="submit-button wide">${esc(p.button || "Prüfen")}</button>${fb}</form>`;
     }
     if (p.type === "sort") {
       return `<div class="lock lock-sort">${head}<p class="muted small">Ziehe die Streifen in die richtige Reihenfolge – oder verschiebe sie mit ▲ ▼.</p><ol class="strips" aria-label="Papierstreifen"></ol>${fb}</div>`;
@@ -428,7 +449,7 @@
     };
     const attempt = (value) => {
       if ((p.answers || []).map(norm).includes(norm(value))) { succeed(p); return true; }
-      fail(p.wrong ? p.wrong[norm(value)] : null);
+      fail((p.wrong && p.wrong[norm(value)]) || p.wrongDefault || null);
       return false;
     };
     if (p.type === "code") {
@@ -516,6 +537,38 @@
       };
       document.addEventListener("keydown", onKey);
       dlgCleanup = () => document.removeEventListener("keydown", onKey);
+    }
+    if (p.type === "cipher") {
+      const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let k = 0;
+      const inner = $(".inner-ring", root), readout = $(".cipher-readout", root);
+      const paint = () => {
+        inner.style.transform = `rotate(${(k * 360) / 26}deg)`;
+        // Anzeige: welcher Klartextbuchstabe steht unter dem markierten Geheimbuchstaben?
+        const first = p.probe || "G";
+        readout.innerHTML = `Erster Buchstabe des Briefs: <b>${first}</b> → <b>${ABC[(ABC.indexOf(first) - k + 26) % 26]}</b> &nbsp;·&nbsp; Stellung ${k}`;
+      };
+      paint();
+      root.addEventListener("click", (e) => {
+        const t = e.target.closest("[data-turn]");
+        if (t) { k = (k + +t.dataset.turn + 26) % 26; A.play("key"); fb.textContent = ""; paint(); return; }
+        if (e.target.closest("[data-cipher-check]")) {
+          if (k === p.shift) return succeed(p);
+          fail((p.wrongShift && p.wrongShift[k]) || "Der Text ist noch nicht lesbar.");
+        }
+      });
+    }
+    if (p.type === "choice") {
+      root.addEventListener("submit", (e) => {
+        e.preventDefault();
+        for (const [si, st] of p.steps.entries()) {
+          const picked = $$(`input[name="step${si}"]:checked`, root).map((i) => i.value);
+          if (picked.length !== st.pick) return fail(st.pick === 1 ? "Bitte wähle bei Frage " + (si + 1) + " eine Antwort." : `Wähle bei Frage ${si + 1} genau ${st.pick} Antworten.`);
+          const right = picked.filter((x) => st.answer.includes(x)).length;
+          if (right !== st.pick) return fail((st.feedback && st.feedback[right]) || st.wrong || "Das stimmt noch nicht.");
+        }
+        succeed(p);
+      });
     }
     if (p.type === "sort") {
       // Risskanten: Jede Grenze zwischen zwei Streifen hat ein eigenes Zackenmuster.
@@ -776,11 +829,11 @@
     let html;
     if (pg.type === "index") {
       html = `<p class="akte-title">Ermittlungsakte</p><p class="akte-sub">Fall 014-10 · Hotel Nocturne</p>
-        ${S.docs.length ? `<ol class="akte-index">${S.docs.map((id) => `<li><button data-akte-doc="${id}">${esc(N.docs[id].title)}${S.newDocs.includes(id) ? "<i>NEU</i>" : ""}</button></li>`).join("")}</ol>` : `<p class="muted">Noch leer.</p>`}`;
+        ${S.docs.length ? `<ol class="akte-index">${S.docs.map((id) => `<li><button data-akte-doc="${id}">${esc(N.docs[id].title)}${S.evidence.includes(id) ? `<em class="proof">BEWEIS</em>` : ""}${S.newDocs.includes(id) ? "<i>NEU</i>" : ""}</button></li>`).join("")}</ol>` : `<p class="muted">Noch leer.</p>`}`;
     } else {
       const d = N.docs[pg.id];
       S.newDocs = S.newDocs.filter((x) => x !== pg.id); save(); renderSide();
-      html = `<p class="akte-doc-title">${esc(d.title)}${pg.n > 1 ? `<small>${pg.i === 0 ? "Vorderseite" : "Rückseite"}</small>` : ""}</p>${paper(d.kind, pg.html)}`;
+      html = `<p class="akte-doc-title">${esc(d.title)}${pg.n > 1 ? `<small>${d.pageLabels ? esc(d.pageLabels[pg.i]) : pg.i === 0 ? "Vorderseite" : "Rückseite"}</small>` : ""}</p>${paper(d.kind, pg.html)}`;
     }
     $("#aktePage").innerHTML = html;
     $("#akteNum").textContent = aktePage === 0 ? "Inhalt" : `Seite ${aktePage} von ${pages.length - 1}`;
@@ -817,7 +870,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>8</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>9</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {

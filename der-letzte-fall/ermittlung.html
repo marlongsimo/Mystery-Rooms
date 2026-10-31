@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e1015">
+  <title>Der letzte Fall – Ermittlung (Prototyp Kapitel 2)</title>
+  <link rel="stylesheet" href="css/fonts.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=1">
+  <link rel="stylesheet" href="css/dlf.css?v=1">
+  <link rel="stylesheet" href="../platform/board/board.css?v=2">
+  <link rel="stylesheet" href="css/tablet.css?v=1">
+</head>
+<body class="tablet-page">
+  <header class="t-top">
+    <div class="t-titles"><small id="tTitle"></small><b id="tSub"></b></div>
+    <span class="t-proto">PROTOTYP</span>
+    <button type="button" id="tTeamBtn" class="t-topbtn">Gemeinsam</button>
+  </header>
+  <nav class="t-tabs" aria-label="Ermittlungs-Tablet">
+    <button type="button" data-tab="fall"><span>◎</span>Fall<i id="badgeFall" hidden></i></button>
+    <button type="button" data-tab="beweise"><span>▤</span>Beweise</button>
+    <button type="button" data-tab="personen"><span>☺</span>Personen</button>
+    <button type="button" data-tab="zeit"><span>⌚</span>Zeitleiste</button>
+    <button type="button" data-tab="wand"><span>⌗</span>Wand</button>
+  </nav>
+  <main class="t-main">
+    <section class="t-pane" id="pane-fall"></section>
+    <section class="t-pane" id="pane-beweise" hidden></section>
+    <section class="t-pane" id="pane-personen" hidden></section>
+    <section class="t-pane" id="pane-zeit" hidden></section>
+    <section class="t-pane t-pane-wand" id="pane-wand" hidden><div id="tBoard" class="t-board"></div></section>
+  </main>
+  <aside class="t-team" id="tTeamPanel" hidden><h3>Gemeinsam ermitteln</h3><div id="tTeam"></div><hr><button class="t-btn small" id="tReset">Prototyp zurücksetzen (nur allein)</button></aside>
+  <div class="t-modal" id="tModal" hidden></div>
+  <div class="t-toast" id="tToast" role="status"></div>
+
+  <script src="js/config.js?v=1"></script>
+  <script src="js/scenes.js?v=1"></script>
+  <script src="js/rooms/01-buero.js?v=1"></script>
+  <script src="js/rooms/02-foyer.js?v=1"></script>
+  <script src="js/case/kapitel2.js?v=1"></script>
+  <script src="js/wand.js?v=3"></script>
+  <script src="../platform/board/board.js?v=2"></script>
+  <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
+  <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-core.js?v=1"></script>
+  <script src="js/case/tablet.js?v=1"></script>
+</body>
+</html>

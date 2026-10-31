@@ -17,6 +17,9 @@ Verbindliche Grundlage für Geschichte, Zeiten und Lösungen: `RAETSELDESIGN.md`
 | `js/wall.js` | Pinnwand im Spiel (Tablet) auf Basis von `platform/board/` |
 | `js/mp-adapter.js` | Anbindung an `platform/multiplayer/` |
 | `pinnwand.html` | Prototyp der Pinnwand (zum Ausprobieren ohne Spiel) |
+| `ermittlung.html` | Prototyp Version 2: Ermittlungs-Tablet für Kapitel 2 (siehe `ERMITTLUNGSDESIGN.md`) |
+| `js/case/kapitel2.js` | Fragen, Personen, Vernehmungen, Zeitleiste des Prototyps |
+| `js/case/tablet.js` | Tablet: Fall · Beweise · Personen · Zeitleiste · Wand, Prüfung „Behauptung plus Beleg“ |
 
 Hotel Nocturne bleibt unverändert; Audio-Datei für iOS und Schriften werden von dort mitbenutzt.
 

@@ -612,11 +612,17 @@
         <label class="switch"><input type="checkbox" id="optSound" ${S.sound ? "checked" : ""}><span>Ton (Geräusche und Musik)</span></label>
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
+        <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
         <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {
         $("#optSound").addEventListener("change", (e) => { S.sound = e.target.checked; A.setEnabled(S.sound); updateSoundIcon(); save(); if (S.sound && inGame()) A.music(S.music ? room().music || MUSIC : null); });
+        $("#soundTest").addEventListener("click", () => {
+          if (!S.sound) { S.sound = true; A.setEnabled(true); updateSoundIcon(); save(); }
+          A.play("bell");
+          if (S.music && inGame()) A.music(room().music || MUSIC);
+        });
         $("#optMusic").addEventListener("change", (e) => { S.music = e.target.checked; save(); if (inGame()) A.music(S.music ? room().music || MUSIC : null); });
         $("#optHotspots").addEventListener("change", (e) => { S.showHotspots = e.target.checked; save(); renderStage(); });
       },

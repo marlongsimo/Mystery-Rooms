@@ -7,16 +7,35 @@
   let enabled = true;
   let ambientTimer = null;
 
-  function ac() {
-    if (!enabled) return null;
+  /* iPhone/iPad: Web Audio wäre sonst bei aktivem Lautlos-Schalter stumm.
+     „playback“ behandelt das Spiel wie einen Musik-Player (iOS 16.4+). */
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) { /* älteres iOS */ }
+  const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const OLD_IOS = IOS && !navigator.audioSession;
+
+  function getCtx() {
     if (!ctx) {
       const C = window.AudioContext || window.webkitAudioContext;
       if (!C) return null;
       ctx = new C();
     }
-    if (ctx.state === "suspended") ctx.resume();
+    if (ctx.state !== "running" && !document.hidden) ctx.resume().catch(() => {});
     return ctx;
   }
+  function ac() { return enabled ? getCtx() : null; }
+
+  /* Bei jeder Berührung prüfen, ob iOS den Ton angehalten hat (z. B. nach App-Wechsel),
+     und ihn innerhalb der Geste wieder freigeben – inklusive eines stillen Puffers. */
+  let unlocked = false;
+  function unlock() {
+    if (!enabled) return;
+    const c = getCtx(); if (!c) return;
+    if (!unlocked) {
+      try { const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); unlocked = true; } catch (e) { /* egal */ }
+    }
+    if (M.active && M.el && M.el.paused && !M.src) M.el.play().catch(() => {});
+  }
+  ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
 
   function tone({ f = 440, type = "sine", d = 0.2, v = 0.12, delay = 0, slide = 0 }) {
     const c = ac(); if (!c) return;
@@ -68,11 +87,7 @@
      Bevorzugt Web Audio (lückenloser Loop). Wenn die Datei nicht geladen werden kann
      (z. B. beim Öffnen direkt aus dem Dateisystem), wird ein normales <audio>-Element benutzt. */
   const M = { url: null, vol: 0.38, active: false, gain: null, src: null, bufs: {}, failed: {}, el: null, fadeTimer: null };
-  function musicCtx() {
-    if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
-    if (ctx.state === "suspended" && !document.hidden) ctx.resume();
-    return ctx;
-  }
+  const musicCtx = getCtx;
   async function loadBuffer(url) {
     if (M.bufs[url] || M.failed[url]) return M.bufs[url] || null;
     if (location.protocol === "file:") { M.failed[url] = true; return null; } // fetch geht im Dateisystem nicht
@@ -92,8 +107,16 @@
       if (i >= steps) { clearInterval(M.fadeTimer); if (done) done(); }
     }, 50);
   }
+  function playElement(url) {
+    if (!M.el || M.el.dataset.url !== url) { M.el = new Audio(url); M.el.loop = true; M.el.preload = "auto"; M.el.setAttribute("playsinline", ""); M.el.dataset.url = url; }
+    M.el.volume = IOS ? 1 : 0; // iOS erlaubt keine Lautstärkeregelung für <audio>
+    const p = M.el.play(); // muss synchron in der Nutzergeste passieren (iOS)
+    if (p) p.then(() => { if (!IOS) fadeElement(M.el, M.vol, 3000); }).catch(() => { /* wird beim nächsten Antippen erneut versucht */ });
+  }
   async function startMusic(url) {
     M.url = url; M.active = true;
+    // Dateisystem oder sehr altes iOS: direkt über <audio>, ohne vorher etwas zu laden
+    if (location.protocol === "file:" || OLD_IOS || M.failed[url]) return playElement(url);
     const c = musicCtx();
     const buf = c ? await loadBuffer(url) : null;
     if (!M.active || M.url !== url) return; // inzwischen gestoppt oder gewechselt
@@ -106,9 +129,7 @@
       M.src.connect(M.gain).connect(c.destination);
       M.src.start();
     } else {
-      if (!M.el || M.el.dataset.url !== url) { M.el = new Audio(url); M.el.loop = true; M.el.dataset.url = url; }
-      M.el.volume = 0;
-      M.el.play().then(() => fadeElement(M.el, M.vol, 3000)).catch(() => { /* Autoplay blockiert */ });
+      playElement(url);
     }
   }
   function stopMusic(fade = 1500) {
@@ -120,19 +141,19 @@
       s.stop(t + fade / 1000 + 0.05);
       M.src = null; M.gain = null;
     }
-    if (M.el && !M.el.paused) { const el = M.el; fadeElement(el, 0, fade, () => el.pause()); }
+    if (M.el && !M.el.paused) { const el = M.el; if (IOS) el.pause(); else fadeElement(el, 0, fade, () => el.pause()); }
   }
   document.addEventListener("visibilitychange", () => {
     if (!M.active) return;
-    if (document.hidden) { if (ctx) ctx.suspend(); if (M.el) M.el.pause(); }
-    else { if (ctx) ctx.resume(); if (M.el && !M.src) M.el.play().catch(() => {}); }
+    if (document.hidden) { if (ctx) ctx.suspend().catch(() => {}); if (M.el) M.el.pause(); }
+    else { if (ctx) ctx.resume().catch(() => {}); if (M.el && !M.src) M.el.play().catch(() => {}); }
   });
 
   window.NOCTURNE.audio = {
     play(name) { if (enabled && sounds[name]) try { sounds[name](); } catch (e) { /* Audio ist optional */ } },
     setEnabled(on) { enabled = on; if (!on) { this.ambient(null); stopMusic(400); } },
     /* Zustand der Musik (für Tests und Fehlersuche) */
-    musicInfo() { return { active: M.active, url: M.url, mode: M.src ? "webaudio" : M.el && !M.el.paused ? "element" : "aus" }; },
+    musicInfo() { return { active: M.active, url: M.url, mode: M.src ? "webaudio" : M.el && !M.el.paused ? "element" : "aus", ctx: ctx ? ctx.state : "keiner", ios: IOS, session: navigator.audioSession ? navigator.audioSession.type : "nicht verfügbar" }; },
     /* music(url) startet bzw. wechselt die Musik, music(null) blendet sie aus. */
     music(url) {
       if (!url || !enabled) { if (M.active) stopMusic(); return; }

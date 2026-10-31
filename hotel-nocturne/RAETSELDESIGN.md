@@ -249,34 +249,34 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 ---
 
-### Raum 7 – Managerbüro · Westflügel · ca. 14 Min.
+### Raum 7 – Managerbüro · Westflügel · ca. 14 Min. · **gebaut (Version 19)**
 
 **Was die Spielerin erfährt:** Die ganze Wahrheit. Und sie verlässt das Hotel auf demselben Weg wie die sechs Gäste.
 
-**Vorgabe aus Raum 6 (räumliche Verbindung):** Der W-Gang hinter der Stahltür im Keller muss im Büro sichtbar ankommen – z. B. eine schmale Tür hinter einem Regal oder einer Wandverkleidung mit derselben Prägung „W-GANG“, und auf einem Plan im Büro der Verlauf Keller → W-Gang → Büro (Westflügel, Erdgeschoss) → Servicetunnel → Rampe → Tor W2. So versteht die Spielerin, dass sie gerade den Weg von 2009 rückwärts gegangen ist und ihn gleich vorwärts geht.
+**Ankunft:** Man kommt durch das **Bücherregal** herein – es ist die Geheimtür am Ende des W-Gangs (Rückseite „W-GANG“). Beim ersten Betreten erscheint mittig: „Ein letztes Stück des Hotels …“. Klang: nur Regen, Wind, Knacken. Keine Schreckmomente, keine neuen Ereignisse.
 
 **Blickrichtungen**
-- **Nord · Schreibtisch:** Brief von Elias, Tischkalender, aufgeschlagen beim 14.10.2009.
-- **Ost · Bücherregal:** eine auffällige Lücke, in der ein dickes Buch fehlt.
-- **Süd · Tresor:** Tresor mit Formular „Abschlussbericht“.
-- **West · Fenster zum Innenhof:** draußen Tor W2, daneben ein Ziffernfeld.
+- **Nord · Schreibtisch:** grüne Lampe (hängt am Notstrom), Brief von Elias (enthält „Das Tor merkt sich die Minute, in der alle draußen waren.“), Tischkalender 14.10.2009 mit hastiger Notiz „23:17 Strom weg → Notstrom. Westgang!“, Wanduhr 23:17. Die Schublade klemmt; mit Taschenlampe sieht man darunter einen Riegel (Geheimnis).
+- **Ost · Bücherregal:** offen wie eine Tür, Lücke im Regal (Verweis auf das Standbild von Monitor 4 in Raum 5), gerahmte Skizze „Fluchtweg Westflügel“: Keller → W-Gang → Büro → Servicetunnel → Rampe → Tor W2.
+- **Süd · Tresor:** Wandtresor mit fünf Eingabezeilen, daneben das Formular „Abschlussbericht“.
+- **West · Fenster:** Innenhof im Regen, Tor W2 mit grün leuchtendem Tastenfeld; rechts die Stahltür „Servicetunnel W“.
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 20 | **Abschlussbericht** | Meta-Rätsel | Der Tresor öffnet sich erst, wenn der Fall vollständig rekonstruiert ist. Fünf Fragen, Antworten aus der Akte (Auswahl oder Eingabe): ① Über welchen Ausgang wurden die Gäste evakuiert? ② Wie viele Gäste? ③ Wer blieb zurück? ④ Um wie viel Uhr waren sie draußen? ⑤ **Wer hat die Unterlagen gefälscht?** Bei Fehlern sagt der Tresor nur, *wie viele* Antworten stimmen. | **Westgang · 6 · Elias Voss · 23:24 · Viktor Lehn** |
-| 21 | **Tor W2** | Abschluss | Im Tresor: das **originale Wartungsregister** und Elias’ letzter Brief. Das Tor im Hof hat ein Ziffernfeld. Elias’ Brief endet mit: „Das Tor merkt sich die Minute, in der alle draußen waren.“ | **2324** → Tor öffnet sich → Abspann |
+| 20 | **Abschlussbericht** | Meta-Rätsel | Fünf Freitextfelder (keine Auswahl, damit „x von 5“ nicht zum Durchprobieren einlädt). Falsch → nur „x von 5 Angaben sind korrekt“. Im Tresor ein Knopf „In der Akte nachsehen“, die Eingaben bleiben stehen. ① Ausgang ② Anzahl Gäste ③ Wer kehrte allein zurück ④ Unter welchem Namen stand Mara im Gästeregister ⑤ Wer ließ die Unterlagen fälschen. Antworten großzügig (z. B. „Westgang“ / „Servicetunnel“, „Lehn“ / „Viktor Lehn“). | Westgang · 6 · Elias Voss · M. Vale · Viktor Lehn |
+| 21 | **Tor W2** | Zahlenschloss | Tresor enthält Wartungsregister (Beweis), den Umschlag „Für den Fall, dass jemand die Wahrheit findet. – Bitte erst draußen öffnen“ und den Schalter TUNNEL W. Dann: Stahltür im Westen → Rampe → Tastenfeld. Rückmeldungen für 2317 (Stromausfall) und 2321 (Registereintrag). | **2324** |
+
+Frage ④ ersetzt die frühere Frage nach der Uhrzeit, damit 23:24 allein dem Tor gehört.
+
+**Finale (room.finale, im Multiplayer bei allen):** Tastenfeld grün, Rumpeln → Tor schwingt auf, Innenhof → „Der Regen wird leiser. Hier haben sie gestanden …“ → Maras Nachricht („Ich war eine der sechs …“, Motiv: unabhängige Zeugin) → „Sechs Gäste gerettet. Ein Mann zu Unrecht beschuldigt. Siebzehn Jahre Schweigen.“ → Knopf „Den Umschlag öffnen“ → Abschlussbildschirm mit Elias’ letztem Brief, persönlicher Nachricht (`config.js`) und Statistik (Spielzeit, Rätsel, Hinweise, Geheimnisse). Wer das Foto gefunden hat, liest zusätzlich: „Manche Erinnerungen bleiben länger als jedes Protokoll.“
 
 **Hinweise**
-- *20:* (1) Alles, was du brauchst, liegt in deiner Akte. (2) Prüfprotokoll, Gepäckverzeichnis, Kameraaufnahme und Bauakte beantworten je eine Frage. (3) Westgang · 6 · Elias Voss · 23:24 · Viktor Lehn.
-- *21:* (1) Lies den letzten Satz von Elias’ Brief noch einmal. (2) Welche Minute zeigte die Kamera im Innenhof? (3) 2324.
+- *20:* (1) Alles liegt in deiner Akte – im Tresor kannst du sie aufschlagen. (2) Ausgang: Prüfprotokoll B und Bauakte · Anzahl und Rückkehr: Kamera 3 · Name: Gepäckverzeichnis · Fälschung: Systemprotokoll und Wandplan. (3) Westgang · 6 · Elias Voss · M. Vale · Viktor Lehn.
+- *21:* (1) Der letzte Satz von Elias’ Brief. (2) Welche Minute zeigte Kamera 3, als alle draußen waren? (3) 2324.
 
-**Finale (in Ruhe, nicht sofort Abspann):**
-1. Tor W2 öffnet sich langsam, Kamerafahrt in den Innenhof.
-2. Der Regen lässt nach, die Musik wird leiser und wärmer, ein letzter Donner weit weg.
-3. Das Telefon vibriert. Letzte Nachricht: *„Du hast die Wahrheit gefunden. Mein Name ist Mara Voss. M. Vale war nie mein richtiger Name. Danke, dass du meinem Vater geglaubt hast.“*
-4. „Case closed“ mit Spielzeit und genutzten Hinweisen.
-5. Persönliche Abschlussseite: Brief (Pflicht, `config.js`), dazu **optional** eine Sprachnachricht und ein Foto. Ohne Medien funktioniert das Ende vollständig.
+**Geheimnis:** Foto „Sommer 2005“, Elias und Mara vor Tor W2, Rückseite: „Wer nachts wacht, findet den Weg. – Papa“.
 
+**Noch offen:** optionale Sprachnachricht und optionales Foto auf der persönlichen Abschlussseite.
 ---
 
 ## 5. Rätselmix und Zeitplan

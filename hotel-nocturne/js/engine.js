@@ -74,6 +74,7 @@
   let aktePage = 0;
   let hintPick = null;     // gewählte Aufgabe in der Hinweise-App, wenn mehrere parallel offen sind
   let lockPid = null;      // Rätsel, dessen Schloss gerade im Dialog offen ist
+  const drafts = {};       // halbfertige Eingaben in Mehrfeld-Schlössern (nicht gespeichert)
 
   const room = () => ROOM[S.current];
   const viewIndex = (r) => S.views[r.id] || 0;
@@ -478,7 +479,10 @@
         <div class="keypad">${keys.map((k) => `<button type="button" data-key="${k}" aria-label="${k === "⌫" ? "Löschen" : k === "✓" ? "Bestätigen" : k}">${k}</button>`).join("")}</div>${fb}</div>`;
     }
     if (p.type === "text") return `<form class="lock lock-text">${head}<div class="text-row"><input class="text-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Lösung eingeben" aria-label="Lösung"><button class="submit-button">Prüfen</button></div>${fb}</form>`;
-    if (p.type === "multi") return `<form class="lock lock-multi">${head}${p.fields.map((f, i) => `<label class="multi-field"><span>${i + 1}. ${esc(f.label)}</span><input class="text-input" autocomplete="off" spellcheck="false"></label>`).join("")}<button class="submit-button wide">Tresor öffnen</button>${fb}</form>`;
+    if (p.type === "multi") {
+      const draft = drafts[p.id] || [];
+      return `<form class="lock lock-multi">${head}${p.akte ? `<button type="button" class="ghost-button wide akte-peek" data-lock-akte>▤ In der Akte nachsehen <small>(Eingaben bleiben stehen)</small></button>` : ""}${p.fields.map((f, i) => `<label class="multi-field"><span>${i + 1}. ${esc(f.label)}</span><input class="text-input" autocomplete="off" spellcheck="false" value="${esc(draft[i] || "")}"></label>`).join("")}<button class="submit-button wide">${esc(p.button || "Tresor öffnen")}</button>${fb}</form>`;
+    }
     if (p.type === "wheels") {
       return `<div class="lock lock-wheels">${head}<p class="muted small">Tippe auf ein Rad, um den Buchstaben direkt zu wählen – oder drehe mit ▲ ▼.</p><div class="wheels${p.length > 5 ? " many" : ""}" role="group" aria-label="Buchstabenräder">${Array.from({ length: p.length }, (_, i) => `<div class="wheel"><button type="button" data-wheel="${i}" data-dir="-1" aria-label="Rad ${i + 1} zurück">▲</button><button type="button" class="wheel-letter" data-pick="${i}" aria-label="Rad ${i + 1}: Buchstabe wählen">A</button><button type="button" data-wheel="${i}" data-dir="1" aria-label="Rad ${i + 1} weiter">▼</button></div>`).join("")}</div>
         <div class="wheel-picker hidden" role="group" aria-label="Buchstabe wählen">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => `<button type="button" data-letter="${c}">${c}</button>`).join("")}</div>
@@ -559,13 +563,16 @@
       root.addEventListener("submit", (e) => { e.preventDefault(); if (!input.value.trim()) return fail("Bitte gib zuerst etwas ein."); attempt(input.value); });
     }
     if (p.type === "multi") {
+      // Eingaben merken, damit man zwischendurch in der Akte nachsehen kann
+      root.addEventListener("input", () => { drafts[p.id] = $$("input", root).map((i) => i.value); });
+      root.addEventListener("click", (e) => { if (e.target.closest("[data-lock-akte]")) { closeDialog(); openAkte(); } });
       root.addEventListener("submit", (e) => {
         e.preventDefault();
         const vals = $$("input", root).map((i) => i.value);
         if (vals.some((v) => !v.trim())) return fail("Bitte beantworte alle Fragen.");
         const right = p.fields.filter((f, i) => f.answers.map(norm).includes(norm(vals[i]))).length;
         if (right === p.fields.length) return succeed(p);
-        fail(`Der Tresor bleibt verschlossen. ${right} von ${p.fields.length} Antworten scheinen zu stimmen.`);
+        fail(p.wrongCount ? p.wrongCount.replace("{n}", right) : `Der Tresor bleibt verschlossen. ${right} von ${p.fields.length} Antworten scheinen zu stimmen.`);
       });
     }
     if (p.type === "wheels") {
@@ -775,9 +782,10 @@
       renderStage({ narrate: p.success }); renderSide(); renderObjective();
       return true;
     }
-    setTimeout(() => A.play("success"), 250);
     const r = ROOM[p.room], next = N.rooms[r.index + 1];
     const completedNow = justCompleted === r.id;
+    if (completedNow && r.final && r.finale) { closeDialog(); renderSide(); startFinale(); return true; } // letzter Raum: Finalszene statt Erfolgsfenster
+    setTimeout(() => A.play("success"), 250);
     let buttons = `<button class="primary-button small" data-close>Weiter untersuchen</button>`;
     if (completedNow && r.final) buttons = `<button class="primary-button small" data-ending>Den letzten Brief lesen <span>→</span></button>`;
     else if (completedNow && next) buttons = `<button class="primary-button small" data-goto="${next.id}" data-via="${r.exitVia || (r.views ? "elevator" : "door")}">${esc(r.exitLabel || `Weiter: ${next.name}`)} <span>→</span></button><button class="ghost-button" data-close>Noch hier bleiben</button>`;
@@ -1031,7 +1039,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>18</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>19</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
@@ -1083,19 +1091,68 @@
     showScreen("game");
     render({ reset: true });
   }
+  /* ---------- Finalszene: Tor W2 öffnet sich (room.finale.steps) ----------
+     Schritte: { text, ms, sound, sceneClass, big } · { message, ms } · { end: "Knopftext" }
+     „Weiter“ springt zum nächsten Schritt. Im Multiplayer startet sie bei allen. */
+  let finaleTimer = null, finaleRunning = false;
+  function startFinale() {
+    const r = N.rooms.find((x) => x.final && x.finale);
+    if (!r || finaleRunning) return;
+    finaleRunning = true;
+    closeDialog(); closeOverlay(); setDrawer(false); hideMoment(); queuedMoment = null;
+    A.ambient("rain");
+    const el = $("#finale");
+    el.innerHTML = `<div class="finale-scene">${r.finale.scene}</div><div class="finale-text" aria-live="polite"></div>
+      <div class="finale-msg" aria-live="polite"></div><button class="finale-next" type="button">Weiter →</button>`;
+    el.classList.add("show");
+    const steps = r.finale.steps;
+    let i = -1;
+    const next = () => {
+      clearTimeout(finaleTimer);
+      const st = steps[++i];
+      if (!st) return;
+      const txt = $(".finale-text", el), msg = $(".finale-msg", el), btn = $(".finale-next", el);
+      if (st.sound) A.play(st.sound);
+      if (st.sceneClass) $(".finale-scene", el).classList.add(st.sceneClass);
+      if (st.message) {
+        addMessage(st.message, 0); S.unread = S.unread.filter((m) => m !== st.message); save();
+        txt.classList.remove("show");
+        msg.innerHTML = `<p class="finale-msg-from">${esc(N.messages[st.message].from)}</p><p class="bubble">${fill(N.messages[st.message].text)}</p>`;
+        msg.classList.add("show");
+      } else if (st.text) {
+        msg.classList.remove("show");
+        txt.classList.toggle("big", Boolean(st.big));
+        txt.classList.remove("show"); void txt.offsetWidth;
+        txt.innerHTML = `<p>${fill(st.text)}</p>`; txt.classList.add("show");
+      }
+      if (st.end) {
+        btn.innerHTML = `${esc(st.end)} <span>→</span>`; btn.classList.add("final");
+        btn.onclick = () => { el.classList.remove("show"); finaleRunning = false; showEnding(); };
+        return;
+      }
+      btn.onclick = next;
+      finaleTimer = setTimeout(next, st.ms || 5000);
+    };
+    setTimeout(next, 600);
+  }
+
   function showEnding() {
     closeDialog();
+    clearTimeout(finaleTimer); finaleRunning = false; $("#finale").classList.remove("show");
     S.finished = true; save();
     const mins = Math.floor(S.playMs / 60000), hints = Object.values(S.hints).reduce((a, b) => a + b, 0);
+    const total = Object.keys(PUZ).length, solvedN = S.solved.filter((id) => PUZ[id]).length;
+    // Der Umschlag aus dem Tresor: Elias’ letzter Brief, „bitte erst draußen öffnen“
     $("#endingLetter").innerHTML = `<p>An den Menschen, der bis hierher gekommen ist.</p>
-      <p>Sie haben herausgefunden, was damals wirklich passiert ist. Die sechs Gäste sind nicht verschwunden. Sie wurden gerettet.</p>
-      <p>Ich habe mich entschieden, den Weg durch den Westgang zu nehmen, obwohl ich wusste, dass ich damit gegen sämtliche offiziellen Anweisungen verstoßen würde. Ich konnte nicht zulassen, dass Menschen sterben, nur weil jemand Geld sparen wollte.</p>
-      <p>Mara war unter ihnen. Ich habe das Register mitgenommen, weil ich wusste, dass die Wahrheit eines Tages ans Licht kommen muss.</p>
-      <p>Wenn Sie dieses Dokument lesen, dann ist das Hotel nicht länger ein Ort der Lügen. Es ist Zeit, die Tür zu öffnen.</p>
+      <p>Wenn Sie diesen Umschlag draußen öffnen, stehen Sie dort, wo in jener Nacht sechs Menschen im Regen standen. Sie sind nicht verschwunden. Sie wurden gerettet.</p>
+      <p>Ich habe den Westgang genommen, obwohl Lehn ihn hatte stilllegen lassen und obwohl ich wusste, dass ich damit gegen jede Anweisung verstoße. Ich konnte nicht zulassen, dass Menschen sterben, weil jemand Geld sparen wollte.</p>
+      <p>Mara war unter ihnen. Lehn hat aus mir den Schuldigen gemacht. Das konnte ich ertragen. Nicht ertragen konnte ich, dass meine Tochter mit dieser Lüge leben muss. Deshalb habe ich das Register in den Tresor gelegt und die Beweise dort versteckt, wo nur sie und ich gesucht hätten.</p>
+      <p>Wenn Sie dies lesen, ist das Hotel kein Ort der Lügen mehr. Es ist Zeit, die Tür zu öffnen.</p>
       <p class="sign">Elias Voss</p>`;
     $("#endingPersonal").textContent = N.config.personalMessage || "";
     $("#restartButton").innerHTML = mp ? "Zum Titelbildschirm <span>→</span>" : "Spiel neu beginnen <span>↻</span>";
-    $("#endingStats").textContent = `Spielzeit ${mins} Min. · ${plural(hints, "Hinweis", "Hinweise")} genutzt`;
+    const bonus = (N.config.endingBonus || []).filter((b) => S.secrets.includes(b.secret)).map((b) => `<span class="ending-bonus">${esc(b.text)}</span>`).join("");
+    $("#endingStats").innerHTML = `${bonus}Spielzeit ${mins} Min. · ${solvedN} von ${total} Rätseln · ${plural(hints, "Hinweis", "Hinweise")} genutzt · ${S.secrets.length} von ${ALL_SECRETS()} Geheimnissen`;
     showScreen("ending");
     A.play("success");
   }
@@ -1237,7 +1294,7 @@
     if (overlay === "akte") renderAkte();
     if (overlay === "phone" && phoneApp !== "notizen") renderPhone();
     renderStage({ narrate }); renderSide(); renderObjective();
-    if (endNow) openDialog({ kicker: "FALL 014-10", title: "Das letzte Rätsel ist gelöst", html: `<p class="inspect-text">Dein Team hat den Fall abgeschlossen.</p><div class="button-row"><button class="primary-button small" data-ending>Den letzten Brief lesen <span>→</span></button></div>` });
+    if (endNow) { if (N.rooms.some((x) => x.final && x.finale)) startFinale(); else openDialog({ kicker: "FALL 014-10", title: "Das letzte Rätsel ist gelöst", html: `<p class="inspect-text">Dein Team hat den Fall abgeschlossen.</p><div class="button-row"><button class="primary-button small" data-ending>Den letzten Brief lesen <span>→</span></button></div>` }); }
     return news;
   }
   N.engine = {

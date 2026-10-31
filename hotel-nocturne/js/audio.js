@@ -237,6 +237,14 @@
         };
         next();
       }
+      if (name === "rain") { // Regen am Fenster, Wind, gelegentlich knackt das alte Haus
+        ambientTimer = setInterval(() => {
+          if (document.hidden) return;
+          noise({ d: 2.1, v: 0.03, freq: 3200 }); noise({ d: 2.1, v: 0.045, freq: 420, type: "lowpass" });
+          if (Math.random() < 0.25) noise({ d: 1.6, v: 0.05, freq: 180, type: "lowpass", delay: 0.4 });
+          if (Math.random() < 0.08) sounds.creak();
+        }, 1900);
+      }
       if (name === "generator") { // gleichmäßiges Brummen eines Notstromaggregats, dazu weiter Tropfen
         let k = 0;
         ambientTimer = setInterval(() => {

@@ -83,7 +83,8 @@
       if (!opts.gameSlug) throw new Error("gameSlug fehlt.");
       this.gameSlug = opts.gameSlug;
       this.maxPlayers = Number(opts.maxPlayers) || 4;
-      this.storeKey = "mr_mp_session_v1:" + this.gameSlug;
+      // eigener Speicherschlüssel möglich (z. B. Prototypen, die Sitzungen eines anderen Spiels nutzen)
+      this.storeKey = opts.storeKey || "mr_mp_session_v1:" + this.gameSlug;
       this.handlers = {};
       this.session = null;   // { session_id, room_code, game_slug, max_players, status, is_host }
       this.user = null;

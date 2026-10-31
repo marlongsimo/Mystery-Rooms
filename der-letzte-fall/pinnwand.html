@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e1015">
+  <title>Der letzte Fall – Pinnwand (Prototyp)</title>
+  <link rel="stylesheet" href="../platform/board/board.css?v=1">
+  <style>
+    :root { --gold: #d5ad62; --text: #f1eee7; --muted: #a3a8b4; --line: #2c3240; --mono: ui-monospace, "SFMono-Regular", Menlo, monospace; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #0e1015; color: var(--text); font: 15px/1.5 "Inter", system-ui, -apple-system, sans-serif; overflow: hidden; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    .top { position: fixed; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; gap: 10px; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; background: #0e1015f2; border-bottom: 1px solid var(--line); }
+    .top h1 { margin: 0; font: 600 14px/1.2 Georgia, serif; letter-spacing: .06em; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .top h1 small { display: block; font: 10px var(--mono); letter-spacing: .12em; color: var(--gold); }
+    .top button { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: none; font-size: 13px; white-space: nowrap; }
+    .top button.live { border-color: #54b8b0; color: #9fe0d8; }
+    #board { position: fixed; left: 0; right: 0; bottom: 0; top: calc(56px + env(safe-area-inset-top, 0px)); }
+    .panel { position: fixed; z-index: 40; top: calc(56px + env(safe-area-inset-top, 0px)); right: 0; bottom: 0; width: min(360px, 92vw); padding: 18px; background: #14161c; border-left: 1px solid var(--line); overflow-y: auto; transform: translateX(105%); transition: transform .3s; }
+    .panel.open { transform: none; }
+    .panel h2 { margin: 0 0 6px; font: 600 18px Georgia, serif; }
+    .panel p { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+    .ev { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px; margin-bottom: 8px; background: #1b1e25; border: 1px solid var(--line); border-radius: 10px; }
+    .ev b { display: block; font-size: 14px; } .ev small { color: var(--muted); font-size: 12px; }
+    .ev[disabled] { opacity: .45; cursor: default; }
+    .ev .plus { margin-left: auto; color: var(--gold); font-size: 20px; }
+    label.f { display: block; margin: 10px 0; } label.f span { display: block; font: 10px var(--mono); letter-spacing: .14em; color: var(--gold); margin-bottom: 4px; }
+    label.f input { width: 100%; padding: 10px; background: #0e1015; color: var(--text); border: 1px solid #3a3a32; border-radius: 8px; font-size: 16px; }
+    .btn { display: block; width: 100%; padding: 11px; margin: 8px 0; border: 1px solid var(--line); border-radius: 8px; background: none; }
+    .btn.gold { background: var(--gold); border-color: var(--gold); color: #141821; font-weight: 600; }
+    .code { font: 600 26px var(--mono); letter-spacing: .12em; color: var(--gold); text-align: center; margin: 10px 0; user-select: all; }
+    .players { list-style: none; padding: 0; margin: 0 0 12px; font-size: 14px; } .players li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+    .status { font-size: 13px; color: #d9a69e; min-height: 1.4em; }
+    .status.ok { color: #9fe0b0; }
+    .viewer { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: #000b; }
+    .viewer[hidden] { display: none; }
+    .viewer-box { position: relative; width: min(560px, 100%); max-height: 86vh; overflow: auto; }
+    .viewer-close { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #0008; color: #fff; font-size: 20px; }
+    .viewer-art { background: #1b1d22; aspect-ratio: 4 / 3; } .viewer-art svg { width: 100%; height: 100%; display: block; }
+    .pv-paper { background: #f4efe3; color: #2a2119; padding: 22px; font: 16px/1.55 Georgia, serif; box-shadow: 0 20px 50px #000c; }
+    .pv-head { font: 600 12px var(--mono); letter-spacing: .12em; color: #6c5a44; margin: 0 0 10px; }
+    .pv-hand { font-style: italic; color: #23285a; }
+    .pv-small { font-size: 13px; color: #6c5a44; }
+    .pv-table { width: 100%; border-collapse: collapse; font: 14px var(--mono); } .pv-table td { padding: 5px 6px 5px 0; border-bottom: 1px solid #d8ccb0; vertical-align: top; }
+    .toast { position: fixed; left: 50%; top: calc(66px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -10px); z-index: 60; padding: 8px 14px; border-radius: 20px; background: #14161cf0; border: 1px solid #54b8b0; color: #c9efe9; font-size: 13px; opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <h1><small>DER LETZTE FALL · PROTOTYP</small>Hagedorns Ermittlungswand</h1>
+    <button id="openEvidence" type="button">Beweise</button>
+    <button id="openTeam" type="button">Gemeinsam</button>
+  </header>
+  <div id="board"></div>
+
+  <aside class="panel" id="evidencePanel" aria-label="Beweise aus der Akte">
+    <h2>Aus der Akte</h2>
+    <p>Gefundene Beweise antippen, um sie an die Wand zu hängen.</p>
+    <div id="evidenceList"></div>
+    <button class="btn" id="resetBoard" type="button">Wand zurücksetzen (nur allein)</button>
+  </aside>
+
+  <aside class="panel" id="teamPanel" aria-label="Gemeinsam ermitteln">
+    <h2>Gemeinsam ermitteln</h2>
+    <p>Prototyp: Die Testsitzung läuft über eine Sitzung von Hotel Nocturne (Code NOCT-…), weil „Der letzte Fall“ in der Datenbank noch nicht eingetragen ist. Die Wand wird in eigenen Einträgen gespeichert.</p>
+    <div id="teamBody"></div>
+    <p class="status" id="teamStatus" role="status"></p>
+  </aside>
+
+  <div class="viewer" id="viewer" hidden><div class="viewer-box"><button class="viewer-close" id="closeViewer" aria-label="Schließen">×</button><div id="viewerBody"></div></div></div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
+  <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-core.js?v=1"></script>
+  <script src="../platform/board/board.js?v=1"></script>
+  <script src="js/wand.js?v=1"></script>
+  <script src="js/pinnwand.js?v=1"></script>
+</body>
+</html>

@@ -6,6 +6,8 @@
  * difficulty: 1 = leicht, 2 = mittel, 3 = anspruchsvoll, 4 = schwer
  * art:        Name der Titelgrafik (siehe ART in portal.js)
  * saveKey:    localStorage-Schlüssel des Spiels, um „Weiterspielen“ anzuzeigen
+ * featured:   true = großes Hauptabenteuer auf der Startseite (genau eines)
+ * tagline, puzzles, minutes, shots, poster: zusätzliche Angaben für das Hauptabenteuer
  */
 window.MR_GAMES = [
   {
@@ -15,7 +17,7 @@ window.MR_GAMES = [
     category: "mystery",
     categoryLabel: "Mystery-Thriller",
     teaser: "In einer stürmischen Oktobernacht verschwinden sechs Gäste – und tauchen Tage später verstört wieder auf. Der Nachtmanager soll versucht haben, sie zu töten. 17 Jahre später liegt eine Reservierung für dich bereit: Zimmer 217, Check-in 23:17 Uhr.",
-    duration: "90–120 Min.",
+    duration: "ca. 100 Min.",
     difficulty: 3,
     players: "1–4 Personen",
     age: "ab 12 Jahren",
@@ -26,6 +28,18 @@ window.MR_GAMES = [
     url: "hotel-nocturne/index.html",
     art: "hotel",
     saveKey: "nocturne_save_v2",
+    // Hauptabenteuer: große Präsentationsfläche auf der Startseite
+    featured: true,
+    tagline: "Die Wahrheit wartet hinter verschlossenen Türen.",
+    puzzles: 21,
+    minutes: "~100",
+    shots: [
+      { src: "portal/img/hotel-rezeption.jpg", label: "Die Rezeption" },
+      { src: "portal/img/hotel-zimmer217.jpg", label: "Zimmer 217" },
+      { src: "portal/img/hotel-gepaecklager.jpg", label: "Das Gepäcklager" },
+      { src: "portal/img/hotel-archiv.jpg", label: "Das Hotelarchiv" },
+    ],
+    poster: "portal/img/hotel-fassade.jpg",
   },
   {
     id: "der-letzte-fall",

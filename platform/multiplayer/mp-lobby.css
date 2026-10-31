@@ -1,0 +1,61 @@
+/*
+ * MYSTERY ROOMS – Multiplayer-Lobby
+ * Jedes Spiel kann das Aussehen über diese Variablen anpassen (z. B. in seiner style.css):
+ *   --mp-accent, --mp-accent-2, --mp-text, --mp-text-2, --mp-muted, --mp-line,
+ *   --mp-panel, --mp-field, --mp-ok, --mp-error, --mp-serif, --mp-mono, --mp-sans
+ */
+.mp-root {
+  --_accent: var(--mp-accent, #b69a6d);
+  --_accent-2: var(--mp-accent-2, #d4bc90);
+  --_text: var(--mp-text, #ece4d6);
+  --_text-2: var(--mp-text-2, #bdb4a5);
+  --_muted: var(--mp-muted, #8d857a);
+  --_line: var(--mp-line, #3d3a31);
+  --_panel: var(--mp-panel, linear-gradient(145deg, #151714, #0d0e0d));
+  --_field: var(--mp-field, #090a09);
+  --_ok: var(--mp-ok, #8aa184);
+  --_err: var(--mp-error, #a3473c);
+  --_serif: var(--mp-serif, Georgia, serif);
+  --_mono: var(--mp-mono, ui-monospace, monospace);
+  --_sans: var(--mp-sans, system-ui, sans-serif);
+  margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--_line); max-width: 470px;
+}
+.mp-root[hidden] { display: none; }
+.mp-entry-title { margin: 0 0 6px; color: var(--_accent-2); font: 500 21px var(--_serif); }
+.mp-entry-copy { margin: 0 0 14px; color: var(--_muted); font-size: 12px; line-height: 1.6; }
+.mp-lobby { margin-top: 14px; padding: 18px; background: var(--_panel); border: 1px solid #554630; box-shadow: 0 18px 45px #0008; }
+.mp-lobby-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.mp-lobby-head h3 { margin: 0; color: var(--_text); font: 500 24px/1.1 var(--_serif); }
+.mp-lobby-head .eyebrow { margin: 0 0 6px; }
+.mp-lobby-close { border: 1px solid var(--_line); background: transparent; color: var(--_muted); width: 32px; height: 32px; font-size: 20px; line-height: 1; cursor: pointer; }
+.mp-field { display: block; margin: 12px 0; }
+.mp-field span { display: block; margin-bottom: 6px; color: var(--_accent); font: 9px var(--_mono); letter-spacing: .16em; text-transform: uppercase; }
+.mp-field input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #454033; border-radius: 0; outline: none; background: var(--_field); color: var(--_text); font: 16px var(--_sans); }
+.mp-field input:focus { border-color: var(--_accent); box-shadow: 0 0 0 2px #b69a6d22; }
+.mp-code-input { text-transform: uppercase; letter-spacing: .2em; font-family: var(--_mono) !important; font-size: 18px !important; }
+.mp-wide { width: 100%; justify-content: center; }
+.mp-status { margin: 12px 0 0; padding: 9px 11px; border-left: 2px solid var(--_accent); background: #b69a6d10; color: var(--_text-2); font-size: 12px; overflow-wrap: anywhere; }
+.mp-status[data-kind="success"] { border-color: var(--_ok); }
+.mp-status[data-kind="error"] { border-color: var(--_err); color: #d9a69e; }
+.mp-code-card { padding: 15px; text-align: center; background: var(--_field); border: 1px solid #574832; }
+.mp-code-label { margin: 0 0 5px; color: var(--_muted); font: 9px var(--_mono); letter-spacing: .2em; }
+.mp-room-code { color: var(--_accent-2); font: 500 clamp(24px, 6vw, 32px) var(--_mono); letter-spacing: .12em; user-select: all; }
+.mp-copy { margin-top: 10px; border: 1px solid #5a4b34; background: #171611; color: var(--_accent-2); padding: 8px 12px; font-size: 11px; cursor: pointer; }
+.mp-players-head { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 6px; color: var(--_muted); font: 9px var(--_mono); letter-spacing: .15em; }
+.mp-player-list { list-style: none; margin: 0; padding: 0; }
+.mp-player { display: flex; align-items: center; gap: 10px; padding: 9px 2px; border-bottom: 1px solid #282821; }
+.mp-player-number { color: #716a5a; font: 10px var(--_mono); }
+.mp-player-name { flex: 1; color: var(--_text-2); font-size: 13px; overflow-wrap: anywhere; }
+.mp-player-name em { color: var(--_muted); font-style: normal; font-size: 11px; }
+.mp-role { color: var(--_accent); font: 9px var(--_mono); letter-spacing: .12em; }
+.mp-role-guest { color: var(--_muted); }
+.mp-waiting { color: var(--_muted); font-size: 12px; line-height: 1.6; margin: 12px 0; }
+.mp-secondary-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.mp-secondary-actions button { font-size: 11px; padding: 8px 10px; }
+.mp-micro { color: var(--_muted); font: 9px var(--_mono); letter-spacing: .15em; }
+.mp-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0 2px; color: #716a5a; font: 9px var(--_mono); letter-spacing: .18em; }
+.mp-divider::before, .mp-divider::after { content: ""; height: 1px; flex: 1; background: #302d25; }
+@media (max-width: 760px) {
+  .mp-root { max-width: none; }
+  .mp-lobby { padding: 14px; }
+}

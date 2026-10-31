@@ -8,6 +8,8 @@
   const N = window.NOCTURNE;
   const A = N.audio;
   const SAVE_KEY = "nocturne_save_v2";
+  let saveKey = SAVE_KEY;  // im Multiplayer: eigener Spielstand je Sitzung (der Einzelspieler-Stand bleibt unberührt)
+  let mp = null;           // Multiplayer-Anbindung (js/mp-adapter.js), sonst null
   N.messages = N.messages || {};
   const MUSIC = "assets/audio/shadowed-loop.mp3"; // Hintergrundmusik des Hotels (Räume können mit music: "…" abweichen)
 
@@ -34,13 +36,14 @@
     v: 2, started: false, finished: false,
     current: N.rooms[0].id, unlocked: [N.rooms[0].id], visited: [N.rooms[0].id], completed: [], views: {},
     solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
-    secrets: [], pending: [], evidence: [], hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
+    secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
   });
   let S = fresh();
   function load() {
     try {
-      const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+      const s = JSON.parse(localStorage.getItem(saveKey) || "null");
       if (s && s.v === 2) S = Object.assign(fresh(), s);
+      S.gone = { items: [], flags: [], ...(S.gone || {}) };
       if (!ROOM[S.current]) S.current = N.rooms[0].id;
       // ältere Spielstände ohne „besucht“: alles Abgeschlossene und der aktuelle Raum gelten als besucht
       [...S.completed, S.current].forEach((id) => add(S.visited, id));
@@ -54,7 +57,10 @@
       if (open.length) save();
     } catch (e) { /* defekter Spielstand → neu beginnen */ }
   }
-  function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* privater Modus */ } }
+  function save() {
+    try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privater Modus */ }
+    if (mp && mp.changed) mp.changed(); // gemeinsamen Stand abgleichen (gebündelt, nicht bei jedem Aufruf)
+  }
 
   /* Laufzeit-Zustand (wird nicht gespeichert) */
   let selected = null;     // ausgewählter Gegenstand im Rucksack
@@ -62,12 +68,15 @@
   let overlay = null;      // "phone" | "akte" | null
   let phoneApp = null;
   let aktePage = 0;
+  let lockPid = null;      // Rätsel, dessen Schloss gerade im Dialog offen ist
 
   const room = () => ROOM[S.current];
   const viewIndex = (r) => S.views[r.id] || 0;
   const has = (flag) => (flag === "licht" ? light : S.flags.includes(flag));
   const isSolved = (pid) => S.solved.includes(pid);
   const add = (arr, v) => (arr.includes(v) ? false : (arr.push(v), true));
+  // Flags, die nur die eigene Sicht betreffen (Ereignisse, kurze Bildschirmeffekte), werden nie geteilt.
+  const localFlag = (f) => f.startsWith("evt_") || ((N.config.multiplayer || {}).localFlags || []).includes(f);
   const visible = (h) => (!h.if || has(h.if)) && (!h.unless || !has(h.unless));
   const clockAt = (ms) => { const m = 23 * 60 + 17 + Math.floor(ms / 60000); return `${pad2(Math.floor(m / 60) % 24)}:${pad2(m % 60)}`; };
   const currentPuzzle = (r) => Object.keys(r.puzzles || {}).find((id) => !isSolved(id));
@@ -88,7 +97,7 @@
   function run(actions) {
     for (const a of actions || []) {
       if (a.flag) add(S.flags, a.flag);
-      if (a.unflag) S.flags = S.flags.filter((f) => f !== a.unflag);
+      if (a.unflag) { S.flags = S.flags.filter((f) => f !== a.unflag); if (!localFlag(a.unflag)) add(S.gone.flags, a.unflag); }
       if (a.open && N.docs[a.open] && inGame()) { // Dokument direkt zeigen, z. B. eine abgespielte Aufnahme
         addDoc(a.open);
         openDialog({ kicker: "AUFNAHME", title: N.docs[a.open].title, html: docHtml(a.open), wide: true });
@@ -99,7 +108,7 @@
       if (a.message) addMessage(a.message);
       if (a.unlock) add(S.unlocked, a.unlock);
       if (a.evidence) { add(S.evidence, a.evidence); if (N.docs[a.evidence]) addDoc(a.evidence); } // Beweis für den Abschlussbericht
-      if (a.remove) { S.inventory = S.inventory.filter((x) => x !== a.remove); if (selected === a.remove) selected = null; }
+      if (a.remove) { S.inventory = S.inventory.filter((x) => x !== a.remove); add(S.gone.items, a.remove); if (selected === a.remove) selected = null; }
       if (a.later) { // verzögerte Aktionen, z. B. etwas rumpelt erst nach ein paar Sekunden
         const roomId = S.current;
         const key = Date.now() + "-" + Math.random().toString(36).slice(2, 7);
@@ -160,6 +169,7 @@
   }
   const inGame = () => !$("#game").classList.contains("hidden");
   function renderIntro() {
+    document.body.classList.toggle("mp-mode", Boolean(mp));
     $("#introName").textContent = playerName();
     $("#startButton").innerHTML = S.started ? "Weiterspielen <span>→</span>" : "Einchecken <span>→</span>";
     $("#newGameLink").classList.toggle("hidden", !S.started);
@@ -335,7 +345,7 @@
   function closeDialog() { if (dlg.open) dlg.close(); }
   dlg.addEventListener("close", () => {
     if (dlgCleanup) { dlgCleanup(); dlgCleanup = null; }
-    justCompleted = null;
+    justCompleted = null; lockPid = null;
     if (inGame()) { renderStage(); renderSide(); renderObjective(); }
   });
   dlg.addEventListener("click", (e) => { if (e.target === dlg) closeDialog(); });
@@ -400,7 +410,7 @@
     if (pid) {
       const p = PUZ[pid];
       if (isSolved(pid)) parts.push(`<div class="solved-box"><span>✓</span><p>${fill(p.success)}</p></div>`);
-      else { parts.push(lockHtml(p)); after = () => bindLock(p); }
+      else { parts.push(lockHtml(p)); after = () => { lockPid = p.id; bindLock(p); }; }
     }
     if (!h.text && !h.doc && !pid && h.go) parts.push(`<p class="inspect-text">Verschlossen.</p>`);
     openDialog({ kicker: r.name.toUpperCase(), title: h.title || h.label, html: parts.join(""), after, wide: Boolean(h.doc && N.docs[h.doc].kind === "plan") });
@@ -900,9 +910,10 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>12</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>13</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
-        <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
+        ${mp && mp.menuHtml ? mp.menuHtml() : ""}
+        <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
       after: () => {
         $("#optSound").addEventListener("change", (e) => { S.sound = e.target.checked; A.setEnabled(S.sound); updateSoundIcon(); save(); if (S.sound && inGame()) A.music(S.music ? room().music || MUSIC : null); });
         $("#soundTest").addEventListener("click", () => {
@@ -920,6 +931,7 @@
     $("#soundToggle").setAttribute("aria-label", S.sound ? "Geräusche ausschalten" : "Geräusche einschalten");
   }
   function resetGame() {
+    if (mp) return showTitle(); // gemeinsamer Stand wird nie lokal gelöscht
     if (!confirm("Möchtest du wirklich den gesamten Spielstand löschen?")) return;
     try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* egal */ }
     S = fresh(); selected = null; light = false;
@@ -961,6 +973,7 @@
       <p>Wenn Sie dieses Dokument lesen, dann ist das Hotel nicht länger ein Ort der Lügen. Es ist Zeit, die Tür zu öffnen.</p>
       <p class="sign">Elias Voss</p>`;
     $("#endingPersonal").textContent = N.config.personalMessage || "";
+    $("#restartButton").innerHTML = mp ? "Zum Titelbildschirm <span>→</span>" : "Spiel neu beginnen <span>↻</span>";
     $("#endingStats").textContent = `Spielzeit ${mins} Min. · ${plural(hints, "Hinweis", "Hinweise")} genutzt`;
     showScreen("ending");
     A.play("success");
@@ -982,7 +995,8 @@
     if ("close" in ds) return closeDialog();
     if ("ending" in ds) return showEnding();
     if ("reset" in ds) return resetGame();
-    if ("title" in ds) { closeDialog(); renderIntro(); return showScreen("intro"); }
+    if ("title" in ds) return showTitle();
+    if ("mpLeave" in ds) { closeDialog(); return mp && mp.leave && mp.leave(); }
     if (ds.hint) { S.hints[ds.hint] = (S.hints[ds.hint] || 0) + 1; save(); A.play("paper"); return renderPhone(); }
   });
   $("#closeDialog").addEventListener("click", closeDialog);
@@ -1034,6 +1048,92 @@
     $("#clock").textContent = clockAt(S.playMs);
   }, 1000);
   window.addEventListener("pagehide", save);
+
+  function showTitle() { closeDialog(); renderIntro(); showScreen("intro"); }
+
+  /* ---------- Multiplayer-Schnittstelle ----------
+     Gemeinsam: gelöste Rätsel, Zustände (Türen, Mechanismen, Story), Rucksack, Akte,
+     Beweise, freigeschaltete und gesicherte Bereiche, Nachrichten, Geheimnisse, Ende.
+     Pro Spieler: Raum, Blickrichtung, besuchte Räume, Taschenlampe, Auswahl, Notizen,
+     Hinweise, Spielzeit, ungelesene Nachrichten. */
+  const SHARED_SETS = ["solved", "unlocked", "completed", "evidence", "secrets"];
+  function exportShared() {
+    return {
+      v: 1,
+      solved: S.solved.slice(), flags: S.flags.filter((f) => !localFlag(f)), inventory: S.inventory.slice(),
+      docs: S.docs.slice(), evidence: S.evidence.slice(), unlocked: S.unlocked.slice(), completed: S.completed.slice(),
+      messages: S.messages.map((m) => ({ id: m.id, at: m.at })), secrets: S.secrets.slice(), finished: Boolean(S.finished),
+      gone: { items: S.gone.items.slice(), flags: S.gone.flags.slice() },
+    };
+  }
+  /** Verbrauchte Gegenstände und zurückgenommene Zustände bleiben weg, auch wenn ein anderes Gerät sie noch kennt. */
+  function normalizeShared(sh) {
+    if (!sh) return sh;
+    const g = sh.gone || {}, gi = g.items || [], gf = g.flags || [];
+    return { ...sh, inventory: (sh.inventory || []).filter((x) => !gi.includes(x)), flags: (sh.flags || []).filter((f) => !gf.includes(f)) };
+  }
+  /** Stand vom Server übernehmen. Gibt zurück, was neu ist (für eine kurze Meldung). */
+  function applyShared(raw) {
+    const sh = normalizeShared(raw);
+    if (!sh || typeof sh !== "object") return [];
+    const news = [], newlySolved = [];
+    let changed = false;
+    (sh.gone?.items || []).forEach((x) => { changed = add(S.gone.items, x) || changed; });
+    (sh.gone?.flags || []).forEach((x) => { changed = add(S.gone.flags, x) || changed; });
+    for (const k of SHARED_SETS) (sh[k] || []).forEach((x) => { if (add(S[k], x)) { changed = true; if (k === "solved") newlySolved.push(x); } });
+    (sh.flags || []).forEach((f) => { if (!localFlag(f) && !S.gone.flags.includes(f)) changed = add(S.flags, f) || changed; });
+    const fl = S.flags.length; S.flags = S.flags.filter((f) => localFlag(f) || !S.gone.flags.includes(f)); changed = changed || fl !== S.flags.length;
+    (sh.inventory || []).forEach((x) => { if (N.items[x] && !S.gone.items.includes(x) && add(S.inventory, x)) { changed = true; news.push(N.items[x].icon + " " + N.items[x].name); } });
+    const il = S.inventory.length; S.inventory = S.inventory.filter((x) => !S.gone.items.includes(x)); changed = changed || il !== S.inventory.length;
+    if (selected && !S.inventory.includes(selected)) selected = null;
+    (sh.docs || []).forEach((id) => { if (addDoc(id)) { changed = true; news.push("▤ " + N.docs[id].title); } });
+    let buzz = false;
+    (sh.messages || []).forEach((m) => {
+      if (!m || !N.messages[m.id] || S.messages.some((x) => x.id === m.id)) return;
+      S.messages.push({ id: m.id, at: m.at || clockAt(S.playMs) }); S.unread.push(m.id); changed = buzz = true;
+    });
+    newlySolved.forEach((pid) => { if (PUZ[pid]) news.unshift("✓ " + (PUZ[pid].title || PUZ[pid].objective || "Rätsel gelöst")); });
+    const endNow = sh.finished && !S.finished;
+    if (endNow) { S.finished = true; changed = true; }
+    if (!changed) return [];
+    save();
+    if (buzz) { A.play("buzz"); const b = $("#phoneButton"); b.classList.remove("ring"); void b.offsetWidth; b.classList.add("ring"); }
+    if (!inGame()) return news;
+    let narrate = null;
+    if (dlg.open && lockPid && newlySolved.includes(lockPid) && $("#dlgBody .lock")) {
+      closeDialog();
+      narrate = "Jemand aus deinem Team hat das gerade gelöst.";
+    }
+    if (overlay === "akte") renderAkte();
+    if (overlay === "phone" && phoneApp !== "notizen") renderPhone();
+    renderStage({ narrate }); renderSide(); renderObjective();
+    if (endNow) openDialog({ kicker: "FALL 014-10", title: "Das letzte Rätsel ist gelöst", html: `<p class="inspect-text">Dein Team hat den Fall abgeschlossen.</p><div class="button-row"><button class="primary-button small" data-ending>Den letzten Brief lesen <span>→</span></button></div>` });
+    return news;
+  }
+  N.engine = {
+    /** In den Spielstand einer Sitzung wechseln. hooks: { saveKey, changed(), leave(), menuHtml() } */
+    enterMultiplayer(hooks) {
+      mp = hooks; saveKey = hooks.saveKey;
+      S = fresh(); selected = null; light = false; scheduledEvents.clear();
+      load();
+      A.setEnabled(S.sound); updateSoundIcon(); $("#clock").textContent = clockAt(S.playMs);
+      renderIntro();
+    },
+    /** Zurück zum eigenen Einzelspieler-Spielstand. */
+    leaveMultiplayer() {
+      mp = null; saveKey = SAVE_KEY;
+      S = fresh(); selected = null; light = false; scheduledEvents.clear();
+      load();
+      A.setEnabled(S.sound); updateSoundIcon(); $("#clock").textContent = clockAt(S.playMs);
+      showTitle();
+    },
+    isMultiplayer: () => Boolean(mp),
+    start() { A.setEnabled(S.sound); start(); },
+    showTitle, inGame,
+    exportShared, applyShared, normalizeShared,
+    position() { const r = room(); return { room: r.id, roomName: r.name, view: r.views ? r.views[viewIndex(r)].name : null }; },
+    roomName: (id) => (ROOM[id] ? ROOM[id].name : id),
+  };
 
   /* ---------- Los geht’s ---------- */
   load();

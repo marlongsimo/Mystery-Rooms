@@ -6,8 +6,9 @@
   <meta name="theme-color" content="#090a0c">
   <meta name="description" content="Hotel Nocturne – Die letzte Nacht. Ein digitaler Mystery-Escape-Room im Browser.">
   <title>Hotel Nocturne – Die letzte Nacht</title>
-  <link rel="stylesheet" href="css/fonts.css?v=12">
-  <link rel="stylesheet" href="css/style.css?v=12">
+  <link rel="stylesheet" href="css/fonts.css?v=13">
+  <link rel="stylesheet" href="css/style.css?v=13">
+  <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
@@ -35,8 +36,9 @@
         <div class="intro-rule"></div>
         <p class="intro-note">RESERVIERUNG BESTÄTIGT<br><strong><span id="introName">Verehrter Gast</span> · Zimmer 217 · Check-in 23:17 Uhr</strong></p>
         <button class="primary-button" id="startButton">Einchecken <span>→</span></button>
-        <p class="micro">SPIELZEIT CA. 90–120 MIN · EINZELSPIELER · MIT TON EMPFOHLEN</p>
+        <p class="micro sp-only">SPIELZEIT CA. 90–120 MIN · ALLEIN ODER BIS ZU VIERT · MIT TON EMPFOHLEN</p>
         <a href="#" class="text-link hidden" id="newGameLink">Neues Spiel beginnen</a>
+        <section class="mp-root" id="mpEntry" aria-label="Gemeinsam spielen"></section>
         <p><a href="../index.html" class="text-link">← Alle Escape Rooms</a></p>
       </div>
       <div class="intro-visual" aria-hidden="true">
@@ -155,14 +157,20 @@
     <div id="dlgBody" class="dialog-body"></div>
   </dialog>
 
-  <script src="js/config.js?v=12"></script>
-  <script src="js/audio.js?v=12"></script>
-  <script src="js/rooms/01-rezeption.js?v=12"></script>
-  <script src="js/rooms/02-zimmer217.js?v=12"></script>
-  <script src="js/rooms/03-gepaecklager.js?v=12"></script>
-  <script src="js/rooms/04-archiv.js?v=12"></script>
-  <script src="js/rooms/05-ueberwachung.js?v=12"></script>
-  <script src="js/rooms/06-07-vorlaeufig.js?v=12"></script>
-  <script src="js/engine.js?v=12"></script>
+  <script src="js/config.js?v=13"></script>
+  <script src="js/audio.js?v=13"></script>
+  <script src="js/rooms/01-rezeption.js?v=13"></script>
+  <script src="js/rooms/02-zimmer217.js?v=13"></script>
+  <script src="js/rooms/03-gepaecklager.js?v=13"></script>
+  <script src="js/rooms/04-archiv.js?v=13"></script>
+  <script src="js/rooms/05-ueberwachung.js?v=13"></script>
+  <script src="js/rooms/06-07-vorlaeufig.js?v=13"></script>
+  <script src="js/engine.js?v=13"></script>
+  <!-- Multiplayer (optional): Plattform-Modul + Anbindung. Ohne diese Zeilen läuft das Spiel als Einzelspieler. -->
+  <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
+  <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-core.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-lobby.js?v=1"></script>
+  <script src="js/mp-adapter.js?v=1"></script>
 </body>
 </html>

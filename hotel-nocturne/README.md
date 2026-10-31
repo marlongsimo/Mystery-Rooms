@@ -1,6 +1,6 @@
 # HOTEL NOCTURNE – Die letzte Nacht
 
-Ein düsteres Point-and-Click-Ermittlungsspiel für den Browser. Kein Server, keine Anmeldung, keine externen Abhängigkeiten. Schriften, Grafiken und Geräusche sind lokal eingebunden bzw. werden im Browser erzeugt.
+Ein düsteres Point-and-Click-Ermittlungsspiel für den Browser – allein oder mit bis zu vier Personen. Kein eigener Server, keine Anmeldung. Schriften, Grafiken, Geräusche und Bibliotheken sind lokal eingebunden bzw. werden im Browser erzeugt. Nur das gemeinsame Spielen nutzt Supabase.
 
 ## Starten
 
@@ -9,7 +9,7 @@ Ein düsteres Point-and-Click-Ermittlungsspiel für den Browser. Kein Server, ke
 
 ## Personalisieren
 
-Nur `js/config.js` bearbeiten: `playerName` (Name auf der Reservierung) und `personalMessage` (Abschlussbildschirm).
+Nur `js/config.js` bearbeiten: `playerName` (Name auf der Reservierung) und `personalMessage` (Abschlussbildschirm). Dort steht auch `multiplayer` (Spielkennung `hotel-nocturne`, höchstens 4 Personen).
 
 ## Bedienung
 
@@ -21,6 +21,18 @@ Nur `js/config.js` bearbeiten: `playerName` (Name auf der Reservierung) und `per
 | **Telefon** | Nachrichten, Taschenlampe, Notizen, Karte (mit Schnellreise), Hinweise |
 | **Akte** | Alle gefundenen Dokumente zum Umblättern, inklusive Rückseiten |
 
+## Gemeinsam spielen
+
+Auf dem Titelbildschirm unter „Nicht allein einchecken.“: Namen eingeben und eine Sitzung erstellen, oder mit einem Einladungscode (`NOCT-XXXXXX`) beitreten. Bis zu vier Personen, nur der Host öffnet das Hotel.
+
+- **Geteilt:** gelöste Rätsel, geöffnete Türen und Mechanismen, Story-Zustände, Rucksack, Akte, Beweise, freigeschaltete und gesicherte Bereiche, Nachrichten, Geheimnisse, das Ende.
+- **Pro Person:** Raum und Blickrichtung, besuchte Räume, Taschenlampe, Notizen, Hinweise, Spielzeit.
+- Rechts unter „Team“ steht, wo die anderen gerade sind. Funde der anderen erscheinen als kurze Meldung.
+- Neu laden ist kein Problem: Die Sitzung wird erkannt, „Zurück ins Hotel“ setzt fort.
+- Verlassen über das Menü (☰). Verlässt der Host, endet die Sitzung für alle. Der eigene Einzelspieler-Spielstand bleibt dabei immer unberührt.
+
+Technik, Sicherheit und Anleitung für weitere Escape Rooms: [`platform/multiplayer/README.md`](../platform/multiplayer/README.md).
+
 ## Projektstruktur
 
 ```text
@@ -30,7 +42,8 @@ hotel-nocturne/
 ├── js/
 │   ├── config.js               persönliche Einstellungen
 │   ├── audio.js                Geräusche (Web Audio, keine Dateien)
-│   ├── engine.js               Spiel-Engine
+│   ├── engine.js               Spiel-Engine (mit Multiplayer-Schnittstelle)
+│   ├── mp-adapter.js           Anbindung an den Multiplayer der Plattform
 │   └── rooms/
 │       ├── 01-rezeption.js     Raum 1 mit vier Blickrichtungen (Musterraum)
 │       ├── 02-zimmer217.js     Raum 2 mit vier Blickrichtungen
@@ -64,7 +77,7 @@ Antworten werden tolerant verglichen: Groß-/Kleinschreibung, Leerzeichen und Sa
 
 ## Spielstand
 
-Automatisch im Browser (`localStorage`, Schlüssel `nocturne_save_v2`). Zurücksetzen über das Menü (☰).
+Automatisch im Browser (`localStorage`, Schlüssel `nocturne_save_v2`). Zurücksetzen über das Menü (☰). Gemeinsame Sitzungen speichern lokal unter `nocturne_mp_<Sitzungs-ID>` und auf dem Server. Der Einzelspieler-Stand wird davon nie berührt.
 
 ## Hinweis zu den Lösungen
 

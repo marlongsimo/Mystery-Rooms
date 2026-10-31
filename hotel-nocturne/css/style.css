@@ -508,3 +508,25 @@ body.flash .stage .lightning-only { opacity: 1; }
   .card-object small { font-size: 7.5px; }
   .draft-cards { gap: 8px; }
 }
+
+/* ========== Gemeinsam spielen (Plattform-Lobby im Hotel-Design) ========== */
+.mp-root { --mp-accent: var(--brass); --mp-accent-2: var(--brass-2); --mp-text: var(--text); --mp-text-2: var(--text-2); --mp-muted: var(--muted); --mp-line: #302b22; --mp-ok: var(--ok); --mp-error: var(--red); --mp-serif: var(--serif); --mp-mono: var(--mono); --mp-sans: var(--sans); }
+/* Während einer Sitzung startet man über die Lobby, nicht über den Einzelspieler-Knopf */
+.mp-session #startButton, .mp-session #newGameLink, .mp-mode #startButton, .mp-mode #newGameLink { display: none; }
+.mp-team-list { list-style: none; margin: 0; padding: 0; }
+.mp-team-list li { display: flex; flex-direction: column; padding: 6px 0; border-bottom: 1px solid #24231e; font-size: 12px; }
+.mp-team-list b { color: var(--text-2); font-weight: 500; }
+.mp-team-list span { color: var(--muted); font: 10px var(--mono); letter-spacing: .06em; }
+.mp-menu { padding: 10px 12px; border: 1px solid var(--line-2); background: #0d0e0d; font-size: 13px; color: var(--text-2); }
+.mp-menu p { margin: 0; } .mp-menu .eyebrow { margin-bottom: 4px; }
+.mp-toast { position: fixed; left: 50%; bottom: 22px; z-index: 60; transform: translate(-50%, 30px); opacity: 0; pointer-events: none; max-width: min(92vw, 560px); padding: 11px 16px; background: #0b0b0af2; border: 1px solid #5a4a33; color: var(--text-2); font-size: 13px; line-height: 1.5; box-shadow: 0 12px 30px #000a; transition: opacity .3s, transform .3s; }
+.mp-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.mp-toast b { color: var(--brass-2); font-weight: 500; }
+@media (max-width: 760px) {
+  .mp-team { flex-basis: 100%; order: 4; }
+  .mp-team-list { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+  .mp-team-list li { flex-direction: row; gap: 6px; padding: 0; border: 0; font-size: 11px; }
+  .mp-team .selected-note { display: none; }
+  .mp-mode .play { padding-bottom: 215px; }
+  .mp-toast { bottom: auto; top: calc(var(--topbar) + 10px); }
+}

@@ -629,3 +629,38 @@ body.flash .stage .lightning-only { opacity: 1; }
 .finale-next { position: absolute; right: 22px; bottom: calc(22px + env(safe-area-inset-bottom)); background: none; border: 1px solid #5a4a33; color: var(--brass-2); padding: 10px 16px; font: 12px var(--mono); letter-spacing: .08em; }
 .finale-next.final { background: var(--brass); color: #0d0d0b; border: 0; font: 500 15px var(--sans); padding: 13px 20px; }
 .ending-bonus { display: block; margin: 0 0 8px; color: var(--brass-2); font: italic 15px var(--serif); letter-spacing: 0; text-transform: none; }
+
+/* ========== Prolog: Fallakte und Ankunft ========== */
+.prolog { position: fixed; inset: 0; z-index: 72; display: none; background: #050605; }
+.prolog.show { display: block; animation: pz-fade .8s ease; }
+@keyframes pz-fade { from { opacity: 0; } }
+.prolog.casefile { overflow-y: auto; padding: clamp(18px, 6vh, 70px) 16px; background: radial-gradient(ellipse at 50% 0, #1d2423 0, transparent 60%), #070807; }
+.pz-file { max-width: 620px; margin: 0 auto; animation: pz-fade .6s ease; }
+.pz-file h2 { margin: 6px 0 22px; font: 500 clamp(30px, 5vw, 46px)/1.1 var(--serif); color: var(--text); }
+.pz-body p { font: 400 clamp(16px, 2vw, 19px)/1.75 var(--serif); color: var(--text-2); margin: 0 0 16px; }
+.pz-body b { color: var(--brass-2); font-weight: 500; }
+.pz-card { margin: 18px 0; padding: 18px 20px; background: linear-gradient(#efe6d0, #e2d6ba); color: #2a2119; box-shadow: 0 14px 40px #000a; transform: rotate(-.6deg); }
+.pz-card .doc-head { text-align: center; font: 600 13px var(--mono); letter-spacing: .18em; margin: 0 0 10px; }
+.pz-card .doc-kv { width: 100%; font: 13px var(--mono); }
+.pz-card .doc-kv th { text-align: left; color: #6c5a44; font-weight: 400; padding: 3px 10px 3px 0; }
+.pz-card .handwriting { font: italic 19px var(--serif); color: #2c2a5a; margin: 14px 0 0; }
+.pz-card .handwriting.sign { text-align: right; margin-top: 4px; }
+.pz-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 28px; }
+.pz-nav .primary-button { width: auto; }
+.pz-dots { display: flex; gap: 8px; }
+.pz-dots i { width: 7px; height: 7px; border-radius: 50%; background: #3a3a32; }
+.pz-dots i.on { background: var(--brass); }
+.prolog.arrival { overflow: hidden; }
+.pz-scene { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s; }
+.pz-scene.in { opacity: 1; }
+.pz-scene svg { width: 100%; height: 100%; display: block; }
+.pz-scene .scene-art { object-fit: cover; }
+.pz-scene .pz-door-l, .pz-scene .pz-door-r { transition: transform 3.5s cubic-bezier(.4, 0, .2, 1); transform-box: fill-box; }
+.pz-scene .pz-door-l { transform-origin: 0 50%; }
+.pz-scene .pz-door-r { transform-origin: 100% 50%; }
+.pz-scene.open .pz-door-l, .pz-scene.open .pz-door-r { transform: scaleX(.15); }
+.pz-scene .pz-rain { animation: rain-down .7s linear infinite; }
+.pz-text { position: absolute; left: 50%; bottom: 92px; transform: translate(-50%, 10px); width: min(92vw, 680px); opacity: 0; transition: opacity 1.2s, transform 1.2s; text-align: center; pointer-events: none; }
+.pz-text.show { opacity: 1; transform: translate(-50%, 0); }
+.pz-text p { margin: 0; padding: 14px 18px; background: #000000b8; color: #efe7d8; font: italic 400 clamp(17px, 2.3vw, 23px)/1.6 var(--serif); text-shadow: 0 2px 10px #000; }
+.pz-skip { position: absolute; right: 20px; bottom: calc(22px + env(safe-area-inset-bottom)); background: none; border: 1px solid #5a4a33; color: var(--brass-2); padding: 9px 14px; font: 12px var(--mono); letter-spacing: .08em; }

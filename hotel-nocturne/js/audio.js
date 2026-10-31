@@ -6,6 +6,7 @@
   let ctx = null;
   let enabled = true;
   let ambientTimer = null;
+  let voiceEl = null; // Sprecheraufnahme im Prolog
   let ambientName = null;
 
   /* iPhone/iPad: Web Audio wäre sonst bei aktivem Lautlos-Schalter stumm.
@@ -189,6 +190,13 @@
   });
 
   window.NOCTURNE.audio = {
+    /** Sprecheraufnahme (Prolog). Fehlt die Datei, passiert einfach nichts. */
+    voice(src) {
+      this.stopVoice();
+      if (!enabled || !src) return;
+      try { voiceEl = new Audio(src); voiceEl.volume = 0.95; voiceEl.play().catch(() => {}); } catch (e) { voiceEl = null; }
+    },
+    stopVoice() { if (voiceEl) { try { voiceEl.pause(); } catch (e) { /* egal */ } voiceEl = null; } },
     play(name) { if (enabled && sounds[name]) try { sounds[name](); } catch (e) { /* Audio ist optional */ } },
     setEnabled(on) { enabled = on; if (!on) { this.ambient(null); stopMusic(400); keepAlive(false); } },
     /* Zustand der Musik (für Tests und Fehlersuche) */

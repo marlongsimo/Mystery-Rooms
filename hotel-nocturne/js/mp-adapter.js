@@ -102,6 +102,8 @@
       enter: "Zurück ins Hotel",
       playersHead: "EINGECHECKTE GÄSTE",
     },
+    // Vor dem Start liest jede/r die Fallakte im eigenen Tempo; danach „bereit“.
+    prepare: { label: "Fallakte lesen", againLabel: "✓ Bereit – Fallakte noch einmal lesen", run: (done) => E.showCaseFile(done) },
     onEnter(session) { attach(session); E.start(); },
     onLeft() { detach(); },
   });

@@ -101,6 +101,8 @@ const lobby = MRLobby.mount({
 const link = MRMultiplayer.sync(client, { exportShared, applyShared, normalize, position, onTeam });
 ```
 
+**Optional: Vorbereitung vor dem Start.** Mit `prepare: { label, run(done) }` bekommt die Lobby einen Knopf (z. B. „Fallakte lesen“). Nach `done()` gilt man als bereit (`client.setReady()`, eigener Eintrag `ready:<Nutzer-ID>` über `set_session_state`). Die Spielerliste zeigt „BEREIT“ / „LIEST …“, der Host-Knopf „2 von 3 bereit“ – starten kann der Host trotzdem jederzeit.
+
 **6. Aussehen anpassen** über CSS-Variablen auf `.mp-root`: `--mp-accent`, `--mp-accent-2`, `--mp-text`, `--mp-text-2`, `--mp-muted`, `--mp-line`, `--mp-panel`, `--mp-field`, `--mp-ok`, `--mp-error`, `--mp-serif`, `--mp-mono`, `--mp-sans`.
 
 **7. Testen:** Sitzung erstellen, in einem zweiten Browserprofil beitreten, starten, etwas aufnehmen, ein Rätsel lösen, neu laden, verlassen. Wichtig: auch einmal ohne Sitzung spielen, um den Einzelspieler zu prüfen.

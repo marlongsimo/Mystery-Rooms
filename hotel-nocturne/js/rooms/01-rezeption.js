@@ -99,12 +99,19 @@
         <p class="dim">Ein Haus mit vielen Fenstern, zwei Figuren davor. Links an der Seite, klein und rot: eine Tür, die auf keinem Plan des Hotels eingezeichnet ist.</p>`,
     },
     zeitung: {
-      title: "Zeitungsartikel vom 16.10.2009", kind: "news",
-      html: `<p class="news-head">LOKALANZEIGER · FREITAG, 16. OKTOBER 2009</p>
+      title: "Zeitungsartikel vom 16. und 21.10.2009", kind: "news", pageLabels: ["16. Oktober 2009", "21. Oktober 2009 – Folgeartikel"],
+      pages: [
+        `<p class="news-head">LOKALANZEIGER · FREITAG, 16. OKTOBER 2009</p>
         <h4 class="news-title">Hotel Nocturne nach Unwetternacht geschlossen</h4>
-        <p class="news-sub">Sechs Gäste vermisst – Nachtmanager unter Verdacht</p>
+        <p class="news-sub">Sechs Gäste vermisst – Nachtmanager verschwunden</p>
         <p>In der Nacht zum Donnerstag fiel im traditionsreichen Hotel Nocturne um 23:17 Uhr der Strom aus. Als die Feuerwehr am Morgen eintraf, waren sechs Gäste verschwunden. Auch der Nachtmanager Elias V. ist seither nicht auffindbar.</p>
         <p>Eigentümer Viktor Lehn wies jede Verantwortung zurück: „Der Westflügel ist seit Jahren gesperrt. Dort gibt es keinen Ausgang. Wer in dieser Nacht Dienst hatte, muss sich erklären.“</p>`,
+        `<p class="news-head">LOKALANZEIGER · MITTWOCH, 21. OKTOBER 2009</p>
+        <h4 class="news-title">Vermisste Hotelgäste lebend aufgefunden</h4>
+        <p class="news-sub">Ermittlungen gegen Nachtmanager wegen versuchten Mordes</p>
+        <p>Alle sechs Gäste des Hotel Nocturne sind wieder aufgetaucht – unterkühlt, erschöpft und verstört, verstreut über die umliegenden Orte. Übereinstimmend berichten sie von völliger Dunkelheit, eiskaltem Wasser und einem Mann mit einer Taschenlampe, der sie durch einen engen Gang trieb. Wie sie aus dem Gebäude kamen, kann keiner sagen.</p>
+        <p>Eigentümer Lehn hat eine Erklärung: „Voss hat den Strom abgestellt und die Gäste in den überfluteten Keller geführt. Dort gibt es keinen Ausgang. Dass sie herausgefunden haben, ist ein Wunder.“ Die Polizei fahndet nach Elias V. wegen versuchten Mordes in sechs Fällen.</p>`,
+      ],
     },
     hotelplan: {
       title: "Hotelplan (Stand 2009)", kind: "plan",

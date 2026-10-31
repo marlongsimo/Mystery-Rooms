@@ -13,7 +13,7 @@
   Object.assign(N.messages, {
     m_mara: {
       from: "Unbekannte Nummer",
-      text: "Du hast die Wahrheit gefunden.<br><br>Mein Name ist <b>Mara Voss</b>. M. Vale war nie mein richtiger Name. Ich war eine der sechs, die mein Vater in jener Nacht hinausgebracht hat.<br><br>Alles, was ich gefunden hätte, hätte man als Fälschung abgetan – die Tochter, die ihren Vater reinwaschen will. Ich brauchte jemanden, der die Beweise selbst findet. Ich habe dir Türen geöffnet. Jeden Beweis hast du selbst entdeckt.<br><br>Was danach mit meinem Vater geschah, weiß ich bis heute nicht. Aber jetzt weiß jeder, was er in jener Nacht getan hat.<br><br>Danke, dass du meinem Vater geglaubt hast.",
+      text: "Du hast die Wahrheit gefunden.<br><br>Mein Name ist <b>Mara Voss</b>. M. Vale war nie mein richtiger Name. Ich war eine der sechs, die mein Vater in jener Nacht hinausgebracht hat.<br><br>Alles, was ich gefunden hätte, hätte man als Fälschung abgetan – die Tochter, die ihren Vater reinwaschen will. Ich brauchte jemanden, der die Beweise selbst findet. Ich habe dir Türen geöffnet. Jeden Beweis hast du selbst entdeckt.<br><br>Der Satz auf deiner Reservierung stammt von meinem Vater. Er hat ihn 2009 in einem Brief hinterlassen – für den Menschen, der eines Tages die Wahrheit suchen würde. Ich habe ihn nur weitergegeben.<br><br>Was danach mit meinem Vater geschah, weiß ich bis heute nicht. Aber jetzt weiß jeder, was er in jener Nacht getan hat.<br><br>Danke, dass du meinem Vater geglaubt hast.",
     },
   });
 

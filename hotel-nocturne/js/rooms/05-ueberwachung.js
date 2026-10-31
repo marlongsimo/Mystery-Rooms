@@ -53,7 +53,7 @@
           <rect width="400" height="240" fill="#b6e0c4" opacity=".04" class="scan-noise"/>
         </svg>
         <p>Sechs Personen gehen im Regen nacheinander durch Tor W2. Die dritte hält sich kurz am Tor fest. Danach erscheint ein Mann in Uniform, prüft das Tor, blickt kurz in die Kamera – und geht allein zurück ins Gebäude.</p>
-        <p class="dim">Erkenntnis: Die Gäste haben das Hotel lebend verlassen. Elias ist nicht mit ihnen verschwunden.</p>`,
+        <p class="dim">Erkenntnis: Der Mann mit der Taschenlampe hat die Gäste nicht in den Keller geführt, sondern durch Tor W2 hinaus – und ist allein zurückgegangen.</p>`,
     },
     datei5: {
       title: "Datei 5 – Elias Voss", kind: "screen",

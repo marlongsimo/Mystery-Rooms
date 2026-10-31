@@ -9,6 +9,9 @@
  *   const lobby = MRLobby.mount({ client, root, texts, defaultName, onEnter, onLeft });
  *   onEnter(session, { auto })   → Spiel soll (wieder) beginnen
  *   onLeft(reason)               → Sitzung verlassen oder beendet
+ *   prepare: { label, run(done) } → optional: Vorbereitung vor dem Start (z. B. Vorgeschichte lesen).
+ *                                   Danach gilt man als „bereit“; der Host sieht „2 von 3 bereit“
+ *                                   und kann trotzdem jederzeit starten.
  */
 (() => {
   "use strict";
@@ -37,7 +40,7 @@
     playersHead: "SPIELER",
   };
 
-  function mount({ client, root, texts = {}, defaultName = "", onEnter = () => {}, onLeft = () => {}, buttons = {} }) {
+  function mount({ client, root, texts = {}, defaultName = "", onEnter = () => {}, onLeft = () => {}, buttons = {}, prepare = null }) {
     const T = { ...DEFAULT_TEXTS, ...texts };
     const B = { primary: "primary-button small", ghost: "ghost-button", danger: "danger-button", ...buttons };
     let open = false, busy = false, status = { text: "", kind: "" }, entered = false;
@@ -55,7 +58,7 @@
     function playersHtml() {
       const s = client.session, me = client.user && client.user.id;
       return `<div class="mp-players-head"><span>${esc(T.playersHead)}</span><span>${client.players.length} / ${s.max_players || 4}</span></div>
-        <ul class="mp-player-list">${client.players.map((p, i) => `<li class="mp-player${p.user_id === me ? " me" : ""}"><span class="mp-player-number">${String(i + 1).padStart(2, "0")}</span><span class="mp-player-name">${esc(p.player_name)}${p.user_id === me ? " <em>(du)</em>" : ""}</span><span class="mp-role${p.is_host ? "" : " mp-role-guest"}">${p.is_host ? "HOST" : "GAST"}</span></li>`).join("")}</ul>`;
+        <ul class="mp-player-list">${client.players.map((p, i) => `<li class="mp-player${p.user_id === me ? " me" : ""}"><span class="mp-player-number">${String(i + 1).padStart(2, "0")}</span><span class="mp-player-name">${esc(p.player_name)}${p.user_id === me ? " <em>(du)</em>" : ""}</span>${prepare && s.status === "waiting" ? `<span class="mp-ready${client.isReady(p.user_id) ? " on" : ""}">${client.isReady(p.user_id) ? "BEREIT" : "LIEST …"}</span>` : ""}<span class="mp-role${p.is_host ? "" : " mp-role-guest"}">${p.is_host ? "HOST" : "GAST"}</span></li>`).join("")}</ul>`;
     }
 
     function render() {
@@ -79,8 +82,9 @@
           <div class="mp-code-card"><p class="mp-code-label">EINLADUNGSCODE</p><div class="mp-room-code">${esc(s.room_code)}</div>${running ? "" : `<button type="button" class="mp-copy" data-mp="copy">Code kopieren</button>`}</div>
           ${playersHtml()}
           <p class="mp-waiting">${esc(running ? T.running : s.is_host ? T.hostWaiting : T.guestWaiting)}</p>
+          ${prepare && !running ? `<button type="button" class="${B.ghost} mp-wide" data-mp="prepare">${esc(client.user && client.isReady(client.user.id) ? (prepare.againLabel || "✓ Bereit – noch einmal lesen") : prepare.label)}</button>` : ""}
           ${running ? `<button type="button" class="${B.primary} mp-wide" data-mp="enter">${esc(T.enter)} <span>→</span></button>`
-            : s.is_host ? `<button type="button" class="${B.primary} mp-wide" data-mp="start">${esc(T.start)} <span>→</span></button>` : ""}
+            : s.is_host ? `<button type="button" class="${B.primary} mp-wide" data-mp="start">${esc(T.start)}${prepare ? ` · ${client.players.filter((p) => client.isReady(p.user_id)).length} von ${client.players.length} bereit` : ""} <span>→</span></button>` : ""}
           <div class="mp-secondary-actions"><span class="mp-micro">MAXIMAL ${s.max_players || 4} SPIELER</span><button type="button" class="${B.danger}" data-mp="leave">${esc(T.leave)}</button></div>
         </div>`;
       }
@@ -113,6 +117,10 @@
           setStatus("Du bist der Sitzung beigetreten.", "success");
           if (s.status === "running") enter(false);
         }, "Die Einladung wird geprüft …");
+      },
+      prepare() {
+        if (!prepare) return;
+        prepare.run(() => act(async () => { await client.setReady(true); setStatus("Du bist bereit für die Ankunft.", "success"); }));
       },
       start() { return act(async () => { await client.start(); setStatus(""); enter(false); }, "Das Spiel wird gestartet …"); },
       enter() { enter(false); },
@@ -150,6 +158,7 @@
     });
 
     client.on("players", () => { if (!busy) render(); });
+    client.on("state", (row) => { if (String(row.state_key).startsWith("ready:") && !busy) render(); });
     client.on("status", (st) => {
       if (!busy) render();
       // Gäste starten automatisch, sobald der Host das Spiel eröffnet

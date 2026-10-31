@@ -1039,9 +1039,10 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>20</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>21</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
+        <div class="button-row" style="margin-top:0"><button class="ghost-button" data-prolog>Prolog ansehen</button></div>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
       after: () => {
         $("#optSound").addEventListener("change", (e) => { S.sound = e.target.checked; A.setEnabled(S.sound); updateSoundIcon(); save(); if (S.sound && inGame()) A.music(S.music ? room().music || MUSIC : null); });
@@ -1069,27 +1070,94 @@
   }
 
   /* ---------- Start & Ende ---------- */
+  /* ---------- Prolog: Fallakte → Ankunft (Inhalt in js/prolog.js) ----------
+     casefile: Fallakte zeigen (im Multiplayer wird sie in der Lobby gelesen) · arrival: Ankunftsszene
+     Die Spielzeit läuft währenddessen nicht. */
+  let prologOpen = false, prologTimer = null;
+  let afterProlog = null; // Spielstart, der während des Lesens ankam (Multiplayer: Host startet, Gast liest noch)
+  function runProlog({ casefile = true, arrival = true, readyLabel = "Zum Hotel fahren", onDone = () => {} } = {}) {
+    const P = N.prolog;
+    if (!P) return onDone();
+    if (prologOpen) return;
+    prologOpen = true;
+    closeDialog(); closeOverlay(); setDrawer(false); hideMoment();
+    const el = $("#prolog");
+    A.ambient("rain");
+    const voice = (v) => { if (N.config.introVoice && v) A.voice("assets/audio/intro/" + v + ".mp3"); };
+    const finish = () => {
+      clearTimeout(prologTimer); A.stopVoice();
+      el.className = "prolog"; el.innerHTML = ""; el.onclick = null;
+      prologOpen = false;
+      if (!inGame()) A.ambient(null);
+      const queued = afterProlog; afterProlog = null;
+      onDone();
+      if (queued) setTimeout(queued, 60);
+    };
+    const showCase = (i) => {
+      const c = P.casefile[i], last = i === P.casefile.length - 1;
+      el.className = "prolog show casefile";
+      el.innerHTML = `<div class="pz-file"><p class="eyebrow">${esc(c.kicker)}</p><h2>${esc(c.title)}</h2><div class="pz-body">${fill(c.html)}</div>
+        <div class="pz-nav">${i ? `<button class="ghost-button" data-pz="back">‹ Zurück</button>` : "<span></span>"}<span class="pz-dots">${P.casefile.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</span>
+        <button class="primary-button small" data-pz="next">${last ? esc(readyLabel) : "Weiter"} <span>→</span></button></div></div>`;
+      A.play("paper"); voice(c.voice);
+      el.onclick = (e) => {
+        const b = e.target.closest("[data-pz]");
+        if (!b) return;
+        if (b.dataset.pz === "back") return showCase(i - 1);
+        if (!last) return showCase(i + 1);
+        A.stopVoice();
+        if (arrival) showArrival(); else finish();
+      };
+    };
+    const showArrival = () => {
+      el.className = "prolog show arrival";
+      el.innerHTML = `<div class="pz-scene"></div><div class="pz-text" aria-live="polite"></div><button class="pz-skip" type="button">Überspringen ›</button>`;
+      el.onclick = (e) => { if (e.target.closest(".pz-skip")) finish(); };
+      let i = -1;
+      const next = () => {
+        const st = P.arrival[++i];
+        if (!st) return finish();
+        const sc = $(".pz-scene", el), t = $(".pz-text", el);
+        sc.innerHTML = st.scene === "lobby" ? N.rooms[0].views[0].scene.replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') : st.scene; // „lobby“ = erste Ansicht des ersten Raums
+        sc.className = "pz-scene"; void sc.offsetWidth; sc.classList.add("in");
+        if (st.sceneClass) setTimeout(() => sc.classList.add(st.sceneClass), 900);
+        if (st.flash) { document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 140); }
+        [].concat(st.sound || []).forEach((s, k) => setTimeout(() => A.play(s), k * 650));
+        voice(st.voice);
+        t.classList.remove("show"); void t.offsetWidth;
+        t.innerHTML = `<p>${fill(st.text)}</p>`; t.classList.add("show");
+        prologTimer = setTimeout(next, st.ms || 5000);
+      };
+      next();
+    };
+    if (casefile) showCase(0); else showArrival();
+  }
+
   function start() {
-    if (!S.started) {
+    if (prologOpen) { afterProlog = start; return; }
+    // Neues Spiel: erst der Prolog (im Multiplayer nur die Ankunft – die Fallakte liest man in der Lobby)
+    if (!S.started && N.prolog) return runProlog({ casefile: !mp, onDone: firstStart });
+    if (!S.started) return firstStart();
+    if (S.finished) return showEnding();
+    showScreen("game");
+    render({ reset: true });
+  }
+  function firstStart() {
+    {
       S.started = true;
-      addDoc("reservierung"); S.newDocs = [];
+      addDoc("reservierung"); if (N.docs.fallakte) addDoc("fallakte"); S.newDocs = [];
       save();
       showScreen("game");
       render({ reset: true });
       A.play("paper");
       openDialog({
-        kicker: "14. OKTOBER · 23:17", title: "Die Reservierung",
-        html: `<p class="inspect-text">Der Umschlag lag ohne Absender in deinem Briefkasten. Jetzt stehst du in einer verlassenen Hotellobby, der Regen trommelt gegen die Scheiben – und die Tür hinter dir ist ins Schloss gefallen.</p>
-          ${docHtml("reservierung")}<p class="found-note">▤ Die Reservierung liegt in deiner Akte.</p>
+        kicker: "14. OKTOBER · 23:17", title: "Eingeschlossen",
+        html: `<p class="inspect-text">Die Tür hinter dir rührt sich nicht mehr. Der Regen trommelt gegen die Scheiben. Die Reservierung und die Fallakte liegen in deiner Akte.</p>
           <ul class="howto"><li><b>‹ ›</b> Umdrehen – oder wischen</li><li><b>Antippen</b> Dinge im Raum untersuchen</li><li><b>Rucksack</b> Gegenstand wählen, dann auf ein Ziel tippen oder ziehen</li><li><b>Telefon</b> Nachrichten, Taschenlampe, Karte, Hinweise</li></ul>
           <div class="button-row"><button class="primary-button small" data-close>Die Lobby betreten <span>→</span></button></div>`,
       });
       addMessage("m_start", 5000);
-      return;
     }
-    if (S.finished) return showEnding();
-    showScreen("game");
-    render({ reset: true });
   }
   /* ---------- Finalszene: Tor W2 öffnet sich (room.finale.steps) ----------
      Schritte: { text, ms, sound, sceneClass, big } · { message, ms } · { end: "Knopftext" }
@@ -1145,7 +1213,7 @@
     const main = Object.keys(PUZ).filter((id) => !PUZ[id].step), total = main.length, solvedN = main.filter(isSolved).length;
     // Der Umschlag aus dem Tresor: Elias’ letzter Brief, „bitte erst draußen öffnen“
     $("#endingLetter").innerHTML = `<p>An den Menschen, der bis hierher gekommen ist.</p>
-      <p>Wenn Sie diesen Umschlag draußen öffnen, stehen Sie dort, wo in jener Nacht sechs Menschen im Regen standen. Sie sind nicht verschwunden. Sie wurden gerettet.</p>
+      <p>Wenn Sie diesen Umschlag draußen öffnen, stehen Sie dort, wo in jener Nacht sechs Menschen im Regen standen. Lehn wird erzählen, ich hätte sie in den Tod geführt. Ich habe sie hinausgeführt.</p>
       <p>Ich habe den Westgang genommen, obwohl Lehn ihn offiziell als stillgelegt führen ließ und obwohl ich wusste, dass ich damit gegen jede Anweisung verstoße. Ich konnte nicht zulassen, dass Menschen sterben, weil jemand Geld sparen wollte.</p>
       <p>Mara war unter ihnen. Lehn hat aus mir den Schuldigen gemacht. Das konnte ich ertragen. Nicht ertragen konnte ich, dass meine Tochter mit dieser Lüge leben muss. Deshalb habe ich das Register in den Tresor gelegt und die Beweise dort versteckt, wo nur sie und ich gesucht hätten.</p>
       <p>Wenn Sie dies lesen, ist das Hotel kein Ort der Lügen mehr. Es ist Zeit, die Tür zu öffnen.</p>
@@ -1175,6 +1243,7 @@
     if ("ending" in ds) return showEnding();
     if ("reset" in ds) return resetGame();
     if ("title" in ds) return showTitle();
+    if ("prolog" in ds) { closeDialog(); return runProlog({ readyLabel: "Weiter", onDone: () => { if (inGame()) render(); } }); }
     if ("mpLeave" in ds) { closeDialog(); return mp && mp.leave && mp.leave(); }
     if (ds.goal) { S.goals[ds.goal] = true; save(); A.play("paper"); return renderPhone(); }
     if (ds.hintPick) { hintPick = ds.hintPick; A.play("click"); return renderPhone(); }
@@ -1230,7 +1299,7 @@
   /* ---------- Spielzeit & Uhr ---------- */
   let ticks = 0;
   setInterval(() => {
-    if (document.hidden || !inGame() || S.finished) return;
+    if (document.hidden || !inGame() || S.finished || prologOpen) return;
     S.playMs += 1000;
     if (++ticks % 10 === 0) save();
     $("#clock").textContent = clockAt(S.playMs);
@@ -1317,6 +1386,8 @@
     },
     isMultiplayer: () => Boolean(mp),
     start() { A.setEnabled(S.sound); start(); },
+    /** Nur die Fallakte zeigen (Multiplayer-Lobby); onDone wird nach „Bereit“ aufgerufen. */
+    showCaseFile(onDone) { A.setEnabled(S.sound); runProlog({ arrival: false, readyLabel: "Bereit für die Ankunft", onDone }); },
     showTitle, inGame,
     exportShared, applyShared, normalizeShared,
     position() { const r = room(); return { room: r.id, roomName: r.name, view: r.views ? r.views[viewIndex(r)].name : null }; },

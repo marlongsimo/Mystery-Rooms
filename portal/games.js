@@ -14,7 +14,7 @@ window.MR_GAMES = [
     subtitle: "Die letzte Nacht",
     category: "mystery",
     categoryLabel: "Mystery-Thriller",
-    teaser: "Sechs Gäste verschwanden in einer stürmischen Oktobernacht. 17 Jahre später liegt eine Reservierung für dich bereit: Zimmer 217, Check-in 23:17 Uhr.",
+    teaser: "In einer stürmischen Oktobernacht verschwinden sechs Gäste – und tauchen Tage später verstört wieder auf. Der Nachtmanager soll versucht haben, sie zu töten. 17 Jahre später liegt eine Reservierung für dich bereit: Zimmer 217, Check-in 23:17 Uhr.",
     duration: "90–120 Min.",
     difficulty: 3,
     players: "1–4 Personen",

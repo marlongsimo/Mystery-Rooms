@@ -137,6 +137,7 @@
       if (error) throw new Error(friendly(error, "Die Sitzung konnte nicht erstellt werden."));
       this._adopt(data, true);
       await this.refresh();
+      await this.fetchStates().catch(() => {});
       this.watch();
       return this.session;
     }
@@ -148,6 +149,7 @@
       if (data.game_slug && data.game_slug !== this.gameSlug) throw new Error("Dieser Code gehört zu einem anderen Escape Room.");
       this._adopt(data, data.is_host);
       await this.refresh();
+      await this.fetchStates().catch(() => {}); // z. B. wer schon „bereit“ ist
       this.watch();
       return this.session;
     }
@@ -290,7 +292,8 @@
       // Sicherheitsnetz: regelmäßiger Abgleich, falls Echtzeit-Ereignisse ausbleiben
       const tick = () => {
         if (!this.session || document.hidden) return;
-        this.refresh().then(() => this.session && this.session.status !== "waiting" && this.fetchStates()).catch((e) => this.emit("error", e));
+        // auch während der Wartephase: dort stehen z. B. die Bereitschaftsmeldungen
+        this.refresh().then(() => this.session && this.fetchStates()).catch((e) => this.emit("error", e));
       };
       this.timer = setInterval(tick, POLL_MS);
       this._vis = () => { if (!document.hidden) tick(); };
@@ -303,6 +306,10 @@
       if (this._vis) document.removeEventListener("visibilitychange", this._vis);
       this._vis = null;
     }
+
+    /* ---------- Bereitschaft vor dem Start (eigener Eintrag je Spieler, wie die Position) ---------- */
+    async setReady(on = true) { if (this.user) await this.writeOwn("ready:" + this.user.id, { ready: Boolean(on), at: Date.now() }); }
+    isReady(userId) { const s = this.states["ready:" + userId]; return Boolean(s && s.ready); }
 
     playerName(userId) { const p = this.players.find((x) => x.user_id === userId); return p ? p.player_name : null; }
   }

@@ -24,6 +24,10 @@ Nur `js/config.js` bearbeiten: `playerName` (Name auf der Reservierung) und `per
 | **Telefon** | Nachrichten, Taschenlampe, Notizen, Karte (mit Schnellreise), Hinweise |
 | **Akte** | Alle gefundenen Dokumente zum Umblättern, inklusive Rückseiten |
 
+## Prolog
+
+Beim ersten Einchecken: drei Seiten Fallakte (die offizielle Version jener Nacht), danach eine kurze Ankunftsszene, die von selbst läuft und sich überspringen lässt. Inhalt in `js/prolog.js`. Optional mit Sprecherstimme: MP3-Dateien nach `assets/audio/intro/` legen (Namen und Texte in `SPRECHERTEXTE.md`) und in `js/config.js` `introVoice: true` setzen. Im Menü (☰) lässt sich der Prolog jederzeit erneut ansehen; die Spielzeit läuft dabei nicht.
+
 ## Gemeinsam spielen
 
 Auf dem Titelbildschirm unter „Nicht allein einchecken.“: Namen eingeben und eine Sitzung erstellen, oder mit einem Einladungscode (`NOCT-XXXXXX`) beitreten. Bis zu vier Personen, nur der Host öffnet das Hotel.
@@ -45,6 +49,7 @@ hotel-nocturne/
 ├── js/
 │   ├── config.js               persönliche Einstellungen
 │   ├── audio.js                Geräusche (Web Audio, keine Dateien)
+│   ├── prolog.js               Prolog: Fallakte und Ankunftsszene
 │   ├── engine.js               Spiel-Engine (mit Multiplayer-Schnittstelle)
 │   ├── mp-adapter.js           Anbindung an den Multiplayer der Plattform
 │   └── rooms/

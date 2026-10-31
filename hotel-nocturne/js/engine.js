@@ -40,7 +40,7 @@
     v: 2, started: false, finished: false,
     current: N.rooms[0].id, unlocked: [N.rooms[0].id], visited: [N.rooms[0].id], completed: [], views: {},
     solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
-    secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false, showGoal: false,
+    secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false, goals: {},
   });
   let S = fresh();
   function load() {
@@ -280,35 +280,17 @@
     setTimeout(() => moment(q), 250);
   }
 
+  /* Kein Ziel im Bild: Spielerinnen finden selbst heraus, was zu tun ist (Hilfe gibt es im Telefon
+     unter „Hinweise“). Hier bleibt nur der Ausgang für Räume ohne Tür in der Szene. */
   function renderObjective() {
     const r = room(), done = S.completed.includes(r.id);
-    // Ziel nur auf Wunsch (Menü) – sonst steht es in der Hinweise-App des Telefons
-    $("#goalBlock").classList.toggle("hidden", !S.showGoal);
-    // Ausgang ohne Tür in der Szene (letzter Raum, vorläufige Räume): Knopf direkt im Bild
     const act = $("#sceneAction"), nx = N.rooms[r.index + 1];
     ["goto", "via", "ending"].forEach((k) => delete act.dataset[k]);
     if (done && r.final) { act.dataset.ending = ""; act.innerHTML = "Den letzten Brief lesen <span>→</span>"; }
     else if (done && !r.views && nx && !S.visited.includes(nx.id)) { act.dataset.goto = nx.id; act.dataset.via = r.exitVia || "door"; act.innerHTML = `${esc(r.exitLabel || `Weiter: ${nx.name}`)} <span>→</span>`; }
     act.classList.toggle("hidden", !("ending" in act.dataset) && !act.dataset.goto);
-    const pid = frontierPuzzle();
-    const next = N.rooms[r.index + 1];
-    if (done && pid && PUZ[pid].room !== r.id) { // Aufgabe geht in einem anderen Raum weiter
-      $("#objective").innerHTML = `<span class="obj-label">ZIEL</span> ${esc(objectiveOf(pid))}`;
-      return;
-    }
-    const fresh = N.rooms.find((x) => S.unlocked.includes(x.id) && !S.visited.includes(x.id));
-    // Ein neuer Bereich ist offen, aber nicht der direkte Nachfolger dieses Raums (z. B. Treppe hinter der Tür „Personal“)
-    if (done && fresh && !(next && next.id === fresh.id)) {
-      $("#objective").innerHTML = `<span class="obj-label">ZIEL</span> Neuer Bereich offen: ${esc(fresh.name)}. Finde den Weg dorthin.`;
-      return;
-    }
-    // Ist in einem früher betretenen Raum noch etwas offen, wird es zusätzlich angezeigt.
-    const behind = N.rooms.find((x) => x.id !== r.id && S.visited.includes(x.id) && !S.completed.includes(x.id) && currentPuzzle(x));
-    const openLine = behind ? `<span class="obj-open">Noch offen – ${esc(behind.name)}: ${esc(objectiveOf(currentPuzzle(behind)))}</span>` : "";
-    $("#objective").innerHTML = (done
-      ? `<span class="obj-done">✓ Bereich gesichert</span>${r.final ? `<button class="link-button" data-ending>Den letzten Brief lesen →</button>` : next && !S.visited.includes(next.id) ? `<button class="link-button" data-goto="${next.id}" data-via="${r.exitVia || (r.views ? "elevator" : "door")}">${esc(r.exitLabel || `Weiter: ${next.name}`)} →</button>` : ""}`
-      : `<span class="obj-label">ZIEL</span> ${esc(pid ? objectiveOf(pid) : "Untersuche den Raum.")}`) + openLine;
   }
+
 
   function renderSide() {
     const slots = Math.max(8, S.inventory.length);
@@ -931,15 +913,23 @@
   }
   function hintsHtml() {
     const front = frontierPuzzle();
-    if (!front) return `<p class="app-empty">Gerade gibt es hier nichts zu lösen. Geh weiter.</p>`;
+    if (!front) {
+      const fresh = N.rooms.find((x) => S.unlocked.includes(x.id) && !S.visited.includes(x.id));
+      return `<p class="app-empty">${fresh ? `Hier ist alles erledigt. Ein neuer Bereich ist offen: <b>${esc(fresh.name)}</b> – finde den Weg dorthin.` : "Gerade gibt es hier nichts zu lösen. Geh weiter."}</p>`;
+    }
     // Mehrere Aufgaben gleichzeitig offen: Spielerin wählt, wobei sie Hilfe möchte
     const group = openGroup(front);
     const pid = group.includes(hintPick) ? hintPick : group[0];
     const tabs = group.length > 1 ? `<p class="app-sub">WOBEI BRAUCHST DU HILFE?</p><div class="hint-tabs">${group.map((id) => `<button class="hint-tab${id === pid ? " on" : ""}" data-hint-pick="${id}">${esc(PUZ[id].title)}</button>`).join("")}</div>` : "";
     const p = PUZ[pid], n = S.hints[pid] || 0;
     const mins = Math.max(0, Math.floor((S.playMs - (S.puzzleStart[pid] ?? S.playMs)) / 60000));
-    return `${tabs}<p class="app-sub">AKTUELLES ZIEL</p><p class="hint-goal">${esc(p.objective || p.title)}</p>
-      <p class="app-hint">Du bist seit ${mins === 0 ? "weniger als einer Minute" : plural(mins, "Minute", "Minuten")} an dieser Aufgabe.</p>
+    // Stufe 0: worum es gerade geht (zählt nicht als Hinweis). Liegt die Aufgabe in einem anderen Raum, steht er dabei.
+    const where = PUZ[pid].room !== S.current ? ` <span class="muted">(${esc(ROOM[PUZ[pid].room].name)})</span>` : "";
+    const goal = S.goals[pid]
+      ? `<p class="hint-goal">${esc(p.objective || p.title)}${where}</p>`
+      : `<button class="ghost-button block" data-goal="${pid}">Worum geht es gerade?</button>`;
+    return `${tabs}<p class="app-sub">WORUM GEHT ES?</p>${goal}
+      <p class="app-hint">Du bist seit ${mins === 0 ? "weniger als einer Minute" : plural(mins, "Minute", "Minuten")} bei diesem Schritt.</p>
       <ol class="hint-list">${p.hints.map((h, i) => i < n
         ? `<li class="open"><b>Hinweis ${i + 1}${i === 2 ? " · Lösung" : ""}</b><p>${fill(h)}</p></li>`
         : `<li class="closed"><b>Hinweis ${i + 1}${i === 2 ? " · Lösung" : ""}</b><p>${i === n ? "Noch verdeckt." : "Erst nach dem vorherigen Hinweis."}</p></li>`).join("")}</ol>
@@ -1040,9 +1030,8 @@
         <label class="switch"><input type="checkbox" id="optSound" ${S.sound ? "checked" : ""}><span>Ton (Geräusche und Musik)</span></label>
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
-        <label class="switch"><input type="checkbox" id="optGoal" ${S.showGoal ? "checked" : ""}><span>Aktuelles Ziel anzeigen <small class="muted">(sonst nur unter „Hinweise“ im Telefon)</small></span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>17</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>18</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
@@ -1055,7 +1044,6 @@
         });
         $("#optMusic").addEventListener("change", (e) => { S.music = e.target.checked; save(); if (inGame()) A.music(S.music ? room().music || MUSIC : null); });
         $("#optHotspots").addEventListener("change", (e) => { S.showHotspots = e.target.checked; save(); renderStage(); });
-        $("#optGoal").addEventListener("change", (e) => { S.showGoal = e.target.checked; save(); renderObjective(); });
       },
     });
   }
@@ -1130,6 +1118,7 @@
     if ("reset" in ds) return resetGame();
     if ("title" in ds) return showTitle();
     if ("mpLeave" in ds) { closeDialog(); return mp && mp.leave && mp.leave(); }
+    if (ds.goal) { S.goals[ds.goal] = true; save(); A.play("paper"); return renderPhone(); }
     if (ds.hintPick) { hintPick = ds.hintPick; A.play("click"); return renderPhone(); }
     if (ds.hint) { S.hints[ds.hint] = (S.hints[ds.hint] || 0) + 1; save(); A.play("paper"); return renderPhone(); }
   });

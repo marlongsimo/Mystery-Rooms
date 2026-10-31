@@ -243,7 +243,7 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 **Unerklärtes Ereignis:** Kurz nach dem Einschalten geht das Licht aus, Schritte auf der Metalltreppe, oben fällt die Tür zum Sicherheitsbereich ins Schloss, dann kommt das Licht zurück. (Nicht in Richtung Westflügel – der Weg dorthin ist zu diesem Zeitpunkt noch verschraubt.) Im Multiplayer erlebt das nur, wer den Strom eingeschaltet hat. Verlässt man den Keller vorher, bleiben die Geräusche aus; das Licht ist beim Zurückkommen trotzdem wieder an.
 
-**Ziel und Hinweise:** Schalttafel und Wäscheschrank sind eine parallele Gruppe (`parallel: "zugang"`). Das Ziel lautet dann „Stelle die Stromversorgung wieder her und finde den verborgenen Zugang.“, und die Hinweise-App fragt „Wobei brauchst du Hilfe?“.
+**Ziel und Hinweise:** Schalttafel und Wäscheschrank sind eine parallele Gruppe (`parallel: "zugang"`). Die Hinweise-App fragt dann „Wobei brauchst du Hilfe?“ (Ziele werden im Spiel nicht angezeigt, nur auf Wunsch in den Hinweisen).
 
 **Nachricht nach dem Einschalten:** „Er hat diesen Plan aufhängen lassen. Damit niemand mehr nach dem Weg fragt.“
 

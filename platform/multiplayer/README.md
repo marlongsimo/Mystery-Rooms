@@ -141,6 +141,7 @@ Die Browser-Konsole zeigt bei abgewiesenen Beitritten (falscher Code, volle oder
 
 **Nicht getestet:**
 
+- Die Live-Seite auf GitHub Pages. Die Bereitstellung lief erfolgreich durch, aber aus der Testumgebung ist `github.io` nicht erreichbar. Getestet wurde derselbe Code über einen lokalen Webserver gegen die echte Datenbank.
 - Echte Geräte: iPhone/Safari und Android. Getestet wurde nur Chromium mit Smartphone-Ansicht. Insbesondere ist offen, ob die Musik auf iOS startet, wenn Gäste automatisch ins Spiel geholt werden.
 - Verbindungsabbruch mitten im Spiel und Wiederkehr nach längerer Zeit offline.
 - Sitzungen über mehr als eine Stunde (automatische Erneuerung des Anmelde-Tokens).

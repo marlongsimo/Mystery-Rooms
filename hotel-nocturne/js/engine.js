@@ -34,7 +34,7 @@
     v: 2, started: false, finished: false,
     current: N.rooms[0].id, unlocked: [N.rooms[0].id], visited: [N.rooms[0].id], completed: [], views: {},
     solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
-    hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
+    secrets: [], hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
   });
   let S = fresh();
   function load() {
@@ -63,6 +63,16 @@
   const visible = (h) => (!h.if || has(h.if)) && (!h.unless || !has(h.unless));
   const clockAt = (ms) => { const m = 23 * 60 + 17 + Math.floor(ms / 60000); return `${pad2(Math.floor(m / 60) % 24)}:${pad2(m % 60)}`; };
   const currentPuzzle = (r) => Object.keys(r.puzzles || {}).find((id) => !isSolved(id));
+  /* Das nächste offene Rätsel im Spiel: zuerst im aktuellen Raum, sonst im frühesten
+     unvollständigen Raum, den man schon betreten hat (z. B. Tür in der Rezeption,
+     die zu Zimmer 217 gehört). */
+  function frontierPuzzle() {
+    const here = currentPuzzle(room());
+    if (here) return here;
+    const r = N.rooms.find((x) => !S.completed.includes(x.id) && S.visited.includes(x.id));
+    return r ? currentPuzzle(r) : null;
+  }
+  const ALL_SECRETS = () => N.rooms.flatMap(hotspotsOf).filter((h) => h.secret).length;
 
   /* ---------- Aktionen ---------- */
   let gained = [];
@@ -74,6 +84,7 @@
       if (a.doc && addDoc(a.doc)) gained.push("▤ " + N.docs[a.doc].title);
       if (a.sound) A.play(a.sound);
       if (a.message) addMessage(a.message);
+      if (a.unlock) add(S.unlocked, a.unlock);
       if (a.solve) solve(a.solve);
     }
   }
@@ -174,10 +185,21 @@
   function setNarration(html) { $("#narration").innerHTML = fill(html); }
 
   function renderObjective() {
-    const r = room(), pid = currentPuzzle(r), done = S.completed.includes(r.id);
+    const r = room(), done = S.completed.includes(r.id);
+    const pid = frontierPuzzle();
     const next = N.rooms[r.index + 1];
+    if (done && pid && PUZ[pid].room !== r.id) { // Aufgabe geht in einem anderen Raum weiter
+      $("#objective").innerHTML = `<span class="obj-label">ZIEL</span> ${esc(PUZ[pid].objective)}`;
+      return;
+    }
+    const fresh = N.rooms.find((x) => S.unlocked.includes(x.id) && !S.visited.includes(x.id));
+    // Ein neuer Bereich ist offen, aber nicht der direkte Nachfolger dieses Raums (z. B. Treppe hinter der Tür „Personal“)
+    if (done && fresh && !(next && next.id === fresh.id)) {
+      $("#objective").innerHTML = `<span class="obj-label">ZIEL</span> Neuer Bereich offen: ${esc(fresh.name)}. Finde den Weg dorthin.`;
+      return;
+    }
     $("#objective").innerHTML = done
-      ? `<span class="obj-done">✓ Bereich gesichert</span>${r.final ? `<button class="link-button" data-ending>Den letzten Brief lesen →</button>` : next ? `<button class="link-button" data-goto="${next.id}" data-via="${r.views ? "elevator" : "door"}">${esc(r.exitLabel || `Weiter: ${next.name}`)} →</button>` : ""}`
+      ? `<span class="obj-done">✓ Bereich gesichert</span>${r.final ? `<button class="link-button" data-ending>Den letzten Brief lesen →</button>` : next && !S.visited.includes(next.id) ? `<button class="link-button" data-goto="${next.id}" data-via="${r.exitVia || (r.views ? "elevator" : "door")}">${esc(r.exitLabel || `Weiter: ${next.name}`)} →</button>` : ""}`
       : `<span class="obj-label">ZIEL</span> ${esc(PUZ[pid]?.objective || "Untersuche den Raum.")}`;
   }
 
@@ -202,6 +224,34 @@
     $("#progressBar").style.width = `${(n / total) * 100}%`;
   }
 
+  /* ---------- Ereignisse ----------
+     room.events: [{ id, view, ifSolved, flash, actions, narrate, delay }]
+     Wird einmalig ausgelöst, wenn die Spielerin die Blickrichtung betritt. */
+  function checkEvents() {
+    const r = room();
+    if (!r.views) return;
+    const v = r.views[viewIndex(r)];
+    for (const ev of r.events || []) {
+      const flag = "evt_" + ev.id;
+      if (has(flag) || (ev.view && ev.view !== v.id) || (ev.ifSolved && !isSolved(ev.ifSolved))) continue;
+      add(S.flags, flag); save();
+      setTimeout(() => {
+        if (room().id !== r.id) return;
+        if (ev.flash) lightning();
+        run(ev.actions);
+        save();
+        renderStage({ narrate: ev.narrate });
+        renderSide(); renderObjective();
+      }, ev.delay ?? 900);
+    }
+  }
+  function lightning() {
+    document.body.classList.add("flash");
+    setTimeout(() => document.body.classList.remove("flash"), 140);
+    setTimeout(() => { document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 100); }, 280);
+    setTimeout(() => A.play("thunder"), 900);
+  }
+
   /* ---------- Drehen & Raumwechsel ---------- */
   function turn(d) {
     const r = room();
@@ -210,6 +260,7 @@
     save();
     A.play("step");
     renderStage({ anim: d > 0 ? "turn-right" : "turn-left", reset: true });
+    checkEvents();
   }
 
   function goRoom(id, via) {
@@ -223,6 +274,7 @@
       S.current = id; add(S.visited, id); save();
       sc.classList.remove("leaving");
       render({ anim: "arrive", reset: true });
+      checkEvents();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }, via === "elevator" ? 1100 : 650);
   }
@@ -296,6 +348,7 @@
     const parts = [];
     let after = null;
     if (h.text) parts.push(`<p class="inspect-text">${fill(h.text)}</p>`);
+    if (h.secret && add(S.secrets, h.id)) { parts.push(`<p class="secret-note">✦ Geheimnis entdeckt (${S.secrets.length} / ${ALL_SECRETS()})</p>`); A.play("success"); save(); }
     if (h.doc) {
       A.play("paper");
       parts.push(docHtml(h.doc));
@@ -324,6 +377,10 @@
     }
     if (p.type === "text") return `<form class="lock lock-text">${head}<div class="text-row"><input class="text-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Lösung eingeben" aria-label="Lösung"><button class="submit-button">Prüfen</button></div>${fb}</form>`;
     if (p.type === "multi") return `<form class="lock lock-multi">${head}${p.fields.map((f, i) => `<label class="multi-field"><span>${i + 1}. ${esc(f.label)}</span><input class="text-input" autocomplete="off" spellcheck="false"></label>`).join("")}<button class="submit-button wide">Tresor öffnen</button>${fb}</form>`;
+    if (p.type === "wheels") {
+      return `<div class="lock lock-wheels">${head}<div class="wheels" role="group" aria-label="Buchstabenräder">${Array.from({ length: p.length }, (_, i) => `<div class="wheel"><button type="button" data-wheel="${i}" data-dir="-1" aria-label="Rad ${i + 1} zurück">▲</button><span class="wheel-letter" aria-live="polite">A</span><button type="button" data-wheel="${i}" data-dir="1" aria-label="Rad ${i + 1} weiter">▼</button></div>`).join("")}</div>
+        <button type="button" class="submit-button wide" data-wheels-open>Öffnen</button>${fb}</div>`;
+    }
     if (p.type === "use") {
       return `<div class="lock lock-use"><p class="lock-prompt">Welchen Gegenstand möchtest du hier benutzen?</p>
         ${S.inventory.length ? `<div class="use-items">${S.inventory.map((id) => `<button type="button" class="use-item" data-use="${id}"><span>${N.items[id].icon}</span> ${esc(N.items[id].name)}</button>`).join("")}</div>` : `<p class="muted">${esc(p.noItems || "Du hast noch nichts, was du hier benutzen könntest.")}</p>`}${fb}</div>`;
@@ -380,6 +437,30 @@
         if (right === p.fields.length) return succeed(p);
         fail(`Der Tresor bleibt verschlossen. ${right} von ${p.fields.length} Antworten scheinen zu stimmen.`);
       });
+    }
+    if (p.type === "wheels") {
+      const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const pos = Array(p.length).fill(0);
+      const letters = $$(".wheel-letter", root);
+      root.addEventListener("click", (e) => {
+        const w = e.target.closest("[data-wheel]");
+        if (w) {
+          const i = +w.dataset.wheel;
+          pos[i] = (pos[i] + +w.dataset.dir + 26) % 26;
+          letters[i].textContent = ABC[pos[i]];
+          letters[i].classList.remove("tick"); void letters[i].offsetWidth; letters[i].classList.add("tick");
+          A.play("key");
+        }
+        if (e.target.closest("[data-wheels-open]")) attempt(pos.map((k) => ABC[k]).join(""));
+      });
+      // Tastatur: Buchstaben tippen füllt die Räder von links
+      let cursor = 0;
+      const onKey = (e) => {
+        if (/^[a-zA-Z]$/.test(e.key)) { const k = ABC.indexOf(e.key.toUpperCase()); pos[cursor] = k; letters[cursor].textContent = ABC[k]; A.play("key"); cursor = (cursor + 1) % p.length; }
+        else if (e.key === "Enter") { e.preventDefault(); attempt(pos.map((k) => ABC[k]).join("")); }
+      };
+      document.addEventListener("keydown", onKey);
+      dlgCleanup = () => document.removeEventListener("keydown", onKey);
     }
     if (p.type === "use") {
       root.addEventListener("click", (e) => {
@@ -530,8 +611,8 @@
     if (phoneApp === "notizen") { const t = $("#notesInput"); t.addEventListener("input", () => { S.notes = t.value; save(); }); }
   }
   function hintsHtml() {
-    const r = room(), pid = currentPuzzle(r);
-    if (!pid) return `<p class="app-empty">In diesem Bereich ist alles gelöst.</p>`;
+    const pid = frontierPuzzle();
+    if (!pid) return `<p class="app-empty">Gerade gibt es hier nichts zu lösen. Geh weiter.</p>`;
     const p = PUZ[pid], n = S.hints[pid] || 0;
     const mins = Math.max(0, Math.floor((S.playMs - (S.puzzleStart[pid] ?? S.playMs)) / 60000));
     return `<p class="app-sub">AKTUELLES ZIEL</p><p class="hint-goal">${esc(p.objective || p.title)}</p>
@@ -616,7 +697,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Version <b>4</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>5</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {

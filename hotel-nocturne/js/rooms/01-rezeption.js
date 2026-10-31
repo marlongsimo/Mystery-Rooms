@@ -132,6 +132,8 @@
   <rect width="1200" height="900" fill="url(#${p}-vig)"/>
 </svg>`;
 
+  N.svgScene = scene; // Grundgerüst auch für die anderen Räume
+
   /* ---------- Blickrichtung NORD: Empfang ---------- */
   const nord = scene("rn", `
   <g transform="translate(600,150)">
@@ -234,9 +236,18 @@
   </g>
 
   <g>
-    <rect x="958" y="256" width="164" height="548" fill="#0a0807"/><rect x="966" y="264" width="148" height="540" fill="#251a12" stroke="#4d3826" stroke-width="2"/>
-    <rect x="990" y="310" width="100" height="32" fill="#cdbd9b"/><text x="1040" y="331" text-anchor="middle" fill="#2a2119" font-family="DM Mono, monospace" font-size="12" letter-spacing="2">PERSONAL</text>
-    <rect x="980" y="560" width="10" height="34" rx="3" fill="url(#ro-brass)"/>
+    <rect x="958" y="256" width="164" height="548" fill="#0a0807"/>
+    <g data-unless="personal_open">
+      <rect x="966" y="264" width="148" height="540" fill="#251a12" stroke="#4d3826" stroke-width="2"/>
+      <rect x="990" y="310" width="100" height="32" fill="#cdbd9b"/><text x="1040" y="331" text-anchor="middle" fill="#2a2119" font-family="DM Mono, monospace" font-size="12" letter-spacing="2">PERSONAL</text>
+      <rect x="980" y="560" width="10" height="34" rx="3" fill="url(#ro-brass)"/>
+    </g>
+    <g data-if="personal_open">
+      <rect x="966" y="264" width="148" height="540" fill="#050404"/>
+      <g fill="#1d1712"><rect x="980" y="700" width="120" height="14"/><rect x="990" y="660" width="110" height="12"/><rect x="1000" y="624" width="100" height="10"/><rect x="1010" y="592" width="90" height="8"/></g>
+      <ellipse cx="1050" cy="640" rx="60" ry="90" fill="#e7b46a" opacity=".07"/>
+      <polygon points="966,264 930,280 930,790 966,804" fill="#251a12" stroke="#4d3826" stroke-width="2"/>
+    </g>
   </g>
   `);
 
@@ -350,7 +361,8 @@
           { id: "schalter", label: "Schlüsselschalter", x: 66.7, y: 47.8, w: 6.7, h: 15.6, if: "cover_open", title: "Der Schlüsselschalter", text: "Ein Schlüsselschalter. Darunter leuchtet ein rotes Lämpchen.", use: "elevator" },
           { id: "anzeige", label: "Stockwerksanzeige", x: 44.2, y: 11.1, w: 11.7, h: 11.1, title: "Die Stockwerksanzeige", text: "Der Zeiger steht auf <b>E</b>. Jemand hat die <b>2</b> mit rotem Stift eingekreist." },
           { id: "palme", label: "Vertrocknete Palme", x: 15.8, y: 57.8, w: 13.3, h: 31.1, title: "Eine vertrocknete Palme", text: "Die Erde ist staubtrocken. Hier hat seit Jahren niemand mehr gegossen." },
-          { id: "personaltuer", label: "Tür „Personal“", x: 80, y: 28.9, w: 13.3, h: 60, title: "Tür „Personal“", text: "Abgeschlossen. Unter dem Schild steht kleiner: <i>Archiv · Verwaltung · Treppe UG</i>. Vielleicht später." },
+          { id: "personaltuer", label: "Tür „Personal“", x: 80, y: 28.9, w: 13.3, h: 60, unless: "personal_open", title: "Tür „Personal“", text: "Abgeschlossen. Unter dem Schild steht kleiner: <i>Archiv · Verwaltung · Treppe UG</i>. Das Schloss ist alt und schwer – ein Zimmerschlüssel passt hier nicht.", use: "personaltuer" },
+          { id: "personaltreppe", label: "Treppe ins Untergeschoss", x: 80, y: 28.9, w: 13.3, h: 60, if: "personal_open", go: "gepaecklager", via: "door" },
         ],
       },
       {

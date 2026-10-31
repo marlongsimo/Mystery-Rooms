@@ -99,7 +99,7 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 ---
 
-### Raum 2 – Zimmer 217 · 2. Etage · ca. 14 Min.
+### Raum 2 – Zimmer 217 · 2. Etage · *gebaut* · ca. 14 Min.
 
 **Was die Spielerin erfährt:** Hier wohnte jemand, den Elias liebte. „M. Vale“ ist nicht der echte Name.
 

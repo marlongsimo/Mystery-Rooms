@@ -1,5 +1,5 @@
 /*
- * STATIONEN 2–7 – VORLÄUFIGE FASSUNG
+ * STATIONEN 3–7 – VORLÄUFIGE FASSUNG
  * Die Rätsel stammen aus dem Prototyp und sind bereits spielbar,
  * die Räume haben aber noch keine gezeichnete Szene. Sie werden nach und nach
  * nach dem Vorbild der Rezeption (01-rezeption.js) ausgebaut.
@@ -12,8 +12,6 @@
   const note = (title, text) => ({ title, kind: "note", html: `<p>${text}</p>` });
 
   Object.assign(N.docs, {
-    brief_elias: { title: "Brief an Mara", kind: "letter", html: `<p class="handwriting">Mara,<br><br>falls du jemals zurückkehrst, erinnere dich daran: Dein Name stand niemals in den offiziellen Aufzeichnungen. Das war meine Entscheidung.<br><br>Ihr wart sechs – und keiner von euch war allein.</p><p class="handwriting sign">E.</p>` },
-    foto_mara: note("Foto von Mara", "Eine junge Frau, lachend, vor dem Hoteleingang. Auf der Rückseite steht: „Mara – 14.10.2009“."),
     gepaeckverzeichnis: note("Originales Gepäckverzeichnis", "Sechs Gäste verließen das Hotel in jener Nacht. Neben „M. Vale, Zimmer 217“ steht handschriftlich ergänzt: <b>Mara Voss</b>.<br><br>„Einer von ihnen durfte niemals offiziell existieren.“"),
     bauakte: note("Bauliche Veränderungen – Oktober 2009", "„Der westliche Servicetunnel ist nach außen hin als dauerhaft verschlossen zu dokumentieren. Eine tatsächliche Stilllegung wird nicht vorgenommen.“<br><br>Unterzeichnet: <b>Viktor Lehn</b>, Eigentümer"),
     entschluesselt: note("Entschlüsselte Nachricht", "DER WESTGANG IST OFFEN"),
@@ -24,21 +22,6 @@
   });
 
   const rooms = [
-    {
-      id: "zimmer217", name: "Zimmer 217", title: "Zimmer 217", kicker: "2. ETAGE / OSTFLÜGEL",
-      story: "Der Raum ist unberührt. Auf dem Nachttisch liegt ein Brief: „Ich habe alles zurückgelassen. Doch nichts davon war zufällig platziert.“ Vier Gegenstände sind sorgfältig aufgestellt.",
-      cards: [["⌛", "Sanduhr"], ["♜", "Kerzenständer"], ["⚿", "Schlüssel"], ["▧", "Porträtfoto"], ["▭", "Kommode"]],
-      puzzle: {
-        type: "code", length: 4, title: "Die Kommode",
-        prompt: "Die Kommode hat ein vierstelliges Ziffernschloss. Im Brief auf dem Nachttisch steht: „Zuerst das, was die Zeit festhält. Danach das, was Licht spendet. Anschließend das, was Türen öffnet. Zuletzt das, was Erinnerungen bewahrt.“",
-        clue: "Auf jedem Gegenstand klebt eine Zahl:\nSanduhr – 4\nKerzenständer – 1\nSchlüssel – 7\nPorträtfoto – 3",
-        answers: ["4173"],
-        objective: "Öffne die Kommode.",
-        hints: ["Die vier Satzteile im Brief beschreiben jeweils einen der Gegenstände.", "Zeit = Sanduhr, Licht = Kerzenständer, Türen = Schlüssel, Erinnerungen = Porträtfoto.", "Die Reihenfolge ergibt 4 – 1 – 7 – 3."],
-        success: "Die Kommode öffnet sich. Darin liegt ein Brief an jemanden namens Mara – und ein Foto, auf dessen Rückseite ein Datum steht.",
-        onSolve: [{ doc: "brief_elias" }, { doc: "foto_mara" }],
-      },
-    },
     {
       id: "gepaecklager", name: "Gepäcklager", title: "Das Gepäcklager", kicker: "UNTERGESCHOSS / SERVICEBEREICH",
       story: "Staub liegt auf den Regalen. Vier Koffer stehen auf einem Tisch, die Anhänger sind noch lesbar. Das Gepäckverzeichnis daneben ist vom Wasser beschädigt.",

@@ -32,8 +32,9 @@ hotel-nocturne/
 │   ├── audio.js                Geräusche (Web Audio, keine Dateien)
 │   ├── engine.js               Spiel-Engine
 │   └── rooms/
-│       ├── 01-rezeption.js     Musterraum mit vier Blickrichtungen
-│       └── 02-07-vorlaeufig.js Räume 2–7, spielbar, noch ohne Szenen
+│       ├── 01-rezeption.js     Raum 1 mit vier Blickrichtungen (Musterraum)
+│       ├── 02-zimmer217.js     Raum 2 mit vier Blickrichtungen
+│       └── 03-07-vorlaeufig.js Räume 3–7, spielbar, noch ohne Szenen
 ├── assets/audio/               Hintergrundmusik
 └── assets/fonts/               Schriften + Lizenzen (SIL OFL)
 ```
@@ -42,11 +43,13 @@ hotel-nocturne/
 
 | Feld | Bedeutung |
 |---|---|
-| `views` | Vier Blickrichtungen mit `dir`, `name`, `desc` (Text unter der Szene), `scene` (SVG 1200 × 900, später auch ein Foto möglich) und `hotspots`. |
+| `views` | Vier Blickrichtungen (Szenen-Grundgerüst: `N.svgScene`) mit `dir`, `name`, `desc` (Text unter der Szene), `scene` (SVG 1200 × 900, später auch ein Foto möglich) und `hotspots`. |
 | `dark` | Bereich einer Ansicht, der nur mit Taschenlampe sichtbar ist (`x, y, w, h` in %, optional `clip`). |
 | Hotspot | Position `x, y, w, h` in Prozent. Kann `text` zeigen, ein `doc` in die Akte legen, ein Schloss tragen (`lock`), einen Gegenstand verlangen (`use`), einen Gegenstand liefern (`take`) oder in einen anderen Raum führen (`go`). Mit `if` / `unless` erscheint er nur in bestimmten Zuständen; `licht` steht für die eingeschaltete Taschenlampe. |
-| `puzzles` | Rätsel in der Reihenfolge der Ziele. Typen: `code`, `text`, `multi`, `use`, `event`. Jedes mit drei Hinweisen (der dritte ist die Lösung) und optionalen Rückmeldungen für typische Fehlversuche (`wrong`). |
-| `onSolve` | `flag`, `give` (Gegenstand), `doc` (Akte), `message` (Telefon), `sound`. |
+| `puzzles` | Rätsel in der Reihenfolge der Ziele. Typen: `code` (Ziffernfeld), `wheels` (Buchstabenräder), `text`, `multi`, `use` (Gegenstand), `event` (wird durch eine Aktion gelöst). Ein Rätsel darf auch an einem Hotspot in einem anderen Raum hängen (z. B. die Tür „Personal“ in der Rezeption gehört zu Zimmer 217). Jedes mit drei Hinweisen (der dritte ist die Lösung) und optionalen Rückmeldungen für typische Fehlversuche (`wrong`). |
+| `onSolve` | `flag`, `give` (Gegenstand), `doc` (Akte), `message` (Telefon), `sound`, `unlock` (Raum freischalten). |
+| `events` | Einmalige Ereignisse beim Betreten einer Blickrichtung, optional erst nach einem bestimmten Rätsel (`ifSolved`) und mit Blitz (`flash`). |
+| `secret: true` | Hotspot zählt als optionales Geheimnis (Zähler im Menü). |
 | `completeWhen` | Welche Rätsel den nächsten Raum freischalten. |
 | `N.messages` | Nachrichten, die während des Spiels aufs Telefon kommen. |
 

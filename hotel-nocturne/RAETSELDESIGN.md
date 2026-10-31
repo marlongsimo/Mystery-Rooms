@@ -1,6 +1,6 @@
 # HOTEL NOCTURNE – Rätseldesign
 
-**Stand:** Entwurf 1 · zur Abstimmung, bevor die Räume 2–7 gebaut werden
+**Stand:** Entwurf 2 · Korrekturen aus der Durchsicht eingearbeitet, Entscheidungen getroffen (siehe Abschnitt 8)
 **Ziel:** ca. 105 Minuten im ersten Durchlauf · 21 Rätsel plus Raumübergänge · 7 Räume mit je 4 Blickrichtungen
 
 > **Spoiler-Warnung:** Dieses Dokument enthält alle Lösungen. Nicht an die Person weitergeben, die das Spiel spielen soll.
@@ -9,7 +9,12 @@
 
 ## 1. Die Geschichte in einem Absatz
 
-Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:17 Uhr** fällt der Strom aus. Der Haupteingang ist nicht mehr sicher. Nachtmanager **Elias Voss** startet den Notstrom und evakuiert die **sechs Gäste** über den **westlichen Servicetunnel** und **Tor W2** in den Innenhof (**23:24 Uhr**). Diesen Tunnel hatte Eigentümer **Viktor Lehn** aus Kostengründen auf dem Papier „stillgelegt“, also Wartungsprotokolle gefälscht. Unter den Gästen ist Elias’ Tochter **Mara Voss**, eingecheckt als **M. Vale** in Zimmer 217. Elias kehrt danach allein ins Büro zurück, sichert das **originale Wartungsregister** und das **Backup-Band der Kamera im Innenhof** und verschwindet. Lehn stellt ihn öffentlich als Schuldigen hin. Siebzehn Jahre später lädt Elias die Spielerin ins Hotel ein, damit endlich jemand die Wahrheit rekonstruiert.
+Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:17 Uhr** fällt der Strom aus. Der Haupteingang ist nicht mehr sicher. Nachtmanager **Elias Voss** startet den Notstrom und evakuiert die **sechs Gäste** über den **westlichen Servicetunnel** und **Tor W2** in den Innenhof (**23:24 Uhr**). Diesen Tunnel hatte Eigentümer **Viktor Lehn** aus Kostengründen auf dem Papier „stillgelegt“, also Wartungsprotokolle gefälscht. Unter den Gästen ist Elias’ Tochter **Mara Voss**, eingecheckt als **M. Vale** in Zimmer 217. Elias kehrt danach allein ins Büro zurück, sichert das **originale Wartungsregister** und das **Backup-Band der Kamera im Innenhof** und verschwindet. Lehn stellt ihn öffentlich als Schuldigen hin. Siebzehn Jahre später lädt **Mara** die Spielerin ins Hotel ein, damit endlich jemand von außen die Wahrheit rekonstruiert und ihren Vater entlastet. Die handschriftlichen Zeilen auf der Reservierung („Vertrauen Sie nicht den offiziellen Aufzeichnungen. – Elias Voss“) stammen aus einem Brief, den Elias 2009 zurückgelassen hat; Mara hat sie abgeschrieben. Die Nachrichten der „unbekannten Nummer“ kommen von ihr und werden im Laufe des Spiels immer persönlicher. Erst ganz am Ende nennt sie ihren Namen.
+
+**Begriffe – überall gleich verwenden:**
+- **Westlicher Servicetunnel** – der Fluchtweg unter dem Westflügel. In Elias’ Briefen heißt er kurz **„Westgang“**; beides meint dasselbe.
+- **Tor W2** – das äußere Tor am Ende dieses Tunnels.
+- **Innenhof** – das Ziel der Evakuierung, von Kamera 3 überwacht.
 
 **Leitgedanke für das Design:** Elias hat die Beweise *für Mara* versteckt. Seine Verstecke folgen Dingen, die nur sie beide kannten. Deshalb tauchen Familienspuren (Schirm „E.V.“, „Für M.“, Schal, „Wer nachts wacht“) immer wieder auf.
 
@@ -42,7 +47,9 @@ Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:
                                              ▼ Tor W2 → hinaus in den Innenhof = ENDE
 ```
 
-Neu gegenüber dem bisherigen Stand: Man kehrt nach Zimmer 217 **zurück in die Rezeption** und öffnet dort die schon bekannte Tür „Personal“. So wird das Hotel als zusammenhängender Ort erlebbar statt als Kette einzelner Seiten. Mit der Karten-App kann man jederzeit in bereits besuchte Räume springen.
+Neu gegenüber dem bisherigen Stand: Man kehrt nach Zimmer 217 **zurück in die Rezeption** und öffnet dort die schon bekannte Tür „Personal“. So wird das Hotel als zusammenhängender Ort erlebbar statt als Kette einzelner Seiten.
+
+**Freigeschaltet ≠ besucht** *(in der Engine bereits umgesetzt)*: Ein Raum gilt als *freigeschaltet*, sobald die Rätsel davor gelöst sind. Betreten kann man ihn trotzdem nur auf dem vorgesehenen Weg (Aufzug, Tür, Gang). Die Karten-App erlaubt Schnellreise **nur in bereits besuchte Räume**; freigeschaltete zeigt sie als „Weg noch finden“. Die Tür „Personal“ wird ein eigener Schlüssel-Übergang mit dem Gegenstand **Personalschlüssel**.
 
 ---
 
@@ -110,7 +117,7 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 **Belohnung im Kleiderschrank:** Elias’ Schlüsselbund mit dem **Personalschlüssel** und einer Nachricht: „Wenn du das findest, nimm die Treppe, nicht den Aufzug. – Papa“
 **Übergang:** Mit dem Aufzug zurück in die Rezeption, mit dem Personalschlüssel die Tür „Personal“ öffnen → Treppe ins UG.
-**Telefon-Nachricht nach Rätsel 6:** „Sie hat ihn nie ‚Papa‘ genannt, wenn Gäste in der Nähe waren.“
+**Telefon-Nachricht nach Rätsel 6:** „Vor Gästen durfte ich ihn nie ‚Papa‘ nennen. Er meinte, das gehöre sich nicht für einen Nachtmanager.“ *(Erster Hinweis, dass die Absenderin seine Tochter ist.)*
 
 **Hinweise**
 - *5:* (1) Der Brief beschreibt vier Dinge, die irgendwo im Zimmer stehen. Sieh dich in alle Richtungen um. (2) Die Zahlen stehen auf der Unterseite. Zeit = Sanduhr, Licht = Kerzenständer, Türen = Schlüssel am Spiegel, Erinnerungen = Porträtfoto. (3) 4 – 1 – 7 – 3.
@@ -132,7 +139,7 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
 | 8 | **Gepäckausgabe** | Mechanik | Gepäckschein Nr. 6 an der Ausgabeklappe benutzen → ein Koffer mit blauem Schal rollt heraus. Am Griff: „M. Vale, 217“. Darin der Gitterkäfig-Schlüssel und Maras Notizbuch (Hintergrund). | Gepäckschein benutzen |
-| 9 | **Ankunftsreihenfolge** | Logik + Raum 1 | Verzeichnisreste nennen nur Zimmer, keine Uhrzeiten: Schachfigur → der von diesen vier zuerst ankam · Schal → Zimmer 217 · Notenblatt → Zimmer 214 · Kompass → der von diesen vier zuletzt ankam. **Die Check-in-Zeiten stehen nur im Gästeregister aus Raum 1.** | **2694** → Truhe |
+| 9 | **Ankunftsreihenfolge** | Logik + Raum 1 | Kopfzeile des Verzeichnisses: *„Wertgepäck 14.10. – nur vier Stücke eingelagert. Die übrigen Gäste haben ihre Koffer vor der Evakuierung zurückerhalten.“* Damit ist klar, warum Hallström und Doran nicht zählen. Die Reste nennen nur Zimmer, keine Uhrzeiten: Schachfigur → der von diesen vier zuerst ankam · Schal → Zimmer 217 · Notenblatt → Zimmer 214 · Kompass → der von diesen vier zuletzt ankam. **Die Check-in-Zeiten stehen nur im Gästeregister aus Raum 1.** | **2694** → Truhe |
 | 10 | **Die zerrissene Notiz** | Puzzle (neu) | Im Papierkorb liegen 5 Schnipsel. Zusammenlegen ergibt Elias’ Handschrift: „Band Kamera 3 gesichert → Archiv, Fach W. Ich bin erst zurück, als alle draußen waren.“ | Schnipsel in die richtige Lage ziehen |
 
 **Belohnung in der Truhe:** Originales Gepäckverzeichnis („M. Vale – tatsächlicher Name: Mara Voss“) und der **Archivschlüssel**.
@@ -140,7 +147,7 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 **Hinweise**
 - *8:* (1) Hier gibt man Gepäck nur gegen etwas heraus. (2) Den Gepäckschein hast du in Zimmer 217 gefunden. (3) Benutze den Gepäckschein Nr. 6 an der Ausgabeklappe (Süden).
-- *9:* (1) Die Uhrzeiten fehlen hier – aber du hast sie schon einmal gesehen. (2) Im Gästeregister (Akte): Berger 20:14, Vale 21:17, Winter 21:31, Stern 22:08. (3) Schachfigur 2 · Schal 6 · Notenblatt 9 · Kompass 4 → 2694.
+- *9:* (1) Die Uhrzeiten fehlen hier – aber du hast sie schon einmal gesehen. Es zählen nur die vier Gäste mit Wertgepäck. (2) Im Gästeregister (Akte): Berger 20:14, Vale 21:17, Winter 21:31, Stern 22:08. (3) Schachfigur 2 · Schal 6 · Notenblatt 9 · Kompass 4 → 2694.
 - *10:* (1) Im Papierkorb ist mehr als Müll. (2) Die Schnipsel passen an den Rissen zusammen; die Zeilen müssen durchgehend lesbar sein. (3) Lösung anzeigen (Schnipsel springen an ihren Platz).
 
 ---
@@ -150,23 +157,23 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 **Was die Spielerin erfährt:** Der Westtunnel war **nie stillgelegt**. Lehn hat Dokumente gefälscht.
 
 **Blickrichtungen**
-- **Nord · Tür und Wandregal:** Ordner nach Jahren, gerahmter Bauplan von **1998**.
-- **Ost · Schreibtisch:** verschlüsselter Brief, Schreibtischfach mit Buchstabenschloss, Chiffrierscheibe in der Schublade.
+- **Nord · Tür und Wandregal:** Ordner nach Jahren, gerahmter Bauplan von **1998**, das **Protokollbuch 2009** (Liste aller Prüfprotokolle mit Nummer, Datum und Gegenstand).
+- **Ost · Schreibtisch:** alte Schreibmaschine, daneben offen die **Chiffrierscheibe**, der verschlüsselte Brief und ein Schreibtischfach mit Buchstabenschloss.
 - **Süd · Aktenschrank A–Z:** 26 kleine Schubladen, eine davon klemmt (W).
 - **West · Planschrank:** zwei Prüfprotokolle zum Westtunnel, Personalakten.
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 11 | **Drei Schritte voraus** | Werkzeug (neu) | Brief „GHU ZHVWJDQJ LVW RIIHQ“, Rückseite: „Der Verfasser war seiner Zeit immer drei Schritte voraus.“ In der Schublade eine **Chiffrierscheibe**, die man drehen kann. | **DER WESTGANG IST OFFEN** → Schreibtischfach mit Bauakte (Lehns Anweisung, den Tunnel nur auf dem Papier zu schließen) |
-| 12 | **Echt oder gefälscht** | Dokumentenanalyse | Zwei Prüfprotokolle zum Tunnel. Lehns: „Tunnel West stillgelegt, Prüfung entfällt“, datiert **31.09.2009**. Tomasz’: „Prüfung 28.09.2009: Tunnel voll funktionsfähig, Tor W2 öffnet nur mit Notstrom. Schaltfolge Notstrom → Westtor: C – A – D – B.“ Frage: Welches ist gefälscht? | **Lehns Protokoll** (den 31. September gibt es nicht) |
+| 11 | **Drei Schritte voraus** | Werkzeug (neu) | Brief „GHU ZHVWJDQJ LVW RIIHQ“, Rückseite: „Der Verfasser war seiner Zeit immer drei Schritte voraus.“ Neben der Schreibmaschine liegt offen eine **Chiffrierscheibe**, die man drehen kann; erst mit ihr lässt sich der Brief entschlüsseln. | **DER WESTGANG IST OFFEN** → Schreibtischfach mit Bauakte (Lehns Anweisung, den Tunnel nur auf dem Papier zu schließen) |
+| 12 | **Echt oder gefälscht** | Dokumentenanalyse | Zwei Prüfprotokolle zum Tunnel. **Protokoll A (Lehn), Nr. PR-09/117:** „Servicetunnel West stillgelegt, technische Prüfung entfällt“, datiert **31.09.2009**, ohne Prüfstempel, Vermerk „Prüfung durch Eigentümer“. **Protokoll B (Tomasz), Nr. PR-09/118:** „Prüfung 28.09.2009: Tunnel voll funktionsfähig, Tor W2 öffnet nur mit Notstrom. Schaltfolge Notstrom → Tor W2: C – A – D – B“, mit Prüfstempel. Das **Protokollbuch** im Wandregal führt PR-09/117 als *„Aufzug, Jahresprüfung“*. Zwei Fragen: ① Welches Protokoll ist gefälscht? ② Welche **zwei** Belege beweisen es? (Auswahl aus fünf: Datum · Protokollnummer · fehlende Unterschrift · anderes Papier · Tintenfarbe) | ① **Protokoll A** ② **Datum** (31. September gibt es nicht) + **Protokollnummer** (gehört laut Protokollbuch zur Aufzugsprüfung) |
 | 13 | **Fach W** | Suche + Raum 3 | Die zerrissene Notiz nennt „Fach W“. Die Schublade W klemmt; mit dem Schraubendreher lässt sie sich aufhebeln. Darin: **Backup-Band Kamera 3** und Tomasz’ Personalakte mit dem Vermerk „Sicherheitsraum: PIN = Gründungsjahr des Hauses“. | Band + **PIN 1897** (steht auf der Reservierung: „SEIT 1897“) |
 
 **Belohnung:** Echtes Prüfprotokoll (mit der Schaltfolge für den Keller), Backup-Band, PIN.
 **Übergang:** Treppe ins UG → Sicherheitsraum mit PIN-Tür.
 
 **Hinweise**
-- *11:* (1) Eine sehr alte Methode, Buchstaben zu verschieben. In der Schublade liegt ein Werkzeug dafür. (2) Jeder Buchstabe ist um drei Stellen verschoben. Stelle die Scheibe auf 3. (3) DER WESTGANG IST OFFEN.
-- *12:* (1) Vergleiche die Daten auf beiden Protokollen sehr genau. (2) Wie viele Tage hat der September? (3) Lehns Protokoll ist gefälscht – den 31. September gibt es nicht.
+- *11:* (1) Eine sehr alte Methode, Buchstaben zu verschieben. Auf dem Schreibtisch liegt ein Werkzeug dafür. (2) Jeder Buchstabe ist um drei Stellen verschoben. Stelle die Scheibe auf 3. (3) DER WESTGANG IST OFFEN.
+- *12:* (1) Vergleiche Datum und Nummer beider Protokolle – und schau, was das Protokollbuch zu den Nummern sagt. (2) Wie viele Tage hat der September? Und welche Prüfung ist im Protokollbuch unter PR-09/117 eingetragen? (3) Protokoll A ist gefälscht. Belege: das Datum 31.09. und die Nummer PR-09/117, die zur Aufzugsprüfung gehört.
 - *13:* (1) Die zerrissene Notiz aus dem Gepäcklager nennt ein Fach. (2) Schublade W im Aktenschrank (Süden) klemmt. Du hast Werkzeug. (3) Benutze den Schraubendreher an Schublade W. Die PIN ist das Gründungsjahr: 1897.
 
 ---
@@ -205,7 +212,7 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 **Blickrichtungen**
 - **Nord · Treppe und Wasser:** knöcheltiefes Wasser, Rückweg.
 - **Ost · Generator:** Generator mit leerem Sicherungsfach, wasserfleckige Startanleitung.
-- **Süd · Schalttafel:** vier große Hebelschalter A, B, C, D. Daneben der **Wandplan**, den Lehn hat aufhängen lassen: „A → B → C → D · Westtor: stillgelegt“.
+- **Süd · Schalttafel:** vier große Hebelschalter A, B, C, D. Daneben der **Wandplan**, den Lehn hat aufhängen lassen: „A → B → C → D · Tor W2: stillgelegt“.
 - **West · Wäscheschrank:** schwerer Wäscheschrank, mit vier Schrauben an der Wand befestigt. Dahinter weht ein Luftzug.
 
 | # | Rätsel | Art | Ablauf | Lösung |
@@ -242,7 +249,12 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 - *20:* (1) Alles, was du brauchst, liegt in deiner Akte. (2) Prüfprotokoll, Gepäckverzeichnis, Kameraaufnahme und Bauakte beantworten je eine Frage. (3) Westgang · 6 · Elias Voss · 23:24 · Viktor Lehn.
 - *21:* (1) Lies den letzten Satz von Elias’ Brief noch einmal. (2) Welche Minute zeigte die Kamera im Innenhof? (3) 2324.
 
-**Finale:** Kamerafahrt durch Tor W2 in den Innenhof, der Regen hört auf, die Musik wird ruhiger → „Case closed“ → persönliche Nachricht (`config.js`).
+**Finale (in Ruhe, nicht sofort Abspann):**
+1. Tor W2 öffnet sich langsam, Kamerafahrt in den Innenhof.
+2. Der Regen lässt nach, die Musik wird leiser und wärmer, ein letzter Donner weit weg.
+3. Das Telefon vibriert. Letzte Nachricht: *„Du hast die Wahrheit gefunden. Mein Name ist Mara Voss. M. Vale war nie mein richtiger Name. Danke, dass du meinem Vater geglaubt hast.“*
+4. „Case closed“ mit Spielzeit und genutzten Hinweisen.
+5. Persönliche Abschlussseite: Brief (Pflicht, `config.js`), dazu **optional** eine Sprachnachricht und ein Foto. Ohne Medien funktioniert das Ende vollständig.
 
 ---
 
@@ -287,11 +299,17 @@ Die Zeiten sind Schätzungen. Messen lässt sich das erst mit Testspielern – a
 | Blitz macht für einen Moment etwas sichtbar | Raum 2 (Beobachtung) | klein |
 | Puzzle „Schnipsel zusammensetzen“ (Ziehen) | 10 | mittel |
 | Chiffrierscheibe (drehbar, Live-Vorschau) | 11 | mittel |
-| Auswahlfrage („Welches Dokument ist gefälscht?“) | 12, 20 | klein |
+| Auswahlfrage, auch mit Mehrfachauswahl („Welche zwei Belege …?“) | 12, 20 | klein |
 | Zeitleiste mit verschiebbaren Standbildern | 15 | mittel |
 | Reihenfolge-Mechanik (Hebel, Generatorschritte) mit Zurückspringen bei Fehlern | 17, 18 | mittel |
 | Raum dauerhaft dunkel, bis ein Ereignis ihn erhellt | Raum 6 | klein |
-| Abspann-Sequenz durch Tor W2 | 21 | klein |
+| Abspann-Sequenz durch Tor W2 mit letzter Nachricht | 21 | klein |
+| Tür-Übergang mit Schlüssel (Personalschlüssel, Archivschlüssel) | Übergänge | klein |
+| Zähler für optionale Geheimnisse | alle | klein |
+| Persönliches Ende mit optionaler Sprachnachricht und Foto (`config.js`) | Finale | klein |
+| Beweisübersicht als erste Seite der Akte | 20 | klein |
+
+**Grundsatz:** Jede Mechanik wird als wiederverwendbarer Baustein gebaut (Buchstabenräder, Auswahlfrage, Schnipsel, Zeitleiste, Schalterfolge) und in den Raumdaten nur noch konfiguriert. Keine Sonderprogrammierung pro Raum.
 
 ---
 
@@ -302,14 +320,47 @@ Aufbauend auf dem, was schon läuft:
 - **Musik:** „Shadowed Loop“ bleibt das durchgehende Thema. An Schlüsselmomenten (Rätsel 6, 14, 19, Finale) kommen kurze Klangakzente dazu, im Finale wird es ruhiger.
 - **Raumgeräusche** (neue Ebene, je Raum eine Schleife): Rezeption Regen und Uhr · Zimmer 217 Fensterklappern und Dielen · Gepäcklager Rohre und Tropfen · Archiv Brummen und Papier · Überwachung Rauschen und Monitorbrummen · Keller Wasser, später Generator · Büro Wind und Stille.
 - **Effekte:** wie bisher, später Schritt für Schritt durch Aufnahmen ersetzt.
-- **Einstellungen:** drei getrennte Regler (Musik, Raumgeräusche, Effekte).
+- **Einstellungen:** drei getrennte Lautstärkeregler (Musik, Raumgeräusche, Effekte) statt der heutigen zwei Ein/Aus-Schalter.
+- **Tonaufnahmen als Hinweise:** Elias’ Aufnahmen (Anrufbeantworter, Datei 5 im Überwachungsraum) können als echte Sprachaufnahmen eingebunden werden. **Jede Aufnahme hat ein Transkript**, kein Rätsel hängt nur am Hören. Ohne Aufnahme bleibt das Transkript allein bestehen.
 - **Quellen:** selbst aufgenommen, CC0 (z. B. Freesound) oder ausdrücklich lizenziert. Die Herkunft wird in `assets/audio/QUELLEN.md` dokumentiert.
 
 ---
 
-## 8. Offene Fragen
+## 8. Optionale Geheimnisse und Ereignisse
 
-1. **Wer schreibt die Nachrichten aufs Telefon?** Vorschlag: Elias. In der letzten Nachricht nach dem Tor unterschreibt er erstmals mit „– E.“. Alternative: **Mara** – dann wäre die Einladung ihre Idee, um ihren Vater zu entlasten. Das wäre eine schöne Wendung für das Ende.
-2. **Schwierigkeit:** Ist „Wie viele Tage hat der September?“ (Rätsel 12) zu leicht oder genau richtig? Insgesamt ist das Design eher mittel-anspruchsvoll gedacht.
-3. **Persönliches Ende:** Soll der Abschlussbildschirm nur Text zeigen, oder sollen dort ein Foto oder eine Sprachnachricht eingebunden werden können?
-4. **Reihenfolge des Baus:** Vorschlag: Zimmer 217 → Gepäcklager → Archiv → Überwachung → Keller → Büro, nach jedem Raum ein Testlauf.
+**Optionale Geheimnisse** – nicht nötig für den Fortschritt, aber belohnt im Menü („Geheimnisse 4 / 9“) und mit einem zusätzlichen Satz im Abspann:
+
+| Raum | Geheimnis |
+|---|---|
+| 1 Rezeption | Ältere Seite im Gästeregister: Kinderzeichnung des Hotels, signiert „M., 9 Jahre“ |
+| 2 Zimmer 217 | Kinokarte vom 14.10.2009, 19:30 Uhr, in der Manteltasche an der Garderobe |
+| 3 Gepäcklager | Maras Notizbuch: „Papa sagt, das Hotel hat mehr Türen, als auf dem Plan stehen.“ |
+| 4 Archiv | Personalakte Elias Voss: Belobigung „für besonnenes Handeln bei Brandalarm 2006“ |
+| 5 Überwachung | Dienstplan 14.10., Elias’ Handschrift am Rand: „M. kommt heute. Zimmer 217 freihalten.“ |
+| 6 Keller | Ins Rohr geritzt: „T. + E. – 1999 – hier unten hört uns keiner“ (Tomasz und Elias) |
+| 7 Büro | Foto in der Schreibtischschublade: Elias und Mara vor Tor W2, Sommer 2005 |
+
+**Unerklärte Ereignisse** – sparsam, ohne Schreckeffekte, alle später durch Mara erklärbar (sie ist im Hotel und geht der Spielerin voraus):
+
+| Raum | Ereignis | Erklärung am Ende |
+|---|---|---|
+| 2 Zimmer 217 | Beim Blitz schlägt das Fenster auf. Danach liegt ein trockenes Blatt auf dem Schreibtisch. | Mara hat das Blatt hineingelegt. |
+| 3 Gepäcklager | Ein Koffer, der vorher oben stand, steht beim Zurückdrehen auf dem Boden. | Mara war kurz vorher dort. |
+| 5 Überwachung | Monitor 2 zeigt für zwei Sekunden eine Person in der Lobby – live, nicht 2009. | Das war Mara. |
+| 6 Keller | Nach dem Generatorstart geht das Licht einmal aus und wieder an; eine Tür fällt irgendwo ins Schloss. | Mara verlässt den Keller vor der Spielerin. |
+
+## 9. Entscheidungen (aus der Durchsicht)
+
+1. **Absenderin der Nachrichten:** **Mara Voss.** Anfangs sachlich, dann persönlicher (Raum 2: „Vor Gästen durfte ich ihn nie ‚Papa‘ nennen …“), Namensnennung erst im Finale.
+2. **Rätsel 12:** Der 31. September bleibt, ist aber nur noch einer von zwei nötigen Belegen. Der zweite ist die Protokollnummer.
+3. **Persönliches Ende:** Brief als fester Bestandteil, Sprachnachricht und Foto optional.
+4. **Baureihenfolge:** Zimmer 217 → Testlauf → Gepäcklager und Archiv → Überwachung und Keller → Büro → Sounddesign → Gesamttest.
+
+## 10. Änderungen gegenüber Entwurf 1
+
+- Gepäcklager: Kopfzeile erklärt, warum nur vier Gäste zählen (sonst wären Hallström und Doran früheste bzw. späteste).
+- Archiv: Chiffrierscheibe liegt offen auf dem Schreibtisch statt im Fach, das sie öffnen soll.
+- Archiv: Rätsel 12 mit Protokollbuch und zwei Belegen.
+- Karte: Schnellreise nur in besuchte Räume (umgesetzt).
+- Begriffe vereinheitlicht: Westlicher Servicetunnel („Westgang“), Tor W2, Innenhof.
+- Mara als Absenderin, längeres Finale, optionale Geheimnisse, unerklärte Ereignisse, Tonaufnahmen mit Transkript, drei Lautstärkeregler.

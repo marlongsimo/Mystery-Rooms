@@ -20,6 +20,7 @@ Nur `js/config.js` bearbeiten: `playerName` (Name auf der Reservierung) und `per
 | **Rucksack** (rechts, auf dem Smartphone hinter dem runden Knopf unten rechts) | Gegenstand antippen → auf eine Stelle im Raum tippen. Oder direkt dorthin ziehen. Zweimal antippen = genauer ansehen. Was man in der Hand hält, steht oben rechts im Bild (antippen = ablegen) |
 | **Texte im Bild** | Kurze Rückmeldungen als Untertitel unten, besondere Momente groß in der Bildmitte (antippen schließt sie) |
 | **Ziel** | Steht unter „Hinweise“ im Telefon; im Menü (☰) auf Wunsch dauerhaft einblendbar |
+| **Smartphone** | Am besten quer halten – dann füllt der Raum den Bildschirm. Im Hochformat erscheint dazu einmal pro Sitzung ein Hinweis |
 | **Telefon** | Nachrichten, Taschenlampe, Notizen, Karte (mit Schnellreise), Hinweise |
 | **Akte** | Alle gefundenen Dokumente zum Umblättern, inklusive Rückseiten |
 

@@ -175,7 +175,8 @@
   /* ---------- Bildschirme ---------- */
   function showScreen(id) {
     ["intro", "game", "ending"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== id));
-    if (id !== "game") { A.ambient(null); A.music(null); closeOverlay(); setDrawer(false); hideMoment(); }
+    if (id !== "game") { A.ambient(null); A.music(null); closeOverlay(); setDrawer(false); hideMoment(); hideRotateHint(); }
+    else setTimeout(maybeRotateHint, 400);
     window.scrollTo(0, 0);
   }
   const inGame = () => !$("#game").classList.contains("hidden");
@@ -399,7 +400,7 @@
   dlg.addEventListener("close", () => {
     if (dlgCleanup) { dlgCleanup(); dlgCleanup = null; }
     justCompleted = null; lockPid = null;
-    if (inGame()) { renderStage(); renderSide(); renderObjective(); flushMoment(); }
+    if (inGame()) { renderStage(); renderSide(); renderObjective(); flushMoment(); setTimeout(maybeRotateHint, 300); }
   });
   dlg.addEventListener("click", (e) => { if (e.target === dlg) closeDialog(); });
 
@@ -993,6 +994,14 @@
   /* ---------- Smartphone: Ausrüstung als ausklappbare Seitenleiste ---------- */
   const COMPACT = window.matchMedia("(max-width: 760px), (max-height: 520px) and (orientation: landscape)");
   const compact = () => COMPACT.matches;
+  /* Hochformat auf dem Smartphone: einmal pro Sitzung empfehlen, das Gerät zu drehen */
+  const PORTRAIT_PHONE = window.matchMedia("(orientation: portrait) and (max-width: 760px) and (pointer: coarse)");
+  function maybeRotateHint() {
+    if (!inGame() || dlg.open || !PORTRAIT_PHONE.matches) return;
+    try { if (sessionStorage.getItem("nocturne_rotate_hint")) return; sessionStorage.setItem("nocturne_rotate_hint", "1"); } catch (e) { /* privat */ }
+    $("#rotateHint").classList.add("show");
+  }
+  const hideRotateHint = () => $("#rotateHint").classList.remove("show");
   function setDrawer(open) {
     document.body.classList.toggle("drawer-open", open);
     $("#gearToggle").setAttribute("aria-expanded", String(open));
@@ -1009,7 +1018,7 @@
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <label class="switch"><input type="checkbox" id="optGoal" ${S.showGoal ? "checked" : ""}><span>Aktuelles Ziel anzeigen <small class="muted">(sonst nur unter „Hinweise“ im Telefon)</small></span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>15</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>16</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
@@ -1101,6 +1110,8 @@
   });
   $("#closeDialog").addEventListener("click", closeDialog);
   $("#moment").addEventListener("click", hideMoment);
+  $("#rotateOk").addEventListener("click", hideRotateHint);
+  PORTRAIT_PHONE.addEventListener?.("change", () => { if (!PORTRAIT_PHONE.matches) hideRotateHint(); });
   $("#gearToggle").addEventListener("click", () => setDrawer(!document.body.classList.contains("drawer-open")));
   $("#sideBackdrop").addEventListener("click", () => setDrawer(false));
   $("#sideClose").addEventListener("click", () => setDrawer(false));

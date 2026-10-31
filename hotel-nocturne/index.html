@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#090a0c">
   <meta name="description" content="Hotel Nocturne – Die letzte Nacht. Ein digitaler Mystery-Escape-Room im Browser.">
   <title>Hotel Nocturne – Die letzte Nacht</title>
-  <link rel="stylesheet" href="css/fonts.css?v=15">
-  <link rel="stylesheet" href="css/style.css?v=15">
+  <link rel="stylesheet" href="css/fonts.css?v=16">
+  <link rel="stylesheet" href="css/style.css?v=16">
   <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
 </head>
 <body>
@@ -98,6 +98,15 @@
         <i id="gearBadge" class="badge hidden"></i>
       </button>
       <div class="side-backdrop" id="sideBackdrop"></div>
+      <!-- Smartphone im Hochformat: einmaliger Hinweis, das Gerät zu drehen -->
+      <div class="rotate-hint" id="rotateHint" role="dialog" aria-modal="false" aria-labelledby="rotateTitle">
+        <div class="rotate-card">
+          <svg class="rotate-icon" viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="10" width="20" height="36" rx="4"/><path d="M29 41h6"/><path class="rotate-arrow" d="M48 26a16 16 0 0 1-6 18M44 46l-2-2 3-1"/></svg>
+          <p class="rotate-title" id="rotateTitle">Am besten quer halten</p>
+          <p class="rotate-text">Im Querformat füllt das Hotel den ganzen Bildschirm.</p>
+          <button class="primary-button small" id="rotateOk">Verstanden</button>
+        </div>
+      </div>
 
       <aside class="side" id="side" aria-label="Ausrüstung">
         <button class="side-close" id="sideClose" aria-label="Ausrüstung schließen">×</button>
@@ -168,16 +177,16 @@
     <div id="dlgBody" class="dialog-body"></div>
   </dialog>
 
-  <script src="js/config.js?v=15"></script>
-  <script src="js/audio.js?v=15"></script>
-  <script src="js/rooms/01-rezeption.js?v=15"></script>
-  <script src="js/rooms/02-zimmer217.js?v=15"></script>
-  <script src="js/rooms/03-gepaecklager.js?v=15"></script>
-  <script src="js/rooms/04-archiv.js?v=15"></script>
-  <script src="js/rooms/05-ueberwachung.js?v=15"></script>
-  <script src="js/rooms/06-keller.js?v=15"></script>
-  <script src="js/rooms/07-buero-vorlaeufig.js?v=15"></script>
-  <script src="js/engine.js?v=15"></script>
+  <script src="js/config.js?v=16"></script>
+  <script src="js/audio.js?v=16"></script>
+  <script src="js/rooms/01-rezeption.js?v=16"></script>
+  <script src="js/rooms/02-zimmer217.js?v=16"></script>
+  <script src="js/rooms/03-gepaecklager.js?v=16"></script>
+  <script src="js/rooms/04-archiv.js?v=16"></script>
+  <script src="js/rooms/05-ueberwachung.js?v=16"></script>
+  <script src="js/rooms/06-keller.js?v=16"></script>
+  <script src="js/rooms/07-buero-vorlaeufig.js?v=16"></script>
+  <script src="js/engine.js?v=16"></script>
   <!-- Multiplayer (optional): Plattform-Modul + Anbindung. Ohne diese Zeilen läuft das Spiel als Einzelspieler. -->
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>

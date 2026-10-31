@@ -581,3 +581,13 @@ body.flash .stage .lightning-only { opacity: 1; }
   .scene { max-width: calc((100svh - var(--topbar)) * 4 / 3); }
   .turn small, .turn:hover small, .turn:focus-visible small { display: none; }
 }
+
+/* Hinweis: Smartphone quer halten */
+.rotate-hint { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: 24px; background: #000000d0; opacity: 0; pointer-events: none; transition: opacity .4s; }
+.rotate-hint.show { opacity: 1; pointer-events: auto; }
+.rotate-card { max-width: 300px; padding: 26px 24px 22px; text-align: center; background: linear-gradient(#141614, #0b0c0b); border: 1px solid #5a4a33; box-shadow: 0 20px 60px #000; }
+.rotate-icon { width: 76px; height: 76px; fill: none; stroke: var(--brass-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; animation: rotate-phone 2.6s ease-in-out infinite; }
+.rotate-title { margin: 10px 0 6px; color: var(--text); font: 500 22px var(--serif); }
+.rotate-text { margin: 0 0 18px; color: var(--text-2); font-size: 14px; line-height: 1.5; }
+.rotate-card .primary-button { width: auto; }
+@keyframes rotate-phone { 0%, 25% { transform: rotate(0); } 55%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }

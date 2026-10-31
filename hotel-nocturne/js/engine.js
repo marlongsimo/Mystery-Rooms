@@ -88,6 +88,11 @@
   function run(actions) {
     for (const a of actions || []) {
       if (a.flag) add(S.flags, a.flag);
+      if (a.unflag) S.flags = S.flags.filter((f) => f !== a.unflag);
+      if (a.open && N.docs[a.open] && inGame()) { // Dokument direkt zeigen, z. B. eine abgespielte Aufnahme
+        addDoc(a.open);
+        openDialog({ kicker: "AUFNAHME", title: N.docs[a.open].title, html: docHtml(a.open), wide: true });
+      }
       if (a.give && add(S.inventory, a.give)) gained.push(N.items[a.give].icon + " " + N.items[a.give].name);
       if (a.doc && addDoc(a.doc)) gained.push("▤ " + N.docs[a.doc].title);
       if (a.sound) A.play(a.sound);
@@ -433,7 +438,7 @@
         <button class="submit-button wide">${esc(p.button || "Prüfen")}</button>${fb}</form>`;
     }
     if (p.type === "sort") {
-      return `<div class="lock lock-sort">${head}<p class="muted small">Ziehe die Streifen in die richtige Reihenfolge – oder verschiebe sie mit ▲ ▼.</p><ol class="strips" aria-label="Papierstreifen"></ol>${fb}</div>`;
+      return `<div class="lock lock-sort">${head}<p class="muted small">${esc(p.help || "Ziehe die Streifen in die richtige Reihenfolge – oder verschiebe sie mit ▲ ▼.")}</p><ol class="strips${p.plain ? " plain" : ""}" aria-label="Reihenfolge"></ol>${p.checkButton ? `<button type="button" class="submit-button wide" data-sort-check>${esc(p.button || "Reihenfolge prüfen")}</button>` : ""}${fb}</div>`;
     }
     if (p.type === "use") {
       return `<div class="lock lock-use"><p class="lock-prompt">Welchen Gegenstand möchtest du hier benutzen?</p>
@@ -600,8 +605,8 @@
       const list = $(".strips", root);
       const item = (id) => p.items.find((it) => it.id === id);
       const draw = () => {
-        list.innerHTML = order.map((id, i) => `<li class="strip" data-strip="${id}" style="clip-path:${clip(p.answer.indexOf(id))}">
-          <span class="strip-text">${esc(item(id).text)}</span>
+        list.innerHTML = order.map((id, i) => `<li class="strip" data-strip="${id}"${p.plain ? "" : ` style="clip-path:${clip(p.answer.indexOf(id))}"`}>
+          ${item(id).html || ""}<span class="strip-text">${esc(item(id).text)}</span>
           <span class="strip-btns"><button type="button" data-move="-1" data-i="${i}" aria-label="Nach oben" ${i === 0 ? "disabled" : ""}>▲</button><button type="button" data-move="1" data-i="${i}" aria-label="Nach unten" ${i === n - 1 ? "disabled" : ""}>▼</button></span></li>`).join("");
       };
       const check = () => {
@@ -616,10 +621,15 @@
       const move = (from, to) => {
         if (to < 0 || to >= n || from === to) return;
         const [x] = order.splice(from, 1); order.splice(to, 0, x);
-        A.play("paper"); draw(); check();
+        A.play("paper"); draw(); fb.textContent = "";
+        if (!p.checkButton) check(); // mit Prüfknopf wird erst auf Wunsch geprüft
       };
       draw();
       root.addEventListener("click", (e) => {
+        if (e.target.closest("[data-sort-check]") && !list.classList.contains("done")) {
+          if (!check()) fail((p.wrongOrders && p.wrongOrders[order.join(",")]) || p.wrongDefault || "Die Reihenfolge stimmt noch nicht.");
+          return;
+        }
         const b = e.target.closest("[data-move]");
         if (b && !list.classList.contains("done")) move(+b.dataset.i, +b.dataset.i + +b.dataset.move);
       });
@@ -885,7 +895,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>10</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>11</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {

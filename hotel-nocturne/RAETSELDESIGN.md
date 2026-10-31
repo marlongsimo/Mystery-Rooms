@@ -188,30 +188,30 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 **Klang:** fast Stille – Lampenbrummen, gelegentliches Holzknacken.
 
-### Raum 5 – Überwachungsraum · Untergeschoss · ca. 14 Min.
+### Raum 5 – Überwachungsraum · Untergeschoss · *gebaut* · ca. 15 Min.
 
-**Was die Spielerin erfährt:** Der Ablauf der Nacht. Die Gäste waren um 23:24 draußen, Elias kehrte danach zurück.
+**Was die Spielerin erfährt:** Zum ersten Mal *sieht* sie es: Die sechs Gäste gehen um 23:24 lebend durch Tor W2, Elias kehrt allein zurück. Lehn hat das Original gelöscht. Elias hat seine letzte Botschaft mit dem Namen seiner Tochter gesichert.
 
 **Blickrichtungen**
-- **Nord · Tür:** PIN-Feld innen, Dienstplan an der Wand.
-- **Ost · Monitorwand:** vier Monitore, Monitor 3 zeigt „KEIN SIGNAL“.
-- **Süd · Bandarchiv und Rekorder:** Bandschacht, Regale mit leeren Hüllen. Eine Hülle trägt die Aufschrift „Kamera 3 – 14.10. – GELÖSCHT“.
-- **West · Schaltpult:** Indexterminal, Türfreigaben, dunkler Platz unter dem Pult.
+- **Nord · Eingang:** Stahltür zum Archiv, Dienstplan (Geheimnis), Wandtelefon mit herausgerissenem Kabel, Uhr auf 23:17.
+- **Ost · Monitorwand:** vier Röhrenmonitore; Monitor 3 „KEIN SIGNAL“.
+- **Süd · Rekorder:** Bandregal, leere Hülle „CAM 3 – GELÖSCHT“ mit Vermerk *„gelöscht 15.10.2009 – V.L.“* (Beweis), Sicherheitsrekorder.
+- **West · Schaltpult:** Indexterminal, Kameratasten, Tür „Technik“, darunter stockdunkel (Ersatzteilkiste).
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 14 | **Das fehlende Band** | Mechanik + Raum 4 | Backup-Band in den Rekorder einlegen → Monitor 3 zeigt den Innenhof: sechs Personen gehen durch Tor W2, **23:24**. | Band benutzen |
-| 15 | **Rekonstruktion** | Logik / Zeitachse (neu) | Vier Standbilder per Ziehen in eine Zeitleiste bringen: A Lobby 23:17 (5) · B Generator, ohne Zeit (2) · C Innenhof 23:24 (8) · D Büro, Elias allein (1). Abhängigkeiten stehen in den Dokumenten: *Tor W2 öffnet nur mit Notstrom* (Prüfprotokoll, Raum 4) · *Ich bin erst zurück, als alle draußen waren* (Notiz, Raum 3). | **A → B → C → D**, ergibt den Index **5281** für Datei 5 |
-| 16 | **Datei 5** | Suche (Taschenlampe) | Datei 5 zeigt Elias mit dem Wartungsregister; er blickt in die Kamera: „Der Keller ist der Schlüssel. Nicht die Tür, die Sie sehen. Die Tür, die Sie niemals sehen sollten.“ Danach entriegelt das Pult die Tür „Technik“. Unter dem Pult (dunkel) liegt eine **Ersatzsicherung 30 A**. | Sicherung mitnehmen |
+| 14 | **Das fehlende Band** | Gegenstand + Raum 4 | Backup-Band in den Rekorder; nach kurzer Pause öffnet sich die Aufnahme: sechs Silhouetten gehen durch W2, Zeitstempel 23:24:18. | Band benutzen → Aufnahme Kamera 3 (Beweis) |
+| 15 | **Rekonstruktion der Nacht** | Zeitleiste mit Prüfknopf | Vier Standbilder (A Lobby 23:17 · B Generator ohne Zeit · C Innenhof 23:24 · D Büro ohne Zeit) sortieren und prüfen. Begründete Rückmeldungen: B nach C → „Ohne Notstrom öffnet sich Tor W2 nicht.“ · D vor C → „Elias kam erst zurück, als alle draußen waren.“ | **A → B → C → D** → Index 5281, Datei 5 gesperrt |
+| 16 | **Datei 5** | Kennwort + Raum 3 | Zettel: *„Kennwort wie immer: der Name, der in keinem Register stehen durfte.“* Rückmeldungen für VALE, VOSS, ELIA. | **MARA** → Elias’ Botschaft mit Untertiteln (Beweis), Tür „Technik“ frei, Warnung „Generator ohne Sicherung F3“ |
+| – | *Suche: Sicherung* | Taschenlampe | Unter dem Pult: Kiste „Ersatzteile T.“ mit Sicherung F3. Raum gilt erst damit als abgeschlossen; die Tür funktioniert schon vorher (keine Sackgasse). | Ersatzsicherung F3 |
 
-**Übergang:** Tür „Technik“ ist jetzt offen → Keller.
+**Nachrichten (Mara, ohne Namen):** nach dem Band *„Sieh genau hin. Die Dritte, die sich am Tor festhält – sie hatte in jener Nacht schreckliche Angst.“* · nach Datei 5 *„Er hat dieses Kennwort nie geändert. Siebzehn Jahre nicht.“*
 
-**Hinweise**
-- *14:* (1) Ein Monitor hat kein Bild. Du trägst etwas, das das ändern könnte. (2) Das Band aus Fach W gehört in den Rekorder (Süden). (3) Benutze das Backup-Band am Rekorder.
-- *15:* (1) Zwei Dokumente aus früheren Räumen verraten die Reihenfolge. (2) Ohne Notstrom öffnet sich das Tor nicht. Elias kam erst zurück, als alle draußen waren. (3) A → B → C → D.
-- *16:* (1) Das Pult hat die Tür zum Keller freigegeben – aber du brauchst dort unten noch etwas. (2) Unter dem Pult ist es dunkel. (3) Leuchte unter das Pult (Westen) und nimm die Sicherung.
+**Ereignis:** Nach dem Band zeigt Monitor 2 für etwa zwei Sekunden ein Livebild: jemand steht im Flur und sieht in die Kamera (Mara). Danach: „Das Bild war live.“
 
----
+**Geheimnis:** Dienstplan mit *„M. kommt heute. Zimmer 217 freihalten. – E.“* und Tomasz „krank gemeldet“ – deshalb startete Elias den Notstrom selbst.
+
+**Klang:** Monitorrauschen, Brummen, klickende Relais; Bandeinzug, Relais-Signal bei Datei 5.
 
 ### Raum 6 – Keller / Technik · Untergeschoss · ca. 16 Min.
 

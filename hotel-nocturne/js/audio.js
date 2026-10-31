@@ -101,6 +101,8 @@
     gate: () => { noise({ d: 0.05, v: 0.4, freq: 2500 }); tone({ f: 310, type: "square", d: 0.3, v: 0.03, delay: 0.03 }); tone({ f: 120, type: "sawtooth", d: 0.8, v: 0.03, delay: 0.2, slide: -40 }); },
     drip: () => { tone({ f: 1800 + Math.random() * 700, d: 0.09, v: 0.035, slide: -900 }); },
     creak: () => { tone({ f: 140 + Math.random() * 60, type: "sawtooth", d: 0.35, v: 0.015, slide: -50 }); },
+    tape: () => { tone({ f: 90, type: "square", d: 0.5, v: 0.03, slide: -30 }); noise({ d: 0.4, v: 0.1, freq: 700, delay: 0.3 }); noise({ d: 1.2, v: 0.05, freq: 5000, delay: 0.8 }); },
+    relay: () => { noise({ d: 0.02, v: 0.3, freq: 2200 }); tone({ f: 880, d: 0.25, v: 0.04, delay: 0.1 }); tone({ f: 660, d: 0.35, v: 0.04, delay: 0.3 }); },
     thunder: () => { noise({ d: 2.6, v: 0.5, freq: 160, type: "lowpass" }); noise({ d: 1.4, v: 0.35, freq: 90, type: "lowpass", delay: 0.3 }); },
   };
 
@@ -206,6 +208,15 @@
             if (!document.hidden) { tone({ f: 100, d: 2.4, v: 0.006 }); if (Math.random() < 0.35) sounds.creak(); }
             if (ambientName === "hum") next();
           }, 2400 + Math.random() * 3000);
+        };
+        next();
+      }
+      if (name === "static") { // Monitorrauschen, Brummen, klickende Relais
+        const next = () => {
+          ambientTimer = setTimeout(() => {
+            if (!document.hidden) { noise({ d: 1.6, v: 0.012, freq: 6000 }); tone({ f: 60, d: 1.8, v: 0.008 }); if (Math.random() < 0.4) noise({ d: 0.02, v: 0.15, freq: 1800, delay: 0.5 }); }
+            if (ambientName === "static") next();
+          }, 1500 + Math.random() * 1500);
         };
         next();
       }

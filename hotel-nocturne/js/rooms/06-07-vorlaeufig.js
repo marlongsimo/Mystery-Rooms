@@ -1,5 +1,5 @@
 /*
- * STATIONEN 5–7 – VORLÄUFIGE FASSUNG
+ * STATIONEN 6–7 – VORLÄUFIGE FASSUNG
  * Die Rätsel stammen aus dem Prototyp und sind bereits spielbar,
  * die Räume haben aber noch keine gezeichnete Szene. Sie werden nach und nach
  * nach dem Vorbild der Rezeption (01-rezeption.js) ausgebaut.
@@ -12,28 +12,11 @@
   const note = (title, text) => ({ title, kind: "note", html: `<p>${text}</p>` });
 
   Object.assign(N.docs, {
-    kameraprotokoll: note("Überwachungsprotokoll 14.10.2009", "23:17 – Stromausfall in der Lobby.<br>Notstrom springt an.<br><b>23:24</b> – Sechs Personen verlassen das Gebäude durch ein Tor im Westen.<br>Danach: Elias Voss betritt allein das Managerbüro und nimmt ein Buch aus dem Regal."),
-    aufnahme_elias: note("Tonaufnahme von Elias", "„Falls jemand diese Aufnahme gefunden hat, ist es endlich an der Zeit, die Wahrheit zu erfahren. Der Keller ist der Schlüssel. Nicht die Tür, die Sie sehen. Die Tür, die Sie niemals sehen sollten.“"),
     wartungsplan: note("Wartungsplan Technikkeller", "Generator → C → A → D → B → Westtor.<br>Der westliche Servicetunnel ist weiterhin an den Notstrom angeschlossen."),
     wartungsregister: note("Originales Wartungsregister", "Der Servicetunnel war 2009 voll funktionsfähig. Eintrag vom 14.10.2009, 23:21, in Elias’ Handschrift: „Evakuierung über Westgang. 6 Personen.“"),
   });
 
   const rooms = [
-    {
-      id: "ueberwachung", name: "Überwachungsraum", title: "Der Überwachungsraum", kicker: "UNTERGESCHOSS / SICHERHEIT",
-      story: "Vier Monitore zeigen Standbilder aus der Nacht des 14. Oktober 2009. Das System verlangt die Aufnahmen in der richtigen Reihenfolge.",
-      cards: [["▣", "Lobby"], ["▣", "Generator"], ["▣", "Innenhof"], ["▣", "Büro"]],
-      puzzle: {
-        type: "code", length: 4, title: "Rekonstruktion der Nacht",
-        prompt: "Gib die Kennziffern der vier Aufnahmen in zeitlicher Reihenfolge ein.",
-        clue: "A – LOBBY · 23:17 · Das Licht geht aus, die Uhr bleibt stehen. · Kennziffer 5\nB – GENERATORRAUM · Ein Notstromgenerator springt an. · Kennziffer 2\nC – INNENHOF · 23:24 · Sechs Personen verlassen das Gebäude durch ein Tor im Westen. · Kennziffer 8\nD – MANAGERBÜRO · Elias nimmt allein ein dickes Buch aus dem Regal. · Kennziffer 1\n\nHandschriftlich auf dem Protokoll:\n„Ohne Notstrom öffnet sich das Westtor nicht.\nIch bin erst zurück, als alle draußen waren.“",
-        answers: ["5281"],
-        objective: "Bringe die Aufnahmen in die richtige Reihenfolge.",
-        hints: ["Beginne mit der Aufnahme, die einen Zeitstempel und den Stromausfall zeigt.", "Ohne Strom kein Generator, ohne Generator kein offenes Westtor. Elias kehrte erst zurück, als alle draußen waren.", "A → B → C → D ergibt 5281."],
-        success: "Eine fünfte Datei erscheint. Elias nimmt ein Buch mit der Aufschrift „Originales Wartungsregister“ an sich. Dann sieht er direkt in die Kamera – und beginnt zu sprechen.",
-        onSolve: [{ doc: "kameraprotokoll" }, { doc: "aufnahme_elias" }],
-      },
-    },
     {
       id: "keller", name: "Keller", title: "Der Keller", kicker: "UNTERGESCHOSS / TECHNIK",
       story: "Es riecht nach feuchtem Beton. An der Wand hängt ein Sicherungskasten, daneben ein Wartungsplan. Die westliche Tür bleibt dunkel – ohne Notstrom bewegt sich hier nichts.",

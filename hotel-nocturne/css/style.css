@@ -375,6 +375,23 @@ dialog::backdrop { background: #000000c0; backdrop-filter: blur(3px); }
 .strips.done { gap: 0; }
 .strips.done .strip { clip-path: none !important; background: #e9e0c8; }
 .strips.done .strip-btns { visibility: hidden; }
+.strips.plain { gap: 8px; }
+.strips.plain .strip { background: #161816; color: var(--text); font: 500 14px/1.35 var(--sans); padding: 8px 10px; border: 1px solid #2f332f; }
+.strips.plain .strip:nth-child(odd) { background: #191b19; }
+.strips.plain .strip svg { width: 92px; height: 60px; flex: none; border: 1px solid #3a3f3a; }
+.strips.plain .strip-btns button { background: #2a2d29; border-color: #4a4f48; color: var(--brass-2); }
+.strips.plain.done .strip { border-color: #3d4a3a; }
+.paper-screen { background: #070a08; color: #b6e0c4; font: 13px/1.6 var(--mono); box-shadow: inset 0 0 40px #000, 0 10px 30px #000a; position: relative; overflow: hidden; }
+.paper-screen::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, #ffffff08 0 1px, transparent 1px 3px); }
+.paper-screen svg { width: 100%; display: block; border: 1px solid #1d2a22; }
+.paper-screen .ts { color: #e6f5c9; letter-spacing: .1em; }
+.paper-screen .sub { opacity: 0; animation: subline .6s ease-out forwards; }
+.paper-screen .sub:nth-of-type(2) { animation-delay: 1.2s; } .paper-screen .sub:nth-of-type(3) { animation-delay: 3s; } .paper-screen .sub:nth-of-type(4) { animation-delay: 4.6s; } .paper-screen .sub:nth-of-type(5) { animation-delay: 6s; }
+@keyframes subline { to { opacity: 1; } }
+.walker { animation: walk 9s linear infinite; }
+@keyframes walk { 0% { transform: translateX(0); opacity: 0; } 8% { opacity: 1; } 70% { opacity: 1; } 85%, 100% { transform: translateX(-330px); opacity: 0; } }
+.scan-noise { animation: noise .25s steps(2) infinite; }
+@keyframes noise { 50% { transform: translateY(-3px); } }
 .wheels { display: flex; justify-content: center; gap: 8px; margin: 6px 0 16px; }
 .wheel { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .wheel button[data-wheel] { width: 48px; height: 34px; background: linear-gradient(#24221d, #161512); border: 1px solid #4d4232; color: var(--brass-2); font-size: 12px; border-radius: 4px; }

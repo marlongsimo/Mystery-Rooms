@@ -36,7 +36,8 @@ hotel-nocturne/
 │       ├── 02-zimmer217.js     Raum 2 mit vier Blickrichtungen
 │       ├── 03-gepaecklager.js  Raum 3 mit vier Blickrichtungen
 │       ├── 04-archiv.js        Raum 4 mit vier Blickrichtungen
-│       └── 05-07-vorlaeufig.js Räume 5–7, spielbar, noch ohne Szenen
+│       ├── 05-ueberwachung.js  Raum 5 mit vier Blickrichtungen
+│       └── 06-07-vorlaeufig.js Räume 6–7, spielbar, noch ohne Szenen
 ├── assets/audio/               Hintergrundmusik
 └── assets/fonts/               Schriften + Lizenzen (SIL OFL)
 ```
@@ -49,7 +50,7 @@ hotel-nocturne/
 | `dark` | Bereich einer Ansicht, der nur mit Taschenlampe sichtbar ist (`x, y, w, h` in %, optional `clip`). |
 | Hotspot | Position `x, y, w, h` in Prozent. Kann `text` zeigen, ein `doc` in die Akte legen, ein Schloss tragen (`lock`), einen Gegenstand verlangen (`use`), einen Gegenstand liefern (`take`) oder in einen anderen Raum führen (`go`). Mit `if` / `unless` erscheint er nur in bestimmten Zuständen; `licht` steht für die eingeschaltete Taschenlampe. |
 | `puzzles` | Rätsel in der Reihenfolge der Ziele. Typen: `code` (Ziffernfeld), `wheels` (Buchstabenräder), `sort` (Streifen/Bilder in Reihenfolge bringen), `cipher` (Chiffrierscheibe), `choice` (Auswahlfragen in Stufen, auch Mehrfachauswahl), `text`, `multi`, `use` (Gegenstand), `event` (wird durch eine Aktion gelöst). Ein Rätsel darf auch an einem Hotspot in einem anderen Raum hängen (z. B. die Tür „Personal“ in der Rezeption gehört zu Zimmer 217). Jedes mit drei Hinweisen (der dritte ist die Lösung) und optionalen Rückmeldungen für typische Fehlversuche (`wrong`). |
-| `onSolve` | `flag`, `give` (Gegenstand), `remove` (Gegenstand verbrauchen), `doc` (Akte), `message` (Telefon), `sound`, `unlock` (Raum freischalten), `later: { ms, actions, narrate }` (verzögert, übersteht Neuladen), `evidence` (als Beweis markieren). Mit `quiet: true` erscheint statt des Erfolgsdialogs nur ein Text unter der Szene. |
+| `onSolve` | `flag`, `give` (Gegenstand), `remove` (Gegenstand verbrauchen), `doc` (Akte), `message` (Telefon), `sound`, `unlock` (Raum freischalten), `later: { ms, actions, narrate }` (verzögert, übersteht Neuladen), `evidence` (als Beweis markieren), `open` (Dokument/Aufnahme sofort zeigen), `unflag` (Zustand zurücknehmen). Sortier-Rätsel optional mit `checkButton`, `wrongOrders` und Bildern (`plain`, `items[].html`). Mit `quiet: true` erscheint statt des Erfolgsdialogs nur ein Text unter der Szene. |
 | `events` | Einmalige Ereignisse beim Betreten einer Blickrichtung, optional erst nach einem bestimmten Rätsel (`ifSolved`) und mit Blitz (`flash`). |
 | `secret: true` | Hotspot zählt als optionales Geheimnis (Zähler im Menü). |
 | `completeWhen` | Welche Rätsel den nächsten Raum freischalten. |

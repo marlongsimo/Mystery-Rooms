@@ -155,6 +155,8 @@ body.flash .stage .lightning { opacity: .55; }
 .objective { margin: 0; font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
 .obj-label { font: 9px var(--mono); letter-spacing: .16em; color: #0d0d0b; background: var(--brass); padding: 3px 7px; }
 .obj-done { color: var(--ok); }
+.obj-open { flex-basis: 100%; font-size: 12px; color: #b9a684; }
+.obj-open::before { content: "◦ "; }
 
 /* ---------- Seitenleiste rechts ---------- */
 .side { border-left: 1px solid #1e211f; background: linear-gradient(#0d0f0e, #090a0c); padding: 22px 18px; display: flex; flex-direction: column; gap: 22px; position: sticky; top: var(--topbar); height: calc(100vh - var(--topbar)); overflow-y: auto; }

@@ -242,7 +242,7 @@
       },
       truhe: {
         type: "code", length: 4, title: "Die Truhe",
-        prompt: "Ein vierstelliges Zahlenschloss. In den Deckel ist eingebrannt: <i>„In der Reihenfolge, in der sie ankamen.“</i>",
+        prompt: "Ein vierstelliges Zahlenschloss. In den Deckel ist eingebrannt: <i>„Ihre Anhänger – in der Reihenfolge, in der sie ankamen.“</i>",
         answers: ["2694"],
         wrong: {
           "2469": "Das ist nur die Reihenfolge der Anhängernummern. Die Truhe fragt nach der Ankunft.",

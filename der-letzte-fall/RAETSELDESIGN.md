@@ -1,6 +1,6 @@
 # DER LETZTE FALL – Der letzte Vorhang
 
-**Rätseldesign · Entwurf 1** · Krimi · 1–4 Personen · ca. 75–90 Minuten · ab 12 Jahren
+**Rätseldesign · Entwurf 2 (freigegeben zur Prototyp-Phase)** · Krimi · 1–4 Personen · ca. 75–90 Minuten · ab 12 Jahren
 
 > Ein Theaterdirektor stirbt bei der Abendprobe. Der Kommissar, der zweifelt, verschwindet. Zurück bleibt seine halb fertige Ermittlungswand – mit richtigen Spuren, falschen Fäden und einer letzten Notiz.
 
@@ -10,14 +10,15 @@ Dieses Dokument ist die verbindliche Grundlage, bevor gebaut wird. Jede Uhrzeit,
 
 ## 1. Die Geschichte in einem Absatz
 
-Am **Montag, 9. November**, stürzt während der Abendprobe im **Stadttheater Velden** um **21:44:12 Uhr** der „Mond“ herab – ein 180 Kilogramm schweres Bühnenelement am Zug 12 – und erschlägt Intendant **Anton Reuter**. Es sieht aus wie ein technischer Defekt. Tatsächlich hat Verwaltungsdirektor **Jannis Keller** den Sicherungsstift **P-4** gezogen und den Zug im Blackout von Hand abgelassen: Reuter hatte entdeckt, dass Keller über drei Jahre **186.400 €** mit Scheinrechnungen abgezweigt hat, und wollte es am nächsten Morgen dem Kulturamt melden. Hauptkommissar **Rainer Hagedorn** zweifelt am Unfall und baut in seinem Büro eine Ermittlungswand auf. Am **Mittwochabend** geht er allein ins Theater und findet im Wartungsgang **U-4** den versteckten Stift. Als er Keller kommen hört, versteckt er ihn im Dunkeln – dann sperrt Keller ihn in die Kammer am Ende des Gangs. Von Hagedorns Telefon kommt eine Nachricht: „Brauche ein paar Tage Abstand.“ Am Donnerstag schließt die Dienststelle den Fall als Unfall. **Freitagnacht** steht seine Partnerin oder sein Partner – die Spielerin / der Spieler – vor seiner Wand.
+Am **Montag, 9. November 2026**, stürzt während der Abendprobe im **Stadttheater Velden** um **21:44:12 Uhr** der „Mond“ herab – ein 180 Kilogramm schweres Bühnenelement am Zug 12 – und erschlägt Intendant **Anton Reuter**. Es sieht aus wie ein technischer Defekt. Tatsächlich hat Verwaltungsdirektor **Jannis Keller** den Sicherungsstift **P-4** gezogen und den Zug im Blackout von Hand abgelassen: Reuter hatte entdeckt, dass Keller über drei Jahre **186.400 €** mit Scheinrechnungen abgezweigt hat, und wollte es am nächsten Morgen dem Kulturamt melden. Hauptkommissar **Rainer Hagedorn** zweifelt am Unfall und baut in seinem Büro eine Ermittlungswand auf. Am **Mittwochabend** geht er allein ins Theater und findet im Wartungsgang **U-4** den versteckten Stift. Als er Keller kommen hört, versteckt er ihn im Dunkeln – dann sperrt Keller ihn in die Kammer am Ende des Gangs. Von Hagedorns Telefon kommt eine Nachricht: „Brauche ein paar Tage Abstand.“ Am Donnerstag schließt die Dienststelle den Fall als Unfall. **Freitagnacht** steht seine Partnerin oder sein Partner – die Spielerin / der Spieler – vor seiner Wand.
 
 ### Festlegungen zur Welt
 
-- **Spielzeit der Handlung:** Freitag, 13. November, ab 22:00 Uhr. Hagedorn ist seit **zwei Nächten** eingesperrt. Im Wartungsgang gibt es einen Wasserhahn – er lebt, ist aber erschöpft. Das gibt dem Spiel Dringlichkeit, ohne es grausam zu machen.
+- **Spielzeit der Handlung:** Freitag, 13. November 2026, ab 22:00 Uhr. Hagedorn ist seit **zwei Nächten** eingesperrt. Im Wartungsgang gibt es einen Wasserhahn – er lebt, ist aber erschöpft. Das gibt dem Spiel Dringlichkeit, ohne es grausam zu machen.
 - **Warum sucht niemand nach ihm?** Hagedorn gilt nicht als vermisst. Die Nachricht von seinem Telefon (geschrieben von Keller) erklärt sein Fehlen. Kriminalrat **Dr. Wessel** hält ihn für überarbeitet und schließt den Fall.
 - **Warum ist der Fall offiziell ein Unfall?** Zug 12 hatte zwei Wochen zuvor eine Störung (echt, dokumentiert). Ein Defekt war die naheliegende Erklärung.
-- **Wer ist die Spielerin / der Spieler?** Hagedorns Partner/in bei der Kripo, angesprochen mit „du“, Name in `config.js` wie bei Hotel Nocturne. Neutral formuliert, ohne Geschlecht.
+- **Wer ist die Spielerin / der Spieler?** Hagedorns Partner/in bei der Kripo, angesprochen mit „du“. Ein Name ist optional über `config.js` personalisierbar wie bei Hotel Nocturne; alle Texte bleiben geschlechtsneutral und funktionieren auch ohne Namen.
+- **Warum erst Freitag?** Du warst seit Montagmittag auf einer Fortbildung in einer anderen Stadt, dein Diensthandy lag die ganze Woche im Büro. Freitagabend kommst du zurück – und findest auf dem Display die Nachricht von Mittwoch.
 - **Die Wand:** Sie hängt im Büro. Im ersten Raum fotografierst du sie mit Hagedorns Dienst-Tablet – ab dann arbeitest du überall auf dem Tablet weiter. So ist die Pinnwand in jedem Raum verfügbar.
 - **Ton:** Krimi, nicht Horror. Kein Blut, keine Schreckmomente. Spannung aus Zeitdruck und Widersprüchen.
 
@@ -46,6 +47,14 @@ Am **Montag, 9. November**, stürzt während der Abendprobe im **Stadttheater Ve
 | **Kurt Mahler** (66) | Pförtner (nur Dokumente) | – | Pförtnerbuch, Schlüsselregister |
 | **Dr. Wessel** | Kriminalrat (nur Nachrichten) | – | schließt den Fall, drängt dich zur Ruhe |
 
+**Schlüssel – genau festgelegt:**
+- **Schlüssel K-4** (Technik: Schnürboden-Aufgang, Unterbühne, Tür U-4, Werkzeugschrank W-1 im Gang) gibt es **zweimal**: das reguläre Exemplar an der Pforte und einen **Ersatzschlüssel in Reuters Tresor**.
+- Das reguläre K-4 hat Keller am Montag um 20:58 geholt und **nie zurückgegeben** – im Register fehlt die Rückgabe.
+- Hagedorn ließ sich am Mittwoch beim Pförtner den **Generalschlüssel des Hauses** geben (Eintrag im Pförtnerbuch). Keller nahm ihn ihm beim Einsperren ab. Bei der Festnahme hat Keller beide Schlüssel bei sich.
+- Sprachlich getrennt: **Schlüssel K-4** · **Werkzeugschrank W-1** (Schließung K-4) · **Wartungsgang U-4**.
+
+**Der Mechanismus des Mordes:** Zug 12 ist ein motorischer Zug, eine Federspeicherbremse hält die Last. Für Notfälle gibt es auf dem **Schnürboden** einen **Handablass-Hebel**, der die Bremse öffnet. Dieser Hebel ist im Probenbetrieb mit dem **Sicherungsstift P-4** blockiert. Ohne P-4 lässt sich der Hebel ziehen, und die Last fällt ungebremst. Keller zog P-4 gegen 21:31 und den Hebel im Blackout um 21:44:12. Die Steuerung protokolliert jeden Handablass mit Uhrzeit („Z12-H“). Wer am Lichtpult oder auf der Bühne war, konnte den Hebel nicht ziehen – er ist nur oben auf dem Schnürboden erreichbar. Die Störung an Zug 12 zwei Wochen vorher betraf den Motor, nicht die Bremse; sie lieferte nur die bequeme Erklärung „Defekt“.
+
 Keller hat für alles dieselbe Nummer: **4417** – seine Kartennummer an der Seitentür, und der Code des Vorhängeschlosses an U-4. Hagedorn hat das bemerkt („Benutzt er überall dieselbe Nummer?“).
 
 ---
@@ -70,7 +79,7 @@ Keller hat für alles dieselbe Nummer: **4417** – seine Kartennummer an der Se
 | 21:44:08 | Sprechanlage, Timo: „Blackout steht, warte auf Freigabe.“ – vom Lichtpult | Mitschnitt Sprechanlage |
 | **21:44:12** | **Zug 12 – Handablass** (Notablass auf dem Schnürboden) | Zugprotokoll der Obermaschinerie |
 | 21:45:03 | Arbeitslicht an | Lichtprotokoll |
-| 21:52 | Keller legt P-4, eingewickelt in ein Tuch aus der Verwaltung, in den Schrank K-4 im Wartungsgang und verlässt das Haus unbemerkt durch die Seitentür (Ausgang wird nicht protokolliert) | Tuch im Schrank (Bereich 5) |
+| 21:52 | Keller legt P-4, eingewickelt in ein Tuch aus der Verwaltung, in den Werkzeugschrank W-1 im Wartungsgang und verlässt das Haus unbemerkt durch die Seitentür (Ausgang wird nicht protokolliert) | Tuch im Schrank (Bereich 5) |
 
 **Danach**
 
@@ -79,8 +88,9 @@ Keller hat für alles dieselbe Nummer: **4417** – seine Kartennummer an der Se
 | Di 10.11., 08:00 | Keller schwärzt seinen Namen im Schlüsselregister. Den Durchschlag darunter übersieht er. | Bereich 2 |
 | Di 10.11., 09:00 | Reuters Termin beim Kulturamt („Prüfung T-17“) – findet nicht mehr statt | Reuters Kalender (Bereich 4) |
 | Di–Mi | Hagedorn baut seine Wand | Bereich 1 |
-| Mi 11.11., 20:40 | Hagedorn fährt allein ins Theater; Notiz in der Lichtregie | Bereich 3 |
-| Mi 11.11., ca. 21:15 | Hagedorn findet P-4 im Schrank. Er hört Schritte, schiebt den Stift unter das Bodengitter am Wasserhahn und ritzt einen Pfeil in die Wand. Keller sperrt ihn in die Kammer (Vorhängeschloss 4417), findet den Schrank leer und sucht im Dunkeln vergeblich. | Bereich 5 |
+| Mi 11.11., 20:45 | Hagedorn lässt sich beim Pförtner den Generalschlüssel geben | Pförtnerbuch (Bereich 2) |
+| Mi 11.11., ca. 20:50 | Hagedorn hinterlegt seine Notiz im Regiebuch (Lichtregie) | Bereich 3 |
+| Mi 11.11., ca. 21:15 | Hagedorn findet P-4 im Werkzeugschrank W-1. Er hört Schritte, schiebt den Stift unter das Bodengitter am Wasserhahn und ritzt einen Pfeil in die Wand. Keller sperrt ihn in die Kammer (Vorhängeschloss 4417), nimmt ihm den Generalschlüssel ab, findet den Schrank leer und sucht im Dunkeln vergeblich. | Bereich 5 |
 | Mi 11.11., 21:58 | SMS von Hagedorns Telefon an dich: „Brauche ein paar Tage Abstand. Der Fall war ein Unfall. – R.H.“ | Telefon (Bereich 1) – Hagedorn unterschreibt sonst immer nur mit „H.“ |
 | Do 12.11. | Dr. Wessel schließt den Fall als Unfall | Nachricht |
 | **Fr 13.11., 22:00** | **Spielbeginn** | – |
@@ -139,9 +149,9 @@ Freigeschaltet ≠ besucht – wie bei Hotel Nocturne: Die Karte erlaubt Schnell
 | Kontrollliste Zug 12 (P-4 um 21:10 gesteckt) | 3 | Rätsel 7 |
 | Hagedorns letzte Notiz („U-4“) | 3 | Weg zu Bereich 5 |
 | Nähprotokoll (17:05, Samtkante Mond) | 4 | Ruth entlasten |
-| Rechnungsvergleich T-17 (entsteht durch Rätsel 10) | 4 | **Motiv** |
+| Rechnungsvergleich T-17 (entsteht durch Rätsel 11) | 4 | **Motiv** |
 | Reuters Notiz „Zahlung stoppen. Morgen melden.“ | 4 | **Motiv** |
-| Leeres Tuch mit Verwaltungsstempel im Schrank K-4 | 5 | stützt „Mittel“ (Verbindung zur Verwaltung) |
+| Leeres Tuch mit Verwaltungsstempel im Werkzeugschrank W-1 | 5 | stützt „Mittel“ (Verbindung zur Verwaltung) |
 | **Sicherungsstift P-4** (verbogene Spitze, passt zum Schaden am Zug) | 5 | **Mittel** |
 
 ---
@@ -197,7 +207,7 @@ Jede Karte, jede Notiz und jeder Faden ist ein eigener Eintrag (`board:<id>`, ü
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 1 | **Die Schublade** | Code | Post-it in Hagedorns Schrift: „Code wie immer: die Minute, um die es geht.“ Auf der Wand steht groß: „Mond fällt 21:44“. | **2144** → Theaterschlüssel |
+| 1 | **Die Schublade** | Code | Post-it in Hagedorns Schrift: „Code wie immer: die Uhrzeit, um die es geht.“ Auf der Wand steht groß: „Mond fällt 21:44“. | **2144** → Theaterschlüssel |
 | 2 | **Die Wand fotografieren** | Ereignis | Tablet nehmen, an der Wand benutzen → Pinnwand erscheint (kurze Einführung: aufhängen, Faden, Notiz) | Tablet an der Wand |
 
 **Telefon beim Start:** die SMS „Brauche ein paar Tage Abstand. Der Fall war ein Unfall. – R.H.“ Hagedorns Notizen an der Wand sind alle mit „H.“ unterschrieben. (Kein Pflichträtsel – ein Moment, der die Dringlichkeit setzt.)
@@ -222,6 +232,9 @@ Jede Karte, jede Notiz und jeder Faden ist ein eigener Eintrag (`board:<id>`, ü
 | 5 | **Der Schlüsselkasten** | Beobachtung | Kasten offen. Haken B-1 (Bühne) hängt, Haken K-4 (Technik, Unterbühne, Gänge) ist leer. | B-1 nehmen |
 
 Rückmeldungen Rätsel 4: **2139** „Die Uhr geht vor – nicht nach.“ · **2133** „Das ist die Zeit der Foyeruhr.“ · **2129** „Das ist die Zeit an der Seitentür.“
+**Hinweise:** *3:* (1) Ein Name wurde geschwärzt – aber Register werden mit Durchschlag geführt. (2) Das Blatt darunter wirkt leer. Mit einem weichen Stift kann man eingedrückte Schrift sichtbar machen. (3) Bleistift aus Hagedorns Büro am Schlüsselregister benutzen. · *4:* (1) Zwei Uhren, zwei Zeiten – nur eine geht richtig. (2) Neben der Foyeruhr hängt ein Wartungszettel; das Seitentür-Terminal nutzt die Serverzeit. (3) 21:33 minus 6 Minuten: 2127. · *5:* (1) Im Schlüsselkasten hängt, was du brauchst – und es fehlt etwas Wichtiges. (2) Achte auf die Beschriftung der Haken. (3) Nimm B-1; der Haken K-4 ist leer, und im Register fehlt die Rückgabe.
+**Rückmeldungen Rätsel 3:** falscher Gegenstand am Register: „Damit drückst du nur noch mehr ein. Du brauchst etwas, das abfärbt.“
+
 **Nachricht nach Rätsel 3 (unbekannt, später: Pförtner Mahler):** „Den Durchschlag hat noch nie jemand angeschaut. Außer Ihrem Kollegen.“
 **Geheimnis:** Hinter dem Gedenkbild ein Theaterzettel von 1987 – Reuter als junger Schauspieler, Rolle: „Der Kommissar“.
 
@@ -254,27 +267,42 @@ Rückmeldungen Rätsel 6: Z12-H vor LS47 → „Dann wäre der Mond im hellen Li
 
 - **Nord · Nähtisch:** Nähmaschine, Nähprotokoll, Stoffmusterbuch.
 - **Ost · Kostümlager:** Kleiderstangen, Kostüm „Mond“ (Ersatzteil mit roter Samtkante).
-- **Süd · Kellers Büro:** aufgeräumt, zu aufgeräumt. Zahlungsbuch im Regal.
+- **Süd · Kellers Büro:** aufgeräumt, zu aufgeräumt. Zahlungsbuch im Regal, Reisekostenabrechnung in der Ablage.
 - **West · Reuters Büro:** Schreibtisch mit Kalender, Rechnungsordner T-17, kleiner Wandtresor (4 Ziffern).
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
 | 10 | **Die Stoffspur** | Auswahl + Pinnwand | Kriminaltechnik-Bericht (in der Akte): „rote Samtfasern, Charge unbekannt“. Nähprotokoll 17:05: „Mond, Samtkante erneuert – Bordeaux, Charge 0917“. Im Musterbuch die passende Probe finden (fünf Rottöne). Dann an der Wand den Ruth-Faden widerlegen. | **Bordeaux 0917** · Ruth-Faden mit Nähprotokoll widerlegen |
-| 11 | **Die doppelte Rechnung** | Auswahl in zwei Stufen | Ordner T-17: Rechnung „Hartwig Bühnenbau“ und Rechnung „BTW Theatertechnik“ – gleicher Auftrag, gleiche Leistung, beide bezahlt (Zahlungsbuch). ① Welche ist die Scheinrechnung? ② Wer hat sie freigegeben? | ① **BTW** (keine Steuernummer, Rechnungsnummern fortlaufend nur fürs Theater, Anschrift = Postfach) ② **Keller** (Freigabe-Kürzel J.K.). Beweis: „Rechnungsvergleich T-17: 186.400 € seit 2023“ |
+| 11 | **Die doppelte Rechnung** | Auswahl in drei Stufen | Ordner T-17 (Reuters Büro): Rechnung „Hartwig Bühnenbau“ und Rechnung „BTW Theatertechnik“ – gleicher Auftrag, gleiche Leistung, beide bezahlt (Zahlungsbuch). In Kellers Büro: seine Reisekostenabrechnung mit Erstattungskonto. ① Welche ist die Scheinrechnung? ② Wer hat sie freigegeben? ③ Wohin floss das Geld? | ① **BTW** ② **Keller** (Freigabe-Kürzel J.K.) ③ **Kellers Konto**: Die IBAN von BTW im Zahlungsbuch endet auf **…4417 02** – dieselbe IBAN steht auf Kellers Reisekostenabrechnung. Beweis: „Rechnungsvergleich T-17: 186.400 € an Keller“ |
 | 12 | **Reuters Tresor** | Code | Auf Reuters Schreibtisch, mit Datum 9.11.: „Zahlung T-17 stoppen. **Morgen** melden.“ Kalender: 10.11., 09:00 „Kulturamt – Prüfung T-17“. Tresor mit 4 Ziffern. | **1011** → Ersatzschlüssel K-4, dazu Reuters Mappe „T-17“ (Beweis Motiv) |
+
+**Die Scheinrechnungen (Zahlungsbuch, Auftrag T-17 „Instandhaltung Obermaschinerie“):**
+
+| Jahr | Rechnungen BTW | Summe | Freigabe |
+|---|---|---|---|
+| 2023 | 4 | 52.800 € | J.K. |
+| 2024 | 5 | 61.200 € | J.K. |
+| 2025 | 6 | 72.400 € | J.K. |
+| **Gesamt** | **15** | **186.400 €** | |
+
+Hartwig Bühnenbau hat die Arbeiten tatsächlich ausgeführt und korrekt abgerechnet; jede BTW-Rechnung kopiert eine Hartwig-Leistung desselben Monats. Verdächtig sind die fehlende Steuernummer und das Postfach – **beweisend** ist erst die IBAN, die zu Kellers Erstattungskonto gehört. Reuter fiel es auf, weil er im Oktober 2026 die Hartwig-Rechnung für die Motorreparatur an Zug 12 abzeichnete und im selben Monat eine zweite fand.
+
+Rückmeldungen Rätsel 11: ① Hartwig → „Hartwig hat gearbeitet – im Probenplan stehen ihre Monteure.“ ③ falsches Konto → „Vergleiche die IBAN mit allen Unterlagen aus der Verwaltung.“
 
 Rückmeldungen Rätsel 12: **0911** „Das ist der Tag der Notiz – er wollte es morgen melden.“ · **0900** „Die Uhrzeit des Termins – gesucht ist der Tag.“
 **Nachricht Dr. Wessel nach Rätsel 11:** „Sind Sie etwa im Theater? Das Haus ist versiegelt.“ – Druck, aber keine Strafe.
 **Geheimnis:** Im Kostümlager ein Kostüm mit Namensschild „A. Reuter – Abschiedsvorstellung“: Ruth hatte heimlich ein Kostüm für Reuters letzte Rolle genäht.
 
-**Hinweise:** *10:* (1) Wann kamen die Fasern an den Mond? (2) Das Nähprotokoll nennt Uhrzeit und Charge. (3) Bordeaux 0917; dann Ruth-Faden mit dem Nähprotokoll widerlegen. · *11:* (1) Zwei Firmen, ein Auftrag. (2) Eine Firma hat keine Steuernummer und nur ein Postfach. Das Freigabe-Kürzel steht unten rechts. (3) BTW – freigegeben von Keller. · *12:* (1) Reuter wollte etwas am nächsten Tag tun. (2) Sein Kalender zeigt den Termin. (3) 1011.
+**Hinweise (ergänzt):** *11:* (1) Zwei Firmen, ein Auftrag – nur eine hat gearbeitet. (2) Das Freigabe-Kürzel steht unten rechts; die IBAN steht im Zahlungsbuch. Wo taucht dieselbe IBAN noch auf? (3) BTW – freigegeben von Keller – IBAN wie auf Kellers Reisekostenabrechnung.
+
+**Hinweise:** *10:* (1) Wann kamen die Fasern an den Mond? (2) Das Nähprotokoll nennt Uhrzeit und Charge. (3) Bordeaux 0917; dann Ruth-Faden mit dem Nähprotokoll widerlegen. · *12:* (1) Reuter wollte etwas am nächsten Tag tun. (2) Sein Kalender zeigt den Termin. (3) 1011.
 
 ### Bereich 5 – Wartungsgang U-4 · Unter der Bühne · ca. 13 Min.
 
 **Was du erfährst:** wo der Stift ist – und wo Hagedorn ist.
 
 - **Nord · Tür U-4:** Stahltür, Schild „U-4 – nur Technik“. Mit K-4 auf.
-- **Ost · Schrank K-4:** Werkzeugschrank (öffnet mit demselben Schlüssel). Darin nur ein leeres Tuch mit Stempel „Verwaltung – Stadttheater Velden“ – die Form eines Stifts ist noch zu sehen. Daneben Arbeitshandschuhe.
+- **Ost · Werkzeugschrank W-1:** öffnet mit Schlüssel K-4. Darin nur ein leeres Tuch mit Stempel „Verwaltung – Stadttheater Velden“ – die Form eines Stifts ist noch zu sehen. Daneben Arbeitshandschuhe.
 - **Süd · Der Gang:** stockdunkel, Rohre, ein Wasserhahn, ein Bodengitter. In die Wand geritzt (nur mit Licht): ein Pfeil nach unten und „H.“.
 - **West · Kammer:** Holztür mit Riegel und Vorhängeschloss (4 Ziffern). Klopfen von innen.
 
@@ -308,7 +336,7 @@ Filmische Sequenz mit dem Abspieler von Hotel Nocturne (Szenen, Untertitel, Ger�
 1. Die Wand, Fäden laufen grün zu Keller zusammen.
 2. Hagedorn, auf einer Kiste sitzend, Wasserbecher: „Ich habe zwei Nächte gezählt, wie oft der Inspizient ‚Achtung Mondszene‘ gerufen hätte.“
 3. Telefon: du schickst den Bericht an Dr. Wessel. Antwort nach kurzer Pause: „Ich schicke eine Streife. Und einen Krankenwagen.“
-4. Außen, Theater bei Nacht, Blaulicht. Keller wird an der Seitentür festgenommen – mit Karte 4417 in der Hand.
+4. Außen, Theater bei Nacht, Blaulicht. Keller wird an der Seitentür festgenommen – mit Karte 4417 in der Hand, in der Tasche Schlüssel K-4 und der Generalschlüssel des Hauses.
 5. „Der letzte Vorhang fällt.“ – Abschluss mit Statistik und persönlicher Nachricht.
 
 **Ende ohne Beweisführung gibt es nicht** – Hagedorn freizulassen reicht nicht, der Fall muss gelöst werden.
@@ -344,8 +372,12 @@ Filmische Sequenz mit dem Abspieler von Hotel Nocturne (Szenen, Untertitel, Ger�
 4. Bereich 1 als spielbarer Einstieg, dann 2–5.
 5. Katalogeintrag „Der letzte Fall“ auf „spielbar“ setzen.
 
-## 11. Offene Fragen
+## 11. Entscheidungen
 
-- **Titel:** „Der letzte Fall – Der letzte Vorhang“ (Katalog: Titel „Der letzte Fall“, Untertitel „Der letzte Vorhang“)?
-- **Spielerfigur:** genügt „Hagedorns Partner/in“ ohne Namen, oder soll der Name wie bei Hotel Nocturne in `config.js` personalisierbar sein?
-- **Stück im Theater:** „Die Nacht der Masken“ ist ein Platzhalter.
+| Frage | Entscheidung |
+|---|---|
+| Katalog | Titel **Der letzte Fall**, Untertitel **Der letzte Vorhang** |
+| Katalogtext | „Ein Theaterdirektor ist tot. Ein Kommissar verschwunden. Seine letzte Ermittlung wartet auf dich.“ · Krimi · 75–90 Min. · 1–4 Personen |
+| Spielerfigur | geschlechtsneutral, Name optional über `config.js` |
+| Stück im Theater | **Die Nacht der Masken** |
+| Jahr | 2026 (Mo 9.11. Tat · Fr 13.11. Spielbeginn) |

@@ -282,6 +282,9 @@ dialog::backdrop { background: #000000c0; backdrop-filter: blur(3px); }
 .paper .handwriting.other { color: #6b2420; font-family: var(--sans); font-style: normal; letter-spacing: .01em; }
 .paper .handwriting.margin { font-size: 15px; border-left: 2px solid #8e3b3688; padding-left: 12px; margin-top: 16px; }
 .paper .mono { font: 13px/1.7 var(--mono); }
+.paper .doc-banner { border: 2px solid #2a2119; padding: 8px 12px; font: 600 15px/1.4 var(--sans); text-align: center; }
+.paper .doc-banner span { font-weight: 400; font-size: 13px; }
+.paper .smudge { color: #8a7a62; filter: blur(1.2px); letter-spacing: .1em; }
 .paper .dim { color: #7b6a54; }
 .doc-table, .doc-kv { width: 100%; border-collapse: collapse; font: 13px var(--mono); }
 .doc-table th { text-align: left; font-size: 10px; letter-spacing: .1em; color: #6c5a44; border-bottom: 1px solid #a89272; padding: 6px; }
@@ -332,6 +335,16 @@ dialog::backdrop { background: #000000c0; backdrop-filter: blur(3px); }
 .use-item span { color: var(--brass); }
 .use-item:hover { border-color: var(--brass); }
 .shake { animation: shake .4s; }
+.strips { list-style: none; padding: 0; margin: 8px 0 6px; display: grid; gap: 2px; }
+.strip { position: relative; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 10px 10px 10px 18px; background: #e6dcc3; color: #2c2a5a; font: italic 500 17px/1.3 var(--serif); cursor: grab; touch-action: none; user-select: none; transition: transform .15s, gap .2s; }
+.strip:nth-child(odd) { background: #e9e0c8; }
+.strip.dragging { cursor: grabbing; z-index: 2; box-shadow: 0 10px 24px #000a; transition: none; }
+.strip-text { flex: 1; }
+.strip-btns { display: flex; flex-direction: column; gap: 2px; }
+.strip-btns button { width: 30px; height: 20px; padding: 0; border: 1px solid #a89272; background: #d8cdb3; color: #4f3c27; font-size: 10px; border-radius: 3px; }
+.strips.done { gap: 0; }
+.strips.done .strip { clip-path: none !important; background: #e9e0c8; }
+.strips.done .strip-btns { visibility: hidden; }
 .wheels { display: flex; justify-content: center; gap: 8px; margin: 6px 0 16px; }
 .wheel { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .wheel button[data-wheel] { width: 48px; height: 34px; background: linear-gradient(#24221d, #161512); border: 1px solid #4d4232; color: var(--brass-2); font-size: 12px; border-radius: 4px; }

@@ -101,11 +101,11 @@
           <rect x="420" y="45" width="80" height="150" class="plan-room"/><text x="460" y="115" class="plan-label">ARCHIV</text>
           <rect x="500" y="45" width="80" height="150" class="plan-room"/><text x="540" y="110" class="plan-label">AUFZUG</text><text x="540" y="126" class="plan-small">Treppe</text>
           <text x="20" y="232" class="plan-title">UNTERGESCHOSS</text><rect x="120" y="250" width="460" height="110" class="plan-wall"/>
-          <rect x="20" y="285" width="100" height="40" fill="url(#hatch)" class="plan-tunnel"/>
+          <rect x="20" y="100" width="100" height="40" fill="url(#hatch)" class="plan-tunnel"/><text x="70" y="94" class="plan-small">Rampe ↗</text>
           <rect x="120" y="250" width="170" height="110" class="plan-room"/><text x="205" y="310" class="plan-label">TECHNIK</text>
           <rect x="290" y="250" width="170" height="110" class="plan-room"/><text x="375" y="310" class="plan-label">GEPÄCKLAGER</text>
           <rect x="460" y="250" width="120" height="110" class="plan-room"/><text x="520" y="305" class="plan-label">SICHERHEIT</text><text x="520" y="321" class="plan-small">Kameras</text>
-          <text x="20" y="384" class="plan-small warn" style="text-anchor:start">◤ SERVICETUNNEL WEST – DAUERHAFT VERSCHLOSSEN</text>
+          <text x="20" y="156" class="plan-small warn" style="text-anchor:start">◤ SERVICETUNNEL</text><text x="20" y="168" class="plan-small warn" style="text-anchor:start">WEST · DAUERHAFT</text><text x="20" y="180" class="plan-small warn" style="text-anchor:start">VERSCHLOSSEN</text>
         </svg><p class="mono dim">Obergeschosse 1–3: Gästezimmer 101–320 (nicht abgebildet).</p>`,
     },
   });

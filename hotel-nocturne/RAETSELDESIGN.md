@@ -11,6 +11,10 @@
 
 Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:17 Uhr** fällt der Strom aus. Der Haupteingang ist nicht mehr sicher. Nachtmanager **Elias Voss** startet den Notstrom und evakuiert die **sechs Gäste** über den **westlichen Servicetunnel** und **Tor W2** in den Innenhof (**23:24 Uhr**). Diesen Tunnel hatte Eigentümer **Viktor Lehn** aus Kostengründen auf dem Papier „stillgelegt“, also Wartungsprotokolle gefälscht. Unter den Gästen ist Elias’ Tochter **Mara Voss**, eingecheckt als **M. Vale** in Zimmer 217. Elias kehrt danach allein ins Büro zurück, sichert das **originale Wartungsregister** und das **Backup-Band der Kamera im Innenhof** und verschwindet. Lehn stellt ihn öffentlich als Schuldigen hin. Siebzehn Jahre später lädt **Mara** die Spielerin ins Hotel ein, damit endlich jemand von außen die Wahrheit rekonstruiert und ihren Vater entlastet. Die handschriftlichen Zeilen auf der Reservierung („Vertrauen Sie nicht den offiziellen Aufzeichnungen. – Elias Voss“) stammen aus einem Brief, den Elias 2009 zurückgelassen hat; Mara hat sie abgeschrieben. Die Nachrichten der „unbekannten Nummer“ kommen von ihr und werden im Laufe des Spiels immer persönlicher. Erst ganz am Ende nennt sie ihren Namen.
 
+**Festlegungen zur Welt:**
+- **Mara** wurde 1991 geboren: 2009 ist sie 18 (Schal zum achtzehnten Geburtstag), heute 35.
+- **Höhenlage:** Der westliche Servicetunnel beginnt im **Westflügel auf Erdgeschosshöhe** und führt über eine Rampe hinaus zu Tor W2. Das Untergeschoss (Gepäcklager, Technik) liegt tiefer und stand in jener Nacht kniehoch unter Wasser. Deshalb war der Westgang der einzige sichere Weg.
+
 **Begriffe – überall gleich verwenden:**
 - **Westlicher Servicetunnel** – der Fluchtweg unter dem Westflügel. In Elias’ Briefen heißt er kurz **„Westgang“**; beides meint dasselbe.
 - **Tor W2** – das äußere Tor am Ende dieses Tunnels.
@@ -126,31 +130,33 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 ---
 
-### Raum 3 – Gepäcklager · Untergeschoss · ca. 14 Min.
+### Raum 3 – Gepäcklager · Untergeschoss · *gebaut (Stand 1.1)* · ca. 14 Min.
 
-**Was die Spielerin erfährt:** M. Vale war **Mara Voss**, Elias’ Tochter. Elias hat Spuren für sie hinterlassen.
+**Was die Spielerin erfährt:** M. Vale war **Mara Voss**, Elias’ Tochter. Elias hat nach der Evakuierung Beweise gesichert (Band Kamera 3 → Archiv, Fach W).
+
+**Gepäcklogik:** Die Anhängernummern sind zugleich die Gepäckscheinnummern. Im Regal stehen drei Wertgepäckstücke (Schachfigur 2, Notenblatt 9, Kompass 4); das vierte, **Nr. 6 mit dem blauen Schal**, ist Maras Koffer und kommt erst gegen den Gepäckschein aus der Ausgabeklappe.
 
 **Blickrichtungen**
-- **Nord · Treppe:** Rückweg, nasse Stufen, Wasserflecken bis kniehoch an der Wand (Hinweis auf die Überschwemmung).
-- **Ost · Regale:** vier Koffer mit Anhängern (Schachfigur 2, Blauer Schal 6, Notenblatt 9, Kompass 4).
-- **Süd · Ausgabetresen:** Ausgabeklappe „Nur gegen Gepäckschein“, wasserbeschädigtes Verzeichnis, Papierkorb.
-- **West · Gitterkäfig „Wertgepäck“:** verschlossene Truhe mit vierstelligem Schloss: „In der Reihenfolge, in der sie ankamen.“
+- **Nord · Treppe:** nasse Treppe zurück zur Rezeption, auf dem Absatz die Milchglastür **ARCHIV**, flackernde Notbeleuchtung („Notstromkreis W · geprüft 09/2009“).
+- **Ost · Regale:** drei Koffer mit Gegenstand und Messinganhänger, tropfendes Rohr über einem Eimer.
+- **Süd · Ausgabe:** Stahlklappe „Ausgabe nur gegen Gepäckschein“ mit Schlitz, Tischklingel, beschädigtes Verzeichnis, Papierkorb.
+- **West · Gitterkäfig:** Käfig „Wertgepäck“ mit Truhe („In der Reihenfolge, in der sie ankamen.“).
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 8 | **Gepäckausgabe** | Mechanik | Gepäckschein Nr. 6 an der Ausgabeklappe benutzen → ein Koffer mit blauem Schal rollt heraus. Am Griff: „M. Vale, 217“. Darin der Gitterkäfig-Schlüssel und Maras Notizbuch (Hintergrund). | Gepäckschein benutzen |
-| 9 | **Ankunftsreihenfolge** | Logik + Raum 1 | Kopfzeile des Verzeichnisses: *„Wertgepäck 14.10. – nur vier Stücke eingelagert. Die übrigen Gäste haben ihre Koffer vor der Evakuierung zurückerhalten.“* Damit ist klar, warum Hallström und Doran nicht zählen. Die Reste nennen nur Zimmer, keine Uhrzeiten: Schachfigur → der von diesen vier zuerst ankam · Schal → Zimmer 217 · Notenblatt → Zimmer 214 · Kompass → der von diesen vier zuletzt ankam. **Die Check-in-Zeiten stehen nur im Gästeregister aus Raum 1.** | **2694** → Truhe |
-| 10 | **Die zerrissene Notiz** | Puzzle (neu) | Im Papierkorb liegen 5 Schnipsel. Zusammenlegen ergibt Elias’ Handschrift: „Band Kamera 3 gesichert → Archiv, Fach W. Ich bin erst zurück, als alle draußen waren.“ | Schnipsel in die richtige Lage ziehen |
+| 8 | **Gepäckausgabe** | Mechanik | Gepäckschein Nr. 6 am Schlitz benutzen (Schein wird verbraucht). Erst ein Klicken, nach zwei Sekunden Rumpeln: Die Klappe hebt sich, Maras Koffer rollt heraus, hinter der Wand entfernen sich Schritte. Im Koffer: **Käfigschlüssel**, Maras Notizbuch (Geheimnis). | Gepäckschein benutzen |
+| – | *Übergang: Käfig* | Mechanik | Käfigschlüssel an der Käfigtür. | – |
+| 9 | **Ankunftsreihenfolge** | Logik + Raum 1 | Verzeichnis: *„Nur vier Stücke eingelagert. Die übrigen Gäste haben ihre Koffer vor der Evakuierung zurückerhalten.“* · Schachfigur → zuerst angekommen · Notenblatt → Zimmer 214 · Kompass → zuletzt angekommen. Die Zeiten stehen nur im Gästeregister (Raum 1). Rückmeldungen für 2469 (Anhängernummern), 2964 (Zimmernummern), 4962 (umgekehrt). | **2694** → Originales Gepäckverzeichnis („M. Vale – tatsächlicher Name: Mara Voss“) + **Archivschlüssel** |
+| 10 | **Elias’ Notiz** | Sortieren | Fünf Papierstreifen ziehen oder mit ▲/▼ ordnen; die Risskanten passen nur in einer Reihenfolge. | „Band Kamera 3 gesichert. / Liegt im Archiv, Fach W. / Lehn darf es nie finden. / Ich bin erst zurück, als alle draußen waren. / – E.“ |
+| – | *Übergang: Archivtür* | Mechanik | Archivschlüssel an der Milchglastür (Nord). Die Tür schaltet das Archiv selbst frei – keine Sackgasse, falls die Notiz noch fehlt. Der Raum gilt erst als abgeschlossen, wenn Truhe, Notiz und Tür gelöst sind. | – |
 
-**Belohnung in der Truhe:** Originales Gepäckverzeichnis („M. Vale – tatsächlicher Name: Mara Voss“) und der **Archivschlüssel**.
-**Übergang:** Treppe hoch, Flur hinter der Tür „Personal“ → Archiv.
+**Nachrichten (Mara, ohne Namen):** nach der Ausgabe *„Den Schal hat er mir zum achtzehnten Geburtstag geschenkt. Ich habe ihn in jener Nacht hier zurückgelassen.“* · nach der Truhe *„Du hast gefunden, was im Register fehlte. Ein Name kann aus einer Akte verschwinden. Aus einer Erinnerung nicht.“*
 
-**Hinweise**
-- *8:* (1) Hier gibt man Gepäck nur gegen etwas heraus. (2) Den Gepäckschein hast du in Zimmer 217 gefunden. (3) Benutze den Gepäckschein Nr. 6 an der Ausgabeklappe (Süden).
-- *9:* (1) Die Uhrzeiten fehlen hier – aber du hast sie schon einmal gesehen. Es zählen nur die vier Gäste mit Wertgepäck. (2) Im Gästeregister (Akte): Berger 20:14, Vale 21:17, Winter 21:31, Stern 22:08. (3) Schachfigur 2 · Schal 6 · Notenblatt 9 · Kompass 4 → 2694.
-- *10:* (1) Im Papierkorb ist mehr als Müll. (2) Die Schnipsel passen an den Rissen zusammen; die Zeilen müssen durchgehend lesbar sein. (3) Lösung anzeigen (Schnipsel springen an ihren Platz).
+**Ereignis:** Nach der Truhe rutscht beim nächsten Blick nach Osten der schwarze Koffer vom Regal; dahinter erscheint die Marke *„14.10.2009 · 23:10 – Wasserstand Kniehöhe“* (sieben Minuten vor dem Stromausfall).
 
----
+**Geheimnis:** Maras Notizbuch: *„Papa sagt, das Hotel hat mehr Türen, als auf dem Plan stehen. Er sagt, ich soll mir merken, welche davon wirklich nach draußen führen.“*
+
+**Klang:** Raumgeräusch Tropfen und Rohrbrummen; Effekte Rumpeln, entfernte Schritte, Gitter, Truhe, Papier.
 
 ### Raum 4 – Hotelarchiv · Erdgeschoss · ca. 14 Min.
 

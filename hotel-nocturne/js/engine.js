@@ -85,6 +85,14 @@
       if (a.sound) A.play(a.sound);
       if (a.message) addMessage(a.message);
       if (a.unlock) add(S.unlocked, a.unlock);
+      if (a.remove) { S.inventory = S.inventory.filter((x) => x !== a.remove); if (selected === a.remove) selected = null; }
+      if (a.later) { // verzögerte Aktionen, z. B. etwas rumpelt erst nach ein paar Sekunden
+        const roomId = S.current;
+        setTimeout(() => {
+          run(a.later.actions); save();
+          if (inGame() && S.current === roomId) { renderStage({ narrate: a.later.narrate }); renderSide(); renderObjective(); }
+        }, a.later.ms || 1500);
+      }
       if (a.solve) solve(a.solve);
     }
   }
@@ -382,6 +390,9 @@
         <div class="wheel-picker hidden" role="group" aria-label="Buchstabe wählen">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => `<button type="button" data-letter="${c}">${c}</button>`).join("")}</div>
         <button type="button" class="submit-button wide" data-wheels-open>Öffnen</button>${fb}</div>`;
     }
+    if (p.type === "sort") {
+      return `<div class="lock lock-sort">${head}<p class="muted small">Ziehe die Streifen in die richtige Reihenfolge – oder verschiebe sie mit ▲ ▼.</p><ol class="strips" aria-label="Papierstreifen"></ol>${fb}</div>`;
+    }
     if (p.type === "use") {
       return `<div class="lock lock-use"><p class="lock-prompt">Welchen Gegenstand möchtest du hier benutzen?</p>
         ${S.inventory.length ? `<div class="use-items">${S.inventory.map((id) => `<button type="button" class="use-item" data-use="${id}"><span>${N.items[id].icon}</span> ${esc(N.items[id].name)}</button>`).join("")}</div>` : `<p class="muted">${esc(p.noItems || "Du hast noch nichts, was du hier benutzen könntest.")}</p>`}${fb}</div>`;
@@ -488,6 +499,66 @@
       document.addEventListener("keydown", onKey);
       dlgCleanup = () => document.removeEventListener("keydown", onKey);
     }
+    if (p.type === "sort") {
+      // Risskanten: Jede Grenze zwischen zwei Streifen hat ein eigenes Zackenmuster.
+      // Ein Streifen trägt oben das Muster seiner richtigen Position, unten das der nächsten –
+      // nur in der richtigen Reihenfolge passen die Kanten aufeinander.
+      const n = p.items.length;
+      const jag = (k, x) => { const v = Math.sin(k * 12.9898 + x * 78.233) * 43758.5453; return (v - Math.floor(v)) * 7; };
+      const clip = (idx) => {
+        const top = Array.from({ length: 11 }, (_, x) => `${x * 10}% ${jag(idx, x).toFixed(1)}px`);
+        const bot = Array.from({ length: 11 }, (_, x) => `${(10 - x) * 10}% calc(100% - ${(7 - jag(idx + 1, 10 - x)).toFixed(1)}px)`);
+        return `polygon(${top.concat(bot).join(",")})`;
+      };
+      let order = (p.start || p.items.map((it) => it.id)).slice();
+      const list = $(".strips", root);
+      const item = (id) => p.items.find((it) => it.id === id);
+      const draw = () => {
+        list.innerHTML = order.map((id, i) => `<li class="strip" data-strip="${id}" style="clip-path:${clip(p.answer.indexOf(id))}">
+          <span class="strip-text">${esc(item(id).text)}</span>
+          <span class="strip-btns"><button type="button" data-move="-1" data-i="${i}" aria-label="Nach oben" ${i === 0 ? "disabled" : ""}>▲</button><button type="button" data-move="1" data-i="${i}" aria-label="Nach unten" ${i === n - 1 ? "disabled" : ""}>▼</button></span></li>`).join("");
+      };
+      const check = () => {
+        if (order.join() === p.answer.join()) {
+          list.classList.add("done");
+          A.play("paper");
+          setTimeout(() => succeed(p), 700);
+          return true;
+        }
+        return false;
+      };
+      const move = (from, to) => {
+        if (to < 0 || to >= n || from === to) return;
+        const [x] = order.splice(from, 1); order.splice(to, 0, x);
+        A.play("paper"); draw(); check();
+      };
+      draw();
+      root.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-move]");
+        if (b && !list.classList.contains("done")) move(+b.dataset.i, +b.dataset.i + +b.dataset.move);
+      });
+      // Ziehen mit Maus oder Finger
+      let drag = null;
+      list.addEventListener("pointerdown", (e) => {
+        const li = e.target.closest(".strip");
+        if (!li || e.target.closest("button") || list.classList.contains("done")) return;
+        drag = { li, from: order.indexOf(li.dataset.strip), y: e.clientY };
+        li.setPointerCapture(e.pointerId); li.classList.add("dragging");
+      });
+      list.addEventListener("pointermove", (e) => { if (drag) drag.li.style.transform = `translateY(${e.clientY - drag.y}px)`; });
+      const drop = (e) => {
+        if (!drag) return;
+        const d = drag; drag = null;
+        d.li.classList.remove("dragging"); d.li.style.transform = "";
+        const rects = $$(".strip", list).map((el) => el.getBoundingClientRect());
+        let to = rects.findIndex((r) => e.clientY < r.top + r.height / 2);
+        if (to === -1) to = n - 1;
+        else if (to > d.from) to -= 1;
+        move(d.from, to);
+      };
+      list.addEventListener("pointerup", drop);
+      list.addEventListener("pointercancel", drop);
+    }
     if (p.type === "use") {
       root.addEventListener("click", (e) => {
         const b = e.target.closest("[data-use]");
@@ -503,6 +574,11 @@
     gained = [];
     A.play("unlock");
     solve(p.id);
+    if (p.quiet && justCompleted !== p.room) { // ohne Erfolgsdialog: nur Text unter der Szene
+      closeDialog();
+      renderStage({ narrate: p.success }); renderSide(); renderObjective();
+      return true;
+    }
     setTimeout(() => A.play("success"), 250);
     const r = ROOM[p.room], next = N.rooms[r.index + 1];
     const completedNow = justCompleted === r.id;
@@ -723,7 +799,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>6</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>7</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {

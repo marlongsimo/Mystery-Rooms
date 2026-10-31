@@ -1,5 +1,5 @@
 /*
- * STATIONEN 3–7 – VORLÄUFIGE FASSUNG
+ * STATIONEN 4–7 – VORLÄUFIGE FASSUNG
  * Die Rätsel stammen aus dem Prototyp und sind bereits spielbar,
  * die Räume haben aber noch keine gezeichnete Szene. Sie werden nach und nach
  * nach dem Vorbild der Rezeption (01-rezeption.js) ausgebaut.
@@ -12,7 +12,6 @@
   const note = (title, text) => ({ title, kind: "note", html: `<p>${text}</p>` });
 
   Object.assign(N.docs, {
-    gepaeckverzeichnis: note("Originales Gepäckverzeichnis", "Sechs Gäste verließen das Hotel in jener Nacht. Neben „M. Vale, Zimmer 217“ steht handschriftlich ergänzt: <b>Mara Voss</b>.<br><br>„Einer von ihnen durfte niemals offiziell existieren.“"),
     bauakte: note("Bauliche Veränderungen – Oktober 2009", "„Der westliche Servicetunnel ist nach außen hin als dauerhaft verschlossen zu dokumentieren. Eine tatsächliche Stilllegung wird nicht vorgenommen.“<br><br>Unterzeichnet: <b>Viktor Lehn</b>, Eigentümer"),
     entschluesselt: note("Entschlüsselte Nachricht", "DER WESTGANG IST OFFEN"),
     kameraprotokoll: note("Überwachungsprotokoll 14.10.2009", "23:17 – Stromausfall in der Lobby.<br>Notstrom springt an.<br><b>23:24</b> – Sechs Personen verlassen das Gebäude durch ein Tor im Westen.<br>Danach: Elias Voss betritt allein das Managerbüro und nimmt ein Buch aus dem Regal."),
@@ -22,21 +21,6 @@
   });
 
   const rooms = [
-    {
-      id: "gepaecklager", name: "Gepäcklager", title: "Das Gepäcklager", kicker: "UNTERGESCHOSS / SERVICEBEREICH",
-      story: "Staub liegt auf den Regalen. Vier Koffer stehen auf einem Tisch, die Anhänger sind noch lesbar. Das Gepäckverzeichnis daneben ist vom Wasser beschädigt.",
-      cards: [["♟", "Schachfigur"], ["♧", "Blauer Schal"], ["♫", "Notenblatt"], ["⌖", "Kompass"], ["▤", "Verzeichnis"]],
-      puzzle: {
-        type: "code", length: 4, title: "Der verschlossene Koffer",
-        prompt: "Ein fünfter Koffer hat ein Zahlenschloss. Auf dem Deckel: „In der Reihenfolge, in der sie ankamen.“ Ordne die Gegenstände den Gästen zu.",
-        clue: "Aus dem Gästeregister:\nL. Berger – 201 – 20:14\nM. Vale – 217 – 21:17\nJ. Winter – 214 – 21:31\nA. Stern – 220 – 22:08\n\nAnhänger: Schachfigur 2 · Blauer Schal 6 · Notenblatt 9 · Kompass 4\n\nReste des Verzeichnisses:\n• Die Schachfigur gehört dem, der von diesen vier zuerst ankam.\n• Der blaue Schal gehört zu Zimmer 217.\n• Das Notenblatt gehört zu Zimmer 214.\n• Der Kompass gehört dem, der von diesen vier zuletzt ankam.",
-        answers: ["2694"],
-        objective: "Öffne den verschlossenen Koffer.",
-        hints: ["Sortiere zuerst die vier Gäste nach ihrer Check-in-Zeit.", "Reihenfolge: Berger, Vale, Winter, Stern. Ordne dann jedem Gast seinen Gegenstand zu.", "Schachfigur 2, Schal 6, Notenblatt 9, Kompass 4 → 2694."],
-        success: "Im Koffer liegt das originale Gepäckverzeichnis. Neben dem Namen M. Vale hat jemand handschriftlich etwas ergänzt.",
-        onSolve: [{ doc: "gepaeckverzeichnis" }],
-      },
-    },
     {
       id: "archiv", name: "Hotelarchiv", title: "Das Hotelarchiv", kicker: "ERDGESCHOSS / VERWALTUNG",
       story: "Zwischen Personalakten und vergilbten Zeitungsartikeln liegt ein Brief, der keinen Sinn ergibt. Der Schreibtisch hat ein Fach mit Buchstabenschloss.",

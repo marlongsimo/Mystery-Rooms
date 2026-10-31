@@ -6,6 +6,7 @@
   let ctx = null;
   let enabled = true;
   let ambientTimer = null;
+  let ambientName = null;
 
   /* iPhone/iPad: Web Audio wäre sonst bei aktivem Lautlos-Schalter stumm.
      „playback“ behandelt das Spiel wie einen Musik-Player (iOS 16.4+). */
@@ -95,6 +96,10 @@
     buzz: () => { for (let i = 0; i < 2; i++) tone({ f: 140, type: "square", d: 0.18, v: 0.03, delay: i * 0.28 }); },
     light: () => noise({ d: 0.02, v: 0.3, freq: 3500 }),
     drop: () => { noise({ d: 0.04, v: 0.3, freq: 3000 }); tone({ f: 1400, d: 0.4, v: 0.03, delay: 0.02 }); noise({ d: 0.05, v: 0.2, freq: 2500, delay: 0.18 }); },
+    rumble: () => { noise({ d: 1.6, v: 0.35, freq: 120, type: "lowpass" }); tone({ f: 55, type: "sawtooth", d: 1.4, v: 0.04, slide: 20 }); noise({ d: 0.5, v: 0.15, freq: 400, delay: 1.2 }); },
+    steps_far: () => { [0, 0.45, 0.9, 1.3].forEach((t, i) => noise({ d: 0.06, v: 0.12 - i * 0.025, freq: 250, type: "lowpass", delay: t })); },
+    gate: () => { noise({ d: 0.05, v: 0.4, freq: 2500 }); tone({ f: 310, type: "square", d: 0.3, v: 0.03, delay: 0.03 }); tone({ f: 120, type: "sawtooth", d: 0.8, v: 0.03, delay: 0.2, slide: -40 }); },
+    drip: () => { tone({ f: 1800 + Math.random() * 700, d: 0.09, v: 0.035, slide: -900 }); },
     thunder: () => { noise({ d: 2.6, v: 0.5, freq: 160, type: "lowpass" }); noise({ d: 1.4, v: 0.35, freq: 90, type: "lowpass", delay: 0.3 }); },
   };
 
@@ -184,11 +189,25 @@
       if (M.active) stopMusic(800);
       startMusic(url);
     },
+    /* Raumgeräusch: "tick" (Uhr) oder "drip" (Tropfen und Rohrbrummen im Keller) */
     ambient(name) {
-      clearInterval(ambientTimer); ambientTimer = null;
-      if (!enabled || !name || !sounds[name]) return;
-      let odd = false;
-      ambientTimer = setInterval(() => { odd = !odd; if (!document.hidden) noise({ d: 0.012, v: odd ? 0.05 : 0.035, freq: odd ? 5000 : 4200 }); }, 1000);
+      if (name === ambientName && ambientTimer) return;
+      clearInterval(ambientTimer); clearTimeout(ambientTimer); ambientTimer = null; ambientName = null;
+      if (!enabled || !name) return;
+      ambientName = name;
+      if (name === "tick") {
+        let odd = false;
+        ambientTimer = setInterval(() => { odd = !odd; if (!document.hidden) noise({ d: 0.012, v: odd ? 0.05 : 0.035, freq: odd ? 5000 : 4200 }); }, 1000);
+      }
+      if (name === "drip") {
+        const next = () => {
+          ambientTimer = setTimeout(() => {
+            if (!document.hidden) { sounds.drip(); if (Math.random() < 0.15) noise({ d: 1.4, v: 0.06, freq: 90, type: "lowpass" }); }
+            if (ambientName === "drip") next();
+          }, 700 + Math.random() * 1900);
+        };
+        next();
+      }
     },
   };
 })();

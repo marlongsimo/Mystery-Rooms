@@ -334,10 +334,14 @@ dialog::backdrop { background: #000000c0; backdrop-filter: blur(3px); }
 .shake { animation: shake .4s; }
 .wheels { display: flex; justify-content: center; gap: 8px; margin: 6px 0 16px; }
 .wheel { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.wheel button { width: 48px; height: 34px; background: linear-gradient(#24221d, #161512); border: 1px solid #4d4232; color: var(--brass-2); font-size: 12px; border-radius: 4px; }
-.wheel button:hover { border-color: var(--brass); }
-.wheel-letter { width: 48px; height: 60px; display: grid; place-items: center; background: linear-gradient(#0b0b0a, #1e1b16 50%, #0b0b0a); border: 1px solid var(--brass); font: 500 28px var(--serif); color: var(--brass-2); }
+.wheel button[data-wheel] { width: 48px; height: 34px; background: linear-gradient(#24221d, #161512); border: 1px solid #4d4232; color: var(--brass-2); font-size: 12px; border-radius: 4px; }
+.wheel button[data-wheel]:hover { border-color: var(--brass); }
+.wheel-letter { width: 48px; height: 60px; padding: 0; cursor: pointer; display: grid; place-items: center; background: linear-gradient(#0b0b0a, #1e1b16 50%, #0b0b0a); border: 1px solid var(--brass); font: 500 28px var(--serif); color: var(--brass-2); }
 .wheel-letter.tick { animation: tick .18s; }
+.wheel-letter.active { box-shadow: 0 0 0 2px var(--brass-2), 0 0 18px #d4bc9055; }
+.wheel-picker { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 0 auto 14px; max-width: 340px; }
+.wheel-picker button { height: 38px; background: #181a19; border: 1px solid #4d4232; color: var(--brass-2); font: 500 16px var(--serif); border-radius: 3px; }
+.wheel-picker button:hover { border-color: var(--brass); }
 @keyframes tick { from { transform: translateY(-6px); opacity: .4; } }
 .secret-note { font: 10px var(--mono); letter-spacing: .12em; color: #d4bc90; margin: 0 0 14px; }
 .stage .lightning-only { opacity: 0; transition: opacity .05s; }

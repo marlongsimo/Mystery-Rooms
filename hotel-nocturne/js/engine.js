@@ -378,7 +378,8 @@
     if (p.type === "text") return `<form class="lock lock-text">${head}<div class="text-row"><input class="text-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Lösung eingeben" aria-label="Lösung"><button class="submit-button">Prüfen</button></div>${fb}</form>`;
     if (p.type === "multi") return `<form class="lock lock-multi">${head}${p.fields.map((f, i) => `<label class="multi-field"><span>${i + 1}. ${esc(f.label)}</span><input class="text-input" autocomplete="off" spellcheck="false"></label>`).join("")}<button class="submit-button wide">Tresor öffnen</button>${fb}</form>`;
     if (p.type === "wheels") {
-      return `<div class="lock lock-wheels">${head}<div class="wheels" role="group" aria-label="Buchstabenräder">${Array.from({ length: p.length }, (_, i) => `<div class="wheel"><button type="button" data-wheel="${i}" data-dir="-1" aria-label="Rad ${i + 1} zurück">▲</button><span class="wheel-letter" aria-live="polite">A</span><button type="button" data-wheel="${i}" data-dir="1" aria-label="Rad ${i + 1} weiter">▼</button></div>`).join("")}</div>
+      return `<div class="lock lock-wheels">${head}<p class="muted small">Tippe auf ein Rad, um den Buchstaben direkt zu wählen – oder drehe mit ▲ ▼.</p><div class="wheels" role="group" aria-label="Buchstabenräder">${Array.from({ length: p.length }, (_, i) => `<div class="wheel"><button type="button" data-wheel="${i}" data-dir="-1" aria-label="Rad ${i + 1} zurück">▲</button><button type="button" class="wheel-letter" data-pick="${i}" aria-label="Rad ${i + 1}: Buchstabe wählen">A</button><button type="button" data-wheel="${i}" data-dir="1" aria-label="Rad ${i + 1} weiter">▼</button></div>`).join("")}</div>
+        <div class="wheel-picker hidden" role="group" aria-label="Buchstabe wählen">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => `<button type="button" data-letter="${c}">${c}</button>`).join("")}</div>
         <button type="button" class="submit-button wide" data-wheels-open>Öffnen</button>${fb}</div>`;
     }
     if (p.type === "use") {
@@ -442,7 +443,32 @@
       const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       const pos = Array(p.length).fill(0);
       const letters = $$(".wheel-letter", root);
+      const picker = $(".wheel-picker", root);
+      let active = null;
+      const setWheel = (i, k) => {
+        pos[i] = k; letters[i].textContent = ABC[k];
+        letters[i].classList.remove("tick"); void letters[i].offsetWidth; letters[i].classList.add("tick");
+        A.play("key");
+      };
       root.addEventListener("click", (e) => {
+        const pick = e.target.closest("[data-pick]");
+        if (pick) {
+          const i = +pick.dataset.pick;
+          active = active === i ? null : i;
+          letters.forEach((l, k) => l.classList.toggle("active", k === active));
+          picker.classList.toggle("hidden", active === null);
+          return;
+        }
+        const letter = e.target.closest("[data-letter]");
+        if (letter && active !== null) {
+          setWheel(active, ABC.indexOf(letter.dataset.letter));
+          letters[active].classList.remove("active");
+          // gleich zum nächsten Rad weiter, damit man flüssig durchtippen kann
+          active = active + 1 < p.length ? active + 1 : null;
+          if (active !== null) letters[active].classList.add("active");
+          picker.classList.toggle("hidden", active === null);
+          return;
+        }
         const w = e.target.closest("[data-wheel]");
         if (w) {
           const i = +w.dataset.wheel;
@@ -482,7 +508,7 @@
     const completedNow = justCompleted === r.id;
     let buttons = `<button class="primary-button small" data-close>Weiter untersuchen</button>`;
     if (completedNow && r.final) buttons = `<button class="primary-button small" data-ending>Den letzten Brief lesen <span>→</span></button>`;
-    else if (completedNow && next) buttons = `<button class="primary-button small" data-goto="${next.id}" data-via="${r.views ? "elevator" : "door"}">${esc(r.exitLabel || `Weiter: ${next.name}`)} <span>→</span></button><button class="ghost-button" data-close>Noch hier bleiben</button>`;
+    else if (completedNow && next) buttons = `<button class="primary-button small" data-goto="${next.id}" data-via="${r.exitVia || (r.views ? "elevator" : "door")}">${esc(r.exitLabel || `Weiter: ${next.name}`)} <span>→</span></button><button class="ghost-button" data-close>Noch hier bleiben</button>`;
     openDialog({
       kicker: r.name.toUpperCase(),
       title: completedNow ? "Bereich gesichert" : "Gelöst",
@@ -697,7 +723,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>5</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>6</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {

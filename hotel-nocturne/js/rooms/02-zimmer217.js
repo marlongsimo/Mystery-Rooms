@@ -77,6 +77,10 @@
     <circle cx="930" cy="556" r="9" fill="none" stroke="#a8875a" stroke-width="4"/><rect x="927" y="563" width="6" height="22" fill="#a8875a"/><rect x="933" y="576" width="8" height="5" fill="#a8875a"/>
   </g>
   <rect x="1080" y="400" width="26" height="40" rx="3" fill="#cdbd9b" opacity=".6"/>
+  <g data-if="fenster_auf" fill="#8aa0b8" opacity=".22">
+    <ellipse cx="560" cy="800" rx="11" ry="18" transform="rotate(-12 560 800)"/><ellipse cx="610" cy="818" rx="11" ry="18" transform="rotate(10 610 818)"/>
+    <ellipse cx="570" cy="845" rx="12" ry="20" transform="rotate(-14 570 845)"/><ellipse cx="625" cy="868" rx="12" ry="20" transform="rotate(12 625 868)"/>
+  </g>
   `);
 
   /* ---------- OST: Bett ---------- */
@@ -163,6 +167,7 @@
         hotspots: [
           { id: "tuer217", label: "Zurück zum Aufzug", x: 38.3, y: 17.8, w: 23.3, h: 68.9, go: "rezeption", via: "elevator" },
           { id: "mantel", label: "Mantel", x: 15, y: 26.7, w: 10.8, h: 36.7, secret: true, title: "Ein dunkelgrüner Mantel", text: "Ein Damenmantel, viel zu leicht für Oktober. In der Tasche steckt eine Kinokarte.", doc: "kinokarte" },
+          { id: "fussspuren", label: "Nasse Fußspuren", x: 40, y: 86, w: 22, h: 8, if: "fenster_auf", title: "Nasse Fußspuren", text: "Frische, nasse Abdrücke auf dem Teppich, kleiner als deine. Sie führen von der Tür zum Schreibtisch – und wieder zurück. Jemand war gerade hier, während du zum Fenster gesehen hast." },
           { id: "spiegel", label: "Spiegel", x: 70.8, y: 24.4, w: 13.3, h: 33.3, title: "Der Spiegel", text: "Dein Gesicht, blass im Dämmerlicht. Für einen Herzschlag meinst du, hinter dir etwas zu sehen – aber da ist nur die Tür. Am unteren Rahmen hängt an einer Kordel ein alter Schlüssel." },
           { id: "alterschluessel", label: "Alter Schlüssel", x: 74.5, y: 59, w: 6, h: 7.5, title: "Ein alter Schlüssel", text: "Ein verzierter Schlüssel, der zu keinem Schloss in diesem Zimmer passt – reine Dekoration. Du drehst ihn um: In den Bart ist eine <b>7</b> eingeschlagen." },
         ],
@@ -186,7 +191,7 @@
         desc: "Das Fenster zum Innenhof. Regen läuft in Strömen über das Glas.",
         hotspots: [
           { id: "fenster", label: "Fenster", x: 31.7, y: 15.6, w: 36.7, h: 55.6, unless: "fenster_auf", title: "Das Fenster", text: "Unten liegt der Innenhof, fast völlig dunkel. Bei jedem Blitz siehst du für einen Augenblick die westliche Mauer – und darin ein schmales Tor, das auf keinem Plan zu stehen scheint." },
-          { id: "fenster_offen", label: "Offenes Fenster", x: 31.7, y: 15.6, w: 36.7, h: 55.6, if: "fenster_auf", title: "Das offene Fenster", text: "Das Fenster ist aufgeschlagen, Regen weht herein. Der Riegel ist nicht gebrochen – er war offen. Jemand muss ihn gelöst haben. Du schließt das Fenster, so gut es geht." },
+          { id: "fenster_offen", label: "Offenes Fenster", x: 31.7, y: 15.6, w: 36.7, h: 55.6, if: "fenster_auf", title: "Das offene Fenster", text: "Der Sturm hat das Fenster aufgedrückt, Regen weht herein. Aber der Riegel ist weder gebrochen noch verbogen – jemand hat ihn vorher gelöst, damit der nächste Windstoß genau das tut. Du drückst das Fenster wieder zu." },
           { id: "vorhang", label: "Vorhang", x: 24, y: 13, w: 9, h: 60, title: "Der Vorhang", text: "Schwerer roter Samt, staubig. Am Saum hat jemand mit Kugelschreiber winzig „M + P“ geschrieben." },
           { id: "heizung", label: "Heizkörper", x: 35.8, y: 75.6, w: 28.3, h: 8.9, title: "Der Heizkörper", text: "Eiskalt. Auf dem Ventil ist die Zahl 0 eingestellt." },
         ],
@@ -208,7 +213,7 @@
       {
         id: "fenster", view: "sued", ifSolved: "anordnung", flash: true,
         actions: [{ flag: "fenster_auf" }, { sound: "drop" }],
-        narrate: "Ein greller Blitz – und mit einem Knall schlägt das Fenster auf. Kalter Regen weht herein. Irgendwo im Flur fällt eine Tür ins Schloss.",
+        narrate: "Ein Blitz, ein heftiger Windstoß – und mit einem Knall schlägt das Fenster auf. Kalter Regen weht herein. Während du dich umdrehst, fällt hinter dir die Zimmertür ins Schloss.",
       },
     ],
     puzzles: {

@@ -530,3 +530,38 @@ body.flash .stage .lightning-only { opacity: 1; }
   .mp-mode .play { padding-bottom: 215px; }
   .mp-toast { bottom: auto; top: calc(var(--topbar) + 10px); }
 }
+
+/* ========== Text unter der Szene (ohne Überschrift) ========== */
+.caption .narration { margin-top: 2px; }
+@media (max-width: 760px) {
+  .narration { font-size: 15px; line-height: 1.55; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  .narration.open { display: block; overflow: visible; }
+  .narration.more:not(.open) { cursor: pointer; position: relative; }
+  .narration.more:not(.open)::after { content: "mehr"; position: absolute; right: 0; bottom: 0; padding-left: 28px; background: linear-gradient(90deg, transparent, var(--black) 26px); color: var(--brass); font: 10px/2.2 var(--mono); letter-spacing: .14em; }
+}
+
+/* ========== Rätseltyp „Folge“ (Bedienelemente nacheinander betätigen) ========== */
+.seq-panel { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 10px; margin: 12px 0 6px; padding: 14px; background: linear-gradient(#2a2d29, #1c1e1b); border: 2px solid #3a3f3a; border-radius: 6px; box-shadow: inset 0 2px 10px #0008; }
+.seq-ctl { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 12px; background: #151714; border: 1px solid #3a3f3a; color: #cfd6c8; border-radius: 4px; cursor: pointer; min-width: 0; }
+.seq-ctl:hover { border-color: var(--brass); }
+.seq-ctl b { font: 500 12px var(--mono); letter-spacing: .06em; text-align: center; }
+.seq-ctl small { font: 10px var(--mono); color: #8a8f88; }
+.seq-art svg { width: 64px; height: 96px; display: block; overflow: visible; }
+.seq-handle { transition: transform .35s cubic-bezier(.3, 1.4, .5, 1); transform-box: fill-box; transform-origin: var(--origin, center); }
+.seq-ctl.on .seq-handle { transform: translate(var(--tx, 0), var(--ty, 0)) rotate(var(--rot, 0deg)); }
+.seq-lamp { fill: #3a2a24; transition: fill .2s; }
+.seq-ctl.on .seq-lamp { fill: #e8b25a; }
+.seq-ctl.on { border-color: #8a7348; background: #1d1b15; }
+.lock-seq.done .seq-lamp { fill: #9fe0b0; }
+.lock-seq.done .seq-ctl { border-color: #5d7a64; }
+.seq-trail { min-height: 1.5em; margin: 4px 0 0; font: 12px var(--mono); color: var(--brass-2); letter-spacing: .06em; text-align: center; }
+@media (max-width: 760px) {
+  .seq-panel { gap: 6px; padding: 10px; }
+  .seq-art svg { width: 48px; height: 72px; }
+  .seq-ctl b { font-size: 10px; }
+}
+
+/* Keller: Startanleitung und Wandplan */
+.paper ol.steps { padding-left: 24px; line-height: 2; margin: 8px 0; }
+.paper .stain { background: radial-gradient(ellipse at 40% 50%, #8a7a5870, transparent 75%); padding: 2px 6px; }
+.paper .big-seq { font-size: 20px; text-align: center; letter-spacing: .12em; margin: 14px 0; }

@@ -50,7 +50,8 @@ hotel-nocturne/
 │       ├── 03-gepaecklager.js  Raum 3 mit vier Blickrichtungen
 │       ├── 04-archiv.js        Raum 4 mit vier Blickrichtungen
 │       ├── 05-ueberwachung.js  Raum 5 mit vier Blickrichtungen
-│       └── 06-07-vorlaeufig.js Räume 6–7, spielbar, noch ohne Szenen
+│       ├── 06-keller.js        Raum 6 mit vier Blickrichtungen (dunkel bis Strom)
+│       └── 07-buero-vorlaeufig.js Raum 7, spielbar, noch ohne Szene
 ├── assets/audio/               Hintergrundmusik
 └── assets/fonts/               Schriften + Lizenzen (SIL OFL)
 ```
@@ -60,9 +61,10 @@ hotel-nocturne/
 | Feld | Bedeutung |
 |---|---|
 | `views` | Vier Blickrichtungen (Szenen-Grundgerüst: `N.svgScene`) mit `dir`, `name`, `desc` (Text unter der Szene), `scene` (SVG 1200 × 900, später auch ein Foto möglich) und `hotspots`. |
-| `dark` | Bereich einer Ansicht, der nur mit Taschenlampe sichtbar ist (`x, y, w, h` in %, optional `clip`). |
-| Hotspot | Position `x, y, w, h` in Prozent. Kann `text` zeigen, ein `doc` in die Akte legen, ein Schloss tragen (`lock`), einen Gegenstand verlangen (`use`), einen Gegenstand liefern (`take`) oder in einen anderen Raum führen (`go`). Mit `if` / `unless` erscheint er nur in bestimmten Zuständen; `licht` steht für die eingeschaltete Taschenlampe. |
-| `puzzles` | Rätsel in der Reihenfolge der Ziele. Typen: `code` (Ziffernfeld), `wheels` (Buchstabenräder), `sort` (Streifen/Bilder in Reihenfolge bringen), `cipher` (Chiffrierscheibe), `choice` (Auswahlfragen in Stufen, auch Mehrfachauswahl), `text`, `multi`, `use` (Gegenstand), `event` (wird durch eine Aktion gelöst). Ein Rätsel darf auch an einem Hotspot in einem anderen Raum hängen (z. B. die Tür „Personal“ in der Rezeption gehört zu Zimmer 217). Jedes mit drei Hinweisen (der dritte ist die Lösung) und optionalen Rückmeldungen für typische Fehlversuche (`wrong`). |
+| `dark` | Bereich einer Ansicht, der nur mit Taschenlampe sichtbar ist (`x, y, w, h` in %, optional `clip`, optional `until: "flag"` – danach hell). |
+| `darkUntil` | Ganzer Raum dunkel, bis der Zustand gesetzt ist: ohne Taschenlampe sind nur Hotspots mit `always: true` sichtbar. Dazu je Ansicht `descLit` (Text bei Licht) und `ambientAfter: { flag, name }` (Raumklang wechselt). |
+| Hotspot | Position `x, y, w, h` in Prozent. Kann `text` zeigen, ein `doc` in die Akte legen, ein Schloss tragen (`lock`), einen Gegenstand verlangen (`use`), einen Gegenstand liefern (`take`) oder in einen anderen Raum führen (`go`). Mit `if` / `unless` (auch als Liste: alle bzw. keine) erscheint er nur in bestimmten Zuständen; `licht` steht für die eingeschaltete Taschenlampe. `solves` löst ein Ereignis-Rätsel beim Antippen (z. B. eine Tür, die jetzt aufgeht). |
+| `puzzles` | Rätsel in der Reihenfolge der Ziele. Typen: `code` (Ziffernfeld), `wheels` (Buchstabenräder), `sort` (Streifen/Bilder in Reihenfolge bringen), `cipher` (Chiffrierscheibe), `choice` (Auswahlfragen in Stufen, auch Mehrfachauswahl), `text`, `multi`, `use` (Gegenstand), `event` (wird durch eine Aktion gelöst), `sequence` (Bedienelemente nacheinander betätigen – `checkEach` setzt bei jedem falschen Schritt zurück, sonst wird nach dem letzten geprüft; `wrongStep`, `wrongOrders`, `pressSound`, `failSound`). Ein Rätsel darf auch an einem Hotspot in einem anderen Raum hängen (z. B. die Tür „Personal“ in der Rezeption gehört zu Zimmer 217). Jedes mit drei Hinweisen (der dritte ist die Lösung) und optionalen Rückmeldungen für typische Fehlversuche (`wrong`). |
 | `onSolve` | `flag`, `give` (Gegenstand), `remove` (Gegenstand verbrauchen), `doc` (Akte), `message` (Telefon), `sound`, `unlock` (Raum freischalten), `later: { ms, actions, narrate }` (verzögert, übersteht Neuladen), `evidence` (als Beweis markieren), `open` (Dokument/Aufnahme sofort zeigen), `unflag` (Zustand zurücknehmen). Sortier-Rätsel optional mit `checkButton`, `wrongOrders` und Bildern (`plain`, `items[].html`). Mit `quiet: true` erscheint statt des Erfolgsdialogs nur ein Text unter der Szene. |
 | `events` | Einmalige Ereignisse beim Betreten einer Blickrichtung, optional erst nach einem bestimmten Rätsel (`ifSolved`) und mit Blitz (`flash`). |
 | `secret: true` | Hotspot zählt als optionales Geheimnis (Zähler im Menü). |

@@ -103,6 +103,14 @@
     creak: () => { tone({ f: 140 + Math.random() * 60, type: "sawtooth", d: 0.35, v: 0.015, slide: -50 }); },
     tape: () => { tone({ f: 90, type: "square", d: 0.5, v: 0.03, slide: -30 }); noise({ d: 0.4, v: 0.1, freq: 700, delay: 0.3 }); noise({ d: 1.2, v: 0.05, freq: 5000, delay: 0.8 }); },
     relay: () => { noise({ d: 0.02, v: 0.3, freq: 2200 }); tone({ f: 880, d: 0.25, v: 0.04, delay: 0.1 }); tone({ f: 660, d: 0.35, v: 0.04, delay: 0.3 }); },
+    // Keller / Technik
+    lever: () => { noise({ d: 0.05, v: 0.45, freq: 1600 }); tone({ f: 210, type: "square", d: 0.12, v: 0.035, slide: -60 }); noise({ d: 0.04, v: 0.3, freq: 2600, delay: 0.16 }); },
+    valve: () => { for (let i = 0; i < 3; i++) noise({ d: 0.07, v: 0.18, freq: 900 + i * 150, delay: i * 0.12 }); },
+    cough: () => { tone({ f: 48, type: "sawtooth", d: 0.35, v: 0.08, slide: 30 }); noise({ d: 0.25, v: 0.35, freq: 160, type: "lowpass", delay: 0.05 }); tone({ f: 52, type: "sawtooth", d: 0.3, v: 0.06, delay: 0.45, slide: -25 }); noise({ d: 0.4, v: 0.2, freq: 140, type: "lowpass", delay: 0.5 }); },
+    engine: () => { tone({ f: 40, type: "sawtooth", d: 0.6, v: 0.06, slide: 25 }); noise({ d: 0.5, v: 0.3, freq: 180, type: "lowpass" }); tone({ f: 55, type: "sawtooth", d: 2.6, v: 0.05, delay: 0.55, slide: 12 }); noise({ d: 2.4, v: 0.14, freq: 220, type: "lowpass", delay: 0.6 }); },
+    power: () => { noise({ d: 0.03, v: 0.4, freq: 2400 }); tone({ f: 100, type: "sawtooth", d: 1.4, v: 0.03, slide: 20, delay: 0.1 }); tone({ f: 880, d: 0.2, v: 0.03, delay: 0.5 }); noise({ d: 0.03, v: 0.3, freq: 2400, delay: 0.7 }); },
+    screws: () => { for (let i = 0; i < 4; i++) { noise({ d: 0.18, v: 0.12, freq: 3200, delay: i * 0.45 }); tone({ f: 1500, d: 0.05, v: 0.02, delay: i * 0.45 + 0.2 }); } },
+    slide: () => { noise({ d: 1.3, v: 0.22, freq: 260, type: "lowpass" }); tone({ f: 120, type: "sawtooth", d: 0.9, v: 0.02, slide: -30, delay: 0.2 }); noise({ d: 0.12, v: 0.3, freq: 600, delay: 1.25 }); },
     thunder: () => { noise({ d: 2.6, v: 0.5, freq: 160, type: "lowpass" }); noise({ d: 1.4, v: 0.35, freq: 90, type: "lowpass", delay: 0.3 }); },
   };
 
@@ -228,6 +236,14 @@
           }, 700 + Math.random() * 1900);
         };
         next();
+      }
+      if (name === "generator") { // gleichmäßiges Brummen eines Notstromaggregats, dazu weiter Tropfen
+        let k = 0;
+        ambientTimer = setInterval(() => {
+          if (document.hidden) return;
+          tone({ f: 50, type: "sawtooth", d: 0.62, v: 0.012 }); noise({ d: 0.6, v: 0.05, freq: 150, type: "lowpass" });
+          if (++k % 3 === 0 && Math.random() < 0.7) sounds.drip();
+        }, 600);
       }
     },
   };

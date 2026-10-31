@@ -213,30 +213,37 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 **Klang:** Monitorrauschen, Brummen, klickende Relais; Bandeinzug, Relais-Signal bei Datei 5.
 
-### Raum 6 – Keller / Technik · Untergeschoss · ca. 16 Min.
+### Raum 6 – Keller / Technik · Untergeschoss · ca. 12 Min. · **gebaut (Version 14)**
 
-**Was die Spielerin erfährt:** Der Fluchtweg war die ganze Zeit da.
+**Was die Spielerin erfährt:** Der Fluchtweg war die ganze Zeit da – und Lehn hat einen falschen Plan aufhängen lassen, damit niemand ihn findet.
 
-**Besonderheit:** Der ganze Raum ist dunkel. Die Taschenlampe ist Pflicht, bis der Notstrom läuft; danach wird es heller. Wasser tropft, der Generator brummt erst nach dem Start.
+**Besonderheit:** Der ganze Raum ist dunkel (`darkUntil: "strom"`). Ohne Taschenlampe ist nur die Treppe zu sehen. Sobald der Strom richtig verteilt ist, bleibt der Keller dauerhaft hell, auch ohne Taschenlampe – im Multiplayer für alle. Vorher tropft es, nach dem Generatorstart brummt das Aggregat.
 
 **Blickrichtungen**
-- **Nord · Treppe und Wasser:** knöcheltiefes Wasser, Rückweg.
-- **Ost · Generator:** Generator mit leerem Sicherungsfach, wasserfleckige Startanleitung.
-- **Süd · Schalttafel:** vier große Hebelschalter A, B, C, D. Daneben der **Wandplan**, den Lehn hat aufhängen lassen: „A → B → C → D · Tor W2: stillgelegt“.
-- **West · Wäscheschrank:** schwerer Wäscheschrank, mit vier Schrauben an der Wand befestigt. Dahinter weht ein Luftzug.
+- **Nord · Treppe:** Metalltreppe zurück zum Sicherheitsbereich, knöcheltiefes Wasser, Wasserstandsmarken (1987, 2002 und, mit der Hand, rot: „14.10.09“ fast hüfthoch), Rohre mit der Inschrift (Geheimnis).
+- **Ost · Generator:** Aggregat West auf einem Sockel, Bedienfeld (Starter · Zündung · Hahn · Choke – absichtlich nicht in Startreihenfolge), Messgerät, Sicherungsfach F3, wasserfleckige Startanleitung.
+- **Süd · Schalttafel:** Hauptverteilung UG mit vier Hebeln A–D (ohne Kennziffern), daneben Lehns Wandplan „A → B → C → D · Tor W2: stillgelegt“.
+- **West · alte Wäscherei:** Mangel, Wäschesäcke und der Wäscheschrank, an die Wand geschraubt. Dahinter eine Stahltür ohne Klinke mit Magnetschloss, eingeprägt „W-GANG · NUR NOTFALL“.
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 17 | **Generator** | Mechanik + Suche | Sicherung einsetzen, dann die Startanleitung befolgen: (1) Kraftstoffhahn auf · (2) Choke ziehen · (3) Zündung · (4) Starter. Schritte 2 und 3 sind nur mit Licht lesbar. Falsche Reihenfolge: der Motor hustet und geht aus. | Sicherung + Reihenfolge Hahn – Choke – Zündung – Starter |
-| 18 | **Der Plan lügt** | Mechanik + Raum 4 | Der Wandplan (A–B–C–D) ist falsch. Die richtige Schaltfolge steht in Tomasz’ echtem Prüfprotokoll: **C – A – D – B**. Die Hebel müssen in dieser Reihenfolge umgelegt werden (Kennziffern auf den Hebeln: C 3, A 1, D 4, B 2). Bei einem Fehler springen alle zurück. | **C → A → D → B** (3-1-4-2) |
-| 19 | **Die Tür, die niemand sehen sollte** | Mechanik + Raum 1 | Notstrom an, das Licht flackert hoch. Am Wäscheschrank sind jetzt vier Schrauben sichtbar → mit dem **Schraubendreher aus der Rezeption** lösen → Schrank zur Seite schieben → schmale Tür: „Nur wer die Vergangenheit versteht, darf eintreten.“ | Schraubendreher benutzen |
+| 17 | **Generator** | Gegenstand + Folge | Sicherung F3 einsetzen (wird verbraucht). Dann vier Bedienelemente in Startreihenfolge betätigen; jeder falsche Schritt: Motor hustet, alles zurück. Bewusst eine leichte, handfeste Station nach Raum 5. | Hahn → Choke → Zündung → Starter |
+| 18 | **Der Plan lügt** | Folge + Raum 4 | Erst wenn der Generator läuft. Vier Hebel umlegen, geprüft wird nach dem vierten; falsch → alle springen zurück (eigene Rückmeldung für A–B–C–D und D–C–B–A). | **C → A → D → B** (Prüfprotokoll B, PR-09/118) |
+| 19 | **Die Tür, die niemand sehen sollte** | Gegenstand + Zustand | Schrank jederzeit mit dem Schraubendreher lösen und zur Seite schieben. Die Stahltür dahinter hat ein Magnetschloss und geht erst auf, wenn der Strom fließt. Schrank und Hebel in beliebiger Reihenfolge. | Schraubendreher + Strom |
 
-**Übergang:** Durch die Tür, einen schmalen Gang hinauf → Westflügel, Managerbüro.
+**Übergang:** Durch die Stahltür, einen schmalen Gang bergauf → Westflügel, Managerbüro.
+
+**Fehlt die Sicherung:** Die Tür „Technik“ öffnet schon mit Datei 5. Ohne F3 sagen Bedienfeld, Fach und Hinweise klar, was fehlt; die Treppe bleibt der Rückweg, und das Ziel zeigt „Noch offen – Überwachungsraum“.
 
 **Hinweise**
-- *17:* (1) Der Generator braucht zuerst ein fehlendes Teil. (2) Setze die Sicherung aus dem Überwachungsraum ein und lies die Startanleitung mit Licht. (3) Kraftstoffhahn – Choke – Zündung – Starter.
-- *18:* (1) Elias hat gesagt: Vertrauen Sie nicht den offiziellen Aufzeichnungen. (2) Das echte Prüfprotokoll aus dem Archiv nennt eine andere Reihenfolge. (3) C – A – D – B.
-- *19:* (1) „Nicht die Tür, die Sie sehen.“ Was steht hier, das nicht hierher gehört? (2) Der Wäscheschrank ist an die Wand geschraubt. (3) Benutze den Schraubendreher am Wäscheschrank (Westen).
+- *17 (Sicherung):* (1) Taschenlampe an, Generator im Osten. (2) Leeres Fach F3 · die Sicherung liegt im Überwachungsraum unter dem Pult. (3) Sicherung am Fach benutzen.
+- *17 (Start):* (1) Neben dem Generator hängt eine Startanleitung. (2) Die Bedienelemente sind anders angeordnet als die Schritte. (3) Hahn → Choke → Zündung → Starter.
+- *18:* (1) Elias: „Vertrauen Sie nicht den offiziellen Aufzeichnungen.“ Der Wandplan ist so eine. (2) Das echte Prüfprotokoll PR-09/118 nennt eine Schaltfolge für Tor W2. (3) C → A → D → B.
+- *19:* (1) „Nicht die Tür, die Sie sehen.“ Was steht hier, das nicht hierher gehört? (2) Der Wäscheschrank ist an die Wand geschraubt, an seinem Rand zieht es. (3) Schraubendreher am Wäscheschrank – die Stahltür dahinter braucht Strom.
+
+**Unerklärtes Ereignis:** Kurz nach dem Einschalten geht das Licht aus, Schritte auf der Metalltreppe, oben fällt die Tür zum Sicherheitsbereich ins Schloss, dann kommt das Licht zurück. (Nicht in Richtung Westflügel – der Weg dorthin ist zu diesem Zeitpunkt noch verschraubt.) Im Multiplayer erlebt das nur, wer den Strom eingeschaltet hat.
+
+**Nachricht nach dem Einschalten:** „Er hat diesen Plan aufhängen lassen. Damit niemand mehr nach dem Weg fragt.“
 
 ---
 
@@ -357,7 +364,7 @@ Aufbauend auf dem, was schon läuft:
 | 2 Zimmer 217 | Beim Blitz schlägt das Fenster auf. Danach liegt ein trockenes Blatt auf dem Schreibtisch. | Mara hat das Blatt hineingelegt. |
 | 3 Gepäcklager | Ein Koffer, der vorher oben stand, steht beim Zurückdrehen auf dem Boden. | Mara war kurz vorher dort. |
 | 5 Überwachung | Monitor 2 zeigt für zwei Sekunden eine Person in der Lobby – live, nicht 2009. | Das war Mara. |
-| 6 Keller | Nach dem Generatorstart geht das Licht einmal aus und wieder an; eine Tür fällt irgendwo ins Schloss. | Mara verlässt den Keller vor der Spielerin. |
+| 6 Keller | Nach dem Einschalten des Stroms geht das Licht einmal aus, Schritte auf der Metalltreppe, oben fällt die Tür ins Schloss. | Mara verlässt den Keller vor der Spielerin – über die Treppe. |
 
 ## 9. Entscheidungen (aus der Durchsicht)
 

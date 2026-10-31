@@ -27,7 +27,11 @@
   const ROOM = {}, PUZ = {};
   N.rooms.forEach((r, i) => {
     r.index = i; ROOM[r.id] = r;
-    for (const [id, p] of Object.entries(r.puzzles || {})) { p.id = id; p.room = r.id; PUZ[id] = p; }
+    for (const [id, p] of Object.entries(r.puzzles || {})) {
+      // Rätsel-IDs gelten im ganzen Spiel: doppelte IDs würden sich gegenseitig als „gelöst“ markieren
+      if (PUZ[id]) console.warn(`[Hotel Nocturne] Rätsel-ID „${id}“ gibt es in ${PUZ[id].room} und ${r.id} – bitte umbenennen.`);
+      p.id = id; p.room = r.id; PUZ[id] = p;
+    }
   });
   const hotspotsOf = (r) => (r.views ? r.views.flatMap((v) => v.hotspots) : r.hotspots);
 
@@ -77,7 +81,13 @@
   const add = (arr, v) => (arr.includes(v) ? false : (arr.push(v), true));
   // Flags, die nur die eigene Sicht betreffen (Ereignisse, kurze Bildschirmeffekte), werden nie geteilt.
   const localFlag = (f) => f.startsWith("evt_") || ((N.config.multiplayer || {}).localFlags || []).includes(f);
-  const visible = (h) => (!h.if || has(h.if)) && (!h.unless || !has(h.unless));
+  // if/unless dürfen auch Listen sein: alle Bedingungen müssen erfüllt bzw. keine darf erfüllt sein.
+  const allOf = (v) => [].concat(v).every(has);
+  const noneOf = (v) => ![].concat(v).some(has);
+  // Raum ganz dunkel, bis ein Zustand (darkUntil) ihn erhellt: ohne Taschenlampe ist nur `always` sichtbar.
+  const roomDark = (r) => Boolean(r.darkUntil) && !has(r.darkUntil);
+  const visible = (h) => (!h.if || allOf(h.if)) && (!h.unless || noneOf(h.unless)) && (!roomDark(room()) || light || h.always);
+  const ambientFor = (r) => (r.ambientAfter && has(r.ambientAfter.flag) ? r.ambientAfter.name : r.ambient);
   const clockAt = (ms) => { const m = 23 * 60 + 17 + Math.floor(ms / 60000); return `${pad2(Math.floor(m / 60) % 24)}:${pad2(m % 60)}`; };
   const currentPuzzle = (r) => Object.keys(r.puzzles || {}).find((id) => !isSolved(id));
   /* Das nächste offene Rätsel im Spiel: zuerst im aktuellen Raum, sonst im frühesten
@@ -184,7 +194,7 @@
     renderStage(opts);
     renderSide();
     renderObjective();
-    A.ambient(r.ambient && !S.finished ? r.ambient : null);
+    A.ambient(r.ambient && !S.finished ? ambientFor(r) : null);
     A.music(S.music && !S.finished ? r.music || MUSIC : null);
   }
 
@@ -196,8 +206,9 @@
     if (r.views) {
       const i = viewIndex(r), v = r.views[i], n = r.views.length;
       sc.classList.remove("draft");
+      const dark = v.dark && !(v.dark.until && has(v.dark.until)) ? v.dark : null;
       st.innerHTML = v.scene
-        + (v.dark ? `<div class="darkness" style="left:${v.dark.x}%;top:${v.dark.y}%;width:${v.dark.w}%;height:${v.dark.h}%${v.dark.clip ? `;clip-path:${v.dark.clip}` : ""}"></div>` : "")
+        + (dark ? `<div class="darkness" style="left:${dark.x}%;top:${dark.y}%;width:${dark.w}%;height:${dark.h}%${dark.clip ? `;clip-path:${dark.clip}` : ""}"></div>` : "")
         + v.hotspots.filter(visible).map((h) =>
           `<button class="hotspot${h.go ? " exit" : ""}${h.take ? " pickup" : ""}" data-hs="${h.id}" style="left:${h.x + h.w / 2}%;top:${h.y + h.h / 2}%;width:${h.w}%;height:${h.h}%" aria-label="${esc(h.label)}"><span class="hs-label">${h.go ? "→ " : ""}${esc(h.label)}</span></button>`).join("");
       $$("[data-if]", st).forEach((el) => { el.style.display = has(el.dataset.if) ? "" : "none"; });
@@ -210,7 +221,8 @@
       $("#turnLeft").setAttribute("aria-label", `Nach links drehen: ${left.name}`);
       $("#turnRight").setAttribute("aria-label", `Nach rechts drehen: ${right.name}`);
       sc.classList.remove("no-views");
-      if (reset) setNarration(v.desc);
+      if (reset) setNarration(r.darkUntil && !roomDark(r) && v.descLit ? v.descLit : v.desc);
+      if (r.ambientAfter && inGame() && !S.finished) A.ambient(ambientFor(r)); // Raumklang wechselt z. B., sobald ein Generator läuft
     } else {
       sc.classList.add("draft", "no-views");
       st.innerHTML = `<div class="draft-inner"><p class="draft-title">${esc(r.title)}</p><p class="draft-sub">14. OKTOBER 2009 · NACH 23:17</p>
@@ -224,7 +236,13 @@
     if (anim) { st.classList.remove("turn-left", "turn-right", "arrive"); void st.offsetWidth; st.classList.add(anim); }
   }
 
-  function setNarration(html) { $("#narration").innerHTML = fill(html); }
+  function setNarration(html) {
+    const el = $("#narration");
+    el.innerHTML = fill(html);
+    // Smartphone: lange Texte auf drei Zeilen gekürzt, Antippen zeigt alles
+    el.classList.remove("open");
+    el.classList.toggle("more", el.scrollHeight > el.clientHeight + 2);
+  }
 
   function renderObjective() {
     const r = room(), done = S.completed.includes(r.id);
@@ -375,6 +393,7 @@
       renderSide(); renderObjective();
       return;
     }
+    if (h.solves && !isSolved(h.solves)) { A.play("click"); run(h.actions); return succeed(PUZ[h.solves]); } // z. B. eine Tür, die jetzt aufgeht
     if (h.go && S.unlocked.includes(h.go)) return goRoom(h.go, h.via);
     inspect(h);
   }
@@ -455,6 +474,11 @@
     if (p.type === "sort") {
       return `<div class="lock lock-sort">${head}<p class="muted small">${esc(p.help || "Ziehe die Streifen in die richtige Reihenfolge – oder verschiebe sie mit ▲ ▼.")}</p><ol class="strips${p.plain ? " plain" : ""}" aria-label="Reihenfolge"></ol>${p.checkButton ? `<button type="button" class="submit-button wide" data-sort-check>${esc(p.button || "Reihenfolge prüfen")}</button>` : ""}${fb}</div>`;
     }
+    if (p.type === "sequence") {
+      return `<div class="lock lock-seq">${head}<p class="muted small">${esc(p.help || "Betätige die Bedienelemente nacheinander.")}</p>
+        <div class="seq-panel${p.panel ? " seq-" + p.panel : ""}" style="--n:${p.items.length}">${p.items.map((it) => `<button type="button" class="seq-ctl" data-seq="${it.id}" style="${it.vars || ""}" aria-pressed="false"><span class="seq-art" aria-hidden="true">${it.html || ""}</span><b>${esc(it.label)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`).join("")}</div>
+        <p class="seq-trail" aria-live="polite">&nbsp;</p>${fb}</div>`;
+    }
     if (p.type === "use") {
       return `<div class="lock lock-use"><p class="lock-prompt">Welchen Gegenstand möchtest du hier benutzen?</p>
         ${S.inventory.length ? `<div class="use-items">${S.inventory.map((id) => `<button type="button" class="use-item" data-use="${id}"><span>${N.items[id].icon}</span> ${esc(N.items[id].name)}</button>`).join("")}</div>` : `<p class="muted">${esc(p.noItems || "Du hast noch nichts, was du hier benutzen könntest.")}</p>`}${fb}</div>`;
@@ -466,7 +490,7 @@
     const root = $("#dlgBody .lock");
     const fb = $(".lock-feedback", root);
     const fail = (msg) => {
-      A.play("error");
+      A.play(p.failSound || "error");
       fb.textContent = msg || "Nichts passiert. Das scheint nicht die richtige Lösung zu sein.";
       root.classList.remove("shake"); void root.offsetWidth; root.classList.add("shake");
     };
@@ -670,6 +694,29 @@
       list.addEventListener("pointerup", drop);
       list.addEventListener("pointercancel", drop);
     }
+    if (p.type === "sequence") {
+      // Bedienelemente nacheinander betätigen. checkEach: sofort zurücksetzen, sobald ein Schritt falsch ist
+      // (z. B. Motor hustet); sonst erst prüfen, wenn alle betätigt sind (z. B. Hebel springen zurück).
+      let seq = [], locked = false;
+      const btns = $$(".seq-ctl", root), trail = $(".seq-trail", root);
+      const item = (id) => p.items.find((it) => it.id === id);
+      const reset = () => { seq = []; locked = false; btns.forEach((b) => { b.classList.remove("on"); b.setAttribute("aria-pressed", "false"); }); trail.innerHTML = "&nbsp;"; };
+      const wrong = (msg) => { locked = true; setTimeout(() => { fail(msg); reset(); }, 450); };
+      root.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-seq]");
+        if (!b || locked || b.classList.contains("on")) return;
+        seq.push(b.dataset.seq);
+        b.classList.add("on"); b.setAttribute("aria-pressed", "true");
+        A.play(p.pressSound || "key");
+        fb.textContent = "";
+        trail.textContent = seq.map((id) => item(id).short || item(id).label).join(" → ");
+        const k = seq.length - 1;
+        if (p.checkEach && seq[k] !== p.answer[k]) return wrong((p.wrongStep && p.wrongStep[seq[k]]) || p.wrongDefault);
+        if (seq.length < p.answer.length) return;
+        if (seq.join() === p.answer.join()) { locked = true; root.classList.add("done"); setTimeout(() => succeed(p), 650); return; }
+        wrong((p.wrongOrders && p.wrongOrders[seq.join(",")]) || p.wrongDefault);
+      });
+    }
     if (p.type === "use") {
       root.addEventListener("click", (e) => {
         const b = e.target.closest("[data-use]");
@@ -840,7 +887,8 @@
     A.play("light");
     closeOverlay();
     const r = room();
-    const dark = r.views && r.views[viewIndex(r)].dark;
+    const vd = r.views && r.views[viewIndex(r)].dark;
+    const dark = vd && !(vd.until && has(vd.until));
     renderStage({ narrate: light ? (dark ? "Die Taschenlampe ist an. Bewege den Lichtkegel mit der Maus oder dem Finger durch die Dunkelheit." : "Die Taschenlampe ist an. Hier ist es allerdings hell genug.") : "Die Taschenlampe ist aus." });
   }
 
@@ -910,7 +958,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>13</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>14</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
@@ -1000,6 +1048,7 @@
     if (ds.hint) { S.hints[ds.hint] = (S.hints[ds.hint] || 0) + 1; save(); A.play("paper"); return renderPhone(); }
   });
   $("#closeDialog").addEventListener("click", closeDialog);
+  $("#narration").addEventListener("click", (e) => { if (e.currentTarget.classList.contains("more")) e.currentTarget.classList.toggle("open"); });
   $("#startButton").addEventListener("click", () => { A.setEnabled(S.sound); start(); });
   $("#newGameLink").addEventListener("click", (e) => { e.preventDefault(); resetGame(); });
   $("#restartButton").addEventListener("click", resetGame);

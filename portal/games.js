@@ -21,7 +21,7 @@ window.MR_GAMES = [
     age: "ab 12 Jahren",
     rooms: 7,
     status: "vorschau",
-    statusNote: "Räume 1–5 (Rezeption bis Überwachungsraum) als begehbare Räume fertig, Räume 6–7 spielbar in Vorabfassung · gemeinsam mit bis zu vier Personen spielbar",
+    statusNote: "Räume 1–6 (Rezeption bis Keller) als begehbare Räume fertig, Raum 7 spielbar in Vorabfassung · gemeinsam mit bis zu vier Personen spielbar",
     isNew: true,
     url: "hotel-nocturne/index.html",
     art: "hotel",

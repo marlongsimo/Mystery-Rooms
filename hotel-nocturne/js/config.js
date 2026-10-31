@@ -23,6 +23,6 @@ window.NOCTURNE.config = {
     maxPlayers: 4,
     // Zustände, die nur die eigene Sicht betreffen und nicht geteilt werden
     // (Ereignis-Flags „evt_…“ sind immer lokal).
-    localFlags: ["monitor2_live"],
+    localFlags: ["monitor2_live", "flackern"],
   },
 };

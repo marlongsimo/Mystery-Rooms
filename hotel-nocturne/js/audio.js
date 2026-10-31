@@ -31,14 +31,14 @@
     o.start(t); o.stop(t + d + 0.05);
   }
 
-  function noise({ d = 0.1, v = 0.1, freq = 2000, delay = 0 }) {
+  function noise({ d = 0.1, v = 0.1, freq = 2000, delay = 0, type = "bandpass" }) {
     const c = ac(); if (!c) return;
     const t = c.currentTime + delay;
     const buf = c.createBuffer(1, Math.ceil(c.sampleRate * d), c.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
     const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
-    src.buffer = buf; f.type = "bandpass"; f.frequency.value = freq; g.gain.value = v;
+    src.buffer = buf; f.type = type; f.frequency.value = freq; g.gain.value = v;
     src.connect(f).connect(g).connect(c.destination);
     src.start(t);
   }
@@ -55,6 +55,13 @@
     phone: () => { for (let i = 0; i < 3; i++) tone({ f: 880, type: "square", d: 0.12, v: 0.02, delay: i * 0.18 }); noise({ d: 1.2, v: 0.02, freq: 1200, delay: 0.6 }); },
     elevator: () => { tone({ f: 70, type: "sawtooth", d: 2.2, v: 0.04, slide: 30 }); tone({ f: 1046, d: 1.2, v: 0.05, delay: 2.0 }); },
     tick: () => noise({ d: 0.012, v: 0.07, freq: 5000 }),
+    step: () => { noise({ d: 0.07, v: 0.18, freq: 300, type: "lowpass" }); noise({ d: 0.06, v: 0.12, freq: 280, type: "lowpass", delay: 0.22 }); },
+    pickup: () => { noise({ d: 0.08, v: 0.12, freq: 1800 }); tone({ f: 660, type: "triangle", d: 0.12, v: 0.05, delay: 0.05 }); tone({ f: 990, type: "triangle", d: 0.2, v: 0.04, delay: 0.12 }); },
+    door: () => { tone({ f: 90, type: "sawtooth", d: 0.9, v: 0.035, slide: 60 }); noise({ d: 0.5, v: 0.08, freq: 500, delay: 0.5 }); },
+    buzz: () => { for (let i = 0; i < 2; i++) tone({ f: 140, type: "square", d: 0.18, v: 0.03, delay: i * 0.28 }); },
+    light: () => noise({ d: 0.02, v: 0.3, freq: 3500 }),
+    drop: () => { noise({ d: 0.04, v: 0.3, freq: 3000 }); tone({ f: 1400, d: 0.4, v: 0.03, delay: 0.02 }); noise({ d: 0.05, v: 0.2, freq: 2500, delay: 0.18 }); },
+    thunder: () => { noise({ d: 2.6, v: 0.5, freq: 160, type: "lowpass" }); noise({ d: 1.4, v: 0.35, freq: 90, type: "lowpass", delay: 0.3 }); },
   };
 
   window.NOCTURNE.audio = {

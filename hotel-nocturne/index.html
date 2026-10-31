@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#11100f">
+  <meta name="theme-color" content="#090a0c">
   <meta name="description" content="Hotel Nocturne – Die letzte Nacht. Ein digitaler Mystery-Escape-Room im Browser.">
   <title>Hotel Nocturne – Die letzte Nacht</title>
   <link rel="stylesheet" href="css/fonts.css">
@@ -14,7 +14,7 @@
 
   <header class="topbar">
     <a class="brand" href="#" id="brandHome"><span class="brand-mark" aria-hidden="true"><span>N</span></span><span>HOTEL <b>NOCTURNE</b></span></a>
-    <div class="top-meta" aria-label="Uhrzeit im Spiel"><span class="live-dot" aria-hidden="true"></span><span class="hide-sm">NACHTPROTOKOLL</span> <span id="clock">23:17</span></div>
+    <div class="top-meta" aria-label="Uhrzeit und Ort im Spiel"><span class="live-dot" aria-hidden="true"></span><span id="clock">23:17</span><span class="sep">·</span><span id="location">REZEPTION</span></div>
     <div class="top-actions">
       <button class="icon-button" id="soundToggle" aria-label="Geräusche ausschalten" title="Geräusche">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="mute" d="M16 9l6 6M22 9l-6 6"/></svg>
@@ -76,43 +76,42 @@
 
     <!-- ========== SPIEL ========== -->
     <section id="game" class="screen game-screen hidden">
-      <aside class="sidebar">
-        <div class="case-label">AKTE <span>№ 014-10</span></div>
-        <div class="progress-wrap">
-          <div class="progress-head"><span>FORTSCHRITT</span><b id="progressText">0 / 7</b></div>
-          <div class="progress-track"><div id="progressBar"></div></div>
+      <section class="play">
+        <div class="scene" id="scene">
+          <div class="stage" id="stage"></div>
+          <div class="view-label"><span id="viewName"></span><span class="compass" id="compass" aria-hidden="true"></span></div>
+          <button class="turn left" id="turnLeft"></button>
+          <button class="turn right" id="turnRight"></button>
+          <button class="light-chip hidden" id="lightChip">◉ Taschenlampe ausschalten</button>
         </div>
-        <nav id="roomNav" class="room-nav" aria-label="Hotelbereiche"></nav>
-      </aside>
-
-      <section class="workspace">
-        <div class="room-heading">
-          <div>
-            <p class="eyebrow" id="roomKicker"></p>
-            <h2 id="roomTitle"></h2>
-            <p class="objective" id="objective"></p>
-          </div>
-          <div class="room-stamp" aria-hidden="true"><span>RAUM</span><b id="roomNumber">01</b></div>
-        </div>
-
-        <div class="scene" id="scene"></div>
-        <p class="pan-hint hidden" id="panHint" aria-hidden="true">← wischen, um dich umzusehen →</p>
-
-        <p class="story" id="storyText"></p>
-
-        <div class="toolbar">
-          <div class="inventory-wrap">
-            <p class="eyebrow">INVENTAR</p>
-            <div class="inventory" id="inventory"></div>
-          </div>
-          <div class="tool-buttons">
-            <button class="tool" id="evidenceButton"><span class="tool-icon">▤</span><span class="tool-label">Beweismappe</span><i id="evidenceCount">0</i></button>
-            <button class="tool hidden" id="planButton"><span class="tool-icon">▦</span><span class="tool-label">Hotelplan</span></button>
-            <button class="tool" id="notesButton"><span class="tool-icon">✎</span><span class="tool-label">Notizen</span></button>
-            <button class="tool" id="hintButton"><span class="tool-icon">?</span><span class="tool-label">Hinweis</span></button>
-          </div>
+        <div class="caption">
+          <p class="eyebrow">UNTERSUCHEN</p>
+          <p class="narration" id="narration" aria-live="polite"></p>
+          <p class="objective" id="objective"></p>
         </div>
       </section>
+
+      <aside class="side" aria-label="Ausrüstung">
+        <div class="side-block">
+          <p class="eyebrow">RUCKSACK</p>
+          <div class="backpack" id="backpack"></div>
+          <p class="selected-note" id="selectedNote"></p>
+        </div>
+        <div class="side-tools">
+          <button class="big-tool" id="phoneButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>
+            <span>Telefon</span><i id="msgBadge" class="badge hidden">0</i>
+          </button>
+          <button class="big-tool" id="akteButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6l2 2h10v11H3z"/><path d="M3 9.5h18"/></svg>
+            <span>Akte</span><i id="docCount" class="count">0</i>
+          </button>
+        </div>
+        <div class="side-progress">
+          <div class="progress-track"><div id="progressBar"></div></div>
+          <p id="progressText">0 / 7 Bereiche</p>
+        </div>
+      </aside>
     </section>
 
     <!-- ========== ENDE ========== -->
@@ -127,6 +126,26 @@
       <button class="primary-button" id="restartButton">Spiel neu beginnen <span>↻</span></button>
     </section>
   </main>
+
+  <!-- Telefon -->
+  <div id="phone" class="phone-wrap hidden" role="dialog" aria-label="Telefon">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-status"><span id="phoneClock">23:17</span><span>▂▄▆ · 41 %</span></div>
+      <div class="phone-screen" id="phoneScreen"></div>
+      <button class="phone-home" data-overlay-close aria-label="Telefon schließen"></button>
+    </div>
+  </div>
+
+  <!-- Akte -->
+  <div id="akte" class="akte-wrap hidden" role="dialog" aria-label="Ermittlungsakte">
+    <div class="akte">
+      <div class="akte-tab">AKTE № 014-10</div>
+      <button class="akte-close" data-overlay-close aria-label="Akte schließen">×</button>
+      <div class="akte-book" id="akteBook"><div class="akte-page" id="aktePage"></div></div>
+      <div class="akte-nav"><button id="aktePrev" aria-label="Zurückblättern">‹</button><span id="akteNum"></span><button id="akteNext" aria-label="Weiterblättern">›</button></div>
+    </div>
+  </div>
 
   <dialog id="dialog" aria-labelledby="dlgTitle">
     <div class="dialog-head">

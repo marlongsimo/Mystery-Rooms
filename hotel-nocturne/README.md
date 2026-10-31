@@ -1,58 +1,60 @@
 # HOTEL NOCTURNE – Die letzte Nacht
 
-Ein digitaler Mystery-Escape-Room für den Browser. Kein Server, keine Anmeldung, keine externen Abhängigkeiten. Schriften und Grafiken sind lokal eingebunden, es werden keine Daten an Dritte übertragen.
+Ein düsteres Point-and-Click-Ermittlungsspiel für den Browser. Kein Server, keine Anmeldung, keine externen Abhängigkeiten. Schriften, Grafiken und Geräusche sind lokal eingebunden bzw. werden im Browser erzeugt.
 
 ## Starten
 
-- **Lokal:** `index.html` doppelklicken. Das Spiel funktioniert auch direkt aus dem Dateisystem.
-- **GitHub Pages:** Im Repository unter *Settings → Pages* „Deploy from a branch“ wählen, Branch `main`, Ordner `/ (root)`. Das Spiel liegt dann unter `https://<benutzername>.github.io/<repository>/hotel-nocturne/`.
+- **Lokal:** `index.html` doppelklicken.
+- **GitHub Pages:** *Settings → Pages →* „Deploy from a branch“, Branch `main`, Ordner `/ (root)`. Das Spiel liegt dann unter `…/hotel-nocturne/index.html`, die Startseite aller Escape Rooms unter `…/`.
 
 ## Personalisieren
 
-Nur `js/config.js` bearbeiten:
+Nur `js/config.js` bearbeiten: `playerName` (Name auf der Reservierung) und `personalMessage` (Abschlussbildschirm).
 
-| Einstellung | Wirkung |
+## Bedienung
+
+| | |
 |---|---|
-| `playerName` | Name auf der Reservierungsbestätigung (leer = „Verehrter Gast“) |
-| `personalMessage` | Persönliche Nachricht auf dem Abschlussbildschirm |
+| **‹ ›**, Wischen, Pfeiltasten | Im Raum umdrehen (vier Blickrichtungen) |
+| Antippen | Dinge im Raum untersuchen, Gegenstände mitnehmen, Türen benutzen |
+| **Rucksack** (rechts) | Gegenstand antippen → auf eine Stelle im Raum tippen. Oder direkt dorthin ziehen. Zweimal antippen = genauer ansehen |
+| **Telefon** | Nachrichten, Taschenlampe, Notizen, Karte (mit Schnellreise), Hinweise |
+| **Akte** | Alle gefundenen Dokumente zum Umblättern, inklusive Rückseiten |
 
 ## Projektstruktur
 
 ```text
 hotel-nocturne/
-├── index.html                  Grundgerüst (Titel, Spiel, Ende, Dialog)
-├── css/
-│   ├── fonts.css               lokale Schriften
-│   └── style.css               gesamtes Design inkl. Smartphone-Ansicht
+├── index.html                  Grundgerüst (Titel, Spiel, Telefon, Akte, Dialog, Ende)
+├── css/style.css               gesamtes Design inkl. Smartphone-Ansicht
 ├── js/
 │   ├── config.js               persönliche Einstellungen
-│   ├── audio.js                Geräusche (live im Browser erzeugt)
+│   ├── audio.js                Geräusche (Web Audio, keine Dateien)
 │   ├── engine.js               Spiel-Engine
 │   └── rooms/
-│       ├── 01-rezeption.js     fertiger Musterraum
-│       └── 02-07-vorlaeufig.js Räume 2–7, spielbar, noch ohne Szene
-└── assets/fonts/               Schriftdateien + Lizenzen (SIL OFL)
+│       ├── 01-rezeption.js     Musterraum mit vier Blickrichtungen
+│       └── 02-07-vorlaeufig.js Räume 2–7, spielbar, noch ohne Szenen
+└── assets/fonts/               Schriften + Lizenzen (SIL OFL)
 ```
 
-## Wie ein Raum aufgebaut ist
-
-Jeder Raum ist ein Datenobjekt. `01-rezeption.js` ist die Vorlage.
+## Wie ein Raum aufgebaut ist (Vorlage: `01-rezeption.js`)
 
 | Feld | Bedeutung |
 |---|---|
-| `scene` | Raumbild als SVG (später auch `<img>` möglich). Elemente mit `data-if="flag"` bzw. `data-unless="flag"` werden je nach Spielzustand ein-/ausgeblendet. |
-| `hotspots` | Anklickbare Stellen. Position `x, y, w, h` in Prozent der Szene. Ein Hotspot kann Text zeigen (`text`), ein Dokument öffnen (`doc`), ein Schloss tragen (`lock`) oder einen Gegenstand verlangen (`use`). |
-| `puzzles` | Rätsel des Raums. Typen: `code` (Ziffernfeld), `text` (Wort/Satz), `multi` (mehrere Fragen), `use` (Gegenstand benutzen). Mit `wrong` lassen sich eigene Rückmeldungen für typische Fehlversuche hinterlegen. |
-| `hints` | Genau drei Hinweisstufen pro Rätsel, die dritte ist die Lösung. |
-| `onSolve` | Was beim Lösen passiert: `flag`, `give` (Gegenstand), `doc` (Dokument in die Beweismappe), `sound`. |
-| `completeWhen` | Welche Rätsel gelöst sein müssen, damit der nächste Raum freigeschaltet wird. |
+| `views` | Vier Blickrichtungen mit `dir`, `name`, `desc` (Text unter der Szene), `scene` (SVG 1200 × 900, später auch ein Foto möglich) und `hotspots`. |
+| `dark` | Bereich einer Ansicht, der nur mit Taschenlampe sichtbar ist (`x, y, w, h` in %, optional `clip`). |
+| Hotspot | Position `x, y, w, h` in Prozent. Kann `text` zeigen, ein `doc` in die Akte legen, ein Schloss tragen (`lock`), einen Gegenstand verlangen (`use`), einen Gegenstand liefern (`take`) oder in einen anderen Raum führen (`go`). Mit `if` / `unless` erscheint er nur in bestimmten Zuständen; `licht` steht für die eingeschaltete Taschenlampe. |
+| `puzzles` | Rätsel in der Reihenfolge der Ziele. Typen: `code`, `text`, `multi`, `use`, `event`. Jedes mit drei Hinweisen (der dritte ist die Lösung) und optionalen Rückmeldungen für typische Fehlversuche (`wrong`). |
+| `onSolve` | `flag`, `give` (Gegenstand), `doc` (Akte), `message` (Telefon), `sound`. |
+| `completeWhen` | Welche Rätsel den nächsten Raum freischalten. |
+| `N.messages` | Nachrichten, die während des Spiels aufs Telefon kommen. |
 
-Antworten werden tolerant verglichen: Groß-/Kleinschreibung, Leerzeichen und Satzzeichen spielen keine Rolle (`23:24`, `2324` und `23.24` sind gleich).
+Antworten werden tolerant verglichen: Groß-/Kleinschreibung, Leerzeichen und Satzzeichen spielen keine Rolle.
 
 ## Spielstand
 
-Wird automatisch im Browser gespeichert (`localStorage`, Schlüssel `nocturne_save_v1`): Fortschritt, Inventar, Beweismappe, Notizen, genutzte Hinweise und Spielzeit. Zurücksetzen über das Menü (☰) → „Spielstand löschen“.
+Automatisch im Browser (`localStorage`, Schlüssel `nocturne_save_v2`). Zurücksetzen über das Menü (☰).
 
 ## Hinweis zu den Lösungen
 
-Alle Lösungen stehen im Klartext in `js/rooms/`. Bei einem reinen Browserspiel lässt sich das nicht verhindern, und die dritte Hinweisstufe verrät sie ohnehin. Wer das Spiel verschenkt, sollte es vorher einmal komplett selbst durchspielen.
+Alle Lösungen stehen im Klartext in `js/rooms/`. Bei einem reinen Browserspiel lässt sich das nicht verhindern. Vor dem Verschenken einmal komplett selbst durchspielen.

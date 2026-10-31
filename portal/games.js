@@ -21,11 +21,11 @@ window.MR_GAMES = [
     age: "ab 12 Jahren",
     rooms: 7,
     status: "vorschau",
-    statusNote: "Raum 1 fertig ausgestaltet, Räume 2–7 spielbar in Vorabfassung",
+    statusNote: "Rezeption als begehbarer Raum mit vier Blickrichtungen fertig, Räume 2–7 spielbar in Vorabfassung",
     isNew: true,
     url: "hotel-nocturne/index.html",
     art: "hotel",
-    saveKey: "nocturne_save_v1",
+    saveKey: "nocturne_save_v2",
   },
   {
     id: "der-letzte-fall",

@@ -11,7 +11,21 @@
      „playback“ behandelt das Spiel wie einen Musik-Player (iOS 16.4+). */
   try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) { /* älteres iOS */ }
   const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  const OLD_IOS = IOS && !navigator.audioSession;
+
+  /* iOS spielt ein <audio>-Element auch im Lautlos-Modus ab – und solange eines läuft,
+     sind auch die Web-Audio-Geräusche hörbar. Deshalb läuft auf iPhone/iPad immer ein
+     Element: die Musik oder, wenn sie aus ist, eine stille Schleife. */
+  let keeper = null;
+  function keepAlive(on) {
+    if (!IOS) return;
+    if (on) {
+      if (!keeper) { keeper = new Audio("assets/audio/silence.mp3"); keeper.loop = true; keeper.setAttribute("playsinline", ""); }
+      if (keeper.paused) keeper.play().catch(() => {});
+    } else if (keeper && !keeper.paused) keeper.pause();
+  }
+  /* Auf iOS lässt sich die Lautstärke eines <audio>-Elements nicht regeln. Darum gibt es
+     zu jeder Musikdatei eine leiser abgemischte Fassung mit der Endung -ios.mp3. */
+  const iosUrl = (u) => u.replace(/\.mp3$/, "-ios.mp3");
 
   function getCtx() {
     if (!ctx) {
@@ -34,6 +48,7 @@
       try { const b = c.createBuffer(1, 1, 22050), s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.start(0); unlocked = true; } catch (e) { /* egal */ }
     }
     if (M.active && M.el && M.el.paused && !M.src) M.el.play().catch(() => {});
+    if (!M.active || !M.el) keepAlive(true);
   }
   ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, unlock, { capture: true, passive: true }));
 
@@ -108,7 +123,14 @@
     }, 50);
   }
   function playElement(url) {
-    if (!M.el || M.el.dataset.url !== url) { M.el = new Audio(url); M.el.loop = true; M.el.preload = "auto"; M.el.setAttribute("playsinline", ""); M.el.dataset.url = url; }
+    if (!M.el || M.el.dataset.url !== url) {
+      if (M.el) M.el.pause();
+      const el = new Audio(IOS ? iosUrl(url) : url);
+      el.loop = true; el.preload = "auto"; el.setAttribute("playsinline", ""); el.dataset.url = url;
+      if (IOS) el.addEventListener("error", () => { if (el.src.endsWith("-ios.mp3")) { el.src = url; if (M.active) el.play().catch(() => {}); } }, { once: true });
+      M.el = el;
+    }
+    keepAlive(false);
     M.el.volume = IOS ? 1 : 0; // iOS erlaubt keine Lautstärkeregelung für <audio>
     const p = M.el.play(); // muss synchron in der Nutzergeste passieren (iOS)
     if (p) p.then(() => { if (!IOS) fadeElement(M.el, M.vol, 3000); }).catch(() => { /* wird beim nächsten Antippen erneut versucht */ });
@@ -116,7 +138,7 @@
   async function startMusic(url) {
     M.url = url; M.active = true;
     // Dateisystem oder sehr altes iOS: direkt über <audio>, ohne vorher etwas zu laden
-    if (location.protocol === "file:" || OLD_IOS || M.failed[url]) return playElement(url);
+    if (location.protocol === "file:" || IOS || M.failed[url]) return playElement(url);
     const c = musicCtx();
     const buf = c ? await loadBuffer(url) : null;
     if (!M.active || M.url !== url) return; // inzwischen gestoppt oder gewechselt
@@ -142,18 +164,19 @@
       M.src = null; M.gain = null;
     }
     if (M.el && !M.el.paused) { const el = M.el; if (IOS) el.pause(); else fadeElement(el, 0, fade, () => el.pause()); }
+    if (enabled) keepAlive(true);
   }
   document.addEventListener("visibilitychange", () => {
     if (!M.active) return;
-    if (document.hidden) { if (ctx) ctx.suspend().catch(() => {}); if (M.el) M.el.pause(); }
+    if (document.hidden) { if (ctx) ctx.suspend().catch(() => {}); if (M.el) M.el.pause(); keepAlive(false); }
     else { if (ctx) ctx.resume().catch(() => {}); if (M.el && !M.src) M.el.play().catch(() => {}); }
   });
 
   window.NOCTURNE.audio = {
     play(name) { if (enabled && sounds[name]) try { sounds[name](); } catch (e) { /* Audio ist optional */ } },
-    setEnabled(on) { enabled = on; if (!on) { this.ambient(null); stopMusic(400); } },
+    setEnabled(on) { enabled = on; if (!on) { this.ambient(null); stopMusic(400); keepAlive(false); } },
     /* Zustand der Musik (für Tests und Fehlersuche) */
-    musicInfo() { return { active: M.active, url: M.url, mode: M.src ? "webaudio" : M.el && !M.el.paused ? "element" : "aus", ctx: ctx ? ctx.state : "keiner", ios: IOS, session: navigator.audioSession ? navigator.audioSession.type : "nicht verfügbar" }; },
+    musicInfo() { return { active: M.active, url: M.url, mode: M.src ? "webaudio" : M.el && !M.el.paused ? "element" : "aus", src: M.el ? M.el.src.split("/").pop() : null, keeper: keeper ? (keeper.paused ? "pausiert" : "läuft") : "keiner", ctx: ctx ? ctx.state : "keiner", ios: IOS, session: navigator.audioSession ? navigator.audioSession.type : "nicht verfügbar" }; },
     /* music(url) startet bzw. wechselt die Musik, music(null) blendet sie aus. */
     music(url) {
       if (!url || !enabled) { if (M.active) stopMusic(); return; }

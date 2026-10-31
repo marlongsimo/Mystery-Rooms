@@ -9,6 +9,7 @@
   const A = N.audio;
   const SAVE_KEY = "nocturne_save_v2";
   N.messages = N.messages || {};
+  const MUSIC = "assets/audio/shadowed-loop.mp3"; // Hintergrundmusik des Hotels (Räume können mit music: "…" abweichen)
 
   /* ---------- Hilfsfunktionen ---------- */
   const $ = (s, root = document) => root.querySelector(s);
@@ -33,7 +34,7 @@
     v: 2, started: false, finished: false,
     current: N.rooms[0].id, unlocked: [N.rooms[0].id], completed: [], views: {},
     solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
-    hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, showHotspots: false,
+    hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
   });
   let S = fresh();
   function load() {
@@ -109,7 +110,7 @@
   /* ---------- Bildschirme ---------- */
   function showScreen(id) {
     ["intro", "game", "ending"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== id));
-    if (id !== "game") { A.ambient(null); closeOverlay(); }
+    if (id !== "game") { A.ambient(null); A.music(null); closeOverlay(); }
     window.scrollTo(0, 0);
   }
   const inGame = () => !$("#game").classList.contains("hidden");
@@ -129,6 +130,7 @@
     renderSide();
     renderObjective();
     A.ambient(r.ambient && !S.finished ? r.ambient : null);
+    A.music(S.music && !S.finished ? r.music || MUSIC : null);
   }
 
   function renderStage({ anim = null, narrate = null, reset = false } = {}) {
@@ -607,13 +609,15 @@
     openDialog({
       kicker: "MENÜ", title: "Einstellungen",
       html: `<div class="menu-list">
-        <label class="switch"><input type="checkbox" id="optSound" ${S.sound ? "checked" : ""}><span>Geräusche</span></label>
+        <label class="switch"><input type="checkbox" id="optSound" ${S.sound ? "checked" : ""}><span>Ton (Geräusche und Musik)</span></label>
+        <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {
-        $("#optSound").addEventListener("change", (e) => { S.sound = e.target.checked; A.setEnabled(S.sound); updateSoundIcon(); save(); });
+        $("#optSound").addEventListener("change", (e) => { S.sound = e.target.checked; A.setEnabled(S.sound); updateSoundIcon(); save(); if (S.sound && inGame()) A.music(S.music ? room().music || MUSIC : null); });
+        $("#optMusic").addEventListener("change", (e) => { S.music = e.target.checked; save(); if (inGame()) A.music(S.music ? room().music || MUSIC : null); });
         $("#optHotspots").addEventListener("change", (e) => { S.showHotspots = e.target.checked; save(); renderStage(); });
       },
     });

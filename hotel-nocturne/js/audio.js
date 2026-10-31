@@ -64,9 +64,82 @@
     thunder: () => { noise({ d: 2.6, v: 0.5, freq: 160, type: "lowpass" }); noise({ d: 1.4, v: 0.35, freq: 90, type: "lowpass", delay: 0.3 }); },
   };
 
+  /* ---------- Hintergrundmusik (Endlosschleife) ----------
+     Bevorzugt Web Audio (lückenloser Loop). Wenn die Datei nicht geladen werden kann
+     (z. B. beim Öffnen direkt aus dem Dateisystem), wird ein normales <audio>-Element benutzt. */
+  const M = { url: null, vol: 0.38, active: false, gain: null, src: null, bufs: {}, failed: {}, el: null, fadeTimer: null };
+  function musicCtx() {
+    if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
+    if (ctx.state === "suspended" && !document.hidden) ctx.resume();
+    return ctx;
+  }
+  async function loadBuffer(url) {
+    if (M.bufs[url] || M.failed[url]) return M.bufs[url] || null;
+    if (location.protocol === "file:") { M.failed[url] = true; return null; } // fetch geht im Dateisystem nicht
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(res.status);
+      M.bufs[url] = await musicCtx().decodeAudioData(await res.arrayBuffer());
+    } catch (e) { M.failed[url] = true; }
+    return M.bufs[url] || null;
+  }
+  function fadeElement(el, to, ms, done) {
+    clearInterval(M.fadeTimer);
+    const from = el.volume, steps = Math.max(1, Math.round(ms / 50));
+    let i = 0;
+    M.fadeTimer = setInterval(() => {
+      i++; el.volume = Math.min(1, Math.max(0, from + (to - from) * (i / steps)));
+      if (i >= steps) { clearInterval(M.fadeTimer); if (done) done(); }
+    }, 50);
+  }
+  async function startMusic(url) {
+    M.url = url; M.active = true;
+    const c = musicCtx();
+    const buf = c ? await loadBuffer(url) : null;
+    if (!M.active || M.url !== url) return; // inzwischen gestoppt oder gewechselt
+    if (buf) {
+      M.gain = c.createGain();
+      M.gain.gain.setValueAtTime(0.0001, c.currentTime);
+      M.gain.gain.exponentialRampToValueAtTime(M.vol, c.currentTime + 3);
+      M.src = c.createBufferSource();
+      M.src.buffer = buf; M.src.loop = true;
+      M.src.connect(M.gain).connect(c.destination);
+      M.src.start();
+    } else {
+      if (!M.el || M.el.dataset.url !== url) { M.el = new Audio(url); M.el.loop = true; M.el.dataset.url = url; }
+      M.el.volume = 0;
+      M.el.play().then(() => fadeElement(M.el, M.vol, 3000)).catch(() => { /* Autoplay blockiert */ });
+    }
+  }
+  function stopMusic(fade = 1500) {
+    M.active = false;
+    if (M.src && ctx) {
+      const g = M.gain, s = M.src, t = ctx.currentTime;
+      g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(g.gain.value, 0.0001), t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + fade / 1000);
+      s.stop(t + fade / 1000 + 0.05);
+      M.src = null; M.gain = null;
+    }
+    if (M.el && !M.el.paused) { const el = M.el; fadeElement(el, 0, fade, () => el.pause()); }
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!M.active) return;
+    if (document.hidden) { if (ctx) ctx.suspend(); if (M.el) M.el.pause(); }
+    else { if (ctx) ctx.resume(); if (M.el && !M.src) M.el.play().catch(() => {}); }
+  });
+
   window.NOCTURNE.audio = {
     play(name) { if (enabled && sounds[name]) try { sounds[name](); } catch (e) { /* Audio ist optional */ } },
-    setEnabled(on) { enabled = on; if (!on) this.ambient(null); },
+    setEnabled(on) { enabled = on; if (!on) { this.ambient(null); stopMusic(400); } },
+    /* Zustand der Musik (für Tests und Fehlersuche) */
+    musicInfo() { return { active: M.active, url: M.url, mode: M.src ? "webaudio" : M.el && !M.el.paused ? "element" : "aus" }; },
+    /* music(url) startet bzw. wechselt die Musik, music(null) blendet sie aus. */
+    music(url) {
+      if (!url || !enabled) { if (M.active) stopMusic(); return; }
+      if (M.active && M.url === url) return;
+      if (M.active) stopMusic(800);
+      startMusic(url);
+    },
     ambient(name) {
       clearInterval(ambientTimer); ambientTimer = null;
       if (!enabled || !name || !sounds[name]) return;

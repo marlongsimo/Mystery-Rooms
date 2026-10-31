@@ -34,6 +34,7 @@ hotel-nocturne/
 │   └── rooms/
 │       ├── 01-rezeption.js     Musterraum mit vier Blickrichtungen
 │       └── 02-07-vorlaeufig.js Räume 2–7, spielbar, noch ohne Szenen
+├── assets/audio/               Hintergrundmusik
 └── assets/fonts/               Schriften + Lizenzen (SIL OFL)
 ```
 
@@ -50,6 +51,10 @@ hotel-nocturne/
 | `N.messages` | Nachrichten, die während des Spiels aufs Telefon kommen. |
 
 Antworten werden tolerant verglichen: Groß-/Kleinschreibung, Leerzeichen und Satzzeichen spielen keine Rolle.
+
+## Musik
+
+`assets/audio/shadowed-loop.mp3` läuft als Endlosschleife, sobald man das Hotel betritt, und wird auf dem Titel- und Endbildschirm ausgeblendet. Ein- und ausschalten über das Menü (☰) oder den Lautsprecher-Knopf. Die Datei wird in `js/engine.js` (`MUSIC`) festgelegt; einzelne Räume können mit `music: "…"` eine eigene Musik bekommen. Über GitHub Pages läuft der Loop lückenlos (Web Audio), beim lokalen Öffnen per Doppelklick über einen normalen Audio-Player.
 
 ## Spielstand
 

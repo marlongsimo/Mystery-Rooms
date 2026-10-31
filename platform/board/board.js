@@ -23,7 +23,14 @@
   const SIZE = { photo: [150, 196], doc: [200, 150], note: [168, 150] };
   const uid = (p) => p + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-  function mount({ el, template, store, onOpen = () => {}, surface = { w: 2600, h: 1700 } }) {
+  /**
+   * Spiel-Erweiterungen (alle optional):
+   *   decorate(o)        → { cls, stamp, color, tag } – Darstellung je Karte/Faden (z. B. „ENTLASTET“, durchgestrichen)
+   *   threadMenu(t)      → { locked, note, actions: [{ id, label, primary }] } – eigene Aktionen statt Farbe/Entfernen
+   *   onThreadAction(t, actionId)
+   *   locked(o)          → true: nicht entfernbar (z. B. Hagedorns Fäden und die Karten daran)
+   */
+  function mount({ el, template, store, onOpen = () => {}, surface = { w: 2600, h: 1700 }, decorate = () => null, threadMenu = () => null, onThreadAction = () => {}, locked = () => false }) {
     /* ---------- Modell: Vorlage + gespeicherte Änderungen ---------- */
     const model = new Map();
     for (const c of template.cards || []) model.set(c.id, { ...c, type: c.type || "card" });
@@ -79,9 +86,11 @@
     function cardHtml(o) {
       const [w, h] = sizeOf(o);
       const style = `left:${o.x}px;top:${o.y}px;width:${w}px;height:${h}px;--rot:${o.rot || 0}deg`;
-      const cls = `mrb-item ${o.type === "note" ? "mrb-note" : "mrb-card mrb-" + o.kind}${selected === o.id ? " sel" : ""}${pending === o.id ? " pending" : ""}`;
-      if (o.type === "note") return `<div class="${cls}" data-id="${o.id}" style="${style};--note:${o.color || NOTE_COLORS[0]}"><i class="pin"></i><p class="${o.author === "hagedorn" ? "hand" : ""}">${esc(o.text || "")}</p>${o.author === "hagedorn" ? `<small>– H.</small>` : ""}</div>`;
-      return `<div class="${cls}" data-id="${o.id}" style="${style}"><i class="pin"></i>${o.art ? `<div class="mrb-art">${o.art}</div>` : ""}<div class="mrb-label"><b>${esc(o.title)}</b>${o.sub ? `<small>${esc(o.sub)}</small>` : ""}</div></div>`;
+      const dec = decorate(o) || {};
+      const cls = `mrb-item ${o.type === "note" ? "mrb-note" : "mrb-card mrb-" + o.kind}${selected === o.id ? " sel" : ""}${pending === o.id ? " pending" : ""}${dec.cls ? " " + dec.cls : ""}`;
+      const stamp = dec.stamp ? `<span class="mrb-stamp">${esc(dec.stamp)}</span>` : "";
+      if (o.type === "note") return `<div class="${cls}" data-id="${o.id}" style="${style};--note:${o.color || NOTE_COLORS[0]}"><i class="pin"></i><p class="${o.author === "hagedorn" ? "hand" : ""}">${esc(o.text || "")}</p>${o.author === "hagedorn" ? `<small>– H.</small>` : ""}${stamp}</div>`;
+      return `<div class="${cls}" data-id="${o.id}" style="${style}"><i class="pin"></i>${o.art ? `<div class="mrb-art">${o.art}</div>` : ""}<div class="mrb-label"><b>${esc(o.title)}</b>${o.sub ? `<small>${esc(o.sub)}</small>` : ""}</div>${stamp}</div>`;
     }
     function threadPath(t) {
       const a = model.get(t.from), b = model.get(t.to);
@@ -94,9 +103,10 @@
       svg.innerHTML = [...model.values()].filter((o) => o.type === "thread" && alive(o)).map((t) => {
         const p = threadPath(t);
         if (!p) return "";
-        const c = COLORS[t.color] || COLORS.red;
-        return `<g class="mrb-thread${selected === t.id ? " sel" : ""}" data-id="${t.id}"><path d="${p.d}" class="hit"/><path d="${p.d}" class="line" style="stroke:${c}"/>
-          ${t.label ? `<foreignObject x="${p.mx - 90}" y="${p.my - 14}" width="180" height="40"><div class="mrb-tlabel" style="--c:${c}">${esc(t.label)}</div></foreignObject>` : ""}</g>`;
+        const dec = decorate(t) || {};
+        const c = COLORS[dec.color || t.color] || COLORS.red;
+        const label = t.label || dec.tag ? `<foreignObject x="${p.mx - 90}" y="${p.my - 14}" width="180" height="62"><div class="mrb-tlabel" style="--c:${c}">${t.label ? `<span class="txt">${esc(t.label)}</span>` : ""}${dec.tag ? `<em class="mrb-ttag">${esc(dec.tag)}</em>` : ""}</div></foreignObject>` : "";
+        return `<g class="mrb-thread${selected === t.id ? " sel" : ""}${dec.cls ? " " + dec.cls : ""}" data-id="${t.id}"><path d="${p.d}" class="hit"/><path d="${p.d}" class="line" style="stroke:${c}"/>${label}</g>`;
       }).join("");
     }
     function render() {
@@ -144,6 +154,8 @@
     function removeObj(id) {
       const o = model.get(id);
       if (!o) return;
+      const guarded = locked(o) || (o.type !== "thread" && [...model.values()].some((t) => t.type === "thread" && alive(t) && locked(t) && (t.from === id || t.to === id)));
+      if (guarded) { setHint(o.type === "thread" ? "Dieser Faden lässt sich nicht abreißen – nur widerlegen." : "Daran hängt ein Faden, der erst widerlegt werden muss."); return; }
       save({ id, type: o.type, deleted: true });
       // Fäden an einer entfernten Karte verschwinden mit
       if (o.type !== "thread") for (const t of model.values()) if (t.type === "thread" && alive(t) && (t.from === id || t.to === id)) save({ id: t.id, type: "thread", deleted: true });
@@ -184,6 +196,17 @@
       const t = model.get(id);
       selected = id; render();
       pop.hidden = false;
+      const menu = threadMenu(t);
+      if (menu) {
+        pop.innerHTML = `<div class="mrb-popbox"><p class="mrb-poptitle">${esc(menu.title || "Faden")}</p>${t.label ? `<p class="mrb-popnote">„${esc(t.label)}“</p>` : ""}${menu.note ? `<p class="mrb-popsub">${esc(menu.note)}</p>` : ""}
+          <div class="mrb-popactions mrb-popstack">${(menu.actions || []).map((a) => `<button type="button" data-tact="${esc(a.id)}" class="${a.primary ? "primary" : ""}">${esc(a.label)}</button>`).join("")}<button type="button" data-pop="ok">Schließen</button></div></div>`;
+        pop.onclick = (e) => {
+          const b = e.target.closest("button"); if (!b) return;
+          hidePop(); selected = null; render();
+          if (b.dataset.tact) onThreadAction(t, b.dataset.tact);
+        };
+        return;
+      }
       pop.innerHTML = `<div class="mrb-popbox"><p class="mrb-poptitle">Faden</p>${t.label ? `<p class="mrb-popnote">„${esc(t.label)}“</p>` : ""}
         <div class="mrb-threadcolors">${Object.keys(COLORS).map((c) => `<button type="button" data-tcolor="${c}" class="${c === t.color ? "on" : ""}" style="--c:${COLORS[c]}">${COLOR_NAMES[c]}</button>`).join("")}</div>
         <div class="mrb-popactions"><button type="button" data-pop="del">Faden entfernen</button><button type="button" data-pop="ok" class="primary">Fertig</button></div></div>`;
@@ -302,6 +325,8 @@
       get: (id) => model.get(id),
       all: () => [...model.values()].filter(alive),
       reload(saved) { applySaved(saved); render(); },
+      /** Neu zeichnen, z. B. wenn sich der Spielstand (Entlastungen) geändert hat. */
+      redraw: () => { if (!dragging) render(); },
       fit,
     };
   }

@@ -45,11 +45,11 @@
       { id: "n-nummer", type: "note", author: "hagedorn", x: 2320, y: 960, rot: -3, color: "#f3e58a", text: "Benutzt K. überall dieselbe Nummer?" },
     ],
     threads: [
-      { id: "t-mira", from: "mira", to: "mond", color: "red", label: "Streit am Vormittag. Motiv!" },
-      { id: "t-timo", from: "timo", to: "zug12", color: "red", label: "Zugang Technik, Kontrolle 21:10" },
-      { id: "t-ruth", from: "ruth", to: "mond", color: "red", label: "Rote Fasern am Mond" },
-      { id: "t-keller", from: "keller", to: "zug12", color: "yellow", label: "Schlüssel?" },
-      { id: "t-zeit", from: "pfoertner", to: "seitentuer", color: "blue", label: "21:33 / 21:29 – passt nicht?" },
+      { id: "t-mira", author: "hagedorn", from: "mira", to: "mond", color: "red", label: "Streit am Vormittag. Motiv!" },
+      { id: "t-timo", author: "hagedorn", from: "timo", to: "zug12", color: "red", label: "Zugang Technik, Kontrolle 21:10" },
+      { id: "t-ruth", author: "hagedorn", from: "ruth", to: "mond", color: "red", label: "Rote Fasern am Mond" },
+      { id: "t-keller", author: "hagedorn", from: "keller", to: "zug12", color: "yellow", label: "Schlüssel?" },
+      { id: "t-zeit", author: "hagedorn", from: "pfoertner", to: "seitentuer", color: "blue", label: "21:33 / 21:29 – passt nicht?" },
     ],
   };
 
@@ -63,5 +63,50 @@
       body: paper(`<p class="pv-head">KOSTÜMWERKSTATT · 9.11.</p><p>17:05 – Mond, Samtkante erneuert – Bordeaux, Charge 0917 – R.E.</p>`) },
     { id: "sprechanlage", kind: "doc", title: "Mitschnitt Sprechanlage", sub: "21:44:08 · Lichtpult", art: docArt([120, 160, 90]),
       body: paper(`<p class="pv-head">SPRECHANLAGE · ABSCHRIFT</p><table class="pv-table"><tr><td>21:44:00</td><td>Inspizienz: „Blackout – jetzt.“</td></tr><tr><td>21:44:08</td><td>Lichtpult (Brandt): „Blackout steht, warte auf Freigabe.“</td></tr></table>`) },
+    { id: "kontrollliste", kind: "doc", title: "Kontrollliste Zug 12", sub: "21:10 · Bremsstift gesteckt", art: docArt([150, 100]),
+      body: paper(`<p class="pv-head">SICHERHEITSKONTROLLE · 9.11.</p><table class="pv-table"><tr><td>21:10</td><td>Zug 12 – Bremsstift gesteckt ✓</td><td>T.B.</td></tr></table>`) },
+    { id: "regiebuch", kind: "doc", title: "Regiebuch, Mondszene", sub: "Mira: Rampe links, Monolog", art: docArt([160, 140, 70]),
+      body: paper(`<p class="pv-head">REGIEBUCH · MONDSZENE</p><p>Blackout. Mira (Rampe links) spricht den Monolog im Dunkeln. A.R. steht selbst auf Mitte und prüft das Licht.</p>`) },
+    { id: "probenmitschnitt", kind: "doc", title: "Probenmitschnitt", sub: "21:44:05 · Miras Monolog", art: docArt([130, 160, 100]),
+      body: paper(`<p class="pv-head">PROBENMITSCHNITT · BÜHNENMIKROFON RAMPE LINKS</p><table class="pv-table"><tr><td>21:44:05</td><td>Seidel: „Wenn der Mond fällt, fällt auch die Nacht …“</td></tr><tr><td>21:44:12</td><td>[lauter Schlag]</td></tr><tr><td>21:44:13</td><td>Seidel schreit.</td></tr></table>`) },
+    { id: "zeitabgleich", kind: "doc", title: "Zeitabgleich Pforte", sub: "Abgang 21:27 · zurück 21:29", art: docArt([150, 150, 90]),
+      body: paper(`<p class="pv-head">ZEITABGLEICH</p><p>Pförtnerbuch 21:33 nach der Foyeruhr, die 6 Minuten vorgeht → Keller ging tatsächlich um <b>21:27</b>. Um <b>21:29</b> öffnete seine Karte die Seitentür: Zwei Minuten später war er wieder im Haus.</p>`) },
+    { id: "zugprotokoll", kind: "doc", title: "Zugprotokoll Obermaschinerie", sub: "21:44:12 · Z12-H (Handablass)", art: docArt([140, 160]),
+      body: paper(`<p class="pv-head">STEUERUNG OBERMASCHINERIE</p><table class="pv-table"><tr><td>21:44:12</td><td>Z12-H</td><td>Zug 12 – Handablass, Schnürboden</td></tr></table>`) },
+    { id: "p4", kind: "photo", title: "Sicherungsstift P-4", sub: "aus dem Wartungsgang, Spitze verbogen",
+      art: `<svg viewBox="0 0 130 150" preserveAspectRatio="xMidYMid slice"><rect width="130" height="150" fill="#1d1f24"/><rect x="58" y="20" width="12" height="100" rx="4" fill="#9a9c94"/><path d="M58 118 q6 18 18 14" stroke="#9a9c94" stroke-width="8" fill="none"/><circle cx="64" cy="22" r="12" fill="#c9a466"/><text x="64" y="27" text-anchor="middle" font-size="12" fill="#2a2119" font-family="monospace">P-4</text></svg>`,
+      body: paper(`<p class="pv-head">FUNDSTÜCK · WARTUNGSGANG U-4</p><p>Sicherungsstift P-4, Spitze verbogen – passt zum Schaden am Handablass von Zug 12. Versteckt unter dem Bodengitter, darüber Hagedorns Zeichen „H. ↓“.</p>`) },
+    { id: "reuternotiz", kind: "doc", title: "Reuters Notiz", sub: "„Zahlung stoppen. Morgen melden.“", art: docArt([120, 90]),
+      body: paper(`<p class="pv-head">NOTIZ A. REUTER · 9.11.2026</p><p class="pv-hand">Zahlung T-17 stoppen. Morgen melden.</p>`) },
+    { id: "rechnungsvergleich", kind: "doc", title: "Rechnungsvergleich T-17", sub: "186.400 € an Keller", art: docArt([160, 160, 120]),
+      body: paper(`<p class="pv-head">RECHNUNGSVERGLEICH T-17</p><p>15 Rechnungen „BTW Theatertechnik“ (2023–2025), zusammen 186.400 €, freigegeben von J.K. Die IBAN von BTW ist dieselbe wie auf Kellers Reisekostenabrechnung.</p>`) },
   ];
+
+  /* Was das Spiel prüft – nur über ausdrückliche Aktionen (RAETSELDESIGN.md, Abschnitt 5.3 und Rätsel 15) */
+  window.DLF_CASE = {
+    refute: {
+      "t-mira": { person: "mira", accept: ["probenmitschnitt", "regiebuch"], fail: "Das zeigt nicht, wo Mira im Blackout war.",
+        wrong: { reuternotiz: "Ein Streit mit Reuter steht fest – die Frage ist, ob sie den Mond hätte lösen können." } },
+      "t-timo": { person: "timo", accept: ["sprechanlage"], fail: "Das zeigt nicht, wo Timo um 21:44:12 war.",
+        wrong: { kontrollliste: "Die Kontrollliste beweist, dass Timo um 21:10 am Zug war – nicht, wo er um 21:44 war.", zugprotokoll: "Das Protokoll zeigt den Handablass – aber nicht, wer ihn ausgelöst hat." } },
+      "t-ruth": { person: "ruth", accept: ["naehprotokoll"], fail: "Das erklärt die roten Fasern nicht." },
+    },
+    confirm: {
+      "t-keller": { accept: ["durchschlag"], fail: "Das zeigt nicht, dass Keller einen Schlüssel hatte." },
+      "t-zeit": { accept: ["zeitabgleich"], fail: "Das erklärt den Widerspruch zwischen 21:33 und 21:29 nicht.",
+        wrong: { uhrzettel: "Richtige Spur: Die Uhr geht vor. Rechne nach – und halte fest, was daraus folgt." } },
+    },
+    proof: {
+      title: "Beweisführung gegen Jannis Keller",
+      requireRefuted: ["t-mira", "t-timo", "t-ruth"],
+      slots: [
+        { id: "zugang", label: "Zugang", q: "Wie kam er an die Technik?", accept: ["durchschlag"] },
+        { id: "gelegenheit", label: "Gelegenheit", q: "War er zur Tatzeit im Haus?", accept: ["zeitabgleich"] },
+        { id: "mittel", label: "Mittel", q: "Wie wurde der Mond zum Absturz gebracht?", accept: ["p4", "zugprotokoll"] },
+        { id: "motiv", label: "Motiv", q: "Warum Reuter?", accept: ["reuternotiz", "rechnungsvergleich"] },
+      ],
+      missing: "Solange ein falscher Verdacht an der Wand hängt, zerreißt Wessel den Bericht.",
+      solved: "Ermittlung abgeschlossen: Jannis Keller hatte Zugang, Gelegenheit, Mittel und Motiv.",
+    },
+  };
 })();

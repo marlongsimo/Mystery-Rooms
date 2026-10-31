@@ -34,6 +34,24 @@
 .mrb-note p.hand { font: italic 16px/1.3 Georgia, serif; color: #23285a; }
 .mrb-note small { position: absolute; right: 12px; bottom: 8px; font: italic 13px Georgia, serif; color: #23285a; }
 
+/* Spielstand: widerlegte und bestätigte Fäden, Stempel */
+.mrb-tlabel .txt { display: block; }
+.mrb-ttag { display: block; margin-top: 2px; font: 600 10px ui-monospace, monospace; font-style: normal; letter-spacing: .1em; text-transform: uppercase; color: var(--c); }
+.mrb-thread.refuted .line { stroke: #6b625a !important; stroke-dasharray: 2 9; opacity: .75; }
+.mrb-thread.refuted .mrb-tlabel { --c: #6b625a !important; opacity: .85; }
+.mrb-thread.refuted .mrb-tlabel .txt { text-decoration: line-through; text-decoration-color: #b3261e; text-decoration-thickness: 2px; }
+.mrb-thread.confirmed .line { stroke-width: 4; }
+.mrb-thread.just .line { animation: mrb-flash 1.4s ease-out 2; }
+@keyframes mrb-flash { 30% { stroke-width: 9; } }
+.mrb-stamp { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) rotate(-14deg); padding: 3px 9px; border: 3px solid #2e8a55; border-radius: 4px; color: #2e8a55; background: #f4efe3cc; font: 800 17px/1 ui-monospace, monospace; letter-spacing: .12em; pointer-events: none; mix-blend-mode: multiply; z-index: 3; }
+.mrb-item.convicted .mrb-stamp { border-color: #b3261e; color: #b3261e; }
+.mrb-item.cleared .mrb-art { filter: grayscale(.7) brightness(.9); }
+.mrb-item.stamp-in .mrb-stamp { animation: mrb-stamp .5s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes mrb-stamp { from { transform: translate(-50%, -50%) rotate(-14deg) scale(2.4); opacity: 0; } }
+.mrb-popsub { margin: -4px 0 12px; font-size: 13px; color: #a3a8b4; }
+.mrb-popstack { flex-direction: column; }
+.mrb-popstack button { width: 100%; }
+
 /* Werkzeugleiste */
 .mrb-toolbar { position: absolute; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 4px; padding: 6px; background: #0e1015f0; border: 1px solid #5a4a33; border-radius: 14px; box-shadow: 0 10px 30px #000a; max-width: calc(100% - 20px); overflow-x: auto; scrollbar-width: none; }
 .mrb-toolbar button { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 52px; padding: 7px 8px; background: none; border: 1px solid transparent; border-radius: 10px; color: #e6dfd3; font: 18px/1 system-ui; cursor: pointer; }

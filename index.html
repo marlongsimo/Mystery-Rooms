@@ -3,111 +3,124 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101827">
-  <meta name="description" content="Mystery Rooms – kostenlose digitale Escape Rooms. Direkt im Browser spielen, ohne Anmeldung.">
-  <title>Mystery Rooms – Entschlüssle das Unbekannte</title>
-  <link rel="stylesheet" href="portal/portal.css?v=4">
+  <meta name="theme-color" content="#0b111c">
+  <meta name="description" content="Mystery Rooms – kostenlose digitale Escape Rooms. Direkt im Browser, ohne Anmeldung, allein oder mit bis zu vier Personen.">
+  <title>Mystery Rooms – Die Nacht hat ihre Geheimnisse</title>
+  <link rel="stylesheet" href="portal/portal.css?v=6">
 </head>
 <body>
-  <header class="header">
+  <header class="header" id="header">
     <a href="#top" class="logo" aria-label="Mystery Rooms – zur Startseite">
-      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M20 9a6.5 6.5 0 0 0-3.6 11.9L14 31h12l-2.4-10.1A6.5 6.5 0 0 0 20 9z" fill="currentColor"/><path d="M18.2 14.6a1.9 1.9 0 1 1 2.6 1.8c-.6.3-.8.7-.8 1.3v.6" fill="none" stroke="#101827" stroke-width="1.5" stroke-linecap="round"/><circle cx="20" cy="20.3" r=".9" fill="#101827"/></svg>
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M20 9a6.5 6.5 0 0 0-3.6 11.9L14 31h12l-2.4-10.1A6.5 6.5 0 0 0 20 9z" fill="currentColor"/></svg>
       <span>MYSTERY <b>ROOMS</b></span>
     </a>
-    <nav class="nav" aria-label="Hauptnavigation">
-      <a href="#rooms">Escape Rooms</a>
-      <a href="#so-gehts">So funktioniert’s</a>
+    <nav class="nav" id="nav" aria-label="Hauptnavigation">
+      <a href="#abenteuer">Abenteuer</a>
+      <a href="#welten">Welten</a>
+      <a href="#so-gehts">So geht’s</a>
       <a href="#faq">FAQ</a>
     </nav>
-    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen"><span></span><span></span><span></span></button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
   </header>
 
   <main id="top">
-    <!-- Hero -->
+    <!-- ========== Titelbereich ========== -->
     <section class="hero">
-      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-bg" aria-hidden="true">
+        <div class="hero-moon"></div>
+        <div class="beam"></div>
+        <svg class="skyline" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMax slice">
+          <defs><radialGradient id="sk-win" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f3c77e" stop-opacity=".7"/><stop offset="1" stop-color="#f3c77e" stop-opacity="0"/></radialGradient></defs>
+          <path d="M0 420 V330 l60 -14 l50 10 l70 -30 l80 18 l60 -8 l40 24 V420 Z" fill="#0f1726"/>
+          <g fill="#0d1421"><polygon points="1180,420 1180,250 1215,250 1215,200 1250,200 1250,250 1290,250 1290,420"/><rect x="1228" y="150" width="6" height="50"/><circle cx="1231" cy="146" r="7"/></g>
+          <polygon points="1360,420 1450,300 1540,420" fill="#101a2a"/>
+          <g class="sk-hotel"><polygon points="520,420 520,190 700,130 880,190 880,420" fill="#0a0f19"/><rect x="520" y="186" width="360" height="6" fill="#141d2c"/>
+            <g fill="#121a28"><rect x="560" y="220" width="34" height="46"/><rect x="630" y="220" width="34" height="46"/><rect x="736" y="220" width="34" height="46"/><rect x="806" y="220" width="34" height="46"/><rect x="560" y="300" width="34" height="46"/><rect x="630" y="300" width="34" height="46"/><rect x="806" y="300" width="34" height="46"/></g>
+            <ellipse class="sk-glow" cx="753" cy="323" rx="70" ry="70" fill="url(#sk-win)"/><rect class="sk-lit" x="736" y="300" width="34" height="46" fill="#e7b46a"/>
+            <path d="M675 420 v-50 a25 25 0 0 1 50 0 v50" fill="#070b12"/></g>
+          <path d="M880 420 V350 l70 -20 l60 14 l80 -26 l90 12 V420 Z" fill="#0c1320"/>
+          <rect y="400" width="1600" height="20" fill="#0b111c"/>
+        </svg>
+        <div class="fog fog-1"></div><div class="fog fog-2"></div><div class="fog fog-3"></div>
+      </div>
       <div class="hero-inner">
-        <p class="kicker">ENTDECKE · ERMITTLE · ENTKOMME</p>
-        <h1>Entschlüssle<br>das <em>Unbekannte.</em></h1>
-        <p class="hero-lead">Betritt geheimnisvolle Welten. Löse knifflige Rätsel. Entdecke, was andere übersehen.</p>
-        <a class="btn gold big" href="#rooms">Escape Rooms entdecken <span aria-hidden="true">→</span></a>
+        <p class="kicker">MYSTERY ROOMS · DIGITALE ABENTEUER</p>
+        <h1>Die Nacht hat ihre <em>Geheimnisse.</em></h1>
+        <p class="hero-lead">Betritt fremde Welten. Entdecke verborgene Hinweise. Löse Rätsel, die mehr miteinander verbinden, als du zunächst glaubst.</p>
+        <div class="hero-actions">
+          <a class="btn gold big" href="#abenteuer">Abenteuer entdecken <span aria-hidden="true">→</span></a>
+        </div>
         <ul class="usp">
-          <li>100 % kostenlos</li><li>Direkt im Browser</li><li>Ohne Anmeldung</li>
+          <li>100 % kostenlos</li><li>Ohne Anmeldung</li><li>Direkt im Browser</li><li>Allein oder zu viert</li>
         </ul>
       </div>
-      <div class="hero-stat"><b id="heroCount">4</b><span>spielbar –<br>weitere folgen</span></div>
+      <a class="scroll-cue" href="#abenteuer" aria-label="Weiter nach unten"><span></span></a>
     </section>
 
-    <!-- Kategorien -->
-    <section class="section categories" aria-labelledby="catTitle">
-      <div class="section-head">
-        <p class="kicker">WÄHLE DEIN ABENTEUER</p>
-        <h2 id="catTitle">Welches Geheimnis möchtest du heute lüften?</h2>
+    <!-- ========== Hauptabenteuer ========== -->
+    <section class="featured" id="abenteuer" aria-labelledby="featuredTitle"></section>
+
+    <!-- ========== Welten (Kategorien) ========== -->
+    <section class="section" id="welten" aria-labelledby="worldsTitle">
+      <div class="section-head reveal">
+        <p class="kicker">WÄHLE DEINE WELT</p>
+        <h2 id="worldsTitle">Welches Geheimnis möchtest du lüften?</h2>
       </div>
-      <div class="cat-grid">
-        <button class="cat-tile" data-cats="krimi"><span class="cat-icon" aria-hidden="true">⌕</span><b>Krimi</b><small>Spuren verfolgen und Fälle lösen</small></button>
-        <button class="cat-tile" data-cats="mystery"><span class="cat-icon" aria-hidden="true">☾</span><b>Mystery</b><small>Geheimnisse und Rätsel entdecken</small></button>
-        <button class="cat-tile" data-cats="abenteuer"><span class="cat-icon" aria-hidden="true">△</span><b>Abenteuer</b><small>Auf Schatzsuche gehen</small></button>
-      </div>
+      <div class="worlds" id="worlds"></div>
     </section>
 
-    <!-- Katalog -->
-    <section class="section" id="rooms" aria-labelledby="roomsTitle">
-      <div class="section-head row">
+    <!-- ========== Sammlung ========== -->
+    <section class="section" id="sammlung" aria-labelledby="collTitle">
+      <div class="section-head row reveal">
         <div>
-          <p class="kicker">DIE SAMMLUNG</p>
-          <h2 id="roomsTitle">Alle Escape Rooms</h2>
+          <p class="kicker">DIE ARCHIVE DER GEHEIMNISSE</p>
+          <h2 id="collTitle">Weitere Abenteuer</h2>
           <p class="muted" id="count"></p>
         </div>
-        <div class="filters">
-          <div class="chips" id="catFilter" role="group" aria-label="Nach Kategorie filtern"></div>
-          <label class="select"><span>Schwierigkeit</span>
-            <select id="diffFilter">
-              <option value="alle">Alle</option><option value="1">Leicht</option><option value="2">Mittel</option><option value="3">Anspruchsvoll</option><option value="4">Schwer</option>
-            </select>
-          </label>
-        </div>
+        <div class="filters" id="filters"></div>
       </div>
       <div class="cards" id="cards"></div>
     </section>
 
-    <!-- So funktioniert's -->
+    <!-- ========== Spielprinzip ========== -->
     <section class="section" id="so-gehts" aria-labelledby="howTitle">
-      <div class="section-head">
-        <p class="kicker">SO FUNKTIONIERT’S</p>
+      <div class="section-head reveal">
+        <p class="kicker">SO GEHT’S</p>
         <h2 id="howTitle">In drei Schritten ins Abenteuer</h2>
       </div>
       <ol class="steps">
-        <li><span>1</span><b>Abenteuer auswählen</b><p>Finde ein Geheimnis, das dich interessiert – nach Thema, Dauer oder Schwierigkeit.</p></li>
-        <li><span>2</span><b>Spiel starten</b><p>Direkt im Browser, ohne Anmeldung. Dein Fortschritt wird automatisch gespeichert.</p></li>
-        <li><span>3</span><b>Rätsel lösen</b><p>Untersuche Räume, sammle Hinweise und entschlüssle das Geheimnis. Gestaffelte Tipps helfen, wenn du feststeckst.</p></li>
+        <li class="reveal"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="10" width="32" height="28" rx="2"/><path d="M8 18h32M16 26h10M16 31h16"/></svg><b>Abenteuer wählen</b><p>Jedes Abenteuer erzählt seine eigene Geschichte – mit Spielzeit, Schwierigkeit und Spielerzahl auf einen Blick.</p></li>
+        <li class="reveal"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 42V8h20v34"/><path d="M14 42h20"/><circle cx="29" cy="26" r="1.6"/><path d="M34 8l6 4v28l-6 2"/></svg><b>Eintreten</b><p>Direkt im Browser, ohne Anmeldung. Eine kurze Einführung bringt dich hinein, dein Fortschritt wird automatisch gespeichert.</p></li>
+        <li class="reveal"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="20" r="11"/><path d="M28 28l12 12"/><path d="M16 20h8M20 16v8"/></svg><b>Entschlüsseln</b><p>Untersuche Räume, sammle Hinweise, verbinde die Spuren. Wenn du feststeckst, helfen Hinweise in drei Stufen.</p></li>
       </ol>
+      <div class="together reveal">
+        <div><p class="kicker">GEMEINSAM SPIELEN</p><h3>Nicht allein einchecken.</h3><p>Erstelle eine Sitzung, teile den Einladungscode – und erkundet das Abenteuer mit bis zu vier Personen. Jede Person bewegt sich frei, Funde und gelöste Rätsel teilt ihr.</p></div>
+        <div class="code-badge" aria-hidden="true"><span>EINLADUNGSCODE</span><b>NOCT-7Q2K4M</b><small>1–4 Personen</small></div>
+      </div>
     </section>
 
-    <!-- FAQ -->
+    <!-- ========== FAQ ========== -->
     <section class="section faq" id="faq" aria-labelledby="faqTitle">
-      <div class="section-head">
+      <div class="section-head reveal">
         <p class="kicker">FRAGEN &amp; ANTWORTEN</p>
         <h2 id="faqTitle">Häufige Fragen</h2>
       </div>
-      <details><summary>Kostet das Spielen etwas?</summary><p>Nein. Alle Escape Rooms sind kostenlos und ohne Registrierung spielbar.</p></details>
-      <details><summary>Auf welchen Geräten kann ich spielen?</summary><p>Auf Smartphone, Tablet und Computer – in jedem aktuellen Browser. Für die beste Atmosphäre empfehlen wir einen größeren Bildschirm und Ton.</p></details>
-      <details><summary>Kann ich eine Pause machen?</summary><p>Ja. Dein Spielstand wird automatisch auf deinem Gerät gespeichert. Öffne das Spiel später im selben Browser, und du machst genau dort weiter.</p></details>
-      <details><summary>Was mache ich, wenn ich nicht weiterkomme?</summary><p>Jedes Rätsel hat drei Hinweisstufen: erst eine kleine Orientierung, dann ein konkreter Denkanstoß, zuletzt die Lösung. Du entscheidest selbst, wann du sie brauchst.</p></details>
-      <details><summary>Kann ich mit mehreren Personen spielen?</summary><p>Ja – gemeinsam vor einem Bildschirm macht das Rätseln oft doppelt Spaß. Die empfohlene Spielerzahl steht bei jedem Escape Room.</p></details>
+      <details><summary>Kostet das Spielen etwas?</summary><p>Nein. Alle Abenteuer sind kostenlos und ohne Registrierung spielbar.</p></details>
+      <details><summary>Auf welchen Geräten kann ich spielen?</summary><p>Auf Smartphone, Tablet und Computer – in jedem aktuellen Browser. Auf dem Smartphone am besten quer halten. Für die beste Atmosphäre empfehlen wir Ton.</p></details>
+      <details><summary>Kann ich eine Pause machen?</summary><p>Ja. Dein Spielstand wird automatisch gespeichert. Öffne das Spiel später im selben Browser, und du machst genau dort weiter.</p></details>
+      <details><summary>Was mache ich, wenn ich nicht weiterkomme?</summary><p>Im Spiel gibt es Hinweise in drei Stufen: erst eine kleine Orientierung, dann ein konkreter Denkanstoß, zuletzt die Lösung. Du entscheidest selbst, wann du sie brauchst.</p></details>
+      <details><summary>Wie spiele ich mit anderen zusammen?</summary><p>Auf dem Titelbildschirm eines Abenteuers „Gemeinsam spielen“ wählen, eine Sitzung erstellen und den Einladungscode teilen. Bis zu vier Personen spielen dann jeweils auf ihrem eigenen Gerät – Rucksack, Akte und gelöste Rätsel sind gemeinsam.</p></details>
+      <details><summary>Was passiert mit meinen Daten?</summary><p>Keine Cookies, kein Tracking, keine Werbung. Allein gespielt bleibt dein Spielstand nur in deinem Browser. Bei gemeinsamen Sitzungen werden der gewählte Spielername und der gemeinsame Spielstand auf einem Server (Supabase) gespeichert, damit alle Geräte denselben Stand sehen.</p></details>
     </section>
 
-    <!-- Abschluss -->
-    <section class="cta">
-      <h2>Das Geheimnis wartet auf dich.</h2>
-      <p>Bist du bereit, dich der Herausforderung zu stellen?</p>
-      <a class="btn gold big" href="#rooms">Abenteuer beginnen <span aria-hidden="true">→</span></a>
-    </section>
+    <!-- ========== Abschluss ========== -->
+    <section class="cta" id="cta"></section>
   </main>
 
   <footer class="footer">
-    <p class="logo-text">MYSTERY <b>ROOMS</b></p>
-    <p>Ein nichtkommerzielles Projekt. Keine Cookies, kein Tracking – Spielstände bleiben auf deinem Gerät.</p>
+    <a href="#top" class="logo-text">MYSTERY <b>ROOMS</b></a>
+    <nav class="footer-nav" aria-label="Fußzeile"><a href="#abenteuer">Abenteuer</a><a href="#so-gehts">So geht’s</a><a href="#faq">FAQ</a></nav>
+    <p>Ein nichtkommerzielles Projekt. Keine Cookies, kein Tracking.</p>
   </footer>
 
   <dialog id="details" aria-labelledby="detailsTitle">
@@ -115,7 +128,7 @@
     <div id="detailsBody" class="details-body"></div>
   </dialog>
 
-  <script src="portal/games.js?v=7"></script>
-  <script src="portal/portal.js?v=4"></script>
+  <script src="portal/games.js?v=8"></script>
+  <script src="portal/portal.js?v=6"></script>
 </body>
 </html>

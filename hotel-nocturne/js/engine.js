@@ -40,7 +40,7 @@
     v: 2, started: false, finished: false,
     current: N.rooms[0].id, unlocked: [N.rooms[0].id], visited: [N.rooms[0].id], completed: [], views: {},
     solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
-    secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
+    secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false, showGoal: false,
   });
   let S = fresh();
   function load() {
@@ -132,7 +132,8 @@
             // Meldung nur zeigen, wenn die Spielerin noch in die passende Richtung blickt
             const r = room(), here = r.views ? r.views[viewIndex(r)].id : null;
             const narrate = !a.later.view || a.later.view === here ? a.later.narrate : null;
-            renderStage({ narrate }); renderSide(); renderObjective();
+            renderStage(); renderSide(); renderObjective();
+            if (narrate) moment(narrate);
           }
         }, a.later.ms || 1500);
       }
@@ -174,7 +175,7 @@
   /* ---------- Bildschirme ---------- */
   function showScreen(id) {
     ["intro", "game", "ending"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== id));
-    if (id !== "game") { A.ambient(null); A.music(null); closeOverlay(); }
+    if (id !== "game") { A.ambient(null); A.music(null); closeOverlay(); setDrawer(false); hideMoment(); }
     window.scrollTo(0, 0);
   }
   const inGame = () => !$("#game").classList.contains("hidden");
@@ -236,16 +237,44 @@
     if (anim) { st.classList.remove("turn-left", "turn-right", "arrive"); void st.offsetWidth; st.classList.add(anim); }
   }
 
+  /* Untertitel unten im Bild: kurze Rückmeldung, blendet nach einigen Sekunden aus */
+  let subTimer = null;
   function setNarration(html) {
     const el = $("#narration");
+    clearTimeout(subTimer);
     el.innerHTML = fill(html);
-    // Smartphone: lange Texte auf drei Zeilen gekürzt, Antippen zeigt alles
-    el.classList.remove("open");
-    el.classList.toggle("more", el.scrollHeight > el.clientHeight + 2);
+    el.classList.toggle("show", Boolean(html));
+    if (html) subTimer = setTimeout(() => el.classList.remove("show"), Math.min(12000, 3500 + el.textContent.length * 45));
+  }
+  /* Besondere Momente (Ereignisse, erstes Betreten eines Raums): groß in der Bildmitte.
+     Ist gerade ein Fenster offen, wartet der Moment, bis es geschlossen wird. */
+  let momentTimer = null, queuedMoment = null;
+  function moment(html) {
+    if (!html) return;
+    if (dlg.open || overlay) { queuedMoment = html; return; }
+    const m = $("#moment");
+    $("p", m).innerHTML = fill(html);
+    m.classList.add("show");
+    clearTimeout(momentTimer);
+    momentTimer = setTimeout(hideMoment, Math.min(9000, 3200 + m.textContent.length * 40));
+  }
+  function hideMoment() { clearTimeout(momentTimer); $("#moment").classList.remove("show"); }
+  function flushMoment() {
+    if (!queuedMoment || !inGame()) return;
+    const q = queuedMoment; queuedMoment = null;
+    setTimeout(() => moment(q), 250);
   }
 
   function renderObjective() {
     const r = room(), done = S.completed.includes(r.id);
+    // Ziel nur auf Wunsch (Menü) – sonst steht es in der Hinweise-App des Telefons
+    $("#goalBlock").classList.toggle("hidden", !S.showGoal);
+    // Ausgang ohne Tür in der Szene (letzter Raum, vorläufige Räume): Knopf direkt im Bild
+    const act = $("#sceneAction"), nx = N.rooms[r.index + 1];
+    ["goto", "via", "ending"].forEach((k) => delete act.dataset[k]);
+    if (done && r.final) { act.dataset.ending = ""; act.innerHTML = "Den letzten Brief lesen <span>→</span>"; }
+    else if (done && !r.views && nx && !S.visited.includes(nx.id)) { act.dataset.goto = nx.id; act.dataset.via = r.exitVia || "door"; act.innerHTML = `${esc(r.exitLabel || `Weiter: ${nx.name}`)} <span>→</span>`; }
+    act.classList.toggle("hidden", !("ending" in act.dataset) && !act.dataset.goto);
     const pid = frontierPuzzle();
     const next = N.rooms[r.index + 1];
     if (done && pid && PUZ[pid].room !== r.id) { // Aufgabe geht in einem anderen Raum weiter
@@ -274,6 +303,11 @@
       const it = N.items[id];
       return `<button class="slot${selected === id ? " selected" : ""}" data-slot="${id}" aria-label="${esc(it.name)}${selected === id ? " (ausgewählt)" : ""}" title="${esc(it.name)}"><span>${it.icon}</span><small>${esc(it.name)}</small></button>`;
     }).join("");
+    const held = $("#heldChip");
+    held.classList.toggle("hidden", !selected);
+    if (selected) { held.innerHTML = `${N.items[selected].icon} ${esc(N.items[selected].name)} <span aria-hidden="true">×</span>`; held.setAttribute("aria-label", `${N.items[selected].name} ablegen`); }
+    const nb = S.unread.length, gb = $("#gearBadge");
+    gb.textContent = nb || "•"; gb.classList.toggle("hidden", !nb && !S.newDocs.length); gb.classList.toggle("dot", !nb);
     $("#selectedNote").innerHTML = selected
       ? `<b>${esc(N.items[selected].name)}</b> ausgewählt – tippe auf eine Stelle im Raum. <button class="link-button" data-examine="${selected}">Ansehen</button> · <button class="link-button" data-deselect>Ablegen</button>`
       : S.inventory.length ? "Gegenstand antippen, um ihn zu benutzen." : "Noch leer.";
@@ -308,7 +342,7 @@
         if (ev.flash) lightning();
         run(ev.actions);
         save();
-        renderStage({ narrate: ev.narrate });
+        renderStage(); moment(ev.narrate);
         renderSide(); renderObjective();
       }, ev.delay ?? 900);
     }
@@ -333,15 +367,16 @@
 
   function goRoom(id, via) {
     if (!S.unlocked.includes(id)) return;
-    closeDialog(); closeOverlay();
+    closeDialog(); closeOverlay(); setDrawer(false); hideMoment(); queuedMoment = null;
     selected = null; light = false;
     const sc = $("#scene");
     sc.classList.add("leaving");
     A.play(via === "elevator" ? "elevator" : "door");
     setTimeout(() => {
-      S.current = id; add(S.visited, id); save();
+      S.current = id; const first = add(S.visited, id); save();
       sc.classList.remove("leaving");
       render({ anim: "arrive", reset: true });
+      if (first && ROOM[id].story) moment(ROOM[id].story); // erster Besuch: Raumstimmung in der Bildmitte
       checkEvents();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }, via === "elevator" ? 1100 : 650);
@@ -364,7 +399,7 @@
   dlg.addEventListener("close", () => {
     if (dlgCleanup) { dlgCleanup(); dlgCleanup = null; }
     justCompleted = null; lockPid = null;
-    if (inGame()) { renderStage(); renderSide(); renderObjective(); }
+    if (inGame()) { renderStage(); renderSide(); renderObjective(); flushMoment(); }
   });
   dlg.addEventListener("click", (e) => { if (e.target === dlg) closeDialog(); });
 
@@ -762,6 +797,7 @@
     selected = id;
     A.play("click");
     renderSide();
+    if (compact()) setDrawer(false); // Smartphone: Leiste zu, damit man das Ziel im Raum antippen kann
     if (room().views) setNarration(`<b>${esc(N.items[id].name)}</b> in der Hand. Tippe auf die Stelle, an der du es benutzen willst.`);
   }
   function openItem(id) {
@@ -779,6 +815,7 @@
     window.addEventListener("pointermove", (e) => {
       if (!drag || e.pointerId !== drag.pid) return;
       if (!drag.ghost && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 10 && room().views) {
+        setDrawer(false);
         drag.ghost = document.createElement("div");
         drag.ghost.className = "drag-ghost";
         drag.ghost.textContent = N.items[drag.id].icon;
@@ -834,6 +871,7 @@
     { id: "hinweise", name: "Hinweise", icon: "?" },
   ];
   function openPhone(app = null) {
+    setDrawer(false);
     if (overlay === "akte") closeOverlay();
     overlay = "phone"; phoneApp = app;
     $("#phone").classList.remove("hidden");
@@ -902,6 +940,7 @@
     return pages;
   }
   function openAkte(docId = null) {
+    setDrawer(false);
     if (overlay === "phone") closeOverlay();
     overlay = "akte";
     $("#akte").classList.remove("hidden");
@@ -944,9 +983,20 @@
   })();
 
   function closeOverlay() {
+    const was = overlay;
     overlay = null; phoneApp = null;
     $("#phone").classList.add("hidden");
     $("#akte").classList.add("hidden");
+    if (was) flushMoment();
+  }
+
+  /* ---------- Smartphone: Ausrüstung als ausklappbare Seitenleiste ---------- */
+  const COMPACT = window.matchMedia("(max-width: 760px), (max-height: 520px) and (orientation: landscape)");
+  const compact = () => COMPACT.matches;
+  function setDrawer(open) {
+    document.body.classList.toggle("drawer-open", open);
+    $("#gearToggle").setAttribute("aria-expanded", String(open));
+    $("#gearToggle").setAttribute("aria-label", open ? "Ausrüstung schließen" : "Ausrüstung öffnen");
   }
 
   /* ---------- Menü ---------- */
@@ -957,8 +1007,9 @@
         <label class="switch"><input type="checkbox" id="optSound" ${S.sound ? "checked" : ""}><span>Ton (Geräusche und Musik)</span></label>
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
+        <label class="switch"><input type="checkbox" id="optGoal" ${S.showGoal ? "checked" : ""}><span>Aktuelles Ziel anzeigen <small class="muted">(sonst nur unter „Hinweise“ im Telefon)</small></span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>14</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>15</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
@@ -971,6 +1022,7 @@
         });
         $("#optMusic").addEventListener("change", (e) => { S.music = e.target.checked; save(); if (inGame()) A.music(S.music ? room().music || MUSIC : null); });
         $("#optHotspots").addEventListener("change", (e) => { S.showHotspots = e.target.checked; save(); renderStage(); });
+        $("#optGoal").addEventListener("change", (e) => { S.showGoal = e.target.checked; save(); renderObjective(); });
       },
     });
   }
@@ -1048,7 +1100,11 @@
     if (ds.hint) { S.hints[ds.hint] = (S.hints[ds.hint] || 0) + 1; save(); A.play("paper"); return renderPhone(); }
   });
   $("#closeDialog").addEventListener("click", closeDialog);
-  $("#narration").addEventListener("click", (e) => { if (e.currentTarget.classList.contains("more")) e.currentTarget.classList.toggle("open"); });
+  $("#moment").addEventListener("click", hideMoment);
+  $("#gearToggle").addEventListener("click", () => setDrawer(!document.body.classList.contains("drawer-open")));
+  $("#sideBackdrop").addEventListener("click", () => setDrawer(false));
+  $("#sideClose").addEventListener("click", () => setDrawer(false));
+  COMPACT.addEventListener?.("change", () => { if (!compact()) setDrawer(false); });
   $("#startButton").addEventListener("click", () => { A.setEnabled(S.sound); start(); });
   $("#newGameLink").addEventListener("click", (e) => { e.preventDefault(); resetGame(); });
   $("#restartButton").addEventListener("click", resetGame);
@@ -1067,7 +1123,7 @@
   $("#soundToggle").addEventListener("click", () => { S.sound = !S.sound; A.setEnabled(S.sound); updateSoundIcon(); save(); if (S.sound && inGame()) { A.play("click"); render(); } });
   document.addEventListener("keydown", (e) => {
     if (!inGame() || dlg.open || e.target.matches("input, textarea")) return;
-    if (e.key === "Escape") { if (overlay) closeOverlay(); else if (selected) { selected = null; renderSide(); } return; }
+    if (e.key === "Escape") { if (document.body.classList.contains("drawer-open")) setDrawer(false); else if (overlay) closeOverlay(); else if (selected) { selected = null; renderSide(); } return; }
     if (overlay === "akte") { if (e.key === "ArrowRight") flip(aktePage + 1); if (e.key === "ArrowLeft") flip(aktePage - 1); return; }
     if (overlay) return;
     if (e.key === "ArrowRight") turn(1);

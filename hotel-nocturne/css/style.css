@@ -97,7 +97,7 @@ body.flash::after { opacity: .13; }
 .play { padding: 20px clamp(12px, 2.5vw, 36px) 30px; min-width: 0; }
 
 /* Szene */
-.scene { position: relative; width: 100%; max-width: calc((100vh - var(--topbar) - 190px) * 4 / 3); min-width: 280px; margin: 0 auto; background: #050505; border: 1px solid #2e2a22; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: pan-y; box-shadow: 0 30px 80px #000; }
+.scene { position: relative; width: 100%; max-width: calc((100vh - var(--topbar) - 48px) * 4 / 3); min-width: 280px; margin: 0 auto; background: #050505; border: 1px solid #2e2a22; overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: pan-y; box-shadow: 0 30px 80px #000; }
 .stage { position: relative; aspect-ratio: 4 / 3; width: 100%; }
 .stage .scene-art { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .stage .flicker { animation: flicker 9s infinite; }
@@ -148,10 +148,7 @@ body.flash .stage .lightning { opacity: .55; }
 .card-object small { font: 9px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
 .draft-tag { position: absolute; left: 0; right: 0; bottom: 4px; font: 9px var(--mono); letter-spacing: .12em; color: #6f6758; margin: 0; }
 
-/* Text unter der Szene */
-.caption { max-width: calc((100vh - var(--topbar) - 190px) * 4 / 3); margin: 14px auto 0; }
-.caption .eyebrow { color: #6f8a85; }
-.narration { font: 500 16px/1.65 var(--serif); color: var(--text-2); margin: 0 0 10px; min-height: 2.4em; }
+/* Ziel (nur auf Wunsch, in der Seitenleiste) */
 .objective { margin: 0; font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
 .obj-label { font: 9px var(--mono); letter-spacing: .16em; color: #0d0d0b; background: var(--brass); padding: 3px 7px; }
 .obj-done { color: var(--ok); }
@@ -470,26 +467,11 @@ body.flash .stage .lightning-only { opacity: 1; }
   .intro-copy h1 { font-size: 64px; }
   .primary-button { width: 100%; }
   .game-screen { display: block; }
-  .play { padding: 10px 0 190px; }
   .scene { max-width: none; min-width: 0; border-left: 0; border-right: 0; }
-  .caption { max-width: none; padding: 0 16px; }
-  .narration { font-size: 15px; }
   .turn { padding: 12px 6px; }
   .turn small, .turn:hover small, .turn:focus-visible small { display: none; }
   .view-label { white-space: nowrap; }
   .view-label { top: 8px; font-size: 9px; padding: 4px 9px; }
-  .side { position: fixed; top: auto; bottom: 0; left: 0; right: 0; height: auto; z-index: 30; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-left: 0; border-top: 1px solid #2c2a24; background: #090a0cf5; overflow: visible; }
-  .side-block { flex: 1; min-width: 0; }
-  .side-block .eyebrow { display: none; }
-  .backpack { display: flex; overflow-x: auto; gap: 6px; scrollbar-width: none; }
-  .slot { flex: none; width: 52px; }
-  .slot small { display: none; }
-  .slot.empty:nth-child(n+5) { display: none; }
-  .selected-note { flex-basis: 100%; order: 3; margin: 0; font-size: 11px; }
-  .side-tools { display: flex; gap: 6px; }
-  .big-tool { width: 58px; height: 52px; padding: 6px 4px; font-size: 10px; gap: 2px; }
-  .big-tool svg { width: 22px; height: 22px; }
-  .side-progress { display: none; }
   .phone-wrap { justify-content: center; padding: 16px; }
   .phone { width: min(320px, 100%); height: min(620px, calc(100vh - 32px)); }
   .akte { padding: 30px 8px 10px; }
@@ -523,21 +505,7 @@ body.flash .stage .lightning-only { opacity: 1; }
 .mp-toast.show { opacity: 1; transform: translate(-50%, 0); }
 .mp-toast b { color: var(--brass-2); font-weight: 500; }
 @media (max-width: 760px) {
-  .mp-team { flex-basis: 100%; order: 4; }
-  .mp-team-list { display: flex; flex-wrap: wrap; gap: 2px 14px; }
-  .mp-team-list li { flex-direction: row; gap: 6px; padding: 0; border: 0; font-size: 11px; }
-  .mp-team .selected-note { display: none; }
-  .mp-mode .play { padding-bottom: 215px; }
   .mp-toast { bottom: auto; top: calc(var(--topbar) + 10px); }
-}
-
-/* ========== Text unter der Szene (ohne Überschrift) ========== */
-.caption .narration { margin-top: 2px; }
-@media (max-width: 760px) {
-  .narration { font-size: 15px; line-height: 1.55; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
-  .narration.open { display: block; overflow: visible; }
-  .narration.more:not(.open) { cursor: pointer; position: relative; }
-  .narration.more:not(.open)::after { content: "mehr"; position: absolute; right: 0; bottom: 0; padding-left: 28px; background: linear-gradient(90deg, transparent, var(--black) 26px); color: var(--brass); font: 10px/2.2 var(--mono); letter-spacing: .14em; }
 }
 
 /* ========== Rätseltyp „Folge“ (Bedienelemente nacheinander betätigen) ========== */
@@ -565,3 +533,51 @@ body.flash .stage .lightning-only { opacity: 1; }
 .paper ol.steps { padding-left: 24px; line-height: 2; margin: 8px 0; }
 .paper .stain { background: radial-gradient(ellipse at 40% 50%, #8a7a5870, transparent 75%); padding: 2px 6px; }
 .paper .big-seq { font-size: 20px; text-align: center; letter-spacing: .12em; margin: 14px 0; }
+
+/* ========== Szene im Mittelpunkt: Untertitel, Momente, Chips ========== */
+.subtitle { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; margin: 0; padding: 34px clamp(16px, 6%, 70px) 14px; background: linear-gradient(transparent, #000000d9 42%); color: #e6dfd3; font: 500 16px/1.55 var(--serif); text-align: center; text-shadow: 0 1px 3px #000; pointer-events: none; opacity: 0; transform: translateY(8px); transition: opacity .45s, transform .45s; }
+.subtitle.show { opacity: 1; transform: none; }
+.subtitle b { color: var(--brass-2); font-weight: 500; }
+.moment { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; padding: 8%; background: radial-gradient(ellipse at 50% 50%, #000000c8, #000000f0); opacity: 0; pointer-events: none; transition: opacity .6s; cursor: pointer; }
+.moment.show { opacity: 1; pointer-events: auto; }
+.moment p { margin: 0; max-width: 34em; color: #efe7d8; font: italic 400 clamp(17px, 2.2vw, 24px)/1.6 var(--serif); text-align: center; text-shadow: 0 2px 12px #000; transform: translateY(6px); transition: transform .8s; }
+.moment.show p { transform: none; }
+.moment p b { color: var(--brass-2); font-weight: 500; font-style: normal; }
+.held-chip { position: absolute; top: 46px; right: 10px; z-index: 4; display: flex; align-items: center; gap: 6px; max-width: 60%; background: #0b0b0ae6; color: var(--brass-2); border: 1px solid #8a7348; padding: 6px 12px; font: 11px var(--mono); letter-spacing: .04em; border-radius: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.held-chip span { color: var(--muted); font-size: 14px; line-height: 1; }
+.scene-action { position: absolute; right: 12px; bottom: 14px; z-index: 5; background: var(--brass); color: #0d0d0b; border: 0; padding: 10px 16px; font: 500 13px var(--sans); }
+.goal-block .objective { font-size: 12px; line-height: 1.5; }
+.gear-toggle, .side-close, .side-backdrop { display: none; }
+
+/* ---------- Smartphone und Querformat: Raum füllt den Bildschirm, Ausrüstung ausklappbar ---------- */
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+  .game-screen { display: block; }
+  .play { padding: 0; min-height: calc(100svh - var(--topbar)); display: flex; flex-direction: column; justify-content: center; }
+  .scene { max-width: none; min-width: 0; border-left: 0; border-right: 0; box-shadow: none; }
+  .subtitle { font-size: 14px; padding: 28px 46px 10px; }
+  .moment p { font-size: 17px; }
+  .side { position: fixed; top: 0; right: 0; bottom: 0; left: auto; z-index: 45; width: min(320px, 86vw); height: auto; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); flex-direction: column; flex-wrap: nowrap; gap: 18px; border-left: 1px solid #2c2a24; border-top: 0; background: #0b0c0bfa; overflow-y: auto; transform: translateX(105%); transition: transform .3s ease; box-shadow: -20px 0 50px #000a; }
+  .drawer-open .side { transform: none; }
+  .side-block { flex: none; }
+  .side-block .eyebrow { display: block; }
+  .backpack { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .slot small { display: -webkit-box; }
+  .side-tools { display: grid; }
+  .side-progress { display: block; margin-top: 0; }
+  .side-close { display: block; position: absolute; top: 8px; right: 10px; width: 34px; height: 34px; background: none; border: 0; color: var(--muted); font-size: 24px; line-height: 1; }
+  .side-backdrop { display: block; position: fixed; inset: 0; z-index: 44; background: #000a; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .drawer-open .side-backdrop { opacity: 1; pointer-events: auto; }
+  #game:not(.hidden) ~ .gear-toggle, .game-screen:not(.hidden) .gear-toggle { display: grid; }
+  .gear-toggle { position: fixed; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 35; width: 56px; height: 56px; place-items: center; border-radius: 50%; background: #0d0e0de6; border: 1px solid #8a7348; box-shadow: 0 8px 24px #000c; }
+  .gear-toggle svg { width: 26px; height: 26px; fill: none; stroke: var(--brass-2); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+  .gear-toggle .badge { position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; border-radius: 10px; background: var(--red); color: #fff; font: 10px/20px var(--mono); text-align: center; padding: 0 5px; }
+  .gear-toggle .badge.dot { background: var(--brass); color: #0d0d0b; }
+  .drawer-open .gear-toggle { opacity: 0; pointer-events: none; }
+  .mp-toast { bottom: auto; top: calc(var(--topbar) + 10px); }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  :root { --topbar: 42px; }
+  .play { min-height: calc(100svh - var(--topbar)); }
+  .scene { max-width: calc((100svh - var(--topbar)) * 4 / 3); }
+  .turn small, .turn:hover small, .turn:focus-visible small { display: none; }
+}

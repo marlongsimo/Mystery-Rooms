@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#090a0c">
   <meta name="description" content="Hotel Nocturne – Die letzte Nacht. Ein digitaler Mystery-Escape-Room im Browser.">
   <title>Hotel Nocturne – Die letzte Nacht</title>
-  <link rel="stylesheet" href="css/fonts.css?v=14">
-  <link rel="stylesheet" href="css/style.css?v=14">
+  <link rel="stylesheet" href="css/fonts.css?v=15">
+  <link rel="stylesheet" href="css/style.css?v=15">
   <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
 </head>
 <body>
@@ -85,14 +85,22 @@
           <button class="turn left" id="turnLeft"></button>
           <button class="turn right" id="turnRight"></button>
           <button class="light-chip hidden" id="lightChip">◉ Taschenlampe ausschalten</button>
-        </div>
-        <div class="caption">
-          <p class="narration" id="narration" aria-live="polite"></p>
-          <p class="objective" id="objective"></p>
+          <button class="held-chip hidden" id="heldChip" data-deselect></button>
+          <button class="scene-action hidden" id="sceneAction"></button>
+          <p class="subtitle" id="narration" aria-live="polite"></p>
+          <div class="moment" id="moment" aria-live="assertive"><p></p></div>
         </div>
       </section>
 
-      <aside class="side" aria-label="Ausrüstung">
+      <!-- Smartphone: Ausrüstung als ausklappbare Seitenleiste -->
+      <button class="gear-toggle" id="gearToggle" aria-label="Ausrüstung öffnen" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V6a5 5 0 0 1 10 0v2"/><rect x="4" y="8" width="16" height="13" rx="2.5"/><path d="M9 13h6"/></svg>
+        <i id="gearBadge" class="badge hidden"></i>
+      </button>
+      <div class="side-backdrop" id="sideBackdrop"></div>
+
+      <aside class="side" id="side" aria-label="Ausrüstung">
+        <button class="side-close" id="sideClose" aria-label="Ausrüstung schließen">×</button>
         <div class="side-block">
           <p class="eyebrow">RUCKSACK</p>
           <div class="backpack" id="backpack"></div>
@@ -107,6 +115,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h6l2 2h10v11H3z"/><path d="M3 9.5h18"/></svg>
             <span>Akte</span><i id="docCount" class="count">0</i>
           </button>
+        </div>
+        <div class="side-block goal-block hidden" id="goalBlock">
+          <p class="eyebrow">AKTUELLES ZIEL</p>
+          <p class="objective" id="objective"></p>
         </div>
         <div class="side-progress">
           <div class="progress-track"><div id="progressBar"></div></div>
@@ -156,16 +168,16 @@
     <div id="dlgBody" class="dialog-body"></div>
   </dialog>
 
-  <script src="js/config.js?v=14"></script>
-  <script src="js/audio.js?v=14"></script>
-  <script src="js/rooms/01-rezeption.js?v=14"></script>
-  <script src="js/rooms/02-zimmer217.js?v=14"></script>
-  <script src="js/rooms/03-gepaecklager.js?v=14"></script>
-  <script src="js/rooms/04-archiv.js?v=14"></script>
-  <script src="js/rooms/05-ueberwachung.js?v=14"></script>
-  <script src="js/rooms/06-keller.js?v=14"></script>
-  <script src="js/rooms/07-buero-vorlaeufig.js?v=14"></script>
-  <script src="js/engine.js?v=14"></script>
+  <script src="js/config.js?v=15"></script>
+  <script src="js/audio.js?v=15"></script>
+  <script src="js/rooms/01-rezeption.js?v=15"></script>
+  <script src="js/rooms/02-zimmer217.js?v=15"></script>
+  <script src="js/rooms/03-gepaecklager.js?v=15"></script>
+  <script src="js/rooms/04-archiv.js?v=15"></script>
+  <script src="js/rooms/05-ueberwachung.js?v=15"></script>
+  <script src="js/rooms/06-keller.js?v=15"></script>
+  <script src="js/rooms/07-buero-vorlaeufig.js?v=15"></script>
+  <script src="js/engine.js?v=15"></script>
   <!-- Multiplayer (optional): Plattform-Modul + Anbindung. Ohne diese Zeilen läuft das Spiel als Einzelspieler. -->
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>

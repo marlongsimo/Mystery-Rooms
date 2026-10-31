@@ -52,7 +52,10 @@ window.MR_GAMES = [
     difficulty: 2,
     players: "1–4 Personen",
     age: "ab 12 Jahren",
-    status: "geplant",
+    status: "vorschau",
+    isNew: true,
+    statusNote: "Alle fünf Bereiche spielbar · Hagedorns Wand als Pinnwand auf dem Tablet",
+    url: "der-letzte-fall/index.html",
     art: "krimi",
   },
   {

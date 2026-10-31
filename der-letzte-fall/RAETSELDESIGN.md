@@ -368,9 +368,9 @@ Filmische Sequenz mit dem Abspieler von Hotel Nocturne (Szenen, Untertitel, Ger�
 
 1. **Dieses Dokument prüfen und festschreiben.**
 2. **Pinnwand-Prototyp** (Stufe 1) mit Hagedorns Startwand, allein und zu zweit, besonders die Fadenbedienung auf dem Smartphone.
-3. Rätseltypen Widerlegen / Bestätigen / Beweisführung.
-4. Bereich 1 als spielbarer Einstieg, dann 2–5.
-5. Katalogeintrag „Der letzte Fall“ auf „spielbar“ setzen.
+3. Rätseltypen Widerlegen / Bestätigen / Beweisführung. ✓
+4. Bereich 1 als spielbarer Einstieg, dann 2–5. ✓ (Version 1)
+5. Katalogeintrag „Der letzte Fall“ auf „spielbar“ setzen. (zunächst „Vorschau“, bis echte Testrunden gelaufen sind)
 
 ## 11. Entscheidungen
 

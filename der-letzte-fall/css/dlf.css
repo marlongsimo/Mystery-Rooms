@@ -1,0 +1,70 @@
+/* DER LETZTE FALL – Ergänzungen zu css/style.css (Kopie aus Hotel Nocturne) */
+:root { --red: #b3261e; }
+.brand-mark { border-color: #b3261e; }
+.brand-mark span { color: #e6a99e; }
+
+/* Pinnwand-Knopf in der Seitenleiste: über die ganze Breite */
+#wallButton { grid-column: 1 / -1; flex-direction: row; justify-content: center; gap: 10px; padding: 12px 8px; border-color: #5a4a33; background: #1b1713; }
+#wallButton span { font-size: 13px; color: var(--text); }
+
+/* ---------- Pinnwand (Tablet) ---------- */
+.wall-wrap { position: fixed; inset: 0; z-index: 50; background: #0e1015; display: block; animation: fade .2s; }
+.wall-wrap[hidden] { display: none; }
+.wall-top { position: absolute; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; gap: 8px; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; background: #0e1015f2; border-bottom: 1px solid #2c3240; }
+.wall-top h2 { margin: 0; flex: 1; min-width: 0; font: 600 14px/1.2 var(--serif); letter-spacing: .04em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wall-top h2 small { display: block; font: 10px var(--mono); letter-spacing: .14em; color: var(--brass); }
+.wall-top button { padding: 8px 12px; border: 1px solid #2c3240; border-radius: 8px; background: none; color: var(--text); font: 13px var(--sans); white-space: nowrap; }
+.wall-top button.done { border-color: #2e8a55; color: #9fe0b0; }
+.wall-top .wall-close { width: 38px; height: 38px; padding: 0; font-size: 22px; line-height: 1; border-radius: 50%; }
+.wall-wrap .wall-board { position: absolute; left: 0; right: 0; bottom: 0; top: calc(56px + env(safe-area-inset-top, 0px)); }
+.wall-panel { position: absolute; z-index: 40; top: calc(56px + env(safe-area-inset-top, 0px)); right: 0; bottom: 0; width: min(360px, 92vw); padding: 18px; background: #14161c; border-left: 1px solid #2c3240; overflow-y: auto; transform: translateX(105%); transition: transform .3s; color: var(--text); }
+.wall-panel.open { transform: none; }
+.wall-panel h3 { margin: 0 0 6px; font: 600 18px var(--serif); }
+.wall-panel > p { color: #a3a8b4; font-size: 13px; margin: 0 0 14px; }
+.wall-wrap .ev { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px; margin-bottom: 8px; background: #1b1e25; border: 1px solid #2c3240; border-radius: 10px; color: var(--text); font: 14px var(--sans); cursor: pointer; }
+.wall-wrap .ev b { display: block; font-size: 14px; font-weight: 500; } .wall-wrap .ev small { color: #a3a8b4; font-size: 12px; }
+.wall-wrap .ev[disabled] { opacity: .45; cursor: default; }
+.wall-wrap .ev .plus { margin-left: auto; color: var(--brass); font-size: 20px; }
+.wall-wrap .ev.nope { animation: nope .4s; border-color: #b3261e; }
+@keyframes nope { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.wall-wrap label.f { display: block; margin: 12px 0; } .wall-wrap label.f span { display: block; font: 10px var(--mono); letter-spacing: .12em; color: var(--brass); margin-bottom: 5px; text-transform: uppercase; }
+.wall-wrap label.f select { width: 100%; padding: 10px; background: #0e1015; color: var(--text); border: 1px solid #3a3a32; border-radius: 8px; font-size: 16px; }
+.wall-btn { display: block; width: 100%; padding: 12px; margin: 12px 0 8px; border: 1px solid #2c3240; border-radius: 8px; background: none; color: var(--text); font: 14px var(--sans); }
+.wall-btn.gold { background: var(--brass); border-color: var(--brass); color: #141821; font-weight: 600; }
+.wall-wrap .cleared { font: 12px var(--mono); letter-spacing: .08em; color: #f0b4aa; margin: 0 0 4px; } .wall-wrap .cleared.ok { color: #9fe0b0; }
+.wall-wrap .solved { padding: 12px; border: 1px solid #2e8a55; border-radius: 10px; background: #143322; color: #c9efd6; } .wall-wrap .solved p { color: #c9efd6; margin: 6px 0 0; font-size: 14px; }
+.wall-feedback { margin: 0 0 10px; font-size: 14px; }
+.wall-feedback:empty { display: none; }
+.wall-feedback.bad { padding: 9px 11px; border-radius: 8px; background: #3a1714; color: #f0b4aa; }
+.pick-note { margin: 0 0 10px; font: italic 15px Georgia, serif; color: #f3e6c4; }
+.pick-more { font-size: 12px; color: #a3a8b4; margin: 8px 0 0; }
+.wall-viewer { position: absolute; inset: 0; z-index: 45; display: grid; place-items: center; padding: 20px; background: #000b; }
+.wall-viewer[hidden] { display: none; }
+.wall-viewer-box { position: relative; width: min(600px, 100%); max-height: 86vh; overflow: auto; }
+.wall-picker { background: #14161c; border: 1px solid #2c3240; border-radius: 12px; padding: 18px; color: var(--text); }
+.wall-picker h3 { margin: 0 40px 4px 0; font: 600 18px var(--serif); }
+.wall-x { position: absolute; top: 8px; right: 8px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #000a; color: #fff; font-size: 20px; }
+.wall-doc .paper { margin: 0; }
+.viewer-art { background: #1b1d22; aspect-ratio: 4 / 3; } .viewer-art svg { width: 100%; height: 100%; display: block; }
+.wall-toast { position: absolute; left: 50%; top: calc(66px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -10px); z-index: 50; max-width: calc(100% - 32px); padding: 8px 14px; border-radius: 20px; background: #14161cf0; border: 1px solid #54b8b0; color: #c9efe9; font-size: 13px; opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none; text-align: center; }
+.wall-toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* Papier der Startwand (wie im Prototyp) */
+.pv-paper { background: #f4efe3; color: #2a2119; padding: 22px; font: 16px/1.55 Georgia, serif; box-shadow: 0 20px 50px #000c; }
+.pv-head { font: 600 12px var(--mono); letter-spacing: .12em; color: #6c5a44; margin: 0 0 10px; }
+.pv-hand { font-style: italic; color: #23285a; }
+.pv-small { font-size: 13px; color: #6c5a44; }
+.pv-table { width: 100%; border-collapse: collapse; font: 14px var(--mono); } .pv-table td { padding: 5px 6px 5px 0; border-bottom: 1px solid #d8ccb0; vertical-align: top; }
+@media (max-width: 560px) {
+  .wall-top { gap: 6px; padding-left: 10px; padding-right: 10px; }
+  .wall-top h2 small { display: none; }
+  .wall-top button { padding: 8px 9px; font-size: 12px; }
+}
+
+/* ---------- Dokumente dieses Falls ---------- */
+.paper .stamp { display: inline-block; padding: 3px 10px; border: 3px solid #7a2620; color: #7a2620; font: 700 14px var(--mono); letter-spacing: .14em; transform: rotate(-6deg); margin: 6px 0; }
+.paper .carbon { color: transparent; text-shadow: 0 0 0 #c9bfa8; }
+.paper .blackened { background: #111; color: #111; padding: 0 4px; }
+.paper .transcript td:first-child { white-space: nowrap; color: #6c5a44; }
+.paper .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
+.paper .swatches div { aspect-ratio: 1; border-radius: 4px; box-shadow: inset 0 0 0 1px #0003; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; font: 10px var(--mono); color: #f4efe3; }
+.lock-wall .submit-button { margin-top: 10px; }

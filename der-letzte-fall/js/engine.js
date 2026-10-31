@@ -1,0 +1,1437 @@
+/*
+ * DER LETZTE FALL – Spiel-Engine
+ * Kopie der Engine von Hotel Nocturne (Version 22), spielspezifische Texte und Werte
+ * kommen aus js/config.js. Ergänzt um den Rätseltyp „wall“ (Pinnwand, js/wall.js).
+ *
+ * Ursprünglich: HOTEL NOCTURNE – Spiel-Engine (Version 2: vier Blickrichtungen)
+ * Liest die Raumdaten aus js/rooms/*.js. Zuständig für Darstellung, Drehen,
+ * Rätsel, Rucksack, Telefon, Akte, Hinweise, Raumwechsel und Spielstand.
+ */
+(() => {
+  "use strict";
+  const N = window.MRGAME;
+  const A = N.audio;
+  const C = N.config;
+  const SAVE_KEY = C.saveKey || "nocturne_save_v2";
+  let saveKey = SAVE_KEY;  // im Multiplayer: eigener Spielstand je Sitzung (der Einzelspieler-Stand bleibt unberührt)
+  let mp = null;           // Multiplayer-Anbindung (js/mp-adapter.js), sonst null
+  N.messages = N.messages || {};
+  const MUSIC = C.music || null; // Hintergrundmusik (Räume können mit music: "…" abweichen)
+
+  /* ---------- Hilfsfunktionen ---------- */
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const playerName = () => (N.config.playerName || "").trim() || "Verehrter Gast";
+  const fill = (s) => String(s ?? "").replaceAll("{name}", esc(playerName()));
+  const norm = (s) => String(s ?? "").toUpperCase().replace(/ß/g, "SS").replace(/[^A-Z0-9ÄÖÜ]/g, "");
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  /* ---------- Raumdaten aufbereiten ---------- */
+  const ROOM = {}, PUZ = {};
+  N.rooms.forEach((r, i) => {
+    r.index = i; ROOM[r.id] = r;
+    for (const [id, p] of Object.entries(r.puzzles || {})) {
+      // Rätsel-IDs gelten im ganzen Spiel: doppelte IDs würden sich gegenseitig als „gelöst“ markieren
+      if (PUZ[id]) console.warn(`[${C.title || "Spiel"}] Rätsel-ID „${id}“ gibt es in ${PUZ[id].room} und ${r.id} – bitte umbenennen.`);
+      p.id = id; p.room = r.id; PUZ[id] = p;
+    }
+  });
+  const hotspotsOf = (r) => (r.views ? r.views.flatMap((v) => v.hotspots) : r.hotspots);
+
+  /* ---------- Spielstand ---------- */
+  const fresh = () => ({
+    v: 2, started: false, finished: false,
+    current: N.rooms[0].id, unlocked: [N.rooms[0].id], visited: [N.rooms[0].id], completed: [], views: {},
+    solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
+    secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false, goals: {},
+  });
+  let S = fresh();
+  function load() {
+    try {
+      const s = JSON.parse(localStorage.getItem(saveKey) || "null");
+      if (s && s.v === 2) S = Object.assign(fresh(), s);
+      S.gone = { items: [], flags: [], ...(S.gone || {}) };
+      if (!ROOM[S.current]) S.current = N.rooms[0].id;
+      // ältere Spielstände ohne „besucht“: alles Abgeschlossene und der aktuelle Raum gelten als besucht
+      [...S.completed, S.current].forEach((id) => add(S.visited, id));
+      // Wurde die Seite neu geladen, während eine verzögerte Aktion noch ausstand
+      // (z. B. Gepäckausgabe), wird sie jetzt sofort nachgeholt – sonst entstünde eine Sackgasse.
+      // Migration: Frühere Platzhalter-Räume tragen dieselbe ID wie die neuen, vollständigen Räume.
+      // Ein Raum bleibt nur „abgeschlossen“, wenn seine heutigen Rätsel wirklich gelöst sind.
+      S.completed = S.completed.filter((id) => ROOM[id] && (ROOM[id].completeWhen || []).every((pid) => S.solved.includes(pid)));
+      const open = S.pending; S.pending = [];
+      open.forEach((p) => run(p.actions.filter((x) => !x.sound))); // nachgeholt: Zustand ja, alte Geräusche nein
+      if (open.length) save();
+    } catch (e) { /* defekter Spielstand → neu beginnen */ }
+  }
+  function save() {
+    try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privater Modus */ }
+    if (mp && mp.changed) mp.changed(); // gemeinsamen Stand abgleichen (gebündelt, nicht bei jedem Aufruf)
+  }
+
+  /* Laufzeit-Zustand (wird nicht gespeichert) */
+  let selected = null;     // ausgewählter Gegenstand im Rucksack
+  let light = false;       // Taschenlampe
+  let overlay = null;      // "phone" | "akte" | null
+  let phoneApp = null;
+  let aktePage = 0;
+  let hintPick = null;     // gewählte Aufgabe in der Hinweise-App, wenn mehrere parallel offen sind
+  let lockPid = null;      // Rätsel, dessen Schloss gerade im Dialog offen ist
+  const drafts = {};       // halbfertige Eingaben in Mehrfeld-Schlössern (nicht gespeichert)
+
+  const room = () => ROOM[S.current];
+  const viewIndex = (r) => S.views[r.id] || 0;
+  const has = (flag) => (flag === "licht" ? light : S.flags.includes(flag));
+  const isSolved = (pid) => S.solved.includes(pid);
+  const add = (arr, v) => (arr.includes(v) ? false : (arr.push(v), true));
+  // Flags, die nur die eigene Sicht betreffen (Ereignisse, kurze Bildschirmeffekte), werden nie geteilt.
+  const localFlag = (f) => f.startsWith("evt_") || ((N.config.multiplayer || {}).localFlags || []).includes(f);
+  // if/unless dürfen auch Listen sein: alle Bedingungen müssen erfüllt bzw. keine darf erfüllt sein.
+  const allOf = (v) => [].concat(v).every(has);
+  const noneOf = (v) => ![].concat(v).some(has);
+  // Raum ganz dunkel, bis ein Zustand (darkUntil) ihn erhellt: ohne Taschenlampe ist nur `always` sichtbar.
+  const roomDark = (r) => Boolean(r.darkUntil) && !has(r.darkUntil);
+  const visible = (h) => (!h.if || allOf(h.if)) && (!h.unless || noneOf(h.unless)) && (!roomDark(room()) || light || h.always);
+  const ambientFor = (r) => (r.ambientAfter && has(r.ambientAfter.flag) ? r.ambientAfter.name : r.ambient);
+  const clockAt = (ms) => { const m = (C.clockStart ?? 23 * 60 + 17) + Math.floor(ms / 60000); return `${pad2(Math.floor(m / 60) % 24)}:${pad2(m % 60)}`; };
+  const currentPuzzle = (r) => Object.keys(r.puzzles || {}).find((id) => !isSolved(id));
+  /* Das nächste offene Rätsel im Spiel: zuerst im aktuellen Raum, sonst im frühesten
+     unvollständigen Raum, den man schon betreten hat (z. B. Tür in der Rezeption,
+     die zu Zimmer 217 gehört). */
+  function frontierPuzzle() {
+    const here = currentPuzzle(room());
+    if (here) return here;
+    const r = N.rooms.find((x) => !S.completed.includes(x.id) && S.visited.includes(x.id));
+    return r ? currentPuzzle(r) : null;
+  }
+  /* Parallel lösbare Aufgaben (gleiches `parallel` im selben Raum): alle offenen der Gruppe. */
+  function openGroup(pid) {
+    const grp = PUZ[pid] && PUZ[pid].parallel;
+    if (!grp) return [pid];
+    return Object.keys(ROOM[PUZ[pid].room].puzzles).filter((id) => PUZ[id].parallel === grp && !isSolved(id));
+  }
+  const objectiveOf = (pid) => {
+    const g = openGroup(pid);
+    return g.length > 1 ? PUZ[pid].parallelObjective || g.map((id) => PUZ[id].objective).join(" · ") : PUZ[pid].objective;
+  };
+  const ALL_SECRETS = () => N.rooms.flatMap(hotspotsOf).filter((h) => h.secret).length;
+
+  /* ---------- Aktionen ---------- */
+  let gained = [];
+  let justCompleted = null;
+  function run(actions) {
+    for (const a of actions || []) {
+      if (a.flag) add(S.flags, a.flag);
+      if (a.unflag) { S.flags = S.flags.filter((f) => f !== a.unflag); if (!localFlag(a.unflag)) add(S.gone.flags, a.unflag); }
+      if (a.open && N.docs[a.open] && inGame()) { // Dokument direkt zeigen, z. B. eine abgespielte Aufnahme
+        addDoc(a.open);
+        openDialog({ kicker: "AUFNAHME", title: N.docs[a.open].title, html: docHtml(a.open), wide: true });
+      }
+      if (a.give && add(S.inventory, a.give)) gained.push(N.items[a.give].icon + " " + N.items[a.give].name);
+      if (a.doc && addDoc(a.doc)) gained.push("▤ " + N.docs[a.doc].title);
+      if (a.sound) A.play(a.sound);
+      if (a.message) addMessage(a.message);
+      if (a.unlock) add(S.unlocked, a.unlock);
+      if (a.evidence) { add(S.evidence, a.evidence); if (N.docs[a.evidence]) addDoc(a.evidence); } // Beweis für den Abschlussbericht
+      if (a.remove) { S.inventory = S.inventory.filter((x) => x !== a.remove); add(S.gone.items, a.remove); if (selected === a.remove) selected = null; }
+      if (a.later) { // verzögerte Aktionen, z. B. etwas rumpelt erst nach ein paar Sekunden
+        const roomId = S.current;
+        const key = Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+        S.pending.push({ key, actions: a.later.actions }); // wird mitgespeichert, falls neu geladen wird
+        setTimeout(() => {
+          const p = S.pending.find((x) => x.key === key);
+          if (!p) return; // bereits beim Laden nachgeholt
+          S.pending = S.pending.filter((x) => x.key !== key);
+          // here: Geräusche nur, solange die Spielerin noch im Raum ist. Zustände (z. B. Licht
+          // wieder an) werden immer ausgeführt, sonst bliebe der Raum in einem Zwischenzustand.
+          const away = !inGame() || S.current !== roomId;
+          run(away && a.later.here ? p.actions.filter((x) => !x.sound) : p.actions); save();
+          if (inGame() && S.current === roomId) {
+            // Meldung nur zeigen, wenn die Spielerin noch in die passende Richtung blickt
+            const r = room(), here = r.views ? r.views[viewIndex(r)].id : null;
+            const narrate = !a.later.view || a.later.view === here ? a.later.narrate : null;
+            renderStage(); renderSide(); renderObjective();
+            if (narrate) moment(narrate);
+          }
+        }, a.later.ms || 1500);
+      }
+      if (a.solve) solve(a.solve);
+    }
+  }
+  function addDoc(id) {
+    if (!N.docs[id] || S.docs.includes(id)) return false;
+    S.docs.push(id); S.newDocs.push(id);
+    return true;
+  }
+  function addMessage(id, delay = 1400) {
+    if (!N.messages[id] || S.messages.some((m) => m.id === id)) return;
+    S.messages.push({ id, at: clockAt(S.playMs) });
+    S.unread.push(id);
+    save();
+    setTimeout(() => {
+      A.play("buzz");
+      const b = $("#phoneButton");
+      b.classList.remove("ring"); void b.offsetWidth; b.classList.add("ring");
+      renderSide();
+    }, delay);
+  }
+  function solve(pid) {
+    if (isSolved(pid)) return;
+    S.solved.push(pid);
+    const p = PUZ[pid];
+    run(p.onSolve);
+    const r = ROOM[p.room];
+    if (!S.completed.includes(r.id) && (r.completeWhen || []).every(isSolved)) {
+      S.completed.push(r.id); justCompleted = r.id;
+      const next = N.rooms[r.index + 1];
+      if (next) add(S.unlocked, next.id);
+      if (r.final) S.finished = true;
+    }
+    save();
+  }
+
+  /* ---------- Bildschirme ---------- */
+  function showScreen(id) {
+    ["intro", "game", "ending"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== id));
+    if (id !== "game") { A.ambient(null); A.music(null); closeOverlay(); setDrawer(false); hideMoment(); hideRotateHint(); }
+    else setTimeout(maybeRotateHint, 400);
+    window.scrollTo(0, 0);
+  }
+  const inGame = () => !$("#game").classList.contains("hidden");
+  function renderIntro() {
+    document.body.classList.toggle("mp-mode", Boolean(mp));
+    if ($("#introName")) $("#introName").textContent = playerName();
+    $("#startButton").innerHTML = S.started ? "Weiterspielen <span>→</span>" : `${esc(C.startLabel || "Spiel starten")} <span>→</span>`;
+    $("#newGameLink").classList.toggle("hidden", !S.started);
+  }
+
+  /* ---------- Darstellung ---------- */
+  function render(opts = {}) {
+    const r = room();
+    const pid = currentPuzzle(r);
+    if (pid && S.puzzleStart[pid] == null) { S.puzzleStart[pid] = S.playMs; save(); }
+    $("#location").textContent = r.name.toUpperCase();
+    renderStage(opts);
+    renderSide();
+    renderObjective();
+    A.ambient(r.ambient && !S.finished ? ambientFor(r) : null);
+    A.music(S.music && !S.finished ? r.music || MUSIC : null);
+  }
+
+  function renderStage({ anim = null, narrate = null, reset = false } = {}) {
+    const r = room(), sc = $("#scene"), st = $("#stage");
+    sc.classList.toggle("show-hotspots", S.showHotspots);
+    sc.classList.toggle("lit", light);
+    $("#lightChip").classList.toggle("hidden", !light);
+    if (r.views) {
+      const i = viewIndex(r), v = r.views[i], n = r.views.length;
+      sc.classList.remove("draft");
+      const dark = v.dark && !(v.dark.until && has(v.dark.until)) ? v.dark : null;
+      st.innerHTML = v.scene
+        + (dark ? `<div class="darkness" style="left:${dark.x}%;top:${dark.y}%;width:${dark.w}%;height:${dark.h}%${dark.clip ? `;clip-path:${dark.clip}` : ""}"></div>` : "")
+        + v.hotspots.filter(visible).map((h) =>
+          `<button class="hotspot${h.go ? " exit" : ""}${h.take ? " pickup" : ""}" data-hs="${h.id}" style="left:${h.x + h.w / 2}%;top:${h.y + h.h / 2}%;width:${h.w}%;height:${h.h}%" aria-label="${esc(h.label)}"><span class="hs-label">${h.go ? "→ " : ""}${esc(h.label)}</span></button>`).join("");
+      $$("[data-if]", st).forEach((el) => { el.style.display = has(el.dataset.if) ? "" : "none"; });
+      $$("[data-unless]", st).forEach((el) => { el.style.display = has(el.dataset.unless) ? "none" : ""; });
+      $("#viewName").textContent = `${v.dir} · ${v.name}`;
+      $("#compass").innerHTML = r.views.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("");
+      const left = r.views[(i - 1 + n) % n], right = r.views[(i + 1) % n];
+      $("#turnLeft").innerHTML = `<span aria-hidden="true">‹</span><small>${esc(left.name)}</small>`;
+      $("#turnRight").innerHTML = `<small>${esc(right.name)}</small><span aria-hidden="true">›</span>`;
+      $("#turnLeft").setAttribute("aria-label", `Nach links drehen: ${left.name}`);
+      $("#turnRight").setAttribute("aria-label", `Nach rechts drehen: ${right.name}`);
+      sc.classList.remove("no-views");
+      if (reset) setNarration(r.darkUntil && !roomDark(r) && v.descLit ? v.descLit : v.desc);
+      if (r.ambientAfter && inGame() && !S.finished) A.ambient(ambientFor(r)); // Raumklang wechselt z. B., sobald ein Generator läuft
+    } else {
+      sc.classList.add("draft", "no-views");
+      st.innerHTML = `<div class="draft-inner"><p class="draft-title">${esc(r.title)}</p><p class="draft-sub">${esc(C.dateLine || "")}</p>
+        <div class="draft-cards">${r.hotspots.map((h) => `<button class="card-object" data-hs="${h.id}"><span class="glyph">${h.glyph}</span><small>${esc(h.label)}</small></button>`).join("")}</div>
+        <p class="draft-tag">Vorläufige Raumansicht – dieser Bereich wird noch ausgestaltet</p></div>`;
+      $("#viewName").textContent = r.name.toUpperCase();
+      $("#compass").innerHTML = "";
+      if (reset) setNarration(r.story);
+    }
+    if (narrate) setNarration(narrate);
+    if (anim) { st.classList.remove("turn-left", "turn-right", "arrive"); void st.offsetWidth; st.classList.add(anim); }
+  }
+
+  /* Untertitel unten im Bild: kurze Rückmeldung, blendet nach einigen Sekunden aus */
+  let subTimer = null;
+  function setNarration(html) {
+    const el = $("#narration");
+    clearTimeout(subTimer);
+    el.innerHTML = fill(html);
+    el.classList.toggle("show", Boolean(html));
+    if (html) subTimer = setTimeout(() => el.classList.remove("show"), Math.min(12000, 3500 + el.textContent.length * 45));
+  }
+  /* Besondere Momente (Ereignisse, erstes Betreten eines Raums): groß in der Bildmitte.
+     Ist gerade ein Fenster offen, wartet der Moment, bis es geschlossen wird. */
+  let momentTimer = null, queuedMoment = null;
+  function moment(html) {
+    if (!html) return;
+    if (dlg.open || overlay) { queuedMoment = html; return; }
+    const m = $("#moment");
+    $("p", m).innerHTML = fill(html);
+    m.classList.add("show");
+    clearTimeout(momentTimer);
+    momentTimer = setTimeout(hideMoment, Math.min(9000, 3200 + m.textContent.length * 40));
+  }
+  function hideMoment() { clearTimeout(momentTimer); $("#moment").classList.remove("show"); }
+  function flushMoment() {
+    if (!queuedMoment || !inGame()) return;
+    const q = queuedMoment; queuedMoment = null;
+    setTimeout(() => moment(q), 250);
+  }
+
+  /* Kein Ziel im Bild: Spielerinnen finden selbst heraus, was zu tun ist (Hilfe gibt es im Telefon
+     unter „Hinweise“). Hier bleibt nur der Ausgang für Räume ohne Tür in der Szene. */
+  function renderObjective() {
+    const r = room(), done = S.completed.includes(r.id);
+    const act = $("#sceneAction"), nx = N.rooms[r.index + 1];
+    ["goto", "via", "ending"].forEach((k) => delete act.dataset[k]);
+    if (done && r.final) { act.dataset.ending = ""; act.innerHTML = `${esc(C.endLabel || "Zum Abschluss")} <span>→</span>`; }
+    else if (done && !r.views && nx && !S.visited.includes(nx.id)) { act.dataset.goto = nx.id; act.dataset.via = r.exitVia || "door"; act.innerHTML = `${esc(r.exitLabel || `Weiter: ${nx.name}`)} <span>→</span>`; }
+    act.classList.toggle("hidden", !("ending" in act.dataset) && !act.dataset.goto);
+  }
+
+
+  function renderSide() {
+    const slots = Math.max(8, S.inventory.length);
+    $("#backpack").innerHTML = Array.from({ length: slots }, (_, k) => {
+      const id = S.inventory[k];
+      if (!id) return `<span class="slot empty" aria-hidden="true"></span>`;
+      const it = N.items[id];
+      return `<button class="slot${selected === id ? " selected" : ""}" data-slot="${id}" aria-label="${esc(it.name)}${selected === id ? " (ausgewählt)" : ""}" title="${esc(it.name)}"><span>${it.icon}</span><small>${esc(it.name)}</small></button>`;
+    }).join("");
+    const held = $("#heldChip");
+    held.classList.toggle("hidden", !selected);
+    if (selected) { held.innerHTML = `${N.items[selected].icon} ${esc(N.items[selected].name)} <span aria-hidden="true">×</span>`; held.setAttribute("aria-label", `${N.items[selected].name} ablegen`); }
+    const nb = S.unread.length, gb = $("#gearBadge");
+    gb.textContent = nb || "•"; gb.classList.toggle("hidden", !nb && !S.newDocs.length); gb.classList.toggle("dot", !nb);
+    $("#selectedNote").innerHTML = selected
+      ? `<b>${esc(N.items[selected].name)}</b> ausgewählt – tippe auf eine Stelle im Raum. <button class="link-button" data-examine="${selected}">Ansehen</button> · <button class="link-button" data-deselect>Ablegen</button>`
+      : S.inventory.length ? "Gegenstand antippen, um ihn zu benutzen." : "Noch leer.";
+    const unread = S.unread.length;
+    $("#msgBadge").textContent = unread;
+    $("#msgBadge").classList.toggle("hidden", !unread);
+    $("#docCount").textContent = S.docs.length;
+    $("#docCount").classList.toggle("fresh", S.newDocs.length > 0);
+    const n = S.completed.length, total = N.rooms.length;
+    $("#progressText").textContent = `${n} / ${total} Bereiche`;
+    $("#progressBar").style.width = `${(n / total) * 100}%`;
+    if (N.onRender) N.onRender(); // z. B. Pinnwand-Knopf und -Stand aktualisieren
+  }
+
+  /* ---------- Ereignisse ----------
+     room.events: [{ id, view, ifSolved, flash, actions, narrate, delay }]
+     Wird einmalig ausgelöst, wenn die Spielerin die Blickrichtung betritt. */
+  const scheduledEvents = new Set();
+  function checkEvents() {
+    const r = room();
+    if (!r.views) return;
+    const v = r.views[viewIndex(r)];
+    for (const ev of r.events || []) {
+      const flag = "evt_" + ev.id;
+      if (has(flag) || scheduledEvents.has(ev.id) || (ev.view && ev.view !== v.id) || (ev.ifSolved && !isSolved(ev.ifSolved))) continue;
+      scheduledEvents.add(ev.id);
+      setTimeout(() => {
+        scheduledEvents.delete(ev.id);
+        // Hat die Spielerin Raum oder Blickrichtung inzwischen gewechselt, bleibt das Ereignis offen
+        // und wird beim nächsten Betreten erneut ausgelöst.
+        if (!inGame() || room().id !== r.id || (ev.view && r.views[viewIndex(r)].id !== ev.view)) return;
+        add(S.flags, flag);
+        if (ev.flash) lightning();
+        run(ev.actions);
+        save();
+        renderStage(); moment(ev.narrate);
+        renderSide(); renderObjective();
+      }, ev.delay ?? 900);
+    }
+  }
+  function lightning() {
+    document.body.classList.add("flash");
+    setTimeout(() => document.body.classList.remove("flash"), 140);
+    setTimeout(() => { document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 100); }, 280);
+    setTimeout(() => A.play("thunder"), 900);
+  }
+
+  /* ---------- Drehen & Raumwechsel ---------- */
+  const wallOpen = () => document.body.classList.contains("wall-open");
+  function turn(d) {
+    const r = room();
+    if (!r.views || overlay || dlg.open || wallOpen()) return;
+    S.views[r.id] = (viewIndex(r) + d + r.views.length) % r.views.length;
+    save();
+    A.play("step");
+    renderStage({ anim: d > 0 ? "turn-right" : "turn-left", reset: true });
+    checkEvents();
+  }
+
+  function goRoom(id, via) {
+    if (!S.unlocked.includes(id)) return;
+    closeDialog(); closeOverlay(); setDrawer(false); hideMoment(); queuedMoment = null;
+    selected = null; light = false;
+    const sc = $("#scene");
+    sc.classList.add("leaving");
+    A.play(via === "elevator" ? "elevator" : "door");
+    setTimeout(() => {
+      S.current = id; const first = add(S.visited, id); save();
+      sc.classList.remove("leaving");
+      render({ anim: "arrive", reset: true });
+      if (first && ROOM[id].story) moment(ROOM[id].story); // erster Besuch: Raumstimmung in der Bildmitte
+      checkEvents();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, via === "elevator" ? 1100 : 650);
+  }
+
+  /* ---------- Dialog ---------- */
+  const dlg = $("#dialog");
+  let dlgCleanup = null;
+  function openDialog({ kicker = "", title = "", html = "", after = null, wide = false }) {
+    if (dlgCleanup) { dlgCleanup(); dlgCleanup = null; }
+    $("#dlgKicker").textContent = kicker;
+    $("#dlgTitle").textContent = title;
+    $("#dlgBody").innerHTML = html;
+    dlg.classList.toggle("wide", wide);
+    if (!dlg.open) dlg.showModal();
+    $("#dlgBody").scrollTop = 0;
+    if (after) after();
+  }
+  function closeDialog() { if (dlg.open) dlg.close(); }
+  dlg.addEventListener("close", () => {
+    if (dlgCleanup) { dlgCleanup(); dlgCleanup = null; }
+    justCompleted = null; lockPid = null;
+    if (inGame()) { renderStage(); renderSide(); renderObjective(); flushMoment(); setTimeout(maybeRotateHint, 300); }
+  });
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) closeDialog(); });
+
+  const paper = (kind, html) => `<article class="paper paper-${kind}">${fill(html)}</article>`;
+  function docHtml(id) {
+    const d = N.docs[id];
+    if (!d.pages) return paper(d.kind, d.html);
+    const label = (i) => (d.pageLabels ? d.pageLabels[i] : i ? "Rückseite" : "");
+    return d.pages.map((h, i) => `${label(i) ? `<p class="page-label">${esc(label(i))}</p>` : ""}${paper(d.kind, h)}`).join("");
+  }
+
+  /* ---------- Hotspots ---------- */
+  function onHotspot(id) {
+    const r = room();
+    const h = hotspotsOf(r).find((x) => x.id === id);
+    if (!h) return;
+    if (selected && r.views) return useItemOn(h, selected);
+    if (h.take) {
+      add(S.inventory, h.take); add(S.flags, "taken_" + h.id);
+      run(h.actions);
+      if (h.solves) solve(h.solves);
+      save();
+      A.play("pickup");
+      pulse("#backpack");
+      renderStage({ narrate: h.takeText || `Du nimmst ${N.items[h.take].name} mit.` });
+      renderSide(); renderObjective();
+      return;
+    }
+    if (h.solves && !isSolved(h.solves)) { A.play("click"); run(h.actions); return succeed(PUZ[h.solves]); } // z. B. eine Tür, die jetzt aufgeht
+    if (h.go && S.unlocked.includes(h.go)) return goRoom(h.go, h.via);
+    if (h.wall && N.wall && has("wand_foto")) { A.play("click"); return N.wall.open(h.wall === true ? null : h.wall); } // Hagedorns Wand
+    inspect(h);
+  }
+
+  function useItemOn(h, itemId) {
+    const it = N.items[itemId];
+    const p = h.use ? PUZ[h.use] : null;
+    if (p && !isSolved(p.id)) {
+      if (p.item === itemId) { selected = null; return succeed(p); }
+      A.play("error");
+      return renderStage({ narrate: p.wrongItem || `${it.name} bringt hier nichts.` });
+    }
+    A.play("error");
+    renderStage({ narrate: `${esc(it.name)} lässt sich an „${esc(h.label)}“ nicht benutzen.` });
+  }
+
+  function inspect(h) {
+    const r = room();
+    A.play("click");
+    if (h.sound) A.play(h.sound);
+    run(h.actions);
+    const parts = [];
+    let after = null;
+    if (h.text) parts.push(`<p class="inspect-text">${fill(h.text)}</p>`);
+    if (h.secret && add(S.secrets, h.id)) { parts.push(`<p class="secret-note">✦ Geheimnis entdeckt (${S.secrets.length} / ${ALL_SECRETS()})</p>`); A.play("success"); save(); }
+    if (h.doc) {
+      A.play("paper");
+      parts.push(docHtml(h.doc));
+      if (addDoc(h.doc)) parts.push(`<p class="found-note">▤ In die Akte gelegt</p>`);
+      save();
+    }
+    const pid = h.lock || h.use;
+    if (pid) {
+      const p = PUZ[pid];
+      if (isSolved(pid)) parts.push(`<div class="solved-box"><span>✓</span><p>${fill(p.success)}</p></div>`);
+      else { parts.push(lockHtml(p)); after = () => { lockPid = p.id; bindLock(p); }; }
+    }
+    if (!h.text && !h.doc && !pid && h.go) parts.push(`<p class="inspect-text">Verschlossen.</p>`);
+    openDialog({ kicker: r.name.toUpperCase(), title: h.title || h.label, html: parts.join(""), after, wide: Boolean(h.doc && N.docs[h.doc].kind === "plan") });
+    renderSide();
+  }
+
+  /* ---------- Schlösser & Rätsel ---------- */
+  function lockHtml(p) {
+    const head = `${p.prompt ? `<p class="lock-prompt">${fill(p.prompt)}</p>` : ""}${p.clue ? `<div class="clue">${esc(p.clue)}</div>` : ""}`;
+    const fb = `<p class="lock-feedback" role="status" aria-live="polite"></p>`;
+    if (p.type === "code") {
+      const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "✓"];
+      return `<div class="lock lock-code">${head}<div class="code-slots" aria-label="Eingegebener Code">${Array.from({ length: p.length }, () => "<span></span>").join("")}</div>
+        <div class="keypad">${keys.map((k) => `<button type="button" data-key="${k}" aria-label="${k === "⌫" ? "Löschen" : k === "✓" ? "Bestätigen" : k}">${k}</button>`).join("")}</div>${fb}</div>`;
+    }
+    if (p.type === "text") return `<form class="lock lock-text">${head}<div class="text-row"><input class="text-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Lösung eingeben" aria-label="Lösung"><button class="submit-button">Prüfen</button></div>${fb}</form>`;
+    if (p.type === "multi") {
+      const draft = drafts[p.id] || [];
+      return `<form class="lock lock-multi">${head}${p.akte ? `<button type="button" class="ghost-button wide akte-peek" data-lock-akte>▤ In der Akte nachsehen <small>(Eingaben bleiben stehen)</small></button>` : ""}${p.fields.map((f, i) => `<label class="multi-field"><span>${i + 1}. ${esc(f.label)}</span><input class="text-input" autocomplete="off" spellcheck="false" value="${esc(draft[i] || "")}"></label>`).join("")}<button class="submit-button wide">${esc(p.button || "Tresor öffnen")}</button>${fb}</form>`;
+    }
+    if (p.type === "wheels") {
+      return `<div class="lock lock-wheels">${head}<p class="muted small">Tippe auf ein Rad, um den Buchstaben direkt zu wählen – oder drehe mit ▲ ▼.</p><div class="wheels${p.length > 5 ? " many" : ""}" role="group" aria-label="Buchstabenräder">${Array.from({ length: p.length }, (_, i) => `<div class="wheel"><button type="button" data-wheel="${i}" data-dir="-1" aria-label="Rad ${i + 1} zurück">▲</button><button type="button" class="wheel-letter" data-pick="${i}" aria-label="Rad ${i + 1}: Buchstabe wählen">A</button><button type="button" data-wheel="${i}" data-dir="1" aria-label="Rad ${i + 1} weiter">▼</button></div>`).join("")}</div>
+        <div class="wheel-picker hidden" role="group" aria-label="Buchstabe wählen">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => `<button type="button" data-letter="${c}">${c}</button>`).join("")}</div>
+        <button type="button" class="submit-button wide" data-wheels-open>Öffnen</button>${fb}</div>`;
+    }
+    if (p.type === "cipher") {
+      const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const pos = (i, r) => { const a = (i / 26) * 2 * Math.PI - Math.PI / 2; return [150 + r * Math.cos(a), 150 + r * Math.sin(a)]; };
+      const ring = (r, cls) => ABC.split("").map((c, i) => { const [x, y] = pos(i, r); return `<text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" class="${cls}">${c}</text>`; }).join("");
+      return `<div class="lock lock-cipher">${head}
+        <p class="muted small">Außen: Buchstaben des Briefs. Innen: was sie bedeuten. Drehe den inneren Ring.</p>
+        <svg viewBox="0 0 300 300" class="cipher-disc" aria-hidden="true">
+          <circle cx="150" cy="150" r="146" class="disc-outer"/><circle cx="150" cy="150" r="106" class="disc-inner"/><circle cx="150" cy="150" r="70" class="disc-hub"/>
+          ${ring(128, "outer-l")}<g class="inner-ring">${ring(88, "inner-l")}</g>
+          <path d="M150 2 l-7 -0 l7 14 l7 -14 z" class="disc-mark"/><text x="150" y="156" class="disc-center">NOCTURNE</text>
+        </svg>
+        <p class="cipher-readout" aria-live="polite"></p>
+        <div class="button-row cipher-buttons"><button type="button" class="ghost-button" data-turn="-1" aria-label="Inneren Ring nach links drehen">↺</button><button type="button" class="ghost-button" data-turn="1" aria-label="Inneren Ring nach rechts drehen">↻</button><button type="button" class="submit-button" data-cipher-check>Text prüfen</button></div>${fb}</div>`;
+    }
+    if (p.type === "choice") {
+      return `<form class="lock lock-choice">${head}${p.steps.map((st, si) => `<fieldset class="choice-step${si ? " hidden" : ""}" data-step="${si}"><legend>${si + 1}. ${esc(st.question)}</legend>
+        ${st.options.map((o) => `<label class="choice-opt"><input type="${st.pick === 1 ? "radio" : "checkbox"}" name="step${si}" value="${o.id}"><span>${esc(o.label)}</span></label>`).join("")}</fieldset>`).join("")}
+        <button class="submit-button wide">${esc(p.button || "Prüfen")}</button>${fb}</form>`;
+    }
+    if (p.type === "sort") {
+      return `<div class="lock lock-sort">${head}<p class="muted small">${esc(p.help || "Ziehe die Streifen in die richtige Reihenfolge – oder verschiebe sie mit ▲ ▼.")}</p><ol class="strips${p.plain ? " plain" : ""}" aria-label="Reihenfolge"></ol>${p.checkButton ? `<button type="button" class="submit-button wide" data-sort-check>${esc(p.button || "Reihenfolge prüfen")}</button>` : ""}${fb}</div>`;
+    }
+    if (p.type === "sequence") {
+      return `<div class="lock lock-seq">${head}<p class="muted small">${esc(p.help || "Betätige die Bedienelemente nacheinander.")}</p>
+        <div class="seq-panel${p.panel ? " seq-" + p.panel : ""}" style="--n:${p.items.length}">${p.items.map((it) => `<button type="button" class="seq-ctl" data-seq="${it.id}" style="${it.vars || ""}" aria-pressed="false"><span class="seq-art" aria-hidden="true">${it.html || ""}</span><b>${esc(it.label)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`).join("")}</div>
+        <p class="seq-trail" aria-live="polite">&nbsp;</p>${fb}</div>`;
+    }
+    if (p.type === "wall") { // wird an der Pinnwand gelöst (js/wall.js)
+      return `<div class="lock lock-wall">${head}<button type="button" class="submit-button wide" data-open-wall="${esc(p.focus || "")}">${esc(p.button || "Zur Pinnwand")}</button></div>`;
+    }
+    if (p.type === "use") {
+      return `<div class="lock lock-use"><p class="lock-prompt">Welchen Gegenstand möchtest du hier benutzen?</p>
+        ${S.inventory.length ? `<div class="use-items">${S.inventory.map((id) => `<button type="button" class="use-item" data-use="${id}"><span>${N.items[id].icon}</span> ${esc(N.items[id].name)}</button>`).join("")}</div>` : `<p class="muted">${esc(p.noItems || "Du hast noch nichts, was du hier benutzen könntest.")}</p>`}${fb}</div>`;
+    }
+    return "";
+  }
+
+  function bindLock(p) {
+    const root = $("#dlgBody .lock");
+    const fb = $(".lock-feedback", root);
+    const fail = (msg) => {
+      A.play(p.failSound || "error");
+      fb.textContent = msg || "Nichts passiert. Das scheint nicht die richtige Lösung zu sein.";
+      root.classList.remove("shake"); void root.offsetWidth; root.classList.add("shake");
+    };
+    const attempt = (value) => {
+      if ((p.answers || []).map(norm).includes(norm(value))) { succeed(p); return true; }
+      fail((p.wrong && p.wrong[norm(value)]) || p.wrongDefault || null);
+      return false;
+    };
+    if (p.type === "code") {
+      let entry = "";
+      const slots = $$(".code-slots span", root);
+      const paint = () => slots.forEach((s, i) => { s.textContent = entry[i] || ""; s.classList.toggle("filled", i < entry.length); });
+      const press = (k) => {
+        if (k === "⌫") entry = entry.slice(0, -1);
+        else if (k === "✓") { if (entry.length === p.length) { if (!attempt(entry)) entry = ""; } else fail(`Der Code hat ${p.length} Stellen.`); }
+        else if (/^\d$/.test(k) && entry.length < p.length) {
+          entry += k; A.play("key");
+          if (entry.length === p.length) { paint(); setTimeout(() => { if (!attempt(entry)) { entry = ""; paint(); } }, 220); return; }
+        }
+        paint();
+      };
+      root.addEventListener("click", (e) => { const b = e.target.closest("[data-key]"); if (b) press(b.dataset.key); });
+      const onKey = (e) => {
+        if (/^\d$/.test(e.key)) press(e.key);
+        else if (e.key === "Backspace") press("⌫");
+        else if (e.key === "Enter") { e.preventDefault(); press("✓"); }
+      };
+      document.addEventListener("keydown", onKey);
+      dlgCleanup = () => document.removeEventListener("keydown", onKey);
+    }
+    if (p.type === "text") {
+      const input = $("input", root);
+      setTimeout(() => input.focus(), 50);
+      root.addEventListener("submit", (e) => { e.preventDefault(); if (!input.value.trim()) return fail("Bitte gib zuerst etwas ein."); attempt(input.value); });
+    }
+    if (p.type === "multi") {
+      // Eingaben merken, damit man zwischendurch in der Akte nachsehen kann
+      root.addEventListener("input", () => { drafts[p.id] = $$("input", root).map((i) => i.value); });
+      root.addEventListener("click", (e) => { if (e.target.closest("[data-lock-akte]")) { closeDialog(); openAkte(); } });
+      root.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const vals = $$("input", root).map((i) => i.value);
+        if (vals.some((v) => !v.trim())) return fail("Bitte beantworte alle Fragen.");
+        const right = p.fields.filter((f, i) => f.answers.map(norm).includes(norm(vals[i]))).length;
+        if (right === p.fields.length) return succeed(p);
+        fail(p.wrongCount ? p.wrongCount.replace("{n}", right) : `Der Tresor bleibt verschlossen. ${right} von ${p.fields.length} Antworten scheinen zu stimmen.`);
+      });
+    }
+    if (p.type === "wheels") {
+      const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const pos = Array(p.length).fill(0);
+      const letters = $$(".wheel-letter", root);
+      const picker = $(".wheel-picker", root);
+      let active = null;
+      const setWheel = (i, k) => {
+        pos[i] = k; letters[i].textContent = ABC[k];
+        letters[i].classList.remove("tick"); void letters[i].offsetWidth; letters[i].classList.add("tick");
+        A.play("key");
+      };
+      root.addEventListener("click", (e) => {
+        const pick = e.target.closest("[data-pick]");
+        if (pick) {
+          const i = +pick.dataset.pick;
+          active = active === i ? null : i;
+          letters.forEach((l, k) => l.classList.toggle("active", k === active));
+          picker.classList.toggle("hidden", active === null);
+          return;
+        }
+        const letter = e.target.closest("[data-letter]");
+        if (letter && active !== null) {
+          setWheel(active, ABC.indexOf(letter.dataset.letter));
+          letters[active].classList.remove("active");
+          // gleich zum nächsten Rad weiter, damit man flüssig durchtippen kann
+          active = active + 1 < p.length ? active + 1 : null;
+          if (active !== null) letters[active].classList.add("active");
+          picker.classList.toggle("hidden", active === null);
+          return;
+        }
+        const w = e.target.closest("[data-wheel]");
+        if (w) {
+          const i = +w.dataset.wheel;
+          pos[i] = (pos[i] + +w.dataset.dir + 26) % 26;
+          letters[i].textContent = ABC[pos[i]];
+          letters[i].classList.remove("tick"); void letters[i].offsetWidth; letters[i].classList.add("tick");
+          A.play("key");
+        }
+        if (e.target.closest("[data-wheels-open]")) attempt(pos.map((k) => ABC[k]).join(""));
+      });
+      // Tastatur: Buchstaben tippen füllt die Räder von links
+      let cursor = 0;
+      const onKey = (e) => {
+        if (/^[a-zA-Z]$/.test(e.key)) { const k = ABC.indexOf(e.key.toUpperCase()); pos[cursor] = k; letters[cursor].textContent = ABC[k]; A.play("key"); cursor = (cursor + 1) % p.length; }
+        else if (e.key === "Enter") { e.preventDefault(); attempt(pos.map((k) => ABC[k]).join("")); }
+      };
+      document.addEventListener("keydown", onKey);
+      dlgCleanup = () => document.removeEventListener("keydown", onKey);
+    }
+    if (p.type === "cipher") {
+      const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let k = 0;
+      const inner = $(".inner-ring", root), readout = $(".cipher-readout", root);
+      const paint = () => {
+        inner.style.transform = `rotate(${(k * 360) / 26}deg)`;
+        // Anzeige: welcher Klartextbuchstabe steht unter dem markierten Geheimbuchstaben?
+        const first = p.probe || "G";
+        readout.innerHTML = `Erster Buchstabe des Briefs: <b>${first}</b> → <b>${ABC[(ABC.indexOf(first) - k + 26) % 26]}</b> &nbsp;·&nbsp; Stellung ${k}`;
+      };
+      paint();
+      root.addEventListener("click", (e) => {
+        const t = e.target.closest("[data-turn]");
+        if (t) { k = (k + +t.dataset.turn + 26) % 26; A.play("key"); fb.textContent = ""; paint(); return; }
+        if (e.target.closest("[data-cipher-check]")) {
+          if (k === p.shift) return succeed(p);
+          fail((p.wrongShift && p.wrongShift[k]) || "Der Text ist noch nicht lesbar.");
+        }
+      });
+    }
+    if (p.type === "choice") {
+      root.addEventListener("submit", (e) => {
+        e.preventDefault();
+        // Schritt für Schritt: Die nächste Frage erscheint erst, wenn die vorige stimmt.
+        for (const [si, st] of p.steps.entries()) {
+          const box = $(`[data-step="${si}"]`, root);
+          const picked = $$(`input[name="step${si}"]:checked`, root).map((i) => i.value);
+          if (picked.length !== st.pick) return fail(st.pick === 1 ? "Bitte wähle eine Antwort." : `Wähle genau ${st.pick} Antworten.`);
+          const right = picked.filter((x) => st.answer.includes(x)).length;
+          if (right !== st.pick) return fail((st.feedback && st.feedback[right]) || st.wrong || "Das stimmt noch nicht.");
+          box.classList.add("done");
+          $$("input", box).forEach((i) => { i.disabled = true; });
+          const nextBox = $(`[data-step="${si + 1}"]`, root);
+          if (nextBox && nextBox.classList.contains("hidden")) {
+            nextBox.classList.remove("hidden");
+            A.play("paper");
+            $(".lock-feedback", root).textContent = "";
+            if (st.next) { const n = document.createElement("p"); n.className = "choice-next"; n.textContent = st.next; box.after(n); }
+            return;
+          }
+        }
+        succeed(p);
+      });
+    }
+    if (p.type === "sort") {
+      // Risskanten: Jede Grenze zwischen zwei Streifen hat ein eigenes Zackenmuster.
+      // Ein Streifen trägt oben das Muster seiner richtigen Position, unten das der nächsten –
+      // nur in der richtigen Reihenfolge passen die Kanten aufeinander.
+      const n = p.items.length;
+      const jag = (k, x) => { const v = Math.sin(k * 12.9898 + x * 78.233) * 43758.5453; return (v - Math.floor(v)) * 7; };
+      const clip = (idx) => {
+        const top = Array.from({ length: 11 }, (_, x) => `${x * 10}% ${jag(idx, x).toFixed(1)}px`);
+        const bot = Array.from({ length: 11 }, (_, x) => `${(10 - x) * 10}% calc(100% - ${(7 - jag(idx + 1, 10 - x)).toFixed(1)}px)`);
+        return `polygon(${top.concat(bot).join(",")})`;
+      };
+      let order = (p.start || p.items.map((it) => it.id)).slice();
+      const list = $(".strips", root);
+      const item = (id) => p.items.find((it) => it.id === id);
+      const draw = () => {
+        list.innerHTML = order.map((id, i) => `<li class="strip" data-strip="${id}"${p.plain ? "" : ` style="clip-path:${clip(p.answer.indexOf(id))}"`}>
+          ${item(id).html || ""}<span class="strip-text">${esc(item(id).text)}</span>
+          <span class="strip-btns"><button type="button" data-move="-1" data-i="${i}" aria-label="Nach oben" ${i === 0 ? "disabled" : ""}>▲</button><button type="button" data-move="1" data-i="${i}" aria-label="Nach unten" ${i === n - 1 ? "disabled" : ""}>▼</button></span></li>`).join("");
+      };
+      const check = () => {
+        if (order.join() === p.answer.join()) {
+          list.classList.add("done");
+          A.play("paper");
+          setTimeout(() => succeed(p), 700);
+          return true;
+        }
+        return false;
+      };
+      const move = (from, to) => {
+        if (to < 0 || to >= n || from === to) return;
+        const [x] = order.splice(from, 1); order.splice(to, 0, x);
+        A.play("paper"); draw(); fb.textContent = "";
+        if (!p.checkButton) check(); // mit Prüfknopf wird erst auf Wunsch geprüft
+      };
+      draw();
+      root.addEventListener("click", (e) => {
+        if (e.target.closest("[data-sort-check]") && !list.classList.contains("done")) {
+          if (!check()) fail((p.wrongOrders && p.wrongOrders[order.join(",")]) || p.wrongDefault || "Die Reihenfolge stimmt noch nicht.");
+          return;
+        }
+        const b = e.target.closest("[data-move]");
+        if (b && !list.classList.contains("done")) move(+b.dataset.i, +b.dataset.i + +b.dataset.move);
+      });
+      // Ziehen mit Maus oder Finger
+      let drag = null;
+      list.addEventListener("pointerdown", (e) => {
+        const li = e.target.closest(".strip");
+        if (!li || e.target.closest("button") || list.classList.contains("done")) return;
+        drag = { li, from: order.indexOf(li.dataset.strip), y: e.clientY };
+        li.setPointerCapture(e.pointerId); li.classList.add("dragging");
+      });
+      list.addEventListener("pointermove", (e) => { if (drag) drag.li.style.transform = `translateY(${e.clientY - drag.y}px)`; });
+      const drop = (e) => {
+        if (!drag) return;
+        const d = drag; drag = null;
+        d.li.classList.remove("dragging"); d.li.style.transform = "";
+        const rects = $$(".strip", list).map((el) => el.getBoundingClientRect());
+        let to = rects.findIndex((r) => e.clientY < r.top + r.height / 2);
+        if (to === -1) to = n - 1;
+        else if (to > d.from) to -= 1;
+        move(d.from, to);
+      };
+      list.addEventListener("pointerup", drop);
+      list.addEventListener("pointercancel", drop);
+    }
+    if (p.type === "sequence") {
+      // Bedienelemente nacheinander betätigen. checkEach: sofort zurücksetzen, sobald ein Schritt falsch ist
+      // (z. B. Motor hustet); sonst erst prüfen, wenn alle betätigt sind (z. B. Hebel springen zurück).
+      let seq = [], locked = false;
+      const btns = $$(".seq-ctl", root), trail = $(".seq-trail", root);
+      const item = (id) => p.items.find((it) => it.id === id);
+      const reset = () => { seq = []; locked = false; btns.forEach((b) => { b.classList.remove("on"); b.setAttribute("aria-pressed", "false"); }); trail.innerHTML = "&nbsp;"; };
+      const wrong = (msg) => { locked = true; setTimeout(() => { fail(msg); reset(); }, 450); };
+      root.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-seq]");
+        if (!b || locked || b.classList.contains("on")) return;
+        seq.push(b.dataset.seq);
+        b.classList.add("on"); b.setAttribute("aria-pressed", "true");
+        A.play(p.pressSound || "key");
+        fb.textContent = "";
+        trail.textContent = seq.map((id) => item(id).short || item(id).label).join(" → ");
+        const k = seq.length - 1;
+        if (p.checkEach && seq[k] !== p.answer[k]) return wrong((p.wrongStep && p.wrongStep[seq[k]]) || p.wrongDefault);
+        if (seq.length < p.answer.length) return;
+        if (seq.join() === p.answer.join()) {
+          locked = true; root.classList.add("done");
+          // release: Elemente, die nach dem Erfolg von selbst zurückgehen (z. B. Choke, wenn der Motor läuft)
+          if (p.release) setTimeout(() => { btns.filter((x) => p.release.includes(x.dataset.seq)).forEach((x) => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); }); A.play(p.pressSound || "key"); }, 700);
+          setTimeout(() => succeed(p), p.release ? 1500 : 650);
+          return;
+        }
+        wrong((p.wrongOrders && p.wrongOrders[seq.join(",")]) || p.wrongDefault);
+      });
+    }
+    if (p.type === "use") {
+      root.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-use]");
+        if (!b) return;
+        if (b.dataset.use === p.item) succeed(p);
+        else fail(p.wrongItem || "Das passt hier nicht.");
+      });
+    }
+  }
+
+  function succeed(p) {
+    if (dlgCleanup) { dlgCleanup(); dlgCleanup = null; }
+    gained = [];
+    A.play("unlock");
+    solve(p.id);
+    if (p.quiet && justCompleted !== p.room) { // ohne Erfolgsdialog: nur Text unter der Szene
+      closeDialog();
+      renderStage({ narrate: p.success }); renderSide(); renderObjective();
+      return true;
+    }
+    const r = ROOM[p.room], next = N.rooms[r.index + 1];
+    const completedNow = justCompleted === r.id;
+    if (completedNow && r.final && r.finale) { closeDialog(); renderSide(); startFinale(); return true; } // letzter Raum: Finalszene statt Erfolgsfenster
+    setTimeout(() => A.play("success"), 250);
+    let buttons = `<button class="primary-button small" data-close>Weiter untersuchen</button>`;
+    if (completedNow && r.final) buttons = `<button class="primary-button small" data-ending>${esc(C.endLabel || "Zum Abschluss")} <span>→</span></button>`;
+    else if (completedNow && next) buttons = `<button class="primary-button small" data-goto="${next.id}" data-via="${r.exitVia || (r.views ? "elevator" : "door")}">${esc(r.exitLabel || `Weiter: ${next.name}`)} <span>→</span></button><button class="ghost-button" data-close>Noch hier bleiben</button>`;
+    openDialog({
+      kicker: r.name.toUpperCase(),
+      title: completedNow ? "Bereich gesichert" : "Gelöst",
+      html: `<div class="success-box"><div class="success-mark">✓</div><p>${fill(p.success)}</p>
+        ${gained.length ? `<div class="gained"><p class="eyebrow">GEFUNDEN</p><ul>${gained.map((g) => `<li>${esc(g)}</li>`).join("")}</ul></div>` : ""}
+        ${completedNow && next ? `<p class="unlock-note">Neuer Bereich freigeschaltet: <b>${esc(next.name)}</b></p>` : ""}
+        <div class="button-row">${buttons}</div></div>`,
+    });
+    renderStage({ narrate: p.success }); renderSide(); renderObjective();
+    return true;
+  }
+
+  /* ---------- Rucksack: antippen oder ziehen ---------- */
+  function pulse(sel) { const el = $(sel); el.classList.remove("pulse"); void el.offsetWidth; el.classList.add("pulse"); }
+  function selectItem(id) {
+    if (selected === id) return openItem(id);
+    selected = id;
+    A.play("click");
+    renderSide();
+    if (compact()) setDrawer(false); // Smartphone: Leiste zu, damit man das Ziel im Raum antippen kann
+    if (room().views) setNarration(`<b>${esc(N.items[id].name)}</b> in der Hand. Tippe auf die Stelle, an der du es benutzen willst.`);
+  }
+  function openItem(id) {
+    const it = N.items[id];
+    openDialog({ kicker: "RUCKSACK", title: it.name, wide: it.doc && N.docs[it.doc].kind === "plan", html: `<p class="inspect-text">${fill(it.text)}</p>${it.doc ? docHtml(it.doc) : ""}` });
+  }
+  (() => {
+    let drag = null;
+    const bp = $("#backpack");
+    bp.addEventListener("pointerdown", (e) => {
+      const slot = e.target.closest("[data-slot]");
+      if (!slot || e.button > 0) return;
+      drag = { id: slot.dataset.slot, x: e.clientX, y: e.clientY, ghost: null, pid: e.pointerId };
+    });
+    window.addEventListener("pointermove", (e) => {
+      if (!drag || e.pointerId !== drag.pid) return;
+      if (!drag.ghost && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 10 && room().views) {
+        setDrawer(false);
+        drag.ghost = document.createElement("div");
+        drag.ghost.className = "drag-ghost";
+        drag.ghost.textContent = N.items[drag.id].icon;
+        document.body.appendChild(drag.ghost);
+        $("#scene").classList.add("dropping");
+      }
+      if (drag.ghost) { drag.ghost.style.left = e.clientX + "px"; drag.ghost.style.top = e.clientY + "px"; e.preventDefault(); }
+    }, { passive: false });
+    window.addEventListener("pointerup", (e) => {
+      if (!drag || e.pointerId !== drag.pid) return;
+      const d = drag; drag = null;
+      $("#scene").classList.remove("dropping");
+      if (d.ghost) {
+        d.ghost.remove();
+        const target = document.elementFromPoint(e.clientX, e.clientY)?.closest("#stage [data-hs]");
+        if (target) { selected = d.id; onHotspot(target.dataset.hs); renderSide(); }
+        return;
+      }
+      selectItem(d.id);
+    });
+    window.addEventListener("pointercancel", () => { if (drag?.ghost) drag.ghost.remove(); drag = null; $("#scene").classList.remove("dropping"); });
+  })();
+
+  /* ---------- Szene: Wischen & Lichtkegel ---------- */
+  (() => {
+    const sc = $("#scene");
+    let start = null, suppressClick = false;
+    const moveLight = (e) => {
+      if (!light) return;
+      $$(".darkness", sc).forEach((d) => {
+        const r = d.getBoundingClientRect();
+        d.style.setProperty("--lx", e.clientX - r.left + "px");
+        d.style.setProperty("--ly", e.clientY - r.top + "px");
+      });
+    };
+    sc.addEventListener("pointerdown", (e) => { start = { x: e.clientX, y: e.clientY, t: Date.now() }; moveLight(e); });
+    sc.addEventListener("pointermove", moveLight);
+    sc.addEventListener("pointerup", (e) => {
+      if (!start) return;
+      const dx = e.clientX - start.x, dy = e.clientY - start.y, dt = Date.now() - start.t;
+      start = null;
+      if (!light && Math.abs(dx) > 60 && Math.abs(dy) < 60 && dt < 700) { suppressClick = true; turn(dx < 0 ? 1 : -1); }
+    });
+    sc.addEventListener("click", (e) => { if (suppressClick) { suppressClick = false; e.stopPropagation(); e.preventDefault(); } }, true);
+  })();
+
+  /* ---------- Telefon ---------- */
+  const APPS = [
+    { id: "nachrichten", name: "Nachrichten", icon: "✉" },
+    { id: "licht", name: "Taschenlampe", icon: "◉" },
+    { id: "notizen", name: "Notizen", icon: "✎" },
+    { id: "karte", name: "Karte", icon: "▦" },
+    { id: "hinweise", name: "Hinweise", icon: "?" },
+  ];
+  function openPhone(app = null) {
+    setDrawer(false);
+    if (overlay === "akte") closeOverlay();
+    overlay = "phone"; phoneApp = app;
+    $("#phone").classList.remove("hidden");
+    A.play("click");
+    renderPhone();
+  }
+  function renderPhone() {
+    $("#phoneClock").textContent = clockAt(S.playMs);
+    const sc = $("#phoneScreen");
+    if (!phoneApp) {
+      sc.innerHTML = `<div class="phone-home-screen"><p class="phone-time">${clockAt(S.playMs)}</p><p class="phone-date">${esc(C.phoneDate || "")}</p>
+        <div class="app-grid">${APPS.map((a) => `<button class="app" data-app="${a.id}"><span class="app-icon${a.id === "licht" && light ? " on" : ""}">${a.icon}${a.id === "nachrichten" && S.unread.length ? `<i>${S.unread.length}</i>` : ""}</span><small>${a.name}</small></button>`).join("")}</div></div>`;
+      return;
+    }
+    const app = APPS.find((a) => a.id === phoneApp);
+    const head = `<div class="app-head"><button class="app-back" data-app-back aria-label="Zurück">‹</button><b>${app.name}</b></div>`;
+    let body = "";
+    if (phoneApp === "nachrichten") {
+      S.unread = []; save(); renderSide();
+      body = S.messages.length
+        ? `<div class="msgs">${S.messages.map((m) => `<div class="msg"><p class="msg-from">${esc(N.messages[m.id].from)} · ${m.at}</p><p class="bubble">${fill(N.messages[m.id].text)}</p></div>`).join("")}</div>`
+        : `<p class="app-empty">Keine Nachrichten.</p>`;
+    }
+    if (phoneApp === "notizen") body = `<textarea id="notesInput" class="note-area" placeholder="Codes, Namen, offene Fragen …">${esc(S.notes)}</textarea><p class="app-hint">Wird automatisch gespeichert.</p>`;
+    if (phoneApp === "karte") {
+      const plan = C.planDoc && S.docs.includes(C.planDoc) ? N.docs[C.planDoc] : null;
+      body = `${plan ? `<div class="mini-plan">${paper("plan", plan.html)}</div>` : `<p class="app-empty">Noch kein Gebäudeplan gespeichert.</p>`}
+        <p class="app-sub">BEREICHE</p><ul class="room-list">${N.rooms.map((r) => {
+          // Schnellreise nur in Räume, die man schon auf dem vorgesehenen Weg betreten hat
+          const open = S.unlocked.includes(r.id), seen = S.visited.includes(r.id), here = r.id === S.current, done = S.completed.includes(r.id);
+          return `<li class="${here ? "here" : ""}"><span>${pad2(r.index + 1)}</span><b>${open ? esc(r.name) : "Verschlossen"}</b>${here ? "<em>Du bist hier</em>" : seen ? `<button class="link-button" data-goto="${r.id}">Hingehen</button>` : open ? "<em class=\"dim\">Weg noch finden</em>" : ""}${done ? "<i>✓</i>" : ""}</li>`;
+        }).join("")}</ul>`;
+    }
+    if (phoneApp === "hinweise") body = hintsHtml();
+    sc.innerHTML = `<div class="app-view">${head}<div class="app-body">${body}</div></div>`;
+    if (phoneApp === "notizen") { const t = $("#notesInput"); t.addEventListener("input", () => { S.notes = t.value; save(); }); }
+  }
+  function hintsHtml() {
+    const front = frontierPuzzle();
+    if (!front) {
+      const fresh = N.rooms.find((x) => S.unlocked.includes(x.id) && !S.visited.includes(x.id));
+      return `<p class="app-empty">${fresh ? `Hier ist alles erledigt. Ein neuer Bereich ist offen: <b>${esc(fresh.name)}</b> – finde den Weg dorthin.` : "Gerade gibt es hier nichts zu lösen. Geh weiter."}</p>`;
+    }
+    // Mehrere Aufgaben gleichzeitig offen: Spielerin wählt, wobei sie Hilfe möchte
+    const group = openGroup(front);
+    const pid = group.includes(hintPick) ? hintPick : group[0];
+    const tabs = group.length > 1 ? `<p class="app-sub">WOBEI BRAUCHST DU HILFE?</p><div class="hint-tabs">${group.map((id) => `<button class="hint-tab${id === pid ? " on" : ""}" data-hint-pick="${id}">${esc(PUZ[id].title)}</button>`).join("")}</div>` : "";
+    const p = PUZ[pid], n = S.hints[pid] || 0;
+    const mins = Math.max(0, Math.floor((S.playMs - (S.puzzleStart[pid] ?? S.playMs)) / 60000));
+    // Stufe 0: worum es gerade geht (zählt nicht als Hinweis). Liegt die Aufgabe in einem anderen Raum, steht er dabei.
+    const where = PUZ[pid].room !== S.current ? ` <span class="muted">(${esc(ROOM[PUZ[pid].room].name)})</span>` : "";
+    const goal = S.goals[pid]
+      ? `<p class="hint-goal">${esc(p.objective || p.title)}${where}</p>`
+      : `<button class="ghost-button block" data-goal="${pid}">Worum geht es gerade?</button>`;
+    return `${tabs}<p class="app-sub">WORUM GEHT ES?</p>${goal}
+      <p class="app-hint">Du bist seit ${mins === 0 ? "weniger als einer Minute" : plural(mins, "Minute", "Minuten")} bei diesem Schritt.</p>
+      <ol class="hint-list">${p.hints.map((h, i) => i < n
+        ? `<li class="open"><b>Hinweis ${i + 1}${i === 2 ? " · Lösung" : ""}</b><p>${fill(h)}</p></li>`
+        : `<li class="closed"><b>Hinweis ${i + 1}${i === 2 ? " · Lösung" : ""}</b><p>${i === n ? "Noch verdeckt." : "Erst nach dem vorherigen Hinweis."}</p></li>`).join("")}</ol>
+      ${n < p.hints.length ? `<button class="primary-button small block" data-hint="${pid}">${n === p.hints.length - 1 ? "Lösung aufdecken" : `Hinweis ${n + 1} aufdecken`}</button>` : ""}`;
+  }
+  function toggleLight(on = !light) {
+    light = on;
+    A.play("light");
+    closeOverlay();
+    const r = room();
+    const vd = r.views && r.views[viewIndex(r)].dark;
+    const dark = vd && !(vd.until && has(vd.until));
+    renderStage({ narrate: light ? (dark ? "Die Taschenlampe ist an. Bewege den Lichtkegel mit der Maus oder dem Finger durch die Dunkelheit." : "Die Taschenlampe ist an. Hier ist es allerdings hell genug.") : "Die Taschenlampe ist aus." });
+  }
+
+  /* ---------- Akte zum Umblättern ---------- */
+  function aktePages() {
+    const pages = [{ type: "index" }];
+    for (const id of S.docs) {
+      const d = N.docs[id];
+      (d.pages || [d.html]).forEach((html, i, arr) => pages.push({ id, html, i, n: arr.length }));
+    }
+    return pages;
+  }
+  function openAkte(docId = null) {
+    setDrawer(false);
+    if (overlay === "phone") closeOverlay();
+    overlay = "akte";
+    $("#akte").classList.remove("hidden");
+    A.play("paper");
+    const pages = aktePages();
+    aktePage = docId ? Math.max(0, pages.findIndex((p) => p.id === docId)) : 0;
+    renderAkte();
+  }
+  function renderAkte() {
+    const pages = aktePages();
+    aktePage = Math.min(aktePage, pages.length - 1);
+    const pg = pages[aktePage];
+    let html;
+    if (pg.type === "index") {
+      html = `<p class="akte-title">Ermittlungsakte</p><p class="akte-sub">${esc(C.caseLabel || "")}</p>
+        ${S.docs.length ? `<ol class="akte-index">${S.docs.map((id) => `<li><button data-akte-doc="${id}">${esc(N.docs[id].title)}${S.evidence.includes(id) ? `<em class="proof">BEWEIS</em>` : ""}${S.newDocs.includes(id) ? "<i>NEU</i>" : ""}</button></li>`).join("")}</ol>` : `<p class="muted">Noch leer.</p>`}`;
+    } else {
+      const d = N.docs[pg.id];
+      S.newDocs = S.newDocs.filter((x) => x !== pg.id); save(); renderSide();
+      html = `<p class="akte-doc-title">${esc(d.title)}${pg.n > 1 ? `<small>${d.pageLabels ? esc(d.pageLabels[pg.i]) : pg.i === 0 ? "Vorderseite" : "Rückseite"}</small>` : ""}</p>${paper(d.kind, pg.html)}`;
+    }
+    $("#aktePage").innerHTML = html;
+    $("#akteNum").textContent = aktePage === 0 ? "Inhalt" : `Seite ${aktePage} von ${pages.length - 1}`;
+    $("#aktePrev").disabled = aktePage === 0;
+    $("#akteNext").disabled = aktePage >= pages.length - 1;
+  }
+  function flip(to) {
+    const pages = aktePages();
+    if (to < 0 || to >= pages.length || to === aktePage) return;
+    const pg = $("#aktePage"), dir = to > aktePage ? "next" : "prev";
+    A.play("paper");
+    pg.className = `akte-page out-${dir}`;
+    setTimeout(() => { aktePage = to; renderAkte(); pg.className = `akte-page in-${dir}`; }, 220);
+  }
+  (() => {
+    let sx = null;
+    const pg = $("#akteBook");
+    pg.addEventListener("pointerdown", (e) => { sx = e.clientX; });
+    pg.addEventListener("pointerup", (e) => { if (sx == null) return; const dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 50) flip(aktePage + (dx < 0 ? 1 : -1)); });
+  })();
+
+  function closeOverlay() {
+    const was = overlay;
+    overlay = null; phoneApp = null;
+    $("#phone").classList.add("hidden");
+    $("#akte").classList.add("hidden");
+    if (was) flushMoment();
+  }
+
+  /* ---------- Smartphone: Ausrüstung als ausklappbare Seitenleiste ---------- */
+  const COMPACT = window.matchMedia("(max-width: 760px), (max-height: 520px) and (orientation: landscape)");
+  const compact = () => COMPACT.matches;
+  /* Hochformat auf dem Smartphone: einmal pro Sitzung empfehlen, das Gerät zu drehen */
+  const PORTRAIT_PHONE = window.matchMedia("(orientation: portrait) and (max-width: 760px) and (pointer: coarse)");
+  function maybeRotateHint() {
+    if (!inGame() || dlg.open || !PORTRAIT_PHONE.matches) return;
+    try { if (sessionStorage.getItem("nocturne_rotate_hint")) return; sessionStorage.setItem("nocturne_rotate_hint", "1"); } catch (e) { /* privat */ }
+    $("#rotateHint").classList.add("show");
+  }
+  const hideRotateHint = () => $("#rotateHint").classList.remove("show");
+  function setDrawer(open) {
+    document.body.classList.toggle("drawer-open", open);
+    $("#gearToggle").setAttribute("aria-expanded", String(open));
+    $("#gearToggle").setAttribute("aria-label", open ? "Ausrüstung schließen" : "Ausrüstung öffnen");
+  }
+
+  /* ---------- Menü ---------- */
+  function openMenu() {
+    openDialog({
+      kicker: "MENÜ", title: "Einstellungen",
+      html: `<div class="menu-list">
+        <label class="switch"><input type="checkbox" id="optSound" ${S.sound ? "checked" : ""}><span>Ton (Geräusche und Musik)</span></label>
+        <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
+        <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
+        <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>${esc(C.version || "1")}</b></span></div>
+        <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
+        ${mp && mp.menuHtml ? mp.menuHtml() : ""}
+        <div class="button-row" style="margin-top:0"><button class="ghost-button" data-prolog>Prolog ansehen</button></div>
+        <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
+      after: () => {
+        $("#optSound").addEventListener("change", (e) => { S.sound = e.target.checked; A.setEnabled(S.sound); updateSoundIcon(); save(); if (S.sound && inGame()) A.music(S.music ? room().music || MUSIC : null); });
+        $("#soundTest").addEventListener("click", () => {
+          if (!S.sound) { S.sound = true; A.setEnabled(true); updateSoundIcon(); save(); }
+          A.play("bell");
+          if (S.music && inGame()) A.music(room().music || MUSIC);
+        });
+        $("#optMusic").addEventListener("change", (e) => { S.music = e.target.checked; save(); if (inGame()) A.music(S.music ? room().music || MUSIC : null); });
+        $("#optHotspots").addEventListener("change", (e) => { S.showHotspots = e.target.checked; save(); renderStage(); });
+      },
+    });
+  }
+  function updateSoundIcon() {
+    $("#soundToggle").classList.toggle("off", !S.sound);
+    $("#soundToggle").setAttribute("aria-label", S.sound ? "Geräusche ausschalten" : "Geräusche einschalten");
+  }
+  function resetGame() {
+    if (mp) return showTitle(); // gemeinsamer Stand wird nie lokal gelöscht
+    if (!confirm("Möchtest du wirklich den gesamten Spielstand löschen?")) return;
+    try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* egal */ }
+    S = fresh(); selected = null; light = false;
+    closeDialog(); closeOverlay();
+    renderIntro(); showScreen("intro");
+  }
+
+  /* ---------- Start & Ende ---------- */
+  /* ---------- Prolog: Fallakte → Ankunft (Inhalt in js/prolog.js) ----------
+     casefile: Fallakte zeigen (im Multiplayer wird sie in der Lobby gelesen) · arrival: Ankunftsszene
+     Die Spielzeit läuft währenddessen nicht. */
+  /* ---------- Filmische Sequenz (Prolog-Ankunft und Finale nutzen denselben Abspieler) ----------
+     Schritte: { scene, sceneClass, text, big, sound, voice, flash, music: null, message, letter, ms, end }
+     scene: SVG-Text, "lobby" (erste Ansicht des ersten Raums) oder weglassen (Bild bleibt)
+     message: Telefonnachricht als Sprachnachricht · letter: Dokument, das langsam durchläuft
+     control: "skip" (Überspringen beendet alles) oder "next" (Weiter → nächster Schritt) */
+  const VOICE_DIR = "assets/audio/sprecher/";
+  const voiceOn = (v) => { if (N.config.introVoice && v) A.voice(VOICE_DIR + v + ".mp3"); };
+  function playCinematic(el, steps, { control = "skip", onDone = () => {} } = {}) {
+    let i = -1, timer = null, done = false;
+    el.innerHTML = `<div class="cine-scene"></div><div class="cine-letter"></div><div class="cine-msg" aria-live="polite"></div>
+      <div class="cine-text" aria-live="polite"></div><button class="cine-btn" type="button">${control === "skip" ? "Überspringen ›" : "Weiter ›"}</button>`;
+    const sc = $(".cine-scene", el), txt = $(".cine-text", el), msg = $(".cine-msg", el), let_ = $(".cine-letter", el), btn = $(".cine-btn", el);
+    const stop = () => { clearTimeout(timer); A.stopVoice(); };
+    const finish = () => { if (done) return; done = true; stop(); onDone(); };
+    const next = () => {
+      clearTimeout(timer); A.stopVoice();
+      const st = steps[++i];
+      if (!st) return finish();
+      if (st.scene) {
+        sc.innerHTML = st.scene === "lobby" ? N.rooms[0].views[0].scene.replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') : st.scene;
+        sc.className = "cine-scene"; void sc.offsetWidth; sc.classList.add("in");
+      }
+      if (st.sceneClass) setTimeout(() => sc.classList.add(st.sceneClass), st.scene ? 900 : 0);
+      if (st.flash) { document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 140); }
+      if ("music" in st && st.music === null) A.music(null);
+      [].concat(st.sound || []).forEach((n, k) => setTimeout(() => A.play(n), k * 650));
+      voiceOn(st.voice);
+      txt.classList.remove("show"); msg.classList.remove("show"); let_.classList.remove("show");
+      if (st.message) {
+        addMessage(st.message, 0); S.unread = S.unread.filter((m) => m !== st.message); save();
+        const m = N.messages[st.message];
+        msg.innerHTML = `<p class="cine-msg-from">${esc(m.from)} · Sprachnachricht</p><p class="bubble">${fill(m.text)}</p>`;
+        msg.classList.add("show");
+      } else if (st.letter && N.docs[st.letter]) {
+        addDoc(st.letter); save();
+        let_.innerHTML = `<div class="cine-letter-box">${st.text ? `<p class="cine-letter-head">${fill(st.text)}</p>` : ""}<div class="cine-letter-roll">${docHtml(st.letter)}</div></div>`;
+        let_.classList.add("show");
+        // Die „Kamera“ fährt langsam über die Handschrift
+        const box = $(".cine-letter-box", let_), roll = $(".cine-letter-roll", let_);
+        setTimeout(() => {
+          const over = roll.scrollHeight - (box.clientHeight - roll.offsetTop) + 24;
+          if (over > 0 && roll.animate) roll.animate([{ transform: "translateY(0)" }, { transform: `translateY(-${over}px)` }], { duration: Math.max(4000, (st.ms || 20000) - 6000), delay: 2500, easing: "linear", fill: "forwards" });
+        }, 50);
+      } else if (st.text) {
+        txt.classList.toggle("big", Boolean(st.big));
+        void txt.offsetWidth;
+        txt.innerHTML = `<p>${fill(st.text)}</p>`; txt.classList.add("show");
+      }
+      if (st.end) {
+        btn.innerHTML = `${esc(st.end)} <span>→</span>`; btn.classList.add("final");
+        btn.onclick = finish;
+        return;
+      }
+      timer = setTimeout(next, st.ms || 5000);
+    };
+    btn.onclick = () => (control === "skip" ? finish() : next());
+    setTimeout(next, 300);
+    return { stop: () => { done = true; stop(); } };
+  }
+
+  let prologOpen = false, prologTimer = null;
+  let afterProlog = null; // Spielstart, der während des Lesens ankam (Multiplayer: Host startet, Gast liest noch)
+  function runProlog({ casefile = true, arrival = true, readyLabel = C.prologReady || "Weiter", onDone = () => {} } = {}) {
+    const P = N.prolog;
+    if (!P) return onDone();
+    if (prologOpen) return;
+    prologOpen = true;
+    closeDialog(); closeOverlay(); setDrawer(false); hideMoment();
+    const el = $("#prolog");
+    A.ambient(C.prologAmbient || null);
+    const voice = voiceOn;
+    let cine = null;
+    const finish = () => {
+      clearTimeout(prologTimer); A.stopVoice(); if (cine) cine.stop();
+      el.className = "prolog"; el.innerHTML = ""; el.onclick = null;
+      prologOpen = false;
+      if (!inGame()) A.ambient(null);
+      const queued = afterProlog; afterProlog = null;
+      onDone();
+      if (queued) setTimeout(queued, 60);
+    };
+    const showCase = (i) => {
+      const c = P.casefile[i], last = i === P.casefile.length - 1;
+      el.className = "prolog show casefile";
+      el.innerHTML = `<div class="pz-file"><p class="eyebrow">${esc(c.kicker)}</p><h2>${esc(c.title)}</h2><div class="pz-body">${fill(c.html)}</div>
+        <div class="pz-nav">${i ? `<button class="ghost-button" data-pz="back">‹ Zurück</button>` : "<span></span>"}<span class="pz-dots">${P.casefile.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</span>
+        <button class="primary-button small" data-pz="next">${last ? esc(readyLabel) : "Weiter"} <span>→</span></button></div></div>`;
+      A.play("paper"); voice(c.voice);
+      el.onclick = (e) => {
+        const b = e.target.closest("[data-pz]");
+        if (!b) return;
+        if (b.dataset.pz === "back") return showCase(i - 1);
+        if (!last) return showCase(i + 1);
+        A.stopVoice();
+        if (arrival) showArrival(); else finish();
+      };
+    };
+    const showArrival = () => {
+      el.className = "prolog show cine";
+      el.onclick = null;
+      cine = playCinematic(el, P.arrival, { control: "skip", onDone: finish });
+    };
+    if (casefile) showCase(0); else showArrival();
+  }
+
+  function start() {
+    if (prologOpen) { afterProlog = start; return; }
+    // Neues Spiel: erst der Prolog (im Multiplayer nur die Ankunft – die Fallakte liest man in der Lobby)
+    if (!S.started && N.prolog) return runProlog({ casefile: !mp, onDone: firstStart });
+    if (!S.started) return firstStart();
+    if (S.finished) return showEnding();
+    showScreen("game");
+    render({ reset: true });
+  }
+  function firstStart() {
+    const st = C.start || {};
+    S.started = true;
+    (st.docs || []).forEach(addDoc); (st.items || []).forEach((x) => add(S.inventory, x)); S.newDocs = [];
+    save();
+    showScreen("game");
+    render({ reset: true });
+    A.play("paper");
+    openDialog({
+      kicker: st.kicker || "", title: st.title || "",
+      html: `<p class="inspect-text">${fill(st.text || "")}</p>
+        <ul class="howto"><li><b>‹ ›</b> Umdrehen – oder wischen</li><li><b>Antippen</b> Dinge im Raum untersuchen</li><li><b>Rucksack</b> Gegenstand wählen, dann auf ein Ziel tippen oder ziehen</li><li><b>Telefon</b> Nachrichten, Taschenlampe, Karte, Hinweise</li></ul>
+        <div class="button-row"><button class="primary-button small" data-close>${esc(st.button || "Los")} <span>→</span></button></div>`,
+    });
+    if (st.message) addMessage(st.message, st.messageDelay ?? 5000);
+  }
+  /* ---------- Finale (room.finale.steps) – gleicher Abspieler wie die Ankunft im Prolog ----------
+     „Weiter“ springt zum nächsten Schritt. Im Multiplayer startet es bei allen. */
+  let finaleRunning = false, finaleCine = null;
+  function startFinale() {
+    const r = N.rooms.find((x) => x.final && x.finale);
+    if (!r || finaleRunning) return;
+    finaleRunning = true;
+    closeDialog(); closeOverlay(); setDrawer(false); hideMoment(); queuedMoment = null;
+    A.ambient(C.finaleAmbient || null);
+    const el = $("#finale");
+    el.className = "finale show cine";
+    finaleCine = playCinematic(el, r.finale.steps, { control: "next", onDone: () => { el.className = "finale"; finaleRunning = false; showEnding(); } });
+  }
+
+  function showEnding() {
+    closeDialog();
+    if (finaleCine) finaleCine.stop(); finaleCine = null; finaleRunning = false; $("#finale").className = "finale";
+    S.finished = true; save();
+    const mins = Math.floor(S.playMs / 60000), hints = Object.values(S.hints).reduce((a, b) => a + b, 0);
+    // Zwischenschritte (step: true) zählen nicht als eigenes Rätsel
+    const main = Object.keys(PUZ).filter((id) => !PUZ[id].step), total = main.length, solvedN = main.filter(isSolved).length;
+    // Elias’ letzter Brief (Rauminhalt) – im Finale vorgelesen, hier zum Nachlesen aufklappbar
+    const letter = C.endingDoc ? N.docs[C.endingDoc] : null;
+    $("#endingLetter").innerHTML = letter ? fill(letter.html) : "";
+    $("#endingLetterWrap").classList.toggle("hidden", !letter);
+    $("#endingPersonal").textContent = N.config.personalMessage || "";
+    $("#restartButton").innerHTML = mp ? "Zum Titelbildschirm <span>→</span>" : "Spiel neu beginnen <span>↻</span>";
+    const bonus = (N.config.endingBonus || []).filter((b) => S.secrets.includes(b.secret)).map((b) => `<span class="ending-bonus">${esc(b.text)}</span>`).join("");
+    $("#endingStats").innerHTML = `${bonus}Spielzeit ${mins} Min. · ${solvedN} von ${total} Rätseln · ${plural(hints, "Hinweis", "Hinweise")} genutzt · ${S.secrets.length} von ${ALL_SECRETS()} Geheimnissen`;
+    showScreen("ending");
+    A.play("success");
+  }
+
+  /* ---------- Ereignisse ---------- */
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("button, a");
+    if (!t) return;
+    const ds = t.dataset;
+    if (ds.hs) return onHotspot(ds.hs);
+    if (ds.slot && e.detail === 0) return selectItem(ds.slot); // Tastatur
+    if (ds.goto) { if (ROOM[ds.goto].id === S.current) return closeOverlay(); return goRoom(ds.goto, ds.via); }
+    if (ds.app) { if (ds.app === "licht") return toggleLight(); phoneApp = ds.app; A.play("click"); return renderPhone(); }
+    if ("appBack" in ds) { phoneApp = null; return renderPhone(); }
+    if (ds.akteDoc) return flip(aktePages().findIndex((p) => p.id === ds.akteDoc));
+    if (ds.examine) return openItem(ds.examine);
+    if ("deselect" in ds) { selected = null; renderSide(); return setNarration("Du steckst den Gegenstand wieder ein."); }
+    if ("close" in ds) return closeDialog();
+    if ("ending" in ds) return showEnding();
+    if ("reset" in ds) return resetGame();
+    if ("title" in ds) return showTitle();
+    if ("prolog" in ds) { closeDialog(); return runProlog({ readyLabel: "Weiter", onDone: () => { if (inGame()) render(); } }); }
+    if ("openWall" in ds) { closeDialog(); return N.wall && N.wall.open(ds.openWall || null); }
+    if ("mpLeave" in ds) { closeDialog(); return mp && mp.leave && mp.leave(); }
+    if (ds.goal) { S.goals[ds.goal] = true; save(); A.play("paper"); return renderPhone(); }
+    if (ds.hintPick) { hintPick = ds.hintPick; A.play("click"); return renderPhone(); }
+    if (ds.hint) { S.hints[ds.hint] = (S.hints[ds.hint] || 0) + 1; save(); A.play("paper"); return renderPhone(); }
+  });
+  $("#closeDialog").addEventListener("click", closeDialog);
+  $("#moment").addEventListener("click", hideMoment);
+  $("#rotateOk").addEventListener("click", hideRotateHint);
+  PORTRAIT_PHONE.addEventListener?.("change", () => { if (!PORTRAIT_PHONE.matches) hideRotateHint(); });
+  $("#gearToggle").addEventListener("click", () => setDrawer(!document.body.classList.contains("drawer-open")));
+  $("#sideBackdrop").addEventListener("click", () => setDrawer(false));
+  $("#sideClose").addEventListener("click", () => setDrawer(false));
+  COMPACT.addEventListener?.("change", () => { if (!compact()) setDrawer(false); });
+  $("#startButton").addEventListener("click", () => { A.setEnabled(S.sound); start(); });
+  $("#newGameLink").addEventListener("click", (e) => { e.preventDefault(); resetGame(); });
+  $("#restartButton").addEventListener("click", resetGame);
+  $("#brandHome").addEventListener("click", (e) => { e.preventDefault(); if (S.started) { closeDialog(); renderIntro(); showScreen("intro"); } });
+  $("#turnLeft").addEventListener("click", () => turn(-1));
+  $("#turnRight").addEventListener("click", () => turn(1));
+  $("#phoneButton").addEventListener("click", () => (overlay === "phone" ? closeOverlay() : openPhone()));
+  $("#akteButton").addEventListener("click", () => (overlay === "akte" ? closeOverlay() : openAkte()));
+  $("#lightChip").addEventListener("click", () => toggleLight(false));
+  $("#aktePrev").addEventListener("click", () => flip(aktePage - 1));
+  $("#akteNext").addEventListener("click", () => flip(aktePage + 1));
+  $$("[data-overlay-close]").forEach((b) => b.addEventListener("click", closeOverlay));
+  $("#phone").addEventListener("click", (e) => { if (e.target.id === "phone") closeOverlay(); });
+  $("#akte").addEventListener("click", (e) => { if (e.target.id === "akte") closeOverlay(); });
+  $("#menuButton").addEventListener("click", openMenu);
+  $("#soundToggle").addEventListener("click", () => { S.sound = !S.sound; A.setEnabled(S.sound); updateSoundIcon(); save(); if (S.sound && inGame()) { A.play("click"); render(); } });
+  document.addEventListener("keydown", (e) => {
+    if (!inGame() || dlg.open || wallOpen() || e.target.matches("input, textarea")) return;
+    if (e.key === "Escape") { if (document.body.classList.contains("drawer-open")) setDrawer(false); else if (overlay) closeOverlay(); else if (selected) { selected = null; renderSide(); } return; }
+    if (overlay === "akte") { if (e.key === "ArrowRight") flip(aktePage + 1); if (e.key === "ArrowLeft") flip(aktePage - 1); return; }
+    if (overlay) return;
+    if (e.key === "ArrowRight") turn(1);
+    if (e.key === "ArrowLeft") turn(-1);
+  });
+
+  /* ---------- Gewitter ---------- */
+  (function storm() {
+    setTimeout(() => {
+      const r = room();
+      if (inGame() && r.weather === "storm" && !document.hidden) {
+        document.body.classList.add("flash");
+        setTimeout(() => document.body.classList.remove("flash"), 120);
+        setTimeout(() => { document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 90); }, 260);
+        setTimeout(() => A.play("thunder"), 1300);
+      }
+      storm();
+    }, 28000 + Math.random() * 40000);
+  })();
+
+  /* ---------- Spielzeit & Uhr ---------- */
+  let ticks = 0;
+  setInterval(() => {
+    if (document.hidden || !inGame() || S.finished || prologOpen) return;
+    S.playMs += 1000;
+    if (++ticks % 10 === 0) save();
+    $("#clock").textContent = clockAt(S.playMs);
+  }, 1000);
+  window.addEventListener("pagehide", save);
+
+  function showTitle() { closeDialog(); renderIntro(); showScreen("intro"); }
+
+  /* ---------- Multiplayer-Schnittstelle ----------
+     Gemeinsam: gelöste Rätsel, Zustände (Türen, Mechanismen, Story), Rucksack, Akte,
+     Beweise, freigeschaltete und gesicherte Bereiche, Nachrichten, Geheimnisse, Ende.
+     Pro Spieler: Raum, Blickrichtung, besuchte Räume, Taschenlampe, Auswahl, Notizen,
+     Hinweise, Spielzeit, ungelesene Nachrichten. */
+  const SHARED_SETS = ["solved", "unlocked", "completed", "evidence", "secrets"];
+  function exportShared() {
+    return {
+      v: 1,
+      solved: S.solved.slice(), flags: S.flags.filter((f) => !localFlag(f)), inventory: S.inventory.slice(),
+      docs: S.docs.slice(), evidence: S.evidence.slice(), unlocked: S.unlocked.slice(), completed: S.completed.slice(),
+      messages: S.messages.map((m) => ({ id: m.id, at: m.at })), secrets: S.secrets.slice(), finished: Boolean(S.finished),
+      gone: { items: S.gone.items.slice(), flags: S.gone.flags.slice() },
+    };
+  }
+  /** Verbrauchte Gegenstände und zurückgenommene Zustände bleiben weg, auch wenn ein anderes Gerät sie noch kennt. */
+  function normalizeShared(sh) {
+    if (!sh) return sh;
+    const g = sh.gone || {}, gi = g.items || [], gf = g.flags || [];
+    return { ...sh, inventory: (sh.inventory || []).filter((x) => !gi.includes(x)), flags: (sh.flags || []).filter((f) => !gf.includes(f)) };
+  }
+  /** Stand vom Server übernehmen. Gibt zurück, was neu ist (für eine kurze Meldung). */
+  function applyShared(raw) {
+    const sh = normalizeShared(raw);
+    if (!sh || typeof sh !== "object") return [];
+    const news = [], newlySolved = [];
+    let changed = false;
+    (sh.gone?.items || []).forEach((x) => { changed = add(S.gone.items, x) || changed; });
+    (sh.gone?.flags || []).forEach((x) => { changed = add(S.gone.flags, x) || changed; });
+    for (const k of SHARED_SETS) (sh[k] || []).forEach((x) => { if (add(S[k], x)) { changed = true; if (k === "solved") newlySolved.push(x); } });
+    (sh.flags || []).forEach((f) => { if (!localFlag(f) && !S.gone.flags.includes(f)) changed = add(S.flags, f) || changed; });
+    const fl = S.flags.length; S.flags = S.flags.filter((f) => localFlag(f) || !S.gone.flags.includes(f)); changed = changed || fl !== S.flags.length;
+    (sh.inventory || []).forEach((x) => { if (N.items[x] && !S.gone.items.includes(x) && add(S.inventory, x)) { changed = true; news.push(N.items[x].icon + " " + N.items[x].name); } });
+    const il = S.inventory.length; S.inventory = S.inventory.filter((x) => !S.gone.items.includes(x)); changed = changed || il !== S.inventory.length;
+    if (selected && !S.inventory.includes(selected)) selected = null;
+    (sh.docs || []).forEach((id) => { if (addDoc(id)) { changed = true; news.push("▤ " + N.docs[id].title); } });
+    let buzz = false;
+    (sh.messages || []).forEach((m) => {
+      if (!m || !N.messages[m.id] || S.messages.some((x) => x.id === m.id)) return;
+      S.messages.push({ id: m.id, at: m.at || clockAt(S.playMs) }); S.unread.push(m.id); changed = buzz = true;
+    });
+    newlySolved.forEach((pid) => { if (PUZ[pid]) news.unshift("✓ " + (PUZ[pid].title || PUZ[pid].objective || "Rätsel gelöst")); });
+    const endNow = sh.finished && !S.finished;
+    if (endNow) { S.finished = true; changed = true; }
+    if (!changed) return [];
+    save();
+    if (buzz) { A.play("buzz"); const b = $("#phoneButton"); b.classList.remove("ring"); void b.offsetWidth; b.classList.add("ring"); }
+    if (!inGame()) return news;
+    let narrate = null;
+    if (dlg.open && lockPid && newlySolved.includes(lockPid) && $("#dlgBody .lock")) {
+      closeDialog();
+      narrate = "Jemand aus deinem Team hat das gerade gelöst.";
+    }
+    if (overlay === "akte") renderAkte();
+    if (overlay === "phone" && phoneApp !== "notizen") renderPhone();
+    renderStage({ narrate }); renderSide(); renderObjective();
+    if (endNow) { if (N.rooms.some((x) => x.final && x.finale)) startFinale(); else openDialog({ kicker: C.caseLabel || "", title: "Das letzte Rätsel ist gelöst", html: `<p class="inspect-text">Dein Team hat den Fall abgeschlossen.</p><div class="button-row"><button class="primary-button small" data-ending>${esc(C.endLabel || "Zum Abschluss")} <span>→</span></button></div>` }); }
+    return news;
+  }
+  N.engine = {
+    /** In den Spielstand einer Sitzung wechseln. hooks: { saveKey, changed(), leave(), menuHtml() } */
+    enterMultiplayer(hooks) {
+      mp = hooks; saveKey = hooks.saveKey;
+      S = fresh(); selected = null; light = false; scheduledEvents.clear();
+      load();
+      A.setEnabled(S.sound); updateSoundIcon(); $("#clock").textContent = clockAt(S.playMs);
+      renderIntro();
+    },
+    /** Zurück zum eigenen Einzelspieler-Spielstand. */
+    leaveMultiplayer() {
+      mp = null; saveKey = SAVE_KEY;
+      S = fresh(); selected = null; light = false; scheduledEvents.clear();
+      load();
+      A.setEnabled(S.sound); updateSoundIcon(); $("#clock").textContent = clockAt(S.playMs);
+      showTitle();
+    },
+    isMultiplayer: () => Boolean(mp),
+    start() { A.setEnabled(S.sound); start(); },
+    /** Nur die Fallakte zeigen (Multiplayer-Lobby); onDone wird nach „Bereit“ aufgerufen. */
+    showCaseFile(onDone) { A.setEnabled(S.sound); runProlog({ arrival: false, readyLabel: "Bereit für die Ankunft", onDone }); },
+    showTitle, inGame,
+    exportShared, applyShared, normalizeShared,
+    position() { const r = room(); return { room: r.id, roomName: r.name, view: r.views ? r.views[viewIndex(r)].name : null }; },
+    roomName: (id) => (ROOM[id] ? ROOM[id].name : id),
+    /* für die Pinnwand (js/wall.js) */
+    has, isSolved, docHtml,
+    docs: () => S.docs.slice(),
+    saveKey: () => saveKey,
+    /** Zustand setzen (wird im Team geteilt, außer lokale Flags). */
+    setFlag(f) { if (add(S.flags, f)) { save(); renderSide(); } },
+    /** Rätsel lösen, das an der Pinnwand erledigt wurde – mit dem üblichen Erfolgsfenster. */
+    solveFromWall(pid) { if (PUZ[pid] && !isSolved(pid)) succeed(PUZ[pid]); },
+    puzzle: (pid) => PUZ[pid],
+    closePanels() { closeDialog(); closeOverlay(); setDrawer(false); },
+  };
+
+  /* ---------- Los geht’s ---------- */
+  load();
+  A.setEnabled(S.sound);
+  updateSoundIcon();
+  $("#clock").textContent = clockAt(S.playMs);
+  renderIntro();
+  showScreen("intro");
+})();

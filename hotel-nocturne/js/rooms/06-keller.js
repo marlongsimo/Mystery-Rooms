@@ -241,6 +241,7 @@
         ],
         answer: ["hahn", "choke", "zuendung", "starter"],
         pressSound: "valve", failSound: "cough",
+        release: ["choke"], // Motor läuft → Choke zurück, wie in der Anleitung
         wrongStep: {
           starter: "Der Anlasser jault, der Motor hustet einmal – und erstirbt. Alles springt zurück.",
           zuendung: "Die Kontrollleuchte zuckt kurz und erlischt. Etwas fehlt noch vor der Zündung. Alles zurück auf Anfang.",
@@ -253,11 +254,12 @@
           "Die Anleitung nennt vier Schritte. Auf dem Bedienfeld sind die Elemente in einer anderen Reihenfolge angeordnet.",
           "Kraftstoffhahn → Choke → Zündung → Starter.",
         ],
-        success: "Der Anlasser jault, der Motor hustet – und fängt sich. Ein tiefes, unregelmäßiges Brummen füllt den Keller, dann wird es gleichmäßig. Die Kontrollleuchte springt auf Grün. <b>Das Licht bleibt trotzdem aus.</b>",
+        success: "Der Anlasser jault, der Motor hustet – und fängt sich. Ein tiefes, unregelmäßiges Brummen füllt den Keller, dann wird es gleichmäßig. Du schiebst den Choke zurück, wie es auf der Anleitung steht. Die Kontrollleuchte springt auf Grün. <b>Das Licht bleibt trotzdem aus.</b>",
         onSolve: [{ flag: "gen_laeuft" }, { sound: "engine" }],
       },
       hebel: {
-        type: "sequence", title: "Hauptverteilung UG", panel: "levers",
+        type: "sequence", title: "Schalttafel", panel: "levers",
+        parallel: "zugang", parallelObjective: "Stelle die Stromversorgung wieder her und finde den verborgenen Zugang.",
         prompt: "Vier schwere Hebel. Laut Wandplan läuft der Strom A → B → C → D. Lege sie in der Reihenfolge um, in der der Strom sie durchlaufen soll.",
         help: "Lege die Hebel nacheinander um. Geprüft wird, wenn alle vier unten sind.",
         items: ["A", "B", "C", "D"].map((l) => ({
@@ -282,15 +284,16 @@
         onSolve: [
           { flag: "strom" }, { sound: "power" }, { evidence: "wandplan" }, { message: "m_strom" },
           // Unerklärtes Ereignis: Licht weg, Schritte auf der Metalltreppe, oben fällt eine Tür zu.
-          { later: { ms: 3800, actions: [{ flag: "flackern" }, { sound: "light" }], narrate: "Das Licht erlischt. Völlige Dunkelheit." } },
-          { later: { ms: 4700, actions: [{ sound: "step" }] } },
-          { later: { ms: 5300, actions: [{ sound: "step" }] } },
-          { later: { ms: 6200, actions: [{ sound: "door" }] } },
-          { later: { ms: 7400, actions: [{ unflag: "flackern" }, { sound: "power" }], narrate: "Für einen Augenblick war alles still. Dann Schritte auf der Metalltreppe – und oben fiel die Tür zum Sicherheitsbereich ins Schloss. Das Licht ist zurück. Jetzt hörst du nur noch den Generator." } },
+          { later: { here: true, ms: 3800, actions: [{ flag: "flackern" }, { sound: "light" }], narrate: "Das Licht erlischt. Völlige Dunkelheit." } },
+          { later: { here: true, ms: 4700, actions: [{ sound: "step" }] } },
+          { later: { here: true, ms: 5300, actions: [{ sound: "step" }] } },
+          { later: { here: true, ms: 6200, actions: [{ sound: "door" }] } },
+          { later: { here: true, ms: 7400, actions: [{ unflag: "flackern" }, { sound: "power" }], narrate: "Für einen Augenblick war alles still. Dann Schritte auf der Metalltreppe – und oben fiel die Tür zum Sicherheitsbereich ins Schloss. Das Licht ist zurück. Jetzt hörst du nur noch den Generator." } },
         ],
       },
       waescheschrank: {
         type: "use", item: "schraubendreher", title: "Wäscheschrank",
+        parallel: "zugang", parallelObjective: "Stelle die Stromversorgung wieder her und finde den verborgenen Zugang.",
         wrongItem: "Damit bekommst du die Schrauben nicht los.",
         noItems: "Mit bloßen Fingern lassen sich die Schrauben nicht lösen.",
         objective: "Finde die Tür, die niemand sehen sollte.",
@@ -300,7 +303,7 @@
           "Benutze den Schraubendreher aus der Rezeption am Wäscheschrank.",
         ],
         success: "Vier Schrauben, eine nach der anderen. Dann stemmst du dich gegen den Schrank – er rutscht knirschend zur Seite. Dahinter: <b>eine Stahltür ohne Klinke</b>, eingeprägt „W-GANG · NUR NOTFALL“.",
-        onSolve: [{ flag: "schrank_weg" }, { sound: "screws" }, { later: { ms: 1900, actions: [{ sound: "slide" }] } }],
+        onSolve: [{ flag: "schrank_weg" }, { sound: "screws" }, { later: { here: true, ms: 1900, actions: [{ sound: "slide" }] } }],
       },
       tuer: {
         type: "event", title: "Die Tür, die niemand sehen sollte",

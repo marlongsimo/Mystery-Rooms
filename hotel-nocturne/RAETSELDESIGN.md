@@ -227,8 +227,8 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
-| 17 | **Generator** | Gegenstand + Folge | Sicherung F3 einsetzen (wird verbraucht). Dann vier Bedienelemente in Startreihenfolge betätigen; jeder falsche Schritt: Motor hustet, alles zurück. Bewusst eine leichte, handfeste Station nach Raum 5. | Hahn → Choke → Zündung → Starter |
-| 18 | **Der Plan lügt** | Folge + Raum 4 | Erst wenn der Generator läuft. Vier Hebel umlegen, geprüft wird nach dem vierten; falsch → alle springen zurück (eigene Rückmeldung für A–B–C–D und D–C–B–A). | **C → A → D → B** (Prüfprotokoll B, PR-09/118) |
+| 17 | **Generator** | Gegenstand + Folge | Sicherung F3 einsetzen (wird verbraucht). Dann vier Bedienelemente in Startreihenfolge betätigen; jeder falsche Schritt: Motor hustet, alles zurück. Nach dem Start springt der Choke von selbst zurück (wie in der Anleitung). Bewusst eine leichte, handfeste Station nach Raum 5. | Hahn → Choke → Zündung → Starter |
+| 18 | **Der Plan lügt** | Folge + Raum 4 · parallel zu 19 | Erst wenn der Generator läuft. Vier Hebel umlegen, geprüft wird nach dem vierten; falsch → alle springen zurück (eigene Rückmeldung für A–B–C–D und D–C–B–A). | **C → A → D → B** (Prüfprotokoll B, PR-09/118) |
 | 19 | **Die Tür, die niemand sehen sollte** | Gegenstand + Zustand | Schrank jederzeit mit dem Schraubendreher lösen und zur Seite schieben. Die Stahltür dahinter hat ein Magnetschloss und geht erst auf, wenn der Strom fließt. Schrank und Hebel in beliebiger Reihenfolge. | Schraubendreher + Strom |
 
 **Übergang:** Durch die Stahltür, einen schmalen Gang bergauf → Westflügel, Managerbüro.
@@ -241,7 +241,9 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 - *18:* (1) Elias: „Vertrauen Sie nicht den offiziellen Aufzeichnungen.“ Der Wandplan ist so eine. (2) Das echte Prüfprotokoll PR-09/118 nennt eine Schaltfolge für Tor W2. (3) C → A → D → B.
 - *19:* (1) „Nicht die Tür, die Sie sehen.“ Was steht hier, das nicht hierher gehört? (2) Der Wäscheschrank ist an die Wand geschraubt, an seinem Rand zieht es. (3) Schraubendreher am Wäscheschrank – die Stahltür dahinter braucht Strom.
 
-**Unerklärtes Ereignis:** Kurz nach dem Einschalten geht das Licht aus, Schritte auf der Metalltreppe, oben fällt die Tür zum Sicherheitsbereich ins Schloss, dann kommt das Licht zurück. (Nicht in Richtung Westflügel – der Weg dorthin ist zu diesem Zeitpunkt noch verschraubt.) Im Multiplayer erlebt das nur, wer den Strom eingeschaltet hat.
+**Unerklärtes Ereignis:** Kurz nach dem Einschalten geht das Licht aus, Schritte auf der Metalltreppe, oben fällt die Tür zum Sicherheitsbereich ins Schloss, dann kommt das Licht zurück. (Nicht in Richtung Westflügel – der Weg dorthin ist zu diesem Zeitpunkt noch verschraubt.) Im Multiplayer erlebt das nur, wer den Strom eingeschaltet hat. Verlässt man den Keller vorher, bleiben die Geräusche aus; das Licht ist beim Zurückkommen trotzdem wieder an.
+
+**Ziel und Hinweise:** Schalttafel und Wäscheschrank sind eine parallele Gruppe (`parallel: "zugang"`). Das Ziel lautet dann „Stelle die Stromversorgung wieder her und finde den verborgenen Zugang.“, und die Hinweise-App fragt „Wobei brauchst du Hilfe?“.
 
 **Nachricht nach dem Einschalten:** „Er hat diesen Plan aufhängen lassen. Damit niemand mehr nach dem Weg fragt.“
 
@@ -250,6 +252,8 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 ### Raum 7 – Managerbüro · Westflügel · ca. 14 Min.
 
 **Was die Spielerin erfährt:** Die ganze Wahrheit. Und sie verlässt das Hotel auf demselben Weg wie die sechs Gäste.
+
+**Vorgabe aus Raum 6 (räumliche Verbindung):** Der W-Gang hinter der Stahltür im Keller muss im Büro sichtbar ankommen – z. B. eine schmale Tür hinter einem Regal oder einer Wandverkleidung mit derselben Prägung „W-GANG“, und auf einem Plan im Büro der Verlauf Keller → W-Gang → Büro (Westflügel, Erdgeschoss) → Servicetunnel → Rampe → Tor W2. So versteht die Spielerin, dass sie gerade den Weg von 2009 rückwärts gegangen ist und ihn gleich vorwärts geht.
 
 **Blickrichtungen**
 - **Nord · Schreibtisch:** Brief von Elias, Tischkalender, aufgeschlagen beim 14.10.2009.

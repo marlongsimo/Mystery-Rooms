@@ -57,7 +57,7 @@
       // Ein Raum bleibt nur „abgeschlossen“, wenn seine heutigen Rätsel wirklich gelöst sind.
       S.completed = S.completed.filter((id) => ROOM[id] && (ROOM[id].completeWhen || []).every((pid) => S.solved.includes(pid)));
       const open = S.pending; S.pending = [];
-      open.forEach((p) => run(p.actions));
+      open.forEach((p) => run(p.actions.filter((x) => !x.sound))); // nachgeholt: Zustand ja, alte Geräusche nein
       if (open.length) save();
     } catch (e) { /* defekter Spielstand → neu beginnen */ }
   }
@@ -72,6 +72,7 @@
   let overlay = null;      // "phone" | "akte" | null
   let phoneApp = null;
   let aktePage = 0;
+  let hintPick = null;     // gewählte Aufgabe in der Hinweise-App, wenn mehrere parallel offen sind
   let lockPid = null;      // Rätsel, dessen Schloss gerade im Dialog offen ist
 
   const room = () => ROOM[S.current];
@@ -99,6 +100,16 @@
     const r = N.rooms.find((x) => !S.completed.includes(x.id) && S.visited.includes(x.id));
     return r ? currentPuzzle(r) : null;
   }
+  /* Parallel lösbare Aufgaben (gleiches `parallel` im selben Raum): alle offenen der Gruppe. */
+  function openGroup(pid) {
+    const grp = PUZ[pid] && PUZ[pid].parallel;
+    if (!grp) return [pid];
+    return Object.keys(ROOM[PUZ[pid].room].puzzles).filter((id) => PUZ[id].parallel === grp && !isSolved(id));
+  }
+  const objectiveOf = (pid) => {
+    const g = openGroup(pid);
+    return g.length > 1 ? PUZ[pid].parallelObjective || g.map((id) => PUZ[id].objective).join(" · ") : PUZ[pid].objective;
+  };
   const ALL_SECRETS = () => N.rooms.flatMap(hotspotsOf).filter((h) => h.secret).length;
 
   /* ---------- Aktionen ---------- */
@@ -127,7 +138,10 @@
           const p = S.pending.find((x) => x.key === key);
           if (!p) return; // bereits beim Laden nachgeholt
           S.pending = S.pending.filter((x) => x.key !== key);
-          run(p.actions); save();
+          // here: Geräusche nur, solange die Spielerin noch im Raum ist. Zustände (z. B. Licht
+          // wieder an) werden immer ausgeführt, sonst bliebe der Raum in einem Zwischenzustand.
+          const away = !inGame() || S.current !== roomId;
+          run(away && a.later.here ? p.actions.filter((x) => !x.sound) : p.actions); save();
           if (inGame() && S.current === roomId) {
             // Meldung nur zeigen, wenn die Spielerin noch in die passende Richtung blickt
             const r = room(), here = r.views ? r.views[viewIndex(r)].id : null;
@@ -279,7 +293,7 @@
     const pid = frontierPuzzle();
     const next = N.rooms[r.index + 1];
     if (done && pid && PUZ[pid].room !== r.id) { // Aufgabe geht in einem anderen Raum weiter
-      $("#objective").innerHTML = `<span class="obj-label">ZIEL</span> ${esc(PUZ[pid].objective)}`;
+      $("#objective").innerHTML = `<span class="obj-label">ZIEL</span> ${esc(objectiveOf(pid))}`;
       return;
     }
     const fresh = N.rooms.find((x) => S.unlocked.includes(x.id) && !S.visited.includes(x.id));
@@ -290,10 +304,10 @@
     }
     // Ist in einem früher betretenen Raum noch etwas offen, wird es zusätzlich angezeigt.
     const behind = N.rooms.find((x) => x.id !== r.id && S.visited.includes(x.id) && !S.completed.includes(x.id) && currentPuzzle(x));
-    const openLine = behind ? `<span class="obj-open">Noch offen – ${esc(behind.name)}: ${esc(PUZ[currentPuzzle(behind)].objective)}</span>` : "";
+    const openLine = behind ? `<span class="obj-open">Noch offen – ${esc(behind.name)}: ${esc(objectiveOf(currentPuzzle(behind)))}</span>` : "";
     $("#objective").innerHTML = (done
       ? `<span class="obj-done">✓ Bereich gesichert</span>${r.final ? `<button class="link-button" data-ending>Den letzten Brief lesen →</button>` : next && !S.visited.includes(next.id) ? `<button class="link-button" data-goto="${next.id}" data-via="${r.exitVia || (r.views ? "elevator" : "door")}">${esc(r.exitLabel || `Weiter: ${next.name}`)} →</button>` : ""}`
-      : `<span class="obj-label">ZIEL</span> ${esc(PUZ[pid]?.objective || "Untersuche den Raum.")}`) + openLine;
+      : `<span class="obj-label">ZIEL</span> ${esc(pid ? objectiveOf(pid) : "Untersuche den Raum.")}`) + openLine;
   }
 
   function renderSide() {
@@ -749,7 +763,13 @@
         const k = seq.length - 1;
         if (p.checkEach && seq[k] !== p.answer[k]) return wrong((p.wrongStep && p.wrongStep[seq[k]]) || p.wrongDefault);
         if (seq.length < p.answer.length) return;
-        if (seq.join() === p.answer.join()) { locked = true; root.classList.add("done"); setTimeout(() => succeed(p), 650); return; }
+        if (seq.join() === p.answer.join()) {
+          locked = true; root.classList.add("done");
+          // release: Elemente, die nach dem Erfolg von selbst zurückgehen (z. B. Choke, wenn der Motor läuft)
+          if (p.release) setTimeout(() => { btns.filter((x) => p.release.includes(x.dataset.seq)).forEach((x) => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); }); A.play(p.pressSound || "key"); }, 700);
+          setTimeout(() => succeed(p), p.release ? 1500 : 650);
+          return;
+        }
         wrong((p.wrongOrders && p.wrongOrders[seq.join(",")]) || p.wrongDefault);
       });
     }
@@ -910,11 +930,15 @@
     if (phoneApp === "notizen") { const t = $("#notesInput"); t.addEventListener("input", () => { S.notes = t.value; save(); }); }
   }
   function hintsHtml() {
-    const pid = frontierPuzzle();
-    if (!pid) return `<p class="app-empty">Gerade gibt es hier nichts zu lösen. Geh weiter.</p>`;
+    const front = frontierPuzzle();
+    if (!front) return `<p class="app-empty">Gerade gibt es hier nichts zu lösen. Geh weiter.</p>`;
+    // Mehrere Aufgaben gleichzeitig offen: Spielerin wählt, wobei sie Hilfe möchte
+    const group = openGroup(front);
+    const pid = group.includes(hintPick) ? hintPick : group[0];
+    const tabs = group.length > 1 ? `<p class="app-sub">WOBEI BRAUCHST DU HILFE?</p><div class="hint-tabs">${group.map((id) => `<button class="hint-tab${id === pid ? " on" : ""}" data-hint-pick="${id}">${esc(PUZ[id].title)}</button>`).join("")}</div>` : "";
     const p = PUZ[pid], n = S.hints[pid] || 0;
     const mins = Math.max(0, Math.floor((S.playMs - (S.puzzleStart[pid] ?? S.playMs)) / 60000));
-    return `<p class="app-sub">AKTUELLES ZIEL</p><p class="hint-goal">${esc(p.objective || p.title)}</p>
+    return `${tabs}<p class="app-sub">AKTUELLES ZIEL</p><p class="hint-goal">${esc(p.objective || p.title)}</p>
       <p class="app-hint">Du bist seit ${mins === 0 ? "weniger als einer Minute" : plural(mins, "Minute", "Minuten")} an dieser Aufgabe.</p>
       <ol class="hint-list">${p.hints.map((h, i) => i < n
         ? `<li class="open"><b>Hinweis ${i + 1}${i === 2 ? " · Lösung" : ""}</b><p>${fill(h)}</p></li>`
@@ -1018,7 +1042,7 @@
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <label class="switch"><input type="checkbox" id="optGoal" ${S.showGoal ? "checked" : ""}><span>Aktuelles Ziel anzeigen <small class="muted">(sonst nur unter „Hinweise“ im Telefon)</small></span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>16</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>17</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
@@ -1106,6 +1130,7 @@
     if ("reset" in ds) return resetGame();
     if ("title" in ds) return showTitle();
     if ("mpLeave" in ds) { closeDialog(); return mp && mp.leave && mp.leave(); }
+    if (ds.hintPick) { hintPick = ds.hintPick; A.play("click"); return renderPhone(); }
     if (ds.hint) { S.hints[ds.hint] = (S.hints[ds.hint] || 0) + 1; save(); A.play("paper"); return renderPhone(); }
   });
   $("#closeDialog").addEventListener("click", closeDialog);

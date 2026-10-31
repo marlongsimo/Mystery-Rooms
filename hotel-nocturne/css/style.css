@@ -591,3 +591,8 @@ body.flash .stage .lightning-only { opacity: 1; }
 .rotate-text { margin: 0 0 18px; color: var(--text-2); font-size: 14px; line-height: 1.5; }
 .rotate-card .primary-button { width: auto; }
 @keyframes rotate-phone { 0%, 25% { transform: rotate(0); } 55%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
+
+/* Hinweise: Auswahl bei parallel offenen Aufgaben */
+.hint-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
+.hint-tab { flex: 1; min-width: 0; padding: 8px 6px; background: none; border: 1px solid #3a3a32; color: var(--text-2); font: 11px var(--mono); letter-spacing: .04em; }
+.hint-tab.on { border-color: var(--brass); color: var(--brass-2); background: #b69a6d14; }

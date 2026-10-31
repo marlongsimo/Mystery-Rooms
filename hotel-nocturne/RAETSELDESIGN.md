@@ -195,19 +195,19 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 **Blickrichtungen**
 - **Nord · Eingang:** Stahltür zum Archiv, Dienstplan (Geheimnis), Wandtelefon mit herausgerissenem Kabel, Uhr auf 23:17.
 - **Ost · Monitorwand:** vier Röhrenmonitore; Monitor 3 „KEIN SIGNAL“.
-- **Süd · Rekorder:** Bandregal, leere Hülle „CAM 3 – GELÖSCHT“ mit Vermerk *„gelöscht 15.10.2009 – V.L.“* (Beweis), Sicherheitsrekorder.
+- **Süd · Rekorder:** Bandregal, leere Hülle „CAM 3 – GELÖSCHT“ mit Vermerk *„gelöscht 15.10.2009 – V.L.“* (Beweis), Sicherheitsrekorder mit herausgerissenem **Systemprotokoll**: *„15.10.2009 · 08:12 · LÖSCHUNG CAM 3 · BENUTZER: V. LEHN (EIGENTÜMER)“* und *„14.10.2009 · 23:58 · BACKUP CAM 3 ERSTELLT · BENUTZER: E. VOSS“* (belastbarer Beweis).
 - **West · Schaltpult:** Indexterminal, Kameratasten, Tür „Technik“, darunter stockdunkel (Ersatzteilkiste).
 
 | # | Rätsel | Art | Ablauf | Lösung |
 |---|---|---|---|---|
 | 14 | **Das fehlende Band** | Gegenstand + Raum 4 | Backup-Band in den Rekorder; nach kurzer Pause öffnet sich die Aufnahme: sechs Silhouetten gehen durch W2, Zeitstempel 23:24:18. | Band benutzen → Aufnahme Kamera 3 (Beweis) |
 | 15 | **Rekonstruktion der Nacht** | Zeitleiste mit Prüfknopf | Vier Standbilder (A Lobby 23:17 · B Generator ohne Zeit · C Innenhof 23:24 · D Büro ohne Zeit) sortieren und prüfen. Begründete Rückmeldungen: B nach C → „Ohne Notstrom öffnet sich Tor W2 nicht.“ · D vor C → „Elias kam erst zurück, als alle draußen waren.“ | **A → B → C → D** → Index 5281, Datei 5 gesperrt |
-| 16 | **Datei 5** | Kennwort + Raum 3 | Zettel: *„Kennwort wie immer: der Name, der in keinem Register stehen durfte.“* Rückmeldungen für VALE, VOSS, ELIA. | **MARA** → Elias’ Botschaft mit Untertiteln (Beweis), Tür „Technik“ frei, Warnung „Generator ohne Sicherung F3“ |
+| 16 | **Datei 5** | Kennwort + Raum 3 | Zettel: *„Kennwort wie immer: der Name, der in keinem Register stehen durfte.“* Rückmeldungen für VALE, VOSS, ELIA. | Das Terminal trennt klar: „DATEI 5 · INDEX 5281 · DATENSATZ GEFUNDEN – ZUGRIFF GESPERRT – PERSÖNLICHES KENNWORT ERFORDERLICH“. **MARA** → Elias’ Botschaft mit Untertiteln (Beweis), Tür „Technik“ frei, Warnung „Generator ohne Sicherung F3“ |
 | – | *Suche: Sicherung* | Taschenlampe | Unter dem Pult: Kiste „Ersatzteile T.“ mit Sicherung F3. Raum gilt erst damit als abgeschlossen; die Tür funktioniert schon vorher (keine Sackgasse). | Ersatzsicherung F3 |
 
 **Nachrichten (Mara, ohne Namen):** nach dem Band *„Sieh genau hin. Die Dritte, die sich am Tor festhält – sie hatte in jener Nacht schreckliche Angst.“* · nach Datei 5 *„Er hat dieses Kennwort nie geändert. Siebzehn Jahre nicht.“*
 
-**Ereignis:** Nach dem Band zeigt Monitor 2 für etwa zwei Sekunden ein Livebild: jemand steht im Flur und sieht in die Kamera (Mara). Danach: „Das Bild war live.“
+**Ereignis:** Nach dem Band zeigt Monitor 2 für etwa zwei Sekunden ein Livebild mit dem Datum von heute (14.10.2026): jemand steht im Flur und sieht in die Kamera (Mara). Danach: „Das Bild war live.“
 
 **Geheimnis:** Dienstplan mit *„M. kommt heute. Zimmer 217 freihalten. – E.“* und Tomasz „krank gemeldet“ – deshalb startete Elias den Notstrom selbst.
 

@@ -109,7 +109,12 @@
           if (!p) return; // bereits beim Laden nachgeholt
           S.pending = S.pending.filter((x) => x.key !== key);
           run(p.actions); save();
-          if (inGame() && S.current === roomId) { renderStage({ narrate: a.later.narrate }); renderSide(); renderObjective(); }
+          if (inGame() && S.current === roomId) {
+            // Meldung nur zeigen, wenn die Spielerin noch in die passende Richtung blickt
+            const r = room(), here = r.views ? r.views[viewIndex(r)].id : null;
+            const narrate = !a.later.view || a.later.view === here ? a.later.narrate : null;
+            renderStage({ narrate }); renderSide(); renderObjective();
+          }
         }, a.later.ms || 1500);
       }
       if (a.solve) solve(a.solve);
@@ -895,7 +900,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>11</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>12</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {

@@ -72,6 +72,15 @@
         <p class="sub">Die Tür, die Sie niemals sehen sollten.“</p>
         <p class="dim">Hinter Elias liegt ein dickes Buch auf dem Tisch: „Originales Wartungsregister“. Die Aufnahme endet abrupt.</p>`,
     },
+    loeschprotokoll: {
+      title: "Systemprotokoll des Rekorders", kind: "screen",
+      html: `<p class="ts">SICHERHEITSREKORDER · SYSTEMPROTOKOLL</p>
+        <p>14.10.2009 · 23:17 · STROMAUSFALL – AUFZEICHNUNG AUF NOTSTROM</p>
+        <p>14.10.2009 · 23:58 · BACKUP CAM 3 ERSTELLT · BENUTZER: E. VOSS</p>
+        <p><b>15.10.2009 · 08:12 · LÖSCHUNG CAM 3 (14.10.) · BENUTZER: V. LEHN (EIGENTÜMER)</b></p>
+        <p>15.10.2009 · 08:13 · BACKUP CAM 3 NICHT AUFFINDBAR</p>
+        <p class="dim">Ein Thermopapierstreifen, halb aus dem Drucker gezogen und abgerissen. Den Rest hat offenbar niemand gelesen.</p>`,
+    },
     kennwortzettel: { title: "Zettel am Terminal", kind: "note", html: `<p class="handwriting big">Kennwort wie immer:<br>der Name, der in keinem Register stehen durfte.</p><p class="handwriting sign">– E.</p>` },
   });
 
@@ -96,7 +105,7 @@
   <rect x="120" y="190" width="960" height="250" fill="#1d201d"/>
   ${crt(160, 230, `<rect x="175" y="300" width="160" height="40" fill="#121a15"/><circle cx="255" cy="270" r="16" fill="none" stroke="#3f5a46"/><text x="172" y="250" fill="#b6e0c4" font-family="DM Mono, monospace" font-size="12">CAM 1 · 23:17</text><rect x="160" y="230" width="190" height="150" rx="14" fill="#000" opacity=".4"/>`, "1 · LOBBY")}
   ${crt(390, 230, `<g class="scan-noise">${Array.from({ length: 18 }, (_, i) => `<rect x="${396 + (i * 37) % 170}" y="${238 + i * 8}" width="${20 + (i * 13) % 50}" height="2" fill="#b6e0c4" opacity="${0.15 + (i % 4) * 0.08}"/>`).join("")}</g>
-    <g data-if="monitor2_live"><rect x="390" y="230" width="190" height="150" rx="14" fill="#0e1712"/><rect x="400" y="320" width="170" height="40" fill="#18241c"/><circle cx="520" cy="290" r="8" fill="#d8f0de"/><rect x="513" y="298" width="14" height="34" rx="5" fill="#d8f0de"/><text x="400" y="250" fill="#e6f5c9" font-family="DM Mono, monospace" font-size="11">CAM 2 · LIVE</text></g>`, "2 · FLUR")}
+    <g data-if="monitor2_live"><rect x="390" y="230" width="190" height="150" rx="14" fill="#0e1712"/><rect x="400" y="320" width="170" height="40" fill="#18241c"/><circle cx="520" cy="290" r="8" fill="#d8f0de"/><rect x="513" y="298" width="14" height="34" rx="5" fill="#d8f0de"/><text x="400" y="250" fill="#e6f5c9" font-family="DM Mono, monospace" font-size="11">CAM 2 · LIVE</text><text x="400" y="372" fill="#9fe0b0" font-family="DM Mono, monospace" font-size="10">14.10.2026</text></g>`, "2 · FLUR")}
   ${crt(620, 230, `<g data-unless="band_eingelegt"><text x="715" y="300" text-anchor="middle" fill="#d4443a" font-family="DM Mono, monospace" font-size="14">KEIN SIGNAL</text><text x="715" y="320" text-anchor="middle" fill="#7a3a34" font-family="DM Mono, monospace" font-size="9">KAMERA 3 – SIGNAL UNTERBROCHEN</text></g>
     <g data-if="band_eingelegt"><rect x="630" y="310" width="170" height="60" fill="#121a15"/><rect x="638" y="280" width="20" height="40" fill="none" stroke="#9fc0a8"/>${[690, 712, 734, 756, 776].map((x) => `<rect x="${x}" y="300" width="8" height="20" rx="3" fill="#9fc0a8"/>`).join("")}<text x="632" y="250" fill="#e6f5c9" font-family="DM Mono, monospace" font-size="11">CAM 3 · 23:24:18</text></g>`, "3 · INNENHOF")}
   ${crt(850, 230, `<rect x="868" y="248" width="60" height="80" fill="#121a15"/><rect x="980" y="300" width="40" height="40" fill="#1b2620"/><text x="862" y="372" fill="#5f7a66" font-family="DM Mono, monospace" font-size="11">CAM 4 · --:--</text>`, "4 · BÜRO")}
@@ -122,7 +131,7 @@
   <rect x="640" y="560" width="440" height="22" fill="#3b2b1e"/><rect x="660" y="582" width="16" height="190" fill="#2a1d14"/><rect x="1044" y="582" width="16" height="190" fill="#2a1d14"/>
   <g><rect x="680" y="480" width="360" height="80" rx="6" fill="#2a2d29" stroke="#3a3f3a" stroke-width="2"/><rect x="720" y="506" width="160" height="14" rx="3" fill="#050605"/><rect x="900" y="500" width="100" height="22" fill="#0b2a1e"/>
     <text x="950" y="516" text-anchor="middle" fill="#9fe0b0" font-family="DM Mono, monospace" font-size="11" data-unless="band_eingelegt">--:--:--</text><text x="950" y="516" text-anchor="middle" fill="#9fe0b0" font-family="DM Mono, monospace" font-size="11" data-if="band_eingelegt">▶ 23:24</text>
-    <g fill="#4a4f48"><circle cx="720" cy="545" r="6"/><circle cx="745" cy="545" r="6"/><circle cx="770" cy="545" r="6"/></g><rect x="728" y="500" width="144" height="8" fill="#1d1f1d" data-if="band_eingelegt"/></g>
+    <g fill="#4a4f48"><circle cx="720" cy="545" r="6"/><circle cx="745" cy="545" r="6"/><circle cx="770" cy="545" r="6"/></g><rect x="728" y="500" width="144" height="8" fill="#1d1f1d" data-if="band_eingelegt"/><path d="M890 482 q4 -20 -6 -40 q-6 -14 4 -30" fill="none" stroke="#e8e2cf" stroke-width="9"/></g>
   <g><rect x="760" y="330" width="200" height="130" rx="10" fill="#2a2d29"/><rect x="772" y="342" width="176" height="106" rx="8" fill="#060908"/><text x="860" y="400" text-anchor="middle" fill="#b6e0c4" font-family="DM Mono, monospace" font-size="12">EINGANG REKORDER</text></g>
   `);
 
@@ -132,7 +141,7 @@
   <g><rect x="460" y="220" width="280" height="200" rx="10" fill="#2a2d29"/><rect x="470" y="230" width="260" height="180" rx="8" fill="#060908"/>
     ${screenText([["INDEXTERMINAL"], ["DATENSATZ CAM 3", "#d4443a"], ["FEHLT"]], 'data-unless="band_eingelegt"')}
     <g data-if="band_eingelegt">${screenText([["INDEXTERMINAL"], ["4 AUFNAHMEN"], ["ORDNEN …"]], 'data-unless="zeitleiste_ok"')}</g>
-    <g data-if="zeitleiste_ok">${screenText([["INDEX 5281"], ["DATEI 5"], ["GESPERRT", "#d4443a"]], 'data-unless="datei5_offen"')}</g>
+    <g data-if="zeitleiste_ok">${screenText([["DATEI 5 · IDX 5281"], ["GESPERRT", "#d4443a"], ["KENNWORT?", "#e6c48a"]], 'data-unless="datei5_offen"')}</g>
     <g data-if="datei5_offen">${screenText([["TÜR TECHNIK"], ["FREIGEGEBEN", "#9fe0b0"], ["F3 FEHLT!", "#e6c48a"]], "")}</g>
     <rect x="684" y="388" width="40" height="18" fill="#e6dcc3" transform="rotate(6 704 397)"/></g>
   <polygon points="80,560 800,560 760,470 120,470" fill="#2a2d29" stroke="#3a3f3a" stroke-width="2"/><rect x="80" y="560" width="720" height="30" fill="#232622"/>
@@ -173,6 +182,7 @@
         hotspots: [
           { id: "monitor1", label: "Monitor 1 – Lobby", x: 13.3, y: 25.6, w: 15.8, h: 16.7, title: "Monitor 1 – Lobby", text: "Ein Standbild: die Lobby im Dunkeln, die Uhr über dem Empfang. Zeitstempel <b>23:17</b>." },
           { id: "monitor2", label: "Monitor 2 – Flur", x: 32.5, y: 25.6, w: 15.8, h: 16.7, unless: "monitor2_gesehen", title: "Monitor 2 – Flur", text: "Nur Rauschen und Bildstörungen." },
+          { id: "monitor2_live", label: "Monitor 2 – LIVE", x: 32.5, y: 25.6, w: 15.8, h: 16.7, if: "monitor2_live", title: "Monitor 2 – LIVE", text: "Ein klares Bild: der Flur zur Lobby, <b>heute, 14.10.2026</b>. Jemand steht dort und sieht direkt in die Kamera – dann flackert das Bild." },
           { id: "monitor2b", label: "Monitor 2 – Flur", x: 32.5, y: 25.6, w: 15.8, h: 16.7, if: "monitor2_gesehen", title: "Monitor 2 – Flur", text: "Wieder nur Rauschen. Aber eben war da ein Bild – <b>und das war keine alte Aufnahme. Das Bild war live.</b>" },
           { id: "monitor3", label: "Monitor 3 – Innenhof", x: 51.7, y: 25.6, w: 15.8, h: 16.7, unless: "band_eingelegt", title: "Monitor 3 – Innenhof", text: "<b>KAMERA 3 – SIGNAL UNTERBROCHEN.</b> Darunter ein Aufkleber: „Aufzeichnung nur über Sicherheitsrekorder wiederherstellbar.“" },
           { id: "monitor3b", label: "Monitor 3 – Innenhof", x: 51.7, y: 25.6, w: 15.8, h: 16.7, if: "band_eingelegt", title: "Monitor 3 – Innenhof", doc: "aufnahme_k3" },
@@ -186,6 +196,7 @@
           { id: "bandregal", label: "Bandregal", x: 10, y: 22.2, w: 38.3, h: 55.6, title: "Das Bandregal", text: "Hunderte Kassetten, nach Kamera und Datum sortiert. Viele Hüllen sind leer." },
           { id: "huelle", label: "Hülle „CAM 3“", x: 34.2, y: 51, w: 4.5, h: 11, title: "Eine leere Hülle", doc: "leere_huelle" },
           { id: "rekorder", label: "Rekorder", x: 56.7, y: 53, w: 30, h: 9.5, title: "Der Sicherheitsrekorder", text: "Ein schwerer Bandrekorder. Der Bandschacht ist leer, das Display zeigt --:--:--.", use: "band" },
+          { id: "loeschprotokoll", label: "Druckerstreifen", x: 72, y: 45, w: 4.5, h: 9, title: "Ein Druckerstreifen", text: "Aus dem Rekorder hängt ein vergilbter Thermopapierstreifen.", doc: "loeschprotokoll", actions: [{ evidence: "loeschprotokoll" }] },
         ],
       },
       {
@@ -207,8 +218,8 @@
     events: [
       {
         id: "live", view: "ost", ifSolved: "band", delay: 900,
-        actions: [{ flag: "monitor2_live" }, { sound: "relay" }, { later: { ms: 2200, actions: [{ unflag: "monitor2_live" }, { flag: "monitor2_gesehen" }], narrate: "Rauschen. Monitor 2 zeigt wieder nur Störungen." } }],
-        narrate: "Monitor 2 flackert – für einen Moment ein klares Bild: der Flur zur Lobby. Jemand steht dort und sieht in die Kamera.",
+        actions: [{ flag: "monitor2_live" }, { sound: "relay" }, { later: { ms: 2200, actions: [{ unflag: "monitor2_live" }, { flag: "monitor2_gesehen" }], narrate: "Rauschen. Monitor 2 zeigt wieder nur Störungen.", view: "ost" } }],
+        narrate: "Monitor 2 flackert – für einen Moment ein klares Bild: der Flur zur Lobby, mit dem Datum von <b>heute</b>. Jemand steht dort und sieht in die Kamera.",
       },
     ],
     puzzles: {
@@ -254,12 +265,12 @@
           "Tomasz’ Prüfprotokoll: „Tor W2 öffnet nur mit Notstrom.“ Elias’ Notiz: „Ich bin erst zurück, als alle draußen waren.“",
           "A → B → C → D.",
         ],
-        success: "Das Terminal rattert. <b>INDEX 5281 – DATEI 5 GEFUNDEN.</b> Darunter, in Rot: GESPERRT.",
+        success: "Das Terminal rattert: <b>DATEI 5 · INDEX 5281 · DATENSATZ GEFUNDEN.</b> Darunter, in Rot: <b>ZUGRIFF GESPERRT – PERSÖNLICHES KENNWORT ERFORDERLICH.</b>",
         onSolve: [{ flag: "zeitleiste_ok" }, { sound: "relay" }],
       },
       datei5: {
         type: "wheels", length: 4, title: "Datei 5 – Kennwort", quiet: true,
-        prompt: "DATEI 5 · KENNWORT EINGEBEN. Daneben Elias’ Zettel: <i>„Kennwort wie immer: der Name, der in keinem Register stehen durfte.“</i>",
+        prompt: "DATEI 5 (Index 5281) ist gefunden, aber gesperrt: <b>PERSÖNLICHES KENNWORT ERFORDERLICH.</b> Daneben Elias’ Zettel: <i>„Kennwort wie immer: der Name, der in keinem Register stehen durfte.“</i>",
         answers: ["MARA"],
         wrong: { VALE: "Das ist der Name, unter dem sie im Register stand.", VOSS: "Der Nachname stand in jedem Register.", ELIA: "Sein eigener Name stand auf jedem Dienstplan." },
         wrongDefault: "ZUGRIFF VERWEIGERT.",

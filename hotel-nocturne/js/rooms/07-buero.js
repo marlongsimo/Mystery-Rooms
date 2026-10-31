@@ -13,7 +13,7 @@
   Object.assign(N.messages, {
     m_mara: {
       from: "Unbekannte Nummer",
-      text: "Du hast die Wahrheit gefunden.<br><br>Mein Name ist <b>Mara Voss</b>. M. Vale war nie mein richtiger Name. Ich war eine der sechs, die mein Vater in jener Nacht hinausgebracht hat.<br><br>Alles, was ich gefunden hätte, hätte man als Fälschung abgetan – die Tochter, die ihren Vater reinwaschen will. Ich brauchte jemanden, der die Beweise selbst findet. Ich habe dir Türen geöffnet. Jeden Beweis hast du selbst entdeckt.<br><br>Danke, dass du meinem Vater geglaubt hast.",
+      text: "Du hast die Wahrheit gefunden.<br><br>Mein Name ist <b>Mara Voss</b>. M. Vale war nie mein richtiger Name. Ich war eine der sechs, die mein Vater in jener Nacht hinausgebracht hat.<br><br>Alles, was ich gefunden hätte, hätte man als Fälschung abgetan – die Tochter, die ihren Vater reinwaschen will. Ich brauchte jemanden, der die Beweise selbst findet. Ich habe dir Türen geöffnet. Jeden Beweis hast du selbst entdeckt.<br><br>Was danach mit meinem Vater geschah, weiß ich bis heute nicht. Aber jetzt weiß jeder, was er in jener Nacht getan hat.<br><br>Danke, dass du meinem Vater geglaubt hast.",
     },
   });
 
@@ -57,7 +57,7 @@
           <tr><td>28.09.2009</td><td>Servicetunnel W</td><td>geprüft, voll funktionsfähig – T.</td></tr>
           <tr><td>01.10.2009</td><td>Servicetunnel W</td><td><span class="handwriting other">laut Direktion „stillgelegt“ – V.L.</span></td></tr>
           <tr><td>14.10.2009</td><td>Notstrom West</td><td>23:19 von Hand gestartet – E.V.</td></tr>
-          <tr><td>14.10.2009</td><td>Tor W2</td><td><span class="handwriting">23:21 Evakuierung über Westgang. 6 Personen. – E.V.</span></td></tr>
+          <tr><td>14.10.2009</td><td>Tor W2</td><td><span class="handwriting">23:21 Evakuierung über Westgang eingeleitet. 6 Personen. – E.V.</span></td></tr>
         </tbody></table>
         <p class="dim">Das Buch hat genau die Maße der Lücke im Bücherregal.</p>`,
     },
@@ -240,7 +240,7 @@
         answers: ["2324"],
         wrong: {
           2317: "Um 23:17 fiel der Strom aus. Da war noch niemand draußen.",
-          2321: "23:21 – der Eintrag im Register. Da begann die Evakuierung erst.",
+          2321: "23:21 – im Register steht „eingeleitet“. Da begann die Evakuierung erst.",
           1410: "Das Datum ist es nicht. Das Tor merkt sich eine Minute.",
         },
         wrongDefault: "Das Tastenfeld piept kurz. Nichts bewegt sich.",

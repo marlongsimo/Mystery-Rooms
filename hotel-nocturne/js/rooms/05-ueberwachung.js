@@ -287,7 +287,7 @@
         ],
       },
       sicherung: {
-        type: "event", title: "Ersatzsicherung",
+        type: "event", step: true, title: "Ersatzsicherung",
         objective: "Besorge eine Sicherung für den Generator.",
         hints: [
           "Das Terminal warnt: Dem Generator fehlt die Sicherung F3. Tomasz hatte Ersatzteile irgendwo hier.",

@@ -83,6 +83,21 @@
           <p class="handwriting big">Für M. – damit du weißt,<br>wo ich nachts bin.</p><p class="handwriting sign">E.</p>`,
       ],
     },
+    kinderzeichnung: {
+      title: "Kinderzeichnung im Gästeregister", kind: "photo",
+      html: `<svg viewBox="0 0 360 240" role="img" aria-label="Kinderzeichnung: das Hotel, ein Mann und ein Mädchen, an der Seite eine kleine Tür mit Pfeil"><rect width="360" height="240" fill="#f4ecd6"/>
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+            <path d="M80 200 V90 L180 40 L280 90 V200 Z" stroke="#6b4a3a"/><path d="M160 200 v-40 h40 v40" stroke="#6b4a3a"/>
+            ${[[105, 105], [215, 105], [105, 145], [215, 145]].map(([x, y]) => `<rect x="${x}" y="${y}" width="30" height="24" stroke="#2f5d8a"/>`).join("")}
+            <path d="M60 200 v-24 h16 v24" stroke="#c0574a"/><path d="M40 170 q10 -14 22 -6" stroke="#c0574a"/><path d="M58 160 l6 4 l-7 3" stroke="#c0574a"/>
+            <circle cx="300" cy="170" r="8" stroke="#2a2119"/><path d="M300 178 v18 M292 186 h16 M300 196 l-6 10 M300 196 l6 10" stroke="#2a2119"/>
+            <circle cx="322" cy="182" r="6" stroke="#2a2119"/><path d="M322 188 v12 M316 194 h12 M322 200 l-4 8 M322 200 l4 8" stroke="#2a2119"/>
+            <path d="M20 210 H340" stroke="#4f7a4a"/></g>
+          <text x="180" y="28" text-anchor="middle" fill="#2a2119" font-family="Georgia, serif" font-style="italic" font-size="16">HOTEL NOKTURNE</text>
+          <text x="36" y="226" fill="#c0574a" font-family="Georgia, serif" font-style="italic" font-size="11">Papas Tür</text>
+          <text x="340" y="232" text-anchor="end" fill="#2a2119" font-family="Georgia, serif" font-style="italic" font-size="12">für Papa – M., 9 Jahre</text></svg>
+        <p class="dim">Ein Haus mit vielen Fenstern, zwei Figuren davor. Links an der Seite, klein und rot: eine Tür, die auf keinem Plan des Hotels eingezeichnet ist.</p>`,
+    },
     zeitung: {
       title: "Zeitungsartikel vom 16.10.2009", kind: "news",
       html: `<p class="news-head">LOKALANZEIGER · FREITAG, 16. OKTOBER 2009</p>
@@ -185,6 +200,7 @@
     <polygon points="500,522 590,515 590,480 508,486" fill="#dccdae"/><polygon points="680,522 590,515 590,480 672,486" fill="#cfbf9f"/>
     <g stroke="#867353" stroke-width="1.5" opacity=".8"><line x1="518" y1="494" x2="580" y2="489"/><line x1="518" y1="502" x2="580" y2="497"/><line x1="518" y1="510" x2="576" y2="505"/><line x1="600" y1="489" x2="662" y2="494"/><line x1="600" y1="497" x2="662" y2="502"/><line x1="600" y1="505" x2="656" y2="510"/></g>
     <rect x="585" y="514" width="9" height="15" fill="#7a2a24"/>
+    <g data-unless="kinderzeichnung_gesehen"><polygon points="492,500 520,494 524,512 496,518" fill="#efe4c4" stroke="#8a7a58" stroke-width="1"/><path d="M500 510 l6 -8 l6 8" stroke="#c0574a" stroke-width="1.5" fill="none"/></g>
   </g>
 
   <g transform="rotate(-6 755 510)"><rect x="722" y="496" width="70" height="30" fill="#e8dcc0"/><g stroke="#6c5a44" stroke-width="1.3"><line x1="730" y1="506" x2="782" y2="506"/><line x1="730" y1="514" x2="772" y2="514"/></g></g>
@@ -347,6 +363,7 @@
           { id: "personalfoto", label: "Gerahmtes Foto", x: 72.5, y: 23.3, w: 16.7, h: 17.8, title: "Ein gerahmtes Foto", text: "Ein Gruppenfoto des Personals, leicht ausgeblichen. Du nimmst es kurz von der Wand und drehst es um.", doc: "personalfoto" },
           { id: "telefon", label: "Telefon", x: 23.75, y: 51.7, w: 10, h: 7.8, title: "Das Telefon", text: "Ein altes Tischtelefon mit Anrufbeantworter. Das rote Lämpchen blinkt. Du drückst auf Wiedergabe.", doc: "anrufbeantworter", sound: "phone" },
           { id: "register", label: "Gästeregister", x: 40.8, y: 51.7, w: 16.7, h: 7.8, title: "Das Gästeregister", text: "Das Buch ist beim 14. Oktober 2009 aufgeschlagen. Ein rotes Lesebändchen markiert die Seite.", doc: "gaesteregister" },
+          { id: "kinderzeichnung", label: "Lose Seite", x: 40, y: 54, w: 4.5, h: 4.5, secret: true, title: "Eine lose Seite", text: "Zwischen den Seiten des Registers steckt ein gefaltetes Blatt, viel älter als der Rest.", doc: "kinderzeichnung", actions: [{ flag: "kinderzeichnung_gesehen" }] },
           { id: "zettel", label: "Zettel", x: 58.75, y: 53.9, w: 7.9, h: 5.6, title: "Ein Zettel auf dem Tresen", doc: "tresenzettel" },
           { id: "klingel", label: "Tischklingel", x: 67.9, y: 53.3, w: 6.25, h: 6.1, title: "Die Tischklingel", text: "<i>Ding.</i> Niemand kommt. Irgendwo tief im Haus antwortet – sehr leise – ein zweites Klingeln.", sound: "bell" },
         ],

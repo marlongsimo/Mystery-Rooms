@@ -1039,7 +1039,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>19</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>20</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button>${mp ? `<button class="danger-button" data-mp-leave>Sitzung verlassen</button>` : `<button class="danger-button" data-reset>Spielstand löschen</button>`}</div></div>`,
@@ -1141,11 +1141,12 @@
     clearTimeout(finaleTimer); finaleRunning = false; $("#finale").classList.remove("show");
     S.finished = true; save();
     const mins = Math.floor(S.playMs / 60000), hints = Object.values(S.hints).reduce((a, b) => a + b, 0);
-    const total = Object.keys(PUZ).length, solvedN = S.solved.filter((id) => PUZ[id]).length;
+    // Zwischenschritte (step: true) zählen nicht als eigenes Rätsel
+    const main = Object.keys(PUZ).filter((id) => !PUZ[id].step), total = main.length, solvedN = main.filter(isSolved).length;
     // Der Umschlag aus dem Tresor: Elias’ letzter Brief, „bitte erst draußen öffnen“
     $("#endingLetter").innerHTML = `<p>An den Menschen, der bis hierher gekommen ist.</p>
       <p>Wenn Sie diesen Umschlag draußen öffnen, stehen Sie dort, wo in jener Nacht sechs Menschen im Regen standen. Sie sind nicht verschwunden. Sie wurden gerettet.</p>
-      <p>Ich habe den Westgang genommen, obwohl Lehn ihn hatte stilllegen lassen und obwohl ich wusste, dass ich damit gegen jede Anweisung verstoße. Ich konnte nicht zulassen, dass Menschen sterben, weil jemand Geld sparen wollte.</p>
+      <p>Ich habe den Westgang genommen, obwohl Lehn ihn offiziell als stillgelegt führen ließ und obwohl ich wusste, dass ich damit gegen jede Anweisung verstoße. Ich konnte nicht zulassen, dass Menschen sterben, weil jemand Geld sparen wollte.</p>
       <p>Mara war unter ihnen. Lehn hat aus mir den Schuldigen gemacht. Das konnte ich ertragen. Nicht ertragen konnte ich, dass meine Tochter mit dieser Lüge leben muss. Deshalb habe ich das Register in den Tresor gelegt und die Beweise dort versteckt, wo nur sie und ich gesucht hätten.</p>
       <p>Wenn Sie dies lesen, ist das Hotel kein Ort der Lügen mehr. Es ist Zeit, die Tür zu öffnen.</p>
       <p class="sign">Elias Voss</p>`;

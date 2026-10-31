@@ -11,6 +11,25 @@
 
 Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:17 Uhr** fällt der Strom aus. Der Haupteingang ist nicht mehr sicher. Nachtmanager **Elias Voss** startet den Notstrom und evakuiert die **sechs Gäste** über den **westlichen Servicetunnel** und **Tor W2** in den Innenhof (**23:24 Uhr**). Diesen Tunnel hatte Eigentümer **Viktor Lehn** aus Kostengründen auf dem Papier „stillgelegt“, also Wartungsprotokolle gefälscht. Unter den Gästen ist Elias’ Tochter **Mara Voss**, eingecheckt als **M. Vale** in Zimmer 217. Elias kehrt danach allein ins Büro zurück, sichert das **originale Wartungsregister** und das **Backup-Band der Kamera im Innenhof** und verschwindet. Lehn stellt ihn öffentlich als Schuldigen hin. Siebzehn Jahre später lädt **Mara** die Spielerin ins Hotel ein, damit endlich jemand von außen die Wahrheit rekonstruiert und ihren Vater entlastet. Die handschriftlichen Zeilen auf der Reservierung („Vertrauen Sie nicht den offiziellen Aufzeichnungen. – Elias Voss“) stammen aus einem Brief, den Elias 2009 zurückgelassen hat; Mara hat sie abgeschrieben. Die Nachrichten der „unbekannten Nummer“ kommen von ihr und werden im Laufe des Spiels immer persönlicher. Erst ganz am Ende nennt sie ihren Namen.
 
+**Zeittafel der Nacht (so steht es in den Beweisen):**
+
+| Zeit | Ereignis | Beleg |
+|---|---|---|
+| 22:51 | Elias’ abgebrochene Nachricht auf dem Anrufbeantworter | Raum 1 |
+| 23:10 | Wasser im Gepäcklager kniehoch | Wasserstandsmarke, Raum 3 |
+| 23:17 | Stromausfall, alle Uhren bleiben stehen | Räume 1, 5, 7 |
+| 23:19 | Notstrom West von Hand gestartet | Wartungsregister, Raum 7 |
+| 23:21 | Evakuierung über den Westgang **eingeleitet** | Wartungsregister, Raum 7 |
+| 23:24:18 | Sechs Personen gehen durch Tor W2, Elias kehrt allein zurück | Kamera 3, Raum 5 |
+| 23:41 | Elias im Büro mit dem Wartungsregister | Datei 5, Raum 5 |
+| 23:50 | Wasser im Technikkeller fast hüfthoch, Marke „E.“ | Raum 6 |
+| 23:58 | Elias erstellt das Backup von Kamera 3 | Systemprotokoll, Raum 5 |
+| 15.10., 08:12 | Lehn lässt Kamera 3 löschen | Systemprotokoll, Raum 5 |
+
+Was danach mit Elias geschah, bleibt bewusst offen. Mara sagt es im Finale selbst: „Was danach mit meinem Vater geschah, weiß ich bis heute nicht.“
+
+**Zählung:** 21 Rätsel (Statistik am Ende). Acht weitere Zwischenschritte (z. B. Sicherung einsetzen, Tür aufschließen) sind in den Raumdateien mit `step: true` markiert und zählen nicht extra. 7 Geheimnisse, eines pro Raum.
+
 **Festlegungen zur Welt:**
 - **Mara** wurde 1991 geboren: 2009 ist sie 18 (Schal zum achtzehnten Geburtstag), heute 35.
 - **Höhenlage:** Der westliche Servicetunnel beginnt im **Westflügel auf Erdgeschosshöhe** und führt über eine Rampe hinaus zu Tor W2. Das Untergeschoss (Gepäcklager, Technik) liegt tiefer und stand in jener Nacht kniehoch unter Wasser. Deshalb war der Westgang der einzige sichere Weg.
@@ -46,11 +65,13 @@ Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:
                                      ┌───────┴────────┐
                                      │ 6 KELLER       │ (UG, dunkel)
                                      └───────┬────────┘
-                                             │ verborgene Tür hinter dem Wäscheschrank
+                                             │ Stahltür hinter dem Wäscheschrank (Magnetschloss, Strom)
+                                             │ W-Gang, bergauf
                                      ┌───────┴────────┐
-                                     │ 7 MANAGERBÜRO  │ (Westflügel)
+                                     │ 7 MANAGERBÜRO  │ (Westflügel, EG – Eingang = Bücherregal)
                                      └───────┬────────┘
-                                             ▼ Tor W2 → hinaus in den Innenhof = ENDE
+                                             │ Stahltür „Servicetunnel W“ (Schalter im Tresor)
+                                             ▼ Servicetunnel → Rampe → Tor W2 (2324) → Innenhof = ENDE
 ```
 
 Neu gegenüber dem bisherigen Stand: Man kehrt nach Zimmer 217 **zurück in die Rezeption** und öffnet dort die schon bekannte Tür „Personal“. So wird das Hotel als zusammenhängender Ort erlebbar statt als Kette einzelner Seiten.
@@ -353,7 +374,7 @@ Aufbauend auf dem, was schon läuft:
 
 | Raum | Geheimnis |
 |---|---|
-| 1 Rezeption | Ältere Seite im Gästeregister: Kinderzeichnung des Hotels, signiert „M., 9 Jahre“ |
+| 1 Rezeption | Lose Seite im Gästeregister: Kinderzeichnung des Hotels, signiert „für Papa – M., 9 Jahre“, links klein eine rote „Papas Tür“ (erste, leise Andeutung des Westgangs) |
 | 2 Zimmer 217 | Kinokarte vom 14.10.2009, 19:30 Uhr, in der Manteltasche an der Garderobe |
 | 3 Gepäcklager | Maras Notizbuch: „Papa sagt, das Hotel hat mehr Türen, als auf dem Plan stehen.“ |
 | 4 Archiv | Personalakte Elias Voss: Belobigung „für besonnenes Handeln bei Brandalarm 2006“ |

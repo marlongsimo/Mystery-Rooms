@@ -186,7 +186,7 @@
           { id: "klappe", label: "Ausgabeklappe", x: 39.2, y: 21.8, w: 21.7, h: 32, unless: "koffer_da", title: "Die Ausgabeklappe", text: "Eine genietete Stahlklappe. Darüber: <i>„Ausgabe nur gegen Gepäckschein“</i>. Darunter ein Schlitz, gerade breit genug für einen Schein.", use: "ausgabe" },
           { id: "koffer6", label: "Koffer mit blauem Schal", x: 39.2, y: 40, w: 21.7, h: 13, if: "koffer_da", title: "Der ausgegebene Koffer", text: "Ein brauner Koffer mit Kofferanhänger: <b>„M. Vale · Zimmer 217 · Nr. 6“</b>. Obenauf liegt ein blauer Wollschal. Der Koffer ist nicht verschlossen." },
           { id: "notizbuch", label: "Notizbuch", x: 42, y: 47.5, w: 6, h: 4.5, if: "koffer_da", secret: true, title: "Ein Notizbuch", text: "Ein kleines rotes Notizbuch. Du schlägst es auf.", doc: "mara_notizbuch" },
-          { id: "kaefigschluessel", label: "Schlüssel", x: 54, y: 48, w: 5, h: 4, if: "koffer_da", unless: "taken_kaefigschluessel", take: "kaefigschluessel", takeText: "Unter dem Schal liegt ein kleiner, schwerer Schlüssel: „Wertgepäck – Käfig“. Du nimmst ihn mit." },
+          { id: "kaefigschluessel", label: "Schlüssel", x: 54, y: 48, w: 5, h: 4, if: "koffer_da", unless: "taken_kaefigschluessel", take: "kaefigschluessel", takeText: "Unter dem Schal liegt ein kleiner, schwerer Schlüssel: „Wertgepäck – Käfig“. An der Marke ein Zettel in Elias’ Handschrift: <i>„Für M., falls du zurückkommst.“</i> Du nimmst ihn mit." },
           { id: "verzeichnis", label: "Gepäckverzeichnis", x: 65.8, y: 49, w: 14, h: 5, title: "Das Gepäckverzeichnis", text: "Wasserflecken haben die Tinte verlaufen lassen. Ein paar Zeilen sind noch lesbar.", doc: "verzeichnis_reste" },
           { id: "klingel3", label: "Tischklingel", x: 22.5, y: 48, w: 6, h: 5.5, title: "Die Tischklingel", text: "<i>Ding.</i> Der Ton verklingt ungewöhnlich lange im Beton. Niemand antwortet.", sound: "bell" },
           { id: "papierkorb", label: "Papierkorb", x: 87.5, y: 72, w: 9, h: 16, title: "Der Papierkorb", text: "Zwischen alten Quittungen liegen fünf schmale Papierstreifen – eine zerrissene Notiz.", lock: "schnipsel" },
@@ -228,7 +228,7 @@
         ],
       },
       kaefig: {
-        type: "use", item: "kaefigschluessel", title: "Käfigtür", quiet: true,
+        type: "use", step: true, item: "kaefigschluessel", title: "Käfigtür", quiet: true,
         wrongItem: "Das passt nicht in das Kastenschloss.",
         noItems: "Ohne Schlüssel bleibt der Käfig zu.",
         objective: "Öffne den Gitterkäfig.",
@@ -280,7 +280,7 @@
         onSolve: [{ doc: "elias_notiz" }],
       },
       archivtuer: {
-        type: "use", item: "archivschluessel", title: "Archivtür",
+        type: "use", step: true, item: "archivschluessel", title: "Archivtür",
         wrongItem: "Der passt nicht in dieses Bartschloss.",
         noItems: "Du hast keinen passenden Schlüssel.",
         objective: "Öffne die Archivtür auf dem Treppenabsatz.",

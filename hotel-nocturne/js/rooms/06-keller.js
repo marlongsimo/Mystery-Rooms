@@ -27,7 +27,7 @@
           <li>Zündung <b>EIN</b></li>
           <li>Starter drücken, bis der Motor läuft</li>
         </ol>
-        <p class="mono dim">Choke nach 30 Sekunden zurückschieben. Danach Verteilung an der Schalttafel (Süd) schalten.</p>
+        <p class="mono dim">Nach dem Anspringen Choke zurückschieben. Danach Verteilung an der Schalttafel (Süd) schalten.</p>
         <p class="handwriting margin">Reihenfolge einhalten, sonst säuft er ab! – T.</p>`,
     },
     wandplan: {
@@ -81,7 +81,7 @@
   <g><rect x="62" y="420" width="96" height="300" fill="#22231f"/><g stroke="#8a8a80" stroke-width="2">${Array.from({ length: 13 }, (_, i) => `<line x1="62" y1="${420 + i * 23}" x2="${i % 2 ? 82 : 96}" y2="${420 + i * 23}"/>`).join("")}</g>
     <line x1="62" y1="690" x2="158" y2="690" stroke="#b6c8d0" stroke-width="2"/><text x="100" y="684" fill="#9aa8ac" font-family="DM Mono, monospace" font-size="12">1987</text>
     <line x1="62" y1="650" x2="158" y2="650" stroke="#b6c8d0" stroke-width="2"/><text x="100" y="644" fill="#9aa8ac" font-family="DM Mono, monospace" font-size="12">2002</text>
-    <line x1="58" y1="540" x2="164" y2="540" stroke="#c0574a" stroke-width="3"/><text x="96" y="532" fill="#c0574a" font-family="Georgia, serif" font-style="italic" font-size="15">14.10.09</text></g>
+    <line x1="58" y1="540" x2="164" y2="540" stroke="#c0574a" stroke-width="3"/><text x="66" y="532" fill="#c0574a" font-family="Georgia, serif" font-style="italic" font-size="13">14.10.09 · 23:50 E.</text></g>
   <g><rect x="840" y="272" width="360" height="26" fill="#3b3a33"/><rect x="840" y="326" width="360" height="20" fill="#34332d"/>
     <g fill="#4a483f">${[880, 1010, 1140].map((x) => `<rect x="${x}" y="266" width="14" height="38"/><rect x="${x + 20}" y="320" width="12" height="32"/>`).join("")}</g>
     <text x="930" y="290" fill="#5a5a50" font-family="Georgia, serif" font-style="italic" font-size="12" opacity=".7">T.+E. – 1999</text>
@@ -168,7 +168,7 @@
         descLit: "Die Metalltreppe hinauf zum Sicherheitsbereich, Wasserstandsmarken an der Wand und dicke Rohre unter der Decke.",
         hotspots: [
           { id: "k_treppe", label: "Treppe nach oben", x: 18.3, y: 15, w: 52, h: 66, always: true, go: "ueberwachung", via: "door" },
-          { id: "wassermarken", label: "Wasserstandsmarken", x: 4.5, y: 55, w: 10, h: 26, title: "Wasserstandsmarken", text: "Mit Farbe gezogene Striche, daneben Jahreszahlen: 1987, 2002 – beide nur knapp über dem Boden. Weit darüber ein roter Strich, mit der Hand geschrieben: <b>14.10.09</b>. In jener Nacht stand das Wasser hier fast hüfthoch." },
+          { id: "wassermarken", label: "Wasserstandsmarken", x: 4.5, y: 55, w: 10, h: 26, title: "Wasserstandsmarken", text: "Mit Farbe gezogene Striche, daneben Jahreszahlen: 1987, 2002 – beide nur knapp über dem Boden. Weit darüber ein roter Strich, mit der Hand geschrieben: <b>„14.10.09 · 23:50 E.“</b> Im Gepäcklager stand es um 23:10 knietief – eine halbe Stunde später hier unten fast hüfthoch." },
           { id: "rohr", label: "Rohrleitung", x: 70, y: 29, w: 30, h: 10, secret: true, title: "Ein altes Rohr", text: "Unter Rost und Kalk sind Buchstaben ins Metall geritzt.", doc: "alte_verbindung" },
           { id: "k_wasser", label: "Wasser", x: 72, y: 82, w: 26, h: 14, title: "Das Wasser", text: "Kalt und trüb. Generator und Schalttafel stehen auf Betonsockeln – jemand hat damit gerechnet, dass es hier unten nass wird." },
         ],
@@ -216,7 +216,7 @@
     ],
     puzzles: {
       f3: {
-        type: "use", item: "sicherung", title: "Sicherungsfach F3",
+        type: "use", step: true, item: "sicherung", title: "Sicherungsfach F3",
         wrongItem: "In das Fach gehört eine Sicherung: F3, 30 A.",
         noItems: "Das Fach ist leer. Ohne Sicherung F3 startet hier nichts.",
         objective: "Bring den Generator in Gang – ihm fehlt die Sicherung F3.",
@@ -306,7 +306,7 @@
         onSolve: [{ flag: "schrank_weg" }, { sound: "screws" }, { later: { here: true, ms: 1900, actions: [{ sound: "slide" }] } }],
       },
       tuer: {
-        type: "event", title: "Die Tür, die niemand sehen sollte",
+        type: "event", step: true, title: "Die Tür, die niemand sehen sollte",
         objective: "Öffne die Stahltür hinter dem Wäscheschrank.",
         hints: [
           "Die Stahltür hat kein Schloss, nur ein Magnetschloss. Es braucht Strom.",

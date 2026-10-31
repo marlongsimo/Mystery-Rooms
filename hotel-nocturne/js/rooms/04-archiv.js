@@ -255,7 +255,7 @@
         onSolve: [{ doc: "archiv_entschluesselt" }],
       },
       fach: {
-        type: "wheels", length: 8, title: "Das Schreibtischfach",
+        type: "wheels", step: true, length: 8, title: "Das Schreibtischfach",
         prompt: "Acht Buchstabenräder. Darüber ist ein einziges Wort ins Holz geschnitzt: <i>„Wohin?“</i>",
         answers: ["WESTGANG"],
         wrong: { OFFENIST: "Das ist kein Ort.", ZHVWJDQJ: "Das ist noch der verschlüsselte Begriff." },
@@ -303,7 +303,7 @@
         onSolve: [{ flag: "fachw_offen" }, { sound: "drop" }, { give: "backupband" }, { evidence: "backupband" }, { evidence: "beweis_band" }, { doc: "zettel_regel" }, { message: "m_band" }],
       },
       pin: {
-        type: "code", length: 4, title: "Zahlenfeld",
+        type: "code", step: true, length: 4, title: "Zahlenfeld",
         prompt: "Ein Zahlenfeld mit vier Stellen. Darunter, in Tomasz’ Handschrift auf einem Klebestreifen: <i>„Wie immer.“</i>",
         answers: ["1897"],
         wrong: { "2009": "Das Jahr der Nacht – nicht das Jahr des Hauses.", "1998": "Das Jahr des Plans – nicht das Jahr des Hauses." },

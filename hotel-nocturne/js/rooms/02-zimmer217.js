@@ -169,7 +169,7 @@
           { id: "mantel", label: "Mantel", x: 15, y: 26.7, w: 10.8, h: 36.7, secret: true, title: "Ein dunkelgrüner Mantel", text: "Ein Damenmantel, viel zu leicht für Oktober. In der Tasche steckt eine Kinokarte.", doc: "kinokarte" },
           { id: "fussspuren", label: "Nasse Fußspuren", x: 40, y: 86, w: 22, h: 8, if: "fenster_auf", title: "Nasse Fußspuren", text: "Frische, nasse Abdrücke auf dem Teppich, kleiner als deine. Sie führen von der Tür zum Schreibtisch – und wieder zurück. Jemand war gerade hier, während du zum Fenster gesehen hast." },
           { id: "spiegel", label: "Spiegel", x: 70.8, y: 24.4, w: 13.3, h: 33.3, title: "Der Spiegel", text: "Dein Gesicht, blass im Dämmerlicht. Für einen Herzschlag meinst du, hinter dir etwas zu sehen – aber da ist nur die Tür. Am unteren Rahmen hängt an einer Kordel ein alter Schlüssel." },
-          { id: "alterschluessel", label: "Alter Schlüssel", x: 74.5, y: 59, w: 6, h: 7.5, title: "Ein alter Schlüssel", text: "Ein verzierter Schlüssel, der zu keinem Schloss in diesem Zimmer passt – reine Dekoration. Du drehst ihn um: In den Bart ist eine <b>7</b> eingeschlagen." },
+          { id: "alterschluessel", label: "Alter Schlüssel", x: 74.5, y: 59, w: 6, h: 7.5, title: "Ein alter Schlüssel", text: "Ein verzierter Schlüssel, der zu keinem Schloss in diesem Zimmer passt – ein Erinnerungsstück, kein Werkzeug. Du drehst ihn um: In den Bart ist eine <b>7</b> eingeschlagen." },
         ],
       },
       {
@@ -192,7 +192,7 @@
         hotspots: [
           { id: "fenster", label: "Fenster", x: 31.7, y: 15.6, w: 36.7, h: 55.6, unless: "fenster_auf", title: "Das Fenster", text: "Unten liegt der Innenhof, fast völlig dunkel. Bei jedem Blitz siehst du für einen Augenblick die westliche Mauer – und darin ein schmales Tor, das auf keinem Plan zu stehen scheint." },
           { id: "fenster_offen", label: "Offenes Fenster", x: 31.7, y: 15.6, w: 36.7, h: 55.6, if: "fenster_auf", title: "Das offene Fenster", text: "Der Sturm hat das Fenster aufgedrückt, Regen weht herein. Aber der Riegel ist weder gebrochen noch verbogen – jemand hat ihn vorher gelöst, damit der nächste Windstoß genau das tut. Du drückst das Fenster wieder zu." },
-          { id: "vorhang", label: "Vorhang", x: 24, y: 13, w: 9, h: 60, title: "Der Vorhang", text: "Schwerer roter Samt, staubig. Am Saum hat jemand mit Kugelschreiber winzig „M + P“ geschrieben." },
+          { id: "vorhang", label: "Vorhang", x: 24, y: 13, w: 9, h: 60, title: "Der Vorhang", text: "Schwerer roter Samt, staubig. Am Saum hat jemand mit Kugelschreiber winzig „M + P“ geschrieben – in der krakeligen Schrift eines Kindes." },
           { id: "heizung", label: "Heizkörper", x: 35.8, y: 75.6, w: 28.3, h: 8.9, title: "Der Heizkörper", text: "Eiskalt. Auf dem Ventil ist die Zahl 0 eingestellt." },
         ],
       },
@@ -203,7 +203,7 @@
           { id: "kerzenstaender", label: "Kerzenständer", x: 14.2, y: 33, w: 7.5, h: 20, title: "Der Kerzenständer", text: "Die Kerze brennt – jemand muss sie vor Kurzem angezündet haben. Du hebst den Ständer vorsichtig an: Unter dem Fuß klebt ein Etikett mit einer <b>1</b>." },
           { id: "schreibtisch", label: "Schreibtischschublade", x: 25, y: 55.5, w: 16.7, h: 7, title: "Die Schreibtischschublade", text: "Hotelbriefpapier, ein Brieföffner und ein Fahrplan der Regionalbahn von 2009. Nichts davon scheint wichtig." },
           { id: "blatt", label: "Blatt Papier", x: 26.7, y: 48.9, w: 7.5, h: 4.4, if: "fenster_auf", title: "Ein Blatt auf dem Schreibtisch", text: "Eben lag es noch nicht hier.", doc: "blatt" },
-          { id: "portraet217", label: "Porträtfoto", x: 56.7, y: 41.1, w: 8.3, h: 11.7, title: "Ein Porträtfoto", text: "Eine Frau mit Maras Augen – vielleicht ihre Mutter. Du drehst den Rahmen um: Auf der Rückseite steht mit Kreide eine <b>3</b>." },
+          { id: "portraet217", label: "Porträtfoto", x: 56.7, y: 41.1, w: 8.3, h: 11.7, title: "Ein Porträtfoto", text: "Eine ältere Aufnahme: eine Frau mit denselben Augen wie Mara. Du drehst den Rahmen um: Auf der Rückseite steht mit Kreide eine <b>3</b>." },
           { id: "kommode", label: "Kommode", x: 48.3, y: 54.4, w: 25, h: 32.2, title: "Die Kommode", lock: "anordnung" },
           { id: "schrank", label: "Kleiderschrank", x: 77.5, y: 18.9, w: 19.2, h: 70, title: "Der Kleiderschrank", lock: "schrank" },
         ],
@@ -261,7 +261,7 @@
         success: "Du hast den Gepäckschein Nr. 6 gefunden.",
       },
       personaltuer: {
-        type: "use", item: "personalschluessel", title: "Tür „Personal“",
+        type: "use", step: true, item: "personalschluessel", title: "Tür „Personal“",
         wrongItem: "Der passt nicht in dieses alte Schloss.",
         noItems: "Du hast keinen passenden Schlüssel.",
         objective: "Öffne in der Rezeption die Tür „Personal“.",

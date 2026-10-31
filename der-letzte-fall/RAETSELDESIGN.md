@@ -4,6 +4,8 @@
 
 > Ein Theaterdirektor stirbt bei der Abendprobe. Der Kommissar, der zweifelt, verschwindet. Zurück bleibt seine halb fertige Ermittlungswand – mit richtigen Spuren, falschen Fäden und einer letzten Notiz.
 
+> **Hinweis (Entwurf 3):** Die Spielmechanik wird zum Ermittlungsspiel umgebaut – siehe `ERMITTLUNGSDESIGN.md`. Geschichte, Figuren, Zeittafel und Zahlen in diesem Dokument bleiben verbindlich; die Abschnitte 4–8 beschreiben Version 1.
+
 Dieses Dokument ist die verbindliche Grundlage, bevor gebaut wird. Jede Uhrzeit, jedes Beweisstück und jede Lösung steht hier genau einmal. Wird etwas geändert, dann zuerst hier.
 
 ---

@@ -73,6 +73,10 @@
           <rect x="20" y="280" width="160" height="60" fill="none" stroke="#2a2119" stroke-dasharray="4 3"/><text x="100" y="315" class="plan-small">INNENHOF</text>
         </svg><p class="mono dim">Der Tunnel ist durchgehend als „in Betrieb“ eingetragen. Kein Hinweis auf eine Stilllegung.</p>`,
     },
+    beweis_band: {
+      title: "Beweisstück: Backup-Band Kamera 3", kind: "news",
+      html: `<p class="news-head">BEWEISSTÜCK · GEFUNDEN IM ARCHIV, FACH W</p><p class="mono">Videokassette, Etikett in Elias’ Handschrift:<br><b>KAMERA 3 – INNENHOF · 14.10.2009 – BACKUP</b></p><p class="mono dim">Noch nicht abgespielt. Dafür braucht es ein Abspielgerät.</p>`,
+    },
     zettel_regel: { title: "Zettel aus Fach W", kind: "note", html: `<p class="handwriting big">Für den Sicherheitsraum gilt noch Tomasz’ alte Regel. Er hat sie nie geändert.</p><p class="handwriting sign">– E.</p>` },
     personalakten: {
       title: "Personalakten 2009", kind: "register", pageLabels: ["Greta – Küche", "Ilse – Empfang", "Tomasz – Haustechnik", "Viktor Lehn – Eigentümer"],
@@ -270,7 +274,8 @@
         prompt: "Zwei Prüfprotokolle zum selben Tunnel – sie können nicht beide stimmen. Vergleiche sie mit dem Protokollbuch.",
         steps: [
           { question: "Welches Prüfprotokoll ist gefälscht?", pick: 1, options: [{ id: "A", label: "Protokoll A (PR-09/117, V. Lehn)" }, { id: "B", label: "Protokoll B (PR-09/118, Tomasz)" }], answer: ["A"],
-            wrong: "Tomasz’ Angaben passen zu allem, was du bisher weißt. Sieh dir das andere Protokoll genauer an." },
+            wrong: "Tomasz’ Angaben passen zu allem, was du bisher weißt. Sieh dir das andere Protokoll genauer an.",
+            next: "Richtig – Protokoll A ist die Fälschung. Aber woran lässt sich das beweisen?" },
           { question: "Welche zwei Belege beweisen die Fälschung?", pick: 2,
             options: [{ id: "datum", label: "Datum" }, { id: "nummer", label: "Protokollnummer" }, { id: "unterschrift", label: "Fehlende Unterschrift" }, { id: "stempel", label: "Fehlender Prüfstempel" }, { id: "papier", label: "Anderes Briefpapier" }],
             answer: ["datum", "nummer"], feedback: { 0: "Keiner deiner beiden Belege erklärt die Widersprüche.", 1: "Einer deiner Belege trägt, der andere nicht." } },
@@ -282,7 +287,7 @@
           "Protokoll A ist gefälscht. Belege: Das Datum 31.09. existiert nicht, und PR-09/117 gehört zur Aufzugsprüfung.",
         ],
         success: "Mit einem Klicken springt das Schloss der unteren Planschublade auf. Darin liegt ein großer, vergilbter Bauplan.",
-        onSolve: [{ flag: "planlade_offen" }, { doc: "bauplan_1998" }, { evidence: "protokoll_b" }, { evidence: "bauplan_1998" }, { sound: "open" }],
+        onSolve: [{ flag: "planlade_offen" }, { doc: "bauplan_1998" }, { evidence: "protokoll_a" }, { evidence: "protokoll_b" }, { evidence: "protokollbuch" }, { evidence: "bauplan_1998" }, { sound: "open" }],
       },
       fachw: {
         type: "use", item: "schraubendreher", title: "Schublade W",
@@ -295,7 +300,7 @@
           "Benutze den Schraubendreher an Schublade W.",
         ],
         success: "Das Holz gibt mit einem kurzen Knacken nach. In der Schublade: eine Videokassette und ein gefalteter Zettel.",
-        onSolve: [{ flag: "fachw_offen" }, { sound: "drop" }, { give: "backupband" }, { evidence: "backupband" }, { doc: "zettel_regel" }, { message: "m_band" }],
+        onSolve: [{ flag: "fachw_offen" }, { sound: "drop" }, { give: "backupband" }, { evidence: "backupband" }, { evidence: "beweis_band" }, { doc: "zettel_regel" }, { message: "m_band" }],
       },
       pin: {
         type: "code", length: 4, title: "Zahlenfeld",

@@ -46,6 +46,9 @@
       [...S.completed, S.current].forEach((id) => add(S.visited, id));
       // Wurde die Seite neu geladen, während eine verzögerte Aktion noch ausstand
       // (z. B. Gepäckausgabe), wird sie jetzt sofort nachgeholt – sonst entstünde eine Sackgasse.
+      // Migration: Frühere Platzhalter-Räume tragen dieselbe ID wie die neuen, vollständigen Räume.
+      // Ein Raum bleibt nur „abgeschlossen“, wenn seine heutigen Rätsel wirklich gelöst sind.
+      S.completed = S.completed.filter((id) => ROOM[id] && (ROOM[id].completeWhen || []).every((pid) => S.solved.includes(pid)));
       const open = S.pending; S.pending = [];
       open.forEach((p) => run(p.actions));
       if (open.length) save();
@@ -425,7 +428,7 @@
         <div class="button-row cipher-buttons"><button type="button" class="ghost-button" data-turn="-1" aria-label="Inneren Ring nach links drehen">↺</button><button type="button" class="ghost-button" data-turn="1" aria-label="Inneren Ring nach rechts drehen">↻</button><button type="button" class="submit-button" data-cipher-check>Text prüfen</button></div>${fb}</div>`;
     }
     if (p.type === "choice") {
-      return `<form class="lock lock-choice">${head}${p.steps.map((st, si) => `<fieldset class="choice-step"><legend>${si + 1}. ${esc(st.question)}</legend>
+      return `<form class="lock lock-choice">${head}${p.steps.map((st, si) => `<fieldset class="choice-step${si ? " hidden" : ""}" data-step="${si}"><legend>${si + 1}. ${esc(st.question)}</legend>
         ${st.options.map((o) => `<label class="choice-opt"><input type="${st.pick === 1 ? "radio" : "checkbox"}" name="step${si}" value="${o.id}"><span>${esc(o.label)}</span></label>`).join("")}</fieldset>`).join("")}
         <button class="submit-button wide">${esc(p.button || "Prüfen")}</button>${fb}</form>`;
     }
@@ -561,11 +564,23 @@
     if (p.type === "choice") {
       root.addEventListener("submit", (e) => {
         e.preventDefault();
+        // Schritt für Schritt: Die nächste Frage erscheint erst, wenn die vorige stimmt.
         for (const [si, st] of p.steps.entries()) {
+          const box = $(`[data-step="${si}"]`, root);
           const picked = $$(`input[name="step${si}"]:checked`, root).map((i) => i.value);
-          if (picked.length !== st.pick) return fail(st.pick === 1 ? "Bitte wähle bei Frage " + (si + 1) + " eine Antwort." : `Wähle bei Frage ${si + 1} genau ${st.pick} Antworten.`);
+          if (picked.length !== st.pick) return fail(st.pick === 1 ? "Bitte wähle eine Antwort." : `Wähle genau ${st.pick} Antworten.`);
           const right = picked.filter((x) => st.answer.includes(x)).length;
           if (right !== st.pick) return fail((st.feedback && st.feedback[right]) || st.wrong || "Das stimmt noch nicht.");
+          box.classList.add("done");
+          $$("input", box).forEach((i) => { i.disabled = true; });
+          const nextBox = $(`[data-step="${si + 1}"]`, root);
+          if (nextBox && nextBox.classList.contains("hidden")) {
+            nextBox.classList.remove("hidden");
+            A.play("paper");
+            $(".lock-feedback", root).textContent = "";
+            if (st.next) { const n = document.createElement("p"); n.className = "choice-next"; n.textContent = st.next; box.after(n); }
+            return;
+          }
         }
         succeed(p);
       });
@@ -870,7 +885,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>9</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>10</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         <div class="button-row"><button class="ghost-button" data-title>Zum Titelbildschirm</button><button class="danger-button" data-reset>Spielstand löschen</button></div></div>`,
       after: () => {

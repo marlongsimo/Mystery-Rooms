@@ -355,6 +355,12 @@ dialog::backdrop { background: #000000c0; backdrop-filter: blur(3px); }
 .choice-step legend { font: 500 15px var(--serif); color: var(--text); padding: 0 6px; }
 .choice-opt { display: flex; gap: 10px; align-items: center; padding: 6px 0; font-size: 14px; color: var(--text-2); cursor: pointer; }
 .choice-opt input { accent-color: var(--brass); width: 17px; height: 17px; }
+.choice-step.done { border-color: #3d4a3a; background: #141a14; }
+.choice-step.done legend::after { content: "  ✓"; color: var(--ok); }
+.choice-step.done .choice-opt:not(:has(input:checked)) { display: none; }
+.choice-step.done .choice-opt span { color: var(--ok); font-weight: 600; }
+.choice-step { animation: rise .3s ease-out; }
+.choice-next { font: italic 500 15px var(--serif); color: var(--brass-2); margin: -4px 0 12px; }
 .akte-index em.proof { font: normal 9px var(--mono); letter-spacing: .12em; color: #fff; background: #2f5d4a; padding: 2px 6px; margin-left: auto; }
 .akte-index em.proof + i { margin-left: 6px; }
 .wheels.many { gap: 4px; }

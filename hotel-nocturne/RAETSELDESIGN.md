@@ -15,7 +15,7 @@ Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:
 - **Mara** wurde 1991 geboren: 2009 ist sie 18 (Schal zum achtzehnten Geburtstag), heute 35.
 - **Höhenlage:** Der westliche Servicetunnel beginnt im **Westflügel auf Erdgeschosshöhe** und führt über eine Rampe hinaus zu Tor W2. Das Untergeschoss (Gepäcklager, Technik) liegt tiefer und stand in jener Nacht kniehoch unter Wasser. Deshalb war der Westgang der einzige sichere Weg.
 
-**Maras Beweggrund (trägt die ganze Geschichte):** Beweise, die Elias’ Tochter findet, würde jedes Gericht als gefälscht abtun. Mara braucht eine **unabhängige Zeugin** – deshalb hat sie die Spielerin eingeladen. Sie geht ihr voraus, öffnet Wege und legt Dinge bereit (Schritte hinter der Gepäckklappe, das Blatt in Zimmer 217, die warme Lampe im Archiv, das aufgeschlagene Protokollbuch, die Kratzspuren an Fach W: sie hat nur geprüft, ob es noch verschlossen ist), **rührt die Beweise selbst aber nie an**. Im Finale spricht sie das aus.
+**Maras Beweggrund (trägt die ganze Geschichte):** Beweise, die Elias’ Tochter findet, würde jedes Gericht als gefälscht abtun. Mara braucht eine **unabhängige Zeugin** – deshalb hat sie die Spielerin eingeladen. Sie geht ihr voraus, öffnet Wege und legt Dinge bereit (Schritte hinter der Gepäckklappe, das Blatt in Zimmer 217, die warme Lampe im Archiv, das aufgeschlagene Protokollbuch, die Kratzspuren an Fach W: sie hat nur geprüft, ob es noch verschlossen ist), **verändert, entfernt oder erschafft aber nie ein Beweisstück** – sie darf Dinge nur sichtbar bereitlegen (eine Tür öffnen, eine Lampe einschalten, ein Buch aufschlagen), damit die Spielerin sie selbst untersucht. So bleibt sie glaubwürdig. Im Finale spricht sie das aus.
 
 **Begriffe – überall gleich verwenden:**
 - **Westlicher Servicetunnel** – der Fluchtweg unter dem Westflügel. In Elias’ Briefen heißt er kurz **„Westgang“**; beides meint dasselbe.
@@ -176,7 +176,7 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 |---|---|---|---|---|
 | 11a | **Chiffrierscheibe** | Werkzeug | Außen Geheimtext, innen Klartext; inneren Ring drehen, „Text prüfen“. Anzeige nur für den ersten Buchstaben (G → ?). Stellung −3: „Falsche Richtung“. | Stellung 3: DER WESTGANG IST OFFEN |
 | 11b | **Schreibtischfach** | Buchstabenräder (8) | „Wohin?“ – Rückmeldungen für OFFENIST, ZHVWJDQJ, sonst „Wohin wollte Tomasz Elias führen?“ | **WESTGANG** → Bauakte Okt. 2009 (Beweis) |
-| 12 | **Echt oder gefälscht** | Auswahl in zwei Stufen | ① A oder B ② genau zwei von fünf Belegen. Rückmeldungen: B gewählt / 0 Treffer / 1 Treffer. | **A** · **Datum + Protokollnummer** → Bestandsplan 1998 (Tunnel, Rampe, Tor W2, „gegr. 1897“); Tomasz’ Protokoll wird Beweis |
+| 12 | **Echt oder gefälscht** | Auswahl in zwei Stufen | ① A oder B – erst danach erscheint ② genau zwei von fünf Belegen. Rückmeldungen: B gewählt / 0 Treffer / 1 Treffer. | **A** · **Datum + Protokollnummer** → Bestandsplan 1998 (Tunnel, Rampe, Tor W2, „gegr. 1897“); Tomasz’ Protokoll wird Beweis |
 | 13 | **Fach W** | Mechanik + Raum 1 und 3 | Schraubendreher an Schublade W. | Backup-Band Kamera 3 (Beweis) + Zettel „Tomasz’ alte Regel“ |
 | – | *Übergang: PIN-Tür* | Code | Tomasz’ Personalakte: „PIN = Gründungsjahr des Hauses“. Die PIN funktioniert jederzeit; der Raum gilt erst mit Fach W als abgeschlossen. Rückmeldungen für 2009 und 1998. | **1897** → Raum 5 |
 

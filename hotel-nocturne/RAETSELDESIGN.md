@@ -15,7 +15,7 @@ Am **14. Oktober 2009** dringt bei einem Unwetter Wasser in den Keller, um **23:
 
 **Die Zeile auf der Reservierung** („Vertrauen Sie nicht den offiziellen Aufzeichnungen. – Elias Voss“) stammt aus einem Brief, den Elias 2009 für den Menschen hinterlassen hat, der eines Tages die Wahrheit sucht. Mara hat sie nur weitergegeben – das sagt sie im Finale.
 
-**Prolog (Version 21):** Fallakte in drei Seiten (Die Nacht · Die offizielle Version · Siebzehn Jahre später, mit Reservierung), danach eine Ankunftsszene von etwa 25 Sekunden: Zufahrt im Regen → Eingangstür gibt nach → Lobby, „Die Uhr über dem Empfang zeigt 23:17. Ihr Zeiger bewegt sich nicht.“ → „Hinter dir fällt die Tür ins Schloss. Ein schwerer Riegel rastet ein.“ (bewusst ohne „von außen abgeschlossen“). Danach kurzer Dialog „Eingeschlossen“ mit Bedienhilfe; Reservierung und Fallakte liegen in der Akte. Im Multiplayer liest jede/r die Fallakte in der Lobby und meldet sich „bereit“ (Host sieht „2 von 3 bereit“, kann aber jederzeit starten); die Ankunft läuft nach dem Start bei allen, Überspringen ist einzeln möglich. „Weiterspielen“ überspringt den Prolog, im Menü gibt es „Prolog ansehen“. Sprecher optional (`introVoice`, Texte in `assets/audio/intro/SPRECHERTEXTE.md`).
+**Prolog (Version 21):** Fallakte in drei Seiten (Die Nacht · Die offizielle Version · Siebzehn Jahre später, mit Reservierung), danach eine Ankunftsszene von etwa 25 Sekunden: Zufahrt im Regen → Eingangstür gibt nach → Lobby, „Die Uhr über dem Empfang zeigt 23:17. Ihr Zeiger bewegt sich nicht.“ → „Hinter dir fällt die Tür ins Schloss. Ein schwerer Riegel rastet ein.“ (bewusst ohne „von außen abgeschlossen“). Danach kurzer Dialog „Eingeschlossen“ mit Bedienhilfe; Reservierung und Fallakte liegen in der Akte. Im Multiplayer liest jede/r die Fallakte in der Lobby und meldet sich „bereit“ (Host sieht „2 von 3 bereit“, kann aber jederzeit starten); die Ankunft läuft nach dem Start bei allen, Überspringen ist einzeln möglich. „Weiterspielen“ überspringt den Prolog, im Menü gibt es „Prolog ansehen“. Sprecher optional (`introVoice`, Texte in `assets/audio/sprecher/SPRECHERTEXTE.md`).
 
 **Zeittafel der Nacht (so steht es in den Beweisen):**
 
@@ -295,7 +295,14 @@ Bleibt wie gebaut. Einzige Ergänzung: Die Tür „Personal“ (Osten) bekommt s
 
 Frage ④ ersetzt die frühere Frage nach der Uhrzeit, damit 23:24 allein dem Tor gehört.
 
-**Finale (room.finale, im Multiplayer bei allen):** Tastenfeld grün, Rumpeln → Tor schwingt auf, Innenhof → „Der Regen wird leiser. Hier haben sie gestanden …“ → Maras Nachricht („Ich war eine der sechs …“, Motiv: unabhängige Zeugin) → „Sechs Gäste gerettet. Ein Mann zu Unrecht beschuldigt. Siebzehn Jahre Schweigen.“ → Knopf „Den Umschlag öffnen“ → Abschlussbildschirm mit Elias’ letztem Brief, persönlicher Nachricht (`config.js`) und Statistik (Spielzeit, Rätsel, Hinweise, Geheimnisse). Wer das Foto gefunden hat, liest zusätzlich: „Manche Erinnerungen bleiben länger als jedes Protokoll.“
+**Finale (room.finale, im Multiplayer bei allen; gleicher Abspieler wie die Ankunft im Prolog – zwei filmische Klammern):**
+1. Nahaufnahme Tastenfeld, „2324“ grün, Rumpeln in der Mauer.
+2. Tor W2 schwingt auf, Innenhof. 3. „Der Regen wird leiser …“
+4. Maras Nachricht als Sprachnachricht (inkl. Herkunft der Reservierungszeile, Elias’ Verbleib offen).
+5. „Du öffnest den Umschlag.“ – Elias’ letzter Brief, die Kamera fährt langsam über die Handschrift.
+6. Epilog vor dem Hotel, das Fenster von Zimmer 217 erlischt, die Musik endet: „Siebzehn Jahre lang lag die Wahrheit verborgen. Jetzt ist sie ans Licht gekommen. Doch nicht jede Frage hat eine Antwort gefunden.“ Elias wird weder als gerettet noch als tot gezeigt.
+7. „Sechs Gäste gerettet. Ein Mann zu Unrecht beschuldigt. Siebzehn Jahre Schweigen.“ → Knopf „Fall abschließen“.
+Danach der Abschlussbildschirm mit persönlicher Nachricht (`config.js`) und Statistik; Elias’ Brief dort nur noch zum Aufklappen (er liegt außerdem in der Akte). „Weiter“ springt jederzeit zum nächsten Schritt; Untertitel immer sichtbar; Sprecher optional (Erzähler, Mara, Elias – `assets/audio/sprecher/SPRECHERTEXTE.md`).
 
 **Hinweise**
 - *20:* (1) Alles liegt in deiner Akte – im Tresor kannst du sie aufschlagen. (2) Ausgang: Prüfprotokoll B und Bauakte · Anzahl und Rückkehr: Kamera 3 · Name: Gepäckverzeichnis · Fälschung: Systemprotokoll und Wandplan. (3) Westgang · 6 · Elias Voss · M. Vale · Viktor Lehn.

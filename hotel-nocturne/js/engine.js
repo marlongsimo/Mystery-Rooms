@@ -1039,7 +1039,7 @@
         <label class="switch"><input type="checkbox" id="optMusic" ${S.music ? "checked" : ""}><span>Hintergrundmusik</span></label>
         <label class="switch"><input type="checkbox" id="optHotspots" ${S.showHotspots ? "checked" : ""}><span>Untersuchbare Stellen immer anzeigen</span></label>
         <div class="button-row" style="margin-top:0"><button class="ghost-button" id="soundTest">♪ Ton testen</button></div>
-        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>21</b></span></div>
+        <div class="stats"><span>Spielzeit <b>${Math.floor(S.playMs / 60000)} Min.</b></span><span>Hinweise <b>${Object.values(S.hints).reduce((a, b) => a + b, 0)}</b></span><span>Bereiche <b>${S.completed.length} / ${N.rooms.length}</b></span><span>Geheimnisse <b>${S.secrets.length} / ${ALL_SECRETS()}</b></span><span>Version <b>22</b></span></div>
         <p class="muted small">Steuerung: Mit den Pfeilen links und rechts (oder Wischen bzw. den Pfeiltasten) drehst du dich im Raum. Gegenstände im Rucksack antippen und dann auf eine Stelle tippen – oder direkt dorthin ziehen.</p>
         ${mp && mp.menuHtml ? mp.menuHtml() : ""}
         <div class="button-row" style="margin-top:0"><button class="ghost-button" data-prolog>Prolog ansehen</button></div>
@@ -1073,6 +1073,66 @@
   /* ---------- Prolog: Fallakte → Ankunft (Inhalt in js/prolog.js) ----------
      casefile: Fallakte zeigen (im Multiplayer wird sie in der Lobby gelesen) · arrival: Ankunftsszene
      Die Spielzeit läuft währenddessen nicht. */
+  /* ---------- Filmische Sequenz (Prolog-Ankunft und Finale nutzen denselben Abspieler) ----------
+     Schritte: { scene, sceneClass, text, big, sound, voice, flash, music: null, message, letter, ms, end }
+     scene: SVG-Text, "lobby" (erste Ansicht des ersten Raums) oder weglassen (Bild bleibt)
+     message: Telefonnachricht als Sprachnachricht · letter: Dokument, das langsam durchläuft
+     control: "skip" (Überspringen beendet alles) oder "next" (Weiter → nächster Schritt) */
+  const VOICE_DIR = "assets/audio/sprecher/";
+  const voiceOn = (v) => { if (N.config.introVoice && v) A.voice(VOICE_DIR + v + ".mp3"); };
+  function playCinematic(el, steps, { control = "skip", onDone = () => {} } = {}) {
+    let i = -1, timer = null, done = false;
+    el.innerHTML = `<div class="cine-scene"></div><div class="cine-letter"></div><div class="cine-msg" aria-live="polite"></div>
+      <div class="cine-text" aria-live="polite"></div><button class="cine-btn" type="button">${control === "skip" ? "Überspringen ›" : "Weiter ›"}</button>`;
+    const sc = $(".cine-scene", el), txt = $(".cine-text", el), msg = $(".cine-msg", el), let_ = $(".cine-letter", el), btn = $(".cine-btn", el);
+    const stop = () => { clearTimeout(timer); A.stopVoice(); };
+    const finish = () => { if (done) return; done = true; stop(); onDone(); };
+    const next = () => {
+      clearTimeout(timer); A.stopVoice();
+      const st = steps[++i];
+      if (!st) return finish();
+      if (st.scene) {
+        sc.innerHTML = st.scene === "lobby" ? N.rooms[0].views[0].scene.replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') : st.scene;
+        sc.className = "cine-scene"; void sc.offsetWidth; sc.classList.add("in");
+      }
+      if (st.sceneClass) setTimeout(() => sc.classList.add(st.sceneClass), st.scene ? 900 : 0);
+      if (st.flash) { document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 140); }
+      if ("music" in st && st.music === null) A.music(null);
+      [].concat(st.sound || []).forEach((n, k) => setTimeout(() => A.play(n), k * 650));
+      voiceOn(st.voice);
+      txt.classList.remove("show"); msg.classList.remove("show"); let_.classList.remove("show");
+      if (st.message) {
+        addMessage(st.message, 0); S.unread = S.unread.filter((m) => m !== st.message); save();
+        const m = N.messages[st.message];
+        msg.innerHTML = `<p class="cine-msg-from">${esc(m.from)} · Sprachnachricht</p><p class="bubble">${fill(m.text)}</p>`;
+        msg.classList.add("show");
+      } else if (st.letter && N.docs[st.letter]) {
+        addDoc(st.letter); save();
+        let_.innerHTML = `<div class="cine-letter-box">${st.text ? `<p class="cine-letter-head">${fill(st.text)}</p>` : ""}<div class="cine-letter-roll">${docHtml(st.letter)}</div></div>`;
+        let_.classList.add("show");
+        // Die „Kamera“ fährt langsam über die Handschrift
+        const box = $(".cine-letter-box", let_), roll = $(".cine-letter-roll", let_);
+        setTimeout(() => {
+          const over = roll.scrollHeight - (box.clientHeight - roll.offsetTop) + 24;
+          if (over > 0 && roll.animate) roll.animate([{ transform: "translateY(0)" }, { transform: `translateY(-${over}px)` }], { duration: Math.max(4000, (st.ms || 20000) - 6000), delay: 2500, easing: "linear", fill: "forwards" });
+        }, 50);
+      } else if (st.text) {
+        txt.classList.toggle("big", Boolean(st.big));
+        void txt.offsetWidth;
+        txt.innerHTML = `<p>${fill(st.text)}</p>`; txt.classList.add("show");
+      }
+      if (st.end) {
+        btn.innerHTML = `${esc(st.end)} <span>→</span>`; btn.classList.add("final");
+        btn.onclick = finish;
+        return;
+      }
+      timer = setTimeout(next, st.ms || 5000);
+    };
+    btn.onclick = () => (control === "skip" ? finish() : next());
+    setTimeout(next, 300);
+    return { stop: () => { done = true; stop(); } };
+  }
+
   let prologOpen = false, prologTimer = null;
   let afterProlog = null; // Spielstart, der während des Lesens ankam (Multiplayer: Host startet, Gast liest noch)
   function runProlog({ casefile = true, arrival = true, readyLabel = "Zum Hotel fahren", onDone = () => {} } = {}) {
@@ -1083,9 +1143,10 @@
     closeDialog(); closeOverlay(); setDrawer(false); hideMoment();
     const el = $("#prolog");
     A.ambient("rain");
-    const voice = (v) => { if (N.config.introVoice && v) A.voice("assets/audio/intro/" + v + ".mp3"); };
+    const voice = voiceOn;
+    let cine = null;
     const finish = () => {
-      clearTimeout(prologTimer); A.stopVoice();
+      clearTimeout(prologTimer); A.stopVoice(); if (cine) cine.stop();
       el.className = "prolog"; el.innerHTML = ""; el.onclick = null;
       prologOpen = false;
       if (!inGame()) A.ambient(null);
@@ -1110,25 +1171,9 @@
       };
     };
     const showArrival = () => {
-      el.className = "prolog show arrival";
-      el.innerHTML = `<div class="pz-scene"></div><div class="pz-text" aria-live="polite"></div><button class="pz-skip" type="button">Überspringen ›</button>`;
-      el.onclick = (e) => { if (e.target.closest(".pz-skip")) finish(); };
-      let i = -1;
-      const next = () => {
-        const st = P.arrival[++i];
-        if (!st) return finish();
-        const sc = $(".pz-scene", el), t = $(".pz-text", el);
-        sc.innerHTML = st.scene === "lobby" ? N.rooms[0].views[0].scene.replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') : st.scene; // „lobby“ = erste Ansicht des ersten Raums
-        sc.className = "pz-scene"; void sc.offsetWidth; sc.classList.add("in");
-        if (st.sceneClass) setTimeout(() => sc.classList.add(st.sceneClass), 900);
-        if (st.flash) { document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 140); }
-        [].concat(st.sound || []).forEach((s, k) => setTimeout(() => A.play(s), k * 650));
-        voice(st.voice);
-        t.classList.remove("show"); void t.offsetWidth;
-        t.innerHTML = `<p>${fill(st.text)}</p>`; t.classList.add("show");
-        prologTimer = setTimeout(next, st.ms || 5000);
-      };
-      next();
+      el.className = "prolog show cine";
+      el.onclick = null;
+      cine = playCinematic(el, P.arrival, { control: "skip", onDone: finish });
     };
     if (casefile) showCase(0); else showArrival();
   }
@@ -1159,10 +1204,9 @@
       addMessage("m_start", 5000);
     }
   }
-  /* ---------- Finalszene: Tor W2 öffnet sich (room.finale.steps) ----------
-     Schritte: { text, ms, sound, sceneClass, big } · { message, ms } · { end: "Knopftext" }
-     „Weiter“ springt zum nächsten Schritt. Im Multiplayer startet sie bei allen. */
-  let finaleTimer = null, finaleRunning = false;
+  /* ---------- Finale (room.finale.steps) – gleicher Abspieler wie die Ankunft im Prolog ----------
+     „Weiter“ springt zum nächsten Schritt. Im Multiplayer startet es bei allen. */
+  let finaleRunning = false, finaleCine = null;
   function startFinale() {
     const r = N.rooms.find((x) => x.final && x.finale);
     if (!r || finaleRunning) return;
@@ -1170,54 +1214,21 @@
     closeDialog(); closeOverlay(); setDrawer(false); hideMoment(); queuedMoment = null;
     A.ambient("rain");
     const el = $("#finale");
-    el.innerHTML = `<div class="finale-scene">${r.finale.scene}</div><div class="finale-text" aria-live="polite"></div>
-      <div class="finale-msg" aria-live="polite"></div><button class="finale-next" type="button">Weiter →</button>`;
-    el.classList.add("show");
-    const steps = r.finale.steps;
-    let i = -1;
-    const next = () => {
-      clearTimeout(finaleTimer);
-      const st = steps[++i];
-      if (!st) return;
-      const txt = $(".finale-text", el), msg = $(".finale-msg", el), btn = $(".finale-next", el);
-      if (st.sound) A.play(st.sound);
-      if (st.sceneClass) $(".finale-scene", el).classList.add(st.sceneClass);
-      if (st.message) {
-        addMessage(st.message, 0); S.unread = S.unread.filter((m) => m !== st.message); save();
-        txt.classList.remove("show");
-        msg.innerHTML = `<p class="finale-msg-from">${esc(N.messages[st.message].from)}</p><p class="bubble">${fill(N.messages[st.message].text)}</p>`;
-        msg.classList.add("show");
-      } else if (st.text) {
-        msg.classList.remove("show");
-        txt.classList.toggle("big", Boolean(st.big));
-        txt.classList.remove("show"); void txt.offsetWidth;
-        txt.innerHTML = `<p>${fill(st.text)}</p>`; txt.classList.add("show");
-      }
-      if (st.end) {
-        btn.innerHTML = `${esc(st.end)} <span>→</span>`; btn.classList.add("final");
-        btn.onclick = () => { el.classList.remove("show"); finaleRunning = false; showEnding(); };
-        return;
-      }
-      btn.onclick = next;
-      finaleTimer = setTimeout(next, st.ms || 5000);
-    };
-    setTimeout(next, 600);
+    el.className = "finale show cine";
+    finaleCine = playCinematic(el, r.finale.steps, { control: "next", onDone: () => { el.className = "finale"; finaleRunning = false; showEnding(); } });
   }
 
   function showEnding() {
     closeDialog();
-    clearTimeout(finaleTimer); finaleRunning = false; $("#finale").classList.remove("show");
+    if (finaleCine) finaleCine.stop(); finaleCine = null; finaleRunning = false; $("#finale").className = "finale";
     S.finished = true; save();
     const mins = Math.floor(S.playMs / 60000), hints = Object.values(S.hints).reduce((a, b) => a + b, 0);
     // Zwischenschritte (step: true) zählen nicht als eigenes Rätsel
     const main = Object.keys(PUZ).filter((id) => !PUZ[id].step), total = main.length, solvedN = main.filter(isSolved).length;
-    // Der Umschlag aus dem Tresor: Elias’ letzter Brief, „bitte erst draußen öffnen“
-    $("#endingLetter").innerHTML = `<p>An den Menschen, der bis hierher gekommen ist.</p>
-      <p>Wenn Sie diesen Umschlag draußen öffnen, stehen Sie dort, wo in jener Nacht sechs Menschen im Regen standen. Lehn wird erzählen, ich hätte sie in den Tod geführt. Ich habe sie hinausgeführt.</p>
-      <p>Ich habe den Westgang genommen, obwohl Lehn ihn offiziell als stillgelegt führen ließ und obwohl ich wusste, dass ich damit gegen jede Anweisung verstoße. Ich konnte nicht zulassen, dass Menschen sterben, weil jemand Geld sparen wollte.</p>
-      <p>Mara war unter ihnen. Lehn hat aus mir den Schuldigen gemacht. Das konnte ich ertragen. Nicht ertragen konnte ich, dass meine Tochter mit dieser Lüge leben muss. Deshalb habe ich das Register in den Tresor gelegt und die Beweise dort versteckt, wo nur sie und ich gesucht hätten.</p>
-      <p>Wenn Sie dies lesen, ist das Hotel kein Ort der Lügen mehr. Es ist Zeit, die Tür zu öffnen.</p>
-      <p class="sign">Elias Voss</p>`;
+    // Elias’ letzter Brief (Rauminhalt) – im Finale vorgelesen, hier zum Nachlesen aufklappbar
+    const letter = N.docs.letzter_brief;
+    $("#endingLetter").innerHTML = letter ? fill(letter.html) : "";
+    $("#endingLetterWrap").classList.toggle("hidden", !letter);
     $("#endingPersonal").textContent = N.config.personalMessage || "";
     $("#restartButton").innerHTML = mp ? "Zum Titelbildschirm <span>→</span>" : "Spiel neu beginnen <span>↻</span>";
     const bonus = (N.config.endingBonus || []).filter((b) => S.secrets.includes(b.secret)).map((b) => `<span class="ending-bonus">${esc(b.text)}</span>`).join("");

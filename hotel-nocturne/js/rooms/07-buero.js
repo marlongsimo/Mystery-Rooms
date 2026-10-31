@@ -66,6 +66,15 @@
       html: `<p class="handwriting big">Für den Fall, dass jemand die Wahrheit findet.</p>
         <p class="mono dim">Auf der Rückseite, kleiner: „Bitte erst draußen öffnen.“</p>`,
     },
+    letzter_brief: {
+      title: "Elias’ letzter Brief", kind: "letter",
+      html: `<p>An den Menschen, der bis hierher gekommen ist.</p>
+        <p>Wenn Sie diesen Umschlag draußen öffnen, stehen Sie dort, wo in jener Nacht sechs Menschen im Regen standen. Lehn wird erzählen, ich hätte sie in den Tod geführt. Ich habe sie hinausgeführt.</p>
+        <p>Ich habe den Westgang genommen, obwohl Lehn ihn offiziell als stillgelegt führen ließ und obwohl ich wusste, dass ich damit gegen jede Anweisung verstoße. Ich konnte nicht zulassen, dass Menschen sterben, weil jemand Geld sparen wollte.</p>
+        <p>Mara war unter ihnen. Lehn hat aus mir den Schuldigen gemacht. Das konnte ich ertragen. Nicht ertragen konnte ich, dass meine Tochter mit dieser Lüge leben muss. Deshalb habe ich das Register in den Tresor gelegt und die Beweise dort versteckt, wo nur sie und ich gesucht hätten.</p>
+        <p>Wenn Sie dies lesen, ist das Hotel kein Ort der Lügen mehr. Es ist Zeit, die Tür zu öffnen.</p>
+        <p class="sign">Elias Voss</p>`,
+    },
     foto_2005: {
       title: "Foto: Elias und Mara, Sommer 2005", kind: "photo", pageLabels: ["Vorderseite", "Rückseite"],
       pages: [
@@ -159,6 +168,26 @@
 
   /* Wer das Foto in der Schublade gefunden hat, bekommt im Abspann einen zusätzlichen Satz */
   N.config.endingBonus = (N.config.endingBonus || []).concat([{ secret: "b_riegel", text: "Manche Erinnerungen bleiben länger als jedes Protokoll." }]);
+
+  /* ---------- Finale: Nahaufnahme Tastenfeld, Epilog vor dem Hotel ---------- */
+  const tastenfeld = `<svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="1200" height="700" fill="#141614"/>
+    <g stroke="#9fb2c4" stroke-opacity=".18" stroke-width="1.4" class="pz-rain">${Array.from({ length: 18 }, (_, i) => `<line x1="${(i * 71) % 1200}" y1="${(i * 43) % 600}" x2="${(i * 71) % 1200 - 10}" y2="${(i * 43) % 600 + 40}"/>`).join("")}</g>
+    <rect x="430" y="120" width="340" height="480" rx="16" fill="#2a2b28" stroke="#4a4c46" stroke-width="6"/>
+    <rect x="470" y="160" width="260" height="80" rx="6" fill="#0b2a1e"/><text x="600" y="220" text-anchor="middle" fill="#9fe0b0" font-family="DM Mono, monospace" font-size="54" letter-spacing="10" class="flicker">2324</text>
+    ${Array.from({ length: 12 }, (_, i) => `<rect x="${478 + (i % 3) * 84}" y="${268 + Math.floor(i / 3) * 76}" width="72" height="60" rx="8" fill="#4a4c46"/>`).join("")}
+    <circle cx="745" cy="150" r="10" fill="#9fe0b0"/><circle cx="745" cy="150" r="26" fill="#9fe0b0" opacity=".18"/>
+    <text x="600" y="86" text-anchor="middle" fill="#8a8f88" font-family="DM Mono, monospace" font-size="16" letter-spacing="6">NOTAUSGANG · FREIGABE ERTEILT</text></svg>`;
+  const epilog = `<svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="ep-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1116"/><stop offset="1" stop-color="#2a2a26"/></linearGradient>
+      <radialGradient id="ep-win" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f3c77e" stop-opacity=".55"/><stop offset="1" stop-color="#f3c77e" stop-opacity="0"/></radialGradient></defs>
+    <rect width="1200" height="700" fill="url(#ep-sky)"/>
+    <polygon points="380,560 380,200 600,120 820,200 820,560" fill="#120f0c" stroke="#3a2e24" stroke-width="2"/>
+    <text x="600" y="176" text-anchor="middle" fill="#8e7656" font-family="Playfair Display, serif" font-size="28" letter-spacing="8">NOCTURNE</text>
+    <g fill="#0b0907">${[420, 500, 640, 720].map((x) => [230, 320, 410].map((y) => `<rect x="${x}" y="${y}" width="44" height="54"/>`).join("")).join("")}</g>
+    <g class="ep-217"><ellipse cx="662" cy="347" rx="70" ry="70" fill="url(#ep-win)"/><rect x="640" y="320" width="44" height="54" fill="#e7b46a"/></g>
+    <rect x="560" y="470" width="80" height="90" fill="#050403" stroke="#5b4430" stroke-width="2"/>
+    <rect y="560" width="1200" height="140" fill="#0d0c0b"/></svg>`;
 
   /* ---------- Raum ---------- */
   N.rooms.push({
@@ -257,14 +286,15 @@
     completeWhen: ["bericht", "tor"],
     /* Finalszene nach dem Tor (engine: startFinale) – im Multiplayer für alle */
     finale: {
-      scene: finaleScene("2324"),
       steps: [
-        { text: "Das Tastenfeld leuchtet grün. Tief in der Mauer setzt sich ein Mechanismus in Gang.", ms: 4200, sound: "rumble" },
-        { text: "Tor W2 schwingt auf. Kalte Luft, nasses Pflaster – der Innenhof.", ms: 5200, sceneClass: "open", sound: "gate" },
-        { text: "Der Regen wird leiser. Hier haben sie gestanden, sechs Menschen, um 23:24 Uhr.", ms: 5600, sceneClass: "calm" },
-        { message: "m_mara", ms: 12000 },
-        { text: "Sechs Gäste gerettet. Ein Mann zu Unrecht beschuldigt. Siebzehn Jahre Schweigen.", ms: 6500, big: true },
-        { end: "Den Umschlag öffnen" },
+        { scene: tastenfeld, text: "Das Tastenfeld leuchtet grün. Tief in der Mauer setzt sich ein Mechanismus in Gang.", ms: 5000, sound: "rumble", voice: "08_tor" },
+        { scene: finaleScene("2324"), text: "Tor W2 schwingt auf. Kalte Luft, nasses Pflaster – der Innenhof.", ms: 5500, sceneClass: "open", sound: "gate", voice: "09_innenhof" },
+        { text: "Der Regen wird leiser. Hier haben sie gestanden, sechs Menschen, um 23:24 Uhr.", ms: 6000, sceneClass: "calm", voice: "10_regen" },
+        { message: "m_mara", ms: 24000, sound: "buzz", voice: "11_mara" },
+        { letter: "letzter_brief", text: "Du öffnest den Umschlag.", ms: 40000, sound: "paper", voice: "12_elias" },
+        { scene: epilog, text: "Siebzehn Jahre lang lag die Wahrheit verborgen. Jetzt ist sie ans Licht gekommen. Doch nicht jede Frage hat eine Antwort gefunden.", ms: 9000, sceneClass: "dim217", music: null, voice: "13_epilog" },
+        { text: "Sechs Gäste gerettet. Ein Mann zu Unrecht beschuldigt. Siebzehn Jahre Schweigen.", ms: 7000, big: true },
+        { end: "Fall abschließen" },
       ],
     },
   });

@@ -19,7 +19,7 @@ window.NOCTURNE.config = {
   // Gemeinsam spielen (Supabase-Verbindung steht für alle Spiele in
   // platform/multiplayer/mp-config.js – dort nur der öffentliche Publishable Key).
   // Sprecherstimme im Prolog: auf true setzen, sobald die MP3-Dateien unter
-  // assets/audio/intro/ liegen (Namen und Texte: assets/audio/intro/SPRECHERTEXTE.md).
+  // assets/audio/sprecher/ liegen (Namen und Texte: assets/audio/sprecher/SPRECHERTEXTE.md).
   introVoice: false,
 
   multiplayer: {

@@ -4,8 +4,8 @@
  *    Version – genau die, die im Spiel widerlegt wird.
  * 2. Ankunft: kurze Szene (ca. 30 s), läuft von selbst, „Überspringen“ jederzeit.
  * Sprecher: Ist in config.js `introVoice: true` gesetzt, spielt die Engine zu jeder Seite/Szene
- * assets/audio/intro/<voice>.mp3 ab. Ohne Dateien funktioniert alles mit Text (Sprechertexte:
- * assets/audio/intro/SPRECHERTEXTE.md).
+ * assets/audio/sprecher/<voice>.mp3 ab. Ohne Dateien funktioniert alles mit Text (Sprechertexte:
+ * assets/audio/sprecher/SPRECHERTEXTE.md).
  */
 (() => {
   const N = window.NOCTURNE;

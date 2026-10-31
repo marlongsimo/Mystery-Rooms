@@ -26,7 +26,7 @@ Nur `js/config.js` bearbeiten: `playerName` (Name auf der Reservierung) und `per
 
 ## Prolog
 
-Beim ersten Einchecken: drei Seiten Fallakte (die offizielle Version jener Nacht), danach eine kurze Ankunftsszene, die von selbst läuft und sich überspringen lässt. Inhalt in `js/prolog.js`. Optional mit Sprecherstimme: MP3-Dateien nach `assets/audio/intro/` legen (Namen und Texte in `SPRECHERTEXTE.md`) und in `js/config.js` `introVoice: true` setzen. Im Menü (☰) lässt sich der Prolog jederzeit erneut ansehen; die Spielzeit läuft dabei nicht.
+Beim ersten Einchecken: drei Seiten Fallakte (die offizielle Version jener Nacht), danach eine kurze Ankunftsszene, die von selbst läuft und sich überspringen lässt. Inhalt in `js/prolog.js`. Das Finale nutzt denselben Abspieler (Tor, Innenhof, Maras Sprachnachricht, Elias’ Brief, Epilog). Optional mit Sprecherstimmen für beides (Erzähler, Mara, Elias): MP3-Dateien nach `assets/audio/sprecher/` legen (13 Dateien, Namen und Texte in `SPRECHERTEXTE.md`) und in `js/config.js` `introVoice: true` setzen. Im Menü (☰) lässt sich der Prolog jederzeit erneut ansehen; die Spielzeit läuft dabei nicht.
 
 ## Gemeinsam spielen
 
@@ -77,7 +77,7 @@ hotel-nocturne/
 | `events` | Einmalige Ereignisse beim Betreten einer Blickrichtung, optional erst nach einem bestimmten Rätsel (`ifSolved`) und mit Blitz (`flash`). |
 | `secret: true` | Hotspot zählt als optionales Geheimnis (Zähler im Menü). |
 | `completeWhen` | Welche Rätsel den nächsten Raum freischalten. |
-| `final` / `finale` | Letzter Raum; `finale: { scene, steps }` spielt nach dem letzten Rätsel eine Schlussszene (Texte, Geräusche, Telefonnachricht, Knopf zum Abschluss) – im Multiplayer bei allen. |
+| `final` / `finale` | Letzter Raum; `finale: { steps }` spielt nach dem letzten Rätsel eine filmische Schlussszene. Schritte: `scene`, `sceneClass`, `text`, `big`, `sound`, `voice`, `message` (als Sprachnachricht), `letter` (Dokument, das langsam durchläuft), `music: null` (ausblenden), `ms`, `end` (Knopf zum Abschluss) – im Multiplayer bei allen. |
 | `N.messages` | Nachrichten, die während des Spiels aufs Telefon kommen. |
 
 Antworten werden tolerant verglichen: Groß-/Kleinschreibung, Leerzeichen und Satzzeichen spielen keine Rolle.

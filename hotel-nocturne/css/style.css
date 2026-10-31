@@ -216,6 +216,7 @@ body.flash .stage .lightning { opacity: .55; }
 .room-list li span { font: 10px var(--mono); color: #7f7b70; }
 .room-list li b { font-weight: 500; flex: 1; }
 .room-list li em { font-style: normal; font-size: 11px; color: var(--brass); }
+.room-list li em.dim { color: #7f7b70; }
 .room-list li i { font-style: normal; color: var(--ok); }
 .room-list li.here b { color: var(--brass-2); }
 .hint-goal { font: 500 16px var(--serif); margin: 0 0 6px; }

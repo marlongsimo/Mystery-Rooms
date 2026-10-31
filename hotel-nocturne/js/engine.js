@@ -32,7 +32,7 @@
   /* ---------- Spielstand ---------- */
   const fresh = () => ({
     v: 2, started: false, finished: false,
-    current: N.rooms[0].id, unlocked: [N.rooms[0].id], completed: [], views: {},
+    current: N.rooms[0].id, unlocked: [N.rooms[0].id], visited: [N.rooms[0].id], completed: [], views: {},
     solved: [], flags: [], inventory: [], docs: [], newDocs: [], messages: [], unread: [],
     hints: {}, puzzleStart: {}, playMs: 0, notes: "", sound: true, music: true, showHotspots: false,
   });
@@ -42,6 +42,8 @@
       const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
       if (s && s.v === 2) S = Object.assign(fresh(), s);
       if (!ROOM[S.current]) S.current = N.rooms[0].id;
+      // ältere Spielstände ohne „besucht“: alles Abgeschlossene und der aktuelle Raum gelten als besucht
+      [...S.completed, S.current].forEach((id) => add(S.visited, id));
     } catch (e) { /* defekter Spielstand → neu beginnen */ }
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* privater Modus */ } }
@@ -218,7 +220,7 @@
     sc.classList.add("leaving");
     A.play(via === "elevator" ? "elevator" : "door");
     setTimeout(() => {
-      S.current = id; save();
+      S.current = id; add(S.visited, id); save();
       sc.classList.remove("leaving");
       render({ anim: "arrive", reset: true });
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -518,8 +520,9 @@
     if (phoneApp === "karte") {
       body = `${S.inventory.includes("hotelplan") ? `<div class="mini-plan">${paper("plan", N.docs.hotelplan.html)}</div>` : `<p class="app-empty">Noch kein Gebäudeplan gespeichert.</p>`}
         <p class="app-sub">BEREICHE</p><ul class="room-list">${N.rooms.map((r) => {
-          const open = S.unlocked.includes(r.id), here = r.id === S.current, done = S.completed.includes(r.id);
-          return `<li class="${here ? "here" : ""}"><span>${pad2(r.index + 1)}</span><b>${open ? esc(r.name) : "Verschlossen"}</b>${here ? "<em>Du bist hier</em>" : open ? `<button class="link-button" data-goto="${r.id}">Hingehen</button>` : ""}${done ? "<i>✓</i>" : ""}</li>`;
+          // Schnellreise nur in Räume, die man schon auf dem vorgesehenen Weg betreten hat
+          const open = S.unlocked.includes(r.id), seen = S.visited.includes(r.id), here = r.id === S.current, done = S.completed.includes(r.id);
+          return `<li class="${here ? "here" : ""}"><span>${pad2(r.index + 1)}</span><b>${open ? esc(r.name) : "Verschlossen"}</b>${here ? "<em>Du bist hier</em>" : seen ? `<button class="link-button" data-goto="${r.id}">Hingehen</button>` : open ? "<em class=\"dim\">Weg noch finden</em>" : ""}${done ? "<i>✓</i>" : ""}</li>`;
         }).join("")}</ul>`;
     }
     if (phoneApp === "hinweise") body = hintsHtml();

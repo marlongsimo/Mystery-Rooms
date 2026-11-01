@@ -12,7 +12,7 @@ Jedes Spiel hat ein eigenes Spielprinzip.
 |---|---|---|---|
 | **Hotel Nocturne** – Die letzte Nacht | Räume erkunden, Gegenstände sammeln und kombinieren (7 Räume, 21 Rätsel) | spielbar, allein oder bis zu viert | [`hotel-nocturne/`](hotel-nocturne/) |
 | **Der letzte Fall** – Der letzte Vorhang | Beweise sammeln, Aussagen prüfen, Fragen mit Belegen beantworten | Vorschau – siehe unten | [`der-letzte-fall/`](der-letzte-fall/) |
-| **DEADLINE.exe** – Der letzte Zugriff | Ermitteln auf einem simulierten Computer: Dateien, Mails, Terminal, sechs Enden | Vorschau, allein vollständig spielbar | [`deadline/`](deadline/) |
+| **DEADLINE.exe** – Der letzte Zugriff | Ermitteln auf einem simulierten Computer: vier parallele Stränge, Terminal, sechs Enden | Vorschau, allein vollständig spielbar | [`deadline/`](deadline/) |
 | Das Geheimnis der Pyramide | – | geplant | – |
 | Projekt Schattenlabor | – | geplant | – |
 

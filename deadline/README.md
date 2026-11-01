@@ -1,63 +1,73 @@
-# DEADLINE.exe – Der letzte Zugriff
+# DEADLINE.exe – Der letzte Zugriff (Version 2)
 
-Cyber-Mystery-Escape-Room auf einem simulierten Computer. 60–90 Minuten, allein oder bis zu viert, sechs Enden. Der Fall spielt im Oktober 2025 (Fr 17.10. Treffen, Sa 18.10. 00:12 Spielbeginn).
+Cyber-Mystery-Escape-Room auf einem simulierten Computer. 90–100 Minuten, allein oder bis zu viert, sechs Enden. Der Fall spielt im Oktober 2025: Treffen am Fr 17.10., Spielbeginn Sa 18.10. 00:12.
 
 **Achtung: Diese Datei enthält alle Lösungen.**
 
-## Was gegenüber dem ursprünglichen Konzept geändert ist
+## Grundregeln
 
-| Konzept | Umsetzung | Warum |
-|---|---|---|
-| Gerät `KRN-01` | `SEC-01` (dazu `SEC-02` als falsche Fährte) | „KRN“ = Kern hätte den Täter verraten. Jetzt führt der Weg über Register → „Leitung IT-Sicherheit“ → Mitarbeiterverzeichnis. |
-| Code `KRN01` im Audit-Portal | **Widerspruch #4471** mit Gerät, zuständiger Person und Belegen aus dem Log | Echte Schlussfolgerung statt Code. Falsche Antworten bekommen eigene Rückmeldungen. |
-| `access_note.txt` verrät die Lösung | entfällt | |
-| `MIRROR` aus vier Beschreibungen raten | Der Trace zeigt `PROC=mrr.svc`, das Portal ordnet Dienste Projekten zu | Verbinden statt ablesen. |
-| Prüfziffern in Reihenfolge ablesen | Trace ist nach Konto gruppiert, enthält auch Viktors eigene Ereignisse. Nur die fremden Konten zählen, nach Uhrzeit sortiert | Man muss filtern und sortieren. |
-| Ein Kalendereintrag | Mehrere Treffen mit Nora; das *nächste nach dem Chat (16.10.)* zählt | |
-| Moralische Wahl „sichern oder löschen“ | Bericht **schwärzen** (zwei Helfer schützen, Täter und Nora drinlassen) und **Empfänger** wählen (Security Review leitet Viktor) | Die Entscheidung prüft, ob man den Fall verstanden hat. |
-| UNBEKANNT schreibt einmal | Neun vorbereitete Nachrichten, ausgelöst durch Aktionen; Hinweis in `autoresp.cfg` im Papierkorb; nach der Verifizierung zeigt der Messenger „geplant · Regel #n“, `cat autoresp.log` listet alle Regeln | Die Wendung braucht Vorbereitung. |
-| Harter 90-Minuten-Countdown | Wählbar: mit Countdown oder ohne Zeitlimit. Die Frist ist **Spielzeit**: Sie läuft, solange das Spiel geöffnet ist (auch im Hintergrund-Tab, gemessen mit der Systemuhr), und steht bei Pause oder geschlossener Seite. Letzte 15 Minuten: Lüfter läuft hoch, letzte 5: Herzschlag. | Wer abends unterbricht, soll nicht automatisch verlieren. |
-| Ereignisse nach Restzeit | nach Spielzeit 30/45/60/75/85 Minuten; die letzten beiden nur mit Countdown | |
-
-## Lösungsweg
-
-1. **ARCHIV_01** (Dokumente): Papierkorb → `uebergabe.tmp` ist die letzte *erfolgreiche* Übergabe (17.10., 21:40) → **2140**.
-2. **Chat-Backup** (Messenger): `memo_03.wav` in ARCHIV_01 ist Morse `-- .. .-.. ---`, Tabelle im Browser unter IT-Hilfe → **MILO** (Noras Kater).
-3. **NORA_PRIVATE** (Dokumente): Chat: „mit unserem nächsten Treffen, Tag und Raumnummer“. Das nächste Treffen nach dem 16.10. laut Kalender: Fr 17.10., Raum B-04 → **1704**.
-4. **Widerspruch #4471** (Browser → Audit-Portal):
-   - Gerät **SEC-01** (Download 19:14 in `audit_1410.csv`)
-   - zuständig: **Viktor Kern** (Register: Leitung IT-Sicherheit → Intranet/Mitarbeiter)
-   - Belege **18:17** (Nora abgemeldet) und **19:14** (Download über SEC-01). 19:15 und 19:06 sind erlaubt, 18:11 ist falsch.
-   - Der Entwurf lässt sich erst ausfüllen, wenn `audit_1410.csv` geöffnet wurde.
-   - Danach: Interne Projekte frei, `pruefung.txt` in Dokumente.
-5. **Terminal:** `trace SEC-01`
-6. `decrypt CASE_17 --key MIRROR` (mrr.svc → MIRROR)
-7. `verify CASE_17 --seed 7319` (fremde Konten nach Zeit: 19:12 → 7, 19:14 → 3, 19:15 → 1, 19:22 → 9). Danach EVIDENCE_UNLOCKED auf dem Desktop.
-8. **DEADLINE.exe:** Jana Thiel und Malte Brück schwärzen (Mails), Empfänger Ombudsstelle Albers & Roth.
-
-Optional: `meetingroom.jpg` (zoomen: SEC-01 und Ausweis V. KERN in der Scheibe), Kopfzeilen der anonymen Mail (`X-Originating-Device: SEC-01`), `whiteboard.jpg`, Sprachmemos.
+- **Eingaben:** Passwörter, Codes, Terminalbefehle und die Entscheidung am Ende. Es gibt keine Formulare und keine Beweisabgaben.
+- **Aufbau:** Erst ein Einstieg aus drei Rätseln. Danach gibt es **vier Siegel** auf CASE_17, die sich in beliebiger Reihenfolge brechen lassen.
+- **Speicherstand:** `deadline_save_v2`. Spielstände aus Version 1 werden nicht übernommen.
 
 ## Rätselstruktur
 
 ```
-START_HERE ─► Papierkorb ─► ARCHIV_01 ─┬─► memo_03 (Morse) ─► Chat-Backup ─┐
-                                      └─► kalender.ics ──────────────────┴─► NORA_PRIVATE
-                                                                                │ audit_1410.csv, Register
- Mail (Kopfzeilen: SEC-01) ─► Terminal: trace SEC-01 ─┐                          ▼
- Intranet: Mitarbeiter ───────────────────────────────┴──────────────► Widerspruch #4471
-                                                                                │
-                                         Interne Projekte (mrr.svc = MIRROR) ◄──┘
- trace SEC-01 (Prüfziffern) ─► decrypt CASE_17 --key MIRROR ─► verify --seed 7319 ─► DEADLINE.exe
- Mails (Jana, Malte, Ombudsstelle, Viktors Signatur) ──────────────────────────────►  (Schwärzen + Empfänger)
+EINSTIEG
+ START_HERE ─► Papierkorb (4 Übergaben) ─► ARCHIV_01 ─┬─► memo_03 vs. memo_04 (Morse) ─► Chat-Backup
+                                                      └─► kalender.ics ────────────────┬──► NORA_PRIVATE
+                                                           Chat (Raum geändert) ───────┘
+VIER SIEGEL (beliebige Reihenfolge, Stand: status CASE_17)
+ 1 GERÄT    audit_1410.csv · Register · Intranet ─────────────► trace SEC-01   (gibt „Interne Projekte“ frei)
+ 2 ZEIT     meetingroom.jpg · Ticket #3311 (Kamera +9 min) ────► zutritt_c01.zip  (Maltes Anhang)
+ 3 QUELLE   zwei anonyme Mails · Kopfzeilen Date/Received ─────► Sicherheitsbericht SR-0458 (Audit-Portal)
+ 4 SCHLÜSSEL Trace (mrr.svc) · Interne Projekte ───────────────► decrypt --key MIRROR
+             Trace · ereignistypen.txt (filtern, sortieren) ───► verify --seed 7319
+ alle vier ─► EVIDENCE_UNLOCKED ─► DEADLINE.exe: Schwärzen + Empfänger (Mails, final_message)
 ```
 
-- **Pflichtkette:** 1 → 2 → 3 → 4 → 5/6 → 7 → 8. Die ersten drei Schritte sind linear (Einstieg), danach laufen Stränge zusammen.
-- **Paralleler Strang:** Wer die Kopfzeilen der anonymen Mail liest (`X-Originating-Device: SEC-01`), kann das Gerät schon vor Noras Ordner im Terminal verfolgen. Der Trace nennt „Leitung IT-Sicherheit“, das Intranet nennt Viktor. Der Widerspruch braucht trotzdem den Audit-Auszug aus NORA_PRIVATE.
-- **Geschlossene Abkürzungen (Überarbeitung):**
-  - Das Chat-Passwort war `NORA` und ließ sich raten. Jetzt `MILO`.
-  - Das Whiteboard verriet `MIRROR`. Jetzt steht dort „Wer darf spiegeln?“.
-  - Der Widerspruch ließ sich ohne Noras Ordner ausfüllen, weil das Formular selbst die Log-Zeilen zeigte. Jetzt erst nach `audit_1410.csv`.
-- **Optionale Belege:** `meetingroom.jpg` (Zoom), Mail-Kopfzeilen, `whiteboard.jpg`, Sprachmemos, `system_error.log` (ab 30 Minuten), `plan_b.txt` (ab 60 Minuten) als Rettungsanker.
+## Lösungsweg
+
+**Einstieg**
+1. **ARCHIV_01 → 2140**
+   - Im Papierkorb liegen vier Übergaben.
+   - Gesucht ist Noras letzte erfolgreiche: `uebergabe (wiederhergestellt).tmp` mit 17.10., 21:40, Quelle USB N. WEISS.
+   - Fallen: Die Liste zeigt bei dieser Datei das Wiederherstellungsdatum 18.10. `uebergabe_sync.tmp` (22:15) war zwar erfolgreich, stammt aber von Elias' eigener Sicherung.
+2. **Chat-Backup → MILO**
+   - Es gibt zwei Morse-Aufnahmen.
+   - `memo_04.wav` (Audio) ist laut „Quelle“ Elias' Mikrofontest und ergibt `NORA`. Das Backup lehnt das ab mit „Nicht mein Name“.
+   - `memo_03.wav` (ARCHIV_01, Anruf N. Weiss) ergibt `-- .. .-.. ---` = MILO, Noras Kater.
+3. **NORA_PRIVATE → 1704**
+   - Regel im Chat: Tag und Raumnummer des nächsten Treffens.
+   - Das Treffen ist Freitag, 17.10. Es wurde laut Chat auf abends verschoben und nach **B-04** verlegt.
+   - Der Kalender zeigt noch **B-03**: Elias hat nur die Uhrzeit geändert.
+
+**Vier Siegel** (Erklärung in `pruefung.txt`, erscheint nach NORA_PRIVATE)
+1. **GERÄT:** Der Download um 19:14 lief über **SEC-01**, SEC-10 ist eine Falle. → `trace SEC-01`. Danach gibt das Portal die internen Projekte frei.
+2. **ZEIT:**
+   - `meetingroom.jpg` trägt die Kamerazeit 19:23.
+   - Ticket #3311 (Mail vom 06.10., ebenso `system_error.log` und `trace CAM-B01`): Die Kamera geht 9 Minuten vor, die echte Zeit ist also 19:14.
+   - Passwort für `zutritt_c01.zip` (Mail von Malte oder Downloads): **1914**.
+   - Inhalt: Nora hat das Gebäude um 18:21 verlassen, Kern war von 18:38 bis 19:34 in C-01.
+3. **QUELLE:**
+   - „Ich habe sie gesehen“ ist auf 14.10. 19:20 datiert, kam laut `Received` aber erst am 15.10. um 07:12 von SEC-01 („geplanter Versand“).
+   - Ihre `X-SR-Ref` lautet **SR-0458**. Im Audit-Portal unter Sicherheitsberichte zeigt dieser Vorgang: von VKERN angelegt um 19:02, zwölf Minuten vor dem Export.
+   - SR-0449 und SR-0451 sind Nebenvorgänge.
+4. **SCHLÜSSEL:**
+   - `decrypt CASE_17 --key MIRROR` (mrr.svc → MIRROR, Interne Projekte).
+   - `verify CASE_17 --seed 7319`: Es zählen nur Ereignisse unter fremden Konten über mrr.svc, die nicht automatisch sind.
+   - VKERN, SYSTEM, HEARTBEAT und TOKEN_RENEW fallen weg. Übrig bleiben 19:12 → 7, 19:14 → 3, 19:15 → 1, 19:22 → 9.
+
+**Finale:** Jana Thiel und Malte Brück schwärzen (aus den Mails), Empfänger Ombudsstelle Albers & Roth.
+
+**Optional:**
+- Whiteboard, Sprachmemos, Sommerfest-Foto
+- `trace` für alle Geräte aus dem Register
+- `plan_b.txt` (ab 60 Minuten) als Rettungsanker
+
+## Hinweise
+
+Jeder offene Schritt hat drei Hinweise und eine Lösung. Die Lösung erscheint erst nach einer Abfrage („Willst du die Lösung wirklich sehen?“). Sind mehrere Siegel offen, wählt man, wofür man Hilfe will. Hinweise kosten keine Zeit.
 
 ## Enden
 
@@ -70,27 +80,33 @@ START_HERE ─► Papierkorb ─► ARCHIV_01 ─┬─► memo_03 (Morse) ─�
 | KEINE SPUREN | Vollständig löschen |
 | SYSTEMVERLUST | Countdown abgelaufen (nur mit Countdown) |
 
-Nach jedem Ende außer Systemverlust kann man im Einzelspiel zur Entscheidung zurück. Gefundene Enden bleiben über neue Spiele erhalten. Schwärzungen und Empfänger werden als Entwurf gespeichert und überstehen ein Neuladen.
+- **Zurück zur Entscheidung:** Nach jedem Ende außer Systemverlust geht das im Einzelspiel.
+- **Gefundene Enden** bleiben über neue Spiele erhalten.
+- **Entwurf:** Schwärzungen und Empfänger werden gespeichert.
+
+## Zeit
+
+- **Countdown:** 100 Minuten Spielzeit. Sie läuft, solange das Spiel geöffnet ist, auch im Hintergrund-Tab (gemessen mit der Systemuhr). Bei Pause oder geschlossener Seite steht sie. Ruhezustand zählt nicht.
+- **Ereignisse nach Spielzeit:** 30 Minuten (`system_error.log`), 45 (Nachricht), 60 (`TEMP_ACCESS`). Nur mit Countdown: 85 (Warnung) und 95 (rote Fenster).
+- **Ton:** In den letzten 15 Minuten wird der Lüfter lauter, in den letzten 5 kommt ein Herzschlag dazu.
 
 ## Dateien
 
 | Datei | Inhalt |
 |---|---|
 | `index.html` | Titel, Boot, Desktop, Taskleiste, Startmenü |
-| `js/story.js` | Alle Inhalte: Dateisystem, Mails, Chat, Kalender, Intranet, Audit-Log, Traces, Bericht, Nachrichten, Ereignisse, Hinweise, Enden |
-| `js/game.js` | Spielstand (`deadline_save_v1`), Countdown, Ereignisse, Schlösser, Widerspruch, Terminal-Befehle, Hinweise, Entscheidung, Multiplayer-Schnittstelle |
-| `js/os.js` | Fenster (verschieben, Größe, minimieren, maximieren), Symbole, Meldungen, Boot, Pause, Endsequenzen |
-| `js/apps.js` | Explorer, Schloss, Editor, Tabelle, Kalender, Mediaplayer (Morse sichtbar und hörbar), Bildbetrachter (Zoom, Details), Mail, Messenger, Browser, Terminal, DEADLINE.exe, Hinweise |
-| `js/sound.js` | Alle Geräusche per Web Audio (keine Audiodateien) |
+| `js/story.js` | Inhalte: Dateien, Mails, Chat, Kalender, Intranet, Audit-Log, Traces, Sicherheitsberichte, Siegel, Bericht, Nachrichten, Ereignisse, Hinweise, Morse, Enden |
+| `js/game.js` | Spielstand, Countdown, Ereignisse, Schlösser, Siegel, Terminal-Befehle (`status`, `trace`, `decrypt`, `verify` …), Hinweise, Entscheidung, Multiplayer-Schnittstelle |
+| `js/os.js` | Fenster, Symbole, Meldungen, Boot, Pause, Endsequenzen |
+| `js/apps.js` | Explorer, Schloss, Editor, Tabelle, Kalender, Mediaplayer, Bildbetrachter, Mail (Kopfzeilen, Anhänge), Messenger, Browser (Intranet, IT-Hilfe, Audit-Portal), Terminal, DEADLINE.exe, Hinweise |
+| `js/sound.js` | Geräusche per Web Audio |
 | `js/mp-adapter.js` | Anbindung an `platform/multiplayer` |
-| `css/deadline.css` | Gestaltung, Handy-Ansicht (Apps im Vollbild), weniger Bewegung bei entsprechender Systemeinstellung |
+| `css/deadline.css` | Gestaltung, Handy-Ansicht, weniger Bewegung bei Systemeinstellung |
 
 ## Multiplayer
 
-- **Geteilt:** gelöste Schritte, Hinweise, Nachrichten, Ereignisse, Laufzeit (die längste zählt) und das Ende.
-- **Gemeinsamer Entwurf:** Schwärzungen und Empfänger stehen in einem eigenen Eintrag `draft`. Alle sehen denselben Entwurf; die letzte Änderung gilt, die Anzeige nennt, wer zuletzt geändert hat. Jede Person kann nach Bestätigung senden; ändert jemand den Entwurf, während die Bestätigung offen ist, wird sie neu angezeigt.
-- **Nicht geteilt:** Fenster und Eingaben bleiben bei jeder Person.
-- **Pause:** gibt es im Multiplayer nicht.
-- **Zeitmodus:** Spielt eine Person im Team ohne Zeitlimit, gilt das für alle.
+- **Geteilt:** gelöste Schritte und Siegel, Hinweise, Nachrichten, Ereignisse, Laufzeit (die längste zählt) und das Ende.
+- **Gemeinsamer Entwurf:** Schwärzungen und Empfänger stehen in einem eigenen Eintrag `draft`. Die letzte Änderung gilt, die Anzeige nennt, wer zuletzt geändert hat.
+- **Zeitmodus:** Spielt eine Person im Team ohne Zeitlimit, gilt das für alle. Pause gibt es im Team nicht.
 
 **Voraussetzung:** In Supabase muss `game_catalog` einen Eintrag mit `slug = deadline` haben (`enabled = true`, Code-Präfix z. B. `DEAD`). Ohne diesen Eintrag meldet die Lobby „Dieser Escape Room ist nicht verfügbar“, allein spielen geht immer.

@@ -16,7 +16,7 @@ window.DL = window.DL || {};
   const N = ST.nodes;
 
   /* ================= Datei-Explorer ================= */
-  const PLACES = ["docs", "pics", "audio", "trash", "temp", "evidence"];
+  const PLACES = ["docs", "pics", "audio", "downloads", "trash", "temp", "evidence"];
   const TYPES = { folder: "Ordner", txt: "Textdokument", csv: "CSV-Tabelle", wav: "Audiodatei", jpg: "Bild", ics: "Kalender", report: "Bericht" };
   function pathOf(id) { const p = []; let c = id; while (c) { p.unshift(c); c = N[c].parent; } return p; }
   const explorer = {
@@ -97,12 +97,11 @@ window.DL = window.DL || {};
     render(w) {
       const days = [];
       ST.calendar.forEach((c) => { let d = days.find((x) => x.day === c.day); if (!d) days.push(d = { day: c.day, items: [] }); d.items.push(c); });
-      w.body.innerHTML = `<div class="cal"><p class="doc-meta">kalender.ics · Oktober 2025 · Export 17.10. 18:00</p>${days.map((d) => `<section class="cal-day"><h4>${esc(d.day)}</h4>${d.items.map((c) => `<div class="cal-item${c.cancelled ? " cancelled" : ""}"><b>${esc(c.time)}</b><span><strong>${esc(c.title)}</strong><small>${esc(c.place)}${c.note ? " · " + esc(c.note) : ""}</small></span></div>`).join("")}</section>`).join("")}</div>`;
+      w.body.innerHTML = `<div class="cal"><p class="doc-meta">kalender.ics · Oktober 2025 · Export 17.10. 23:41</p>${days.map((d) => `<section class="cal-day"><h4>${esc(d.day)}</h4>${d.items.map((c) => `<div class="cal-item${c.cancelled ? " cancelled" : ""}"><b>${esc(c.time)}</b><span><strong>${esc(c.title)}</strong><small>${esc(c.place)}${c.note ? " · " + esc(c.note) : ""}</small></span></div>`).join("")}</section>`).join("")}</div>`;
     },
   };
 
   /* ================= Audio-Player ================= */
-  const MORSE = ["--", "..", ".-..", "---"];
   const TRANSCRIPTS = {
     memo1: "Notiz an mich. Viktor schreibt mir um zwanzig vor neun, ich soll die Finger von #4471 lassen. Der Leiter der IT-Sicherheit persönlich. Wegen eines Exports, den angeblich eine Admin gemacht hat. Warum interessiert ihn so sehr, was ich mir ansehe?",
     memo2: "Der Audit-Export für #4471 kommt von Security Review. Da fehlt was. Okafor ist drin, sonst niemand aus der Sicherheitsabteilung. Wer filtert seine eigene Abteilung aus einem Export? … Und der Download um 19:14 – das Gerät kenne ich nicht. Ich brauch das Register. Jana fragen.",
@@ -110,13 +109,13 @@ window.DL = window.DL || {};
   const audio = {
     title: () => "Mediaplayer", icon: () => "audio", w: 600, h: 420,
     render(w) {
-      const files = ["memo1", "memo2"].concat(G.unlocked("archiv") ? ["memo3"] : []);
+      const files = ["memo1", "memo2", "memo4"].concat(G.unlocked("archiv") ? ["memo3"] : []);
       const cur = w.state.cur || (N[w.arg] ? w.arg : files[files.length - 1]);
       w.state.cur = cur;
-      const isMorse = cur === "memo3";
+      const M = ST.memos[cur], isMorse = Boolean(M);
       let wave;
       if (isMorse) {
-        wave = `<div class="wave morse">${MORSE.map((g, gi) => `<span class="wg">${g.split("").map((c, ci) => `<i class="${c === "-" ? "long" : "short"}" data-k="${gi}-${ci}"></i>`).join("")}</span>`).join("")}</div>`;
+        wave = `<div class="wave morse">${M.morse.map((g, gi) => `<span class="wg">${g.split("").map((c, ci) => `<i class="${c === "-" ? "long" : "short"}" data-k="${gi}-${ci}"></i>`).join("")}</span>`).join("")}</div>`;
       } else {
         let seed = cur === "memo1" ? 7 : 13;
         const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
@@ -128,7 +127,7 @@ window.DL = window.DL || {};
           <div class="ap-ctrl"><button class="btn ap-play">${w.state.playing ? "■ Stopp" : "▶ Abspielen"}</button>
           ${isMorse ? `<label class="ap-slow"><input type="checkbox" ${w.state.slow ? "checked" : ""}> langsam</label>` : ""}
           <span class="ap-hint">${snd.isOn() ? "" : "Ton ist aus – die Anzeige zeigt die Signale trotzdem."}</span></div>
-          ${isMorse ? `<p class="ap-sub">Unbekanntes Signal · 4 Gruppen · keine Sprache erkannt</p>` : `<p class="ap-sub">Sprachmemo · automatisches Transkript</p><p class="ap-trans">${esc(TRANSCRIPTS[cur])}</p>`}
+          ${isMorse ? `<p class="ap-sub">Unbekanntes Signal · ${M.morse.length} Gruppen · keine Sprache erkannt</p><p class="ap-src"><b>Quelle:</b> ${esc(M.source)}</p>` : `<p class="ap-sub">Sprachmemo · automatisches Transkript</p><p class="ap-trans">${esc(TRANSCRIPTS[cur])}</p>`}
         </div></div>`;
     },
     opened(w) {
@@ -141,16 +140,18 @@ window.DL = window.DL || {};
     closed(w) { stopPlay(w); },
     onChange(w) { if (!w.state.playing) os().render(w); },
   };
-  function planFor(slow) { const unit = slow ? 0.2 : 0.11; const plan = []; let t = 0.15; MORSE.forEach((g, gi) => { g.split("").forEach((c, ci) => { const dur = c === "-" ? unit * 3 : unit; plan.push({ start: t, dur, k: gi + "-" + ci }); t += dur + unit; }); t += unit * 6; }); return plan; }
+  function planFor(groups, slow) { const unit = slow ? 0.2 : 0.11; const plan = []; let t = 0.15; groups.forEach((g, gi) => { g.split("").forEach((c, ci) => { const dur = c === "-" ? unit * 3 : unit; plan.push({ start: t, dur, k: gi + "-" + ci }); t += dur + unit; }); t += unit * 6; }); return plan; }
   function stopPlay(w) { (w.state.timers || []).forEach(clearTimeout); w.state.timers = []; w.state.playing = false; }
   function play(w) {
     w.state.playing = true; os().render(w);
     w.state.timers = [];
-    if (w.state.cur === "memo3") {
-      if (!G.flag("played_memo3")) { G.setFlag("played_memo3"); setTimeout(() => G.send("u_memo"), 5000); }
-      const { plan, total } = snd.morse(MORSE, { unit: w.state.slow ? 0.2 : 0.11 });
+    const M = ST.memos[w.state.cur];
+    if (M) {
+      if (w.state.cur === "memo3" && !G.flag("played_memo3")) { G.setFlag("played_memo3"); setTimeout(() => G.send("u_memo"), 5000); }
+      const { plan, total } = snd.morse(M.morse, { unit: w.state.slow ? 0.2 : 0.11 });
+      const keys = planFor(M.morse, w.state.slow);
       plan.forEach((p, i) => {
-        const k = planFor(w.state.slow)[i].k;
+        const k = keys[i].k;
         w.state.timers.push(setTimeout(() => { const el = w.body.querySelector(`[data-k="${k}"]`); if (el) el.classList.add("on"); }, p.start * 1000));
         w.state.timers.push(setTimeout(() => { const el = w.body.querySelector(`[data-k="${k}"]`); if (el) el.classList.remove("on"); }, (p.start + p.dur) * 1000));
       });
@@ -188,7 +189,7 @@ window.DL = window.DL || {};
         ${[["Lea", 130, "#8fb3d9"], ["Jana", 260, "#e39b9b"], ["Elias", 400, "#9fc79a"], ["Nora", 530, "#d7b6e8"], ["Malte", 660, "#e8cf8f"]].map(([n, x, c]) => `<g><circle cx="${x}" cy="250" r="34" fill="#f1d3b5"/><rect x="${x - 45}" y="290" width="90" height="120" rx="30" fill="${c}"/><rect x="${x - 30}" y="318" width="60" height="22" fill="#fff"/><text x="${x}" y="334" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" fill="#222">${n}</text></g>`).join("")}</svg>`,
     },
     meeting: {
-      meta: ["Aufgenommen: 14.10.2025, 19:16:04", "Quelle: Konferenzsystem Raum B-01 (automatische Raumbelegung)", "Blick: Glaswand zum Flur · gegenüber: Sicherheitsbüro C-01"],
+      meta: ["Aufgenommen: 14.10.2025, 19:23:04 (Kamerazeit)", "Quelle: Konferenzsystem CAM-B01, Raum B-01 (automatische Raumbelegung)", "Blick: Glaswand zum Flur · gegenüber: Sicherheitsbüro C-01"],
       svg: `<svg viewBox="0 0 800 500"><rect width="800" height="500" fill="#1d2228"/>
         <rect x="0" y="0" width="800" height="330" fill="#2b333c"/>
         <g opacity=".95"><rect x="420" y="60" width="300" height="250" fill="#3c4650"/><rect x="440" y="80" width="260" height="210" fill="#e9dfb8" opacity=".85"/>
@@ -201,7 +202,7 @@ window.DL = window.DL || {};
         <rect x="0" y="0" width="800" height="330" fill="#cfe3f5" opacity=".08"/>
         <path d="M60 400 L740 400 L800 500 L0 500 Z" fill="#4a3a2c"/><rect x="120" y="360" width="560" height="40" rx="6" fill="#6b5440"/>
         ${[160, 280, 400, 520, 640].map((x) => `<rect x="${x}" y="410" width="60" height="60" rx="8" fill="#202428"/>`).join("")}
-        <text x="16" y="24" font-family="DM Mono,monospace" font-size="13" fill="#e8e8e8">B-01 CAM · 14.10.2025 19:16:04</text><circle cx="770" cy="20" r="6" fill="#d33"/></svg>`,
+        <text x="16" y="24" font-family="DM Mono,monospace" font-size="13" fill="#e8e8e8">CAM-B01 · 14.10.2025 19:23:04</text><circle cx="770" cy="20" r="6" fill="#d33"/></svg>`,
     },
   };
   const image = {
@@ -239,13 +240,14 @@ window.DL = window.DL || {};
       w.body.innerHTML = `<div class="ml${m ? " reading" : ""}"><nav class="ml-list">${ST.mails.map((x) => `<button class="ml-item${x.id === sel ? " on" : ""}${G.flag("mail_" + x.id) ? "" : " unread"}" data-m="${x.id}"><b>${esc(x.from)}</b><span>${esc(x.subject)}</span><small>${esc(x.date)}</small></button>`).join("")}</nav>
         <article class="ml-read">${m ? `<button class="ml-back btn small ghost">← Posteingang</button><h3>${esc(m.subject)}</h3><p class="ml-from"><b>${esc(m.from)}</b> &lt;${esc(m.addr)}&gt; · ${esc(m.date)}</p>
           ${m.headers ? `<button class="btn small ghost ml-hdr">${w.state.hdr ? "Kopfzeilen ausblenden" : "Kopfzeilen anzeigen"}</button>${w.state.hdr ? `<pre class="ml-headers">${esc(m.headers)}</pre>` : ""}` : ""}
-          <pre class="ml-body">${esc(m.body)}</pre>` : `<p class="ml-empty">Wähle eine Nachricht.</p>`}</article></div>`;
+          <pre class="ml-body">${esc(m.body)}</pre>${m.attach ? `<p class="ml-att-row">Anhang: <button class="btn small ghost ml-att" data-node="${m.attach}">📎 ${esc(N[m.attach].name)}</button></p>` : ""}` : `<p class="ml-empty">Wähle eine Nachricht.</p>`}</article></div>`;
     },
     opened(w) {
       w.body.addEventListener("click", (e) => {
         const it = e.target.closest(".ml-item"); if (it) { w.state.sel = it.dataset.m; w.state.hdr = false; G.setFlag("mail_" + it.dataset.m); os().render(w); return; }
         if (e.target.closest(".ml-back")) { w.state.sel = null; os().render(w); }
         if (e.target.closest(".ml-hdr")) { w.state.hdr = !w.state.hdr; os().render(w); }
+        const att = e.target.closest(".ml-att"); if (att) os().openNode(att.dataset.node);
       });
     },
   };
@@ -266,7 +268,7 @@ window.DL = window.DL || {};
           : `<form class="ms-lock"><div class="lock-ico">${DL.icon("lock")}</div><p><b>chat_backup.enc</b><br>Verschlüsseltes Backup des Chats mit Nora Weiss.</p>
              <input class="field code" autocomplete="off" maxlength="12" placeholder="Passwort" aria-label="Passwort"><button class="btn" type="submit">Entschlüsseln</button><p class="lock-msg" role="alert"></p></form>`;
       } else {
-        const after = G.isSolved("verify");
+        const after = G.isSolved("case");
         main = `<p class="ms-day">UNBEKANNT · ${after ? "lokaler Absender" : "Absender verborgen"}</p>${S.msgs.map((id) => {
           const m = ST.messages[id]; const t = S.msgAt[id] || 0; const tt = 12 + Math.floor(t / 60);
           const time = `${String(Math.floor(tt / 60) % 24).padStart(2, "0")}:${String(tt % 60).padStart(2, "0")}`;
@@ -310,31 +312,34 @@ window.DL = window.DL || {};
   };
   function portal(w) {
     const sec = w.state.sec || "vorfaelle";
-    const nav = [["vorfaelle", "Vorfälle"], ["widerspruch", "Widerspruch #4471"], ["projekte", "Interne Projekte"], ["berichte", "Sicherheitsberichte"]];
+    const nav = [["vorfaelle", "Vorfälle"], ["akte", "Akte #4471"], ["projekte", "Interne Projekte"], ["berichte", "Sicherheitsberichte"]];
     let body = "";
     if (sec === "vorfaelle") body = `<h3>Vorfälle · Oktober 2025</h3><table class="pg-table"><thead><tr><th>Nr.</th><th>Vorfall</th><th>Konto</th><th>Status</th></tr></thead><tbody>
-      <tr><td>#4471</td><td>Export Kundendaten (kundendaten_gesamt.zip), 14.10. 19:14</td><td>NWEISS</td><td>${G.isSolved("widerspruch") ? "Widerspruch eingereicht" : "in Prüfung · Security Review"}</td></tr>
+      <tr><td>#4471</td><td>Export Kundendaten (kundendaten_gesamt.zip), 14.10. 19:14</td><td>NWEISS</td><td>in Prüfung · Security Review</td></tr>
       <tr><td>#4466</td><td>Fehlgeschlagene Anmeldungen VPN</td><td>LAHRENS</td><td>erledigt</td></tr><tr><td>#4459</td><td>Zertifikat abgelaufen (HALCYON)</td><td>SYSTEM</td><td>erledigt</td></tr></tbody></table>`;
-    if (sec === "widerspruch") {
-      const O = ST.objection, st = w.state.obj || (w.state.obj = { device: "", person: "", rows: [] });
-      if (G.isSolved("widerspruch")) body = `<h3>Widerspruch gegen Vorfall #4471</h3><p class="pg-ok">Eingereicht. Gerät SEC-01 · zuständig: Viktor Kern · Belege: 18:17, 19:14.</p><p>Erweiterter Prüfzugang aktiv: Interne Projekte sind freigegeben.</p>`;
-      else if (!G.flag("seen_auditcsv")) body = `<h3>Widerspruch gegen Vorfall #4471 <span class="pg-draft">ENTWURF · E. VOSS</span></h3>
-        <p>Der Export am 14.10. um 19:14 wurde dem Konto <b>NWEISS</b> zugeordnet.</p>
-        <p class="pg-locked">Entwurf unvollständig: Es fehlt der Audit-Auszug zum Vorfall.<br><small>Notiz E. V.: „Nora bringt den Export mit. Erst einfügen, dann einreichen.“</small></p>`;
-      else body = `<h3>Widerspruch gegen Vorfall #4471 <span class="pg-draft">ENTWURF · E. VOSS</span></h3>
-        <p>Der Export am 14.10. um 19:14 wurde dem Konto <b>NWEISS</b> zugeordnet. Mit diesem Widerspruch wird belegt, dass die Aktion nicht von Nora Weiss an ihrem Gerät ausgeführt wurde.</p>
-        <form class="objection"><label>1 · Ausführendes Gerät des Downloads um 19:14<input class="field" name="device" autocomplete="off" placeholder="z. B. XX-00" value="${esc(st.device)}"></label>
-        <label>2 · Zuständig für dieses Gerät<select class="field" name="person"><option value="">– bitte wählen –</option>${O.persons.map((p) => `<option${st.person === p ? " selected" : ""}>${esc(p)}</option>`).join("")}</select></label>
-        <fieldset><legend>3 · Belege aus dem Audit-Log (alle passenden Zeilen wählen)</legend><div class="obj-rows">${ST.audit.rows.map((r) => `<label class="obj-row"><input type="checkbox" value="${r[0]}"${st.rows.includes(r[0]) ? " checked" : ""}><code>${r.map(esc).join("  ")}</code></label>`).join("")}</div></fieldset>
-        <button class="btn" type="submit">Widerspruch einreichen</button><p class="obj-msg${w.state.objOk === false ? " bad" : ""}" role="alert">${esc(w.state.objMsg || "")}</p></form>`;
-    }
-    if (sec === "projekte") body = G.isSolved("widerspruch")
+    if (sec === "akte") body = `<h3>Ermittlungsakte #4471 <span class="pg-draft">NOTIZEN E. VOSS</span></h3>
+      <p>Export von <b>kundendaten_gesamt.zip</b> am Dienstag, 14.10., 19:14, unter dem Konto <b>NWEISS</b>. N. Weiss seit 15.10. freigestellt. Zuständig: Security Review.</p>
+      <ul class="pg-notes">
+        <li>Konto ≠ Person. Welches <b>Gerät</b> hat den Download ausgeführt? Audit-Auszug liegt bei Nora.</li>
+        <li>Geräte lassen sich im Terminal zurückverfolgen (<code>trace</code>). Danach gibt das Portal die internen Projekte frei (Forensik-Richtlinie 4.2).</li>
+        <li>Foto aus B-01 – Kamerazeit prüfen, Ticket #3311?</li>
+        <li>Zwei anonyme Mails. Wer schreibt so etwas, und wann wirklich?</li>
+        <li>Security Review vergibt für alles Vorgangsnummern (SR-…).</li>
+      </ul>`;
+    if (sec === "projekte") body = G.isSolved("trace")
       ? `<h3>Interne Projekte</h3><table class="pg-table"><thead><tr><th>Projekt</th><th>Dienst</th><th>Zweck</th><th>Verantwortlich</th></tr></thead><tbody>${ST.projects.map((p) => `<tr><td>${p.detail ? `<a href="#" data-proj="${p.name}">${p.name}</a>` : p.name}</td><td><code>${p.svc}</code></td><td>${esc(p.what)}</td><td>${esc(p.owner)}</td></tr>`).join("")}</tbody></table>
          ${w.state.proj ? `<div class="pg-detail"><h4>${esc(w.state.proj)}</h4><p>${esc(ST.projects.find((p) => p.name === w.state.proj).detail)}</p></div>` : `<p class="pg-tip">Projektnamen mit Link haben eine ausführliche Beschreibung.</p>`}`
-      : `<h3>Interne Projekte</h3><p class="pg-locked">Kein Zugriff. Erweiterter Prüfzugang erforderlich (z. B. nach eingereichtem Widerspruch).</p>`;
-    if (sec === "berichte") body = `<h3>Sicherheitsberichte</h3><p class="pg-locked">Nur für Security Review. Leitung: V. Kern.</p>`;
+      : `<h3>Interne Projekte</h3><p class="pg-locked">Kein Zugriff. Erweiterter Prüfzugang erforderlich: Er wird automatisch aktiv, sobald ein verdächtiges Gerät im Terminal untersucht wurde (Forensik-Richtlinie 4.2).</p>`;
+    if (sec === "berichte") {
+      const r = w.state.sr ? ST.srReports[w.state.sr] : null;
+      body = `<h3>Sicherheitsberichte</h3><p>Berichte von Security Review lassen sich nur mit ihrer Vorgangsnummer aufrufen.</p>
+        <form class="sr-form"><input class="field" name="sr" placeholder="SR-0000" autocomplete="off" spellcheck="false" aria-label="Vorgangsnummer"><button class="btn small" type="submit">Aufrufen</button></form>
+        <p class="obj-msg bad" role="alert">${esc(w.state.srMsg || "")}</p>
+        ${r ? `<div class="pg-detail"><h4>${esc(r.title)}</h4><pre class="pg-pre">${esc(r.text)}</pre></div>` : ""}`;
+    }
     return `<div class="pg portal"><header class="pg-head"><b>AUDIT-PORTAL</b><span class="pg-user">angemeldet: E.VOSS</span></header><nav class="pg-tabs">${nav.map(([k, l]) => `<button data-sec="${k}" class="${k === sec ? "on" : ""}">${l}</button>`).join("")}</nav>${body}</div>`;
   }
+
   const BOOKMARKS = [["vanta.local", "Intranet"], ["hilfe.vanta.local", "IT-Hilfe"], ["audit.vanta.local", "Audit-Portal"], ["albers-roth.de", "Ombudsstelle"]];
   const browser = {
     title: () => "Browser", icon: () => "browser", w: 820, h: 540,
@@ -355,22 +360,13 @@ window.DL = window.DL || {};
       w.body.addEventListener("submit", (e) => {
         e.preventDefault();
         if (e.target.matches(".br-url")) { go($("input", e.target).value); return; }
-        if (e.target.matches(".objection")) {
-          const st = w.state.obj;
-          const r = G.objection(st);
-          w.state.objMsg = r.text; w.state.objOk = r.ok;
-          if (!r.ok) snd.play("error"); else DL.toast({ title: "Widerspruch eingereicht", text: "Interne Projekte im Audit-Portal sind freigegeben.", kind: "ok" });
+        if (e.target.matches(".sr-form")) {
+          const v = $("input", e.target).value;
+          const r = G.openReport(v);
+          if (r) { w.state.sr = Object.keys(ST.srReports).find((k) => ST.srReports[k] === r); w.state.srMsg = ""; if (r.key) snd.play("unlock"); }
+          else { w.state.sr = null; w.state.srMsg = "Kein Vorgang mit dieser Nummer."; snd.play("error"); }
           os().render(w);
         }
-      });
-      w.body.addEventListener("input", (e) => {
-        const st = w.state.obj; if (!st || !e.target.closest(".objection")) return;
-        if (e.target.name === "device") st.device = e.target.value;
-      });
-      w.body.addEventListener("change", (e) => {
-        const st = w.state.obj; if (!st || !e.target.closest(".objection")) return;
-        if (e.target.name === "person") st.person = e.target.value;
-        if (e.target.type === "checkbox") st.rows = Array.from(w.body.querySelectorAll(".obj-row input:checked")).map((x) => x.value);
       });
     },
     onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input,select")) return; os().render(w); },
@@ -381,7 +377,7 @@ window.DL = window.DL || {};
     title: () => "Terminal", icon: () => "terminal", w: 680, h: 440, cls: "win-term",
     render(w) {
       if (!w.state.lines) {
-        w.state.lines = [{ t: "VANTA SYSTEM TERMINAL" }, { t: `User: ${G.isSolved("verify") ? "E.VOSS" : "UNKNOWN"}` }, { t: `Access Level: ${G.isSolved("verify") ? "FULL" : "LIMITED"}` }, { t: 'Type "help" for available commands.', cls: "dim" }, { t: "" }];
+        w.state.lines = [{ t: "VANTA SYSTEM TERMINAL" }, { t: `User: ${G.isSolved("case") ? "E.VOSS" : "UNKNOWN"}` }, { t: `Access Level: ${G.isSolved("case") ? "FULL" : "LIMITED"}` }, { t: 'Type "help" for available commands.', cls: "dim" }, { t: "" }];
         w.state.hist = []; w.state.hi = 0;
       }
       w.state.lines.push(...G.takeTermQueue());
@@ -427,9 +423,9 @@ window.DL = window.DL || {};
     title: () => "DEADLINE.exe", icon: () => "deadline", w: 760, h: 560, cls: "win-dead",
     render(w) {
       const S = G.state;
-      if (!G.isSolved("verify")) {
+      if (!G.isSolved("case")) {
         w.body.innerHTML = `<div class="dx locked"><p class="dx-k">VANTA EMERGENCY PROTOCOL</p><p class="dx-big" data-live-countdown>${S.relaxed ? "OHNE ZEITLIMIT" : G.fmt(G.remaining())}</p><p class="dx-sub">AUTOMATISCHE DATENLÖSCHUNG</p>
-          <p class="dx-deny">ZUGRIFF VERWEIGERT · Beweispaket CASE_17 nicht verifiziert.</p></div>`;
+          <p class="dx-deny">ZUGRIFF VERWEIGERT · CASE_17 versiegelt (${4 - G.sealsOpen().length} von 4 Siegeln gebrochen)</p></div>`;
         return;
       }
       const draft = G.draft(), count = draft.redact.length;
@@ -456,7 +452,7 @@ window.DL = window.DL || {};
       w.offDraft = DL.on("draft", () => { if (!w.body.isConnected) return; const c = $(".dx-confirm", w.body), kind = c && !c.hidden ? c.dataset.kind : null; const r = $(".dx-report", w.body), y = r ? r.scrollTop : 0; os().render(w); const r2 = $(".dx-report", w.body); if (r2) r2.scrollTop = y; if (kind) confirmBox(w, kind, true); });
     },
     closed(w) { if (w.offDraft) w.offDraft(); },
-    onChange(w) { if ($(".dx-confirm", w.body) && !$(".dx-confirm", w.body).hidden) return; if (!$(".dx-report", w.body) || G.isSolved("verify") !== Boolean($(".dx-report", w.body))) os().render(w); },
+    onChange(w) { if ($(".dx-confirm", w.body) && !$(".dx-confirm", w.body).hidden) return; if (!$(".dx-report", w.body) || G.isSolved("case") !== Boolean($(".dx-report", w.body))) os().render(w); },
   };
   function confirmBox(w, kind, changed) {
     const box = $(".dx-confirm", w.body);
@@ -472,20 +468,34 @@ window.DL = window.DL || {};
 
   /* ================= Hinweise ================= */
   const hints = {
-    title: () => "Hinweise", icon: () => "hints", w: 480, h: 470,
+    title: () => "Hinweise", icon: () => "hints", w: 500, h: 520,
     render(w) {
-      const cur = G.currentStep();
+      const open = G.openSteps();
       const done = ST.steps.filter((s) => s.id !== "finale" && G.isSolved(s.id)).length;
-      if (!cur) { w.body.innerHTML = `<div class="hn"><p>Der Fall ist abgeschlossen.</p></div>`; return; }
+      if (!open.length) { w.body.innerHTML = `<div class="hn"><p>Der Fall ist abgeschlossen.</p></div>`; return; }
+      if (!open.find((s) => s.id === w.state.sel)) w.state.sel = open[0].id;
+      const cur = open.find((s) => s.id === w.state.sel);
       const lvl = G.hintLevel(cur.id), H = ST.hints[cur.id];
-      w.body.innerHTML = `<div class="hn"><p class="hn-prog">Fortschritt: ${done} von 7 Schritten</p>
-        <ol class="hn-steps">${ST.steps.map((s) => `<li class="${s.id === "finale" ? (G.state.ending ? "ok" : "") : G.isSolved(s.id) ? "ok" : ""}${s.id === cur.id ? " cur" : ""}">${s.id === cur.id || G.isSolved(s.id) ? esc(s.label) : "…"}</li>`).join("")}</ol>
-        <h4>Gerade offen: ${esc(cur.label)}</h4>
-        ${H.slice(0, lvl).map((h, i) => `<p class="hn-hint"><b>Hinweis ${i + 1}</b>${esc(h)}</p>`).join("")}
-        ${lvl < 3 ? `<button class="btn hn-more">${lvl === 0 ? "Ersten Hinweis zeigen" : lvl === 1 ? "Genauer bitte" : "Lösungsweg zeigen"}</button>` : ""}
+      const known = (s) => G.stepDone(s) || s.needs.every((n) => G.isSolved(n));
+      w.body.innerHTML = `<div class="hn"><p class="hn-prog">Fortschritt: ${done} von ${ST.steps.length - 1} Schritten</p>
+        <ol class="hn-steps">${ST.steps.map((s) => `<li class="${G.stepDone(s) ? "ok" : ""}${open.includes(s) ? " cur" : ""}">${known(s) ? esc(s.label) : "…"}</li>`).join("")}</ol>
+        ${open.length > 1 ? `<p class="hn-pick">Gerade offen – wähle, wobei du Hilfe brauchst:</p><div class="hn-tabs">${open.map((s) => `<button class="btn small ${s.id === cur.id ? "" : "ghost"}" data-step="${s.id}">${esc(s.label)}</button>`).join("")}</div>` : ""}
+        <h4>${esc(cur.label)}</h4>
+        ${H.slice(0, Math.min(lvl, 3)).map((h, i) => `<p class="hn-hint"><b>Hinweis ${i + 1}</b>${esc(h)}</p>`).join("")}
+        ${lvl >= 4 ? `<p class="hn-hint sol"><b>Lösung</b>${esc(H[3])}</p>` : ""}
+        ${lvl < 3 ? `<button class="btn hn-more">${lvl === 0 ? "Ersten Hinweis zeigen" : "Nächsten Hinweis zeigen"}</button>` : lvl === 3 ? `<button class="btn ghost hn-more">Lösung zeigen …</button>` : ""}
         <p class="hn-note">Hinweise kosten keine Zeit.${G.isMultiplayer() ? " Dein Team sieht sie auch." : ""}</p></div>`;
     },
-    opened(w) { w.body.addEventListener("click", (e) => { if (e.target.closest(".hn-more")) { const c = G.currentStep(); if (c) G.revealHint(c.id); } }); },
+    opened(w) {
+      w.body.addEventListener("click", (e) => {
+        const t = e.target.closest("[data-step]"); if (t) { w.state.sel = t.dataset.step; os().render(w); return; }
+        if (e.target.closest(".hn-more")) {
+          const id = w.state.sel; if (!id) return;
+          if (G.hintLevel(id) === 3 && !confirm("Willst du die Lösung für diesen Schritt wirklich sehen?")) return;
+          G.revealHint(id);
+        }
+      });
+    },
     onChange(w) { os().render(w); },
   };
 

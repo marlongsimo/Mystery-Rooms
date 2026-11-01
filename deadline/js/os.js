@@ -179,7 +179,7 @@ window.DL = window.DL || {};
   ];
   function paintIcons() {
     const nodes = Object.keys(ST.nodes).filter((id) => ST.nodes[id].desktop && G.visible(id));
-    const items = DESK.map((d) => ({ key: "a:" + d.id, label: d.label, icon: d.icon, hot: d.id === "deadline" && G.isSolved("verify"), badge: badge(d.id) }))
+    const items = DESK.map((d) => ({ key: "a:" + d.id, label: d.label, icon: d.icon, hot: d.id === "deadline" && G.isSolved("case"), badge: badge(d.id) }))
       .concat(nodes.map((id) => ({ key: "n:" + id, label: ST.nodes[id].name, icon: nodeIcon(id), fresh: !G.flag("seen_" + id) })));
     $("#icons").innerHTML = items.map((it) => `<button class="dicon${it.hot ? " hot" : ""}${it.fresh ? " fresh" : ""}" data-key="${it.key}">
       <span class="dicon-img">${DL.icon(it.icon)}${it.badge ? `<i class="badge">${it.badge}</i>` : ""}</span><span class="dicon-label">${esc(it.label)}</span></button>`).join("");
@@ -328,7 +328,9 @@ window.DL = window.DL || {};
     paintIcons();
   });
   DL.on("solved", (id, remote) => {
-    if (id === "verify") setTimeout(() => toast({ title: "Neuer Ordner", text: "EVIDENCE_UNLOCKED liegt auf dem Desktop. DEADLINE.exe ist bereit.", kind: "ok" }), 600);
+    const seal = ST.seals.findIndex((x) => x.id === id);
+    if (seal >= 0 && !remote) setTimeout(() => toast({ title: `Siegel ${seal + 1} · ${ST.seals[seal].name} gebrochen`, text: `CASE_17: ${4 - G.sealsOpen().length} von 4 Siegeln offen.`, kind: "ok" }), 300);
+    if (id === "case") setTimeout(() => toast({ title: "CASE_17 entsiegelt", text: "EVIDENCE_UNLOCKED liegt auf dem Desktop. DEADLINE.exe ist bereit.", kind: "ok" }), 600);
     if (!remote) snd.play("unlock");
     if (remote && !$("#desk").classList.contains("hidden")) {
       const st = ST.steps.find((s) => s.id === id);

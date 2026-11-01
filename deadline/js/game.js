@@ -9,8 +9,8 @@ window.DL = window.DL || {};
 (() => {
   "use strict";
   const ST = DL.story;
-  const TOTAL = 90 * 60;
-  const DEFAULT_KEY = "deadline_save_v1";
+  const TOTAL = 100 * 60;
+  const DEFAULT_KEY = "deadline_save_v2"; // v2: vier Siegel – Spielstände aus v1 werden nicht übernommen
   let saveKey = DEFAULT_KEY;
   let hooks = null; // Multiplayer
 
@@ -59,12 +59,16 @@ window.DL = window.DL || {};
   function solve(id) {
     if (isSolved(id)) return false;
     S.completed.push(id);
-    const trig = { archiv: "u_archiv", nora: "u_nora", widerspruch: "u_widerspruch", verify: "u_verify" }[id];
+    const trig = { archiv: "u_archiv", nora: "u_nora", trace: "u_trace", case: "u_case" }[id];
     changed();
     DL.emit("solved", id);
     if (trig) setTimeout(() => send(trig), 2600 + Math.random() * 3000);
+    checkSeals();
     return true;
   }
+  /** Alle vier Siegel gebrochen → CASE_17 entsiegelt */
+  const sealsOpen = () => ST.seals.filter((x) => !isSolved(x.id));
+  function checkSeals() { if (!isSolved("case") && !sealsOpen().length) solve("case"); }
 
   /* ---------- Nachrichten von UNBEKANNT ---------- */
   function send(id) {
@@ -131,28 +135,21 @@ window.DL = window.DL || {};
     if (isSolved("chat")) return { ok: true };
     if (norm(code) === "MILO") { solve("chat"); return { ok: true }; }
     S.fails.chat = (S.fails.chat || 0) + 1; changed();
+    if (norm(code) === "NORA") return { ok: false, text: "Abgelehnt. Hinweis der Besitzerin: „Nicht mein Name. So leicht mache ich es niemandem.“" };
     return { ok: false, text: "Entschlüsselung fehlgeschlagen. Passwort ungültig." };
   }
 
-  /* ---------- Widerspruch #4471 ---------- */
-  function objection({ device, person, rows = [] }) {
-    const O = ST.objection;
-    const d = norm(device);
-    if (!d) return { ok: false, text: "Trag ein, von welchem Gerät der Download um 19:14 kam." };
-    if (d !== O.device) return { ok: false, text: O.wrongDevice[d] || "Dieses Gerät passt nicht zum Download um 19:14." };
-    if (!person) return { ok: false, text: "Wer ist für dieses Gerät verantwortlich?" };
-    if (person !== O.person) return { ok: false, text: O.wrongPerson[person] || "Für SEC-01 ist jemand anderes zuständig." };
-    if (rows.length < O.need.length) return { ok: false, text: "Noch zu wenige Belege. Welche Zeilen zeigen, dass Nora nicht an ihrem Gerät saß, als der Download lief?" };
-    const bad = rows.find((r) => !O.need.includes(r) && !O.allowed.includes(r));
-    if (bad) return { ok: false, text: O.wrongRow[bad] || `Die Zeile ${bad} zeigt das nicht.` };
-    if (!O.need.every((r) => rows.includes(r))) return { ok: false, text: "Ein Beleg fehlt noch: Es braucht die Abmeldung und den Download selbst." };
-    solve("widerspruch");
-    return { ok: true, text: "Widerspruch eingereicht. Erweiterter Prüfzugang: Interne Projekte freigegeben." };
+  /* ---------- Sicherheitsberichte (Audit-Portal, Aufruf per Vorgangsnummer) ---------- */
+  function openReport(ref) {
+    const r = ST.srReports[norm(ref)];
+    if (!r) return null;
+    if (r.key) solve("quelle");
+    return r;
   }
 
   /* ---------- Terminal ---------- */
   const pretty = (d) => d.replace(/^([A-Z]+)([A-Z0-9]*?)(\d+)$/, (m, a, b, c) => (b ? `${a}-${b}${c}` : `${a}-${c}`));
-  const DEVNAMES = { SEC01: "SEC-01", SEC02: "SEC-02", LTN14: "LT-N14", WSE02: "WS-E02", HD03: "HD-03", WSL07: "WS-L07", SRVL1: "SRV-L1" };
+  const DEVNAMES = { SEC01: "SEC-01", SEC10: "SEC-10", CAMB01: "CAM-B01", LTN14: "LT-N14", WSE02: "WS-E02", HD03: "HD-03", WSL07: "WS-L07", SRVL1: "SRV-L1" };
   let termQueue = [];
   function command(input) {
     const raw = String(input || "").trim();
@@ -167,27 +164,39 @@ window.DL = window.DL || {};
     switch (cmd) {
       case "help":
         L("Verfügbare Befehle:");
-        ["help", "ls", "cat <datei>", "trace <geräte-id>", "decrypt <paket> --key <wort>", "verify <paket> --seed <code>", "whoami", "date", "clear"].forEach((c) => L("  " + c, "dim"));
+        ["help", "ls", "cat <datei>", "status <paket>", "trace <geräte-id>", "decrypt <paket> --key <wort>", "verify <paket> --seed <code>", "whoami", "date", "clear"].forEach((c) => L("  " + c, "dim"));
         break;
       case "ls":
-        L("CASE_17.enc            2.4 MB   " + (isSolved("verify") ? "verifiziert" : isSolved("decrypt") ? "entschlüsselt · unverified" : "verschlüsselt"));
-        L("autoresp.log           —        " + (isSolved("verify") ? "lesbar" : "Zugriff verweigert"));
+        L("CASE_17.enc            2.4 MB   " + (isSolved("case") ? "entsiegelt" : `versiegelt (${4 - sealsOpen().length} von 4 Siegeln gebrochen)`));
+        L("autoresp.log           —        " + (isSolved("case") ? "lesbar" : "Zugriff verweigert"));
         L("readme_terminal.txt    1 KB");
         break;
       case "cat": {
         const f = (parts[1] || "").toLowerCase();
         if (!f) { L("Syntax: cat <datei>", "warn"); break; }
-        if (f === "readme_terminal.txt") { L("Arbeitsordner von E. Voss. CASE_17 ist versiegelt."); L("Zum Öffnen: decrypt, danach verify. Siehe terminal_help.txt in Dokumente."); }
+        if (f === "readme_terminal.txt") { L("Arbeitsordner von E. Voss. CASE_17 ist mit vier Siegeln verschlossen."); L("Zustand: status CASE_17. Siehe pruefung.txt und terminal_help.txt in Dokumente."); }
         else if (f.startsWith("case_17")) L("�ꝏ▒░ PK♦ 7a 1f e2 ▒▒ ░░ … (verschlüsselt)", "dim");
         else if (f === "autoresp.log") {
-          if (!isSolved("verify")) { L("Permission denied.", "err"); break; }
+          if (!isSolved("case")) { L("Permission denied.", "err"); break; }
           L("autoresp · Regeln (angelegt 17.10. 23:46 von E.VOSS)");
           Object.entries(ST.messages).forEach(([id, m]) => L(`  #${m.rule}  ${id.padEnd(14)} → "${m.text}"`, "dim"));
           L("SENDER \"UNBEKANNT\" · Zustellung lokal, zeitversetzt");
         } else L(`cat: ${parts[1]}: Datei nicht gefunden`, "err");
         break;
       }
-      case "whoami": L(isSolved("verify") ? "E.VOSS (wiederhergestellt) · Access Level: FULL" : "UNKNOWN · Access Level: LIMITED"); break;
+      case "status": {
+        if (!pkgOk(parts[1])) { L(parts[1] ? `status: Paket ${parts[1]} nicht gefunden` : "Syntax: status <paket>", parts[1] ? "err" : "warn"); break; }
+        L("CASE_17 · Beweispaket von E. VOSS · 2.4 MB");
+        ST.seals.forEach((x, i) => {
+          const done = isSolved(x.id);
+          let extra = "";
+          if (x.id === "verify" && !done) extra = isSolved("decrypt") ? "   (decrypt ✓ · verify fehlt)" : "   (decrypt fehlt · verify fehlt)";
+          L(`  SIEGEL ${i + 1}  ${x.name.padEnd(10)} ${done ? "GEBROCHEN" : "VERSIEGELT"}${extra}`, done ? "ok" : "");
+        });
+        L(isSolved("case") ? "STATUS: ENTSIEGELT – EVIDENCE_UNLOCKED liegt auf dem Desktop" : `STATUS: VERSIEGELT · ${sealsOpen().length} Siegel offen · Hinweise in pruefung.txt`, isSolved("case") ? "ok" : "warn");
+        break;
+      }
+      case "whoami": L(isSolved("case") ? "E.VOSS (wiederhergestellt) · Access Level: FULL" : "UNKNOWN · Access Level: LIMITED"); break;
       case "date": L(`Sa 18.10.2025 ${clock()}`); break;
       case "trace": {
         const d = norm(parts[1]);
@@ -206,7 +215,7 @@ window.DL = window.DL || {};
         }
         if (t.tail) { L(""); L(t.tail, "dim"); }
         L(""); L("TRACE COMPLETE");
-        if (d === "SEC01") solve("trace");
+        if (d === "SEC01" && !isSolved("trace")) { L("SIEGEL 1 · GERÄT GEBROCHEN", "ok"); L("Erweiterter Prüfzugang aktiv: Interne Projekte im Audit-Portal freigegeben.", "ok"); solve("trace"); }
         break;
       }
       case "decrypt": {
@@ -216,8 +225,8 @@ window.DL = window.DL || {};
         if (isSolved("decrypt")) { L("CASE_17 ist bereits entschlüsselt. Status: " + (isSolved("verify") ? "VERIFIED" : "UNVERIFIED")); break; }
         L("DECRYPTION STARTED ...");
         if (norm(key) !== "MIRROR") { L("KEY REJECTED.", "err"); S.fails.decrypt = (S.fails.decrypt || 0) + 1; changed(); break; }
-        L("KEY ACCEPTED.", "ok"); L("CASE_17 DECRYPTED."); L("PACKAGE CONTENT:"); L("  evidence/  (14 Dateien)", "dim"); L("  CASE_17_bericht.txt", "dim"); L("  final_message.txt", "dim");
-        L("STATUS: UNVERIFIED – verify required", "warn");
+        L("KEY ACCEPTED.", "ok"); L("CASE_17 DECRYPTED.");
+        L("STATUS: UNVERIFIED – verify required (Siegel 4, Teil 2)", "warn");
         solve("decrypt");
         break;
       }
@@ -236,8 +245,10 @@ window.DL = window.DL || {};
           break;
         }
         ["SOURCE DEVICE: SEC-01", "PROJECT: MIRROR", "SIGNATURE: VALID", "CHECKSUM: MATCH"].forEach((x) => L(x));
-        L("EVIDENCE PACKAGE VERIFIED.", "ok"); L("ACCESS GRANTED. Neuer Ordner auf dem Desktop: EVIDENCE_UNLOCKED", "ok");
+        L("SIEGEL 4 · SCHLÜSSEL GEBROCHEN", "ok");
         solve("verify");
+        if (isSolved("case")) L("ALLE SIEGEL GEBROCHEN. Neuer Ordner auf dem Desktop: EVIDENCE_UNLOCKED", "ok");
+        else L(`Noch versiegelt: ${sealsOpen().map((x) => x.name).join(", ")} – siehe status CASE_17`, "warn");
         break;
       }
       case "clear": return [{ clear: true }];
@@ -251,10 +262,13 @@ window.DL = window.DL || {};
   DL.on("event", (ev) => { if (ev.id === "e75") termQueue.push({ t: "WARNING: FINAL PURGE SEQUENCE PREPARED.", cls: "err" }); });
 
   /* ---------- Hinweise ---------- */
-  const currentStep = () => ST.steps.find((s) => s.id === "finale" ? !S.ending : !isSolved(s.id)) || null;
+  const stepDone = (s) => (s.id === "finale" ? Boolean(S.ending) : isSolved(s.id));
+  /** Schritte, deren Voraussetzungen erfüllt sind und die noch offen sind (mehrere gleichzeitig möglich) */
+  const openSteps = () => ST.steps.filter((s) => !stepDone(s) && s.needs.every((n) => isSolved(n)));
+  const currentStep = () => openSteps()[0] || null;
   function revealHint(step) {
     const lvl = S.hints[step] || 0;
-    if (lvl >= 3) return;
+    if (lvl >= 4) return;
     S.hints[step] = lvl + 1; changed();
   }
 
@@ -274,7 +288,7 @@ window.DL = window.DL || {};
     changed();
     DL.emit("ending", id);
   }
-  const decide = (choice) => { if (!isSolved("verify") && choice.target !== "purge") return null; const id = judge(choice); finish(id); return id; };
+  const decide = (choice) => { if (!isSolved("case")) return null; const id = judge(choice); finish(id); return id; };
   function backToDecision() { if (!S.ending || S.ending === "timeout") return; S.ending = null; changed(); }
 
   /* ---------- Spielstart ---------- */
@@ -315,6 +329,7 @@ window.DL = window.DL || {};
     try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privat */ }
     S.msgs.filter((id) => !before.msgs.includes(id)).forEach((id) => DL.emit("message", id, true));
     S.events.filter((id) => !before.events.includes(id)).forEach((id) => DL.emit("event", ST.events.find((e) => e.id === id), true));
+    checkSeals();
     DL.emit("change");
     if (S.ending && !before.ending) DL.emit("ending", S.ending, true);
     return news;
@@ -327,8 +342,8 @@ window.DL = window.DL || {};
     TOTAL, isSolved, flag, setFlag, cond, visible, unlocked, children, solve, send,
     remaining, elapsed: () => S.elapsed, fmt, clock,
     pause(on) { paused = on; DL.emit("change"); }, isPaused: () => paused, isRunning: () => running,
-    tryLock, tryChat, objection, command, takeTermQueue,
-    currentStep, revealHint, hintLevel: (s) => S.hints[s] || 0,
+    tryLock, tryChat, openReport, command, takeTermQueue, sealsOpen,
+    currentStep, openSteps, stepDone, revealHint, hintLevel: (s) => S.hints[s] || 0,
     decide, judge, backToDecision, draft: getDraft, updateDraft, applyDraft, startGame, newGame, stop, reset, save,
     exportShared, applyShared, enterMultiplayer, leaveMultiplayer,
     isMultiplayer: () => Boolean(hooks), hooks: () => hooks,

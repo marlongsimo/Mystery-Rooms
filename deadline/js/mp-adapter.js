@@ -10,7 +10,7 @@
   const G = window.DL && DL.game, root = document.getElementById("mpEntry");
   if (!G || !root) return;
   const esc = DL.esc;
-  const CFG = { gameSlug: "deadline", maxPlayers: 4, storeKey: "mr_mp_session_v1:deadline", savePrefix: "deadline_mp_" };
+  const CFG = { gameSlug: "deadline", maxPlayers: 4, storeKey: "mr_mp_session_v1:deadline", savePrefix: "deadline2_mp_" };
   if (!window.MRMultiplayer || !window.MRLobby) { root.innerHTML = `<p class="mp-entry-copy">Gemeinsames Spielen ist gerade nicht verfügbar. Allein ermitteln geht jederzeit.</p>`; return; }
 
   let client;

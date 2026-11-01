@@ -70,6 +70,7 @@ window.DL = window.DL || {};
       <span class="win-btns"><button class="wb-min" aria-label="Minimieren" title="Minimieren">–</button><button class="wb-max" aria-label="Maximieren" title="Maximieren">□</button><button class="wb-close" aria-label="Schließen" title="Schließen">×</button></span></header>
       <div class="win-body"></div><span class="win-resize" aria-hidden="true"></span>`;
     w.el = el; w.body = $(".win-body", el);
+    guardBody(w.body);
     $(".win-title", el).textContent = app.title(arg);
     layer().appendChild(el);
     const desk = $("#desk").getBoundingClientRect();
@@ -86,6 +87,19 @@ window.DL = window.DL || {};
     paintTasks();
     if (app.opened) app.opened(w);
     return w;
+  }
+  /*
+   * Neu zeichnen nur, wenn sich der Inhalt wirklich geändert hat. Sonst würden Elemente
+   * unter dem Mauszeiger ausgetauscht – ein Doppelklick oder eine Auswahl ginge verloren.
+   */
+  const HTML = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
+  function guardBody(el) {
+    let last = null;
+    Object.defineProperty(el, "innerHTML", {
+      configurable: true,
+      get() { return HTML.get.call(this); },
+      set(v) { if (v === last) return; last = v; HTML.set.call(this, v); },
+    });
   }
   function render(w) { DL.apps[w.app].render(w); const t = DL.apps[w.app].title(w.arg); $(".win-title", w.el).textContent = t; }
   function close(w) {
@@ -142,12 +156,13 @@ window.DL = window.DL || {};
   }
 
   /** Doppelklick am Rechner, einfacher Fingertipp am Handy, Enter mit der Tastatur */
-  function activate(root, sel, fn) {
-    root.addEventListener("dblclick", (e) => { const t = e.target.closest(sel); if (t) fn(t); });
+  /** Desktop-Symbole: Doppelklick (Touch: Antippen). Listen in Fenstern (single = true): ein Klick. */
+  function activate(root, sel, fn, single = false) {
+    root.addEventListener("dblclick", (e) => { if (single) return; const t = e.target.closest(sel); if (t) fn(t); });
     root.addEventListener("click", (e) => {
       const t = e.target.closest(sel); if (!t) return;
       root.querySelectorAll(sel).forEach((x) => x.classList.toggle("selected", x === t));
-      if (coarse() || t.dataset.single) fn(t);
+      if (single || coarse()) fn(t);
     });
     root.addEventListener("keydown", (e) => { if (e.key === "Enter") { const t = e.target.closest(sel); if (t) fn(t); } });
   }
@@ -181,9 +196,11 @@ window.DL = window.DL || {};
     const nodes = Object.keys(ST.nodes).filter((id) => ST.nodes[id].desktop && G.visible(id));
     const items = DESK.map((d) => ({ key: "a:" + d.id, label: d.label, icon: d.icon, hot: d.id === "deadline" && G.isSolved("case"), badge: badge(d.id) }))
       .concat(nodes.map((id) => ({ key: "n:" + id, label: ST.nodes[id].name, icon: nodeIcon(id), fresh: !G.flag("seen_" + id) })));
-    $("#icons").innerHTML = items.map((it) => `<button class="dicon${it.hot ? " hot" : ""}${it.fresh ? " fresh" : ""}" data-key="${it.key}">
+    const html = items.map((it) => `<button class="dicon${it.hot ? " hot" : ""}${it.fresh ? " fresh" : ""}" data-key="${it.key}">
       <span class="dicon-img">${DL.icon(it.icon)}${it.badge ? `<i class="badge">${it.badge}</i>` : ""}</span><span class="dicon-label">${esc(it.label)}</span></button>`).join("");
+    if (html !== lastIcons) { lastIcons = html; $("#icons").innerHTML = html; }
   }
+  let lastIcons = "";
   function badge(app) {
     if (app === "messenger") { const unread = G.state.msgs.filter((m) => !G.flag("read_" + m)).length; return unread || ""; }
     return "";
@@ -196,7 +213,7 @@ window.DL = window.DL || {};
   }
 
   /* ---------- Meldungen ---------- */
-  function toast({ title, text, kind = "", onClick, ms = 7000 }) {
+  function toast({ title, text, kind = "", onClick, ms = 5500 }) {
     const el = document.createElement("div");
     el.className = "toast " + kind;
     el.setAttribute("role", "status");
@@ -341,7 +358,7 @@ window.DL = window.DL || {};
     if (!ev) return;
     const desk = $("#desk");
     if (ev.sound) snd.play(ev.sound);
-    if (ev.note) toast({ title: ev.note, text: ev.sub || "", kind: ev.red ? "alert" : "sys", ms: 9000 });
+    if (ev.note) toast({ title: ev.note, text: ev.sub || "", kind: ev.red ? "alert" : "sys", ms: 7000 });
     if (ev.glitch) { desk.classList.add("glitch"); setTimeout(() => desk.classList.remove("glitch"), 1800); }
     paintAlert();
   });

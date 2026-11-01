@@ -156,8 +156,9 @@ body.mp-session .sp-only { display: none; }
 @keyframes shake { 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
 
 /* ---------- Meldungen ---------- */
-.toasts { position: absolute; right: 12px; top: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 9500; width: min(340px, calc(100% - 24px)); pointer-events: none; }
-.toast { padding: 12px 14px; background: #161a20f5; border: 1px solid var(--line-2); border-left: 3px solid var(--blue); border-radius: 4px; box-shadow: 0 12px 30px #000a; transform: translateX(30px); opacity: 0; transition: .3s; pointer-events: auto; }
+/* Meldungen unten rechts über der Taskleiste. Sie fangen keine Klicks ab – darunter liegende Knöpfe bleiben bedienbar. */
+.toasts { position: absolute; right: 12px; bottom: calc(var(--tb) + 12px); display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; z-index: 9500; width: min(320px, calc(100% - 24px)); pointer-events: none; }
+.toast { pointer-events: none !important; padding: 10px 14px; background: #161a20f0; border: 1px solid var(--line-2); border-left: 3px solid var(--blue); border-radius: 4px; box-shadow: 0 12px 30px #000a; transform: translateX(30px); opacity: 0; transition: .3s; pointer-events: auto; }
 .toast.show { transform: none; opacity: 1; }
 .toast b { display: block; font: 600 12px var(--mono); letter-spacing: .08em; }
 .toast span { display: block; margin-top: 3px; font-size: 13px; color: var(--text-2); }
@@ -166,7 +167,7 @@ body.mp-session .sp-only { display: none; }
 .toast.ok { border-left-color: var(--green); }
 .toast.sys { border-left-color: var(--amber); }
 .toast.alert { border-left-color: var(--red); background: #3a0d10f5; }
-.toast.clickable { cursor: pointer; }
+.toast.clickable { cursor: default; }
 
 /* ---------- Pause ---------- */
 .pause { position: absolute; inset: 0; z-index: 9800; display: grid; place-items: center; background: #000c; backdrop-filter: blur(6px); text-align: center; padding: 20px; }
@@ -429,7 +430,7 @@ body.mp-session .sp-only { display: none; }
 .end-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
 
 /* ---------- Team (Multiplayer) ---------- */
-.mp-toast { position: fixed; left: 50%; top: 14px; transform: translate(-50%, -80px); z-index: 9600; padding: 10px 16px; background: #14181df5; border: 1px solid var(--green); border-radius: 4px; font-size: 13px; transition: .3s; max-width: calc(100% - 24px); }
+.mp-toast { pointer-events: none; position: fixed; left: 50%; top: 14px; transform: translate(-50%, -80px); z-index: 9600; padding: 10px 16px; background: #14181df5; border: 1px solid var(--green); border-radius: 4px; font-size: 13px; transition: .3s; max-width: calc(100% - 24px); }
 .mp-toast.show { transform: translate(-50%, 0); }
 
 /* ---------- Handy ---------- */

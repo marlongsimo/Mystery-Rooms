@@ -33,7 +33,7 @@ window.DL = window.DL || {};
             const n = N[id], locked = n.lock && !G.unlocked(id);
             return `<button class="ex-row${G.flag("seen_" + id) ? "" : " fresh"}" data-node="${id}"><span class="ex-name">${DL.icon(DL.nodeIcon(id))}<span>${esc(n.name)}</span>${locked ? `<em class="ex-lock">gesperrt</em>` : ""}</span><span>${esc(n.date || "")}</span><span>${TYPES[n.type] || ""}</span></button>`;
           }).join("") : `<p class="ex-empty">Dieser Ordner ist leer.</p>`}</div>
-          <p class="ex-status">${kids.length} Element${kids.length === 1 ? "" : "e"}${os().coarse() ? " · antippen zum Öffnen" : " · Doppelklick zum Öffnen"}</p>
+          <p class="ex-status">${kids.length} Element${kids.length === 1 ? "" : "e"}${os().coarse() ? " · antippen zum Öffnen" : " · Klick zum Öffnen"}</p>
         </div></div>`;
     },
     opened(w) {
@@ -45,7 +45,7 @@ window.DL = window.DL || {};
         const id = t.dataset.node, n = N[id];
         if (n.type === "folder" && G.unlocked(id)) { G.setFlag("seen_" + id); w.state.cur = id; os().render(w); }
         else os().openNode(id);
-      });
+      }, true);
     },
     onChange(w) { const cur = w.state.cur || w.arg; if (!G.visible(cur)) w.state.cur = w.arg; os().render(w); },
   };
@@ -279,6 +279,8 @@ window.DL = window.DL || {};
       w.body.innerHTML = `<div class="ms"><nav class="ms-threads">${threads.map((t) => `<button class="ms-th${t.id === th ? " on" : ""}" data-th="${t.id}"><b>${esc(t.name)}</b><small>${esc(t.sub)}</small>${t.unread ? `<i class="badge">${t.unread}</i>` : ""}</button>`).join("")}</nav><div class="ms-main">${main}</div></div>`;
       const mm = $(".ms-main", w.body); mm.scrollTop = mm.scrollHeight;
       const f = $(".ms-lock", w.body);
+      if (f && !f.dataset.bound) f.dataset.bound = "1";
+      else if (f) return;
       if (f) f.addEventListener("submit", (e) => {
         e.preventDefault();
         const r = G.tryChat($("input", f).value);

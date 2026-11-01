@@ -189,7 +189,7 @@ Zu jedem Rätsel stehen hier: Ort, Material, Herleitung, **Eingabe**, Sperrregel
 #### R5 · Der letzte Anruf
 - **Material:** `anruf_3010.wav` (Freitag, 30.10., 19:52, 2:40 Min.):
   - Transkript: Aris spricht mit Ida, dann sagt er: „Wenn mir was passiert – hör genau hin, nicht nur auf mich.“
-  - Ab 1:10 gibt es 20 Sekunden Rauschen mit einem gleichmäßigen Pfeifton.
+  - Ab 1:17 gibt es gut 20 Sekunden Rauschen mit einem gleichmäßigen Pfeifton.
   - Im **Spektrogramm** (Ansicht im Mediaplayer) erscheinen im Bereich 4–6 kHz Buchstaben: **VELLUM**.
 - **Eingabe:** keine eigene. VELLUM wird gebraucht für R9 (Name des Trusts) und für das Masterpasswort.
 - **Bestätigung:** Ein Klick auf „Markieren“ im Spektrogramm legt das Wort als Fundstück in der Akte ab. Damit gilt das Rätsel als gelöst.

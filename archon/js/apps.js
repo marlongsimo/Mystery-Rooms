@@ -288,7 +288,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       g.fillStyle = `rgba(${40 + v * 200},${30 + v * 120},${120 + v * 80},${v})`; g.fillRect(x, y, 3, 3);
     }
     if (A.spectro) {
-      const x0 = W * (70 / A.dur), x1 = W * (92 / A.dur);
+      const [g0, g1] = A.gap || [70, 92], x0 = W * (g0 / A.dur), x1 = W * (g1 / A.dur);
       g.fillStyle = "rgba(255,240,200,.15)"; g.fillRect(x0, 0, x1 - x0, H);
       g.save(); g.fillStyle = "rgba(255,250,220,.92)"; g.font = "bold 30px DM Mono, monospace"; g.textBaseline = "middle";
       const yTop = H * (1 - 6 / 8), yBot = H * (1 - 4 / 8); // 4–6 kHz

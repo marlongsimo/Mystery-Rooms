@@ -1,6 +1,6 @@
 # Das ARCHON-Protokoll
 
-Schwerer Desktop-Thriller (Extreme Edition): 120 Minuten Spielzeit, allein, nur am Computer.
+Schwerer Desktop-Thriller (Extreme Edition): 120 Minuten Spielzeit, allein, am besten am Computer oder Tablet im Querformat. Am Handy spielbar, mit Hinweis, dass ein größerer Bildschirm (oder AirPlay/Spiegeln auf den Fernseher) besser ist.
 
 **Achtung: Die Lösungen stehen in `DESIGN.md`.**
 

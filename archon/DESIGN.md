@@ -24,7 +24,7 @@
 | Kategorie | Digitales Escape Game (Plattform-Kategorie 03) |
 | Schwierigkeit | 4 von 4 („Schwer“), als *Extreme Edition* gekennzeichnet |
 | Spieler | allein (kein Multiplayer in Version 1) |
-| Gerät | **nur am Computer** (Maus und Tastatur, ab 1280 px Breite). Am Handy erscheint ein Hinweis statt des Spiels. |
+| Gerät | am besten Computer oder Tablet quer. Handy ist spielbar; auf kleinen Bildschirmen zeigt der Titel einen Hinweis (größerer Bildschirm, iPad, Spiegeln auf den Fernseher). |
 | Spielzeit | 120:00 Minuten **Spielzeit**. Die Zeit läuft nur, während das Spiel geöffnet und nicht pausiert ist. |
 | Pause | jederzeit möglich. Der Bildschirm wird dabei verdeckt, damit man nicht in der Pause weiterermittelt. |
 | Ordner | `archon/` (eigener Speicherstand `archon_save_v1`) |
@@ -615,7 +615,7 @@ Er wird aus DEADLINE.exe herausgelöst; DEADLINE läuft danach unverändert dara
 
 ```
 archon/
-  index.html            Titel, „nur am Computer“-Hinweis, Sperrbildschirm
+  index.html            Titel, Hinweis für kleine Bildschirme, Sperrbildschirm
   DESIGN.md             dieses Dokument
   README.md             Lösungen, Aufbau, Tests
   css/archon.css
@@ -657,7 +657,7 @@ Ein Skript prüft beim Bau automatisch:
 3. **Menschen:** mindestens **drei Personen** spielen unabhängig und ohne Vorwissen, davon mindestens eine ohne Finanz- oder IT-Hintergrund.
    - Gemessen werden die Zeit je Kapitel, die Hinweise je Rätsel, die genutzten Suchbegriffe (lokal protokolliert) und wo jemand länger als 10 Minuten festhängt.
    - Danach werden Sperrzeiten, Wertung, die Schwelle für Beweistiefe und fehlende Wissensartikel ergänzt.
-4. **Geräte:** Chrome, Firefox, Safari und Edge am Rechner. Am Handy nur der Hinweis „nur am Computer“.
+4. **Geräte:** Chrome, Firefox, Safari und Edge am Rechner. Handy und Tablet mit Touch (Hinweis auf dem Titel, Spiel bleibt spielbar).
 
 ---
 

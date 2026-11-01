@@ -44,7 +44,8 @@ button { font: inherit; color: inherit; }
 .title-actions { display: flex; gap: 10px; margin-top: 22px; }
 .state { min-height: 1em; font: 12px var(--mono); color: var(--amber); }
 .micro { font: 11px var(--mono); color: var(--muted); letter-spacing: .1em; }
-.mobile-note { margin-top: 22px; padding: 14px 16px; border: 1px solid var(--red); background: #1a0709; color: var(--text); }
+.mobile-note { margin: 4px 0 18px; padding: 12px 14px; border: 1px solid var(--amber); border-radius: 4px; background: #1a1407; color: var(--text-2); font-size: 14px; line-height: 1.5; }
+.mobile-note b { display: block; color: var(--amber); margin-bottom: 2px; }
 .link { color: var(--text-2); font-size: 13px; }
 .title-visual { display: flex; flex-direction: column; gap: 22px; align-items: center; justify-content: center; }
 .title-logo { width: 260px; border-radius: 50%; mix-blend-mode: screen; opacity: .9; mask-image: radial-gradient(circle, #000 55%, transparent 72%); -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 72%); }
@@ -438,4 +439,60 @@ button, .btn, .task, .dicon, .win-bar, .win-btns, .ap-file, .ml-item, .ap-tabs, 
   .ap-tabs button, .lg-tabs button, .nb-tabs button, .hn-tabs button { min-height: 40px; padding: 8px 16px; font-size: 13px; }
   .task { height: 40px; }
   .ap-file, .ml-item { min-height: 44px; }
+}
+
+/* ---------- Handy (spielbar, aber eng – Hinweis auf dem Titelbildschirm) ---------- */
+@supports (height: 100dvh) { .screen { height: 100dvh; bottom: auto; } }
+@media (max-width: 760px), (max-height: 480px) {
+  :root { --tb: 52px; --top: 44px; }
+  .title-copy { padding: 28px 16px 30px; max-width: none; }
+  .eyebrow { letter-spacing: .12em; line-height: 1.6; }
+  .title h1 { font-size: 40px; }
+  .sub { letter-spacing: .2em; }
+  .title-actions { flex-wrap: wrap; }
+  .boot { padding: 8vh 16px; }
+  #bootLog { font-size: 13px; }
+  /* Kopfzeile: nur Kapitel, Level-Balken, Knöpfe, TRACE */
+  .topbar { padding: 0 6px; gap: 6px; }
+  .tb-left span:not(.chap), .tb-mid span, .trace-k { display: none; }
+  .tb-left { gap: 6px; } .tb-left b { letter-spacing: .1em; }
+  .tb-mid i { width: 10px; }
+  .tb-right { gap: 4px; }
+  .tbtn { width: 36px; height: 32px; }
+  .trace { font-size: 14px; min-width: 0; }
+  /* Sperrleiste umbrechen */
+  .lockbar { left: 8px; right: 8px; transform: none; flex-wrap: wrap; justify-content: center; }
+  .lockbar p { white-space: normal; width: 100%; text-align: center; margin: 0 0 4px; }
+  .lockbar .btn { flex: 1 1 40%; }
+  /* Symbole als Raster */
+  .icons { left: 0; right: 0; grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); grid-template-rows: none; grid-auto-rows: 96px; grid-auto-columns: auto; padding: 0 8px; overflow-y: auto; }
+  /* Fenster immer vollflächig */
+  .win { left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; border-radius: 0; border: 0; min-width: 0; }
+  .win-resize, .wb-max { display: none; }
+  .win-bar { height: 44px; cursor: default; }
+  .win-btns button { width: 46px; height: 42px; font-size: 19px; }
+  .task-label { display: none; }
+  .task { padding: 0 10px; height: 44px; }
+  /* Zweispaltige Apps untereinander */
+  .ex, .ap { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .ex-side, .ap-list { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 6px; }
+  .ex-place, .ap-file { width: auto; flex-shrink: 0; white-space: nowrap; }
+  .ex-head { display: none; }
+  .ex-row { grid-template-columns: 1fr; padding: 10px 8px; min-height: 44px; }
+  .ex-row > span:not(.ex-name) { display: none; }
+  .ml { grid-template-columns: 1fr; }
+  .ml.reading .ml-list { display: none; }
+  .ml:not(.reading) .ml-read { display: none; }
+  .ml-back { display: inline-flex; margin-bottom: 8px; }
+  .ml-item { min-height: 48px; }
+  .ap-main, .ml-read { padding: 10px 12px; }
+  .ap-ctrl { flex-wrap: wrap; }
+  .lg-tabs, .ap-tabs, .nb-tabs, .br-marks { overflow-x: auto; flex-wrap: nowrap; }
+  .lg-tabs button, .br-marks button { flex-shrink: 0; }
+  .lg-tools { flex-wrap: wrap; }
+  .paper { margin: 8px; padding: 12px; }
+  .term { font-size: 12px; }
+  .term-in input { font-size: 16px; } /* iOS zoomt sonst beim Tippen */
+  input.field, .field { font-size: 16px; }
+  .toasts { left: 8px; right: 8px; width: auto; }
 }

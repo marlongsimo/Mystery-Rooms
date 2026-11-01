@@ -499,3 +499,20 @@ body.mp-session .sp-only { display: none; }
 .hn-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 .hn-hint.sol { border-left-color: var(--red); }
 .hn-hint.sol b { color: var(--red-2); }
+
+/* ---------- Touch: zuverlässiges Antippen ---------- */
+html, body { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+/* Kein versehentliches Markieren bei langem Druck – das stört danach jedes Antippen (iOS) */
+.taskbar, .win-bar, .icons, .dicon, .ex-row, .ex-place, .ap-file, .ml-item, .ms-th, .sm-item, .btn, .task, .tray-btn, .start-btn, .rd-name, .hn-tabs, .pg-tabs, .br-marks, .win-btns {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+@supports (height: 100dvh) { .screen, .ending { height: 100dvh; bottom: auto; } }
+@media (max-width: 760px), (max-height: 480px) {
+  /* Abstand zu Notch und Home-Leiste */
+  .taskbar { height: calc(var(--tb) + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  #windows { bottom: calc(var(--tb) + env(safe-area-inset-bottom, 0px)); top: env(safe-area-inset-top, 0px); }
+  .icons { top: calc(10px + env(safe-area-inset-top, 0px)); bottom: calc(var(--tb) + env(safe-area-inset-bottom, 0px) + 10px); }
+  .toasts { bottom: calc(var(--tb) + env(safe-area-inset-bottom, 0px) + 10px); }
+  .win-btns button { width: 48px; height: 44px; }
+  .ex-row, .ap-file, .ml-item, .ms-th { min-height: 48px; }
+}

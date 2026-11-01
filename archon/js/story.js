@@ -290,9 +290,9 @@ Wenn er bei Anlage B ankommt, entscheiden wir.
     p3: { name: "profil_varga.txt", type: "txt", parent: "profile", text: "Profil: Dr. Felix Varga, VR-Präsident Corvane. Pflegt Kontakte zu Prüfern und Behörden, sammelt Informationen. Deckname: Kompass." },
     p4: { name: "profil_halden.txt", type: "txt", parent: "profile", text: "Profil: Jonas Halden, Halden Consult. Treuhänder, Nominee-Direktor, setzt Anweisungen um. Deckname: Anker." },
     p5: { name: "profil_aufsichtsratsbuero.txt", type: "txt", parent: "profile", text: "Profil: Büro des Aufsichtsrats der Hafenbank Nordelbe. Organisiert Sitzungen, Protokolle und Termine der Vorsitzenden." },
-    f1: { name: "F1_2810_1941.wav", type: "wav", parent: "fragmente", audio: "f1", meta: { Aufnahmezeit: "28.10.2026 19:41", Dauer: "0:38" } },
-    f2: { name: "F2_2810_1943.wav", type: "wav", parent: "fragmente", audio: "f2", meta: { Aufnahmezeit: "28.10.2026 19:43", Dauer: "0:21" } },
-    f3: { name: "F3_2810_1958.wav", type: "wav", parent: "fragmente", audio: "f3", meta: { Aufnahmezeit: "28.10.2026 19:58", Dauer: "0:14" } },
+    f1: { name: "F1_2810_1941.wav", type: "wav", parent: "fragmente", audio: "f1", meta: { Aufnahmezeit: "28.10.2026 19:41", Dauer: "0:36" } },
+    f2: { name: "F2_2810_1943.wav", type: "wav", parent: "fragmente", audio: "f2", meta: { Aufnahmezeit: "28.10.2026 19:43", Dauer: "0:20" } },
+    f3: { name: "F3_2810_1958.wav", type: "wav", parent: "fragmente", audio: "f3", meta: { Aufnahmezeit: "28.10.2026 19:58", Dauer: "0:22" } },
 
     /* ARCHIVE_CORE (Kapitel 5) */
     master: { name: "master.proto", type: "proto", parent: "core", date: "01.11. 21:12" },
@@ -431,21 +431,21 @@ Wenn er bei Anlage B ankommt, entscheiden wir.
       [4, "Aris: Holm fragt jedes Mal nach Anlage B. Woher weiß sie, dass es eine Anlage B gibt? Ich habe ihr das nie gesagt."],
       [16, "Aris: Und warum immer am Morgen nach der Sitzung? Sie will nicht wissen, was ich gefunden habe. Sie will wissen, wie weit ich bin."],
       [29, "Aris: Ende der Notiz."]] },
-    f1: { title: "Fragment F1 · Aufnahmezeit 28.10. 19:41", dur: 35, transcript: [
+    f1: { title: "Fragment F1 · Aufnahmezeit 28.10. 19:41", dur: 36, src: "audio/F1_2810_1941.mp3", transcript: [
       [0, "[gedämpftes Stimmengemurmel hinter einer Tür]"],
-      [2, "Stimme (verzerrt): Ich habe zehn Minuten. Drinnen reden sie noch über die Quartalszahlen."],
-      [8, "Stimme: Sag Anker, er soll den Prüfer laufen lassen."],
-      [15, "Stimme: Nein. Er soll nichts unternehmen. Ich will wissen, wie weit er kommt."],
-      [24, "Stimme: Wenn er bei Anlage B ankommt, entscheide ich. Nicht du."]] },
-    f2: { title: "Fragment F2 · Aufnahmezeit 28.10. 19:43", dur: 20, transcript: [
+      [3, "Stimme (verzerrt): Ich habe zehn Minuten. Drinnen reden sie noch über die Quartalszahlen."],
+      [11, "Stimme: Sag Anker, er soll den Prüfer laufen lassen."],
+      [16, "Stimme: Nein. Er soll nichts unternehmen. Ich will wissen, wie weit er kommt."],
+      [25, "Stimme: Wenn er bei Anlage B ankommt, entscheide ich. Nicht du."]] },
+    f2: { title: "Fragment F2 · Aufnahmezeit 28.10. 19:43", dur: 20, src: "audio/F2_2810_1943.mp3", transcript: [
       [0, "[Wind, Wasser an einer Kaimauer, Möwen, ein langes Schiffshorn]"],
       [9, "Stimme (verzerrt): … nicht hier draußen."],
-      [12, "Stimme: Ruf mich morgen an. Vor acht."]], place: "Geräuschkarte im Hafen-Intranet: typisch für den Anleger Hafenbank / Kehrwieder" },
-    f3: { title: "Fragment F3 · Aufnahmezeit 28.10. 19:58", dur: 15, transcript: [
+      [11, "Stimme: Ruf mich morgen an. Vor acht."]], place: "Geräuschkarte im Hafen-Intranet: typisch für den Anleger Hafenbank / Kehrwieder" },
+    f3: { title: "Fragment F3 · Aufnahmezeit 28.10. 19:58", dur: 22, src: "audio/F3_2810_1958.mp3", transcript: [
       [0, "[Glockenschlag]"],
-      [6, "Stimme (verzerrt): Gleich acht."],
+      [5, "Stimme (verzerrt): Gleich acht."],
       [8, "Stimme: Ich muss wieder rein."],
-      [10, "[Schritte auf Stein, eine schwere Tür]"]] },
+      [12, "[Schritte auf Kies, eine schwere Tür fällt zu]"]] },
   };
 
   /* ---------- Masterprotokoll (R14) ---------- */

@@ -239,26 +239,44 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
           ${A.spectro ? `<form class="ap-mark"><label>Auffälligkeit eintragen: <input class="field" name="w" autocomplete="off" ${G.is("R5") ? "disabled value=\"VELLUM (gesichert)\"" : ""}></label><button class="btn small" ${G.is("R5") ? "disabled" : ""}>Eintragen</button>${msgHtml(w.state.m)}</form>` : ""}`
         : view === "info" ? `<div class="ap-info">${Object.entries(N[cur].meta || { Datei: N[cur].name, Datum: N[cur].date || "" }).map(([k, v]) => `<p>${esc(k)}: ${esc(v)}</p>`).join("")}${A.place ? `<p>${esc(A.place)}</p>` : ""}</div>`
         : `<div class="wave">${Array.from({ length: 72 }, (_, i) => `<i style="height:${15 + Math.round(Math.abs(Math.sin(i * 1.7 + cur.length)) * 70)}%"></i>`).join("")}</div>`}
-        <div class="ap-ctrl"><button class="btn ap-play">${w.state.playing ? "■ Stopp" : "▶ Abspielen"}</button>${A.reverse ? `<label class="ap-rev"><input type="checkbox" ${w.state.rev ? "checked" : ""}> rückwärts</label>` : ""}</div>
-        <div class="ap-trans"><p class="ap-sub">Transkript</p>${A.transcript ? A.transcript.map(([t, s]) => `<p><b>${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}</b> ${esc(s)}</p>`).join("") : `<p>${esc(rev ? A.backward : A.forward)}</p>`}</div></div></div>`;
+        <div class="ap-ctrl"><button class="btn ap-play">${w.state.playing ? "■ Stopp" : "▶ Abspielen"}</button>${A.reverse ? `<label class="ap-rev"><input type="checkbox" ${w.state.rev ? "checked" : ""}> rückwärts</label>` : ""}<span class="ap-time">0:00 / ${Math.floor(A.dur / 60)}:${String(A.dur % 60).padStart(2, "0")}</span>${A.src ? "" : `<span class="ap-note">Aufnahme folgt – Transkript lesen</span>`}</div>
+        <div class="ap-trans"><p class="ap-sub">Transkript</p>${A.transcript ? A.transcript.map(([t, s]) => `<p data-t="${t}"><b>${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}</b> ${esc(s)}</p>`).join("") : `<p>${esc(rev ? A.backward : A.forward)}</p>`}</div></div></div>`;
       if (view === "spec") drawSpec($("canvas.spec", w.body), A);
     },
     opened(w) {
       w.body.addEventListener("click", (e) => {
-        const f = e.target.closest(".ap-file"); if (f) { w.state.cur = f.dataset.f; w.state.rev = false; os().render(w); return; }
+        const f = e.target.closest(".ap-file"); if (f) { stopAudio(w); w.state.cur = f.dataset.f; w.state.rev = false; os().render(w); return; }
         const v = e.target.closest("[data-v]"); if (v) { w.state.view = v.dataset.v; os().render(w); return; }
         if (e.target.closest(".ap-play")) {
           const A = AR.audio[N[w.state.cur].audio];
-          snd.play("beep"); if (A.spectro) { snd.tone(5200, 1.4, { vol: 0.03, at: 0.2 }); snd.noise(1.2, { vol: 0.08, freq: 3000, at: 0.1 }); }
+          if (w.state.playing) { stopAudio(w); os().render(w); return; }
           if (A.reverse && w.state.rev) { G.solveSide("N4"); G.addFound("Ida: „Er ist sicher. Frag nicht, wo.“"); }
-          w.state.playing = true; os().render(w); setTimeout(() => { w.state.playing = false; os().render(w); }, 1800);
+          w.state.playing = true; os().render(w);
+          const src = A.reverse && w.state.rev ? A.srcRev : A.src;
+          if (src) playAudio(w, src);
+          else { snd.play("beep"); if (A.spectro) { snd.tone(5200, 1.4, { vol: 0.03, at: 0.2 }); snd.noise(1.2, { vol: 0.08, freq: 3000, at: 0.1 }); } setTimeout(() => { w.state.playing = false; os().render(w); }, 1800); }
         }
       });
-      w.body.addEventListener("change", (e) => { if (e.target.closest(".ap-rev")) { w.state.rev = e.target.checked; os().render(w); } });
+      w.body.addEventListener("change", (e) => { if (e.target.closest(".ap-rev")) { stopAudio(w); w.state.rev = e.target.checked; os().render(w); } });
+      w.offPause = AR.on("pause", (on) => { if (on && w.state.playing) { stopAudio(w); os().render(w); } });
       w.body.addEventListener("submit", (e) => { e.preventDefault(); const r = G.spectro(e.target.w.value); w.state.m = r.ok ? { ok: true, text: "Gesichert und in der Akte vermerkt." } : { ok: false, text: r.text }; if (r.ok) snd.play("unlock"); os().render(w); });
     },
     onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input[type=text],input:not([type])")) return; if (!w.state.playing) os().render(w); },
+    closed(w) { stopAudio(w); if (w.offPause) w.offPause(); },
   };
+  /* Echte Aufnahmen (archon/audio): Abspielen, Zeitanzeige, aktuelle Transkriptzeile hervorheben */
+  function playAudio(w, src) {
+    const el = new Audio(src); w.state.el = el;
+    const fmtT = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+    el.addEventListener("timeupdate", () => {
+      const tEl = $(".ap-time", w.body); if (tEl) tEl.textContent = `${fmtT(el.currentTime)} / ${fmtT(el.duration || 0)}`;
+      let cur = null; w.body.querySelectorAll(".ap-trans [data-t]").forEach((p) => { if (+p.dataset.t <= el.currentTime) cur = p; p.classList.remove("now"); });
+      if (cur) cur.classList.add("now");
+    });
+    el.addEventListener("ended", () => { w.state.playing = false; w.state.el = null; os().render(w); });
+    el.play().catch(() => { w.state.playing = false; os().render(w); });
+  }
+  function stopAudio(w) { if (w.state.el) { w.state.el.pause(); w.state.el = null; } w.state.playing = false; }
   function drawSpec(c, A) {
     if (!c || !c.getContext) return;
     const g = c.getContext("2d"), W = c.width, H = c.height;

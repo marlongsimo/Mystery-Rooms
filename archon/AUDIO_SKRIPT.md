@@ -165,8 +165,8 @@ Version 1 · 01.11.2026
 ## Checkliste zum Abgeben
 
 - [ ] `anruf_3010_aris.wav` und `anruf_3010_ida.wav` (oder zusammen), mit 20 s Pause an der markierten Stelle
-- [ ] `sprachnachricht_ida.wav` (vorwärts gesprochen)
-- [ ] `memo_2810.wav`
+- [x] `sprachnachricht_ida.wav` (vorwärts gesprochen) – eingebaut als `audio/ida_vorwaerts.mp3` / `audio/ida_rueckwaerts.mp3`
+- [x] `memo_2810.wav` – eingebaut als `audio/memo_2810.mp3`
 - [ ] `F1_2810_1941.wav` (+ Sitzungsgemurmel, falls vorhanden)
 - [ ] `F2_2810_1943.wav` (+ Hafengeräusche oder Quelle)
 - [ ] `F3_2810_1958.wav` (+ Glocke oder Quelle)

@@ -423,14 +423,14 @@ Wenn er bei Anlage B ankommt, entscheiden wir.
       [139, "Ida: Ruf mich morgen an. Versprochen?"],
       [143, "Aris: Ich melde mich."],
       [147, "[Aufgelegt]"]], spectro: "VELLUM" },
-    ida: { title: "Sprachnachricht von Ida · 02.11. 08:12", dur: 20, reverse: true,
+    ida: { title: "Sprachnachricht von Ida · 02.11. 08:12", dur: 20, reverse: true, src: "audio/ida_rueckwaerts.mp3", srcRev: "audio/ida_vorwaerts.mp3",
       forward: "»…thcäirhcaN eseid hcsöl dnU .ow ,thcin garF .rehcis tsi rE …« (unverständlich, klingt wie rückwärts gesprochen)",
       backward: "„Hendrik, ich bin's. … Nein – wer auch immer das hier abhört: Er ist sicher. Frag nicht, wo. Und lösch diese Nachricht.“" },
-    memo: { title: "Diktat · 28.10. 21:30", dur: 40, transcript: [
+    memo: { title: "Diktat · 28.10. 21:30", dur: 34, src: "audio/memo_2810.mp3", transcript: [
       [0, "Aris: Notiz, achtundzwanzigster Oktober, halb zehn."],
       [4, "Aris: Holm fragt jedes Mal nach Anlage B. Woher weiß sie, dass es eine Anlage B gibt? Ich habe ihr das nie gesagt."],
-      [20, "Aris: Und warum immer am Morgen nach der Sitzung? Sie will nicht wissen, was ich gefunden habe. Sie will wissen, wie weit ich bin."],
-      [36, "Aris: Ende der Notiz."]] },
+      [16, "Aris: Und warum immer am Morgen nach der Sitzung? Sie will nicht wissen, was ich gefunden habe. Sie will wissen, wie weit ich bin."],
+      [29, "Aris: Ende der Notiz."]] },
     f1: { title: "Fragment F1 · Aufnahmezeit 28.10. 19:41", dur: 35, transcript: [
       [0, "[gedämpftes Stimmengemurmel hinter einer Tür]"],
       [2, "Stimme (verzerrt): Ich habe zehn Minuten. Drinnen reden sie noch über die Quartalszahlen."],

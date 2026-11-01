@@ -405,3 +405,7 @@ table.proto td { border-color: var(--line) !important; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 @media (max-width: 1023px) { .title { grid-template-columns: 1fr; } .title-visual { display: none; } .title-copy { padding: 36px 18px; } }
+
+.ap-time { font: 12px var(--mono); color: var(--text-2); }
+.ap-note { font-size: 12px; color: var(--muted); }
+.ap-trans p.now { color: var(--text); background: #5fd0ff14; }

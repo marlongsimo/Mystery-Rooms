@@ -16,6 +16,7 @@ Schwerer Desktop-Thriller (Extreme Edition): 120 Minuten Spielzeit, allein, nur 
 | `index.html` | Titel (mit Handy-Hinweis), Verbindungsaufbau, Desktop mit Kopfleiste (Kapitel, Sicherheitslevel, TRACE, Pause), Ende |
 | `js/data.js` | 8 Firmen mit Register- und IBAN-Daten, Stiftung Kestrel, 6 Rechnungen, 5 Frachtpapiere, Embargoliste, AIS-Liste |
 | `js/ledger.js` | 84 Buchungen (erzeugt) |
+| `audio/` | Echte Aufnahmen (MP3, mono, Lautheit angeglichen). Einträge in `AR.audio` mit `src` (bei Ida zusätzlich `srcRev`) werden abgespielt; Einträge ohne `src` zeigen nur das Transkript. Vorhanden: Ida, Diktat. Fehlt noch: Anruf, F1–F3. |
 | `js/story.js` | Haupt- und Nebenrätsel, Hinweise, Dateisystem, 24 Mails, interne Nachrichten, Kalender, Notizbuch, Audio, Enden |
 | `js/wiki.js` | NORDSUCHE: 46 Wissensartikel mit Synonymen und Mini-Rechnern |
 | `js/game.js` | Spielstand `archon_save_v1`, Kapitel, Rätselprüfung, Sperren, Sicherheitslevel, Terminal, Beweistiefe, Wertung, Enden |

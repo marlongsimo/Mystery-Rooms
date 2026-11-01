@@ -241,7 +241,7 @@ window.AR = window.AR || {};
       case "status": P(`HOST ARIS-ARCHIVE-07 · KAPITEL ${chapter()} · SECURITY LEVEL 0${level()} · TRACE ${fmt(remaining())}`); break;
       case "sysinfo":
         ["Host: ARIS-ARCHIVE-07 (Archivrechner)", "Betrieb: über Infrastruktur Dritter", "Benutzer: h.aris", "Kennworthinweis: „Wo sie liegt.“",
-          "Kennwortrichtlinie: Buchstaben, gefolgt von Ziffern. Keine Leerzeichen.", "Hintergrundbild: harbour.jpg"].forEach((l) => P(l));
+          "Kennwortrichtlinie: Buchstaben, gefolgt von Ziffern. Keine Leerzeichen. Groß-/Kleinschreibung egal.", "Hintergrundbild: harbour.jpg"].forEach((l) => P(l));
         break;
       case "ls": {
         const all = args[0] === "-a";

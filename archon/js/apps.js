@@ -54,9 +54,9 @@ window.AR = window.AR || {};
     render(w) {
       const locked = G.locks.left("login") > 0, show = !!w.state.show;
       w.body.innerHTML = `<form class="login"><div class="avatar">HA</div><p class="login-user">h.aris</p>
-        <div class="pw"><input class="field" type="${show ? "text" : "password"}" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Kennwort" aria-label="Kennwort" ${locked ? "disabled" : ""}><button type="button" class="pw-eye" aria-label="${show ? "Kennwort verbergen" : "Kennwort anzeigen"}" title="${show ? "Kennwort verbergen" : "Kennwort anzeigen"}">${show ? EYE_C : EYE_O}</button></div>
+        <div class="pw"><input class="field" type="${show ? "text" : "password"}" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Kennwort" aria-label="Kennwort" ${locked ? "disabled" : ""}><button type="button" class="pw-eye" aria-label="${show ? "Kennwort verbergen" : "Kennwort anzeigen"}" title="${show ? "Kennwort verbergen" : "Kennwort anzeigen"}">${show ? EYE_C : EYE_O}</button></div>
         <button class="btn" type="submit" ${locked ? "disabled" : ""}>Anmelden</button>
-        <p class="login-hint">Kennworthinweis: <b>„Wo sie liegt.“</b></p>${w.state.m ? msgHtml(w.state.m) : locked ? msgHtml({ ok: false, text: "Anmeldung gesperrt.", t: "login" }) : msgHtml(null)}</form>`;
+        <p class="login-hint">Kennworthinweis: <b>„Wo sie liegt.“</b><br><small>Groß-/Kleinschreibung spielt keine Rolle.</small></p>${w.state.m ? msgHtml(w.state.m) : locked ? msgHtml({ ok: false, text: "Anmeldung gesperrt.", t: "login" }) : msgHtml(null)}</form>`;
     },
     opened(w) {
       w.body.addEventListener("click", (e) => {
@@ -79,7 +79,7 @@ Betrieb:           Infrastruktur eines Dritten
 Benutzer:          h.aris
 Kennworthinweis:   „Wo sie liegt.“
 Kennwortrichtlinie: Buchstaben, gefolgt von Ziffern.
-                   Keine Leerzeichen.
+                   Keine Leerzeichen. Groß-/Kleinschreibung egal.
 Hintergrundbild:   harbour.jpg
 Notfall-Terminal:  help · meta · decode</pre></div>`; },
   };

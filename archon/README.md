@@ -38,6 +38,22 @@ Gemeinsame Bausteine: `platform/desktop` (Fenster, Ton, Spielzeit-Uhr, Sperren),
 | Strukturierte Zahlungen „ab 06.10.“ | 03.10. (TX-1015, Feiertag) bis 26.10.; das Geld vom 03.10. wird erst am 13./15.10. weitergeleitet, der erste *vollständige* Durchlauf bleibt TX-1017 → 1019 → 1022 → 1031 | Konsistenz mit TX-1015 als Teil der neun Zahlungen |
 | N3 „Kalender: drei Termine H.“ | verschlüsselte Notiz `notiz_H.enc`, Kennwort DONNERSTAG (Wochentag der H.-Termine) | braucht eine Eingabe, damit es ein Rätsel ist |
 
+## Überarbeitung nach dem ersten Testlauf (01.11.2026)
+
+Befund: zu schwer, zu viel gleichzeitig; Kapitel 3 trotz Hinweisen nicht lösbar. Ursache bei R7/R8: Die Eingabe prüfte nur einen aus Prüfbericht und Firmenprofilen zusammengesetzten Code – die 84 Buchungen waren für die Lösung gar nicht nötig.
+
+| Änderung | Umsetzung |
+|---|---|
+| Vier Hinweisstufen | Alle Haupträtsel: Orientierung · Methode · konkrete Hilfe · Lösungsweg (Stufe 4 nennt die Lösung). `story.js` |
+| Zielzeile | Unter der Kopfleiste steht immer das aktuelle Ziel; in Kapitel 2–4 alle Aufgaben des Kapitels mit Häkchen. Klick öffnet den Einstieg. `os.js` |
+| R8 Geldspur | Im LEDGER markierte Buchungen werden als Kette geprüft: Empfänger = nächster Absender, 1–3 Tage, Betrag −1,5 % (Cent). Fehler werden je Glied erklärt. Erst danach zeigt das Spiel Route, Prüfziffern und Stationen-Code. `game.js traceChain` |
+| Eindeutigkeit | `tools/check.js`: Alle 5 gültigen Durchläufe in den 84 Buchungen ergeben dieselbe Route NORD-01 → MERC-04 → ARGO-07 → LUX-02; keine Kette lässt sich verlängern; keine Ausschüttung passt als Glied. |
+| R10 Rechnungsabgleich | Eigenes Arbeitsfenster: links 6 Rechnungen, Mitte Rechnung, rechts Buchung und Registereinträge (Aussteller/Empfänger). Notizen „Fehler gefunden/stimmig“, Bestätigen = Lösung. |
+| R14 | Das Protokoll nennt die Prüfregel und markiert die drei defekten Blöcke. |
+| Ruhigerer Bildschirm | Höchstens 3 sichtbare Fenster (das hinterste wandert in die Taskleiste), Knopf „Aufräumen“, höchstens 2 Meldungen gleichzeitig, keine doppelte Level-Meldung. |
+| Spielweise | Beim Start: „Mit Countdown“ oder „Ohne Zeitdruck“ (kein Zeitablauf, keine Zeit-Eskalation, Kopfleiste zeigt Spielzeit; Wertung ohne Zeitanteil, getrennt ausgewiesen). |
+| Testprotokoll | Pause-Menü und Endbildschirm: Modus, Gesamtdauer, Zeit je Kapitel und Rätsel (Freischaltung → Lösung), Hinweisstufe und -zeitpunkte, Fehlversuche, Hänger über 10 min. Export als JSON-Datei oder Text. Gemessen wird am Spielstand, nicht an Fenstern. |
+
 ## Tests (Playwright, 01.11.2026)
 
 - **Durchlauf A:** alle 15 Haupt- und 12 Nebenrätsel über die Oberfläche bis zum Ende A1 (Index 96, THE ARCHON), keine Fehler.

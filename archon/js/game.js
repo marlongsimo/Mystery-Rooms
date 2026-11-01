@@ -23,16 +23,28 @@ window.AR = window.AR || {};
     solved: {}, sides: {}, flags: {}, locks: {}, hints: {},
     proto: {}, autoFlags: {}, akte: { notes: "", hypos: [] }, found: [],
     storyLevel: 1, maxFailLevel: 1, ending: null, choice: null, seen: {},
+    mode: null,          // "timer" (Countdown) | "relaxed" (ohne Zeitdruck); alte Spielstände = timer
+    marks: {},           // LEDGER: markierte Buchungen
+    invMarks: {},        // Rechnungsabgleich: eigene Notizen (ok/bad)
+    route: null,         // R8: gültige Kette
+    openAt: {}, chAt: {}, hintAt: {}, startedAt: null, // Testprotokoll
   });
   let S = fresh();
   try { const raw = JSON.parse(localStorage.getItem(KEY) || "null"); if (raw && raw.v === 1) S = { ...fresh(), ...raw }; } catch (e) { /* privat */ }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* privat */ } };
-  const changed = () => { save(); AR.emit("change"); };
+  const relaxed = () => S.mode === "relaxed";
+  /** Testprotokoll: wann wurde ein Kapitel erreicht, wann ein Rätsel freigeschaltet (unabhängig von Fenstern). */
+  function track() {
+    if (!S.started) return;
+    const ch = chapter(); if (S.chAt[ch] == null) S.chAt[ch] = S.elapsed;
+    openPuzzles().forEach((p) => { if (S.openAt[p.id] == null) S.openAt[p.id] = S.elapsed; });
+  }
+  const changed = () => { track(); save(); AR.emit("change"); };
 
   /* ---------- Zeit, Pause, Sperren ---------- */
   const clock = MRPlayClock.create({
     get: () => S.elapsed, set: (v) => { S.elapsed = v; }, save,
-    onTick: () => { if (S.elapsed >= TOTAL && !S.ending) finish("FAIL"); AR.emit("tick"); },
+    onTick: () => { if (S.elapsed >= TOTAL && !S.ending && !relaxed()) finish("FAIL"); AR.emit("tick"); },
   });
   const locks = MRLocks.create({ store: () => S.locks, now: () => S.elapsed, onChange: () => { updateLevel(); changed(); } });
   const remaining = () => Math.max(0, TOTAL - S.elapsed);
@@ -134,6 +146,44 @@ window.AR = window.AR || {};
     MRSound.play("deny");
     return { ok: false, text: hint + (sec ? ` Analysemodul für ${locks.fmt(sec)} gesperrt.` : "") };
   }
+  /* R8: markierte Buchungen als Weiterleitungskette prüfen.
+   * Regeln: Empfänger = nächster Absender · 1–3 Tage später · Betrag = vorheriger − 1,5 % (auf Cent).
+   * Drei Buchungen = vier Konten (Ursprung bis letzte Zwischenstation). Jede gültige Kette ergibt dieselbe Route
+   * (tools/check.js prüft das über alle 84 Buchungen). */
+  const dayNo = (d) => { const [a, b, c] = d.split(".").map(Number); return Math.round(Date.UTC(c, b - 1, a) / 864e5); };
+  const cent = (x) => Math.round(x * 100) / 100;
+  const eurTxt = (n) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  function linkProblem(a, b) {
+    if (a.to !== b.from) return `${b.id} kommt von ${b.from} – das Geld aus ${a.id} ging aber an ${a.to}.`;
+    const d = dayNo(b.date) - dayNo(a.date);
+    if (d < 1 || d > 3) return `${b.id} liegt ${d} Tag${Math.abs(d) === 1 ? "" : "e"} nach ${a.id}. Eine Weiterleitung folgt 1 bis 3 Tage später.`;
+    const exp = cent(a.amount * 0.985);
+    if (Math.abs(exp - b.amount) >= 0.005) return `${b.id}: erwartet ${eurTxt(exp)} (${a.id} minus 1,5 %), gebucht sind ${eurTxt(b.amount)}.`;
+    return null;
+  }
+  const chainLinks = (tx) => tx.slice(1).map((b, i) => linkProblem(tx[i], b));
+  const routeOf = (tx) => [tx[0].from, ...tx.map((t) => t.to)];
+  const checkDigit = (k) => (AR.firms[k] ? AR.firms[k].iban.replace(/\s/g, "").slice(2, 4) : "??");
+  function traceChain(ids) {
+    const tx = ids.map((id) => AR.ledger.find((t) => t.id === id)).filter(Boolean).sort((a, b) => (dayNo(a.date) - dayNo(b.date)) || a.time.localeCompare(b.time));
+    const left = locks.left("ledger");
+    if (left > 0) return { ok: false, locked: left, target: "ledger", base: "Analysemodul gesperrt.", text: `Analysemodul gesperrt · noch ${locks.fmt(left)}` };
+    const div = tx.find((t) => /^Dividende/.test(t.purpose));
+    if (div) return { ok: false, soft: true, text: `${div.id} ist eine Ausschüttung an ${div.to}, keine Weiterleitung – sie gehört nicht zur Route. Entferne die Markierung.` };
+    if (tx.length !== 3) return { ok: false, soft: true, text: `${tx.length} Buchung${tx.length === 1 ? "" : "en"} markiert. Gesucht ist ein vollständiger Durchlauf: drei Buchungen, vom Ursprung bis zur letzten Zwischenstation (vier Konten).` };
+    const probs = chainLinks(tx), bad = probs.find(Boolean);
+    if (!bad) {
+      const route = routeOf(tx);
+      S.route = tx.map((t) => t.id);
+      addFound(`Geldroute ${route.join(" → ")} · Stationen-Code ${route.map(checkDigit).join("")}`);
+      solve("R8");
+      return { ok: true, tx, route, code: route.map(checkDigit).join("") };
+    }
+    const sec = locks.fail("ledger");
+    MRSound.play("deny");
+    return { ok: false, target: "ledger", tx, probs, base: "Keine gültige Kette: " + bad, text: "Keine gültige Kette: " + bad + (sec ? ` Analysemodul für ${locks.fmt(sec)} gesperrt.` : "") };
+  }
+  function setMark(id, on) { if (on) S.marks[id] = true; else delete S.marks[id]; changed(); }
   function registerSearch(q) {
     const d = String(q || "").replace(/\D/g, "");
     const left = locks.left("register");
@@ -320,7 +370,11 @@ window.AR = window.AR || {};
 
   /* ---------- Hinweise ---------- */
   const openPuzzles = () => AR.puzzles.filter((p) => p.ch === chapter() && !is(p.id) && (!p.needs || p.needs.every(is)));
-  function revealHint(id) { const n = S.hints[id] || 0; if (n >= 3) return; S.hints[id] = n + 1; changed(); }
+  function revealHint(id) {
+    const p = AR.puzzles.find((x) => x.id === id), n = S.hints[id] || 0;
+    if (!p || n >= p.hints.length) return;
+    S.hints[id] = n + 1; (S.hintAt[id] = S.hintAt[id] || []).push(S.elapsed); changed();
+  }
   const hintsUsed = () => Object.values(S.hints).reduce((a, b) => a + b, 0);
 
   /* ---------- Beweistiefe, Wertung, Enden ---------- */
@@ -334,12 +388,13 @@ window.AR = window.AR || {};
     const e = evidence();
     const inv = (0.6 * mainSolved() / 15 + 0.4 * e.pts / 12) * 100;
     const acc = Math.max(0, 100 - 4 * locks.total());
-    const time = S.ending && S.ending !== "FAIL" ? Math.min(remaining() / 1800, 1) * 100 : 0;
+    const time = relaxed() ? null : S.ending && S.ending !== "FAIL" ? Math.min(remaining() / 1800, 1) * 100 : 0;
     const help = Math.max(0, 100 - 10 * hintsUsed());
     const sec = S.maxFailLevel <= 3 ? 100 : S.maxFailLevel === 4 ? 75 : 50;
-    const total = Math.round(0.35 * inv + 0.25 * acc + 0.2 * time + 0.1 * help + 0.1 * sec);
+    // Ohne Zeitdruck: Zeitanteil entfällt, die übrigen Anteile werden hochgerechnet (eigene Wertung)
+    const total = relaxed() ? Math.round((0.35 * inv + 0.25 * acc + 0.1 * help + 0.1 * sec) / 0.8) : Math.round(0.35 * inv + 0.25 * acc + 0.2 * time + 0.1 * help + 0.1 * sec);
     const title = total >= 95 ? "THE ARCHON" : total >= 80 ? "GHOST PROTOCOL" : total >= 60 ? "MASTER ANALYST" : total >= 40 ? "DIGITAL FORENSIC" : "ARCHON INITIATE";
-    return { total, title, parts: { inv: Math.round(inv), acc, time: Math.round(time), help, sec }, evidence: e, main: mainSolved(), hints: hintsUsed(), fails: locks.total() };
+    return { total, title, relaxed: relaxed(), parts: { inv: Math.round(inv), acc, time: time === null ? null : Math.round(time), help, sec }, evidence: e, main: mainSolved(), hints: hintsUsed(), fails: locks.total() };
   }
   function decide(choice) {
     if (!is("R15") || S.ending) return null;
@@ -350,16 +405,45 @@ window.AR = window.AR || {};
   function finish(id) { if (S.ending) return; S.ending = id; clock.stop(); changed(); AR.emit("end", id); }
 
   /* ---------- Start ---------- */
-  function start() { if (!S.started) { S.started = true; changed(); } clock.start(); }
+  function start(mode) {
+    if (!S.started) { S.started = true; S.mode = mode === "relaxed" ? "relaxed" : "timer"; S.startedAt = new Date().toISOString(); S.chAt[1] = 0; changed(); }
+    clock.start();
+  }
+
+  /* ---------- Testprotokoll ---------- */
+  const FAIL_TARGET = { R1: "login", R3: "auth", R4: "restore", R5: "R5", R6: "R6", R8: "ledger", R9: "register", R10: "R10", R11: "R11", R12: "R12", R14: "repair", R15: "decrypt" };
+  const mmss = (sec) => (sec == null ? "–" : `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`);
+  function protocol() {
+    const now = S.elapsed, ch = chapter(), sc = score();
+    const chapters = [1, 2, 3, 4, 5].filter((c) => S.chAt[c] != null).map((c) => {
+      const end = S.chAt[c + 1] != null ? S.chAt[c + 1] : S.ending ? now : null;
+      return { kapitel: c, beginn: mmss(S.chAt[c]), ende: end == null ? "läuft" : mmss(end), dauer_min: +(((end == null ? now : end) - S.chAt[c]) / 60).toFixed(1) };
+    });
+    const puzzles = AR.puzzles.map((p) => {
+      const op = S.openAt[p.id], sv = S.solved[p.id], dur = op == null ? null : (sv != null ? sv : now) - op;
+      return { id: p.id, raetsel: p.label, kapitel: p.ch, freigeschaltet: mmss(op), geloest: sv != null ? mmss(sv) : (op != null ? "offen" : "–"),
+        dauer_min: dur == null ? null : +(dur / 60).toFixed(1), hinweise: S.hints[p.id] || 0, hinweis_zeiten: (S.hintAt[p.id] || []).map(mmss),
+        fehlversuche: FAIL_TARGET[p.id] ? locks.fails(FAIL_TARGET[p.id]) : 0, ueber_10_min: dur != null && dur > 600 };
+    });
+    return {
+      spiel: "Das ARCHON-Protokoll", version: AR.version || "", erstellt: new Date().toISOString(), begonnen: S.startedAt,
+      modus: relaxed() ? "ohne Zeitdruck" : "Countdown 120 min", gesamtdauer_min: +(now / 60).toFixed(1), restzeit: relaxed() ? "–" : mmss(remaining()),
+      ende: S.ending || "nicht beendet", kapitel_erreicht: ch, haupraetsel_geloest: mainSolved(), nebenraetsel: Object.keys(S.sides).length,
+      hinweise_gesamt: hintsUsed(), fehlversuche_gesamt: locks.total(), wertung: S.ending ? sc.total : null,
+      haenger_ueber_10_min: puzzles.filter((p) => p.ueber_10_min).map((p) => `${p.id} ${p.raetsel} (${p.dauer_min} min)`),
+      kapitel: chapters, raetsel: puzzles,
+      hinweis: "Rätselzeit = von der Freischaltung bis zur Lösung. In Kapitel 2–4 sind mehrere Rätsel gleichzeitig offen; ihre Zeiten überschneiden sich.",
+    };
+  }
   function reset() { S = fresh(); save(); clock.stop(); AR.emit("change"); }
   function pause(on) { clock.pause(on); MRSound.suspend(on); AR.emit("pause", on); }
   updateLevel();
 
   AR.game = {
     get state() { return S; }, TOTAL, norm, fmt, remaining, chapter, level, cond, is, side, visible, unlocked, children,
-    solve, solveSide, setFlag, addFound, login, spectro, ledgerCode, registerSearch, freightFinding, brenner, flagAuto, tryNodeLock,
+    solve, solveSide, setFlag, addFound, login, spectro, ledgerCode, traceChain, chainLinks, routeOf, checkDigit, setMark, registerSearch, protocol, relaxed, freightFinding, brenner, flagAuto, tryNodeLock,
     command, available, openPuzzles, revealHint, hintsUsed, evidence, score, decide, start, reset, pause,
     isPaused: () => clock.isPaused(), locks, save,
-    _set(sec) { S.elapsed = sec; if (S.elapsed >= TOTAL && !S.ending) finish("FAIL"); AR.emit("tick"); },
+    _set(sec) { S.elapsed = sec; if (S.elapsed >= TOTAL && !S.ending && !relaxed()) finish("FAIL"); AR.emit("tick"); },
   };
 })();

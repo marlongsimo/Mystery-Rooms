@@ -261,6 +261,8 @@ Zu jedem Rätsel stehen hier: Ort, Material, Herleitung, **Eingabe**, Sperrregel
 - Die Embargo-Codes sind **nicht Teil einer Pflichtlösung**. Sie liefern Beweistiefe und erklären, warum die Fracht als Tarnung taugt.
 
 #### R7 + R8 · Transaktionsanalyse und die vier Konten
+
+> **Geändert nach Testlauf 1 (siehe README):** Gelöst wird R8 jetzt, indem man im LEDGER einen vollständigen Durchlauf (z. B. TX-1017 → TX-1019 → TX-1022) markiert und als Kette prüfen lässt. Danach zeigt das Spiel Route, Prüfziffern und den Stationen-Code 42178805 an.
 - **Fachlicher Hinweis zur 50.000-EUR-Schwelle:** Die 50.000 EUR sind ausschließlich eine fiktive interne Freigabe- und Prüfschwelle der Hafenbank, keine gesetzliche Verdachtsmeldeschwelle. Nach § 43 Abs. 1 GwG besteht die Pflicht zur Verdachtsmeldung unabhängig vom Wert der Transaktion. Die Spieler sollen ein bankinternes Umgehungsmuster erkennen. Der Suchmaschinen-Artikel „Strukturierung“ erklärt genau diesen Unterschied.
 - **Herleitung:**
   1. Strukturierte Zahlungen erkennen: Häufigkeit, Beträge knapp unter der internen 50.000-EUR-Schwelle, fehlende Rechnungsreferenzen. Große Beträge allein führen in die Falle.

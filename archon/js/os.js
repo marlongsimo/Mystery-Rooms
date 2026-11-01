@@ -44,8 +44,10 @@ window.AR = window.AR || {};
   AR.nodeIcon = (id) => { const n = N[id]; if (n.type === "folder") return n.lock && !G.unlocked(id) ? "lockfolder" : n.icon === "red" ? "redfolder" : "folder"; return n.type === "origin" ? "origin" : n.type; };
 
   /* ---------- Fenster (gemeinsamer Desktop-Baustein) ---------- */
-  const D = MRDesktop.create({ desk: $("#desk"), layer: $("#windows"), tasks: $("#tasks"), apps: () => AR.apps, icon: AR.icon, sound: snd });
-  const toast = (o) => MRDesktop.toast($("#toasts"), o);
+  // Höchstens drei sichtbare Fenster: das vierte schiebt das hinterste in die Taskleiste
+  const D = MRDesktop.create({ desk: $("#desk"), layer: $("#windows"), tasks: $("#tasks"), apps: () => AR.apps, icon: AR.icon, sound: snd, maxOpen: 3 });
+  // Ruhiger Bildschirm: höchstens zwei Meldungen gleichzeitig, etwas kürzer
+  const toast = (o) => MRDesktop.toast($("#toasts"), { max: 2, ms: 4500, ...o });
 
   function openNode(id) {
     const n = N[id]; if (!n || !G.visible(id)) return;
@@ -66,7 +68,7 @@ window.AR = window.AR || {};
       ["browser", "Browser", "browser", () => D.open("browser")], ["audio", "Audio", "audio", () => D.open("audio")], ["pics", "Bilder", "folder", () => D.open("explorer", "pics")],
       ["trash", "Papierkorb", "trash", () => D.open("explorer", "trash")], ["notebook", "Notizbuch", "note", () => D.open("notebook")], ["terminal", "Terminal", "terminal", () => D.open("terminal")],
       ["akte", "Akte", "akte", () => D.open("akte")], ["syslog", "Systemlog", "log", () => D.open("syslog")]);
-    if (ch >= 3) it.push(["ledger", "LEDGER", "ledger", () => D.open("ledger")], ["pruefung", "PRUEFUNG", "folder", () => D.open("explorer", "pruefung")]);
+    if (ch >= 3) it.push(["ledger", "LEDGER", "ledger", () => D.open("ledger")], ["abgleich", "Rechnungs­abgleich", "invoice", () => D.open("abgleich")], ["pruefung", "PRUEFUNG", "folder", () => D.open("explorer", "pruefung")]);
     if (ch >= 4) it.push(["inq", "INQUISITION_PROTOCOL", "redfolder", () => D.open("explorer", "inquisition")]);
     if (ch >= 5) it.push(["core", "ARCHIVE_CORE", "redfolder", () => D.open("explorer", "core")]);
     return it;
@@ -82,9 +84,10 @@ window.AR = window.AR || {};
 
   /* ---------- Kopfleiste ---------- */
   function paintTop() {
-    const S = G.state, lv = G.level(), r = G.remaining();
-    $("#trace").textContent = G.fmt(r);
-    $("#trace").className = "trace" + (r <= 300 ? " crit" : r <= 1800 ? " warn" : "");
+    const S = G.state, lv = G.level(), relaxed = G.relaxed(), r = relaxed ? G.TOTAL : G.remaining();
+    $("#traceK").textContent = relaxed ? "SPIELZEIT" : "TRACE";
+    $("#trace").textContent = G.fmt(relaxed ? S.elapsed : r);
+    $("#trace").className = "trace" + (relaxed ? " calm" : r <= 300 ? " crit" : r <= 1800 ? " warn" : "");
     $("#lvl").innerHTML = [1, 2, 3, 4, 5].map((i) => `<i class="${i <= lv ? "on" : ""}${i >= 4 && i <= lv ? " hot" : ""}"></i>`).join("") + `<span>SECURITY LEVEL 0${lv}</span>`;
     $("#chap").textContent = S.login ? `KAPITEL ${G.chapter()}` : "GESPERRT";
     const desk = $("#desk");
@@ -100,13 +103,43 @@ window.AR = window.AR || {};
   }
   let lastBeat = -1;
 
+  /* ---------- Zielzeile: immer sichtbar, was als Nächstes zu tun ist ---------- */
+  function goals() {
+    const S = G.state;
+    if (G.is("R15")) return [{ id: "END", goal: "ARCHON_ORIGIN ist entschlüsselt. Lies es und triff deine Entscheidung.", go: ["node", "origin"] }];
+    const ch = G.chapter(), list = AR.puzzles.filter((p) => p.ch === ch);
+    if (!S.login && !G.is("R1")) return [list[0]];
+    if (ch === 1 || ch === 5) { const nx = list.find((p) => !G.is(p.id) && (!p.needs || p.needs.every(G.is))); return nx ? [nx] : []; }
+    return list;
+  }
+  let lastGoal = "";
+  function paintGoal() {
+    const el = $("#goal"), S = G.state;
+    if (!S.started || S.ending) { el.hidden = true; return; }
+    const gs = goals(), multi = gs.length > 1;
+    const html = !gs.length ? "" : multi
+      ? `<span class="gk">KAPITEL ${G.chapter()} · ${gs.length} AUFGABEN, BELIEBIGE REIHENFOLGE</span>${gs.map((p) => `<button class="g-item${G.is(p.id) ? " done" : ""}" data-goal="${p.id}" title="${esc(p.goal)}"><i>${G.is(p.id) ? "✓" : "○"}</i>${esc(p.label)}</button>`).join("")}`
+      : `<span class="gk">ZIEL</span><button class="g-item one" data-goal="${gs[0].id}"><span>${esc(gs[0].goal)}</span><em>öffnen →</em></button>`;
+    el.hidden = !html;
+    if (html !== lastGoal) { lastGoal = html; el.innerHTML = html; }
+  }
+  function runGoal(id) {
+    const p = id === "END" ? goals()[0] : AR.puzzles.find((x) => x.id === id); if (!p || !p.go) return;
+    const [kind, a, arg, tab] = p.go;
+    if (kind === "node") { if (G.visible(a)) openNode(a); else D.open("explorer", "docs"); return; }
+    const w = D.open(a, arg == null ? undefined : arg);
+    if (w && tab) { w.state.tab = tab; D.render(w); }
+  }
+
   /* ---------- Bildschirme ---------- */
+  let pendingMode = "timer";
   const show = (id) => ["title", "boot", "desk", "end"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== id));
   function paintTitle() {
     const S = G.state, going = S.started && !S.ending;
     $("#startBtn").textContent = going ? "Sitzung fortsetzen" : "Verbindung herstellen";
     $("#resetBtn").hidden = !S.started;
-    $("#titleState").textContent = going ? `Laufende Sitzung · TRACE noch ${G.fmt(G.remaining())} · Kapitel ${G.chapter()}` : S.ending ? `Letzte Sitzung beendet: ${AR.endings[S.ending].title}` : "";
+    $("#titleState").textContent = going ? (G.relaxed() ? `Laufende Sitzung ohne Zeitdruck · Spielzeit ${G.fmt(S.elapsed)} · Kapitel ${G.chapter()}` : `Laufende Sitzung · TRACE noch ${G.fmt(G.remaining())} · Kapitel ${G.chapter()}`) : S.ending ? `Letzte Sitzung beendet: ${AR.endings[S.ending].title}` : "";
+    $("#modeBox").hidden = going;
   }
   /* Intro (nur bei neuer Sitzung): Video → Meldung + anonyme Nachricht → Verbindungsaufbau. Spielzeit startet erst danach. */
   function boot() {
@@ -144,8 +177,8 @@ window.AR = window.AR || {};
     vid.play().catch(stageMsg);
   }
   function enterDesk() {
-    show("desk"); G.start(); snd.fan();
-    paintIcons(); paintTop(); D.paintTasks();
+    show("desk"); G.start(pendingMode); snd.fan();
+    paintIcons(); paintTop(); paintGoal(); D.paintTasks();
     if (!G.state.login) lockScreen(); else $("#lockbar").hidden = true;
     if (G.state.ending) showEnd(G.state.ending, true);
   }
@@ -157,7 +190,7 @@ window.AR = window.AR || {};
     $("#lockbar").hidden = true;
     D.wins.slice().forEach((w) => { if (w.app === "sysinfo") D.close(w); });
     toast({ title: "Angemeldet als h.aris", text: "Eingeschränkter Modus. Mail und Terminal sind verfügbar.", kind: "ok" });
-    paintIcons();
+    paintIcons(); paintGoal();
   }
   function pause(on) {
     G.pause(on);
@@ -174,7 +207,7 @@ window.AR = window.AR || {};
       const w = D.wins.find((x) => x.body.contains(el)); if (w) D.render(w);
     });
   });
-  AR.on("change", () => { if ($("#desk").classList.contains("hidden")) return; paintIcons(); paintTop(); D.refresh(); });
+  AR.on("change", () => { if ($("#desk").classList.contains("hidden")) return; paintIcons(); paintTop(); paintGoal(); D.refresh(); });
   AR.on("solved", (id) => {
     snd.play("unlock");
     const p = AR.puzzles.find((x) => x.id === id);
@@ -194,7 +227,8 @@ window.AR = window.AR || {};
     if (ch === 5) { snd.play("alarm"); toast({ title: "NACHRICHT VON H. ARIS", text: "Öffne „Nachrichten“. SECURITY LEVEL 05 – Alarmzustand.", kind: "alert", ms: 10000 }); setTimeout(() => D.open("messenger"), 1200); }
     paintIcons();
   });
-  AR.on("level", (lv) => { snd.play("level"); toast({ title: `SECURITY LEVEL 0${lv}`, text: lv >= 4 ? "Aktive Gegenmaßnahmen. Weniger raten." : "Erhöhte Überwachung.", kind: "sys" }); });
+  // Nur Level-Sprünge durch Fehlversuche melden; Kapitel-Level meldet schon das Kapitel-Ereignis
+  AR.on("level", (lv) => { if (lv <= G.state.storyLevel) return; snd.play("level"); toast({ title: `SECURITY LEVEL 0${lv}`, text: lv >= 4 ? "Aktive Gegenmaßnahmen. Weniger raten." : "Erhöhte Überwachung.", kind: "sys" }); });
   AR.on("end", (id) => showEnd(id, false));
 
   /* ---------- Ende ---------- */
@@ -204,12 +238,14 @@ window.AR = window.AR || {};
     show("end");
     const box = $("#end");
     box.className = "end " + E.kind;
-    const solution = `<ol class="sol"><li>R1 Login: LIEGEPLATZ47 (meta harbour.jpg → decode → „Liegeplatz 47“, Richtlinie: ohne Leerzeichen)</li><li>R2/R3: X-Archive-Key → sargasso → auth sargasso</li><li>R4: restore frag_A frag_C frag_B (Zeiten im Zitat: 09:14, 11:02, 16:40)</li><li>R5: Spektrogramm → VELLUM</li><li>R6: HR-2209 (Eintragsdatum 31.09. gibt es nicht)</li><li>R7/R8: 42178805 (Prüfziffern NORD 42 · MERC 17 · ARGO 88 · LUX 05)</li><li>R9: FL-0002.413.587-4 → Stiftung Kestrel</li><li>R10: AR-2026-118</li><li>R11: ORKAN</li><li>R12: HOLM (Unterbrechung 19:35–19:48, Telefonat 19:41)</li><li>R14: repair 3 904D · repair 5 7786 · repair 7 C1DA</li><li>R15: LIEGEPLATZ47-VELLUM-42178805-ORKAN</li><li>Nebenrätsel: whoami · HELM · DONNERSTAG · Mediaplayer „Umkehren“ bei Idas Nachricht · TX-1015 ⚙ · K-3 · log --user ns_observer · NORDELBE · inspect window · history · SMS im Papierkorb · ls -a / cat .postkarte</li></ol>`;
+    const solution = `<ol class="sol"><li>R1 Login: LIEGEPLATZ47 (meta harbour.jpg → decode → „Liegeplatz 47“, Richtlinie: ohne Leerzeichen)</li><li>R2/R3: X-Archive-Key → sargasso → auth sargasso</li><li>R4: restore frag_A frag_C frag_B (Zeiten im Zitat: 09:14, 11:02, 16:40)</li><li>R5: Spektrogramm → VELLUM</li><li>R6: HR-2209 (Eintragsdatum 31.09. gibt es nicht)</li><li>R8: im LEDGER TX-1017 → TX-1019 → TX-1022 markieren, „Kette prüfen“ → Route NORD-01 → MERC-04 → ARGO-07 → LUX-02 → Stationen-Code 42178805 (Prüfziffern 42 · 17 · 88 · 05)</li><li>R9: FL-0002.413.587-4 → Stiftung Kestrel</li><li>R10: AR-2026-118</li><li>R11: ORKAN</li><li>R12: HOLM (Unterbrechung 19:35–19:48, Telefonat 19:41)</li><li>R14: repair 3 904D · repair 5 7786 · repair 7 C1DA</li><li>R15: LIEGEPLATZ47-VELLUM-42178805-ORKAN</li><li>Nebenrätsel: whoami · HELM · DONNERSTAG · Mediaplayer „Umkehren“ bei Idas Nachricht · TX-1015 ⚙ · K-3 · log --user ns_observer · NORDELBE · inspect window · history · SMS im Papierkorb · ls -a / cat .postkarte</li></ol>`;
     box.innerHTML = `<div class="end-inner"><p class="end-k">${id === "FAIL" ? "SESSION TERMINATED" : "CASE CLOSED"}</p><h1>${esc(E.title)}</h1>
       ${E.text.map((t) => `<p>${esc(t)}</p>`).join("")}
       <section class="end-score"><h3>ARCHON PERFORMANCE INDEX · ${sc.total} · ${esc(sc.title)}</h3>
-        <table><tr><td>Ermittlungsleistung (35 %)</td><td>${sc.parts.inv}</td></tr><tr><td>Rätselgenauigkeit (25 %)</td><td>${sc.parts.acc}</td></tr><tr><td>Zeitmanagement (20 %)</td><td>${sc.parts.time}</td></tr><tr><td>Hilfenutzung (10 %)</td><td>${sc.parts.help}</td></tr><tr><td>Sicherheitsverhalten (10 %)</td><td>${sc.parts.sec}</td></tr></table>
-        <p>Haupträtsel ${sc.main} von 15 · Beweistiefe ${sc.evidence.pts} von 12 · ${sc.hints} Hinweise · ${sc.fails} Fehlversuche · Restzeit ${G.fmt(G.remaining())}</p></section>
+        ${sc.relaxed ? `<p class="dim">Wertung ohne Zeitdruck – nicht mit dem Countdown-Modus vergleichbar.</p>` : ""}
+        <table><tr><td>Ermittlungsleistung (${sc.relaxed ? "44" : "35"} %)</td><td>${sc.parts.inv}</td></tr><tr><td>Rätselgenauigkeit (${sc.relaxed ? "31" : "25"} %)</td><td>${sc.parts.acc}</td></tr>${sc.relaxed ? "" : `<tr><td>Zeitmanagement (20 %)</td><td>${sc.parts.time}</td></tr>`}<tr><td>Hilfenutzung (${sc.relaxed ? "12,5" : "10"} %)</td><td>${sc.parts.help}</td></tr><tr><td>Sicherheitsverhalten (${sc.relaxed ? "12,5" : "10"} %)</td><td>${sc.parts.sec}</td></tr></table>
+        <p>Haupträtsel ${sc.main} von 15 · Beweistiefe ${sc.evidence.pts} von 12 · ${sc.hints} Hinweise · ${sc.fails} Fehlversuche · ${sc.relaxed ? `Spielzeit ${G.fmt(G.state.elapsed)}` : `Restzeit ${G.fmt(G.remaining())}`}</p>
+        <p><button class="btn small ghost" id="endProto">Testprotokoll anzeigen und speichern</button></p></section>
       <details class="end-sol"><summary>Lösungen anzeigen</summary>${solution}</details>
       <div class="end-rating"></div>
       <div class="end-actions"><button class="btn" id="endNew">Neue Sitzung</button> <a class="btn ghost" href="../index.html">Alle Escape Rooms</a></div></div>`;
@@ -218,6 +254,7 @@ window.AR = window.AR || {};
     if (window.MRRating) MRRating.mount($(".end-rating", box), { game: "archon", title: "Das ARCHON-Protokoll", ending: id });
     $("#endNew").onclick = () => { if (confirm("Neue Sitzung beginnen? Der Spielstand wird gelöscht.")) { G.reset(); location.reload(); } };
     if (!instant) snd.play(id === "FAIL" ? "alarm" : "notify");
+    const ep = $("#endProto"); if (ep) ep.addEventListener("click", showProtocol);
   }
 
   /* ---------- Verdrahtung ---------- */
@@ -227,7 +264,15 @@ window.AR = window.AR || {};
     const paintGate = () => { $("#mobileNote").hidden = !gate.matches; };
     paintGate(); gate.addEventListener("change", paintGate);
     paintTitle();
-    $("#startBtn").addEventListener("click", () => { if (G.state.ending) G.reset(); if (G.state.started) enterDesk(); else boot(); });
+    $("#startBtn").addEventListener("click", () => {
+      if (G.state.ending) G.reset();
+      if (G.state.started) return enterDesk();
+      const m = document.querySelector('input[name="mode"]:checked'); pendingMode = m ? m.value : "timer";
+      boot();
+    });
+    $("#goal").addEventListener("click", (e) => { const b = e.target.closest("[data-goal]"); if (b) { snd.play("click"); runGoal(b.dataset.goal); } });
+    $("#tidyBtn").addEventListener("click", () => D.tidy());
+    $("#pauseProto").addEventListener("click", () => showProtocol());
     $("#resetBtn").addEventListener("click", () => { if (confirm("Sitzung wirklich neu beginnen? Der Fortschritt geht verloren.")) { G.reset(); paintTitle(); } });
     $("#pauseBtn").addEventListener("click", () => pause(true));
     $("#resume").addEventListener("click", () => pause(false));
@@ -242,6 +287,39 @@ window.AR = window.AR || {};
     $("#lkLogin").addEventListener("click", () => D.open("login"));
     document.addEventListener("visibilitychange", () => { if (document.hidden) G.save(); });
   }
-  AR.os = { open: D.open, close: D.close, render: D.render, activate: D.activate, openNode, toast, paintIcons, afterLogin, wins: D.wins, D };
+  /* ---------- Testprotokoll (Anzeige, Export als JSON-Datei und Text) ---------- */
+  function protoText(P) {
+    const L = [`${P.spiel} – Testprotokoll`, `Modus: ${P.modus} · Gesamtdauer ${P.gesamtdauer_min} min · Ende: ${P.ende} · Kapitel erreicht: ${P.kapitel_erreicht}`,
+      `Haupträtsel gelöst: ${P.haupraetsel_geloest}/15 · Nebenrätsel: ${P.nebenraetsel} · Hinweise: ${P.hinweise_gesamt} · Fehlversuche: ${P.fehlversuche_gesamt}${P.wertung != null ? " · Wertung " + P.wertung : ""}`, "",
+      "Kapitel:", ...P.kapitel.map((k) => `  ${k.kapitel}: ${k.beginn} – ${k.ende} (${k.dauer_min} min)`), "",
+      "Rätsel (Freischaltung → Lösung):", ...P.raetsel.filter((r) => r.freigeschaltet !== "–").map((r) => `  ${r.id} ${r.raetsel}: ${r.freigeschaltet} → ${r.geloest}, ${r.dauer_min} min, Hinweise ${r.hinweise}${r.hinweise ? " (" + r.hinweis_zeiten.join(", ") + ")" : ""}, Fehlversuche ${r.fehlversuche}${r.ueber_10_min ? "  ⚠ über 10 min" : ""}`), "",
+      `Hänger über 10 min: ${P.haenger_ueber_10_min.length ? P.haenger_ueber_10_min.join("; ") : "keine"}`, P.hinweis];
+    return L.join("\n");
+  }
+  function showProtocol() {
+    const P = G.protocol(), box = $("#protoBox");
+    box.innerHTML = `<div class="pb-inner"><h2>Testprotokoll</h2><p class="dim">${esc(P.modus)} · ${P.gesamtdauer_min} min gespielt · Kapitel ${P.kapitel_erreicht} · ${P.hinweise_gesamt} Hinweise · ${P.fehlversuche_gesamt} Fehlversuche</p>
+      <table class="pb-tab"><tr><th>Kapitel</th><th>Beginn</th><th>Ende</th><th>Minuten</th></tr>${P.kapitel.map((k) => `<tr><td>${k.kapitel}</td><td>${k.beginn}</td><td>${k.ende}</td><td>${k.dauer_min}</td></tr>`).join("")}</table>
+      <table class="pb-tab"><tr><th>Rätsel</th><th>frei ab</th><th>gelöst</th><th>Minuten</th><th>Hinweisstufe</th><th>Fehlversuche</th></tr>${P.raetsel.filter((r) => r.freigeschaltet !== "–").map((r) => `<tr class="${r.ueber_10_min ? "warn" : ""}"><td>${esc(r.id + " " + r.raetsel)}</td><td>${r.freigeschaltet}</td><td>${r.geloest}</td><td>${r.dauer_min}${r.ueber_10_min ? " ⚠" : ""}</td><td>${r.hinweise}</td><td>${r.fehlversuche}</td></tr>`).join("")}</table>
+      <p class="dim">⚠ = über 10 Minuten. ${esc(P.hinweis)}</p>
+      <div class="pb-acts"><button class="btn" id="pbSave">Als Datei speichern (JSON)</button><button class="btn ghost" id="pbCopy">Als Text kopieren</button><button class="btn ghost" id="pbClose">Schließen</button><span id="pbMsg" class="dim"></span></div></div>`;
+    box.hidden = false;
+    $("#pbClose").onclick = () => { box.hidden = true; };
+    $("#pbSave").onclick = () => {
+      const blob = new Blob([JSON.stringify(P, null, 2)], { type: "application/json" }), a = document.createElement("a");
+      const d = new Date(), stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${String(d.getHours()).padStart(2, "0")}${String(d.getMinutes()).padStart(2, "0")}`;
+      a.href = URL.createObjectURL(blob); a.download = `archon-testprotokoll-${stamp}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      $("#pbMsg").textContent = "Datei gespeichert.";
+    };
+    $("#pbCopy").onclick = () => {
+      const t = protoText(P);
+      (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { $("#pbMsg").textContent = "Text kopiert."; }, () => {
+        const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); $("#pbMsg").textContent = "Text kopiert."; } catch (e) { $("#pbMsg").textContent = "Kopieren nicht möglich."; } ta.remove();
+      });
+    };
+  }
+  AR.protocolText = protoText;
+
+  AR.os = { open: D.open, close: D.close, render: D.render, activate: D.activate, openNode, toast, paintIcons, paintGoal, runGoal, showProtocol, afterLogin, wins: D.wins, D };
   init();
 })();

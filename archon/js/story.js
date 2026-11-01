@@ -11,58 +11,72 @@ window.AR = window.AR || {};
 
   /* ---------- Haupträtsel ---------- */
   AR.puzzles = [
-    { id: "R1", ch: 1, label: "Das unsichtbare Passwort", hints: [
-      "Das Bild ist mehr als ein Hintergrund.",
-      "Bilder haben Eigenschaften, die man nicht sieht. Das Terminal kann sie lesen – und manche Zeichenketten übersetzen.",
-      "In den Bilddaten steht eine verschlüsselte Zeichenkette. Entschlüsselt sagt sie, wo sie liegt – schreib es so, wie die Kennwortrichtlinie es verlangt."] },
-    { id: "R2", ch: 1, label: "Die manipulierte Spam-Mail", hints: [
-      "Nicht jede Spam-Mail ist Spam.",
-      "Sieh dir an, was eine Mail über sich selbst verrät – unter der Oberfläche.",
-      "Eine Kopfzeile beginnt mit X- und gehört zu keinem Mailprogramm. Das Terminal kann sie lesbar machen."] },
-    { id: "R3", ch: 1, label: "Der erste Terminalzugang", needs: ["R2"], hints: [
-      "Das Terminal kann jetzt mehr. Frag es.",
-      "„help“ zeigt einen neuen Befehl.",
-      "Der Schlüssel stammt aus der Mail, die keine Spam-Mail war."] },
-    { id: "R4", ch: 2, label: "Die gelöschte Akte", hints: [
-      "Drei Teile einer Datei. Die Reihenfolge stand irgendwo, als sie noch ganz war.",
-      "Aris hat die Teile an sich selbst gemailt. Achte auf die Uhrzeit, zu der er sie ursprünglich verschickt hat.",
-      "Weiterleitungen tragen ein neues Datum. Die echte Zeit steht im zitierten Text."] },
-    { id: "R5", ch: 2, label: "Der letzte Anruf", hints: [
-      "Aris hat nicht nur gesprochen.",
-      "Untersuche die Frequenzbereiche der Aufnahme.",
-      "Im mittleren Abschnitt, hoch oben im Spektrum, ist etwas geschrieben."] },
-    { id: "R6", ch: 2, label: "Die falsche Identität", hints: [
-      "Drei Dokumente, eine Person. Eines lügt.",
-      "Vergleiche nicht nur die Person, sondern auch die Angaben über die Dokumente selbst.",
-      "Ein Datum kann nicht stimmen, egal welches Jahr."] },
-    { id: "R8", ch: 3, label: "Transaktionsanalyse: die vier Konten", hints: [
-      "Es geht nicht um die größten Beträge, sondern um die regelmäßigsten.",
-      "Folge einer Zahlung: Wohin geht dasselbe Geld ein, zwei Tage später?",
-      "Der Prüfbericht sagt, welche Konten zählen und in welcher Reihenfolge. Die Ziffern stehen in den Firmenprofilen."] },
-    { id: "R9", ch: 3, label: "Die Kontrollkette", hints: [
-      "Wem gehört Corvane – und wem gehört der, dem Corvane gehört?",
-      "Der Trust verweist auf eine Anlage. Ein Name fehlt dort, eine Nummer nicht.",
-      "Ausländische Register lassen sich im Intranet nur über die Registernummer abfragen."] },
-    { id: "R10", ch: 3, label: "Der Rechnungsabgleich", hints: [
-      "Fünf Rechnungen haben je genau einen Fehler. Eine einzige ist mit allen drei Quellen konsistent.",
-      "Prüfe jede Rechnung gegen drei Quellen: Buchung, Register, Prüfbericht.",
-      "Achte auf Beträge, Daten, Anschriften, Steuernummern und darauf, ob es den Aussteller oder Empfänger an diesem Tag unter diesem Namen noch gab."] },
-    { id: "R11", ch: 4, label: "Das Organisationsdiagramm", hints: [
-      "Fünf Decknamen, fünf Ebenen. Die Kopfzeilen verraten, wer wem berichtet.",
-      "Beginne bei den Zahlungslisten und folge der Berichtskette bis zu der Person, an die niemand berichtet.",
-      "Der Schlüssel ist ein Wort aus fünf Buchstaben: der Anfang jedes Decknamens, von unten nach oben."] },
-    { id: "R12", ch: 4, label: "Die Identität von ARCHON", hints: [
-      "Nordstern hat eine Lücke im Terminkalender verraten.",
-      "Vergleiche den Zeitstempel des Telefonats mit dem Sitzungsprotokoll.",
-      "Das Protokoll vermerkt eine Unterbrechung. Wer hat den Raum in genau dieser Zeit verlassen? Die Teilnehmerliste sagt, wer diese Rolle hat."] },
-    { id: "R14", ch: 5, label: "Das beschädigte Masterprotokoll", hints: [
-      "Die Regeln standen in Aris' Prüfbericht.",
-      "Hex-Ziffern: A=10 … F=15. Jede Zeile prüft sich selbst.",
-      "Rechne für jeden Block die Summe der ersten drei Stellen mod 16 und vergleiche mit der vierten."] },
-    { id: "R15", ch: 5, label: "Die letzte Verschlüsselung", needs: ["R14"], hints: [
-      "Das Format steht im reparierten Protokoll.",
-      "Jeder Teil ist ein Schlüssel, den du schon benutzt oder gefunden hast.",
-      "Zugang = das erste, was du auf diesem Rechner eingegeben hast. Ton = was du gesehen, nicht gehört hast."] },
+    // hints: 1 Orientierung (wo) · 2 Methode (was vergleichen) · 3 konkrete Hilfe (welche Daten) · 4 Lösungsweg
+    { id: "R1", ch: 1, label: "Das unsichtbare Passwort", goal: "Melde dich als h.aris an.", go: ["open", "login"], hints: [
+      "Alles Nötige findest du auf dem Sperrbildschirm: Systeminformationen, Notfall-Terminal und das Hintergrundbild.",
+      "Das Hintergrundbild harbour.jpg hat versteckte Bilddaten. Im Terminal liest „meta“ sie aus, „decode“ übersetzt verschlüsselte Zeichenketten.",
+      "Gib im Terminal „meta harbour.jpg“ ein. Der Kommentar ist Base64 – übersetze ihn mit decode. Die Kennwortrichtlinie verlangt: Buchstaben, dann Ziffern, keine Leerzeichen.",
+      "decode TGllZ2VwbGF0eiA0Nw== ergibt „Liegeplatz 47“. Das Kennwort lautet LIEGEPLATZ47."] },
+    { id: "R2", ch: 1, label: "Die manipulierte Spam-Mail", goal: "Finde den Archivschlüssel – eine der Mails ist nicht, was sie scheint.", go: ["open", "mail"], hints: [
+      "Im Mailprogramm liegen nur vier Nachrichten. Eine davon ist keine echte Spam-Mail.",
+      "Öffne die Mail vom Paketdienst und klicke auf „Kopfzeilen anzeigen“. Kopfzeilen verraten, was eine Mail über sich selbst sagt.",
+      "Die Kopfzeile „X-Archive-Key“ gehört zu keinem Mailprogramm. Ihr Wert ist Base64 – übersetze ihn im Terminal mit decode.",
+      "Im Terminal: decode c2FyZ2Fzc28= ergibt „sargasso“. Das ist der Archivschlüssel."] },
+    { id: "R3", ch: 1, label: "Der erste Terminalzugang", needs: ["R2"], goal: "Gib das Archiv im Terminal frei.", go: ["open", "terminal"], hints: [
+      "Die Mail vom IT-Service erklärt, wie das Archiv freigegeben wird.",
+      "Der Befehl heißt „auth“ und braucht einen Archivschlüssel („help auth“ erklärt ihn).",
+      "Den Schlüssel hast du aus der Kopfzeile der Paketdienst-Mail entschlüsselt.",
+      "Im Terminal: auth sargasso"] },
+    { id: "R4", ch: 2, label: "Die gelöschte Akte", goal: "Stelle den gelöschten Prüfbericht wieder her.", go: ["node", "trash"], hints: [
+      "Die drei Fragmente liegen im Papierkorb. Die richtige Reihenfolge steht im Mailprogramm, Ordner „Sicherung“.",
+      "Jede Sicherungsmail hat ein Fragment im Anhang (teil_2C9, teil_A11, teil_7F3). Ordne die Teile nach der Uhrzeit, zu der Aris sie ursprünglich verschickt hat – nicht nach dem Datum der Weiterleitung.",
+      "Bei weitergeleiteten Mails (Fwd) steht die Originalzeit im zitierten Text: 2C9 um 09:14, A11 um 11:02, 7F3 um 16:40. Zusammengesetzt wird im Terminal mit restore.",
+      "Im Terminal: restore frag_A frag_C frag_B (gleichbedeutend: restore 2C9 A11 7F3)."] },
+    { id: "R5", ch: 2, label: "Der letzte Anruf", goal: "Untersuche den Anruf vom 30.10.", go: ["open", "audio", "anruf"], hints: [
+      "Mediaplayer, Datei anruf_3010.wav.",
+      "Ab 1:17 ist gut 20 Sekunden lang nur Rauschen. Hören hilft dort nicht – sieh dir die Aufnahme auf andere Weise an.",
+      "Schalte im Mediaplayer auf „Spektrogramm“ und schau in den hervorgehobenen Bereich, oben zwischen 4 und 6 kHz.",
+      "Im Spektrogramm steht VELLUM. Trag es unter „Auffälligkeit eintragen“ ein."] },
+    { id: "R6", ch: 2, label: "Die falsche Identität", goal: "Entlarve das gefälschte Dokument über Jonas Halden.", go: ["node", "identitaet"], hints: [
+      "Dokumente → identitaet_halden: drei Dokumente über dieselbe Person. Der Ordner VERIFIZIERT will die Nummer der Fälschung.",
+      "Name, Geburtsdatum und Adresse stimmen überall. Prüfe die Angaben über die Dokumente selbst, vor allem jedes Datum.",
+      "Der Handelsregisterauszug (HR-2209) nennt ein Eintragungsdatum, das es im Kalender nicht gibt. Das unscharfe Foto im Profil ist nur eine Falle.",
+      "Den 31.09.2025 gibt es nicht – der September hat 30 Tage. Gib beim Ordner VERIFIZIERT HR-2209 ein."] },
+    { id: "R8", ch: 3, label: "Die Geldspur", goal: "Verfolge einen vollständigen Geld-Durchlauf im LEDGER.", go: ["open", "ledger"], hints: [
+      "Programm LEDGER, Reiter „Buchungen“. Der wiederhergestellte Prüfbericht sagt: Die Zahlungsroute läuft über vier Konten, vom Ursprung bis zur letzten Zwischenstation.",
+      "Suche regelmäßige Zahlungen von NORD-01 an MERC-04 knapp unter 50.000 €. Das Geld wird 1–3 Tage später weitergeleitet, jedes Mal 1,5 % weniger. Der Empfänger einer Buchung ist der Absender der nächsten.",
+      "Beginne bei TX-1017 (06.10., NORD-01 → MERC-04, 48.700 €). Suche die Weiterleitung von MERC-04 einen Tag später und von dort die nächste. Markiere die drei Buchungen (Kästchen links) und prüfe sie im Reiter „Rückverfolgung“.",
+      "Markiere TX-1017, TX-1019 und TX-1022 und drücke im Reiter „Rückverfolgung“ auf „Kette prüfen“. Die Ausschüttung an CORV-08 gehört nicht dazu. Ergebnis: Stationen-Code 42178805."] },
+    { id: "R9", ch: 3, label: "Die Kontrollkette", goal: "Finde heraus, wem Corvane wirklich gehört.", go: ["open", "ledger", null, "firms"], hints: [
+      "Firmenprofile: LEDGER, Reiter „Firmen“ (oder das Register im Intranet). Beginne bei Corvane Holding (CORV-08).",
+      "Lies jeweils „Gesellschafter“: Wem gehört Corvane – und wem gehört diese Firma? Folge der Kette, bis ein Trust auf einen Vertrag verweist.",
+      "Corvane → Sarnia Holdings → Vellum Trust. Der Treuhandvertrag (PRUEFUNG/Treuhand) verweist auf Anlage B; dort steht eine Registernummer aus Liechtenstein.",
+      "Frage im Intranet (Browser) unter „Register“ → Ausländische Register die Nummer FL-0002.413.587-4 ab. Ergebnis: Stiftung Kestrel."] },
+    { id: "R10", ch: 3, label: "Der Rechnungsabgleich", goal: "Finde die einzige stimmige Rechnung.", go: ["open", "abgleich"], hints: [
+      "Desktop-Symbol „Rechnungsabgleich“: links die sechs Rechnungen, rechts jeweils die passende Buchung und die Registereinträge.",
+      "Vergleiche jede Rechnung mit ihrer Buchung (Betrag, Datum) und mit dem Register (Anschrift, USt-ID, Firmenname am Rechnungsdatum). Fünf Rechnungen haben genau einen Fehler.",
+      "Die fünf Fehler: ein Betrag weicht von der Buchung ab · eine Rechnung ist erst nach der Zahlung datiert · eine Anschrift stimmt nicht mit dem Register · eine USt-ID hat eine Ziffer zu viel · eine Firma hieß am Rechnungsdatum schon anders.",
+      "Stimmig ist AR-2026-118 (Buchung TX-1046). Bestätige sie im Rechnungsabgleich – oder gib sie als Kennwort von abgleich_final.enc ein."] },
+    { id: "R11", ch: 4, label: "Das Organisationsdiagramm", goal: "Entschlüssle die Rangordnung von ARCHON.", go: ["node", "inquisition"], hints: [
+      "Ordner INQUISITION_PROTOCOL: nachrichten (MSG-01 … MSG-06) und profile. Die Datei hierarchie.lock will ein Wort aus fünf Buchstaben.",
+      "Jede Nachricht hat einen Absender und einen Empfänger (Decknamen). Wer schreibt an wen? Daraus ergibt sich, wer wem berichtet – von ganz unten bis ganz oben.",
+      "Die Berichtskette: Obolus → Reede → Kompass → Anker → Nordstern. Nimm von jedem Decknamen den ersten Buchstaben, von unten nach oben.",
+      "O-R-K-A-N: Das Freigabewort für hierarchie.lock ist ORKAN."] },
+    { id: "R12", ch: 4, label: "Die Identität von ARCHON", goal: "Finde heraus, wer Nordstern ist.", go: ["node", "inquisition"], hints: [
+      "nordstern.enc will den Nachnamen von Nordstern. Material: Fragment F1 (audio_fragmente) und das Sitzungsprotokoll vom 28.10.",
+      "Vergleiche die Aufnahmezeit von F1 mit dem Ablauf der Aufsichtsratssitzung: Wer war in diesem Moment nicht im Raum?",
+      "F1 wurde um 19:41 aufgenommen. Laut Protokoll war die Sitzung von 19:35 bis 19:48 unterbrochen – die Vorsitzende hat den Raum verlassen.",
+      "Vorsitzende des Aufsichtsrats ist M. Holm. Kennwort für nordstern.enc: HOLM."] },
+    { id: "R14", ch: 5, label: "Das beschädigte Masterprotokoll", goal: "Repariere das Masterprotokoll.", go: ["node", "master"], hints: [
+      "ARCHIVE_CORE → master.proto. Repariert wird im Terminal mit „repair <block> <wert>“.",
+      "Das Protokoll markiert drei defekte Blöcke. Bei jedem Block ist die vierte Stelle die Prüfsumme der ersten drei (Regel aus Aris' Prüfbericht).",
+      "Rechne (1. + 2. + 3. Stelle) mod 16, mit A=10 … F=15. Beispiel Block 3: 9 + 0 + 4 = 13 = D, also 904D.",
+      "Im Terminal: repair 3 904D · repair 5 7786 · repair 7 C1DA"] },
+    { id: "R15", ch: 5, label: "Die letzte Verschlüsselung", needs: ["R14"], goal: "Entschlüssle ARCHON_ORIGIN.", go: ["open", "terminal"], hints: [
+      "Das reparierte Protokoll nennt das Format: MASTER = <ZUGANG>-<TON>-<STATIONEN>-<ORDNUNG>.",
+      "Jeder Teil ist etwas, das du schon gelöst hast – die Akte listet deine Funde.",
+      "ZUGANG = dein Anmeldekennwort · TON = das Wort im Spektrogramm · STATIONEN = der Code aus der Rückverfolgung · ORDNUNG = das Freigabewort der Hierarchie.",
+      "Im Terminal: decrypt ARCHON_ORIGIN --key LIEGEPLATZ47-VELLUM-42178805-ORKAN"] },
   ];
   // R7 ist Teil von R8, R13 ist ein Story-Ereignis – zusammen 15 Haupträtsel
   AR.MAIN_TOTAL = 15;

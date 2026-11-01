@@ -70,17 +70,17 @@ window.AR = window.AR || {};
 
   /* ---------- Rechnungen (PRUEFUNG/Rechnungen) ---------- */
   AR.invoices = [
-    { id: "RE-MER-0412", issuer: "Meridian Logistics Ltd", issuerAddr: "81, Triq il-Merkanti, Valletta VLT 1170", issuerVat: "MT21048833",
+    { id: "RE-MER-0412", tx: "TX-1017", issuerKey: "MERC-04", toKey: "NORD-01", issuer: "Meridian Logistics Ltd", issuerAddr: "81, Triq il-Merkanti, Valletta VLT 1170", issuerVat: "MT21048833",
       to: "Nordkap Handels GmbH", toAddr: "Am Sandtorkai 12, 20457 Hamburg", date: "05.10.2026", item: "Warenvorschuss lt. Rahmenvereinbarung, Ihre Zahlung vom 06.10.", net: "48.500,00 EUR" },
-    { id: "RE-ARG-0233", issuer: "Argos Shipping Ltd", issuerAddr: "28 Spyrou Kyprianou Ave, 3070 Limassol", issuerVat: "CY10401228X",
+    { id: "RE-ARG-0233", tx: "TX-1019", issuerKey: "ARGO-07", toKey: "MERC-04", issuer: "Argos Shipping Ltd", issuerAddr: "28 Spyrou Kyprianou Ave, 3070 Limassol", issuerVat: "CY10401228X",
       to: "Meridian Logistics Ltd", toAddr: "81, Triq il-Merkanti, Valletta VLT 1170", date: "12.10.2026", item: "Fracht Valletta–Limassol, bezahlt am 07.10.", net: "47.969,50 EUR" },
-    { id: "RE-NOR-1180", issuer: "Spedition Kühl GmbH & Co. KG", issuerAddr: "Ellerholzdamm 30, 20457 Hamburg", issuerVat: "DE241773105",
+    { id: "RE-NOR-1180", tx: "TX-1042", toKey: "NORD-01", issuer: "Spedition Kühl GmbH & Co. KG", issuerAddr: "Ellerholzdamm 30, 20457 Hamburg", issuerVat: "DE241773105",
       to: "Nordkap Handels GmbH", toAddr: "Kehrwieder 4, 20457 Hamburg", date: "16.10.2026", item: "Lagerkosten Oktober, Zahlung am 19.10.", net: "530,00 EUR" },
-    { id: "RE-LUX-0077", issuer: "Fiduciaire Moselle S.A.", issuerAddr: "4, Route d’Esch, L-1470 Luxembourg", issuerVat: "LU20381164",
+    { id: "RE-LUX-0077", tx: "TX-1060", toKey: "LUX-02", issuer: "Fiduciaire Moselle S.A.", issuerAddr: "4, Route d’Esch, L-1470 Luxembourg", issuerVat: "LU20381164",
       to: "Luxor Capital S.à r.l.", toAddr: "12, Rue de l’Eau, L-1449 Luxembourg", toVat: "LU314882071", date: "20.10.2026", item: "Buchhaltung Oktober, Zahlung am 23.10.", net: "2.350,00 EUR" },
-    { id: "RE-SAR-0019", issuer: "Guernsey Registry Services", issuerAddr: "PO Box 451, St Peter Port, GY1 3HS", issuerVat: "–",
+    { id: "RE-SAR-0019", tx: "TX-1041", toKey: "SARN-06", issuer: "Guernsey Registry Services", issuerAddr: "PO Box 451, St Peter Port, GY1 3HS", issuerVat: "–",
       to: "Sarnia Maritime Ltd", toAddr: "Les Banques, St Peter Port, GY1 1BZ", date: "14.10.2026", item: "Änderungsmeldung Direktor, Zahlung am 16.10.", net: "745,00 EUR" },
-    { id: "AR-2026-118", issuer: "Argos Shipping Ltd", issuerAddr: "28 Spyrou Kyprianou Ave, 3070 Limassol", issuerVat: "CY10401228X",
+    { id: "AR-2026-118", tx: "TX-1046", issuerKey: "ARGO-07", toKey: "LUX-02", issuer: "Argos Shipping Ltd", issuerAddr: "28 Spyrou Kyprianou Ave, 3070 Limassol", issuerVat: "CY10401228X",
       to: "Luxor Capital S.à r.l.", toAddr: "12, Rue de l’Eau, L-1449 Luxembourg", toVat: "LU31488207", date: "16.10.2026", item: "Seefracht Hamburg–Limassol, Konnossement KN-2210, Zahlung am 19.10.", net: "12.400,00 EUR" },
   ];
 

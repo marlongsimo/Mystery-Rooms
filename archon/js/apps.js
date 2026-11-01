@@ -472,11 +472,11 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       const tabs = [["tx", "Buchungen"], ["firms", "Firmen"], ["net", "Netzwerk"], ["trace", "Rückverfolgung"]];
       let body = "";
       if (tab === "tx") {
-        const f = w.state.f || {}, s = w.state.sort || ["id", 1], marks = w.state.marks || (w.state.marks = {});
+        const f = w.state.f || {}, s = w.state.sort || ["id", 1], marks = G.state.marks;
         let rows = AR.ledger.filter((t) => COLS.every(([k]) => !f[k] || fold(k === "amount" ? eur(t[k]) : t[k]).includes(fold(f[k]))));
         rows.sort((a, b) => { const k = s[0]; const va = k === "amount" ? a.amount : k === "date" ? dkey(a) : String(a[k]); const vb = k === "amount" ? b.amount : k === "date" ? dkey(b) : String(b[k]); return (va > vb ? 1 : va < vb ? -1 : 0) * s[1]; });
         const sum = AR.ledger.filter((t) => marks[t.id]).reduce((a, t) => a + t.amount, 0), nm = Object.values(marks).filter(Boolean).length;
-        body = `<div class="lg-tools"><span>${rows.length} von ${AR.ledger.length} Buchungen</span><span>Markiert: ${nm} · Summe ${eur(sum)} EUR</span><button class="btn small ghost" data-clear>Filter löschen</button></div>
+        body = `<div class="lg-tools"><span>${rows.length} von ${AR.ledger.length} Buchungen</span><span>Markiert: ${nm} · Summe ${eur(sum)} EUR</span><button class="btn small ghost" data-clear>Filter löschen</button>${nm ? `<button class="btn small ghost" data-unmark>Markierungen aufheben</button><button class="btn small" data-tab="trace">Markierte als Kette prüfen →</button>` : ""}</div>
           <div class="lg-scroll"><table class="lg"><thead><tr><th></th>${COLS.map(([k, l]) => `<th><button data-sort="${k}">${l}${s[0] === k ? (s[1] > 0 ? " ▲" : " ▼") : ""}</button><input class="field tiny" data-filter="${k}" value="${esc(f[k] || "")}" placeholder="Filter"></th>`).join("")}<th>auto</th></tr></thead>
           <tbody>${rows.map((t) => `<tr class="${marks[t.id] ? "mk" : ""}"><td><input type="checkbox" data-mark="${t.id}" ${marks[t.id] ? "checked" : ""} aria-label="markieren"></td><td>${t.id}</td><td>${t.date}</td><td>${t.time}</td><td class="num">${eur(t.amount)}</td><td>${esc(t.from)}</td><td>${esc(t.to)}</td><td>${esc(t.ref || "–")}</td><td>${esc(t.purpose)}</td><td><button class="auto${G.state.autoFlags[t.id] ? " on" : ""}" data-auto="${t.id}" title="als automatisiert markieren">⚙</button></td></tr>`).join("")}</tbody></table></div>`;
       } else if (tab === "firms") {
@@ -484,9 +484,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       } else if (tab === "net") {
         body = `<p class="lg-tip">Firmen als Karten. Werkzeug „Faden“: zwei Karten antippen, um eine Verbindung zu ziehen. Verbindungen sind nur Arbeitsmaterial.</p><div class="lg-board"></div>`;
       } else {
-        const left = G.locks.left("ledger");
-        body = `<div class="lg-trace"><h3>Rückverfolgung bestätigen</h3><p>Gib den Code der Zahlungsroute ein (laut Prüfbericht).</p>
-          ${G.is("R8") ? `<p class="msg ok">Rückverfolgung bestätigt: Route gesichert.</p>` : `<form class="lg-code"><input class="field code" name="c" autocomplete="off" ${left > 0 ? "disabled" : ""}><button class="btn" ${left > 0 ? "disabled" : ""}>Bestätigen</button></form>${left > 0 ? lockLine("ledger", "Analysemodul gesperrt") : msgHtml(w.state.m)}`}</div>`;
+        body = traceView(w);
       }
       w.body.innerHTML = `<div class="lg-wrap"><nav class="lg-tabs">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${k === tab ? "on" : ""}">${l}</button>`).join("")}</nav>${body}</div>`;
       if (tab === "net") mountNet(w);
@@ -496,19 +494,38 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
         const t = e.target.closest("[data-tab]"); if (t) { w.state.tab = t.dataset.tab; os().render(w); return; }
         const so = e.target.closest("[data-sort]"); if (so) { const k = so.dataset.sort, s = w.state.sort || ["id", 1]; w.state.sort = [k, s[0] === k ? -s[1] : 1]; os().render(w); return; }
         if (e.target.closest("[data-clear]")) { w.state.f = {}; os().render(w); return; }
+        if (e.target.closest("[data-unmark]")) { Object.keys(G.state.marks).forEach((k) => G.setMark(k, false)); w.state.m = null; return; }
+        const um = e.target.closest("[data-unmark-one]"); if (um) { G.setMark(um.dataset.unmarkOne, false); w.state.m = null; return; }
+        if (e.target.closest("[data-chain]")) { const r = G.traceChain(Object.keys(G.state.marks)); w.state.m = r.ok ? null : { ok: false, text: r.base || r.text, t: r.target }; if (r.ok) snd.play("unlock"); os().render(w); return; }
         const au = e.target.closest("[data-auto]"); if (au) { G.flagAuto(au.dataset.auto); os().render(w); }
       });
-      w.body.addEventListener("change", (e) => { const m = e.target.closest("[data-mark]"); if (m) { w.state.marks[m.dataset.mark] = m.checked; os().render(w); } });
+      w.body.addEventListener("change", (e) => { const m = e.target.closest("[data-mark]"); if (m) { G.setMark(m.dataset.mark, m.checked); w.state.m = null; } });
       w.body.addEventListener("input", (e) => {
         const fi = e.target.closest("[data-filter]"); if (!fi) return;
         (w.state.f = w.state.f || {})[fi.dataset.filter] = fi.value;
         const k = fi.dataset.filter, pos = fi.selectionStart; os().render(w);
         const again = w.body.querySelector(`[data-filter="${k}"]`); if (again) { again.focus(); again.setSelectionRange(pos, pos); }
       });
-      w.body.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.matches(".lg-code")) { const r = G.ledgerCode(e.target.c.value); w.state.m = r.ok ? null : fail(r); if (r.ok) snd.play("unlock"); os().render(w); } });
     },
-    onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input")) return; os().render(w); if (w.state.board && G.is("R9") && !w.state.board.has("kestrel")) w.state.board.pin({ id: "kestrel", kind: "doc", title: "Stiftung Kestrel", sub: "Vaduz · " + AR.kestrel.number }); },
+    onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input:not([type=checkbox])")) return; os().render(w); if (w.state.board && G.is("R9") && !w.state.board.has("kestrel")) w.state.board.pin({ id: "kestrel", kind: "doc", title: "Stiftung Kestrel", sub: "Vaduz · " + AR.kestrel.number }); },
   };
+  /** Reiter „Rückverfolgung“: markierte Buchungen als Kette prüfen (R8). */
+  function traceView(w) {
+    const rule = `<ol class="tr-rules"><li>Empfänger einer Buchung = Absender der nächsten</li><li>1 bis 3 Tage später</li><li>Betrag = vorheriger Betrag minus 1,5 % (auf Cent)</li></ol>`;
+    if (G.is("R8") && G.state.route) {
+      const tx = G.state.route.map((id) => AR.ledger.find((t) => t.id === id)), route = G.routeOf(tx);
+      return `<div class="lg-trace"><h3>Rückverfolgung bestätigt</h3><p class="msg ok">Die Kette ist lückenlos. Die Route läuft über vier Konten.</p>
+        <div class="tr-route">${route.map((k, i) => `<div class="tr-st"><b>${esc(k)}</b><small>${esc(AR.firms[k] ? AR.firms[k].name : "")}</small><span>Prüfziffer ${esc(G.checkDigit(k))}</span></div>${i < route.length - 1 ? `<i>→ ${esc(tx[i].id)}</i>` : ""}`).join("")}</div>
+        <p class="tr-code">Stationen-Code: <b>${route.map(G.checkDigit).join("")}</b></p><p class="dim">Der Code steht auch in der Akte.</p></div>`;
+    }
+    if (G.is("R8")) return `<div class="lg-trace"><h3>Rückverfolgung bestätigt</h3><p class="tr-code">Stationen-Code: <b>42178805</b></p></div>`;
+    const tx = Object.keys(G.state.marks).map((id) => AR.ledger.find((t) => t.id === id)).filter(Boolean).sort((a, b) => dkey(a).localeCompare(dkey(b)));
+    const probs = tx.length > 1 ? G.chainLinks(tx) : [];
+    const left = G.locks.left("ledger");
+    return `<div class="lg-trace"><h3>Rückverfolgung</h3><p>Markiere im Reiter „Buchungen“ einen vollständigen Durchlauf des Geldes und prüfe ihn hier. Eine gültige Kette erfüllt:</p>${rule}
+      ${tx.length ? `<table class="tr-tab"><tr><th>Buchung</th><th>Datum</th><th>Von → An</th><th class="num">Betrag</th><th>Verbindung zur vorigen</th><th></th></tr>${tx.map((t, i) => `<tr><td>${t.id}</td><td>${t.date}</td><td>${esc(t.from)} → ${esc(t.to)}</td><td class="num">${eur(t.amount)}</td><td>${i === 0 ? "–" : probs[i - 1] ? `<span class="bad">✗ ${esc(probs[i - 1])}</span>` : `<span class="ok">✓ passt</span>`}</td><td><button class="hx" data-unmark-one="${t.id}" aria-label="Markierung entfernen">×</button></td></tr>`).join("")}</table>` : `<p class="dim">Noch keine Buchung markiert.</p>`}
+      <p><button class="btn" data-chain ${left > 0 || !tx.length ? "disabled" : ""}>Kette prüfen</button></p>${left > 0 ? lockLine("ledger", "Analysemodul gesperrt") : msgHtml(w.state.m)}</div>`;
+  }
   function mountNet(w) {
     const el = $(".lg-board", w.body);
     if (!el || el === w.state.boardEl) return;
@@ -558,6 +575,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
   function pinFound(w) { G.state.found.forEach((f, i) => { const id = "f" + i; if (!w.state.board.has(id)) w.state.board.pin({ id, kind: "doc", title: f.split(":")[0].slice(0, 40), sub: f.includes(":") ? f.split(":").slice(1).join(":").trim().slice(0, 60) : "" }); }); }
 
   /* ================= Hinweise ================= */
+  const HN_STEPS = ["Orientierung", "Methode", "Konkrete Hilfe", "Lösungsweg"];
   const hints = {
     title: () => "Hinweise", icon: () => "hints", w: 520, h: 480,
     render(w) {
@@ -565,10 +583,10 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       if (!open.length) { w.body.innerHTML = `<div class="hn"><p>Gerade gibt es kein offenes Haupträtsel.</p></div>`; return; }
       if (!open.find((p) => p.id === w.state.sel)) w.state.sel = open[0].id;
       const p = open.find((x) => x.id === w.state.sel), lv = G.state.hints[p.id] || 0;
-      w.body.innerHTML = `<div class="hn"><p class="hn-note">Kapitel ${G.chapter()} · ${G.hintsUsed()} Hinweise genutzt · jeder Hinweis kostet Wertungspunkte, aber keine Zeit. Fachbegriffe erklärt die NORDSUCHE kostenlos.</p>
+      w.body.innerHTML = `<div class="hn"><p class="hn-note">Kapitel ${G.chapter()} · ${G.hintsUsed()} Hinweise genutzt · vier Stufen je Rätsel, von „wo suchen“ bis zum Lösungsweg. Hinweise kosten Wertungspunkte, keine Zeit. Fachbegriffe erklärt die NORDSUCHE kostenlos.</p>
         ${open.length > 1 ? `<div class="hn-tabs">${open.map((x) => `<button class="btn small ${x.id === p.id ? "" : "ghost"}" data-sel="${x.id}">${esc(x.label)}</button>`).join("")}</div>` : ""}
-        <h4>${esc(p.label)}</h4>${p.hints.slice(0, lv).map((h, i) => `<p class="hn-hint"><b>Hinweis ${i + 1}</b>${esc(h)}</p>`).join("")}
-        ${lv < 3 ? `<button class="btn hn-more">${lv ? "Nächster Hinweis" : "Ersten Hinweis zeigen"}</button>` : `<p class="hn-note">Mehr Hinweise gibt es hier nicht. Die Lösungen siehst du nach dem Spiel.</p>`}</div>`;
+        <h4>${esc(p.label)}</h4>${p.goal ? `<p class="hn-goal">Ziel: ${esc(p.goal)}</p>` : ""}${p.hints.slice(0, lv).map((h, i) => `<p class="hn-hint${i === 3 ? " sol" : ""}"><b>Stufe ${i + 1} · ${HN_STEPS[i]}</b>${esc(h)}</p>`).join("")}
+        ${lv < p.hints.length ? `<button class="btn hn-more">${lv ? `Stufe ${lv + 1} zeigen: ${HN_STEPS[lv]}` : "Stufe 1 zeigen: Orientierung"}</button>${lv === 2 ? `<p class="hn-note">Stufe 4 zeigt den vollständigen Lösungsweg.</p>` : ""}` : `<p class="hn-note">Alle Stufen aufgedeckt.</p>`}</div>`;
     },
     opened(w) { w.body.addEventListener("click", (e) => { const s = e.target.closest("[data-sel]"); if (s) { w.state.sel = s.dataset.sel; os().render(w); return; } if (e.target.closest(".hn-more")) G.revealHint(w.state.sel); }); },
     onChange(w) { os().render(w); },
@@ -586,9 +604,11 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
     title: () => "master.proto", icon: () => "proto", w: 520, h: 420,
     render(w) {
       const P = AR.proto;
+      const okSum = (b) => [0, 1, 2].reduce((a, k) => a + parseInt(b[k], 16), 0) % 16 === parseInt(b[3], 16);
       w.body.innerHTML = `<div class="doc"><p class="doc-meta">Sicherungsprotokoll · 8 Blöcke · Reparatur im Terminal: repair &lt;block&gt; &lt;wert&gt;</p>
-        <table class="grid proto">${P.blocks.map((b, i) => `<tr><td>Block ${i + 1}</td><td class="mono">${G.state.proto[i + 1] ? P.fixes[i + 1] : b}</td><td>${G.state.proto[i + 1] ? "repariert" : ""}</td></tr>`).join("")}</table>
-        ${G.is("R14") ? `<p class="msg ok">Protokoll lesbar.<br><b>MASTER = &lt;ZUGANG&gt;-&lt;TON&gt;-&lt;STATIONEN&gt;-&lt;ORDNUNG&gt;</b></p>` : `<p class="dim">Prüfregeln: siehe Anhang des Prüfberichts.</p>`}</div>`;
+        <p class="pr-rule">Prüfregel (Prüfbericht, Anhang): Die <b>vierte Stelle</b> jedes Blocks ist die Summe der ersten drei Stellen <b>mod 16</b>. Hex-Ziffern: A=10, B=11, C=12, D=13, E=14, F=15.</p>
+        <table class="grid proto">${P.blocks.map((b, i) => { const fixed = G.state.proto[i + 1], v = fixed ? P.fixes[i + 1] : b, ok = fixed || okSum(b); return `<tr class="${ok ? "" : "pr-bad"}"><td>Block ${i + 1}</td><td class="mono">${v}</td><td>${fixed ? "✓ repariert" : ok ? "Prüfsumme stimmt" : "✗ Prüfsumme falsch"}</td></tr>`; }).join("")}</table>
+        ${G.is("R14") ? `<p class="msg ok">Protokoll lesbar.<br><b>MASTER = &lt;ZUGANG&gt;-&lt;TON&gt;-&lt;STATIONEN&gt;-&lt;ORDNUNG&gt;</b></p>` : `<p class="dim">Rechne für jeden defekten Block die richtige vierte Stelle aus und ersetze den Block im Terminal.</p>`}</div>`;
     },
     onChange(w) { os().render(w); },
   };
@@ -615,6 +635,40 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
     onChange(w) { const b = $(".o-confirm", w.body); if (b && !b.hidden) return; os().render(w); },
   };
 
-  AR.apps = { login, sysinfo, explorer, lock, text, image, mail, messenger, audio, calendar, notebook, syslog, terminal, browser, ledger, akte, hints, watch, proto, origin };
+  /* ================= Rechnungsabgleich (R10): Rechnung · Buchung · Register in einem Fenster ================= */
+  const regBox = (k, role) => {
+    const f = k && AR.firms[k];
+    if (!f) return `<div class="ab-reg"><h5>${esc(role)}</h5><p class="dim">Externer Dienstleister – nicht im Firmenregister.</p></div>`;
+    return `<div class="ab-reg"><h5>${esc(role)} · Register ${esc(k)}</h5>${tbl([["Name heute", f.name], ["Anschrift", f.address], ["USt-ID", f.vat || "–"], ["Historie", (f.history || []).join(" · ")]])}</div>`;
+  };
+  const abgleich = {
+    title: () => "Rechnungsabgleich · PRUEFUNG", icon: () => "invoice", w: 1040, h: 600, cls: "win-abgleich",
+    render(w) {
+      const invs = AR.invoices, cur = invs.find((x) => x.id === w.state.cur) || invs[0]; w.state.cur = cur.id;
+      const t = AR.ledger.find((x) => x.id === cur.tx), mk = G.state.invMarks, done = G.is("R10"), left = G.locks.left("R10");
+      w.body.innerHTML = `<div class="ab">
+        <nav class="ab-list"><p class="ab-k">Rechnungen (6)</p>${invs.map((x) => `<button class="ab-item${x.id === cur.id ? " on" : ""} ${mk[x.id] || ""}" data-inv="${x.id}"><b>${esc(x.id)}</b><small>${esc(x.issuer)}</small>${mk[x.id] === "bad" ? `<em>Fehler notiert</em>` : mk[x.id] === "ok" ? `<em>stimmig?</em>` : ""}</button>`).join("")}
+          <p class="ab-tip">Fünf Rechnungen haben genau einen Fehler. Vergleiche Betrag und Datum mit der Buchung, Anschrift, USt-ID und Firmennamen mit dem Register.</p></nav>
+        <section class="ab-doc paper"><h4>RECHNUNG ${esc(cur.id)}</h4>${tbl([["Aussteller", cur.issuer], ["Anschrift Aussteller", cur.issuerAddr], ["USt-ID Aussteller", cur.issuerVat], ["Empfänger", cur.to], ["Anschrift Empfänger", cur.toAddr], ...(cur.toVat ? [["USt-ID Empfänger", cur.toVat]] : []), ["Rechnungsdatum", cur.date], ["Leistung", cur.item], ["Betrag", cur.net]])}
+          <div class="ab-acts"><button class="btn small ghost" data-im="bad">Fehler gefunden</button><button class="btn small ghost" data-im="ok">Wirkt stimmig</button><button class="btn small ghost" data-im="">Notiz löschen</button></div>
+          ${done ? `<p class="msg ok">Abgleich abgeschlossen: ${esc("AR-2026-118")} ist die einzige stimmige Rechnung.</p>` : `<button class="btn" data-confirm ${left > 0 ? "disabled" : ""}>Als einzige stimmige Rechnung bestätigen</button>${left > 0 ? lockLine("R10") : msgHtml(w.state.m)}`}</section>
+        <section class="ab-side"><div class="ab-tx"><h5>Buchung laut LEDGER</h5>${t ? tbl([["ID", t.id], ["Datum", t.date + " " + t.time], ["Betrag", eur(t.amount) + " EUR"], ["Von → An", t.from + " → " + t.to], ["Verwendungszweck", t.purpose]]) : `<p class="dim">Keine Buchung gefunden.</p>`}</div>
+          ${regBox(cur.issuerKey, "Aussteller")}${regBox(cur.toKey, "Empfänger")}</section></div>`;
+    },
+    opened(w) {
+      w.body.addEventListener("click", (e) => {
+        const it = e.target.closest("[data-inv]"); if (it) { w.state.cur = it.dataset.inv; w.state.m = null; os().render(w); return; }
+        const im = e.target.closest("[data-im]"); if (im) { if (im.dataset.im) G.state.invMarks[w.state.cur] = im.dataset.im; else delete G.state.invMarks[w.state.cur]; G.save(); os().render(w); return; }
+        if (e.target.closest("[data-confirm]")) {
+          const r = G.tryNodeLock("abgleich", w.state.cur);
+          if (r.ok) { snd.play("unlock"); os().render(w); AR.os.toast({ title: "abgleich_final.enc geöffnet", kind: "ok" }); os().openNode("abgleich"); }
+          else { w.state.m = { ok: false, text: r.locked ? r.base : "Diese Rechnung ist nicht stimmig.", t: r.target }; os().render(w); }
+        }
+      });
+    },
+    onChange(w) { os().render(w); },
+  };
+
+  AR.apps = { login, sysinfo, explorer, lock, text, image, mail, messenger, audio, calendar, notebook, syslog, terminal, browser, ledger, akte, hints, watch, proto, origin, abgleich };
   AR.IMG = IMG;
 })();

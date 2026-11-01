@@ -38,7 +38,7 @@
     });
   }
 
-  function create({ desk, layer, tasks, apps, icon, sound = { play() {} } }) {
+  function create({ desk, layer, tasks, apps, icon, sound = { play() {} }, maxOpen = Infinity }) {
     installTouch();
     guardBody(tasks);
     const wins = [];
@@ -72,6 +72,9 @@
       el.style.width = ww + "px"; el.style.height = hh + "px";
       el.style.left = Math.max(8, Math.min(box.width - ww - 8, opts.x ?? (box.width - ww) / 2 + (n % 6) * 26 - 60)) + "px";
       el.style.top = Math.max(8, Math.min(box.height - hh - 56, opts.y ?? (box.height - hh) / 2 + (n % 6) * 22 - 50)) + "px";
+      // Ruhiger Bildschirm: Sind schon maxOpen Fenster sichtbar, wird das hinterste minimiert (bleibt in der Taskleiste).
+      const vis = wins.filter((x) => !x.min);
+      if (vis.length >= maxOpen) minimize(vis.sort((a, b) => a.el.style.zIndex - b.el.style.zIndex)[0]);
       wins.push(w);
       wire(w);
       focus(w);
@@ -104,6 +107,8 @@
     const topWin = () => wins.filter((x) => !x.min).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
     function toggleMax(w) { w.max = !w.max; w.el.classList.toggle("maxed", w.max); }
     function closeAll() { wins.slice().forEach(close); }
+    /** Alles außer dem vordersten Fenster minimieren. */
+    function tidy() { const top = topWin(); wins.forEach((x) => { if (x !== top && !x.min) minimize(x); }); }
 
     function drag(e, onMove) {
       e.preventDefault();
@@ -158,7 +163,7 @@
     }
     function refresh() { wins.forEach((w) => { const a = A()[w.app]; if (a && a.onChange) a.onChange(w); }); }
 
-    return { open, close, closeAll, render, focus, restore, minimize, toggleMax, wins, topWin, activate, refresh, paintTasks };
+    return { open, close, closeAll, tidy, render, focus, restore, minimize, toggleMax, wins, topWin, activate, refresh, paintTasks };
   }
 
   /* ---------- Scrollpositionen über ein Neuzeichnen retten ---------- */
@@ -218,13 +223,13 @@
   }
 
   /** Kurze Meldung. Fängt keine Klicks ab (CSS: pointer-events none). */
-  function toast(container, { title, text, kind = "", ms = 5500 }) {
+  function toast(container, { title, text, kind = "", ms = 5500, max = 4 }) {
     const el = document.createElement("div");
     el.className = "toast " + kind;
     el.setAttribute("role", "status");
     el.innerHTML = `<b>${esc(title)}</b>${text ? `<span>${esc(text)}</span>` : ""}`;
     container.appendChild(el);
-    const all = container.children; while (all.length > 4) all[0].remove();
+    const all = container.children; while (all.length > max) all[0].remove();
     requestAnimationFrame(() => el.classList.add("show"));
     setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 400); }, ms);
   }

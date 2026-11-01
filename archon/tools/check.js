@@ -22,12 +22,26 @@ pin("TX-1046", "19.10", "LUX-02", "ARGO-07", (x) => x.amount === 12400); pin("TX
 const struct = groups.filter((g) => g.g === "struct");
 ok(struct.every((g) => g.amount >= 47900 && g.amount <= 48900 && !g.ref && g.from_ === "NORD-01" && g.to === "MERC-04"), "strukturierte Zahlungen 47.900–48.900, ohne Rechnung");
 ok(!L.some((t) => t.amount >= 50000 && t.from === "NORD-01"), "keine Nordkap-Zahlung über der internen Schwelle");
+console.log("Hinweise");
+ok(AR.puzzles.every((p) => p.hints.length === 4), "alle Haupträtsel haben vier Hinweisstufen");
+ok(AR.puzzles.every((p) => p.goal && p.go), "alle Haupträtsel haben Ziel und Einstieg");
 console.log("Route und Code");
 const cd = (k) => AR.firms[k].iban.slice(2, 4);
 const code = ["NORD-01", "MERC-04", "ARGO-07", "LUX-02"].map(cd).join("");
 ok(code === "42178805", "IBAN-Prüfziffern der Route ergeben " + code);
 ok(cd("CORV-08") === "29" && cd("HALD-05") === "63", "Fallen: CORV-08 = 29, HALD-05 = 63");
+// R8: Kettenprüfung wie in game.js (Empfänger = nächster Absender, 1–3 Tage, −1,5 % auf Cent)
+const dayNo = (d) => { const [x, y, z] = d.split(".").map(Number); return Math.round(Date.UTC(z, y - 1, x) / 864e5); };
+const link = (a, b) => a.to === b.from && dayNo(b.date) - dayNo(a.date) >= 1 && dayNo(b.date) - dayNo(a.date) <= 3 && Math.abs(Math.round(a.amount * 98.5) / 100 - b.amount) < 0.005;
+const chains = []; L.forEach((a) => L.forEach((b) => { if (link(a, b)) L.forEach((c) => { if (link(b, c)) chains.push([a, b, c]); }); }));
+const routes = new Set(chains.map((c) => [c[0].from, ...c.map((t) => t.to)].join(">")));
+ok(chains.length >= 1 && chains.some((c) => c.map((t) => t.id).join() === "TX-1017,TX-1019,TX-1022"), `Kette TX-1017 → TX-1019 → TX-1022 ist gültig (${chains.length} gültige Durchläufe insgesamt)`);
+ok(routes.size === 1 && routes.has("NORD-01>MERC-04>ARGO-07>LUX-02"), "jede gültige Kette ergibt dieselbe Route NORD-01 → MERC-04 → ARGO-07 → LUX-02 (eindeutig)");
+ok(!chains.some((c) => L.some((d) => link(c[2], d))) && !chains.some((c) => L.some((d) => link(d, c[0]))), "keine Kette lässt sich verlängern (Ursprung und Ende eindeutig)");
+ok(!L.some((a) => /^Dividende/.test(a.purpose) && L.some((b) => link(b, a))), "keine Ausschüttung passt als Weiterleitung");
 console.log("Rechnungen");
+ok(AR.invoices.every((r) => r.tx && by[r.tx]), "jede Rechnung ist einer Buchung zugeordnet (Rechnungsabgleich)");
+ok(AR.invoices.every((r) => (!r.issuerKey || AR.firms[r.issuerKey]) && (!r.toKey || AR.firms[r.toKey])), "Registerbezüge der Rechnungen existieren");
 const vatOk = (v) => /^DE\d{9}$|^LU\d{8}$|^MT\d{8}$|^CY\d{8}[A-Z]$|^–$/.test(v);
 const findFirm = (name) => Object.values(AR.firms).find((f) => f.name === name);
 const errorsOf = (r) => {

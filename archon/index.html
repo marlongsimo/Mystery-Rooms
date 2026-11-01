@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../der-letzte-fall/css/fonts.css?v=1">
   <link rel="stylesheet" href="../platform/board/board.css?v=2">
   <link rel="stylesheet" href="../platform/rating/rating.css?v=1">
-  <link rel="stylesheet" href="css/archon.css?v=6">
+  <link rel="stylesheet" href="css/archon.css?v=7">
 </head>
 <body>
   <!-- ========== TITEL ========== -->
@@ -22,6 +22,10 @@
       <p class="lead">Ermittle in Mails, Buchungen, Registern und Audioaufnahmen. Fachbegriffe erklärt die Wissensdatenbank im Spiel. Falsche Lösungen sperren Eingaben – raten lohnt sich nicht.</p>
       <div id="startBox">
         <div id="mobileNote" class="mobile-note" hidden><b>Tipp: Größer spielt es sich besser.</b> ARCHON ist ein Desktop-Thriller mit vielen Fenstern, Tabellen und Eingaben. Am Handy geht es, wird aber eng. Besser: Computer, iPad im Querformat (gern mit Tastatur) – oder das Handy/iPad per AirPlay bzw. Bildschirmübertragung auf den Fernseher spiegeln.</div>
+        <fieldset id="modeBox" class="modebox"><legend>Spielweise</legend>
+          <label><input type="radio" name="mode" value="timer" checked><span><b>Mit Countdown</b><small>120 Minuten. Läuft die Zeit ab, endet die Sitzung.</small></span></label>
+          <label><input type="radio" name="mode" value="relaxed"><span><b>Ohne Zeitdruck</b><small>Dieselben Rätsel, kein Zeitablauf, keine Zeit-Eskalation. Eigene Wertung.</small></span></label>
+        </fieldset>
         <div class="title-actions"><button class="btn big" id="startBtn">Verbindung herstellen</button><button class="btn ghost" id="resetBtn" hidden>Neu beginnen</button></div>
         <p class="state" id="titleState"></p>
         <p class="micro">SCHWER · ALLEIN · AM BESTEN AM COMPUTER ODER TABLET · MIT TON EMPFOHLEN · PAUSE JEDERZEIT MIT ESC</p>
@@ -59,9 +63,10 @@ HOST: ARIS-ARCHIVE-07
         <button class="tbtn" id="hintBtn" title="Hinweise">?</button>
         <button class="tbtn" id="soundBtn" title="Ton an/aus" aria-label="Ton an/aus">♪</button>
         <button class="tbtn" id="pauseBtn" title="Pause (Esc)" aria-label="Pause">❚❚</button>
-        <span class="trace-k">TRACE</span><span class="trace" id="trace">02:00:00</span>
+        <span class="trace-k" id="traceK">TRACE</span><span class="trace" id="trace">02:00:00</span>
       </div>
     </header>
+    <div id="goal" class="goalbar" hidden></div>
     <div class="wall" aria-hidden="true"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" class="wall-img"></svg></div>
     <div id="icons" class="icons"></div>
     <div id="lockbar" class="lockbar" hidden>
@@ -73,26 +78,27 @@ HOST: ARIS-ARCHIVE-07
     </div>
     <div id="windows"></div>
     <div id="toasts" class="toasts" aria-live="polite"></div>
-    <nav class="taskbar"><div id="tasks" class="tasks"></div></nav>
-    <div id="pause" class="pause" hidden><div><p class="eyebrow">FREEZE</p><h2>TRACE ANGEHALTEN</h2><p>Die Verbindung ist eingefroren. Countdown, Sperren und Ereignisse stehen still.</p><button class="btn" id="resume">Weiter (Esc)</button> <button class="btn ghost" id="pauseTitle">Zum Titel</button></div></div>
+    <nav class="taskbar"><div id="tasks" class="tasks"></div><button class="tidy" id="tidyBtn" title="Alle Fenster außer dem vordersten minimieren">Aufräumen</button></nav>
+    <div id="pause" class="pause" hidden><div><p class="eyebrow">FREEZE</p><h2>TRACE ANGEHALTEN</h2><p>Die Verbindung ist eingefroren. Countdown, Sperren und Ereignisse stehen still.</p><button class="btn" id="resume">Weiter (Esc)</button> <button class="btn ghost" id="pauseTitle">Zum Titel</button> <button class="btn ghost" id="pauseProto">Testprotokoll</button></div></div>
   </section>
 
   <section id="end" class="screen end hidden"></section>
+  <div id="protoBox" class="protobox" hidden role="dialog" aria-label="Testprotokoll"></div>
 
   <script src="../platform/desktop/sound.js?v=1"></script>
-  <script src="../platform/desktop/desktop.js?v=3"></script>
+  <script src="../platform/desktop/desktop.js?v=5"></script>
   <script src="../platform/desktop/playclock.js?v=1"></script>
   <script src="../platform/desktop/locks.js?v=1"></script>
   <script src="../platform/board/board.js?v=2"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>
   <script src="../platform/rating/rating.js?v=1"></script>
-  <script src="js/data.js?v=1"></script>
+  <script src="js/data.js?v=2"></script>
   <script src="js/ledger.js?v=1"></script>
-  <script src="js/story.js?v=5"></script>
+  <script src="js/story.js?v=6"></script>
   <script src="js/wiki.js?v=1"></script>
-  <script src="js/game.js?v=2"></script>
-  <script src="js/apps.js?v=4"></script>
-  <script src="js/os.js?v=5"></script>
+  <script src="js/game.js?v=3"></script>
+  <script src="js/apps.js?v=5"></script>
+  <script src="js/os.js?v=7"></script>
   <script>document.querySelector(".wall-img").innerHTML = AR.IMG.harbour.replace(/^<svg[^>]*>|<\/svg>$/g, "").replace(/<text[^>]*>(KESTREL|LIMASSOL)<\/text>/g, "");</script>
 </body>
 </html>

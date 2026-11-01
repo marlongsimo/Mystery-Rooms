@@ -51,7 +51,9 @@ window.AR = window.AR || {};
 
   function openNode(id) {
     const n = N[id]; if (!n || !G.visible(id)) return;
-    G.state.seen[id] = true; G.save();
+    G.state.seen[id] = true;
+    if (n.type === "invoice" && AR.invoices[n.invoice]) G.state.invSeen[AR.invoices[n.invoice].id] = true;
+    G.save();
     if (n.side === "N11") { G.solveSide("N11"); G.addFound("SMS: Wagen der Vorsitzenden 19:35 am Seiteneingang"); }
     if (n.lock && !G.unlocked(id)) return D.open("lock", id);
     if (n.type === "folder") return D.open("explorer", id);
@@ -102,6 +104,40 @@ window.AR = window.AR || {};
     }
   }
   let lastBeat = -1;
+
+  /* ---------- Aktive Zeit: welches Programm liegt vorne, zu welchem Rätsel gehört es? ---------- */
+  const FOLDER_P = { trash: "R4", identitaet: "R6", verifiziert: "R6", rechnungen: "R10", treuhand: "R9", msgs: "R11", profile: "R11", fragmente: "R12", core: "R14" };
+  const NODE_P = { harbour: "R1", abgleich: "R10", hierarchie: "R11", nordstern: "R12", protokoll: "R12", master: "R14", origin: "R15" };
+  function nodeP(id) { while (id && N[id]) { if (NODE_P[id]) return NODE_P[id]; if (FOLDER_P[id]) return FOLDER_P[id]; id = N[id].parent; } return null; }
+  function activeTarget() {
+    const w = D.topWin(); if (!w) return { app: "desktop", p: null };
+    const S = G.state, ch = G.chapter(); let p = null;
+    switch (w.app) {
+      case "login": case "sysinfo": p = "R1"; break;
+      case "mail": p = ch === 1 ? "R2" : w.state.f === "backup" ? "R4" : null; break;
+      case "terminal": p = !S.login ? "R1" : ch === 1 ? (G.is("R2") ? "R3" : "R2") : ch === 2 ? "R4" : ch === 5 ? (G.is("R14") ? "R15" : "R14") : null; break;
+      case "audio": { const c = w.state.cur || w.arg; p = c === "anruf" ? "R5" : /^f[123]$/.test(c || "") ? "R12" : null; break; }
+      case "ledger": p = w.state.tab === "firms" ? "R9" : "R8"; break;
+      case "browser": p = w.state.url === "register" ? "R9" : null; break;
+      case "abgleich": p = "R10"; break;
+      case "explorer": p = nodeP(w.state.cur || w.arg); break;
+      case "text": case "lock": case "image": p = nodeP(w.arg); break;
+      case "proto": p = "R14"; break;
+      case "origin": p = "R15"; break;
+      case "hints": p = w.state.sel || null; break;
+    }
+    if (p && G.is(p)) p = null;
+    return { app: w.app, p };
+  }
+  let lastAct = null;
+  AR.on("tick", () => {
+    const S = G.state, now = S.elapsed, d = lastAct == null ? 0 : now - lastAct; lastAct = now;
+    if (d <= 0 || d > 5 || !S.started || S.ending || document.hidden || $("#desk").classList.contains("hidden")) return;
+    const t = activeTarget();
+    S.act.app[t.app] = (S.act.app[t.app] || 0) + d;
+    if (t.p) S.act.p[t.p] = (S.act.p[t.p] || 0) + d; // gespeichert wird mit der Spieluhr (alle 5 s)
+  });
+  AR.activeTarget = activeTarget;
 
   /* ---------- Zielzeile: immer sichtbar, was als Nächstes zu tun ist ---------- */
   function goals() {
@@ -292,16 +328,19 @@ window.AR = window.AR || {};
     const L = [`${P.spiel} – Testprotokoll`, `Modus: ${P.modus} · Gesamtdauer ${P.gesamtdauer_min} min · Ende: ${P.ende} · Kapitel erreicht: ${P.kapitel_erreicht}`,
       `Haupträtsel gelöst: ${P.haupraetsel_geloest}/15 · Nebenrätsel: ${P.nebenraetsel} · Hinweise: ${P.hinweise_gesamt} · Fehlversuche: ${P.fehlversuche_gesamt}${P.wertung != null ? " · Wertung " + P.wertung : ""}`, "",
       "Kapitel:", ...P.kapitel.map((k) => `  ${k.kapitel}: ${k.beginn} – ${k.ende} (${k.dauer_min} min)`), "",
-      "Rätsel (Freischaltung → Lösung):", ...P.raetsel.filter((r) => r.freigeschaltet !== "–").map((r) => `  ${r.id} ${r.raetsel}: ${r.freigeschaltet} → ${r.geloest}, ${r.dauer_min} min, Hinweise ${r.hinweise}${r.hinweise ? " (" + r.hinweis_zeiten.join(", ") + ")" : ""}, Fehlversuche ${r.fehlversuche}${r.ueber_10_min ? "  ⚠ über 10 min" : ""}`), "",
-      `Hänger über 10 min: ${P.haenger_ueber_10_min.length ? P.haenger_ueber_10_min.join("; ") : "keine"}`, P.hinweis];
+      "Rätsel (Freischaltung → Lösung):", ...P.raetsel.filter((r) => r.freigeschaltet !== "–").map((r) => `  ${r.id} ${r.raetsel}: ${r.freigeschaltet} → ${r.geloest} · offen ${r.offen_min} min · aktiv ${r.aktiv_min} min · Hinweisstufe ${r.hinweisstufe}${r.hinweisstufe ? " (" + r.hinweis_zeiten.join(", ") + ")" : ""} · Fehlversuche ${r.fehlversuche}${r.ueber_10_min_aktiv ? "  ⚠ über 10 min aktiv" : ""}`), "",
+      `Über 10 min aktiv: ${P.ueber_10_min_aktiv.length ? P.ueber_10_min_aktiv.join("; ") : "keins"}`,
+      `Rechnungsabgleich: ${P.rechnungsabgleich.rechnungen_angesehen} angesehen, ${P.rechnungsabgleich.fehler_notiert} Fehler notiert, ${P.rechnungsabgleich.aktiv_min} min aktiv, beim Lösen: ${P.rechnungsabgleich.beim_loesen}, Fehlversuche ${P.rechnungsabgleich.fehlversuche}`,
+      `Programme (aktiv, min): ${Object.entries(P.programme_aktiv_min).map(([k, v]) => k + " " + v).join(", ")}`, P.hinweis];
     return L.join("\n");
   }
   function showProtocol() {
     const P = G.protocol(), box = $("#protoBox");
     box.innerHTML = `<div class="pb-inner"><h2>Testprotokoll</h2><p class="dim">${esc(P.modus)} · ${P.gesamtdauer_min} min gespielt · Kapitel ${P.kapitel_erreicht} · ${P.hinweise_gesamt} Hinweise · ${P.fehlversuche_gesamt} Fehlversuche</p>
       <table class="pb-tab"><tr><th>Kapitel</th><th>Beginn</th><th>Ende</th><th>Minuten</th></tr>${P.kapitel.map((k) => `<tr><td>${k.kapitel}</td><td>${k.beginn}</td><td>${k.ende}</td><td>${k.dauer_min}</td></tr>`).join("")}</table>
-      <table class="pb-tab"><tr><th>Rätsel</th><th>frei ab</th><th>gelöst</th><th>Minuten</th><th>Hinweisstufe</th><th>Fehlversuche</th></tr>${P.raetsel.filter((r) => r.freigeschaltet !== "–").map((r) => `<tr class="${r.ueber_10_min ? "warn" : ""}"><td>${esc(r.id + " " + r.raetsel)}</td><td>${r.freigeschaltet}</td><td>${r.geloest}</td><td>${r.dauer_min}${r.ueber_10_min ? " ⚠" : ""}</td><td>${r.hinweise}</td><td>${r.fehlversuche}</td></tr>`).join("")}</table>
-      <p class="dim">⚠ = über 10 Minuten. ${esc(P.hinweis)}</p>
+      <table class="pb-tab"><tr><th>Rätsel</th><th>frei ab</th><th>gelöst</th><th>offen (min)</th><th>aktiv (min)</th><th>Hinweisstufe</th><th>Fehlversuche</th></tr>${P.raetsel.filter((r) => r.freigeschaltet !== "–").map((r) => `<tr class="${r.ueber_10_min_aktiv ? "warn" : ""}"><td>${esc(r.id + " " + r.raetsel)}</td><td>${r.freigeschaltet}</td><td>${r.geloest}</td><td>${r.offen_min}</td><td>${r.aktiv_min}${r.ueber_10_min_aktiv ? " ⚠" : ""}</td><td>${r.hinweisstufe}</td><td>${r.fehlversuche}</td></tr>`).join("")}</table>
+      <p class="dim">Rechnungsabgleich: ${esc(P.rechnungsabgleich.rechnungen_angesehen)} Rechnungen angesehen · ${P.rechnungsabgleich.fehler_notiert} Fehler notiert · ${P.rechnungsabgleich.aktiv_min} min aktiv · beim Lösen: ${esc(P.rechnungsabgleich.beim_loesen)}</p>
+      <p class="dim">⚠ = über 10 Minuten aktiv bearbeitet. ${esc(P.hinweis)}</p>
       <div class="pb-acts"><button class="btn" id="pbSave">Als Datei speichern (JSON)</button><button class="btn ghost" id="pbCopy">Als Text kopieren</button><button class="btn ghost" id="pbClose">Schließen</button><span id="pbMsg" class="dim"></span></div></div>`;
     box.hidden = false;
     $("#pbClose").onclick = () => { box.hidden = true; };

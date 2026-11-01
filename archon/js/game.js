@@ -28,6 +28,8 @@ window.AR = window.AR || {};
     invMarks: {},        // Rechnungsabgleich: eigene Notizen (ok/bad)
     route: null,         // R8: gültige Kette
     openAt: {}, chAt: {}, hintAt: {}, startedAt: null, // Testprotokoll
+    act: { p: {}, app: {} }, // aktive Sekunden je Rätsel / Programm (Programm im Vordergrund, nicht pausiert)
+    invSeen: {}, r10snap: null, // Rechnungsabgleich: angesehene Rechnungen, Stand beim Lösen
   });
   let S = fresh();
   try { const raw = JSON.parse(localStorage.getItem(KEY) || "null"); if (raw && raw.v === 1) S = { ...fresh(), ...raw }; } catch (e) { /* privat */ }
@@ -51,8 +53,8 @@ window.AR = window.AR || {};
   const fmt = (sec) => { sec = Math.max(0, Math.floor(sec)); return `${String(Math.floor(sec / 3600)).padStart(2, "0")}:${String(Math.floor(sec % 3600 / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`; };
 
   /* ---------- Kapitel und Level ---------- */
-  const is = (id) => Boolean(S.solved[id]);
-  const side = (id) => Boolean(S.sides[id]);
+  const is = (id) => S.solved[id] != null; // Zeitstempel 0 (sofort gelöst) zählt als gelöst
+  const side = (id) => S.sides[id] != null;
   function chapter() {
     if (!is("R3")) return 1;
     if (!(is("R4") && is("R5") && is("R6"))) return 2;
@@ -74,7 +76,7 @@ window.AR = window.AR || {};
   let lastLevel = null;
   function updateLevel() {
     const ch = chapter();
-    const story = S.solved.R13 ? 5 : ch >= 4 ? 4 : ch >= 3 ? 3 : is("R3") ? 2 : 1;
+    const story = is("R13") ? 5 : ch >= 4 ? 4 : ch >= 3 ? 3 : is("R3") ? 2 : 1;
     S.storyLevel = Math.max(S.storyLevel, story);
     const lv = level();
     if (lv > S.storyLevel) S.maxFailLevel = Math.max(S.maxFailLevel, lv);
@@ -84,11 +86,12 @@ window.AR = window.AR || {};
 
   /* ---------- Lösen ---------- */
   function solve(id, silent) {
-    if (S.solved[id]) return false;
+    if (is(id)) return false;
     const before = chapter();
     S.solved[id] = S.elapsed;
     if (id === "R8") S.solved.R7 = S.elapsed;
-    if (id === "R2" || id === "R3") S.solved.R2 = S.solved.R2 || S.elapsed;
+    if (id === "R10") S.r10snap = { gesehen: Object.keys(S.invSeen).length, notizen: Object.keys(S.invMarks).length, fehler_notiert: Object.values(S.invMarks).filter((v) => v === "bad").length };
+    if (id === "R2" || id === "R3") if (!is("R2")) S.solved.R2 = S.elapsed;
     if (is("R11") && is("R12") && !is("R13")) { S.solved.R13 = S.elapsed; S.flags.arisMsg = true; }
     updateLevel();
     changed();
@@ -98,7 +101,7 @@ window.AR = window.AR || {};
     return true;
   }
   function solveSide(id) {
-    if (S.sides[id] || !AR.sides[id]) return false;
+    if (side(id) || !AR.sides[id]) return false;
     S.sides[id] = S.elapsed; changed(); AR.emit("side", id); return true;
   }
   function setFlag(k, v = true) { if (S.flags[k] !== v) { S.flags[k] = v; changed(); } }
@@ -130,21 +133,6 @@ window.AR = window.AR || {};
   }
   function spectro(word) {
     return attempt("R5", norm(word) === "VELLUM", () => { addFound("Spektrogramm: VELLUM"); solve("R5"); }, "Das ergibt keinen Sinn im Spektrum.");
-  }
-  function ledgerCode(code) {
-    const c = norm(code);
-    const left = locks.left("ledger");
-    if (left > 0) return { ok: false, locked: left, text: `Analysemodul gesperrt · noch ${locks.fmt(left)}` };
-    if (c === "42178805") { solve("R8"); return { ok: true }; }
-    let hint = "Rückverfolgung nicht bestätigt.";
-    const pairs = (c.match(/\d\d/g) || []);
-    const set = new Set(pairs), right = ["42", "17", "88", "05"];
-    if (set.has("29")) hint = "Ausschüttung ist keine Station.";
-    else if (set.has("63")) hint = "Honorare mit Rechnung sind kein Durchlauf.";
-    else if (pairs.length === 4 && right.every((r) => set.has(r))) hint = "Stationen erkannt, Reihenfolge nicht.";
-    const sec = locks.fail("ledger", { fixed: 90 });
-    MRSound.play("deny");
-    return { ok: false, text: hint + (sec ? ` Analysemodul für ${locks.fmt(sec)} gesperrt.` : "") };
   }
   /* R8: markierte Buchungen als Weiterleitungskette prüfen.
    * Regeln: Empfänger = nächster Absender · 1–3 Tage später · Betrag = vorheriger − 1,5 % (auf Cent).
@@ -420,19 +408,22 @@ window.AR = window.AR || {};
       return { kapitel: c, beginn: mmss(S.chAt[c]), ende: end == null ? "läuft" : mmss(end), dauer_min: +(((end == null ? now : end) - S.chAt[c]) / 60).toFixed(1) };
     });
     const puzzles = AR.puzzles.map((p) => {
-      const op = S.openAt[p.id], sv = S.solved[p.id], dur = op == null ? null : (sv != null ? sv : now) - op;
+      const op = S.openAt[p.id], sv = S.solved[p.id], dur = op == null ? null : (sv != null ? sv : now) - op, act = S.act.p[p.id] || 0;
       return { id: p.id, raetsel: p.label, kapitel: p.ch, freigeschaltet: mmss(op), geloest: sv != null ? mmss(sv) : (op != null ? "offen" : "–"),
-        dauer_min: dur == null ? null : +(dur / 60).toFixed(1), hinweise: S.hints[p.id] || 0, hinweis_zeiten: (S.hintAt[p.id] || []).map(mmss),
-        fehlversuche: FAIL_TARGET[p.id] ? locks.fails(FAIL_TARGET[p.id]) : 0, ueber_10_min: dur != null && dur > 600 };
+        offen_min: dur == null ? null : +(dur / 60).toFixed(1), aktiv_min: +(act / 60).toFixed(1), hinweisstufe: S.hints[p.id] || 0, hinweis_zeiten: (S.hintAt[p.id] || []).map(mmss),
+        fehlversuche: FAIL_TARGET[p.id] ? locks.fails(FAIL_TARGET[p.id]) : 0, ueber_10_min_aktiv: act > 600 };
     });
     return {
       spiel: "Das ARCHON-Protokoll", version: AR.version || "", erstellt: new Date().toISOString(), begonnen: S.startedAt,
       modus: relaxed() ? "ohne Zeitdruck" : "Countdown 120 min", gesamtdauer_min: +(now / 60).toFixed(1), restzeit: relaxed() ? "–" : mmss(remaining()),
       ende: S.ending || "nicht beendet", kapitel_erreicht: ch, haupraetsel_geloest: mainSolved(), nebenraetsel: Object.keys(S.sides).length,
       hinweise_gesamt: hintsUsed(), fehlversuche_gesamt: locks.total(), wertung: S.ending ? sc.total : null,
-      haenger_ueber_10_min: puzzles.filter((p) => p.ueber_10_min).map((p) => `${p.id} ${p.raetsel} (${p.dauer_min} min)`),
+      ueber_10_min_aktiv: puzzles.filter((p) => p.ueber_10_min_aktiv).map((p) => `${p.id} ${p.raetsel} (${p.aktiv_min} min aktiv)`),
       kapitel: chapters, raetsel: puzzles,
-      hinweis: "Rätselzeit = von der Freischaltung bis zur Lösung. In Kapitel 2–4 sind mehrere Rätsel gleichzeitig offen; ihre Zeiten überschneiden sich.",
+      programme_aktiv_min: Object.fromEntries(Object.entries(S.act.app).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, +(v / 60).toFixed(1)])),
+      rechnungsabgleich: { rechnungen_angesehen: Object.keys(S.invSeen).length + " von 6", notizen: Object.keys(S.invMarks).length, fehler_notiert: Object.values(S.invMarks).filter((v) => v === "bad").length,
+        aktiv_min: +((S.act.p.R10 || 0) / 60).toFixed(1), beim_loesen: S.r10snap ? `${S.r10snap.gesehen} von 6 angesehen, ${S.r10snap.fehler_notiert} Fehler notiert` : "noch nicht gelöst", fehlversuche: locks.fails("R10") },
+      hinweis: "Offen = Freischaltung bis Lösung (parallel offene Rätsel überschneiden sich). Aktiv = Sekunden, in denen ein zum Rätsel gehörendes Programm vorne lag und das Spiel nicht pausiert war.",
     };
   }
   function reset() { S = fresh(); save(); clock.stop(); AR.emit("change"); }
@@ -441,7 +432,7 @@ window.AR = window.AR || {};
 
   AR.game = {
     get state() { return S; }, TOTAL, norm, fmt, remaining, chapter, level, cond, is, side, visible, unlocked, children,
-    solve, solveSide, setFlag, addFound, login, spectro, ledgerCode, traceChain, chainLinks, routeOf, checkDigit, setMark, registerSearch, protocol, relaxed, freightFinding, brenner, flagAuto, tryNodeLock,
+    solve, solveSide, setFlag, addFound, login, spectro, traceChain, chainLinks, routeOf, checkDigit, setMark, registerSearch, protocol, relaxed, freightFinding, brenner, flagAuto, tryNodeLock,
     command, available, openPuzzles, revealHint, hintsUsed, evidence, score, decide, start, reset, pause,
     isPaused: () => clock.isPaused(), locks, save,
     _set(sec) { S.elapsed = sec; if (S.elapsed >= TOTAL && !S.ending && !relaxed()) finish("FAIL"); AR.emit("tick"); },

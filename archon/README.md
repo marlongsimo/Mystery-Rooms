@@ -52,7 +52,9 @@ Befund: zu schwer, zu viel gleichzeitig; Kapitel 3 trotz Hinweisen nicht lösbar
 | R14 | Das Protokoll nennt die Prüfregel und markiert die drei defekten Blöcke. |
 | Ruhigerer Bildschirm | Höchstens 3 sichtbare Fenster (das hinterste wandert in die Taskleiste), Knopf „Aufräumen“, höchstens 2 Meldungen gleichzeitig, keine doppelte Level-Meldung. |
 | Spielweise | Beim Start: „Mit Countdown“ oder „Ohne Zeitdruck“ (kein Zeitablauf, keine Zeit-Eskalation, Kopfleiste zeigt Spielzeit; Wertung ohne Zeitanteil, getrennt ausgewiesen). |
-| Testprotokoll | Pause-Menü und Endbildschirm: Modus, Gesamtdauer, Zeit je Kapitel und Rätsel (Freischaltung → Lösung), Hinweisstufe und -zeitpunkte, Fehlversuche, Hänger über 10 min. Export als JSON-Datei oder Text. Gemessen wird am Spielstand, nicht an Fenstern. |
+| Testprotokoll | Pause-Menü und Endbildschirm: Modus, Gesamtdauer, Zeit je Kapitel; je Rätsel **offen** (Freischaltung → Lösung) und **aktiv** (Sekunden, in denen ein zugehöriges Programm vorne lag, ohne Pause); Hinweisstufe mit Zeitpunkten, Fehlversuche, Markierung „über 10 min aktiv“; aktive Minuten je Programm; Rechnungsabgleich: angesehene Rechnungen, notierte Fehler, Stand beim Lösen. Export als JSON-Datei oder Text. Zuordnung Programm → Rätsel in `os.js activeTarget()`. |
+| Spielzeit | „120 Minuten Spielzeit – die Uhr läuft nur, solange das Spiel geöffnet und nicht pausiert ist.“ Bewusst kein serverseitiger Echtzeit-Countdown. |
+| Nebenrätsel | Bewusst ohne Hinweise (optionale Entdeckungen); Auflösung nach dem Spiel. |
 
 ## Tests (Playwright, 01.11.2026)
 

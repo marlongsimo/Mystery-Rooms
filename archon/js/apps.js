@@ -645,6 +645,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
     title: () => "Rechnungsabgleich · PRUEFUNG", icon: () => "invoice", w: 1040, h: 600, cls: "win-abgleich",
     render(w) {
       const invs = AR.invoices, cur = invs.find((x) => x.id === w.state.cur) || invs[0]; w.state.cur = cur.id;
+      G.state.invSeen[cur.id] = true;
       const t = AR.ledger.find((x) => x.id === cur.tx), mk = G.state.invMarks, done = G.is("R10"), left = G.locks.left("R10");
       w.body.innerHTML = `<div class="ab">
         <nav class="ab-list"><p class="ab-k">Rechnungen (6)</p>${invs.map((x) => `<button class="ab-item${x.id === cur.id ? " on" : ""} ${mk[x.id] || ""}" data-inv="${x.id}"><b>${esc(x.id)}</b><small>${esc(x.issuer)}</small>${mk[x.id] === "bad" ? `<em>Fehler notiert</em>` : mk[x.id] === "ok" ? `<em>stimmig?</em>` : ""}</button>`).join("")}

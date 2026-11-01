@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07080a">
+  <meta name="description" content="DEADLINE.exe – Der letzte Zugriff. Ein Cyber-Mystery-Escape-Room im Browser: ein fremder Computer, 90 Minuten bis zur Löschung.">
+  <title>DEADLINE.exe – Der letzte Zugriff</title>
+  <link rel="stylesheet" href="../der-letzte-fall/css/fonts.css?v=1">
+  <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
+  <link rel="stylesheet" href="css/deadline.css?v=1">
+</head>
+<body>
+  <!-- ========== TITEL ========== -->
+  <section id="title" class="screen title">
+    <div class="title-copy">
+      <p class="eyebrow">CYBER-MYSTERY · DIGITALE FORENSIK</p>
+      <h1 class="glitch-title" data-text="DEADLINE.exe">DEADLINE.exe</h1>
+      <p class="title-sub">DER LETZTE ZUGRIFF · 90 MINUTEN</p>
+      <p class="lead">Ein Mitarbeiter ist verschwunden. Sein Computer wurde zurückgelassen. Darauf: Dateien, Nachrichten und Spuren einer Angelegenheit, die jemand vertuschen will.</p>
+      <p class="lead">Doch der Computer ist nicht mehr sicher. Eine automatische Datenlöschung wurde aktiviert. Durchsuche ihn, rekonstruiere die letzten Tage seines Besitzers – und entscheide, was mit der Wahrheit geschieht.</p>
+      <div id="modeBox" class="mode">
+        <label><input type="radio" name="mode" value="countdown" checked><span><b>Mit Countdown</b><small>90:00 bis zur Löschung · läuft die Zeit ab, ist alles weg</small></span></label>
+        <label><input type="radio" name="mode" value="relaxed"><span><b>Ohne Zeitlimit</b><small>in Ruhe ermitteln · die Uhr läuft nur mit</small></span></label>
+      </div>
+      <div class="title-actions">
+        <button class="btn big" id="startGame">Fall starten</button>
+        <button class="btn ghost" id="newGame" hidden>Neu beginnen</button>
+      </div>
+      <p class="title-state" id="titleState"></p>
+      <p class="micro sp-only">SPIELZEIT 60–90 MIN · ALLEIN ODER BIS ZU VIERT · MIT TON EMPFOHLEN · AM BESTEN AM COMPUTER</p>
+      <section class="mp-root" id="mpEntry" aria-label="Gemeinsam spielen"></section>
+      <p><a href="../index.html" class="text-link">← Alle Escape Rooms</a></p>
+    </div>
+    <div class="title-visual" aria-hidden="true">
+      <div class="crt"><pre>VANTA SYSTEMS · SECURITY BOOT
+User: Elias Voss
+<span class="err">WARNING: Integrity compromised.</span>
+<span class="err">Emergency deletion protocol activated.</span>
+
+<b>01:30:00</b>
+AUTOMATISCHE DATENLÖSCHUNG<span class="cursor">_</span></pre></div>
+    </div>
+  </section>
+
+  <!-- ========== BOOT ========== -->
+  <section id="boot" class="screen boot hidden">
+    <pre id="bootLog" aria-live="polite"></pre>
+    <div id="bootBig" class="boot-big" hidden></div>
+    <button class="btn ghost small boot-skip" id="bootSkip">Überspringen</button>
+  </section>
+
+  <!-- ========== DESKTOP ========== -->
+  <section id="desk" class="screen desk hidden">
+    <div class="wallpaper" aria-hidden="true"><span>VANTA</span><small>WS-E02 · E. VOSS</small></div>
+    <div id="icons" class="icons" role="toolbar" aria-label="Desktop"></div>
+    <div id="windows"></div>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+    <div id="startMenu" class="startmenu" hidden>
+      <input id="startSearch" class="field" placeholder="Suchen …" aria-label="Dateien und Programme suchen" autocomplete="off">
+      <div id="startList" class="sm-list"></div>
+      <div class="sm-foot">
+        <button class="sm-item" id="hintsItem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16.5" text-anchor="middle" font-size="12" fill="currentColor">?</text></svg><span>Hinweise</span></button>
+        <button class="sm-item" id="pauseItem"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3"/></svg><span>Pause</span></button>
+        <button class="sm-item" id="soundItem"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/></svg><span>Ton ausschalten</span></button>
+        <button class="sm-item" id="quitItem"><svg viewBox="0 0 24 24"><path d="M12 3v9M6.5 6.5a8 8 0 1 0 11 0" fill="none" stroke="currentColor" stroke-width="2.4"/></svg><span>Zum Titel</span></button>
+      </div>
+    </div>
+    <nav id="taskbar" class="taskbar">
+      <button id="startBtn" class="start-btn" aria-label="Startmenü" aria-expanded="false"><b>◆</b><span>VANTA</span></button>
+      <div id="tasks" class="tasks"></div>
+      <div class="tray">
+        <span class="team-dot" id="teamDot" hidden></span>
+        <button class="tray-btn" id="hintBtn" aria-label="Hinweise" title="Hinweise">?</button>
+        <button class="tray-btn" id="soundBtn" aria-label="Ton ausschalten" title="Ton"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2"/><path class="mute" d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2"/></svg></button>
+        <span id="clock" class="clock">00:12</span>
+        <span id="countdown" class="countdown">01:30:00</span>
+      </div>
+    </nav>
+    <div id="pause" class="pause" hidden><div><p class="eyebrow">PAUSE</p><h2>Countdown angehalten</h2><p>Der Fall wartet. Dein Fortschritt ist gespeichert.</p><button class="btn" id="resume">Weiter</button> <button class="btn ghost" id="pauseQuit">Zum Titel</button></div></div>
+  </section>
+
+  <section id="ending" class="ending hidden" aria-live="polite"></section>
+
+  <script src="js/story.js?v=1"></script>
+  <script src="js/game.js?v=1"></script>
+  <script src="js/sound.js?v=1"></script>
+  <script src="js/os.js?v=1"></script>
+  <script src="js/apps.js?v=1"></script>
+  <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
+  <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-core.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-lobby.js?v=1"></script>
+  <script src="js/mp-adapter.js?v=1"></script>
+</body>
+</html>

@@ -2,7 +2,8 @@
  * MYSTERY ROOMS – Spielekatalog
  * Ein neuer Escape Room = ein neuer Eintrag in dieser Liste.
  *
- * status:     "spielbar" | "vorschau" (spielbar, aber noch im Ausbau) | "geplant"
+ * status:     "spielbar" | "vorschau" (spielbar, aber noch im Ausbau) | "geplant" (wird nicht angezeigt)
+ * category:   "klassisch" | "crime" | "digital" (Kategorien siehe CATEGORIES in portal.js)
  * difficulty: 1 = leicht, 2 = mittel, 3 = anspruchsvoll, 4 = schwer
  * art:        Name der Titelgrafik (siehe ART in portal.js)
  * saveKey:    localStorage-Schlüssel des Spiels, um „Weiterspielen“ anzuzeigen
@@ -14,8 +15,8 @@ window.MR_GAMES = [
     id: "hotel-nocturne",
     title: "Hotel Nocturne",
     subtitle: "Die letzte Nacht",
-    category: "mystery",
-    categoryLabel: "Mystery-Thriller",
+    category: "klassisch",
+    categoryLabel: "Klassischer Escape Room",
     teaser: "In einer stürmischen Oktobernacht verschwinden sechs Gäste – und tauchen Tage später verstört wieder auf. Der Nachtmanager soll versucht haben, sie zu töten. 17 Jahre später liegt eine Reservierung für dich bereit: Zimmer 217, Check-in 23:17 Uhr.",
     duration: "ca. 100 Min.",
     difficulty: 3,
@@ -45,8 +46,8 @@ window.MR_GAMES = [
     id: "der-letzte-fall",
     title: "Der letzte Fall",
     subtitle: "Der letzte Vorhang",
-    category: "krimi",
-    categoryLabel: "Krimi",
+    category: "crime",
+    categoryLabel: "Crime & Mystery",
     teaser: "Ein Theaterdirektor ist tot. Ein Kommissar verschwunden. Seine letzte Ermittlung wartet auf dich – mit richtigen Spuren, falschen Fäden und einer gemeinsamen Ermittlungswand.",
     duration: "75–90 Min.",
     difficulty: 2,
@@ -62,8 +63,8 @@ window.MR_GAMES = [
     id: "deadline",
     title: "DEADLINE.exe",
     subtitle: "Der letzte Zugriff",
-    category: "mystery",
-    categoryLabel: "Cyber-Mystery",
+    category: "digital",
+    categoryLabel: "Digitales Escape Game",
     teaser: "Ein Mitarbeiter ist verschwunden, sein Computer zurückgelassen. Darauf: Mails, Chats, Protokolle – und eine Löschroutine, die in 100 Minuten alles vernichtet. Finde heraus, wer die Wahrheit löschen wollte.",
     duration: "90–100 Min.",
     difficulty: 3,

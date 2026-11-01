@@ -516,3 +516,6 @@ html, body { touch-action: manipulation; -webkit-tap-highlight-color: transparen
   .win-btns button { width: 48px; height: 44px; }
   .ex-row, .ap-file, .ml-item, .ms-th { min-height: 48px; }
 }
+
+.ending .mr-rating { margin-left: 0; --mr-r-accent: var(--red-2); --mr-r-text: var(--text); --mr-r-muted: var(--muted); --mr-r-line: var(--line-2); }
+.ending .mr-rating-send { color: #fff; }

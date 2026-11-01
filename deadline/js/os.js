@@ -380,6 +380,7 @@ window.DL = window.DL || {};
       ${E.quote ? `<p class="end-quote">${esc(E.quote)}</p>` : ""}
       <p class="end-closed">CASE CLOSED</p><h2>${esc(E.title)}</h2><p class="end-sub">DEADLINE.exe · VANTA SYSTEMS</p>
       <p class="end-count">Gefundene Enden: ${G.state.endings.length} von 6</p>
+      <div class="end-rating"></div>
       <div class="end-actions">
         ${id !== "timeout" && !G.isMultiplayer() ? `<button class="btn ghost" id="endBack">Zur Entscheidung zurück</button>` : ""}
         ${G.isMultiplayer() ? "" : `<button class="btn" id="endNew">Neues Spiel</button>`}
@@ -390,6 +391,8 @@ window.DL = window.DL || {};
     const lines = E.log.slice();
     const reveal = () => {
       text.hidden = false;
+      const slot = $(".end-rating", box);
+      if (slot && !slot.firstChild && window.MRRating) MRRating.mount(slot, { game: "deadline", title: "DEADLINE.exe", ending: id });
       const back = $("#endBack", box); if (back) back.onclick = () => { G.backToDecision(); box.classList.add("hidden"); $("#desk").classList.remove("off"); open("deadline"); };
       const nw = $("#endNew", box); if (nw) nw.onclick = () => { if (confirm("Neues Spiel beginnen? Der aktuelle Fall wird zurückgesetzt.")) { G.reset(); location.reload(); } };
     };

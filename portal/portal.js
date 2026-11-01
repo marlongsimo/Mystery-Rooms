@@ -18,7 +18,7 @@
       <circle cx="290" cy="160" r="36" fill="#54b8b022" stroke="#d5ad62" stroke-width="6"/><line x1="316" y1="186" x2="350" y2="220" stroke="#d5ad62" stroke-width="10" stroke-linecap="round"/>`,
     cyber: `<rect width="400" height="240" fill="#07080a"/><rect x="70" y="36" width="260" height="160" rx="8" fill="#111418" stroke="#2f363f" stroke-width="4"/><rect x="84" y="50" width="232" height="132" fill="#050607"/>
       <g font-family="DM Mono,monospace" font-size="10" fill="#5be08f"><text x="96" y="70">VANTA SECURITY BOOT</text><text x="96" y="86" fill="#ff6a5e">WARNING: integrity compromised</text><text x="96" y="102">trace SEC-01 ...</text></g>
-      <text x="200" y="152" text-anchor="middle" font-family="DM Mono,monospace" font-size="30" font-weight="600" fill="#ff6a5e">01:30:00</text><rect x="170" y="196" width="60" height="18" fill="#191d23"/><rect x="130" y="212" width="140" height="8" rx="2" fill="#191d23"/>`,
+      <text x="200" y="152" text-anchor="middle" font-family="DM Mono,monospace" font-size="30" font-weight="600" fill="#ff6a5e">01:40:00</text><rect x="170" y="196" width="60" height="18" fill="#191d23"/><rect x="130" y="212" width="140" height="8" rx="2" fill="#191d23"/>`,
     pyramide: `<rect width="400" height="240" fill="#120f0c"/><circle cx="310" cy="60" r="26" fill="#d5ad62" opacity=".8"/><rect y="190" width="400" height="50" fill="#2a2016"/>
       <polygon points="200,40 330,190 70,190" fill="#5a4630"/><polygon points="200,40 330,190 200,190" fill="#3e3022"/><rect x="186" y="150" width="28" height="40" fill="#120f0c"/>`,
     labor: `<rect width="400" height="240" fill="#0a1214"/><g stroke="#54b8b0" stroke-opacity=".15"><line x1="0" y1="60" x2="400" y2="60"/><line x1="0" y1="120" x2="400" y2="120"/><line x1="0" y1="180" x2="400" y2="180"/><line x1="100" y1="0" x2="100" y2="240"/><line x1="200" y1="0" x2="200" y2="240"/><line x1="300" y1="0" x2="300" y2="240"/></g>
@@ -45,63 +45,32 @@
   }
   const status = (g) => (playable(g) ? `<span class="badge play">Spielbar</span>${g.isNew ? `<span class="badge new">Neu</span>` : ""}` : `<span class="badge soon">Demnächst</span>`);
 
-  /* ---------- Hauptabenteuer ---------- */
-  const feat = games.find((g) => g.featured && playable(g)) || games.find(playable);
-  function renderFeatured() {
-    const el = $("#abenteuer");
-    if (!feat) { el.remove(); return; }
-    const p = progress(feat);
-    el.style.setProperty("--feat-bg", feat.shots && feat.shots[0] ? `url("${abs(feat.shots[0].src)}")` : "none");
-    el.innerHTML = `<div class="featured-inner">
-      <div class="featured-poster reveal">${art(feat)}<div class="rain" aria-hidden="true"></div></div>
-      <div class="featured-body reveal">
-        <p class="kicker">HAUPTABENTEUER · ${esc(feat.categoryLabel.toUpperCase())}</p>
-        <h2 id="featuredTitle">${esc(feat.title)}</h2>
-        <p class="featured-sub">${esc(feat.subtitle)}${feat.tagline ? ` – ${esc(feat.tagline)}` : ""}</p>
-        <p class="featured-teaser">${esc(feat.teaser)}</p>
-        <ul class="stats">
-          ${feat.rooms ? `<li><b>${feat.rooms}</b><span>Räume</span></li>` : ""}
-          ${feat.puzzles ? `<li><b>${feat.puzzles}</b><span>Rätsel</span></li>` : ""}
-          <li><b>${esc(feat.minutes || feat.duration)}</b><span>Minuten</span></li>
-          <li><b>${esc(feat.players.replace(" Personen", ""))}</b><span>Spieler</span></li>
-        </ul>
-        <p class="featured-meta">${dots(feat.difficulty)} ${DIFF[feat.difficulty]} · ${esc(feat.age)} · mit Ton empfohlen</p>
-        ${p ? `<p class="featured-progress">${p.finished ? "✓ Du hast den Fall gelöst." : `Dein Fortschritt: ${p.done} von ${p.total} Bereichen`}</p>` : ""}
-        <div class="actions">${playButton(feat, "big")}<button class="btn ghost big" data-details="${feat.id}">Mehr erfahren</button></div>
-      </div>
-    </div>
-    ${feat.shots ? `<ul class="shots" aria-label="Einblicke in ${esc(feat.title)}">${feat.shots.map((s) => `<li class="reveal"><img src="${esc(s.src)}" alt="${esc(s.label)}" loading="lazy"><span>${esc(s.label)}</span></li>`).join("")}</ul>` : ""}`;
-  }
-
-  /* ---------- Welten ---------- */
-  const WORLDS = [
-    { id: "mystery", name: "Mystery", text: "Verlassene Orte, verborgene Wahrheiten", art: "hotel" },
-    { id: "krimi", name: "Krimi", text: "Spuren verfolgen, Fälle lösen", art: "krimi" },
-    { id: "abenteuer", name: "Abenteuer", text: "Vergessene Kammern, alte Schätze", art: "pyramide" },
+  /* ---------- Kategorien (nach Spielprinzip) ---------- */
+  const CATEGORIES = [
+    { id: "klassisch", no: "01", name: "Klassische Escape Rooms", text: "Du bist eingeschlossen. Erkunde Räume, untersuche Gegenstände und finde deinen Weg durch verschlossene Türen.", tag: "Raum für Raum", art: "hotel" },
+    { id: "crime", no: "02", name: "Crime & Mystery", text: "Untersuche Beweise, verbinde Hinweise und löse mysteriöse Fälle. Hier ist dein Ermittlergeschick gefragt.", tag: "Ermitteln & Kombinieren", art: "krimi" },
+    { id: "digital", no: "03", name: "Digitale Escape Games", text: "Rätselwelten auf einem fremden Computer. Knacke Codes, entschlüssele Nachrichten und löse komplexe Aufgaben.", tag: "Digitales Rätseln", art: "cyber" },
   ];
-  const state = { cat: "alle", diff: "alle" };
-  function renderWorlds() {
-    $("#worlds").innerHTML = WORLDS.map((w) => {
-      const n = games.filter((g) => g.category === w.id && playable(g)).length;
-      const soon = games.filter((g) => g.category === w.id && !playable(g)).length;
-      return `<button class="world reveal${state.cat === w.id ? " on" : ""}" data-world="${w.id}" aria-pressed="${state.cat === w.id}">
-        <span class="world-art" aria-hidden="true"><svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice">${ART[w.art]}</svg></span>
-        <span class="world-text"><b>${w.name}</b><small>${w.text}</small><em>${n ? `${n} spielbar` : ""}${n && soon ? " · " : ""}${soon ? `${soon} demnächst` : ""}</em></span></button>`;
+  const shown = games.filter(playable);
+  function renderCategories() {
+    $("#kategorien-list").innerHTML = CATEGORIES.map((c) => {
+      const list = shown.filter((g) => g.category === c.id);
+      const target = list.length ? "#spiel-" + list[0].id : "#abenteuer";
+      return `<a class="category reveal" href="${target}">
+        <span class="category-art" aria-hidden="true"><svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice">${ART[c.art] || ""}</svg></span>
+        <span class="category-text"><span class="category-no">${c.no}</span><b>${esc(c.name)}</b><small>${esc(c.text)}</small>
+        <em>${esc(c.tag)}</em>${list.length ? `<span class="category-games">${list.map((g) => esc(g.title)).join(" · ")} <span aria-hidden="true">→</span></span>` : ""}</span></a>`;
     }).join("");
   }
 
-  /* ---------- Sammlung ---------- */
-  function renderCards() {
-    // Ohne Filter: alles außer dem Hauptabenteuer. Mit Welt-Filter: alle passenden Abenteuer.
-    let list = state.cat === "alle" ? games.filter((g) => g !== feat) : games.filter((g) => g.category === state.cat);
-    if (state.diff !== "alle") list = list.filter((g) => String(g.difficulty) === state.diff);
-    list.sort((a, b) => Number(playable(b)) - Number(playable(a)));
-    const world = WORLDS.find((w) => w.id === state.cat);
-    $("#collTitle").textContent = world ? `Welt: ${world.name}` : "Weitere Abenteuer";
-    $("#cards").innerHTML = list.length ? list.map((g) => {
+  /* ---------- Unsere Abenteuer (nur spielbare) ---------- */
+  function renderGames() {
+    const order = (g) => CATEGORIES.findIndex((c) => c.id === g.category);
+    const list = shown.slice().sort((a, b) => order(a) - order(b));
+    $("#cards").innerHTML = list.map((g) => {
       const p = progress(g);
-      return `<article class="card reveal ${playable(g) ? "" : "is-planned"}">
-        <div class="card-art">${art(g)}<div class="card-badges">${status(g)}</div></div>
+      return `<article class="card reveal" id="spiel-${esc(g.id)}">
+        <div class="card-art">${art(g)}<div class="card-badges">${g.isNew ? `<span class="badge new">Neu</span>` : ""}${g.status === "vorschau" ? `<span class="badge soon">Vorschau</span>` : ""}</div></div>
         <div class="card-body">
           <p class="card-cat">${esc(g.categoryLabel)}</p>
           <h3>${esc(g.title)}</h3>
@@ -112,25 +81,11 @@
             <div><dt>Schwierigkeit</dt><dd>${dots(g.difficulty)}</dd></div>
             <div><dt>Spieler</dt><dd>${esc(g.players)}</dd></div>
           </dl>
-          ${p ? `<p class="card-progress">${p.finished ? "✓ Gelöst" : `Fortschritt: ${p.done} / ${p.total} Bereiche`}</p>` : ""}
+          ${p ? `<p class="card-progress">${p.finished ? "✓ Gelöst" : "Spielstand gespeichert"}</p>` : ""}
           <div class="card-actions">${playButton(g)}<button class="btn ghost" data-details="${g.id}">Details</button></div>
         </div></article>`;
-    }).join("") : `<p class="empty">Für diese Auswahl gibt es noch kein Abenteuer. <button class="link" data-reset>Alle anzeigen</button></p>`;
-    const n = games.filter(playable).length;
-    $("#count").textContent = `${n} spielbar · ${games.length - n} in Vorbereitung`;
-    // Filter erst, wenn es genug spielbare Abenteuer gibt – sonst reicht die Auswahl der Welten
-    $("#filters").innerHTML = state.cat !== "alle"
-      ? `<button class="chip on" data-reset>${esc(world ? world.name : "")} ✕</button>`
-      : n >= 3 ? `<label class="select"><span>Schwierigkeit</span><select id="diffFilter"><option value="alle">Alle</option>${[1, 2, 3, 4].map((d) => `<option value="${d}" ${state.diff === String(d) ? "selected" : ""}>${DIFF[d]}</option>`).join("")}</select></label>` : "";
+    }).join("");
     observe();
-  }
-
-  /* ---------- Abschluss ---------- */
-  function renderCta() {
-    const el = $("#cta");
-    if (!feat) { el.innerHTML = ""; return; }
-    el.style.setProperty("--cta-bg", feat.poster ? `url("${abs(feat.poster)}")` : "none");
-    el.innerHTML = `<div class="cta-inner reveal"><p class="kicker">CHECK-IN 23:17 UHR</p><h2>Die Tür steht offen.</h2><p>${esc(feat.title)} wartet auf dich – allein oder mit bis zu drei Mitspielern.</p>${playButton(feat, "big")}</div>`;
   }
 
   /* ---------- Detailansicht ---------- */
@@ -168,11 +123,8 @@
   document.addEventListener("click", (e) => {
     const t = e.target.closest("button");
     if (!t) return;
-    if (t.dataset.world) { state.cat = state.cat === t.dataset.world ? "alle" : t.dataset.world; renderWorlds(); renderCards(); $("#sammlung").scrollIntoView({ behavior: "smooth" }); }
     if (t.dataset.details) openDetails(t.dataset.details);
-    if ("reset" in t.dataset) { state.cat = "alle"; state.diff = "alle"; renderWorlds(); renderCards(); }
   });
-  document.addEventListener("change", (e) => { if (e.target.id === "diffFilter") { state.diff = e.target.value; renderCards(); } });
   $("#closeDetails").addEventListener("click", () => dlg.close());
   dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
   $("#menuToggle").addEventListener("click", () => setNav(!document.body.classList.contains("nav-open")));
@@ -181,10 +133,8 @@
   const onScroll = () => $("#header").classList.toggle("scrolled", window.scrollY > 40);
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  renderFeatured();
-  renderWorlds();
-  renderCards();
-  renderCta();
+  renderCategories();
+  renderGames();
   onScroll();
   observe();
 })();

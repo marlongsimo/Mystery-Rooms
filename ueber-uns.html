@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b111c">
+  <title>Über uns – Mystery Rooms</title>
+  <meta name="description" content="Wer hinter Mystery Rooms steckt: Theresa und Julian, zwei Escape-Room-Fans mit einer gemeinsamen Idee.">
+  <link rel="stylesheet" href="portal/portal.css?v=8">
+</head>
+<body>
+  <header class="header scrolled solid" id="header">
+    <a href="index.html" class="logo" aria-label="Mystery Rooms – zur Startseite">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M20 9a6.5 6.5 0 0 0-3.6 11.9L14 31h12l-2.4-10.1A6.5 6.5 0 0 0 20 9z" fill="currentColor"/></svg>
+      <span>MYSTERY <b>ROOMS</b></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Hauptnavigation">
+      <a href="index.html#kategorien">Kategorien</a>
+      <a href="index.html#abenteuer">Abenteuer</a>
+      <a href="index.html#so-gehts">So geht’s</a>
+      <a href="ueber-uns.html">Über uns</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
+  </header>
+  <main class="page" id="top">
+    <p class="kicker">ÜBER UNS</p>
+    <h1>Zwei Escape-Room-Fans. <em>Eine gemeinsame Idee.</em></h1>
+    <p class="lead">Wir sind Theresa und Julian – zwei begeisterte Escape-Room-Fans.</p>
+    <p>Was uns an Escape Rooms so begeistert, ist die besondere Mischung aus Spannung, kniffligen Rätseln, geheimnisvollen Geschichten und dem Gefühl, gemeinsam etwas herauszufinden.</p>
+    <p>Irgendwann kam uns eine Idee: Warum sollte man diesen Spaß eigentlich nur vor Ort erleben können?</p>
+    <p>Wir wollten die Faszination von Escape Rooms zu jedem nach Hause bringen. Ohne Anfahrt, ohne Eintritt und ohne komplizierte Voraussetzungen.</p>
+    <p><strong>So entstand Mystery Rooms.</strong></p>
+    <p>Mit viel Kreativität und Begeisterung entwickeln wir digitale Escape Rooms, in denen ihr Geheimnisse entdecken, Gegenstände untersuchen, Codes knacken und spannende Geschichten erleben könnt.</p>
+    <p>Unser Ziel ist ganz einfach: Wir möchten jedem die Möglichkeit geben, in die Welt der Escape Rooms einzutauchen – kostenlos und bequem von zu Hause aus.</p>
+    <h2>Unsere Idee</h2>
+    <ul class="ideas">
+      <li>Spannende Geschichten und liebevoll gestaltete Spielwelten.</li>
+      <li>Rätsel, die zum Nachdenken und Kombinieren einladen.</li>
+      <li>Abenteuer, die direkt im Browser gespielt werden können.</li>
+      <li>Kostenloser Zugang für alle.</li>
+    </ul>
+    <h2>Schön, dass du dabei bist!</h2>
+    <p>Wir wünschen dir viel Spaß beim Entdecken, Rätseln und Entschlüsseln.</p>
+    <p class="signature">Theresa &amp; Julian</p>
+    <p class="claim">Mystery Rooms – Entschlüssle das Unbekannte.</p>
+    <a class="back" href="index.html">← Zur Startseite</a>
+  </main>
+  <footer class="footer">
+    <a href="index.html" class="logo-text">MYSTERY <b>ROOMS</b></a>
+    <p>Mit Leidenschaft entwickelt. Für alle kostenlos.</p>
+    <nav class="footer-nav" aria-label="Fußzeile"><a href="ueber-uns.html">Über uns</a><a href="impressum.html#kontakt">Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
+  </footer>
+  <script>
+    (() => {
+      const b = document.getElementById("menuToggle");
+      const set = (o) => { document.body.classList.toggle("nav-open", o); b.setAttribute("aria-expanded", String(o)); };
+      b.addEventListener("click", () => set(!document.body.classList.contains("nav-open")));
+      document.querySelectorAll("#nav a").forEach((a) => a.addEventListener("click", () => set(false)));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+/* MYSTERY ROOMS – Bewertung. Farben über Variablen anpassbar: --mr-r-accent, --mr-r-text, --mr-r-muted, --mr-r-line, --mr-r-bg */
+.mr-rating { margin: 28px auto 8px; max-width: 460px; padding: 18px 20px; text-align: center; color: var(--mr-r-text, #ece4d6); background: var(--mr-r-bg, #ffffff08); border: 1px solid var(--mr-r-line, #ffffff22); border-radius: 6px; }
+.mr-rating-title { margin: 0 0 10px; font-size: 18px; font-weight: 600; }
+.mr-stars { display: inline-flex; gap: 4px; }
+.mr-stars button { width: 44px; height: 44px; padding: 0; border: 0; background: transparent; color: var(--mr-r-muted, #8d857a); font-size: 32px; line-height: 1; cursor: pointer; touch-action: manipulation; transition: transform .1s, color .1s; }
+.mr-stars button.on { color: var(--mr-r-accent, #d5ad62); }
+.mr-stars button:hover { transform: scale(1.12); }
+.mr-stars button:focus-visible { outline: 2px solid var(--mr-r-accent, #d5ad62); outline-offset: 2px; border-radius: 4px; }
+.mr-stars-label { margin: 4px 0 12px; min-height: 1.2em; font-size: 13px; color: var(--mr-r-muted, #8d857a); }
+.mr-rating-label { display: block; text-align: left; font-size: 13px; color: var(--mr-r-muted, #8d857a); }
+.mr-rating-label textarea { display: block; width: 100%; margin-top: 6px; padding: 8px 10px; box-sizing: border-box; background: #0006; color: var(--mr-r-text, #ece4d6); border: 1px solid var(--mr-r-line, #ffffff22); border-radius: 4px; font: inherit; font-size: 14px; resize: vertical; }
+.mr-rating-send { margin-top: 12px; min-height: 42px; padding: 8px 20px; border: 1px solid var(--mr-r-accent, #d5ad62); background: var(--mr-r-accent, #d5ad62); color: #111; font: inherit; font-weight: 600; border-radius: 4px; cursor: pointer; }
+.mr-rating-send:disabled { opacity: .45; cursor: not-allowed; }
+.mr-rating-note { margin: 10px 0 0; font-size: 11px; color: var(--mr-r-muted, #8d857a); }
+.mr-rating-note a { color: inherit; }
+.mr-rating-msg { margin: 6px 0 0; min-height: 1em; font-size: 13px; color: #e0705f; }
+.mr-rating-thanks { margin: 0; font-size: 15px; }

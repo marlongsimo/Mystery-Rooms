@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/fonts.css?v=22">
   <link rel="stylesheet" href="css/style.css?v=22">
   <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
+  <link rel="stylesheet" href="../platform/rating/rating.css?v=1">
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
@@ -141,6 +142,7 @@
       <details class="ending-letter-wrap" id="endingLetterWrap"><summary>Elias’ letzten Brief noch einmal lesen</summary><div class="ending-letter paper" id="endingLetter"></div></details>
       <p class="ending-personal" id="endingPersonal"></p>
       <p class="micro" id="endingStats"></p>
+      <div id="ratingSlot"></div>
       <button class="primary-button" id="restartButton">Spiel neu beginnen <span>↻</span></button>
     </section>
   </main>
@@ -193,6 +195,8 @@
   <!-- Multiplayer (optional): Plattform-Modul + Anbindung. Ohne diese Zeilen läuft das Spiel als Einzelspieler. -->
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/rating/rating.js?v=1"></script>
+  <script>window.MRRating && MRRating.mount(document.getElementById("ratingSlot"), { game: "hotel-nocturne", title: "Hotel Nocturne" });</script>
   <script src="../platform/multiplayer/mp-core.js?v=1"></script>
   <script src="../platform/multiplayer/mp-lobby.js?v=1"></script>
   <script src="js/mp-adapter.js?v=1"></script>

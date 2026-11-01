@@ -40,10 +40,13 @@ Jedes Spiel hat ein eigenes Spielprinzip.
 |---|---|---|
 | Hotel Nocturne | vorhanden | ja (31.10.2026) |
 | Der letzte Fall | vorhanden | ja, Version 1 und Version 2 |
-| DEADLINE.exe | **fehlt noch** (`slug = deadline`) | nein – nur ohne Datenbank simuliert |
+| DEADLINE.exe | vorhanden | ja (01.11.2026: zwei Spieler, alle Siegel, gemeinsamer Entwurf, Ende) |
+
+## Bewertungen
+
+Tabelle `game_ratings` ist angelegt (`platform/rating/setup.sql`). Besucher können nur eintragen; Auswertung im Supabase-Dashboard.
 
 ## Noch offen
 
 - Tests auf echten Geräten (iOS Safari, Android)
-- Gemeinsames Spielen für DEADLINE.exe, sobald der Katalogeintrag existiert
 - Der letzte Fall, Version 2: Kapitel 4 und 5

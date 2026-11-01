@@ -109,4 +109,4 @@ Jeder offene Schritt hat drei Hinweise und eine Lösung. Die Lösung erscheint e
 - **Gemeinsamer Entwurf:** Schwärzungen und Empfänger stehen in einem eigenen Eintrag `draft`. Die letzte Änderung gilt, die Anzeige nennt, wer zuletzt geändert hat.
 - **Zeitmodus:** Spielt eine Person im Team ohne Zeitlimit, gilt das für alle. Pause gibt es im Team nicht.
 
-**Voraussetzung:** In Supabase muss `game_catalog` einen Eintrag mit `slug = deadline` haben (`enabled = true`, Code-Präfix z. B. `DEAD`). Ohne diesen Eintrag meldet die Lobby „Dieser Escape Room ist nicht verfügbar“, allein spielen geht immer.
+`game_catalog` enthält `deadline` (Codes `DEAD-XXXXXX`). Getestet am 01.11.2026 mit zwei Spielern über die echte Datenbank: Einstieg und Siegel geteilt, gemeinsamer Entwurf in beide Richtungen, Ende bei beiden, Sitzung verlassen.

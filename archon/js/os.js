@@ -214,8 +214,10 @@ window.AR = window.AR || {};
 
   /* ---------- Verdrahtung ---------- */
   function init() {
-    const small = window.matchMedia("(max-width: 1023px), (pointer: coarse) and (max-width: 1279px)").matches;
-    $("#mobileNote").hidden = !small; $("#startBox").hidden = small;
+    // Zu klein: schmaler als 1024 px oder Tablet im Hochformat. Reagiert auf Drehen.
+    const gate = window.matchMedia("(max-width: 1023px), (pointer: coarse) and (orientation: portrait)");
+    const paintGate = () => { $("#mobileNote").hidden = !gate.matches; $("#startBox").hidden = gate.matches; };
+    paintGate(); gate.addEventListener("change", paintGate);
     paintTitle();
     $("#startBtn").addEventListener("click", () => { if (G.state.ending) G.reset(); if (G.state.started) enterDesk(); else boot(); });
     $("#resetBtn").addEventListener("click", () => { if (confirm("Sitzung wirklich neu beginnen? Der Fortschritt geht verloren.")) { G.reset(); paintTitle(); } });

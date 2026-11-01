@@ -18,6 +18,8 @@
  * Eigenschaften: Inhalte werden nur neu gezeichnet, wenn sich das HTML ändert (stabile Klicks),
  * Fenster lassen sich verschieben, in der Größe ändern, minimieren, maximieren.
  * Auf schmalen Bildschirmen sind Fenster Vollbild (per CSS), Doppelklick wird zu Antippen.
+ * Touch (Finger/Stift): Klick beim Loslassen, kein doppelter Klick, Wischen ist kein Tippen, Textfelder
+ * bekommen den Fokus selbst, kein Kontextmenü außerhalb von Eingabefeldern, Scrollpositionen bleiben.
  */
 (() => {
   "use strict";
@@ -37,6 +39,8 @@
   }
 
   function create({ desk, layer, tasks, apps, icon, sound = { play() {} } }) {
+    installTouch();
+    guardBody(tasks);
     const wins = [];
     let zTop = 10, seq = 0;
     const A = () => apps();
@@ -77,7 +81,13 @@
       if (app.opened) app.opened(w);
       return w;
     }
-    function render(w) { A()[w.app].render(w); w.el.querySelector(".win-title").textContent = title(w); }
+    /** Neu zeichnen, Scrollpositionen in Listen bleiben erhalten. */
+    function render(w) {
+      const keep = scrollState(w.body);
+      A()[w.app].render(w);
+      restoreScroll(w.body, keep);
+      const t = w.el.querySelector(".win-title"), tt = title(w); if (t.textContent !== tt) t.textContent = tt;
+    }
     function close(w) {
       const i = wins.indexOf(w); if (i < 0) return;
       if (A()[w.app].closed) A()[w.app].closed(w);
@@ -104,11 +114,12 @@
     }
     function wire(w) {
       const el = w.el, bar = el.querySelector(".win-bar");
-      el.addEventListener("pointerdown", () => focus(w), true);
+      // Nur wenn nötig nach vorn holen: Jede DOM-Änderung beim Antippen kann Safari (iPad) den Klick kosten.
+      el.addEventListener("pointerdown", () => { if (topWin() !== w || !el.classList.contains("focused")) focus(w); }, true);
       el.querySelector(".wb-close").addEventListener("click", (e) => { e.stopPropagation(); close(w); });
       el.querySelector(".wb-min").addEventListener("click", (e) => { e.stopPropagation(); minimize(w); });
       el.querySelector(".wb-max").addEventListener("click", (e) => { e.stopPropagation(); toggleMax(w); });
-      bar.addEventListener("dblclick", (e) => { if (!e.target.closest("button")) toggleMax(w); });
+      bar.addEventListener("dblclick", (e) => { if (!e.target.closest("button") && !coarse()) toggleMax(w); });
       bar.addEventListener("pointerdown", (e) => {
         if (e.target.closest("button") || w.max || mobile()) return;
         const ox = el.offsetLeft, oy = el.offsetTop, box = desk.getBoundingClientRect();
@@ -141,13 +152,69 @@
       root.addEventListener("click", (e) => {
         const t = e.target.closest(sel); if (!t) return;
         root.querySelectorAll(sel).forEach((x) => x.classList.toggle("selected", x === t));
-        if (single || coarse()) fn(t);
+        if (single || coarse() || tapping) fn(t); // Touch (auch Windows-Touchscreen mit Maus): ein Tipp öffnet
       });
       root.addEventListener("keydown", (e) => { if (e.key === "Enter") { const t = e.target.closest(sel); if (t) fn(t); } });
     }
     function refresh() { wins.forEach((w) => { const a = A()[w.app]; if (a && a.onChange) a.onChange(w); }); }
 
     return { open, close, closeAll, render, focus, restore, minimize, toggleMax, wins, topWin, activate, refresh, paintTasks };
+  }
+
+  /* ---------- Scrollpositionen über ein Neuzeichnen retten ---------- */
+  const pathOf = (root, el) => { const p = []; while (el && el !== root) { p.unshift([...el.parentNode.children].indexOf(el) + ":" + el.tagName); el = el.parentNode; } return p.join("/"); };
+  function scrollState(root) {
+    const out = [];
+    [root, ...root.querySelectorAll("*")].forEach((el) => { if (el.scrollTop || el.scrollLeft) out.push([pathOf(root, el), el.scrollTop, el.scrollLeft]); });
+    return out;
+  }
+  function restoreScroll(root, list) {
+    if (!list.length) return;
+    const map = new Map(list.map((x) => [x[0], x]));
+    [root, ...root.querySelectorAll("*")].forEach((el) => { if (el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth) return; const k = map.get(pathOf(root, el)); if (k && !el.scrollTop && !el.scrollLeft) { el.scrollTop = k[1]; el.scrollLeft = k[2]; } });
+  }
+
+  /* ---------- Touch: Klick beim Loslassen ----------
+   * Safari (iPad) verschluckt Klicks, wenn sich beim Antippen die Seite ändert; Windows-Touch macht aus
+   * langem Drücken einen Rechtsklick. Deshalb lösen wir bei Finger/Stift den Klick selbst beim Loslassen aus
+   * und verwerfen den Klick, den der Browser eventuell hinterherschickt.
+   *  - Bewegung > 12 px, Scrollen oder Abbruch: kein Tipp.
+   *  - Textfelder: Fokus selbst setzen (öffnet die Tastatur), kein künstlicher Klick.
+   *  - Auswahllisten (select): bleiben beim Browser (eigene Auswahl am iPad).
+   *  - Kein Kontextmenü außer in Eingabefeldern. */
+  const TEXT = 'textarea, [contenteditable=""], [contenteditable="true"], input:not([type]), input[type=text], input[type=search], input[type=password], input[type=number], input[type=email], input[type=tel], input[type=url]';
+  let touchOn = false, tapping = false;
+  function installTouch() {
+    if (touchOn) return; touchOn = true;
+    let tap = null, swallowUntil = 0;
+    const isTouch = (e) => e.pointerType === "touch" || e.pointerType === "pen";
+    document.addEventListener("pointerdown", (e) => {
+      if (!isTouch(e) || !e.isPrimary) { tap = null; return; }
+      tap = { t: e.target, x: e.clientX, y: e.clientY, id: e.pointerId };
+    }, true);
+    document.addEventListener("pointermove", (e) => { if (tap && e.pointerId === tap.id && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 12) tap = null; }, true);
+    document.addEventListener("pointercancel", () => { tap = null; }, true);
+    document.addEventListener("scroll", () => { tap = null; }, true);
+    document.addEventListener("pointerup", (e) => {
+      const t = tap; tap = null;
+      if (!t || e.pointerId !== t.id || !isTouch(e)) return;
+      const el = t.t; if (!el || !el.isConnected) return;
+      if (el.closest("select, option")) return;
+      const field = el.closest(TEXT);
+      if (field) { if (!field.disabled && document.activeElement !== field) field.focus(); return; }
+      if (el.closest("input:disabled, button:disabled")) return;
+      swallowUntil = performance.now() + 800;
+      tapping = true;
+      try { el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window, clientX: e.clientX, clientY: e.clientY, detail: 1 })); } finally { tapping = false; }
+    }, true);
+    // Den echten Klick des Browsers nach einem Tipp verwerfen (sonst doppelt, z. B. Häkchen an und gleich wieder aus)
+    document.addEventListener("click", (e) => {
+      if (!e.isTrusted || performance.now() > swallowUntil) return;
+      if (e.target.closest && (e.target.closest("select, option") || e.target.closest(TEXT))) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+    }, true);
+    document.addEventListener("dblclick", (e) => { if (performance.now() < swallowUntil + 400) { e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+    document.addEventListener("contextmenu", (e) => { if (!(e.target.closest && e.target.closest(TEXT))) e.preventDefault(); });
   }
 
   /** Kurze Meldung. Fängt keine Klicks ab (CSS: pointer-events none). */
@@ -162,5 +229,5 @@
     setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 400); }, ms);
   }
 
-  window.MRDesktop = { create, toast, esc, mobile, coarse, guardBody, version: 1 };
+  window.MRDesktop = { create, toast, esc, mobile, coarse, guardBody, installTouch, version: 2 };
 })();

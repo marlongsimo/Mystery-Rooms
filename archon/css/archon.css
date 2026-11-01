@@ -426,3 +426,16 @@ table.proto td { border-color: var(--line) !important; }
 #bootLog .arc { color: var(--red-2); font-size: 22px; display: inline-block; margin-top: 14px; animation: blink 1s steps(2) 2; }
 @keyframes blink { 50% { opacity: 0; } }
 #bootSkip { position: absolute; right: 24px; bottom: 24px; z-index: 3; }
+
+/* ---------- Touch (iPad, Windows-Touch): siehe platform/desktop/desktop.js ---------- */
+html, body { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+button, .btn, .task, .dicon, .win-bar, .win-btns, .ap-file, .ml-item, .ap-tabs, .lg-tabs, .nb-tabs, .hn-tabs, [data-go], [data-art], [data-f], [data-m] {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+@media (pointer: coarse) {
+  .win-bar { height: 44px; }
+  .win-btns button { width: 50px; height: 42px; font-size: 18px; }
+  .ap-tabs button, .lg-tabs button, .nb-tabs button, .hn-tabs button { min-height: 40px; padding: 8px 16px; font-size: 13px; }
+  .task { height: 40px; }
+  .ap-file, .ml-item { min-height: 44px; }
+}

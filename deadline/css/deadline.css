@@ -519,3 +519,10 @@ html, body { touch-action: manipulation; -webkit-tap-highlight-color: transparen
 
 .ending .mr-rating { margin-left: 0; --mr-r-accent: var(--red-2); --mr-r-text: var(--text); --mr-r-muted: var(--muted); --mr-r-line: var(--line-2); }
 .ending .mr-rating-send { color: #fff; }
+
+/* Touch: größere Ziele auch auf Tablets (pointer: coarse) */
+@media (pointer: coarse) {
+  .win-bar { height: 44px; }
+  .win-btns button { width: 50px; height: 42px; font-size: 18px; }
+  .hn-tabs button, .pg-tabs button { min-height: 40px; padding: 8px 16px; }
+}

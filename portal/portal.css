@@ -311,3 +311,7 @@ dialog[open] { animation: rise .25s ease-out; }
 .hero-inner { max-width: 820px; }
 .hero h1 { font-size: clamp(38px, 6vw, 78px); }
 .hero-lead { max-width: 600px; }
+
+/* Bewertung auf Karten und in den Details */
+.rating { display: inline-flex; align-items: baseline; gap: 6px; margin-top: 6px; font-size: 14px; color: var(--muted); }
+.rating b { color: var(--gold); font-weight: 600; letter-spacing: .02em; }

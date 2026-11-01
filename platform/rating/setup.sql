@@ -56,3 +56,21 @@ create trigger game_ratings_throttle
 --   select created_at, game_slug, stars, ending, comment
 --   from public.game_ratings where comment is not null order by created_at desc;
 -- =====================================================================
+
+-- =====================================================================
+-- 4) Öffentliche Zusammenfassung für die Startseite (nur Schnitt + Anzahl,
+--    keine Kommentare). Angezeigt wird erst ab 3 Bewertungen (portal.js).
+-- =====================================================================
+create or replace function public.game_rating_summary()
+returns table (game_slug text, avg_stars numeric, total bigint)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select game_slug, round(avg(stars)::numeric, 1), count(*)
+  from public.game_ratings
+  group by game_slug;
+$$;
+revoke all on function public.game_rating_summary() from public;
+grant execute on function public.game_rating_summary() to anon, authenticated;

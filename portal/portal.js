@@ -63,6 +63,30 @@
     }).join("");
   }
 
+  /* ---------- Bewertungen: Schnitt und Anzahl (ab MIN_RATINGS) ---------- */
+  const MIN_RATINGS = 3;
+  let ratings = {};
+  const stars = (g) => {
+    const r = ratings[g.id];
+    if (!r || r.total < MIN_RATINGS) return "";
+    const avg = Number(r.avg).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return `<span class="rating" aria-label="Bewertung ${avg} von 5 Sternen, ${r.total} Bewertungen"><b aria-hidden="true">★ ${avg}</b> <span aria-hidden="true">(${r.total})</span></span>`;
+  };
+  async function loadRatings() {
+    const cfg = window.MR_MULTIPLAYER_CONFIG;
+    if (!cfg || !cfg.supabaseUrl || !window.fetch) return;
+    try {
+      const res = await fetch(cfg.supabaseUrl.replace(/\/$/, "") + "/rest/v1/rpc/game_rating_summary", {
+        method: "POST", headers: { apikey: cfg.supabasePublishableKey, "Content-Type": "application/json" }, body: "{}",
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      ratings = {};
+      (rows || []).forEach((r) => { ratings[r.game_slug] = { avg: r.avg_stars, total: Number(r.total) }; });
+      renderGames();
+    } catch (e) { /* ohne Bewertungen weiter */ }
+  }
+
   /* ---------- Unsere Abenteuer (nur spielbare) ---------- */
   function renderGames() {
     const order = (g) => CATEGORIES.findIndex((c) => c.id === g.category);
@@ -73,7 +97,7 @@
         <div class="card-art">${art(g)}<div class="card-badges">${g.isNew ? `<span class="badge new">Neu</span>` : ""}${g.status === "vorschau" ? `<span class="badge soon">Vorschau</span>` : ""}</div></div>
         <div class="card-body">
           <p class="card-cat">${esc(g.categoryLabel)}</p>
-          <h3>${esc(g.title)}</h3>
+          <h3>${esc(g.title)}</h3>${stars(g)}
           <p class="card-sub">${esc(g.subtitle)}</p>
           <p class="card-teaser">${esc(g.teaser)}</p>
           <dl class="card-meta">
@@ -96,7 +120,7 @@
     $("#detailsBody").innerHTML = `<div class="detail-art">${art(g)}</div>
       <div class="detail-content">
         <p class="card-cat">${esc(g.categoryLabel)} ${status(g)}</p>
-        <h2 id="detailsTitle">${esc(g.title)}</h2><p class="card-sub">${esc(g.subtitle)}</p>
+        <h2 id="detailsTitle">${esc(g.title)}</h2>${stars(g)}<p class="card-sub">${esc(g.subtitle)}</p>
         <p class="detail-teaser">${esc(g.teaser)}</p>
         ${g.shots ? `<div class="detail-shots">${g.shots.map((s) => `<img src="${esc(s.src)}" alt="${esc(s.label)}" loading="lazy">`).join("")}</div>` : ""}
         <table class="facts">
@@ -135,6 +159,7 @@
 
   renderCategories();
   renderGames();
+  loadRatings();
   onScroll();
   observe();
 })();

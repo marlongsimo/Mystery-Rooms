@@ -10,7 +10,8 @@
 - legt die Tabelle an,
 - erlaubt Besuchern **nur das Eintragen** (kein Lesen, Ändern oder Löschen),
 - begrenzt Einträge auf 30 pro Minute,
-- enthält am Ende zwei Abfragen zur Auswertung.
+- enthält zwei Abfragen zur Auswertung,
+- stellt mit `game_rating_summary()` nur Schnitt und Anzahl je Spiel öffentlich bereit (Startseite zeigt sie ab 3 Bewertungen).
 
 Bis dahin zeigt der Baustein nach dem Absenden „Das hat leider nicht geklappt“. Die Spiele selbst laufen normal.
 

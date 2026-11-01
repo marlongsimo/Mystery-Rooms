@@ -18,7 +18,7 @@
   }
 
   let client;
-  try { client = window.MRMultiplayer.connect({ gameSlug: cfg.gameSlug, maxPlayers: cfg.maxPlayers }); }
+  try { client = window.MRMultiplayer.connect({ gameSlug: cfg.gameSlug, maxPlayers: cfg.maxPlayers, storeKey: cfg.storeKey }); }
   catch (e) { root.innerHTML = `<p class="mp-status" data-kind="error">${esc(e.message)}</p>`; return; }
 
   let link = null, saveKey = null;
@@ -56,7 +56,7 @@
   /* ---------- Sitzung ↔ Engine ---------- */
   function attach(session) {
     if (link) return;
-    saveKey = "dlf_mp_" + session.session_id;
+    saveKey = (cfg.savePrefix || "dlf_mp_") + session.session_id;
     E.enterMultiplayer({
       saveKey,
       changed: () => link && link.changed(),
@@ -99,7 +99,7 @@
   client.on("status", paintBody);
 
   // Nach dem Neuladen: laufende Sitzung wiederfinden (Spielstand bleibt erhalten)
-  let stored = null; try { stored = localStorage.getItem("mr_mp_session_v1:" + cfg.gameSlug); } catch (e) { /* privat */ }
+  let stored = null; try { stored = localStorage.getItem(cfg.storeKey || "mr_mp_session_v1:" + cfg.gameSlug); } catch (e) { /* privat */ }
   if (stored) {
     lobby.restore().then((s) => { if (s && s.status === "running") attach(s); paintBody(); });
   }

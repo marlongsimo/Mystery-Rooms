@@ -463,7 +463,7 @@
     if (h.doc) {
       A.play("paper");
       parts.push(docHtml(h.doc));
-      if (addDoc(h.doc)) parts.push(`<p class="found-note">▤ In die Akte gelegt</p>`);
+      if (addDoc(h.doc)) parts.push(`<p class="found-note">▤ ${esc(C.docFoundLabel || "In die Akte gelegt")}</p>`);
       save();
     }
     const pid = h.lock || h.use;
@@ -522,6 +522,9 @@
       return `<div class="lock lock-seq">${head}<p class="muted small">${esc(p.help || "Betätige die Bedienelemente nacheinander.")}</p>
         <div class="seq-panel${p.panel ? " seq-" + p.panel : ""}" style="--n:${p.items.length}">${p.items.map((it) => `<button type="button" class="seq-ctl" data-seq="${it.id}" style="${it.vars || ""}" aria-pressed="false"><span class="seq-art" aria-hidden="true">${it.html || ""}</span><b>${esc(it.label)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`).join("")}</div>
         <p class="seq-trail" aria-live="polite">&nbsp;</p>${fb}</div>`;
+    }
+    if (p.type === "question") { // Version 2: wird im Ermittlungs-Tablet mit Antwort + Belegen eingereicht
+      return `<div class="lock lock-wall">${head}<button type="button" class="submit-button wide" data-open-tablet="${esc(p.id)}">${esc(p.button || "Im Tablet bearbeiten")}</button></div>`;
     }
     if (p.type === "wall") { // wird an der Pinnwand gelöst (js/wall.js)
       return `<div class="lock lock-wall">${head}<button type="button" class="submit-button wide" data-open-wall="${esc(p.focus || "")}">${esc(p.button || "Zur Pinnwand")}</button></div>`;
@@ -1266,6 +1269,7 @@
     if ("reset" in ds) return resetGame();
     if ("title" in ds) return showTitle();
     if ("prolog" in ds) { closeDialog(); return runProlog({ readyLabel: "Weiter", onDone: () => { if (inGame()) render(); } }); }
+    if ("openTablet" in ds) { closeDialog(); return N.tablet && N.tablet.open(ds.openTablet || null); }
     if ("openWall" in ds) { closeDialog(); return N.wall && N.wall.open(ds.openWall || null); }
     if ("mpLeave" in ds) { closeDialog(); return mp && mp.leave && mp.leave(); }
     if (ds.goal) { S.goals[ds.goal] = true; save(); A.play("paper"); return renderPhone(); }
@@ -1424,6 +1428,18 @@
     /** Rätsel lösen, das an der Pinnwand erledigt wurde – mit dem üblichen Erfolgsfenster. */
     solveFromWall(pid) { if (PUZ[pid] && !isSolved(pid)) succeed(PUZ[pid]); },
     puzzle: (pid) => PUZ[pid],
+    /** Version 2: Frage aus dem Tablet lösen. Schließt sie den Bereich ab, kommt das übliche Erfolgsfenster. */
+    solveQuestion(pid) {
+      const p = PUZ[pid]; if (!p || isSolved(pid)) return false;
+      const r = ROOM[p.room];
+      if ((r.completeWhen || []).every((x) => x === pid || isSolved(x))) { if (N.tablet) N.tablet.close(); succeed(p); return true; }
+      solve(pid); renderStage(); renderSide(); renderObjective(); return false;
+    },
+    hintCount: (pid) => S.hints[pid] || 0,
+    addHint(pid) { S.hints[pid] = (S.hints[pid] || 0) + 1; save(); },
+    rooms: () => N.rooms.map((r) => ({ id: r.id, name: r.name, done: S.completed.includes(r.id) })),
+    visited: (id) => S.visited.includes(id),
+    questions: () => Object.values(PUZ).filter((p) => p.type === "question"),
     closePanels() { closeDialog(); closeOverlay(); setDrawer(false); },
   };
 

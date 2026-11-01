@@ -233,7 +233,7 @@ Abschlussbildschirm: „13 von 13 Erkenntnissen · 2 von 2 Zusatzfragen · x Feh
 
 1. **Dieses Dokument prüfen und festschreiben** (vor allem: Fragenkatalog, Hypothesen-Texte, Rückmeldungen).
 2. ✓ *(Prototyp steht: `ermittlung.html`, Code in `js/case/`)* **Prototyp Kapitel 2 (Foyer):** Tablet mit allen fünf Reitern, Fragen F3–F5, Zeitleiste mit Foyeruhr/Serverzeit, Personenakte Keller und Mahler. Allein und zu zweit testen. Hier zeigt sich, ob „Behauptung plus Beleg“ sich gut anfühlt.
-3. Kapitel 1 und 3 umstellen, dann 4 und 5.
+3. ✓ Kapitel 1–3 im Spiel umgestellt (`ermittlung.html`, Version 2 Vorschau). Offen: Kapitel 4 und 5, F10 (Probenplan aus Kapitel 4).
 4. Bisherige Version 1 bleibt spielbar, bis Version 2 vollständig ist.
 5. Plattform: zwei Spielarten „Erkundung“ (Hotel Nocturne) und „Ermittlung“ (Der letzte Fall) auf der Startseite; über einen neuen Plattformnamen erst nach der Testphase entscheiden.
 

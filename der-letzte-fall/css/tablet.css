@@ -36,8 +36,8 @@ body.tablet-page { margin: 0; height: 100dvh; overflow: hidden; background: #0e1
 .t-field i { position: absolute; top: 12px; right: 12px; font: normal 10px var(--mono); color: #6b707a; }
 .t-field.ok { border-style: solid; border-color: #2e8a55; background: #11231a; } .t-field.ok b { color: #9fe0b0; } .t-field.ok span { color: #d6efe0; } .t-field.ok i { color: #9fe0b0; font-size: 14px; }
 .t-q { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; margin-bottom: 8px; padding: 14px; background: #171a21; border: 1px solid #2c3240; border-left: 3px solid var(--brass); border-radius: 10px; color: var(--text); font: 15px var(--sans); }
-.t-q span { flex: 1; } .t-q small { display: block; flex-basis: 100%; } .t-q { flex-wrap: wrap; } .t-q em { font-style: normal; color: var(--brass); font-size: 20px; position: absolute; right: 0; }
-.t-q { position: relative; padding-right: 34px; } .t-q em { right: 14px; top: 12px; }
+.t-q span { flex: 1; } .t-q small { display: block; flex-basis: 100%; } .t-q { flex-wrap: wrap; } .t-q > em { font-style: normal; color: var(--brass); font-size: 20px; position: absolute; right: 0; }
+.t-q { position: relative; padding-right: 34px; } .t-q > em { right: 14px; top: 12px; }
 .t-q small { color: #a3a8b4; font-size: 12px; }
 .t-findings { padding-left: 20px; } .t-findings li { margin-bottom: 12px; } .t-findings b { font-weight: 500; } .t-findings p { margin: 3px 0 0; color: #c9efd6; font: italic 15px var(--serif); } .t-findings small { color: #8a8f98; }
 /* Fenster */
@@ -117,3 +117,23 @@ body.tablet-page { margin: 0; height: 100dvh; overflow: hidden; background: #0e1
 .t-toast { position: fixed; z-index: 50; left: 50%; top: calc(66px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -10px); max-width: calc(100% - 32px); padding: 9px 16px; border-radius: 20px; background: #14161cf2; border: 1px solid #54b8b0; color: #c9efe9; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; text-align: center; }
 .t-toast.show { opacity: 1; transform: translate(-50%, 0); } .t-toast b { color: #fff; font-weight: 600; }
 .tm-box .paper { margin-top: 10px; }
+
+/* ---------- Version 2: Tablet als Ebene im Spiel ---------- */
+.tablet-wrap { position: fixed; inset: 0; z-index: 50; background: #0e1015; color: var(--text); font-family: var(--sans); animation: fade .2s; }
+.tablet-wrap[hidden] { display: none; }
+.tablet-wrap .t-top, .tablet-wrap .t-tabs, .tablet-wrap .t-main { position: absolute; }
+.tablet-wrap .t-modal, .tablet-wrap .t-toast { position: absolute; }
+.t-close { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #2c3240; background: none; color: var(--text); font-size: 22px; line-height: 1; }
+.t-tag { font: 10px var(--mono); letter-spacing: .1em; color: #8ab4d8; border: 1px solid #3b76c4; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+.t-q.bonus { border-left-color: #3b76c4; }
+.t-wallhint { padding: 40px 24px; text-align: center; }
+#tabletButton { grid-column: 1 / -1; flex-direction: row; justify-content: center; gap: 10px; padding: 14px 8px; border-color: #8a7348; background: #1b1713; }
+#tabletButton span { font-size: 14px; color: var(--text); }
+/* Smartphone quer: wenig Höhe – Reiter kompakter, damit alle fünf sichtbar sind */
+@media (max-height: 520px) and (min-width: 761px) {
+  .t-tabs { width: 78px; gap: 2px; padding: 6px; }
+  .t-tabs button { padding: 5px 2px; gap: 1px; font-size: 10px; }
+  .t-tabs button span { font-size: 16px; }
+  .t-main { left: 78px; }
+  .tablet-wrap .t-top { height: 48px; } .tablet-wrap .t-tabs, .tablet-wrap .t-main { top: 48px; }
+}

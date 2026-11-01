@@ -97,12 +97,12 @@ window.DL = window.DL || {};
     render(w) {
       const days = [];
       ST.calendar.forEach((c) => { let d = days.find((x) => x.day === c.day); if (!d) days.push(d = { day: c.day, items: [] }); d.items.push(c); });
-      w.body.innerHTML = `<div class="cal"><p class="doc-meta">kalender.ics · Oktober 2026 · Export 17.10. 18:00</p>${days.map((d) => `<section class="cal-day"><h4>${esc(d.day)}</h4>${d.items.map((c) => `<div class="cal-item${c.cancelled ? " cancelled" : ""}"><b>${esc(c.time)}</b><span><strong>${esc(c.title)}</strong><small>${esc(c.place)}${c.note ? " · " + esc(c.note) : ""}</small></span></div>`).join("")}</section>`).join("")}</div>`;
+      w.body.innerHTML = `<div class="cal"><p class="doc-meta">kalender.ics · Oktober 2025 · Export 17.10. 18:00</p>${days.map((d) => `<section class="cal-day"><h4>${esc(d.day)}</h4>${d.items.map((c) => `<div class="cal-item${c.cancelled ? " cancelled" : ""}"><b>${esc(c.time)}</b><span><strong>${esc(c.title)}</strong><small>${esc(c.place)}${c.note ? " · " + esc(c.note) : ""}</small></span></div>`).join("")}</section>`).join("")}</div>`;
     },
   };
 
   /* ================= Audio-Player ================= */
-  const MORSE = ["-.", "---", ".-.", ".-"];
+  const MORSE = ["--", "..", ".-..", "---"];
   const TRANSCRIPTS = {
     memo1: "Notiz an mich. Viktor schreibt mir um zwanzig vor neun, ich soll die Finger von #4471 lassen. Der Leiter der IT-Sicherheit persönlich. Wegen eines Exports, den angeblich eine Admin gemacht hat. Warum interessiert ihn so sehr, was ich mir ansehe?",
     memo2: "Der Audit-Export für #4471 kommt von Security Review. Da fehlt was. Okafor ist drin, sonst niemand aus der Sicherheitsabteilung. Wer filtert seine eigene Abteilung aus einem Export? … Und der Download um 19:14 – das Gerät kenne ich nicht. Ich brauch das Register. Jana fragen.",
@@ -166,7 +166,7 @@ window.DL = window.DL || {};
   /* ================= Bilder ================= */
   const IMAGES = {
     whiteboard: {
-      meta: ["Aufgenommen: 16.10.2026, 19:02", "Gerät: Smartphone E. Voss", "Ort: Arbeitsplatz 02"],
+      meta: ["Aufgenommen: 16.10.2025, 19:02", "Gerät: Smartphone E. Voss", "Ort: Arbeitsplatz 02"],
       svg: `<svg viewBox="0 0 800 500"><rect width="800" height="500" fill="#4a4f55"/><rect x="30" y="30" width="740" height="430" fill="#f3f3ef" stroke="#9aa0a6" stroke-width="6"/>
         <g font-family="'Segoe Print','Comic Sans MS',cursive" fill="#1d3f8a" font-size="24">
         <text x="70" y="90">#4471 — Nora?</text><text x="270" y="90" fill="#b3261e">NEIN</text>
@@ -177,18 +177,18 @@ window.DL = window.DL || {};
         <text x="70" y="340">Dienste: ltn · qtz · orb · hlc · ???</text>
         <text x="460" y="400" fill="#b3261e" font-size="22">Ombudsstelle — extern!</text>
         <text x="460" y="432" fill="#b3261e" font-size="22">NICHT an Security Review</text></g>
-        <path d="M60 100 q120 -10 260 0" stroke="#b3261e" stroke-width="2" fill="none"/><circle cx="610" cy="160" r="50" fill="none" stroke="#2e7d32" stroke-width="3"/><text x="610" y="168" text-anchor="middle" font-family="cursive" fill="#2e7d32" font-size="22">MIRROR?</text></svg>`,
+        <path d="M60 100 q120 -10 260 0" stroke="#b3261e" stroke-width="2" fill="none"/><circle cx="620" cy="165" r="62" fill="none" stroke="#2e7d32" stroke-width="3"/><text x="620" y="158" text-anchor="middle" font-family="cursive" fill="#2e7d32" font-size="18">Wer darf</text><text x="620" y="182" text-anchor="middle" font-family="cursive" fill="#2e7d32" font-size="18">spiegeln?</text></svg>`,
     },
     sommerfest: {
-      meta: ["Aufgenommen: 29.08.2026, 20:14", "Kamera: J. Thiel", "VANTA Sommerfest, Dachterrasse"],
+      meta: ["Aufgenommen: 29.08.2025, 20:14", "Kamera: J. Thiel", "VANTA Sommerfest, Dachterrasse"],
       svg: `<svg viewBox="0 0 800 500"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2a65a"/><stop offset="1" stop-color="#7b4a6b"/></linearGradient></defs><rect width="800" height="500" fill="url(#sky)"/>
         <rect y="360" width="800" height="140" fill="#3b2c35"/><g stroke="#ffd98a" stroke-width="2"><path d="M0 60 Q200 110 400 60 T800 60" fill="none"/></g>
         <g fill="#ffe7a8">${[40, 120, 200, 280, 360, 440, 520, 600, 680, 760].map((x) => `<circle cx="${x}" cy="${78 + (x % 160 === 40 ? 6 : 0)}" r="6"/>`).join("")}</g>
-        <text x="400" y="140" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="30" fill="#fff" opacity=".9">VANTA Sommerfest 2026</text>
+        <text x="400" y="140" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="30" fill="#fff" opacity=".9">VANTA Sommerfest 2025</text>
         ${[["Lea", 130, "#8fb3d9"], ["Jana", 260, "#e39b9b"], ["Elias", 400, "#9fc79a"], ["Nora", 530, "#d7b6e8"], ["Malte", 660, "#e8cf8f"]].map(([n, x, c]) => `<g><circle cx="${x}" cy="250" r="34" fill="#f1d3b5"/><rect x="${x - 45}" y="290" width="90" height="120" rx="30" fill="${c}"/><rect x="${x - 30}" y="318" width="60" height="22" fill="#fff"/><text x="${x}" y="334" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" fill="#222">${n}</text></g>`).join("")}</svg>`,
     },
     meeting: {
-      meta: ["Aufgenommen: 14.10.2026, 19:16:04", "Quelle: Konferenzsystem Raum B-01 (automatische Raumbelegung)", "Blick: Glaswand zum Flur · gegenüber: Sicherheitsbüro C-01"],
+      meta: ["Aufgenommen: 14.10.2025, 19:16:04", "Quelle: Konferenzsystem Raum B-01 (automatische Raumbelegung)", "Blick: Glaswand zum Flur · gegenüber: Sicherheitsbüro C-01"],
       svg: `<svg viewBox="0 0 800 500"><rect width="800" height="500" fill="#1d2228"/>
         <rect x="0" y="0" width="800" height="330" fill="#2b333c"/>
         <g opacity=".95"><rect x="420" y="60" width="300" height="250" fill="#3c4650"/><rect x="440" y="80" width="260" height="210" fill="#e9dfb8" opacity=".85"/>
@@ -196,12 +196,12 @@ window.DL = window.DL || {};
           <rect x="640" y="248" width="22" height="8" fill="#f4f4f4"/><text x="651" y="254.6" text-anchor="middle" font-family="DM Mono,monospace" font-size="5.2" fill="#000">SEC-01</text>
           <circle cx="520" cy="170" r="22" fill="#272320"/><path d="M490 290 q30 -100 60 0 z" fill="#272320"/><rect x="494" y="190" width="52" height="100" rx="18" fill="#272320"/>
           <line x1="520" y1="194" x2="528" y2="236" stroke="#b32" stroke-width="1.6"/><rect x="522" y="236" width="16" height="11" fill="#f2f2f2"/><text x="530" y="243.5" text-anchor="middle" font-family="DM Mono,monospace" font-size="3.6" fill="#111">V. KERN</text>
-          <rect x="440" y="80" width="260" height="22" fill="#1b2026"/><text x="570" y="96" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" fill="#d8d8d8">C-01 · SICHERHEITSBÜRO</text></g>
+          <rect x="440" y="80" width="260" height="22" fill="#1b2025"/><text x="570" y="96" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" fill="#d8d8d8">C-01 · SICHERHEITSBÜRO</text></g>
         <g stroke="#9fb1c2" stroke-opacity=".35">${Array.from({ length: 9 }, (_, i) => `<line x1="${30 + i * 90}" y1="0" x2="${30 + i * 90}" y2="330"/>`).join("")}</g>
         <rect x="0" y="0" width="800" height="330" fill="#cfe3f5" opacity=".08"/>
         <path d="M60 400 L740 400 L800 500 L0 500 Z" fill="#4a3a2c"/><rect x="120" y="360" width="560" height="40" rx="6" fill="#6b5440"/>
         ${[160, 280, 400, 520, 640].map((x) => `<rect x="${x}" y="410" width="60" height="60" rx="8" fill="#202428"/>`).join("")}
-        <text x="16" y="24" font-family="DM Mono,monospace" font-size="13" fill="#e8e8e8">B-01 CAM · 14.10.2026 19:16:04</text><circle cx="770" cy="20" r="6" fill="#d33"/></svg>`,
+        <text x="16" y="24" font-family="DM Mono,monospace" font-size="13" fill="#e8e8e8">B-01 CAM · 14.10.2025 19:16:04</text><circle cx="770" cy="20" r="6" fill="#d33"/></svg>`,
     },
   };
   const image = {
@@ -293,9 +293,9 @@ window.DL = window.DL || {};
   const link = (href, label) => `<a href="#" data-href="${href}">${esc(label)}</a>`;
   const PAGES = {
     "vanta.local": () => `<div class="pg intranet"><header class="pg-head"><b>VANTA</b> Intranet<nav>${link("vanta.local", "Start")} ${link("vanta.local/team", "Mitarbeiter")} ${link("hilfe.vanta.local", "IT-Hilfe")} ${link("audit.vanta.local", "Audit-Portal")}</nav></header>
-      <article class="news"><small>15.10.2026 · Unternehmenskommunikation</small><h3>Datenabfluss: Security Review übernimmt Vorfall #4471</h3><p>Nach einem unberechtigten Export von Kundendaten hat Security Review unter Leitung von Viktor Kern die Untersuchung übernommen. Eine Mitarbeiterin der Systemadministration wurde freigestellt. Wir bitten alle Mitarbeitenden, keine eigenen Nachforschungen anzustellen.</p></article>
-      <article class="news"><small>14.10.2026 · IT-Betrieb</small><h3>Patchnacht erfolgreich vorbereitet</h3><p>Danke an alle, die am Dienstagabend länger geblieben sind. Die Sicherung über LANTERN lief um 19:25 planmäßig.</p></article>
-      <article class="news"><small>01.09.2026 · Personal</small><h3>Fotos vom Sommerfest</h3><p>Danke an Jana Thiel für die Fotos! Sie liegen auf euren Rechnern unter Bilder.</p></article></div>`,
+      <article class="news"><small>15.10.2025 · Unternehmenskommunikation</small><h3>Datenabfluss: Security Review übernimmt Vorfall #4471</h3><p>Nach einem unberechtigten Export von Kundendaten hat Security Review unter Leitung von Viktor Kern die Untersuchung übernommen. Eine Mitarbeiterin der Systemadministration wurde freigestellt. Wir bitten alle Mitarbeitenden, keine eigenen Nachforschungen anzustellen.</p></article>
+      <article class="news"><small>14.10.2025 · IT-Betrieb</small><h3>Patchnacht erfolgreich vorbereitet</h3><p>Danke an alle, die am Dienstagabend länger geblieben sind. Die Sicherung über LANTERN lief um 19:25 planmäßig.</p></article>
+      <article class="news"><small>01.09.2025 · Personal</small><h3>Fotos vom Sommerfest</h3><p>Danke an Jana Thiel für die Fotos! Sie liegen auf euren Rechnern unter Bilder.</p></article></div>`,
     "vanta.local/team": () => `<div class="pg intranet"><header class="pg-head"><b>VANTA</b> Intranet<nav>${link("vanta.local", "Start")} ${link("vanta.local/team", "Mitarbeiter")} ${link("hilfe.vanta.local", "IT-Hilfe")} ${link("audit.vanta.local", "Audit-Portal")}</nav></header>
       <h3>Mitarbeiterverzeichnis · IT und Technik</h3><table class="pg-table"><thead><tr><th>Name</th><th>Funktion</th><th>Arbeitsplatz</th></tr></thead><tbody>${ST.team.map((p) => `<tr><td>${esc(p.name)}</td><td>${esc(p.role)}${p.note ? ` <em>(${esc(p.note)})</em>` : ""}</td><td>${esc(p.place)}</td></tr>`).join("")}</tbody></table></div>`,
     "hilfe.vanta.local": () => `<div class="pg help"><header class="pg-head"><b>IT-Hilfe</b><nav>${link("vanta.local", "Intranet")}</nav></header><h3>Häufige Themen</h3><ul class="pg-links">
@@ -312,12 +312,15 @@ window.DL = window.DL || {};
     const sec = w.state.sec || "vorfaelle";
     const nav = [["vorfaelle", "Vorfälle"], ["widerspruch", "Widerspruch #4471"], ["projekte", "Interne Projekte"], ["berichte", "Sicherheitsberichte"]];
     let body = "";
-    if (sec === "vorfaelle") body = `<h3>Vorfälle · Oktober 2026</h3><table class="pg-table"><thead><tr><th>Nr.</th><th>Vorfall</th><th>Konto</th><th>Status</th></tr></thead><tbody>
+    if (sec === "vorfaelle") body = `<h3>Vorfälle · Oktober 2025</h3><table class="pg-table"><thead><tr><th>Nr.</th><th>Vorfall</th><th>Konto</th><th>Status</th></tr></thead><tbody>
       <tr><td>#4471</td><td>Export Kundendaten (kundendaten_gesamt.zip), 14.10. 19:14</td><td>NWEISS</td><td>${G.isSolved("widerspruch") ? "Widerspruch eingereicht" : "in Prüfung · Security Review"}</td></tr>
       <tr><td>#4466</td><td>Fehlgeschlagene Anmeldungen VPN</td><td>LAHRENS</td><td>erledigt</td></tr><tr><td>#4459</td><td>Zertifikat abgelaufen (HALCYON)</td><td>SYSTEM</td><td>erledigt</td></tr></tbody></table>`;
     if (sec === "widerspruch") {
       const O = ST.objection, st = w.state.obj || (w.state.obj = { device: "", person: "", rows: [] });
       if (G.isSolved("widerspruch")) body = `<h3>Widerspruch gegen Vorfall #4471</h3><p class="pg-ok">Eingereicht. Gerät SEC-01 · zuständig: Viktor Kern · Belege: 18:17, 19:14.</p><p>Erweiterter Prüfzugang aktiv: Interne Projekte sind freigegeben.</p>`;
+      else if (!G.flag("seen_auditcsv")) body = `<h3>Widerspruch gegen Vorfall #4471 <span class="pg-draft">ENTWURF · E. VOSS</span></h3>
+        <p>Der Export am 14.10. um 19:14 wurde dem Konto <b>NWEISS</b> zugeordnet.</p>
+        <p class="pg-locked">Entwurf unvollständig: Es fehlt der Audit-Auszug zum Vorfall.<br><small>Notiz E. V.: „Nora bringt den Export mit. Erst einfügen, dann einreichen.“</small></p>`;
       else body = `<h3>Widerspruch gegen Vorfall #4471 <span class="pg-draft">ENTWURF · E. VOSS</span></h3>
         <p>Der Export am 14.10. um 19:14 wurde dem Konto <b>NWEISS</b> zugeordnet. Mit diesem Widerspruch wird belegt, dass die Aktion nicht von Nora Weiss an ihrem Gerät ausgeführt wurde.</p>
         <form class="objection"><label>1 · Ausführendes Gerät des Downloads um 19:14<input class="field" name="device" autocomplete="off" placeholder="z. B. XX-00" value="${esc(st.device)}"></label>
@@ -417,10 +420,8 @@ window.DL = window.DL || {};
   };
 
   /* ================= DEADLINE.exe ================= */
-  const draft = { redact: new Set(), target: "" };
-  DL.draft = draft;
-  function reportHtml() {
-    return esc(ST.report).replace(/\{([^}]+)\}/g, (m, name) => `<button type="button" class="rd-name${draft.redact.has(name) ? " redacted" : ""}" data-name="${esc(name)}" aria-pressed="${draft.redact.has(name)}">${esc(name)}</button>`);
+  function reportHtml(red) {
+    return esc(ST.report).replace(/\{([^}]+)\}/g, (m, name) => `<button type="button" class="rd-name${red.includes(name) ? " redacted" : ""}" data-name="${esc(name)}" aria-pressed="${red.includes(name)}">${esc(name)}</button>`);
   }
   const deadline = {
     title: () => "DEADLINE.exe", icon: () => "deadline", w: 760, h: 560, cls: "win-dead",
@@ -431,36 +432,40 @@ window.DL = window.DL || {};
           <p class="dx-deny">ZUGRIFF VERWEIGERT · Beweispaket CASE_17 nicht verifiziert.</p></div>`;
         return;
       }
-      const count = draft.redact.size;
+      const draft = G.draft(), count = draft.redact.length;
       w.body.innerHTML = `<div class="dx"><header class="dx-head"><div><p class="dx-k">VANTA EMERGENCY PROTOCOL · SYSTEMENTSCHEIDUNG</p><p>Das Beweispaket wurde verifiziert. Die automatische Löschung läuft weiter.</p></div><p class="dx-time"><b data-live-countdown>${S.relaxed ? "OHNE ZEITLIMIT" : G.fmt(G.remaining())}</b><small>VERBLEIBENDE ZEIT</small></p></header>
-        <section class="dx-sec"><h4>1 · Bericht prüfen <span>Namen anklicken, um sie zu schwärzen · ${count} geschwärzt</span></h4><div class="dx-report">${reportHtml()}</div></section>
+        <section class="dx-sec"><h4>1 · Bericht prüfen <span>Namen anklicken, um sie zu schwärzen · ${count} geschwärzt</span></h4><div class="dx-report">${reportHtml(draft.redact)}</div></section>
         <section class="dx-sec"><h4>2 · Empfänger</h4><div class="dx-targets">
           <label class="dx-t"><input type="radio" name="dxt" value="review"${draft.target === "review" ? " checked" : ""}><span><b>VANTA Security Review</b><small>intern · review.vanta.local</small></span></label>
           <label class="dx-t"><input type="radio" name="dxt" value="ombud"${draft.target === "ombud" ? " checked" : ""}><span><b>Ombudsstelle Albers &amp; Roth</b><small>extern · albers-roth.de/portal</small></span></label></div></section>
-        ${G.isMultiplayer() ? `<p class="dx-note">Die Entscheidung gilt für das ganze Team.</p>` : ""}
+        ${G.isMultiplayer() ? `<p class="dx-note">Ihr bearbeitet diesen Entwurf gemeinsam – alle sehen dieselben Schwärzungen und denselben Empfänger.${draft.by ? ` Zuletzt geändert von <b>${esc(draft.by)}</b>.` : ""} Wer sendet oder löscht, entscheidet für das ganze Team.</p>` : ""}
         <div class="dx-actions"><button class="btn danger dx-purge">VOLLSTÄNDIG LÖSCHEN</button><button class="btn dx-send"${draft.target ? "" : " disabled"}>BEWEISE SENDEN</button></div>
         <div class="dx-confirm" hidden></div></div>`;
     },
     opened(w) {
       w.body.addEventListener("click", (e) => {
         const n = e.target.closest(".rd-name");
-        if (n) { const name = n.dataset.name; draft.redact.has(name) ? draft.redact.delete(name) : draft.redact.add(name); snd.play("click"); const y = $(".dx-report", w.body).scrollTop; os().render(w); $(".dx-report", w.body).scrollTop = y; return; }
+        if (n) { const name = n.dataset.name, red = G.draft().redact; G.updateDraft({ redact: red.includes(name) ? red.filter((x) => x !== name) : red.concat(name) }); snd.play("click"); return; }
         if (e.target.closest(".dx-send")) return confirmBox(w, "send");
         if (e.target.closest(".dx-purge")) return confirmBox(w, "purge");
         if (e.target.closest(".dx-no")) { $(".dx-confirm", w.body).hidden = true; return; }
         const yes = e.target.closest(".dx-yes");
-        if (yes) G.decide({ target: yes.dataset.t === "purge" ? "purge" : draft.target, redact: Array.from(draft.redact) });
+        if (yes) G.decide({ target: yes.dataset.t === "purge" ? "purge" : G.draft().target, redact: G.draft().redact.slice() });
       });
-      w.body.addEventListener("change", (e) => { if (e.target.name === "dxt") { draft.target = e.target.value; const b = $(".dx-send", w.body); if (b) b.disabled = false; } });
+      w.body.addEventListener("change", (e) => { if (e.target.name === "dxt") G.updateDraft({ target: e.target.value }); });
+      w.offDraft = DL.on("draft", () => { if (!w.body.isConnected) return; const c = $(".dx-confirm", w.body), kind = c && !c.hidden ? c.dataset.kind : null; const r = $(".dx-report", w.body), y = r ? r.scrollTop : 0; os().render(w); const r2 = $(".dx-report", w.body); if (r2) r2.scrollTop = y; if (kind) confirmBox(w, kind, true); });
     },
+    closed(w) { if (w.offDraft) w.offDraft(); },
     onChange(w) { if ($(".dx-confirm", w.body) && !$(".dx-confirm", w.body).hidden) return; if (!$(".dx-report", w.body) || G.isSolved("verify") !== Boolean($(".dx-report", w.body))) os().render(w); },
   };
-  function confirmBox(w, kind) {
+  function confirmBox(w, kind, changed) {
     const box = $(".dx-confirm", w.body);
-    const names = Array.from(draft.redact);
+    if (!box) return;
+    box.dataset.kind = kind;
+    const draft = G.draft(), names = draft.redact.slice();
     box.innerHTML = kind === "purge"
       ? `<p><b>Bist du sicher, dass du sämtliche Daten unwiderruflich löschen möchtest?</b><br>Damit werden auch alle Beweise vernichtet.</p><div class="dx-actions"><button class="btn ghost dx-no">Abbrechen</button><button class="btn danger dx-yes" data-t="purge">Endgültig löschen</button></div>`
-      : `<p><b>Bericht CASE_17 senden?</b><br>Empfänger: ${draft.target === "review" ? "VANTA Security Review (intern)" : "Ombudsstelle Albers &amp; Roth (extern)"}<br>Geschwärzt: ${names.length ? names.map(esc).join(", ") : "niemand"}</p><p class="dx-warn">Das lässt sich nicht rückgängig machen.</p><div class="dx-actions"><button class="btn ghost dx-no">Noch einmal prüfen</button><button class="btn dx-yes" data-t="send">Endgültig senden</button></div>`;
+      : `<p><b>Bericht CASE_17 senden?</b><br>Empfänger: ${draft.target === "review" ? "VANTA Security Review (intern)" : "Ombudsstelle Albers &amp; Roth (extern)"}<br>Geschwärzt: ${names.length ? names.map(esc).join(", ") : "niemand"}</p>${changed ? `<p class="dx-warn">Der Entwurf wurde gerade${draft.by ? " von " + esc(draft.by) : ""} geändert – bitte noch einmal prüfen.</p>` : ""}<p class="dx-warn">Das lässt sich nicht rückgängig machen.</p><div class="dx-actions"><button class="btn ghost dx-no">Noch einmal prüfen</button><button class="btn dx-yes" data-t="send">Endgültig senden</button></div>`;
     box.hidden = false;
     box.scrollIntoView({ block: "nearest" });
   }

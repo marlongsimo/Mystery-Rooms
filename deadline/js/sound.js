@@ -52,6 +52,7 @@ window.DL = window.DL || {};
     unlock: () => { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.12, { type: "triangle", vol: 0.08, at: i * 0.07 })); },
     glitch: () => { noise(0.35, { vol: 0.35, freq: 2400 }); tone(70, 0.3, { type: "sawtooth", vol: 0.06 }); },
     alarm: () => { [0, 0.4, 0.8].forEach((t) => { tone(740, 0.18, { type: "square", vol: 0.05, at: t }); tone(560, 0.18, { type: "square", vol: 0.05, at: t + 0.2 }); }); },
+    heart: () => { tone(58, 0.12, { type: "sine", vol: 0.32, attack: 0.01, release: 0.08 }); tone(52, 0.14, { type: "sine", vol: 0.24, at: 0.2, attack: 0.01, release: 0.1 }); },
     key: () => tone(2400 + Math.random() * 400, 0.012, { type: "square", vol: 0.015 }),
     boot: () => { tone(110, 0.6, { type: "sawtooth", vol: 0.04 }); tone(220, 0.4, { vol: 0.05, at: 0.3 }); },
   };
@@ -73,6 +74,8 @@ window.DL = window.DL || {};
     morse,
     fan() { if (on) { try { startFan(); } catch (e) { /* ohne Ton */ } } },
     isOn: () => on,
+    /** Lüfter lauter, je näher die Löschung kommt (0 = normal, 1 = Höchstlast) */
+    fanLevel(x) { if (fan && ctx) fan.g.gain.setTargetAtTime(0.05 + 0.13 * Math.max(0, Math.min(1, x)), ctx.currentTime, 1.5); },
     toggle() {
       on = !on;
       try { localStorage.setItem("deadline_sound", on ? "on" : "off"); } catch (e) { /* privat */ }

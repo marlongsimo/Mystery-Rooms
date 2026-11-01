@@ -39,17 +39,29 @@
   function attach(session) {
     if (link) return;
     saveKey = CFG.savePrefix + session.session_id;
-    G.enterMultiplayer({ saveKey, changed: () => link && link.changed() });
+    G.enterMultiplayer({ saveKey, changed: () => link && link.changed(), draftChanged });
     link = window.MRMultiplayer.sync(client, {
       exportShared: G.exportShared,
       applyShared: (state, byName) => { const news = G.applyShared(state); if (news.length && byName) toast(`<b>${esc(byName)}</b> · ${news.map(esc).join(" · ")}`); },
       position,
       onTeam: renderTeam,
     });
+    link.ready.then(() => { const d = client.states.draft; if (d) G.applyDraft(d, null); }).catch(() => {});
     if (!beat) beat = setInterval(() => { if (link) link.changed(); }, 15000); // Laufzeit und Position regelmäßig teilen
     renderTeam([]);
     paint();
   }
+  /* Entwurf der Entscheidung: ein gemeinsamer Eintrag, die letzte Änderung gilt */
+  let draftTimer = null;
+  function draftChanged(d) {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(() => { if (link) client.writeOwn("draft", { redact: d.redact, target: d.target, at: d.at }).catch((e) => client.emit("error", e)); }, 250);
+  }
+  client.on("state", (row) => {
+    if (!link || row.state_key !== "draft") return;
+    if (client.user && row.updated_by === client.user.id) return;
+    G.applyDraft(row.state, client.playerName(row.updated_by) || "Team");
+  });
   function detach() {
     if (link) link.stop();
     link = null; renderTeam();

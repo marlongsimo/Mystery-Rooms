@@ -151,6 +151,7 @@ DELAY    rand(4,11)s
 Sie hat ihn gesprochen. Nein – geklopft.
 
 Kurze und lange Signale. Mehr brauchst du nicht.
+(Und nein, es ist nicht ihr Name. So leicht macht sie es niemandem.)
 Das Passwort öffnet das Chat-Backup im Messenger.`,
     },
     memo3: { name: "memo_03.wav", type: "wav", parent: "archiv", date: "16.10. 22:58", audio: "memo3" },
@@ -250,7 +251,7 @@ Danke, dass du dir die Zeit genommen hast.
 
   /* ---------- Audit-Export (NORA_PRIVATE/audit_1410.csv) ---------- */
   const audit = {
-    title: "Audit-Log 14.10.2026 · 17:30–20:00 · Export für Vorfall #4471 · erstellt von: Security Review",
+    title: "Audit-Log 14.10.2025 · 17:30–20:00 · Export für Vorfall #4471 · erstellt von: Security Review",
     head: ["Zeit", "Konto", "Aktion", "Objekt", "Gerät"],
     rows: [
       ["17:48", "JTHIEL", "LOGIN", "—", "HD-03"],
@@ -310,7 +311,7 @@ Fragt euch, warum sie immer als Letzte geht.
 
 Jemand, der es gut meint`,
       headers: `Received: from SEC-01.vanta.local (10.4.0.11)
-        by mail.vanta.local; Wed, 15 Oct 2026 17:30:02 +0200
+        by mail.vanta.local; Wed, 15 Oct 2025 17:30:02 +0200
 From: noreply-4471@vanta.local
 X-Originating-Device: SEC-01
 X-Mailer: VANTA Notify 2.3`,
@@ -368,6 +369,7 @@ E.`,
     { who: "Nora", time: "22:21", text: "Elias, ich hab Angst. Wer kann so was überhaupt?" },
     { who: "Elias", time: "22:23", text: "Jemand mit sehr viel Zugriff. Ich sag es dir, wenn ich sicher bin." },
     { who: "Elias", time: "22:24", text: "Falls etwas passiert, muss jemand den Kalender finden." },
+    { who: "Nora", time: "22:25", text: "Das Passwort für dieses Backup klopf ich dir nachher aufs Handy. Milo schläft gerade auf meiner Tastatur. 🐈" },
   ];
 
   /* ---------- Kalender (ARCHIV_01/kalender.ics) ---------- */
@@ -450,9 +452,9 @@ E.`,
   /* ---------- Beweisbericht (Namen sind schwärzbar) ---------- */
   const people = ["Nora Weiss", "Viktor Kern", "Elias Voss", "Jana Thiel", "Malte Brück"];
   const report = `BEWEISBERICHT CASE_17
-erstellt von {Elias Voss}, IT-Forensik · 17.10.2026
+erstellt von {Elias Voss}, IT-Forensik · 17.10.2025
 
-1  Am 14.10.2026 um 19:14 wurde unter dem Konto von {Nora Weiss} die Datei kundendaten_gesamt.zip exportiert. {Nora Weiss} hatte sich um 18:17 an ihrem Laptop LT-N14 abgemeldet. Das Gerät war danach bis zum Morgen offline.
+1  Am 14.10.2025 um 19:14 wurde unter dem Konto von {Nora Weiss} die Datei kundendaten_gesamt.zip exportiert. {Nora Weiss} hatte sich um 18:17 an ihrem Laptop LT-N14 abgemeldet. Das Gerät war danach bis zum Morgen offline.
 
 2  Ausführendes Gerät war SEC-01, das Sicherheitsterminal im Büro von {Viktor Kern}.
 
@@ -496,7 +498,7 @@ erstellt von {Elias Voss}, IT-Forensik · 17.10.2026
     chat: [
       "In ARCHIV_01 liegt eine Notiz zu einer Sprachaufnahme.",
       "memo_03.wav besteht aus kurzen und langen Tönen: Morsezeichen. Eine Tabelle findest du im Browser unter IT-Hilfe.",
-      "-. / --- / .-. / .- ergibt NORA. Damit öffnest du das Chat-Backup im Messenger.",
+      "-- / .. / .-.. / --- ergibt MILO. Damit öffnest du das Chat-Backup im Messenger.",
     ],
     nora: [
       "Im Chat-Backup erklärt Nora, womit sie ihren Ordner gesperrt hat.",

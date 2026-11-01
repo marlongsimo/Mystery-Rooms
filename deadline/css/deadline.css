@@ -477,3 +477,10 @@ body.mp-session .sp-only { display: none; }
   .toasts { top: auto; bottom: calc(var(--tb) + 10px); }
   .doc-text { font-size: 13px; }
 }
+
+/* ---------- Weniger Bewegung (Systemeinstellung) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .glitch-title::before, .glitch-title::after { display: none; }
+  .desk.glitch { filter: none; transform: none; }
+}

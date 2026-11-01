@@ -210,6 +210,7 @@ window.DL = window.DL || {};
   DL.toast = toast;
 
   /* ---------- Taskleiste: Uhr und Countdown ---------- */
+  let lastBeat = -1;
   function paintClock() {
     const S = G.state;
     $("#clock").textContent = G.clock();
@@ -219,6 +220,11 @@ window.DL = window.DL || {};
       const r = G.remaining();
       cd.textContent = G.fmt(r);
       cd.className = "countdown" + (r <= 15 * 60 ? " critical" : r <= 30 * 60 ? " warn" : "");
+      // Letzte 15 Minuten: Lüfter läuft hoch. Letzte 5 Minuten: Herzschlag.
+      if (!S.ending && G.isRunning() && !G.isPaused()) {
+        snd.fanLevel(r <= 15 * 60 ? 1 - r / (15 * 60) : 0);
+        if (r <= 5 * 60 && r > 0 && S.elapsed % 2 === 0 && S.elapsed !== lastBeat) { lastBeat = S.elapsed; snd.play("heart"); }
+      }
     }
     const dlc = document.querySelectorAll("[data-live-countdown]");
     dlc.forEach((x) => { x.textContent = S.relaxed ? "OHNE ZEITLIMIT" : G.fmt(G.remaining()); });

@@ -24,6 +24,7 @@ window.DL = window.DL || {};
     v: 1, started: false, relaxed: false, elapsed: 0,
     completed: [], flags: {}, fails: {}, msgs: [], msgAt: {}, events: [], hints: {},
     ending: null, endings: [], finished: false,
+    draft: { redact: [], target: "", by: "" },
   });
   let S = fresh();
   let paused = false;
@@ -78,13 +79,26 @@ window.DL = window.DL || {};
   const fmt = (sec) => { sec = Math.max(0, Math.floor(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60; return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`; };
   /** Uhrzeit im Spiel: Start Samstag, 18.10., 00:12 */
   const clock = () => { const t = 12 + Math.floor(S.elapsed / 60); return `${String(Math.floor(t / 60) % 24).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`; };
-  let running = false;
+  /*
+   * Die Frist ist Spielzeit: Sie läuft, solange das Spiel geöffnet ist – auch in einem
+   * Hintergrund-Tab. Sie steht nur bei Pause oder geschlossener Seite. Gemessen wird mit
+   * der Systemuhr, weil Browser Zeitgeber in Hintergrund-Tabs stark verlangsamen.
+   * Ein Sprung über 2 Minuten (Rechner im Ruhezustand) zählt nicht.
+   */
+  let running = false, lastTs = null, frac = 0, lastSave = 0;
   function tick() {
-    if (!running || paused || !S.started || S.ending) return;
-    if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
-    S.elapsed += 1;
+    if (!running || paused || !S.started || S.ending) { lastTs = null; return; }
+    const now = Date.now();
+    if (lastTs === null) { lastTs = now; return; }
+    let d = (now - lastTs) / 1000; lastTs = now;
+    if (d > 120) d = 1;
+    frac += d;
+    const whole = Math.floor(frac);
+    if (!whole) return;
+    frac -= whole;
+    S.elapsed += whole;
     checkTime();
-    if (S.elapsed % 5 === 0) save();
+    if (now - lastSave > 5000) { lastSave = now; save(); }
     DL.emit("tick");
   }
   function checkTime() {
@@ -115,7 +129,7 @@ window.DL = window.DL || {};
   }
   function tryChat(code) {
     if (isSolved("chat")) return { ok: true };
-    if (norm(code) === "NORA") { solve("chat"); return { ok: true }; }
+    if (norm(code) === "MILO") { solve("chat"); return { ok: true }; }
     S.fails.chat = (S.fails.chat || 0) + 1; changed();
     return { ok: false, text: "Entschlüsselung fehlgeschlagen. Passwort ungültig." };
   }
@@ -174,7 +188,7 @@ window.DL = window.DL || {};
         break;
       }
       case "whoami": L(isSolved("verify") ? "E.VOSS (wiederhergestellt) · Access Level: FULL" : "UNKNOWN · Access Level: LIMITED"); break;
-      case "date": L(`Sa 18.10.2026 ${clock()}`); break;
+      case "date": L(`Sa 18.10.2025 ${clock()}`); break;
       case "trace": {
         const d = norm(parts[1]);
         if (!d) { L("Syntax: trace <geräte-id>", "warn"); break; }
@@ -184,7 +198,7 @@ window.DL = window.DL || {};
         L("TRACE STARTED");
         L(`DEVICE : ${DEVNAMES[d] || pretty(d)}`);
         L(`OWNER  : ${t.owner}`);
-        L("DATE   : 14.10.2026");
+        L("DATE   : 14.10.2025");
         L(`EVENTS : ${n}${t.groups.length > 1 ? "   (gruppiert nach Konto)" : ""}`);
         for (const [head, rows] of t.groups) {
           L(""); L(`[${head}]`, "hl");
@@ -264,6 +278,21 @@ window.DL = window.DL || {};
   function backToDecision() { if (!S.ending || S.ending === "timeout") return; S.ending = null; changed(); }
 
   /* ---------- Spielstart ---------- */
+  /* ---------- Entwurf der Entscheidung (gespeichert; im Team gemeinsam, letzte Änderung gilt) ---------- */
+  const getDraft = () => S.draft || (S.draft = { redact: [], target: "", by: "" });
+  function updateDraft(patch) {
+    S.draft = { ...getDraft(), ...patch, by: "", at: Date.now() };
+    save();
+    if (hooks && hooks.draftChanged) hooks.draftChanged(S.draft);
+    DL.emit("draft");
+  }
+  function applyDraft(d, byName) {
+    if (!d || typeof d !== "object") return;
+    S.draft = { redact: Array.isArray(d.redact) ? d.redact.slice() : [], target: d.target || "", by: byName || "", at: d.at || 0 };
+    try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privat */ }
+    DL.emit("draft", true);
+  }
+
   function startGame({ relaxed } = {}) {
     if (!S.started) { S.started = true; S.relaxed = Boolean(relaxed); }
     running = true; paused = false;
@@ -300,7 +329,7 @@ window.DL = window.DL || {};
     pause(on) { paused = on; DL.emit("change"); }, isPaused: () => paused, isRunning: () => running,
     tryLock, tryChat, objection, command, takeTermQueue,
     currentStep, revealHint, hintLevel: (s) => S.hints[s] || 0,
-    decide, judge, backToDecision, startGame, newGame, stop, reset, save,
+    decide, judge, backToDecision, draft: getDraft, updateDraft, applyDraft, startGame, newGame, stop, reset, save,
     exportShared, applyShared, enterMultiplayer, leaveMultiplayer,
     isMultiplayer: () => Boolean(hooks), hooks: () => hooks,
     _setElapsed(sec) { S.elapsed = sec; checkTime(); changed(); },

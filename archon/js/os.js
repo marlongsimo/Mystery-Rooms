@@ -108,14 +108,40 @@ window.AR = window.AR || {};
     $("#resetBtn").hidden = !S.started;
     $("#titleState").textContent = going ? `Laufende Sitzung · TRACE noch ${G.fmt(G.remaining())} · Kapitel ${G.chapter()}` : S.ending ? `Letzte Sitzung beendet: ${AR.endings[S.ending].title}` : "";
   }
+  /* Intro (nur bei neuer Sitzung): Video → Meldung + anonyme Nachricht → Verbindungsaufbau. Spielzeit startet erst danach. */
   function boot() {
     show("boot");
-    const lines = ["REMOTE SESSION ESTABLISHED.", "USER: UNKNOWN   HOST: ARIS-ARCHIVE-07   SECURITY LEVEL: 01", "!WARNING: SESSION MONITORED", "!TRACE IN PROGRESS · ESTIMATED TIME TO LOCATION: " + G.fmt(G.remaining())];
-    const log = $("#bootLog"); log.textContent = ""; let i = 0, done = false;
-    const fin = () => { if (done) return; done = true; enterDesk(); };
+    let done = false, timers = [];
+    const later = (fn, ms) => timers.push(setTimeout(() => { if (!done) fn(); }, ms));
+    const vid = $("#introVid"), msg = $("#introMsg"), log = $("#bootLog");
+    msg.hidden = true; log.textContent = ""; $("#imOpen").hidden = true; $("#imText").textContent = "";
+    const fin = () => { if (done) return; done = true; timers.forEach(clearTimeout); vid.pause(); vid.hidden = true; document.removeEventListener("keydown", key); enterDesk(); };
+    const key = (e) => { if (e.key === "Escape") fin(); };
+    document.addEventListener("keydown", key);
     $("#bootSkip").onclick = fin;
-    const step = () => { if (done) return; if (i < lines.length) { const l = lines[i++], s = document.createElement("span"); s.className = l[0] === "!" ? "err" : ""; s.textContent = l.replace(/^!/, "") + "\n"; log.appendChild(s); snd.play(l[0] === "!" ? "deny" : "key"); setTimeout(step, 600); } else setTimeout(fin, 1200); };
-    snd.play("boot"); setTimeout(step, 400);
+
+    let inMsg = false;
+    const stageMsg = () => {
+      if (done || inMsg) return; inMsg = true;
+      vid.pause(); vid.hidden = true; msg.hidden = false; snd.play("beep");
+      const text = "Hendrik Aris ist seit Sonntag verschwunden.\nDieser Link öffnet sein Archiv.\n\nSie werden merken, dass du drin bist. Du hast zwei Stunden.\nFolge dem Geld, nicht den Namen.", el = $("#imText");
+      let k = 0;
+      later(function type() { el.textContent = text.slice(0, ++k); if (k % 3 === 0) snd.play("key"); if (k < text.length) later(type, text[k - 1] === "\n" ? 380 : 32); else { $("#imOpen").hidden = false; $("#imOpen").focus(); } }, 2000);
+      $("#imOpen").onclick = stageLog;
+    };
+    const stageLog = () => {
+      msg.hidden = true; snd.play("boot");
+      const lines = ["> connect remote://aris-archive-07 --token ••••••••", "HANDSHAKE ……………… OK", "DECRYPT SESSION KEY … OK", "MOUNT /archive ……… 3 VOLUMES", "", "REMOTE SESSION ESTABLISHED.", "USER: UNKNOWN   HOST: ARIS-ARCHIVE-07   SECURITY LEVEL: 01", "!WARNING: SESSION MONITORED", "!TRACE IN PROGRESS · ESTIMATED TIME TO LOCATION: " + G.fmt(G.remaining())];
+      let i = 0;
+      later(function step() {
+        if (i < lines.length) { const l = lines[i++], sp = document.createElement("span"); sp.className = l[0] === "!" ? "err" : ""; sp.textContent = l.replace(/^!/, "") + "\n"; log.appendChild(sp); if (l) snd.play(l[0] === "!" ? "deny" : "key"); later(step, l[0] === "!" ? 900 : 420); }
+        else { const a = document.createElement("span"); a.className = "arc"; a.textContent = "ARCHON: Wer bist du?"; log.appendChild(a); snd.play("deny"); later(fin, 2600); }
+      }, 500);
+    };
+
+    vid.hidden = false; vid.currentTime = 0; vid.muted = !snd.isOn();
+    vid.onended = stageMsg; vid.onerror = stageMsg;
+    vid.play().catch(stageMsg);
   }
   function enterDesk() {
     show("desk"); G.start(); snd.fan();

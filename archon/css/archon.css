@@ -46,7 +46,8 @@ button { font: inherit; color: inherit; }
 .micro { font: 11px var(--mono); color: var(--muted); letter-spacing: .1em; }
 .mobile-note { margin-top: 22px; padding: 14px 16px; border: 1px solid var(--red); background: #1a0709; color: var(--text); }
 .link { color: var(--text-2); font-size: 13px; }
-.title-visual { display: flex; align-items: center; justify-content: center; }
+.title-visual { display: flex; flex-direction: column; gap: 22px; align-items: center; justify-content: center; }
+.title-logo { width: 260px; border-radius: 50%; mix-blend-mode: screen; opacity: .9; mask-image: radial-gradient(circle, #000 55%, transparent 72%); -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 72%); }
 .title-visual pre { padding: 28px 34px; background: #02050a; border: 1px solid #1a2636; border-radius: 8px; font: 14px/1.8 var(--mono); color: #8fd6ff; box-shadow: 0 30px 80px #000, 0 0 0 8px #0a111a; }
 .title-visual span { color: var(--red-2); }
 .title-visual b { font-size: 42px; color: var(--red-2); }
@@ -409,3 +410,19 @@ table.proto td { border-color: var(--line) !important; }
 .ap-time { font: 12px var(--mono); color: var(--text-2); }
 .ap-note { font-size: 12px; color: var(--muted); }
 .ap-trans p.now { color: var(--text); background: #5fd0ff14; }
+
+/* Intro: Video → Nachricht → Verbindungsaufbau */
+.intro-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; z-index: 2; }
+.intro-msg { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; animation: imIn .6s ease; }
+.im-clock { font: 13px var(--mono); color: var(--muted); text-align: center; margin: 0 0 10px; letter-spacing: .1em; }
+.im-card { background: #0b121c; border: 1px solid #1c2a3c; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 20px 50px #000a; animation: imIn .5s ease both; }
+.im-card small { font: 11px var(--mono); color: var(--muted); letter-spacing: .08em; }
+.im-card b { color: var(--text); }
+.im-card span { font-size: 14px; color: var(--text-2); }
+.im-card.msg { animation-delay: 1.4s; border-color: #2b4a66; }
+.im-card.msg p { margin: 0; font: 15px/1.6 var(--mono); color: #cfe9ff; white-space: pre-wrap; min-height: 6em; }
+.im-card.msg .btn { align-self: flex-start; margin-top: 6px; }
+@keyframes imIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+#bootLog .arc { color: var(--red-2); font-size: 22px; display: inline-block; margin-top: 14px; animation: blink 1s steps(2) 2; }
+@keyframes blink { 50% { opacity: 0; } }
+#bootSkip { position: absolute; right: 24px; bottom: 24px; z-index: 3; }

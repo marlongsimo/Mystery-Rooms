@@ -496,3 +496,15 @@ button, .btn, .task, .dicon, .win-bar, .win-btns, .ap-file, .ml-item, .ap-tabs, 
   input.field, .field { font-size: 16px; }
   .toasts { left: 8px; right: 8px; width: auto; }
 }
+
+/* Kennwort anzeigen, Sperr-Countdown, Wiedergabe-Werkzeuge */
+.pw { position: relative; width: 100%; max-width: 240px; }
+.pw .field { max-width: none; width: 100%; padding-right: 44px; }
+.pw-eye { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); width: 40px; height: 36px; display: grid; place-items: center; background: transparent; border: 0; color: var(--text-2); cursor: pointer; border-radius: 3px; }
+.pw-eye:hover { color: var(--text); background: #ffffff0d; }
+.lock-t { font-family: var(--mono); font-weight: 600; }
+.ap-fx { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--line-2); border-radius: 4px; }
+.ap-fx button { padding: 5px 9px; background: transparent; border: 0; border-radius: 3px; color: var(--text-2); font: 12px var(--mono); cursor: pointer; }
+.ap-fx button.on { background: #5fd0ff22; color: var(--text); }
+.ap-trans .dim { color: var(--muted); font-style: italic; }
+@media (pointer: coarse) { .ap-fx button { min-height: 40px; padding: 8px 12px; } }

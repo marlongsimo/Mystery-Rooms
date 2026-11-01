@@ -9,8 +9,17 @@ window.AR = window.AR || {};
   const $ = (s, r = document) => r.querySelector(s);
   const os = () => AR.os;
   const lockMsg = (r) => (r.locked ? `<p class="lockmsg">${esc(r.text)}</p>` : "");
-  function formResult(w, key, r, okText) { w.state[key] = r.ok ? { ok: true, text: okText || "" } : { ok: false, text: r.text }; os().render(w); }
-  const msgHtml = (m) => (m ? `<p class="msg ${m.ok ? "ok" : "bad"}" role="alert">${esc(m.text)}</p>` : `<p class="msg" role="alert"></p>`);
+  function formResult(w, key, r, okText) { w.state[key] = r.ok ? { ok: true, text: okText || "" } : fail(r); os().render(w); }
+  /* Live-Sperranzeige: os.js zählt alle [data-lockt] jede Sekunde herunter und zeichnet das Fenster bei 0 neu. */
+  const lockSpan = (t) => `<span class="lock-t" data-lockt="${esc(t)}">${G.locks.fmt(G.locks.left(t))}</span>`;
+  const lockLine = (t, label = "GESPERRT") => (G.locks.left(t) > 0 ? `<p class="lockmsg">${esc(label)} · noch ${lockSpan(t)} · Sicherheitsprotokoll</p>` : "");
+  const msgHtml = (m) => {
+    if (!m) return `<p class="msg" role="alert"></p>`;
+    const lk = m.t && G.locks.left(m.t) > 0 ? ` Eingabe gesperrt · noch ${lockSpan(m.t)}` : "";
+    return `<p class="msg ${m.ok ? "ok" : "bad"}" role="alert">${esc(m.text)}${lk}</p>`;
+  };
+  const EYE_O = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>', EYE_C = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6C3.8 8.3 2 12 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+  const fail = (r) => ({ ok: false, text: r.base || r.text, t: r.target });
 
   /* ================= Bilder (SVG) ================= */
   const IMG = {
@@ -43,16 +52,23 @@ window.AR = window.AR || {};
   const login = {
     title: () => "Anmeldung · ARIS-ARCHIVE-07", icon: () => "lock", w: 420, h: 330, cls: "win-login",
     render(w) {
+      const locked = G.locks.left("login") > 0, show = !!w.state.show;
       w.body.innerHTML = `<form class="login"><div class="avatar">HA</div><p class="login-user">h.aris</p>
-        <input class="field" type="password" autocomplete="off" placeholder="Kennwort" aria-label="Kennwort">
-        <button class="btn" type="submit">Anmelden</button>
-        <p class="login-hint">Kennworthinweis: <b>„Wo sie liegt.“</b></p>${msgHtml(w.state.m)}</form>`;
+        <div class="pw"><input class="field" type="${show ? "text" : "password"}" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Kennwort" aria-label="Kennwort" ${locked ? "disabled" : ""}><button type="button" class="pw-eye" aria-label="${show ? "Kennwort verbergen" : "Kennwort anzeigen"}" title="${show ? "Kennwort verbergen" : "Kennwort anzeigen"}">${show ? EYE_C : EYE_O}</button></div>
+        <button class="btn" type="submit" ${locked ? "disabled" : ""}>Anmelden</button>
+        <p class="login-hint">Kennworthinweis: <b>„Wo sie liegt.“</b></p>${w.state.m ? msgHtml(w.state.m) : locked ? msgHtml({ ok: false, text: "Anmeldung gesperrt.", t: "login" }) : msgHtml(null)}</form>`;
     },
     opened(w) {
+      w.body.addEventListener("click", (e) => {
+        if (!e.target.closest(".pw-eye")) return;
+        // Ohne Neuzeichnen umschalten, damit Eingabe und Fokus bleiben
+        w.state.show = !w.state.show; const i = $("input", w.body), b = $(".pw-eye", w.body);
+        i.type = w.state.show ? "text" : "password"; b.innerHTML = w.state.show ? EYE_C : EYE_O; b.setAttribute("aria-label", w.state.show ? "Kennwort verbergen" : "Kennwort anzeigen"); b.title = b.getAttribute("aria-label");
+      });
       w.body.addEventListener("submit", (e) => {
         e.preventDefault();
         const r = G.login($("input", w.body).value);
-        if (r.ok) { snd.play("unlock"); os().afterLogin(); os().close(w); } else { w.state.m = { ok: false, text: r.text }; w.state.n = (w.state.n || 0) + 1; w.body.innerHTML = ""; os().render(w); }
+        if (r.ok) { snd.play("unlock"); os().afterLogin(); os().close(w); } else { w.state.m = fail(r); w.state.n = (w.state.n || 0) + 1; w.body.innerHTML = ""; os().render(w); }
       });
     },
   };
@@ -102,7 +118,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       const L = N[w.arg].lock, left = G.locks.left(L.target);
       w.body.innerHTML = `<form class="lockbox"><div class="lock-ico">${AR.icon("lock")}</div><p>${esc(L.prompt)}</p>
         <input class="field code" autocomplete="off" aria-label="Eingabe" ${left > 0 ? "disabled" : ""}><button class="btn" type="submit" ${left > 0 ? "disabled" : ""}>Öffnen</button>
-        ${left > 0 ? `<p class="lockmsg">GESPERRT · ${G.locks.fmt(left)} · Sicherheitsprotokoll</p>` : msgHtml(w.state.m)}</form>`;
+        ${left > 0 ? lockLine(L.target) : msgHtml(w.state.m)}</form>`;
       const i = $("input", w.body); if (i && !i.disabled) setTimeout(() => i.focus(), 30);
     },
     opened(w) {
@@ -110,7 +126,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
         e.preventDefault();
         const id = w.arg, r = G.tryNodeLock(id, $("input", w.body).value);
         if (r.ok) { snd.play("unlock"); os().close(w); AR.os.toast({ title: N[id].name + " geöffnet", kind: "ok" }); os().openNode(id); }
-        else { w.state.m = { ok: false, text: r.text }; os().render(w); }
+        else { w.state.m = fail(r); os().render(w); }
       });
     },
     onChange(w) { os().render(w); },
@@ -142,7 +158,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       w.body.innerHTML = body;
     },
     opened(w) {
-      w.body.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.matches(".finding")) { const r = G.freightFinding(e.target.code.value); w.state.m = r.ok ? { ok: true, text: "Befund bestätigt: Embargoverstoß." } : { ok: false, text: r.text }; if (r.ok) snd.play("unlock"); os().render(w); } });
+      w.body.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.matches(".finding")) { const r = G.freightFinding(e.target.code.value); w.state.m = r.ok ? { ok: true, text: "Befund bestätigt: Embargoverstoß." } : fail(r); if (r.ok) snd.play("unlock"); os().render(w); } });
     },
     onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input")) return; os().render(w); },
   };
@@ -194,7 +210,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
         if (e.target.closest(".ml-hdr")) { w.state.hdr = !w.state.hdr; os().render(w); }
         const a = e.target.closest("[data-att]"); if (a) { w.state.att = a.dataset.att; os().render(w); }
       });
-      w.body.addEventListener("submit", (e) => { e.preventDefault(); const r = G.brenner(e.target.pw.value); w.state.bm = r.ok ? null : { ok: false, text: r.text }; if (r.ok) snd.play("unlock"); os().render(w); });
+      w.body.addEventListener("submit", (e) => { e.preventDefault(); const r = G.brenner(e.target.pw.value); w.state.bm = r.ok ? null : fail(r); if (r.ok) snd.play("unlock"); os().render(w); });
     },
     onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input")) return; os().render(w); },
   };
@@ -231,7 +247,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       const files = Object.keys(N).filter((id) => N[id].type === "wav" && G.visible(id));
       const cur = w.state.cur || (N[w.arg] ? w.arg : files[0]); w.state.cur = cur;
       const A = AR.audio[N[cur].audio], view = w.state.view || "wave";
-      const rev = A.reverse && w.state.rev;
+      const rev = !!w.state.rev, rate = w.state.rate || 1;
       w.body.innerHTML = `<div class="ap"><nav class="ap-list">${files.map((f) => `<button class="ap-file${f === cur ? " on" : ""}" data-f="${f}">${AR.icon("wav")}<span>${esc(N[f].name)}</span></button>`).join("")}</nav>
         <div class="ap-main"><p class="ap-title">${esc(A.title)}</p>
         <div class="ap-tabs"><button data-v="wave" class="${view === "wave" ? "on" : ""}">Wellenform</button><button data-v="spec" class="${view === "spec" ? "on" : ""}">Spektrogramm</button><button data-v="info" class="${view === "info" ? "on" : ""}">Details</button></div>
@@ -239,34 +255,35 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
           ${A.spectro ? `<form class="ap-mark"><label>Auffälligkeit eintragen: <input class="field" name="w" autocomplete="off" ${G.is("R5") ? "disabled value=\"VELLUM (gesichert)\"" : ""}></label><button class="btn small" ${G.is("R5") ? "disabled" : ""}>Eintragen</button>${msgHtml(w.state.m)}</form>` : ""}`
         : view === "info" ? `<div class="ap-info">${Object.entries(N[cur].meta || { Datei: N[cur].name, Datum: N[cur].date || "" }).map(([k, v]) => `<p>${esc(k)}: ${esc(v)}</p>`).join("")}${A.place ? `<p>${esc(A.place)}</p>` : ""}</div>`
         : `<div class="wave">${Array.from({ length: 72 }, (_, i) => `<i style="height:${15 + Math.round(Math.abs(Math.sin(i * 1.7 + cur.length)) * 70)}%"></i>`).join("")}</div>`}
-        <div class="ap-ctrl"><button class="btn ap-play">${w.state.playing ? "■ Stopp" : "▶ Abspielen"}</button>${A.reverse ? `<label class="ap-rev"><input type="checkbox" ${w.state.rev ? "checked" : ""}> rückwärts</label>` : ""}<span class="ap-time">0:00 / ${Math.floor(A.dur / 60)}:${String(A.dur % 60).padStart(2, "0")}</span>${A.src ? "" : `<span class="ap-note">Aufnahme folgt – Transkript lesen</span>`}</div>
-        <div class="ap-trans"><p class="ap-sub">Transkript</p>${A.transcript ? A.transcript.map(([t, s]) => `<p data-t="${t}"><b>${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}</b> ${esc(s)}</p>`).join("") : `<p>${esc(rev ? A.backward : A.forward)}</p>`}</div></div></div>`;
+        <div class="ap-ctrl"><button class="btn ap-play">${w.state.playing ? "■ Stopp" : "▶ Abspielen"}</button><span class="ap-fx" role="group" aria-label="Wiedergabe"><button data-rate="0.5" class="${rate === 0.5 ? "on" : ""}">½×</button><button data-rate="1" class="${rate === 1 ? "on" : ""}">1×</button><button data-rate="2" class="${rate === 2 ? "on" : ""}">2×</button><button data-fx="rev" class="${rev ? "on" : ""}" title="Wiedergaberichtung umkehren">⇄ Umkehren</button></span><span class="ap-time">0:00 / ${Math.floor(A.dur / 60)}:${String(A.dur % 60).padStart(2, "0")}</span>${A.src ? "" : `<span class="ap-note">Aufnahme folgt – Transkript lesen</span>`}</div>
+        <div class="ap-trans"><p class="ap-sub">Transkript</p>${rev && !A.backward ? `<p class="dim">(umgekehrte Wiedergabe – unverständlich)</p>` : A.transcript ? A.transcript.map(([t, s]) => `<p data-t="${t}"><b>${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}</b> ${esc(s)}</p>`).join("") : `<p>${esc(rev ? A.backward : A.forward)}</p>`}</div></div></div>`;
       if (view === "spec") drawSpec($("canvas.spec", w.body), A);
     },
     opened(w) {
       w.body.addEventListener("click", (e) => {
-        const f = e.target.closest(".ap-file"); if (f) { stopAudio(w); w.state.cur = f.dataset.f; w.state.rev = false; os().render(w); return; }
+        const f = e.target.closest(".ap-file"); if (f) { stopAudio(w); w.state.cur = f.dataset.f; w.state.rev = false; w.state.rate = 1; os().render(w); return; }
+        const rt = e.target.closest("[data-rate]"); if (rt) { w.state.rate = +rt.dataset.rate; if (w.state.el) w.state.el.playbackRate = w.state.rate; os().render(w); return; }
+        if (e.target.closest('[data-fx="rev"]')) { stopAudio(w); w.state.rev = !w.state.rev; os().render(w); return; }
         const v = e.target.closest("[data-v]"); if (v) { w.state.view = v.dataset.v; os().render(w); return; }
         if (e.target.closest(".ap-play")) {
           const A = AR.audio[N[w.state.cur].audio];
           if (w.state.playing) { stopAudio(w); os().render(w); return; }
-          if (A.reverse && w.state.rev) { G.solveSide("N4"); G.addFound("Ida: „Er ist sicher. Frag nicht, wo.“"); }
+          if (A.backward && w.state.rev) { G.solveSide("N4"); G.addFound("Ida: „Er ist sicher. Frag nicht, wo.“"); }
           w.state.playing = true; os().render(w);
-          const src = A.reverse && w.state.rev ? A.srcRev : A.src;
-          if (src) playAudio(w, src);
+          const src = w.state.rev ? A.srcRev || (A.src && A.src.replace(".mp3", "_rev.mp3")) : A.src;
+          if (src) playAudio(w, src, w.state.rate || 1);
           else { snd.play("beep"); if (A.spectro) { snd.tone(5200, 1.4, { vol: 0.03, at: 0.2 }); snd.noise(1.2, { vol: 0.08, freq: 3000, at: 0.1 }); } setTimeout(() => { w.state.playing = false; os().render(w); }, 1800); }
         }
       });
-      w.body.addEventListener("change", (e) => { if (e.target.closest(".ap-rev")) { stopAudio(w); w.state.rev = e.target.checked; os().render(w); } });
       w.offPause = AR.on("pause", (on) => { if (on && w.state.playing) { stopAudio(w); os().render(w); } });
-      w.body.addEventListener("submit", (e) => { e.preventDefault(); const r = G.spectro(e.target.w.value); w.state.m = r.ok ? { ok: true, text: "Gesichert und in der Akte vermerkt." } : { ok: false, text: r.text }; if (r.ok) snd.play("unlock"); os().render(w); });
+      w.body.addEventListener("submit", (e) => { e.preventDefault(); const r = G.spectro(e.target.w.value); w.state.m = r.ok ? { ok: true, text: "Gesichert und in der Akte vermerkt." } : fail(r); if (r.ok) snd.play("unlock"); os().render(w); });
     },
     onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input[type=text],input:not([type])")) return; if (!w.state.playing) os().render(w); },
     closed(w) { stopAudio(w); if (w.offPause) w.offPause(); },
   };
   /* Echte Aufnahmen (archon/audio): Abspielen, Zeitanzeige, aktuelle Transkriptzeile hervorheben */
-  function playAudio(w, src) {
-    const el = new Audio(src); w.state.el = el;
+  function playAudio(w, src, rate = 1) {
+    const el = new Audio(src); w.state.el = el; el.preservesPitch = false; el.mozPreservesPitch = false; el.webkitPreservesPitch = false; el.playbackRate = rate;
     const fmtT = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
     el.addEventListener("timeupdate", () => {
       const tEl = $(".ap-time", w.body); if (tEl) tEl.textContent = `${fmtT(el.currentTime)} / ${fmtT(el.duration || 0)}`;
@@ -469,7 +486,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
       } else {
         const left = G.locks.left("ledger");
         body = `<div class="lg-trace"><h3>Rückverfolgung bestätigen</h3><p>Gib den Code der Zahlungsroute ein (laut Prüfbericht).</p>
-          ${G.is("R8") ? `<p class="msg ok">Rückverfolgung bestätigt: Route gesichert.</p>` : `<form class="lg-code"><input class="field code" name="c" autocomplete="off" ${left > 0 ? "disabled" : ""}><button class="btn" ${left > 0 ? "disabled" : ""}>Bestätigen</button></form>${left > 0 ? `<p class="lockmsg">Analysemodul gesperrt · ${G.locks.fmt(left)}</p>` : msgHtml(w.state.m)}`}</div>`;
+          ${G.is("R8") ? `<p class="msg ok">Rückverfolgung bestätigt: Route gesichert.</p>` : `<form class="lg-code"><input class="field code" name="c" autocomplete="off" ${left > 0 ? "disabled" : ""}><button class="btn" ${left > 0 ? "disabled" : ""}>Bestätigen</button></form>${left > 0 ? lockLine("ledger", "Analysemodul gesperrt") : msgHtml(w.state.m)}`}</div>`;
       }
       w.body.innerHTML = `<div class="lg-wrap"><nav class="lg-tabs">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${k === tab ? "on" : ""}">${l}</button>`).join("")}</nav>${body}</div>`;
       if (tab === "net") mountNet(w);
@@ -488,7 +505,7 @@ Notfall-Terminal:  help · meta · decode</pre></div>`; },
         const k = fi.dataset.filter, pos = fi.selectionStart; os().render(w);
         const again = w.body.querySelector(`[data-filter="${k}"]`); if (again) { again.focus(); again.setSelectionRange(pos, pos); }
       });
-      w.body.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.matches(".lg-code")) { const r = G.ledgerCode(e.target.c.value); w.state.m = r.ok ? null : { ok: false, text: r.text }; if (r.ok) snd.play("unlock"); os().render(w); } });
+      w.body.addEventListener("submit", (e) => { e.preventDefault(); if (e.target.matches(".lg-code")) { const r = G.ledgerCode(e.target.c.value); w.state.m = r.ok ? null : fail(r); if (r.ok) snd.play("unlock"); os().render(w); } });
     },
     onChange(w) { const a = document.activeElement; if (a && w.body.contains(a) && a.matches("input")) return; os().render(w); if (w.state.board && G.is("R9") && !w.state.board.has("kestrel")) w.state.board.pin({ id: "kestrel", kind: "doc", title: "Stiftung Kestrel", sub: "Vaduz · " + AR.kestrel.number }); },
   };

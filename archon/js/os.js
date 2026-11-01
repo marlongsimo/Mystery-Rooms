@@ -166,6 +166,14 @@ window.AR = window.AR || {};
 
   /* ---------- Ereignisse ---------- */
   AR.on("tick", paintTop);
+  // Sperren live herunterzählen; bei 0 das Fenster neu zeichnen (Eingabe wieder frei)
+  AR.on("tick", () => {
+    document.querySelectorAll("[data-lockt]").forEach((el) => {
+      const left = G.locks.left(el.dataset.lockt);
+      if (left > 0) { el.textContent = G.locks.fmt(left); return; }
+      const w = D.wins.find((x) => x.body.contains(el)); if (w) D.render(w);
+    });
+  });
   AR.on("change", () => { if ($("#desk").classList.contains("hidden")) return; paintIcons(); paintTop(); D.refresh(); });
   AR.on("solved", (id) => {
     snd.play("unlock");
@@ -196,7 +204,7 @@ window.AR = window.AR || {};
     show("end");
     const box = $("#end");
     box.className = "end " + E.kind;
-    const solution = `<ol class="sol"><li>R1 Login: KESTREL47 (Schiffsname im Bild + Liegeplatz aus den Metadaten)</li><li>R2/R3: X-Archive-Key → sargasso → auth sargasso</li><li>R4: restore frag_A frag_C frag_B (Zeiten im Zitat: 09:14, 11:02, 16:40)</li><li>R5: Spektrogramm → VELLUM</li><li>R6: HR-2209 (Eintragsdatum 31.09. gibt es nicht)</li><li>R7/R8: 42178805 (Prüfziffern NORD 42 · MERC 17 · ARGO 88 · LUX 05)</li><li>R9: FL-0002.413.587-4 → Stiftung Kestrel</li><li>R10: AR-2026-118</li><li>R11: ORKAN</li><li>R12: HOLM (Unterbrechung 19:35–19:48, Telefonat 19:41)</li><li>R14: repair 3 904D · repair 5 7786 · repair 7 C1DA</li><li>R15: KESTREL47-VELLUM-42178805-ORKAN</li><li>Nebenrätsel: whoami · HELM · DONNERSTAG · rückwärts · TX-1015 ⚙ · K-3 · log --user ns_observer · NORDELBE · inspect window · history · SMS im Papierkorb · ls -a / cat .postkarte</li></ol>`;
+    const solution = `<ol class="sol"><li>R1 Login: LIEGEPLATZ47 (meta harbour.jpg → decode → „Liegeplatz 47“, Richtlinie: ohne Leerzeichen)</li><li>R2/R3: X-Archive-Key → sargasso → auth sargasso</li><li>R4: restore frag_A frag_C frag_B (Zeiten im Zitat: 09:14, 11:02, 16:40)</li><li>R5: Spektrogramm → VELLUM</li><li>R6: HR-2209 (Eintragsdatum 31.09. gibt es nicht)</li><li>R7/R8: 42178805 (Prüfziffern NORD 42 · MERC 17 · ARGO 88 · LUX 05)</li><li>R9: FL-0002.413.587-4 → Stiftung Kestrel</li><li>R10: AR-2026-118</li><li>R11: ORKAN</li><li>R12: HOLM (Unterbrechung 19:35–19:48, Telefonat 19:41)</li><li>R14: repair 3 904D · repair 5 7786 · repair 7 C1DA</li><li>R15: LIEGEPLATZ47-VELLUM-42178805-ORKAN</li><li>Nebenrätsel: whoami · HELM · DONNERSTAG · Mediaplayer „Umkehren“ bei Idas Nachricht · TX-1015 ⚙ · K-3 · log --user ns_observer · NORDELBE · inspect window · history · SMS im Papierkorb · ls -a / cat .postkarte</li></ol>`;
     box.innerHTML = `<div class="end-inner"><p class="end-k">${id === "FAIL" ? "SESSION TERMINATED" : "CASE CLOSED"}</p><h1>${esc(E.title)}</h1>
       ${E.text.map((t) => `<p>${esc(t)}</p>`).join("")}
       <section class="end-score"><h3>ARCHON PERFORMANCE INDEX · ${sc.total} · ${esc(sc.title)}</h3>

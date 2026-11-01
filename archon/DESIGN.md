@@ -72,7 +72,7 @@ Der Rechner wird überwacht. Mit deiner Anmeldung hat ARCHON begonnen, die Verbi
 - **Das Geldnetz:** Über vier Konten in vier Ländern werden Gelder der Hafenbank gewaschen. Dahinter steht eine Holding-Kette: Corvane → Sarnia Holdings → Vellum Trust → **Stiftung Kestrel** (Vaduz).
 - **ARCHON** ist keine Organisation mit Logo, sondern eine Ordnung aus fünf Ebenen mit Decknamen. An ihrer Spitze („Nordstern“) steht die Stifterin der Stiftung Kestrel: **Margarete Holm**, Aufsichtsratsvorsitzende der Hafenbank Nordelbe.
 - **Der Twist:** Die Frau, die Aris den Prüfauftrag gegeben hat, ist ARCHON. Sie wollte wissen, wie viel man finden kann, und beobachtete jeden Schritt.
-- **Aris** hat das früh geahnt. Sein Login-Passwort enthält ausgerechnet den Namen der Stiftung („KESTREL“). Er ist untergetaucht, nicht tot. Seine letzte Nachricht erreicht dich in Kapitel 4.
+- **Aris** hat das früh geahnt. Sein Hintergrundbild zeigt ausgerechnet das Schiff der Stiftung („KESTREL“). Er ist untergetaucht, nicht tot. Seine letzte Nachricht erreicht dich in Kapitel 4.
 
 ### Figuren
 
@@ -133,8 +133,8 @@ Zu jedem Rätsel stehen hier: Ort, Material, Herleitung, **Eingabe**, Sperrregel
   - Die Bilddetails bzw. `meta harbour.jpg` zeigen Kamera, Datum und Kommentar `TGllZ2VwbGF0eiA0Nw==`.
   - `decode TGllZ2VwbGF0eiA0Nw==` ergibt **„Liegeplatz 47“**.
   - Systeminformationen: „Kennwortrichtlinie: Buchstaben, gefolgt von Ziffern. Keine Leerzeichen.“
-- **Herleitung:** „Wo sie liegt“ meint das Schiff und seinen Liegeplatz: Name plus Liegeplatz in der vorgeschriebenen Form.
-- **Eingabe:** **`KESTREL47`** (Groß-/Kleinschreibung egal)
+- **Herleitung:** „Wo sie liegt“ meint den Liegeplatz des Schiffs: die entschlüsselte Angabe in der vorgeschriebenen Form (ohne Leerzeichen). Der Schiffsname KESTREL im Bild ist nur Vorahnung.
+- **Eingabe:** **`LIEGEPLATZ47`** (Groß-/Kleinschreibung egal; `WALTERSHOFLIEGEPLATZ47` wird auch angenommen)
 - **Sperre:** Login
 - **Hinweise:**
   1. „Das Bild ist mehr als ein Hintergrund.“
@@ -409,7 +409,7 @@ Zu jedem Rätsel stehen hier: Ort, Material, Herleitung, **Eingabe**, Sperrregel
 - **Recherche:** Hexadezimalsystem · Modulo · Prüfsumme
 
 #### R15 · Die letzte Verschlüsselung
-- **Eingabe:** `decrypt ARCHON_ORIGIN --key KESTREL47-VELLUM-42178805-ORKAN`
+- **Eingabe:** `decrypt ARCHON_ORIGIN --key LIEGEPLATZ47-VELLUM-42178805-ORKAN`
   - ZUGANG = Login (R1) · TON = Spektrogramm (R5) · STATIONEN = Kontencode (R8) · ORDNUNG = Hierarchie (R11)
 - **Sperre:** `decrypt` steigend
 - **Rückmeldung bei Fehlern:** Wie viele der vier Teile stimmen („2 von 4 Teilen gültig“), aber nicht welche. Erst ab dem dritten Fehlversuch.
@@ -456,7 +456,7 @@ Nebenrätsel sind nie Pflicht für das Erreichen des Finales. Jedes bringt einen
 | N1 | 1 | `whoami` vor dem Login | zeigt `guest@unknown`. Nach dem Login zeigt ein zweites `whoami` die versteckte Gruppe `wg-nordelbe` | Beweis: Zugang über Bank-Infrastruktur |
 | N2 | 2 | Notizbuch, Seite 3: Zahlenreihe 8-5-12-13 | Buchstaben-Positionen im Alphabet = **HELM** → Ordner `HELM/` | Fotos vom Hafen, Schiff KESTREL im Besitz von ARGO-07 |
 | N3 | 2 | Kalender von Aris: drei Termine „H.“ | alle am Tag nach Aufsichtsratssitzungen | Indiz zu Holm (zweiter Weg zu R12) |
-| N4 | 2 | Sprachnachricht von Ida, rückwärts abgespielt (Player-Funktion) | „Er ist sicher. Frag nicht, wo.“ | Aris lebt |
+| N4 | 2 | Sprachnachricht von Ida, im Mediaplayer mit „⇄ Umkehren“ abgespielt (zwischen ½×/1×/2×; das Transkript zeigt nur spiegelverkehrte Buchstaben) | „Er ist sicher. Frag nicht, wo.“ | Aris lebt |
 | N5 | 3 | Feiertagsbuchung TX-1015 (03.10.) | in LEDGER als „automatisiert“ markieren | automatisierter Zahlungsplan |
 | N6 | 3 | Nicht verbuchtes Frachtpapier MS KESTREL + Embargoliste + Schiffsposition (AIS-Liste im Hafen-Intranet) | Warennummer 8526 91 fällt unter den fiktiven Embargo-Code **K-3**. Die KESTREL lag an den Tagen der Weiterleitungen an Liegeplatz 47. Eingabe: Embargo-Code `K-3` im Feld „Befund“ des Frachtpapiers | Ware als Tarnung, Embargoverstoß |
 | N7 | 3 | `log --user ns_observer` | Login-Zeiten = Sitzungspausen der Bank | Überwachung durch die Bank (zweiter Weg zu R12) |

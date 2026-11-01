@@ -14,7 +14,7 @@ window.AR = window.AR || {};
     { id: "R1", ch: 1, label: "Das unsichtbare Passwort", hints: [
       "Das Bild ist mehr als ein Hintergrund.",
       "Bilder haben Eigenschaften, die man nicht sieht. Das Terminal kann sie lesen – und manche Zeichenketten übersetzen.",
-      "Zwei Teile: ein Name, der nur von Nahem lesbar ist, und eine Zahl aus den Bilddaten. Die Richtlinie sagt, in welcher Reihenfolge."] },
+      "In den Bilddaten steht eine verschlüsselte Zeichenkette. Entschlüsselt sagt sie, wo sie liegt – schreib es so, wie die Kennwortrichtlinie es verlangt."] },
     { id: "R2", ch: 1, label: "Die manipulierte Spam-Mail", hints: [
       "Nicht jede Spam-Mail ist Spam.",
       "Sieh dir an, was eine Mail über sich selbst verrät – unter der Oberfläche.",
@@ -423,8 +423,8 @@ Wenn er bei Anlage B ankommt, entscheiden wir.
       [147, "Ida: Ruf mich morgen an. Versprochen?"],
       [150, "Aris: Ich melde mich."],
       [152, "[Aufgelegt · Besetztzeichen]"]], spectro: "VELLUM" },
-    ida: { title: "Sprachnachricht von Ida · 02.11. 08:12", dur: 20, reverse: true, src: "audio/ida_rueckwaerts.mp3", srcRev: "audio/ida_vorwaerts.mp3",
-      forward: "»…thcäirhcaN eseid hcsöl dnU .ow ,thcin garF .rehcis tsi rE …« (unverständlich, klingt wie rückwärts gesprochen)",
+    ida: { title: "Sprachnachricht von Ida · 02.11. 08:12", dur: 20, src: "audio/ida_rueckwaerts.mp3", srcRev: "audio/ida_vorwaerts.mp3",
+      forward: "»…thcäirhcaN eseid hcsöl dnU .ow ,thcin garF .rehcis tsi rE …« (unverständlich)",
       backward: "„Hendrik, ich bin's. … Nein – wer auch immer das hier abhört: Er ist sicher. Frag nicht, wo. Und lösch diese Nachricht.“" },
     memo: { title: "Diktat · 28.10. 21:30", dur: 34, src: "audio/memo_2810.mp3", transcript: [
       [0, "Aris: Notiz, achtundzwanzigster Oktober, halb zehn."],

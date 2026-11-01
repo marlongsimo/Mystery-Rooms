@@ -94,11 +94,11 @@ window.AR = window.AR || {};
   /** Prüft eine Eingabe gegen ein Sperrziel. Gibt { ok } / { locked: sek } / { ok:false, text, wait } zurück. */
   function attempt(target, ok, onOk, wrongText = "Falsch.", opts = {}) {
     const left = locks.left(target);
-    if (left > 0) return { ok: false, locked: left, text: `Gesperrt durch Sicherheitsprotokoll · noch ${locks.fmt(left)}` };
+    if (left > 0) return { ok: false, locked: left, target, base: "Gesperrt durch Sicherheitsprotokoll.", text: `Gesperrt durch Sicherheitsprotokoll · noch ${locks.fmt(left)}` };
     if (ok) { onOk(); return { ok: true }; }
     const sec = locks.fail(target, opts);
     MRSound.play("deny");
-    return { ok: false, text: wrongText + (sec ? ` Eingabe für ${locks.fmt(sec)} gesperrt.` : ""), wait: sec };
+    return { ok: false, target, base: wrongText, text: wrongText + (sec ? ` Eingabe für ${locks.fmt(sec)} gesperrt.` : ""), wait: sec };
   }
 
   /* ---------- Schlösser an Dateien und Ordnern ---------- */
@@ -114,7 +114,7 @@ window.AR = window.AR || {};
 
   /* ---------- Einzelne Rätsel ---------- */
   function login(pw) {
-    return attempt("login", norm(pw) === "KESTREL47", () => { S.login = true; solve("R1"); }, "Anmeldung fehlgeschlagen.");
+    return attempt("login", ["LIEGEPLATZ47", "WALTERSHOFLIEGEPLATZ47"].includes(norm(pw)), () => { S.login = true; solve("R1"); }, "Anmeldung fehlgeschlagen.");
   }
   function spectro(word) {
     return attempt("R5", norm(word) === "VELLUM", () => { addFound("Spektrogramm: VELLUM"); solve("R5"); }, "Das ergibt keinen Sinn im Spektrum.");
@@ -303,7 +303,7 @@ window.AR = window.AR || {};
         const ki = parts.findIndex((p) => p.toLowerCase() === "--key");
         if (!/^archon_origin(\.enc)?$/i.test(args[0] || "") || ki < 0 || !parts[ki + 1]) { P("Syntax: decrypt ARCHON_ORIGIN --key <schlüssel>", "warn"); break; }
         const given = parts[ki + 1].toUpperCase().split("-");
-        const want = ["KESTREL47", "VELLUM", "42178805", "ORKAN"];
+        const want = ["LIEGEPLATZ47", "VELLUM", "42178805", "ORKAN"];
         const ok = given.length === 4 && given.every((g, i) => norm(g) === want[i]);
         const r = attempt("decrypt", ok, () => solve("R15"), "DECRYPTION FAILED.");
         if (r.ok) { P("KEY ACCEPTED · ARCHON_ORIGIN entschlüsselt.", "ok"); P("Die Entscheidung ist jetzt möglich.", "hl"); }

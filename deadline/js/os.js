@@ -50,122 +50,10 @@ window.DL = window.DL || {};
   const screens = ["title", "boot", "desk"];
   const show = (id) => screens.forEach((s) => $("#" + s).classList.toggle("hidden", s !== id));
 
-  /* ---------- Fenster ---------- */
-  const wins = [];
-  let zTop = 10, seq = 0;
-  const layer = () => $("#windows");
-
-  function open(appId, arg, opts = {}) {
-    const app = DL.apps[appId];
-    if (!app) return null;
-    const key = appId + ":" + (arg ?? "");
-    let w = wins.find((x) => x.key === key);
-    if (w) { restore(w); return w; }
-    w = { id: "w" + (++seq), key, app: appId, arg, state: {}, min: false, max: false };
-    const el = document.createElement("section");
-    el.className = "win" + (app.cls ? " " + app.cls : "");
-    el.setAttribute("role", "dialog");
-    el.setAttribute("aria-label", app.title(arg));
-    el.innerHTML = `<header class="win-bar"><span class="win-ico">${DL.icon(app.icon ? app.icon(arg) : appId)}</span><span class="win-title"></span>
-      <span class="win-btns"><button class="wb-min" aria-label="Minimieren" title="Minimieren">–</button><button class="wb-max" aria-label="Maximieren" title="Maximieren">□</button><button class="wb-close" aria-label="Schließen" title="Schließen">×</button></span></header>
-      <div class="win-body"></div><span class="win-resize" aria-hidden="true"></span>`;
-    w.el = el; w.body = $(".win-body", el);
-    guardBody(w.body);
-    $(".win-title", el).textContent = app.title(arg);
-    layer().appendChild(el);
-    const desk = $("#desk").getBoundingClientRect();
-    const ww = Math.min(app.w || 620, desk.width - 24), hh = Math.min(app.h || 440, desk.height - 70);
-    const n = wins.length;
-    el.style.width = ww + "px"; el.style.height = hh + "px";
-    el.style.left = Math.max(8, Math.min(desk.width - ww - 8, (opts.x ?? (desk.width - ww) / 2 + (n % 6) * 26 - 60))) + "px";
-    el.style.top = Math.max(8, Math.min(desk.height - hh - 56, (opts.y ?? (desk.height - hh) / 2 + (n % 6) * 22 - 50))) + "px";
-    wins.push(w);
-    wire(w);
-    focus(w);
-    render(w);
-    snd.play("open");
-    paintTasks();
-    if (app.opened) app.opened(w);
-    return w;
-  }
-  /*
-   * Neu zeichnen nur, wenn sich der Inhalt wirklich geändert hat. Sonst würden Elemente
-   * unter dem Mauszeiger ausgetauscht – ein Doppelklick oder eine Auswahl ginge verloren.
-   */
-  const HTML = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
-  function guardBody(el) {
-    let last = null;
-    Object.defineProperty(el, "innerHTML", {
-      configurable: true,
-      get() { return HTML.get.call(this); },
-      set(v) { if (v === last) return; last = v; HTML.set.call(this, v); },
-    });
-  }
-  function render(w) { DL.apps[w.app].render(w); const t = DL.apps[w.app].title(w.arg); $(".win-title", w.el).textContent = t; }
-  function close(w) {
-    const i = wins.indexOf(w); if (i < 0) return;
-    if (DL.apps[w.app].closed) DL.apps[w.app].closed(w);
-    wins.splice(i, 1); w.el.remove(); paintTasks();
-    const top = topWin(); if (top) focus(top);
-  }
-  function focus(w) {
-    wins.forEach((x) => x.el.classList.toggle("focused", x === w));
-    w.el.style.zIndex = ++zTop;
-    paintTasks();
-  }
-  function restore(w) { w.min = false; w.el.classList.remove("minimized"); focus(w); }
-  function minimize(w) { w.min = true; w.el.classList.add("minimized"); w.el.classList.remove("focused"); paintTasks(); }
-  const topWin = () => wins.filter((x) => !x.min).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
-  function toggleMax(w) { w.max = !w.max; w.el.classList.toggle("maxed", w.max); }
-
-  function wire(w) {
-    const el = w.el, bar = $(".win-bar", el);
-    el.addEventListener("pointerdown", () => focus(w), true);
-    $(".wb-close", el).addEventListener("click", (e) => { e.stopPropagation(); close(w); });
-    $(".wb-min", el).addEventListener("click", (e) => { e.stopPropagation(); minimize(w); });
-    $(".wb-max", el).addEventListener("click", (e) => { e.stopPropagation(); toggleMax(w); });
-    bar.addEventListener("dblclick", (e) => { if (!e.target.closest("button")) toggleMax(w); });
-    // Verschieben
-    bar.addEventListener("pointerdown", (e) => {
-      if (e.target.closest("button") || w.max || mobile()) return;
-      e.preventDefault();
-      const sx = e.clientX, sy = e.clientY, ox = el.offsetLeft, oy = el.offsetTop;
-      const desk = $("#desk").getBoundingClientRect();
-      const mv = (ev) => {
-        el.style.left = Math.max(-el.offsetWidth + 80, Math.min(desk.width - 80, ox + ev.clientX - sx)) + "px";
-        el.style.top = Math.max(0, Math.min(desk.height - 80, oy + ev.clientY - sy)) + "px";
-      };
-      const up = () => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); };
-      window.addEventListener("pointermove", mv); window.addEventListener("pointerup", up);
-    });
-    // Größe ändern
-    $(".win-resize", el).addEventListener("pointerdown", (e) => {
-      if (w.max || mobile()) return;
-      e.preventDefault();
-      const sx = e.clientX, sy = e.clientY, ow = el.offsetWidth, oh = el.offsetHeight;
-      const mv = (ev) => { el.style.width = Math.max(300, ow + ev.clientX - sx) + "px"; el.style.height = Math.max(200, oh + ev.clientY - sy) + "px"; };
-      const up = () => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); };
-      window.addEventListener("pointermove", mv); window.addEventListener("pointerup", up);
-    });
-  }
-
-  function paintTasks() {
-    const top = topWin();
-    $("#tasks").innerHTML = wins.map((w) => `<button class="task${w === top ? " active" : ""}${w.min ? " min" : ""}" data-w="${w.id}" title="${esc(DL.apps[w.app].title(w.arg))}">
-      <span class="task-ico">${DL.icon(DL.apps[w.app].icon ? DL.apps[w.app].icon(w.arg) : w.app)}</span><span class="task-label">${esc(DL.apps[w.app].title(w.arg))}</span></button>`).join("");
-  }
-
-  /** Doppelklick am Rechner, einfacher Fingertipp am Handy, Enter mit der Tastatur */
-  /** Desktop-Symbole: Doppelklick (Touch: Antippen). Listen in Fenstern (single = true): ein Klick. */
-  function activate(root, sel, fn, single = false) {
-    root.addEventListener("dblclick", (e) => { if (single) return; const t = e.target.closest(sel); if (t) fn(t); });
-    root.addEventListener("click", (e) => {
-      const t = e.target.closest(sel); if (!t) return;
-      root.querySelectorAll(sel).forEach((x) => x.classList.toggle("selected", x === t));
-      if (single || coarse()) fn(t);
-    });
-    root.addEventListener("keydown", (e) => { if (e.key === "Enter") { const t = e.target.closest(sel); if (t) fn(t); } });
-  }
+  /* ---------- Fenster (gemeinsamer Desktop-Baustein platform/desktop) ---------- */
+  const D = MRDesktop.create({ desk: $("#desk"), layer: $("#windows"), tasks: $("#tasks"), apps: () => DL.apps, icon: (n) => DL.icon(n), sound: snd });
+  const wins = D.wins;
+  const { open, close, render, focus, topWin, activate, paintTasks } = D;
 
   /* ---------- Knoten öffnen ---------- */
   function openNode(id) {
@@ -421,11 +309,6 @@ window.DL = window.DL || {};
       G.reset(); paintTitle();
     });
     activate($("#icons"), ".dicon", (t) => runIcon(t.dataset.key));
-    $("#tasks").addEventListener("click", (e) => {
-      const b = e.target.closest(".task"); if (!b) return;
-      const w = wins.find((x) => x.id === b.dataset.w); if (!w) return;
-      if (w.min || topWin() !== w) restore(w); else minimize(w);
-    });
     $("#startBtn").addEventListener("click", (e) => { e.stopPropagation(); toggleStart(); });
     $("#startSearch").addEventListener("input", paintStart);
     $("#startList").addEventListener("click", (e) => {

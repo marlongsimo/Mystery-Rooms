@@ -1,12 +1,14 @@
 /*
- * DEADLINE.exe – Geräusche (Web Audio, keine Audiodateien)
+ * MYSTERY ROOMS – Geräusche für Desktop-Spiele (Web Audio, keine Audiodateien)
+ * Bereitgestellt als window.MRSound; DEADLINE.exe nutzt sie zusätzlich als DL.sound.
  * Lüfterrauschen, Klicks, Benachrichtigungen, Fehler, Störungen, Morse-Töne.
  */
-window.DL = window.DL || {};
 (() => {
   "use strict";
   let ctx = null, master = null, fan = null, on = true;
-  try { on = localStorage.getItem("deadline_sound") !== "off"; } catch (e) { /* privat */ }
+  // Speicherschlüssel je Spiel: <html data-sound-key="..."> (DEADLINE: deadline_sound)
+  const KEY = (document.documentElement && document.documentElement.dataset.soundKey) || "mr_sound";
+  try { on = localStorage.getItem(KEY) !== "off"; } catch (e) { /* privat */ }
 
   function ensure() {
     if (ctx) { if (ctx.state === "suspended") ctx.resume(); return ctx; }
@@ -53,6 +55,9 @@ window.DL = window.DL || {};
     glitch: () => { noise(0.35, { vol: 0.35, freq: 2400 }); tone(70, 0.3, { type: "sawtooth", vol: 0.06 }); },
     alarm: () => { [0, 0.4, 0.8].forEach((t) => { tone(740, 0.18, { type: "square", vol: 0.05, at: t }); tone(560, 0.18, { type: "square", vol: 0.05, at: t + 0.2 }); }); },
     heart: () => { tone(58, 0.12, { type: "sine", vol: 0.32, attack: 0.01, release: 0.08 }); tone(52, 0.14, { type: "sine", vol: 0.24, at: 0.2, attack: 0.01, release: 0.1 }); },
+    deny: () => { tone(220, 0.09, { type: "square", vol: 0.06 }); tone(165, 0.22, { type: "square", vol: 0.06, at: 0.1 }); },
+    level: () => { [196, 165, 131].forEach((f, i) => tone(f, 0.35, { type: "sawtooth", vol: 0.05, at: i * 0.22 })); },
+    beep: () => tone(1046, 0.06, { vol: 0.06 }),
     key: () => tone(2400 + Math.random() * 400, 0.012, { type: "square", vol: 0.015 }),
     boot: () => { tone(110, 0.6, { type: "sawtooth", vol: 0.04 }); tone(220, 0.4, { vol: 0.05, at: 0.3 }); },
   };
@@ -69,7 +74,7 @@ window.DL = window.DL || {};
     return { plan, total: t };
   }
 
-  DL.sound = {
+  const api = {
     play(name) { if (!on) return; try { ensure(); fx[name] && fx[name](); } catch (e) { /* ohne Ton */ } },
     morse,
     fan() { if (on) { try { startFan(); } catch (e) { /* ohne Ton */ } } },
@@ -78,10 +83,15 @@ window.DL = window.DL || {};
     fanLevel(x) { if (fan && ctx) fan.g.gain.setTargetAtTime(0.05 + 0.13 * Math.max(0, Math.min(1, x)), ctx.currentTime, 1.5); },
     toggle() {
       on = !on;
-      try { localStorage.setItem("deadline_sound", on ? "on" : "off"); } catch (e) { /* privat */ }
+      try { localStorage.setItem(KEY, on ? "on" : "off"); } catch (e) { /* privat */ }
       if (ensure()) master.gain.value = on ? 1 : 0;
       if (on) startFan();
       return on;
     },
   };
+  api.tone = tone; api.noise = noise;
+  /** Pause: alles stumm schalten, ohne die Einstellung zu ändern */
+  api.suspend = (off) => { if (ctx) { if (off) ctx.suspend(); else ctx.resume(); } };
+  window.MRSound = api;
+  if (window.DL) window.DL.sound = api;
 })();

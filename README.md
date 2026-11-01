@@ -13,6 +13,7 @@ Jedes Spiel hat ein eigenes Spielprinzip.
 | **Hotel Nocturne** – Die letzte Nacht | Räume erkunden, Gegenstände sammeln und kombinieren (7 Räume, 21 Rätsel) | spielbar, allein oder bis zu viert | [`hotel-nocturne/`](hotel-nocturne/) |
 | **Der letzte Fall** – Der letzte Vorhang | Beweise sammeln, Aussagen prüfen, Fragen mit Belegen beantworten | Vorschau – siehe unten | [`der-letzte-fall/`](der-letzte-fall/) |
 | **DEADLINE.exe** – Der letzte Zugriff | Ermitteln auf einem simulierten Computer: vier parallele Stränge, Terminal, sechs Enden | Vorschau, allein vollständig spielbar | [`deadline/`](deadline/) |
+| **Das ARCHON-Protokoll** – 120 Minuten. Eine Chance. | Schwerer Desktop-Thriller: Finanzermittlung, Register, Audio, Terminal; Wissensdatenbank im Spiel | Vorschau, allein, nur am Computer | [`archon/`](archon/) |
 | Das Geheimnis der Pyramide | – | geplant | – |
 | Projekt Schattenlabor | – | geplant | – |
 
@@ -30,6 +31,8 @@ Jedes Spiel hat ein eigenes Spielprinzip.
 | `index.html`, `portal/` | Startseite: Katalog (`portal/games.js`), Welten, Detailansicht, FAQ |
 | `platform/multiplayer/` | Gemeinsames Spielen für alle Spiele (Supabase, nur Publishable Key) – siehe [README](platform/multiplayer/README.md) |
 | `platform/board/` | Pinnwand-Baustein (Karten, Fäden, gemeinsam bearbeitbar) |
+| `platform/desktop/` | Desktop-Baustein für Computer-Spiele (Fenster, Ton, Spielzeit, Sperren) |
+| `platform/rating/` | Bewertungen nach dem Spiel (Supabase, nur Eintragen) |
 | `hotel-nocturne/`, `der-letzte-fall/`, `deadline/` | je ein Spiel mit eigener README (Aufbau, Lösungen) |
 
 **Neues Spiel eintragen:** Eintrag in `portal/games.js`. Für gemeinsames Spielen zusätzlich ein Eintrag in der Supabase-Tabelle `game_catalog` (`slug`, Titel, Code-Präfix, `enabled = true`).

@@ -74,3 +74,10 @@ as $$
 $$;
 revoke all on function public.game_rating_summary() from public;
 grant execute on function public.game_rating_summary() to anon, authenticated;
+
+-- =====================================================================
+-- 5) Neues Spiel „Das ARCHON-Protokoll“ für Bewertungen zulassen (01.11.2026)
+-- =====================================================================
+alter table public.game_ratings drop constraint if exists game_ratings_game_slug_check;
+alter table public.game_ratings add constraint game_ratings_game_slug_check
+  check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline', 'archon'));

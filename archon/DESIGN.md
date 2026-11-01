@@ -4,6 +4,8 @@
 
 > **Achtung: enthält alle Lösungen.** Nur für die Entwicklung, nicht für Testspieler.
 
+**Umsetzung:** Stand 01.11.2026 gebaut. Kleine Abweichungen stehen in `README.md` (Abschnitt „Abweichungen“).
+
 **Änderungen gegenüber 1.1**
 - **Countdown:** pausierbar, nicht mehr strikt. Ohne Server und Backend; die Zeit läuft nur, solange das Spiel geöffnet und nicht pausiert ist (Kap. 0, 5a, 11, 15.6).
 - **Neu: Kapitel 16 „Recherche“.** Eine Suchmaschine im Spiel erklärt jeden Fachbegriff, den man zum Lösen braucht: Embargo, Treuhand, IBAN, Base64 usw.

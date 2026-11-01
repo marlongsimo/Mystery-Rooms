@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de" data-sound-key="archon_sound">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#04070c">
+  <meta name="description" content="Das ARCHON-Protokoll – 120 Minuten. Eine Chance. Ein schwerer digitaler Thriller auf einem fremden Computer. Nur am Computer spielbar.">
+  <title>Das ARCHON-Protokoll – 120 Minuten. Eine Chance.</title>
+  <link rel="stylesheet" href="../der-letzte-fall/css/fonts.css?v=1">
+  <link rel="stylesheet" href="../platform/board/board.css?v=2">
+  <link rel="stylesheet" href="../platform/rating/rating.css?v=1">
+  <link rel="stylesheet" href="css/archon.css?v=1">
+</head>
+<body>
+  <!-- ========== TITEL ========== -->
+  <section id="title" class="screen title">
+    <div class="title-copy">
+      <p class="eyebrow">DIGITALER THRILLER · CYBER-FORENSIK · EXTREME EDITION</p>
+      <h1>Das <span>ARCHON</span>-Protokoll</h1>
+      <p class="sub">120 MINUTEN. EINE CHANCE.</p>
+      <p class="lead">Ein Wirtschaftsprüfer ist verschwunden. Sein letzter Link führt dich auf seinen Archivrechner – und jemand beobachtet die Verbindung. In 120 Minuten wissen sie, wer du bist.</p>
+      <p class="lead">Ermittle in Mails, Buchungen, Registern und Audioaufnahmen. Fachbegriffe erklärt die Wissensdatenbank im Spiel. Falsche Lösungen sperren Eingaben – raten lohnt sich nicht.</p>
+      <div id="startBox">
+        <div class="title-actions"><button class="btn big" id="startBtn">Verbindung herstellen</button><button class="btn ghost" id="resetBtn" hidden>Neu beginnen</button></div>
+        <p class="state" id="titleState"></p>
+        <p class="micro">SCHWER · ALLEIN · NUR AM COMPUTER · MIT TON EMPFOHLEN · PAUSE JEDERZEIT MIT ESC</p>
+      </div>
+      <div id="mobileNote" class="mobile-note" hidden><b>Nur am Computer spielbar.</b> Dieses Spiel braucht einen großen Bildschirm, Maus und Tastatur (ab 1280 Pixel Breite). Öffne die Seite bitte am Rechner.</div>
+      <p><a class="link" href="../index.html">← Alle Escape Rooms</a></p>
+    </div>
+    <div class="title-visual" aria-hidden="true"><pre>REMOTE SESSION ESTABLISHED.
+USER: UNKNOWN
+HOST: ARIS-ARCHIVE-07
+<span>WARNING: SESSION MONITORED</span>
+<span>TRACE IN PROGRESS</span>
+
+<b>02:00:00</b></pre></div>
+  </section>
+
+  <!-- ========== VERBINDUNG ========== -->
+  <section id="boot" class="screen boot hidden"><pre id="bootLog"></pre><button class="btn ghost small" id="bootSkip">Überspringen</button></section>
+
+  <!-- ========== DESKTOP ========== -->
+  <section id="desk" class="screen desk hidden">
+    <header class="topbar">
+      <div class="tb-left"><b>ARCHON</b><span>ARIS-ARCHIVE-07</span><span id="chap" class="chap"></span></div>
+      <div class="tb-mid" id="lvl" aria-label="Sicherheitslevel"></div>
+      <div class="tb-right">
+        <button class="tbtn" id="hintBtn" title="Hinweise">?</button>
+        <button class="tbtn" id="soundBtn" title="Ton an/aus" aria-label="Ton an/aus">♪</button>
+        <button class="tbtn" id="pauseBtn" title="Pause (Esc)" aria-label="Pause">❚❚</button>
+        <span class="trace-k">TRACE</span><span class="trace" id="trace">02:00:00</span>
+      </div>
+    </header>
+    <div class="wall" aria-hidden="true"><svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" class="wall-img"></svg></div>
+    <div id="icons" class="icons"></div>
+    <div id="lockbar" class="lockbar" hidden>
+      <p>ARIS-ARCHIVE-07 ist gesperrt.</p>
+      <button class="btn small ghost" id="lkLogin">Anmeldung</button>
+      <button class="btn small ghost" id="lkInfo">Systeminformationen</button>
+      <button class="btn small ghost" id="lkTerm">Notfall-Terminal</button>
+      <button class="btn small ghost" id="lkImg">Hintergrundbild ansehen</button>
+    </div>
+    <div id="windows"></div>
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+    <nav class="taskbar"><div id="tasks" class="tasks"></div></nav>
+    <div id="pause" class="pause" hidden><div><p class="eyebrow">FREEZE</p><h2>TRACE ANGEHALTEN</h2><p>Die Verbindung ist eingefroren. Countdown, Sperren und Ereignisse stehen still.</p><button class="btn" id="resume">Weiter (Esc)</button> <button class="btn ghost" id="pauseTitle">Zum Titel</button></div></div>
+  </section>
+
+  <section id="end" class="screen end hidden"></section>
+
+  <script src="../platform/desktop/sound.js?v=1"></script>
+  <script src="../platform/desktop/desktop.js?v=1"></script>
+  <script src="../platform/desktop/playclock.js?v=1"></script>
+  <script src="../platform/desktop/locks.js?v=1"></script>
+  <script src="../platform/board/board.js?v=2"></script>
+  <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/rating/rating.js?v=1"></script>
+  <script src="js/data.js?v=1"></script>
+  <script src="js/ledger.js?v=1"></script>
+  <script src="js/story.js?v=1"></script>
+  <script src="js/wiki.js?v=1"></script>
+  <script src="js/game.js?v=1"></script>
+  <script src="js/apps.js?v=1"></script>
+  <script src="js/os.js?v=1"></script>
+  <script>document.querySelector(".wall-img").innerHTML = AR.IMG.harbour.replace(/^<svg[^>]*>|<\/svg>$/g, "").replace(/<text[^>]*>(KESTREL|LIMASSOL)<\/text>/g, "");</script>
+</body>
+</html>

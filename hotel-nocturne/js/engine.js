@@ -7,7 +7,7 @@
   "use strict";
   const N = window.NOCTURNE;
   const A = N.audio;
-  const SAVE_KEY = "nocturne_save_v2";
+  const SAVE_KEY = N.config.saveKey || "nocturne_save_v2"; // 3D-Testmodus (3d.html) nutzt einen eigenen Spielstand
   let saveKey = SAVE_KEY;  // im Multiplayer: eigener Spielstand je Sitzung (der Einzelspieler-Stand bleibt unberührt)
   let mp = null;           // Multiplayer-Anbindung (js/mp-adapter.js), sonst null
   N.messages = N.messages || {};
@@ -198,7 +198,8 @@
   function renderIntro() {
     document.body.classList.toggle("mp-mode", Boolean(mp));
     $("#introName").textContent = playerName();
-    $("#startButton").innerHTML = S.started ? "Weiterspielen <span>→</span>" : "Einchecken <span>→</span>";
+    const tm = N.config.testMode3d ? " (Testmodus)" : "";
+    $("#startButton").innerHTML = S.started ? `Weiterspielen${tm} <span>→</span>` : `Einchecken${tm} <span>→</span>`;
     $("#newGameLink").classList.toggle("hidden", !S.started);
   }
 
@@ -224,7 +225,10 @@
       const i = viewIndex(r), v = r.views[i], n = r.views.length;
       sc.classList.remove("draft");
       const dark = v.dark && !(v.dark.until && has(v.dark.until)) ? v.dark : null;
-      st.innerHTML = v.scene
+      const in3d = Boolean(N.view3d && N.view3d.supports(r));
+      sc.classList.toggle("is3d", in3d);
+      if (in3d) { N.view3d.render(st, r, i); anim = null; } // 3D-Schicht zeichnet selbst; Hotspots kommen aus denselben Daten
+      else st.innerHTML = v.scene
         + (dark ? `<div class="darkness" style="left:${dark.x}%;top:${dark.y}%;width:${dark.w}%;height:${dark.h}%${dark.clip ? `;clip-path:${dark.clip}` : ""}"></div>` : "")
         + v.hotspots.filter(visible).map((h) =>
           `<button class="hotspot${h.go ? " exit" : ""}${h.take ? " pickup" : ""}" data-hs="${h.id}" style="left:${h.x + h.w / 2}%;top:${h.y + h.h / 2}%;width:${h.w}%;height:${h.h}%" aria-label="${esc(h.label)}"><span class="hs-label">${h.go ? "→ " : ""}${esc(h.label)}</span></button>`).join("");
@@ -842,7 +846,8 @@
       if (d.ghost) {
         d.ghost.remove();
         const target = document.elementFromPoint(e.clientX, e.clientY)?.closest("#stage [data-hs]");
-        if (target) { selected = d.id; onHotspot(target.dataset.hs); renderSide(); }
+        const hs3d = !target && N.view3d && $("#scene").classList.contains("is3d") ? N.view3d.pickAt(e.clientX, e.clientY) : null;
+        if (target || hs3d) { selected = d.id; onHotspot(target ? target.dataset.hs : hs3d); renderSide(); }
         return;
       }
       selectItem(d.id);
@@ -868,6 +873,7 @@
       if (!start) return;
       const dx = e.clientX - start.x, dy = e.clientY - start.y, dt = Date.now() - start.t;
       start = null;
+      if (sc.classList.contains("is3d")) return; // in 3D dreht das Ziehen die Kamera
       if (!light && Math.abs(dx) > 60 && Math.abs(dy) < 60 && dt < 700) { suppressClick = true; turn(dx < 0 ? 1 : -1); }
     });
     sc.addEventListener("click", (e) => { if (suppressClick) { suppressClick = false; e.stopPropagation(); e.preventDefault(); } }, true);
@@ -1402,6 +1408,15 @@
     showTitle, inGame,
     exportShared, applyShared, normalizeShared,
     position() { const r = room(); return { room: r.id, roomName: r.name, view: r.views ? r.views[viewIndex(r)].name : null }; },
+    /* Schnittstelle für die 3D-Ansicht (js/3d): dieselben Hotspots, dieselbe Logik */
+    hotspot: (id) => onHotspot(id),
+    isVisible: (id) => { const h = hotspotsOf(room()).find((x) => x.id === id); return Boolean(h) && visible(h); },
+    hotspotData: (id) => hotspotsOf(room()).find((x) => x.id === id) || null,
+    has, isLight: () => light, toggleLight: (on) => toggleLight(on), selectedItem: () => selected,
+    say: (html) => setNarration(html),
+    setView(i) { const r = room(); if (!r.views || viewIndex(r) === i) return; S.views[r.id] = i; save(); renderStage(); checkEvents(); },
+    refresh() { if (inGame() && !dlg.open) renderStage(); },
+    blocked: () => Boolean(overlay || dlg.open),
     roomName: (id) => (ROOM[id] ? ROOM[id].name : id),
   };
 

@@ -1,0 +1,13 @@
+/* HOTEL NOCTURNE – 3D-Testmodus (js/3d) */
+.n3d-wrap { position: absolute; inset: 0; overflow: hidden; background: #050505; }
+.n3d { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; outline: none; }
+.n3d:active { cursor: grabbing; }
+.n3d-tip { position: absolute; transform: translate(-50%, calc(-100% - 14px)); padding: 5px 10px; background: #0d0a08e6; border: 1px solid var(--brass, #b69a6d); color: #f0e6d2; font: 13px "DM Sans", system-ui, sans-serif; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 3; }
+.n3d-tip.show { opacity: 1; }
+.n3d-hint { position: absolute; left: 50%; bottom: 24%; transform: translateX(-50%); padding: 7px 14px; background: #0d0a08cc; border: 1px solid #b69a6d66; color: #d4bc90; font: 12px "DM Mono", monospace; letter-spacing: .06em; pointer-events: none; text-align: center; transition: opacity .6s; z-index: 2; }
+.n3d-hint.gone { opacity: 0; }
+.scene.is3d { touch-action: none; }
+.scene.is3d .stage { animation: none !important; }
+.test3d-banner { margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--brass, #b69a6d); background: #1a140c; color: #d4bc90; font-size: 13px; line-height: 1.5; }
+.test3d-banner b { color: #f0e0bc; }
+.test3d-link { display: inline-block; margin: 10px 0 2px; }

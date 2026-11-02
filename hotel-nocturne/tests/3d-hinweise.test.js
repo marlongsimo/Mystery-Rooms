@@ -1,5 +1,5 @@
 /*
- * Hotel Nocturne – 3D-Testmodus: Sichtbare Texte in 3D müssen zur Geschichte passen.
+ * Hotel Nocturne – 3D-Testmodus: Sichtbare Texte in 3D müssen zur Geschichte passen (Rezeption, Zimmer 217).
  * Jeder Text, den die 3D-Rezeption auf eine Textur schreibt, muss (sinngemäß gleich) in der
  * Original-Raumdatei vorkommen – Dokumente oder SVG-Szenen. Aufruf: node hotel-nocturne/tests/3d-hinweise.test.js
  */
@@ -24,7 +24,23 @@ const PAIRS = [
   ['plaqueTex("PERSONAL"', "Personal"],
   ["(23 % 12) + 17 / 60", "23:17"], // Uhrzeiger
 ];
+// Zimmer 217
+const room2 = flat(fs.readFileSync(path.join(__dirname, "../js/rooms/02-zimmer217.js"), "utf8"));
+const scene2 = fs.readFileSync(path.join(__dirname, "../js/3d/zimmer217.js"), "utf8");
+const PAIRS2 = [
+  ['plaqueTex("217"', "217"],
+  ['"für E."', "für E."],
+  ['"Wer nachts wacht"', "Wer nachts wacht"],
+  ['fillText("6"', "Nr. 6"],
+  ['fillText("W2"', "W2"],
+  ["[0, 0, 0, 0]", "0"], // Ziffernschloss der Kommode zeigt 0000
+];
 let fail = 0;
+for (const [inScene, inStory] of PAIRS2) {
+  const a = scene2.includes(inScene), b = room2.includes(flat(inStory));
+  console.log(`${a && b ? "  ✓" : "  ✗"} Zimmer 217: ${inStory}${a ? "" : "  (fehlt in 3D)"}${b ? "" : "  (nicht in der Geschichte)"}`);
+  if (!(a && b)) fail++;
+}
 for (const [inScene, inStory] of PAIRS) {
   const a = scene.includes(inScene), b = R.includes(flat(inStory));
   console.log(`${a && b ? "  ✓" : "  ✗"} ${inStory}${a ? "" : "  (fehlt in 3D)"}${b ? "" : "  (nicht in der Geschichte)"}`);

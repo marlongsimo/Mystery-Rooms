@@ -1,5 +1,5 @@
 /*
- * Hotel Nocturne – 3D-Testmodus: Vergleich 3D ↔ 2D für alle Hotspots der Rezeption und kompletter Durchlauf in 3D bis Zimmer 217.
+ * Hotel Nocturne – 3D-Testmodus: Vergleich 3D ↔ 2D für alle Hotspots der Rezeption und kompletter Durchlauf in 3D bis Zimmer 217 (ebenfalls 3D).
  * Aufruf (aus dem Repository-Wurzelordner):
  *   python3 -m http.server 8765 &
  *   node hotel-nocturne/tests/3d-rezeption.test.js
@@ -68,6 +68,6 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
   console.log('Nach Neuladen 3D:', await p.evaluate(() => document.querySelector('#scene').classList.contains('is3d')), JSON.stringify(await st()), '| normaler Spielstand vorhanden:', await p.evaluate(() => !!localStorage.getItem('nocturne_save_v2')));
   // Aufzug betreten → Zimmer 217 (2D)
   await click3d('aufzug_offen'); await p.waitForTimeout(1800);
-  console.log('Aufzug →', (await st()).room, '| 3D aus:', !(await p.evaluate(() => document.querySelector('#scene').classList.contains('is3d'))), '| 2D-Hotspots:', (await p.$$('#stage [data-hs]')).length);
+  console.log('Aufzug →', (await st()).room, '| Zimmer 217 in 3D:', await p.evaluate(() => document.querySelector('#scene').classList.contains('is3d')));
   console.log(errs.join('\n') || 'no errors'); await b.close();
 })();

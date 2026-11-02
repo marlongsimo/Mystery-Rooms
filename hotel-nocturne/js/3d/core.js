@@ -281,8 +281,7 @@ function supports(r) { return Boolean(BUILDERS[r.id]) && webgl && (renderer || i
 function aimAt(id) {
   if (!built) return null;
   const e = built.pick.find((x) => x.ids.includes(id) || x.label === id); if (!e) return null;
-  const c = new THREE.Box3().setFromObject(e.obj).getCenter(new THREE.Vector3());
-  if (e.aim) c.add(new THREE.Vector3(...e.aim));
+  const c = e.aimLocal ? e.obj.localToWorld(new THREE.Vector3(...e.aimLocal)) : new THREE.Box3().setFromObject(e.obj).getCenter(new THREE.Vector3());
   const d = c.clone().sub(camera.position);
   yaw = Math.atan2(-d.x, -d.z); pitch = Math.atan2(d.y, Math.hypot(d.x, d.z)); targetYaw = null;
   camera.rotation.set(pitch, yaw, 0, "YXZ"); camera.updateMatrixWorld();

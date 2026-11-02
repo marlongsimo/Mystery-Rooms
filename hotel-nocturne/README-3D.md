@@ -2,7 +2,7 @@
 
 **Seite:** `hotel-nocturne/3d.html` – auf der Startseite des Spiels als „Einchecken (Testmodus 3D)“ verlinkt, nicht im Katalog.
 
-Stand: Prototyp **Rezeption** als 360°-Raum. Alle anderen Räume laufen auf derselben Seite in der gewohnten 2D-Ansicht weiter – das Spiel bleibt komplett durchspielbar.
+Stand: **Rezeption** und **Zimmer 217** als 360°-Räume. Alle anderen Räume laufen auf derselben Seite in der gewohnten 2D-Ansicht weiter – das Spiel bleibt komplett durchspielbar.
 
 ## Grundsätze
 
@@ -18,6 +18,8 @@ Stand: Prototyp **Rezeption** als 360°-Raum. Alle anderen Räume laufen auf der
 | `css/3d.css` | Leinwand, Tooltip, Bedienhinweis |
 | `js/3d/core.js` | Renderer, Kamera (Ziehen/Wischen, Mausrad/zwei Finger = Zoom), Auswahl per Raycasting, Taschenlampe, Blitz, Schnittstelle `NOCTURNE.view3d` |
 | `js/3d/rezeption.js` | Raum 1: Hülle, Möbel, Licht; jedes Objekt an Hotspot-IDs aus `js/rooms/01-rezeption.js` gebunden |
+| `js/3d/kit.js` | gemeinsame Bausteine ab Raum 2: Tapete, Holz, Dielen, Schilder, Regen, Raumhülle (`shell`) |
+| `js/3d/zimmer217.js` | Raum 2: alle 22 Hotspots aus `js/rooms/02-zimmer217.js` |
 | `../platform/vendor/three-0.170.0/` | three.js (MIT), fest im Repository – kein CDN |
 
 Änderungen an `js/engine.js` (2D unverändert): `saveKey` aus der Konfiguration, in `renderStage` 3D statt SVG, wenn `NOCTURNE.view3d.supports(raum)`; Ziehen eines Gegenstands auf ein 3D-Objekt; Schnittstelle `engine.hotspot / isVisible / hotspotData / has / isLight / selectedItem / say / setView / refresh`.
@@ -52,6 +54,19 @@ defineRoom("zimmer217", (ctx) => {
 | Nur das Porträt hängt gerade | Personalfoto und Zeitungsartikel leicht schief |
 | Ordner „ABR. 10/09“ | beschrifteter Ordner im Regal |
 
+## Bildhinweise und Zustände in Zimmer 217
+
+| Hinweis / Zustand | Umsetzung |
+|---|---|
+| Zimmernummer 217, Spiegel mit altem Schlüssel an der Kordel | Messingschild an der Tür, Schlüssel unter dem Spiegel |
+| Sanduhr, Kerzenständer (Kerze brennt), Porträtfoto, alter Schlüssel | die vier Gegenstände des Kommoden-Codes; die Ziffern stehen – wie in 2D – erst beim Untersuchen im Text |
+| Kommode mit vierstelligem Ziffernschloss (0000) | Schloss an der obersten Schublade; nach dem Code gleitet sie auf |
+| „Wer nachts wacht“ über dem Schrank, fünf Buchstabenräder | Schnitzerei und Räder; nach ELIAS schwingen die Türen auf |
+| Landschaftsbild „für E.“ | Signatur unten rechts im Bild |
+| Fenster schlägt auf (Ereignis beim Blick nach Süden, nachdem die Kommode offen ist) | Blitz, linker Flügel öffnet, Vorhänge wehen; danach nasse Fußspuren von der Tür zum Schreibtisch und ein Blatt auf dem Schreibtisch |
+| Tor in der Westmauer (nur im Blitz) | Umriss „W2“ im Hof, nur während des Blitzes sichtbar |
+| Gepäckschein „6“ unter dem Bett | an der Vorderkante, halb unter dem Bett, nur im Lichtkegel; ohne Licht ist der Spalt schwarz |
+
 ## Tests
 
 Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m http.server 8765 &`):
@@ -60,8 +75,9 @@ Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m h
 |---|---|---|
 | `3d-hinweise.test.js` | Alle sichtbaren Texte der 3D-Texturen stehen so auch in der Raumdatei (keine erfundenen Namen/Daten) | < 1 s, ohne Browser |
 | `3d-rezeption.test.js` | Jeder Hotspot im Startzustand: 3D-Klick öffnet denselben Dialog wie 2D · Durchlauf Code 2117 → Taschenlampe → Schraubendreher → Abdeckung → Schlüsselschalter → Aufzug → Zimmer 217 · Neuladen · getrennter Spielstand | ca. 3 min (Software-Rendering) |
+| `3d-zimmer217.test.js` | Start direkt in Zimmer 217: jeder Hotspot 3D ↔ 2D · Kommode 4173 → Fensterereignis → Fußspuren und Blatt → Taschenlampe → Gepäckschein → Schrank ELIAS → Tür zurück in die Rezeption | ca. 3 min |
 | `3d-touch.test.js` | iPhone quer/hochkant (emuliert): Tippen untersucht, Wischen dreht ohne Fehlauslösung | ca. 1 min |
 
-Letzter Lauf (02.11.2026): 22/22 Hotspots gleich wie 2D, Durchlauf vollständig, keine Fehler.
+Letzter Lauf (02.11.2026): Rezeption 22/22, Zimmer 217 17/17 Hotspots gleich wie 2D (Startzustand), beide Durchläufe vollständig, keine Fehler.
 
 Nicht prüfbar hier: Bildrate und Gefühl auf echten Geräten, Safari/iOS-WebGL.

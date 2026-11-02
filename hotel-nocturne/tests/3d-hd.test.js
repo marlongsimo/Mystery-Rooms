@@ -12,6 +12,7 @@ const base = { v: 2, started: true, finished: false, views: {}, docs: ['reservie
 const SAVES = {
   rezeption: { ...base, current: 'rezeption', unlocked: ['rezeption'], visited: ['rezeption'], completed: [], solved: [], flags: [], inventory: [] },
   zimmer217: { ...base, current: 'zimmer217', unlocked: ['rezeption', 'zimmer217'], visited: ['rezeption', 'zimmer217'], completed: ['rezeption'], solved: ['keybox', 'werkzeug', 'cover', 'elevator'], flags: ['keybox_open', 'taken_schraubendreher', 'cover_open', 'elevator_open'], inventory: ['key217', 'hotelplan', 'schraubendreher'] },
+  archiv: { ...base, current: 'archiv', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], completed: ['rezeption', 'zimmer217', 'gepaecklager'], solved: [], flags: ['archiv_offen'], inventory: ['hotelplan', 'schraubendreher'] },
 };
 const EXPECT = { high: { bloom: true, shadows: true }, medium: { bloom: true, shadows: true }, low: { bloom: false, shadows: false } };
 (async () => {

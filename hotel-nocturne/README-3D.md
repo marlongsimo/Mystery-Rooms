@@ -2,7 +2,7 @@
 
 **Seite:** `hotel-nocturne/3d.html` – auf der Startseite des Spiels als „Einchecken (Testmodus 3D)“ verlinkt, nicht im Katalog.
 
-Stand: **Rezeption** und **Zimmer 217** als 360°-Räume. Alle anderen Räume laufen auf derselben Seite in der gewohnten 2D-Ansicht weiter – das Spiel bleibt komplett durchspielbar.
+Stand: **Rezeption**, **Zimmer 217** und **Gepäcklager** als 360°-Räume. Alle anderen Räume laufen auf derselben Seite in der gewohnten 2D-Ansicht weiter – das Spiel bleibt komplett durchspielbar.
 
 ## Grundsätze
 
@@ -20,6 +20,7 @@ Stand: **Rezeption** und **Zimmer 217** als 360°-Räume. Alle anderen Räume la
 | `js/3d/rezeption.js` | Raum 1: Hülle, Möbel, Licht; jedes Objekt an Hotspot-IDs aus `js/rooms/01-rezeption.js` gebunden |
 | `js/3d/kit.js` | gemeinsame Bausteine ab Raum 2: Tapete, Holz, Dielen, Schilder, Regen, Raumhülle (`shell`) |
 | `js/3d/zimmer217.js` | Raum 2: alle 22 Hotspots aus `js/rooms/02-zimmer217.js` |
+| `js/3d/gepaecklager.js` | Raum 3: alle 24 Hotspots aus `js/rooms/03-gepaecklager.js` |
 | `../platform/vendor/three-0.170.0/` | three.js (MIT), fest im Repository – kein CDN |
 
 Änderungen an `js/engine.js` (2D unverändert): `saveKey` aus der Konfiguration, in `renderStage` 3D statt SVG, wenn `NOCTURNE.view3d.supports(raum)`; Ziehen eines Gegenstands auf ein 3D-Objekt; Schnittstelle `engine.hotspot / isVisible / hotspotData / has / isLight / selectedItem / say / setView / refresh`.
@@ -67,6 +68,17 @@ defineRoom("zimmer217", (ctx) => {
 | Tor in der Westmauer (nur im Blitz) | Umriss „W2“ im Hof, nur während des Blitzes sichtbar |
 | Gepäckschein „6“ unter dem Bett | an der Vorderkante, halb unter dem Bett, nur im Lichtkegel; ohne Licht ist der Spalt schwarz |
 
+## Bildhinweise und Zustände im Gepäcklager
+
+| Hinweis / Zustand | Umsetzung |
+|---|---|
+| Messinganhänger 2 · 9 · 4 (Regal) und 6 (Ausgabe), Springerfigur, Notenblatt „Nocturne“, Kompass | Anhänger mit großer Ziffer an jedem Koffer; die Truhen-Kombination ergibt sich daraus |
+| „AUSGABE NUR GEGEN GEPÄCKSCHEIN“, Schlitz unter der Klappe | Schild über der Stahlklappe; nach dem Gepäckschein hebt sich die Klappe, Koffer Nr. 6 mit blauem Schal, rotem Notizbuch und Käfigschlüssel gleitet auf den Tresen |
+| „WERTGEPÄCK“, Käfigtür mit Kastenschloss, Truhe mit Zahlenschloss 0000 | Gittertür schwingt nach dem Käfigschlüssel auf, Deckel öffnet nach dem Code |
+| Koffer 4 rutscht vom Regal (Ereignis beim Blick nach Osten, nachdem die Truhe offen ist) | Koffer fällt schräg auf den Boden; dahinter die gelbe Marke „14.10.2009 · 23:10 – WASSERSTAND KNIEHÖHE“ |
+| Wasserrand auf Kniehöhe rundum, nasse Treppe, Milchglastür „ARCHIV“ oben, „← REZEPTION“ | dunkler Rand in der Wandtextur; Treppenschacht hinter der Nordwand, Tür öffnet nach dem Archivschlüssel |
+| Notbeleuchtung flackert, Wasser tropft in den Eimer | Licht flackert unregelmäßig, Tropfen fallen aus dem Rohr |
+
 ## Tests
 
 Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m http.server 8765 &`):
@@ -76,8 +88,9 @@ Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m h
 | `3d-hinweise.test.js` | Alle sichtbaren Texte der 3D-Texturen stehen so auch in der Raumdatei (keine erfundenen Namen/Daten) | < 1 s, ohne Browser |
 | `3d-rezeption.test.js` | Jeder Hotspot im Startzustand: 3D-Klick öffnet denselben Dialog wie 2D · Durchlauf Code 2117 → Taschenlampe → Schraubendreher → Abdeckung → Schlüsselschalter → Aufzug → Zimmer 217 · Neuladen · getrennter Spielstand | ca. 3 min (Software-Rendering) |
 | `3d-zimmer217.test.js` | Start direkt in Zimmer 217: jeder Hotspot 3D ↔ 2D · Kommode 4173 → Fensterereignis → Fußspuren und Blatt → Taschenlampe → Gepäckschein → Schrank ELIAS → Tür zurück in die Rezeption | ca. 3 min |
+| `3d-gepaecklager.test.js` | Start im Gepäcklager: jeder Hotspot 3D ↔ 2D · Gepäckschein → Koffer Nr. 6 → Käfigschlüssel → Käfig → Truhe 2694 → Ereignis Koffer 4/Wassermarke → Archivtür → Archiv | ca. 3 min |
 | `3d-touch.test.js` | iPhone quer/hochkant (emuliert): Tippen untersucht, Wischen dreht ohne Fehlauslösung | ca. 1 min |
 
-Letzter Lauf (02.11.2026): Rezeption 22/22, Zimmer 217 17/17 Hotspots gleich wie 2D (Startzustand), beide Durchläufe vollständig, keine Fehler.
+Letzter Lauf (02.11.2026): Rezeption 22/22, Zimmer 217 17/17, Gepäcklager 13/13 Hotspots gleich wie 2D (Startzustand), alle Durchläufe vollständig, keine Fehler.
 
 Nicht prüfbar hier: Bildrate und Gefühl auf echten Geräten, Safari/iOS-WebGL.

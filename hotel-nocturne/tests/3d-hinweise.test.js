@@ -1,5 +1,5 @@
 /*
- * Hotel Nocturne – 3D-Testmodus: Sichtbare Texte in 3D müssen zur Geschichte passen (Rezeption, Zimmer 217).
+ * Hotel Nocturne – 3D-Testmodus: Sichtbare Texte in 3D müssen zur Geschichte passen (Rezeption, Zimmer 217, Gepäcklager).
  * Jeder Text, den die 3D-Rezeption auf eine Textur schreibt, muss (sinngemäß gleich) in der
  * Original-Raumdatei vorkommen – Dokumente oder SVG-Szenen. Aufruf: node hotel-nocturne/tests/3d-hinweise.test.js
  */
@@ -35,7 +35,21 @@ const PAIRS2 = [
   ['fillText("W2"', "W2"],
   ["[0, 0, 0, 0]", "0"], // Ziffernschloss der Kommode zeigt 0000
 ];
+// Gepäcklager
+const room3 = flat(fs.readFileSync(path.join(__dirname, "../js/rooms/03-gepaecklager.js"), "utf8"));
+const scene3 = fs.readFileSync(path.join(__dirname, "../js/3d/gepaecklager.js"), "utf8");
+const PAIRS3 = [
+  ["tag(2)", "Messinganhänger: 2"], ["tag(9)", "Messinganhänger: 9"], ["tag(4)", "Messinganhänger: 4"], ["tag(6)", "Nr. 6"],
+  ['fillText("ARCHIV"', "ARCHIV"], ['"← REZEPTION"', "← REZEPTION"], ['"AUSGABE NUR GEGEN GEPÄCKSCHEIN"', "AUSGABE NUR GEGEN GEPÄCKSCHEIN"],
+  ['"WERTGEPÄCK"', "WERTGEPÄCK"], ['"14.10.2009 · 23:10"', "14.10.2009 · 23:10"], ['"WASSERSTAND KNIEHÖHE"', "WASSERSTAND KNIEHÖHE"],
+  ['fillText("Nocturne"', "Chopin-Nocturne"], ["const knight", "Springerfigur"], ["const comp =", "Kompass"],
+];
 let fail = 0;
+for (const [inScene, inStory] of PAIRS3) {
+  const a = scene3.includes(inScene), b = room3.includes(flat(inStory));
+  console.log(`${a && b ? "  ✓" : "  ✗"} Gepäcklager: ${inStory}${a ? "" : "  (fehlt in 3D)"}${b ? "" : "  (nicht in der Geschichte)"}`);
+  if (!(a && b)) fail++;
+}
 for (const [inScene, inStory] of PAIRS2) {
   const a = scene2.includes(inScene), b = room2.includes(flat(inStory));
   console.log(`${a && b ? "  ✓" : "  ✗"} Zimmer 217: ${inStory}${a ? "" : "  (fehlt in 3D)"}${b ? "" : "  (nicht in der Geschichte)"}`);

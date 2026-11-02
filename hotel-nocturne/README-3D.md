@@ -23,6 +23,7 @@ Stand: **Rezeption**, **Zimmer 217** und **Gepäcklager** als 360°-Räume. Alle
 | `js/3d/gepaecklager.js` | Raum 3: alle 24 Hotspots aus `js/rooms/03-gepaecklager.js` |
 | `js/3d/archiv.js` | Raum 4 (HD): alle 19 Hotspots aus `js/rooms/04-archiv.js` – Regal mit Jahresordnern, Lesetisch, Schreibtisch mit Bankerlampe, Chiffrierscheibe und Buchstabenrädern, Aktenschrank A–Z, Planschrank, Stahltür |
 | `js/3d/intro.js` | Prolog-Ankunft als Kamerafahrt (ca. 49 s): Windschutzscheibe mit Wischern, Zufahrt, Fassade, Blitz zeigt kurz die Westmauer mit Tor W2, zu Fuß mit Taschenlampe hinein, Uhr 23:17, Tür schlägt zu, Aufblende genau auf die Startansicht. Läuft in derselben Szene wie das Spiel (`cinemaHost()` in core.js); Außenbereich wird danach entfernt. Texte aus `js/prolog.js`, Sprecher wie bisher über `introVoice`. Ohne WebGL oder bei „Bewegung reduzieren“: bisherige Bildfolge |
+| Filmische Fallakte | `engine.js` (`runProlog`) + `prolog.js` (`coldOpen`, `props`) + `css/3d.css` – nur mit `config.cineCasefile` (setzt bisher nur `3d.html`): Vorspann mit Funkprotokoll der Feuerwehr und Titel, Fallakte am Schreibtisch mit Zeitungsausschnitten (wie Dokument „zeitung“), Uhr 23:17, Foto, Stempel „Fahndung ohne Ergebnis“, Umschlag; Überschrift wie Schreibmaschine, Absätze nacheinander, Name und Handschrift schreiben sich. Lesen weiter im eigenen Tempo; gesehene Seiten ohne Animation |
 | `../platform/vendor/three-0.170.0/` | three.js (MIT), fest im Repository – kein CDN |
 
 Änderungen an `js/engine.js` (2D unverändert): `saveKey` aus der Konfiguration, in `renderStage` 3D statt SVG, wenn `NOCTURNE.view3d.supports(raum)`; Ziehen eines Gegenstands auf ein 3D-Objekt; Schnittstelle `engine.hotspot / isVisible / hotspotData / has / isLight / selectedItem / say / setView / refresh`.
@@ -114,6 +115,7 @@ Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m h
 | `3d-gepaecklager.test.js` | Start im Gepäcklager: jeder Hotspot 3D ↔ 2D · Gepäckschein → Koffer Nr. 6 → Käfigschlüssel → Käfig → Truhe 2694 → Ereignis Koffer 4/Wassermarke → Archivtür → Archiv | ca. 3 min |
 | `3d-archiv.test.js` | Start im Archiv: jeder Hotspot 3D ↔ 2D · Chiffrierscheibe → Fach WESTGANG → Planschrank (A · Datum + Nummer) → Ereignis im Norden → Schublade W → Stahltür 1897 → Sicherheitsbereich | ca. 4 min |
 | `3d-intro.test.js` | Neues Spiel → Fallakte → 3D-Ankunft: alle vier Untertitel, danach Spiel in der Rezeption (3D, Nord), bedienbar; zweiter Lauf mit „Überspringen“. Bilder per Sprung (`cinemaCtl.seek`) | ca. 2 min |
+| `3d-fallakte.test.js` | Vorspann, Titel, drei Seiten (Text unverändert, Requisiten, Stempel, Handschrift), Zurück, Handy; Gegenprobe normale Version unverändert | ca. 1 min |
 | `3d-hd.test.js` | Rezeption, Zimmer 217 und Archiv in den Stufen high/medium/low: HD aktiv, Umgebung, Leuchten und Schatten je Stufe, keine Ladefehler, keine Fehler; Bilder im Temp-Ordner | ca. 4 min |
 | `3d-touch.test.js` | iPhone quer/hochkant (emuliert): Tippen untersucht, Wischen dreht ohne Fehlauslösung | ca. 1 min |
 

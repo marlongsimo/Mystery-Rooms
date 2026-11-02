@@ -17,6 +17,7 @@ async function newGame(b) {
   await p.addInitScript(() => { if (!sessionStorage.getItem('seeded')) { localStorage.clear(); sessionStorage.setItem('seeded', '1'); } });
   await p.goto(BASE + '/hotel-nocturne/3d.html?q=' + QUAL); await p.waitForTimeout(1200);
   await p.click('#startButton'); await p.waitForTimeout(800);
+  if (await p.$('.cf-cold .cine-btn')) { await p.click('.cf-cold .cine-btn'); await p.waitForTimeout(500); } // Vorspann überspringen
   for (let i = 0; i < 3; i++) { await p.click('[data-pz="next"]'); await p.waitForTimeout(300); }
   return { p, errs };
 }

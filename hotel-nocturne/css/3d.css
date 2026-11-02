@@ -23,3 +23,68 @@
 .prolog .c3-bar.top.gone { transform: translateY(-100%); } .prolog .c3-bar.bottom.gone { transform: translateY(100%); }
 .prolog .c3-stage ~ .cine-text { z-index: 2; bottom: calc(11vh + 18px); }
 .prolog .c3-stage ~ .cine-text p { background: none; }
+
+/* ---------- Filmische Fallakte (config.cineCasefile) ---------- */
+/* Vorspann: Funkprotokoll, dann Titel */
+.prolog.cf-cold { background: #000; }
+.cf-radio { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(88vw, 620px); transition: opacity 1.2s; }
+.cf-radio-head { font: 11px var(--mono, monospace); letter-spacing: .2em; color: #8a7a5c; border-bottom: 1px solid #3a3226; padding-bottom: 8px; margin: 0 0 14px; animation: cf-blink 1.4s steps(2) 2; }
+.cf-radio-line { margin: 0 0 8px; font: 15px/1.6 var(--mono, monospace); color: #d6cbb4; text-shadow: 0 0 8px #d6cbb455; }
+.cf-radio-line:last-child::after { content: "▌"; margin-left: 2px; color: #b69a6d; animation: cf-blink .8s steps(2) infinite; }
+.cf-title { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; opacity: 0; pointer-events: none; }
+.cf-title h1 { margin: 0; font: 500 clamp(34px, 7vw, 76px)/1 var(--serif, Georgia, serif); letter-spacing: .32em; color: #e8dcc0; text-indent: .32em; }
+.cf-title p { margin: 18px 0 0; font: 12px var(--mono, monospace); letter-spacing: .4em; color: #8a7a5c; }
+.cf-titled .cf-radio { opacity: 0; }
+.cf-titled .cf-title { animation: cf-title 4.2s ease forwards; }
+@keyframes cf-title { 0% { opacity: 0; filter: blur(6px); transform: scale(1.06); } 18% { opacity: 1; filter: blur(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: scale(1); } }
+@keyframes cf-blink { 50% { opacity: 0; } }
+
+/* Fallakte: Schreibtisch mit Requisiten links, Text rechts (schmal: Requisiten oben) */
+.prolog.casefile.cinefile { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 620px); gap: clamp(20px, 4vw, 56px); align-items: center; padding-left: clamp(16px, 4vw, 56px); padding-right: clamp(16px, 4vw, 56px); }
+.cinefile .pz-file { margin: 0; }
+.cf-desk { position: relative; height: min(78vh, 620px); overflow: hidden; border-radius: 4px; background:
+  radial-gradient(ellipse at 34% 28%, #6a4a2499 0, transparent 55%),
+  repeating-linear-gradient(92deg, #00000000 0 22px, #0000001a 22px 23px, #00000000 23px 61px),
+  linear-gradient(180deg, #2a1c12, #140d08); box-shadow: inset 0 0 120px #000; }
+.cf-desk::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 34% 30%, transparent 30%, #000c 100%); pointer-events: none; }
+.cf-props { position: absolute; inset: 0; animation: cf-drift 26s ease-in-out infinite alternate; transform-origin: 40% 40%; }
+@keyframes cf-drift { from { transform: scale(1.02) translate(0, 0); } to { transform: scale(1.12) translate(-3%, 2%); } }
+.cf-clip { position: absolute; left: 10%; top: 12%; width: 62%; padding: 16px 18px 20px; background: linear-gradient(#e9dfc7, #d9cba9); color: #2a2119; box-shadow: 0 18px 40px #000b; transform: rotate(-4deg); animation: cf-drop .9s cubic-bezier(.2, .8, .2, 1) both; }
+.cf-clip.b { left: 14%; top: 8%; transform: rotate(3deg); }
+.cf-clip h4 { margin: 8px 0 4px; font: 600 clamp(15px, 1.7vw, 22px)/1.2 var(--serif, Georgia, serif); }
+.cf-sub { margin: 0 0 8px; font: italic 13px var(--serif, Georgia, serif); color: #4a3e30; }
+.cf-txt { margin: 0; font: 12px/1.5 Georgia, serif; color: #3a3026; }
+.cf-lines { display: block; height: 46px; margin-top: 8px; background: repeating-linear-gradient(180deg, #3a302633 0 3px, transparent 3px 9px); }
+.cf-clock { position: absolute; right: 12%; bottom: 14%; width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(#efe6d0 55%, #b08c52 57%, #6e5632 66%, #2a1d14 68%); box-shadow: 0 12px 30px #000c; animation: cf-drop 1s .6s cubic-bezier(.2, .8, .2, 1) both; }
+.cf-clock b { font: 600 16px var(--mono, monospace); color: #2a2119; }
+.cf-photo { position: absolute; right: 10%; bottom: 12%; width: 30%; padding: 10px 10px 30px; background: #e8e2d4; box-shadow: 0 14px 34px #000c; transform: rotate(-6deg); animation: cf-drop .9s .5s cubic-bezier(.2, .8, .2, 1) both; }
+.cf-photo i { display: block; aspect-ratio: 4 / 5; background: radial-gradient(ellipse 22% 26% at 50% 38%, #4a4036 96%, transparent 100%), radial-gradient(ellipse 46% 40% at 50% 100%, #3a322a 96%, transparent 100%), linear-gradient(#6a6258, #2a2620); filter: grayscale(1) contrast(1.1); }
+.cf-photo span { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font: italic 13px var(--serif, Georgia, serif); color: #2c2a5a; }
+.cf-stamp { position: absolute; z-index: 2; left: 10%; top: 50%; padding: 8px 16px; border: 4px solid #a3302a; color: #a3302a; font: 700 clamp(16px, 2vw, 26px)/1.1 var(--mono, monospace); letter-spacing: .12em; text-align: center; transform: rotate(-12deg); opacity: 0; mix-blend-mode: multiply; animation: cf-stamp .35s 4.6s cubic-bezier(.3, 1.6, .5, 1) forwards; background: #e9dfc755; }
+@keyframes cf-stamp { from { opacity: 0; transform: rotate(-12deg) scale(2.2); } to { opacity: .9; transform: rotate(-12deg) scale(1); } }
+@keyframes cf-drop { from { opacity: 0; translate: 0 -30px; scale: 1.08; } }
+.cf-env { position: absolute; left: 14%; top: 22%; width: 66%; aspect-ratio: 16 / 10; background: linear-gradient(160deg, #d8ccb0, #b9a984); box-shadow: 0 20px 44px #000c; transform: rotate(-3deg); animation: cf-drop 1s cubic-bezier(.2, .8, .2, 1) both; overflow: hidden; }
+.cf-flap { position: absolute; left: 0; right: 0; top: 0; height: 58%; background: linear-gradient(170deg, #cbbd9c, #a8986f); clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: top; animation: cf-flap 1.2s 1.2s ease forwards; }
+@keyframes cf-flap { to { transform: scaleY(-1); filter: brightness(.8); } }
+.cf-addr { position: absolute; left: 34%; top: 58%; font: italic clamp(16px, 1.8vw, 24px) var(--serif, Georgia, serif); color: #2c2a5a; }
+.cf-env small { position: absolute; right: 8%; bottom: 8%; font: 10px var(--mono, monospace); letter-spacing: .14em; color: #6c5a44; }
+/* Text: Absätze nacheinander, Handschrift schreibt sich */
+.cinefile .cf-in { animation: cf-in 1s ease both; }
+@keyframes cf-in { from { opacity: 0; transform: translateY(8px); filter: blur(2px); } }
+.cinefile .pz-card { animation: cf-card 1.2s 1.6s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes cf-card { from { opacity: 0; transform: translateY(40px) rotate(-3deg); } }
+.cinefile .pz-card .handwriting { clip-path: inset(0 100% 0 0); animation: cf-write 3.2s 4.2s linear forwards; }
+.cinefile .pz-card .handwriting.sign { animation-delay: 7.4s; animation-duration: 1.2s; }
+@keyframes cf-write { to { clip-path: inset(0 0 0 0); } }
+.cinefile.seen *, .cinefile.seen *::after { animation-duration: 0s !important; animation-delay: 0s !important; }
+.cinefile.seen .cf-props { animation: cf-drift 26s ease-in-out infinite alternate !important; }
+@media (max-width: 900px) {
+  .prolog.casefile.cinefile { display: block; }
+  .cf-desk { height: 34vh; margin: 0 auto 18px; max-width: 620px; }
+  .cf-clip { width: 70%; padding: 10px 12px; } .cf-txt, .cf-lines { display: none; }
+  .cf-clock { width: 70px; height: 70px; } .cf-clock b { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cinefile *, .cf-cold * { animation-duration: 0s !important; animation-delay: 0s !important; }
+  .cinefile .cf-props { animation: none !important; }
+}

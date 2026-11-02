@@ -70,6 +70,24 @@
     ],
   };
 
+  /* ---------- Filmische Fallakte (nur mit config.cineCasefile, derzeit 3D-Testmodus) ----------
+     coldOpen: Funkprotokoll vom Morgen danach (nur Inhalte, die in der Fallakte und im Zeitungsartikel stehen), dann Titel.
+     props[i]: Requisiten auf dem Schreibtisch neben Seite i (reine Optik; Texte wie Dokument „zeitung“ der Rezeption). */
+  N.prolog.coldOpen = {
+    head: "FEUERWEHR · FUNKPROTOKOLL · 15.10.2009",
+    lines: ["Leitstelle, kommen.", "Hotel Nocturne. Erdgeschoss und Obergeschosse durchsucht.", "Die unteren Geschosse stehen unter Wasser.", "Gebäude leer. Keine Personen.", "Wiederhole: keine Personen."],
+    title: "HOTEL NOCTURNE", sub: "FALL 014-10",
+  };
+  const clip = (date, title, sub, text, cls) => `<div class="cf-clip ${cls}"><p class="news-head">LOKALANZEIGER · ${date}</p><h4>${title}</h4><p class="cf-sub">${sub}</p><p class="cf-txt">${text}</p><i class="cf-lines"></i></div>`;
+  N.prolog.props = [
+    `${clip("FREITAG, 16. OKTOBER 2009", "Hotel Nocturne nach Unwetternacht geschlossen", "Sechs Gäste vermisst – Nachtmanager verschwunden", "In der Nacht zum Donnerstag fiel im traditionsreichen Hotel Nocturne um 23:17 Uhr der Strom aus …", "a")}
+     <div class="cf-clock"><b>23:17</b></div>`,
+    `${clip("MITTWOCH, 21. OKTOBER 2009", "Vermisste Hotelgäste lebend aufgefunden", "Ermittlungen gegen Nachtmanager wegen versuchten Mordes", "Alle sechs Gäste des Hotel Nocturne sind wieder aufgetaucht – unterkühlt, erschöpft und verstört …", "b")}
+     <div class="cf-photo"><i></i><span>E. Voss · Nachtmanager</span></div>
+     <div class="cf-stamp">FAHNDUNG<br>OHNE ERGEBNIS</div>`,
+    `<div class="cf-env"><i class="cf-flap"></i><span class="cf-addr">{name}</span><small>kein Absender</small></div>`,
+  ];
+
   /* Die Fallakte liegt danach auch in der Akte (für alle, die sie im Multiplayer übersprungen haben) */
   N.docs.fallakte = {
     title: "Fallakte 014-10 – die offizielle Version", kind: "letter", pageLabels: N.prolog.casefile.map((c) => c.title),

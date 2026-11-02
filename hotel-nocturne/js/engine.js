@@ -1160,13 +1160,49 @@
       onDone();
       if (queued) setTimeout(queued, 60);
     };
+    // Filmische Fallakte (config.cineCasefile): Vorspann, Schreibtisch mit Requisiten, Schreibmaschine, Stempel, Handschrift
+    const cf = Boolean(N.config.cineCasefile && P.props), seen = new Set();
+    const typeInto = (node, text, ms, done) => {
+      if (!node) return; node.textContent = ""; let k = 0;
+      const step = () => { if (!node.isConnected) return; node.textContent = text.slice(0, ++k); if (k % 2) A.play("key"); if (k < text.length) prologTimer = setTimeout(step, ms); else if (done) done(); };
+      prologTimer = setTimeout(step, ms);
+    };
+    const showCold = (then) => {
+      const C = P.coldOpen;
+      el.className = "prolog show cine cf-cold"; el.onclick = null;
+      el.innerHTML = `<div class="cf-radio"><p class="cf-radio-head">${esc(C.head)}</p><div class="cf-radio-lines"></div></div>
+        <div class="cf-title"><h1>${esc(C.title)}</h1><p>${esc(C.sub)}</p></div><button class="cine-btn" type="button">Überspringen ›</button>`;
+      const box = $(".cf-radio-lines", el); let n = 0, over = false;
+      const go = () => { if (over) return; over = true; clearTimeout(prologTimer); then(); };
+      $(".cine-btn", el).onclick = go;
+      const line = () => {
+        if (over) return;
+        if (n >= C.lines.length) { // Titel mit Blitz und Donner
+          prologTimer = setTimeout(() => { if (over) return; el.classList.add("cf-titled"); document.body.classList.add("flash"); setTimeout(() => document.body.classList.remove("flash"), 140); A.play("thunder"); prologTimer = setTimeout(go, 4200); }, 900);
+          return;
+        }
+        const p = document.createElement("p"); p.className = "cf-radio-line"; box.appendChild(p); A.play("light");
+        typeInto(p, "– " + C.lines[n++], 34, () => { prologTimer = setTimeout(line, n === C.lines.length ? 1400 : 650); });
+      };
+      prologTimer = setTimeout(line, 900);
+    };
     const showCase = (i) => {
       const c = P.casefile[i], last = i === P.casefile.length - 1;
-      el.className = "prolog show casefile";
-      el.innerHTML = `<div class="pz-file"><p class="eyebrow">${esc(c.kicker)}</p><h2>${esc(c.title)}</h2><div class="pz-body">${fill(c.html)}</div>
+      clearTimeout(prologTimer);
+      el.className = "prolog show casefile" + (cf ? " cinefile" + (seen.has(i) ? " seen" : "") : "");
+      el.innerHTML = (cf ? `<div class="cf-desk" aria-hidden="true"><div class="cf-props cf-p${i}">${fill(P.props[i] || "")}</div></div>` : "") + `<div class="pz-file"><p class="eyebrow">${esc(c.kicker)}</p><h2>${esc(c.title)}</h2><div class="pz-body">${fill(c.html)}</div>
         <div class="pz-nav">${i ? `<button class="ghost-button" data-pz="back">‹ Zurück</button>` : "<span></span>"}<span class="pz-dots">${P.casefile.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</span>
         <button class="primary-button small" data-pz="next">${last ? esc(readyLabel) : "Weiter"} <span>→</span></button></div></div>`;
       A.play("paper"); voice(c.voice);
+      if (cf) {
+        const first = !seen.has(i); seen.add(i);
+        if (first) {
+          const h2 = $(".pz-file h2", el); typeInto(h2, c.title, 42);
+          $$(".pz-body > *", el).forEach((x, k) => { x.classList.add("cf-in"); x.style.animationDelay = (0.5 + c.title.length * 0.042 + k * 0.9).toFixed(2) + "s"; });
+          if (i === 1) setTimeout(() => { if (el.querySelector(".cf-stamp")) A.play("drop"); }, 4600); // Stempel
+          if (i === P.casefile.length - 1) setTimeout(() => { const td = $(".pz-card .doc-kv td", el); if (td && td.isConnected) typeInto(td, td.textContent, 90); }, 2600);
+        }
+      }
       el.onclick = (e) => {
         const b = e.target.closest("[data-pz]");
         if (!b) return;
@@ -1183,7 +1219,7 @@
       const c3 = N.view3d && N.view3d.cinema ? N.view3d.cinema(el, { steps: P.arrival, voice, onDone: finish }) : null;
       cine = c3 || playCinematic(el, P.arrival, { control: "skip", onDone: finish });
     };
-    if (casefile) showCase(0); else showArrival();
+    if (casefile) { if (cf && P.coldOpen) showCold(() => showCase(0)); else showCase(0); } else showArrival();
   }
 
   function start() {

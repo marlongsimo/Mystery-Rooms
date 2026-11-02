@@ -101,3 +101,16 @@ export function ornateFrame(w, h, picMat, frameMat, depth = 0.05, border = 0.07)
   const back = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.01), new THREE.MeshStandardMaterial({ color: 0x0a0806 })); back.position.z = -depth / 2; g.add(back);
   return g;
 }
+
+/** Tischlampe aus Code: gedrechselter Messingfuß, Stoffschirm, warm leuchtend (Bloom). Höhe ca. hgt. */
+export function tableLamp(hgt = 0.55, shadeColor = 0x8a5a34, brass = brassMat()) {
+  const g = new THREE.Group();
+  const base = [[0, 0], [0.09, 0], [0.095, 0.015], [0.06, 0.035], [0.03, 0.06], [0.022, hgt * 0.25], [0.04, hgt * 0.32], [0.02, hgt * 0.4], [0.014, hgt * 0.6], [0, hgt * 0.6]];
+  g.add(new THREE.Mesh(new THREE.LatheGeometry(base.map(([a, b]) => new THREE.Vector2(a, b)), 20), brass));
+  const shadeMat = new THREE.MeshStandardMaterial({ color: shadeColor, emissive: 0xff9a40, emissiveIntensity: 0.55, roughness: 0.9, side: THREE.DoubleSide });
+  const shade = new THREE.Mesh(new THREE.CylinderGeometry(hgt * 0.2, hgt * 0.36, hgt * 0.38, 28, 1, true), shadeMat); shade.position.y = hgt * 0.74; g.add(shade);
+  const trim = (r, y) => { const t = new THREE.Mesh(new THREE.TorusGeometry(r, 0.006, 6, 28), brass); t.rotation.x = Math.PI / 2; t.position.y = y; g.add(t); };
+  trim(hgt * 0.2, hgt * 0.93); trim(hgt * 0.36, hgt * 0.55);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(hgt * 0.07, 12, 10), new THREE.MeshBasicMaterial({ color: 0xfff0c8 })); bulb.position.y = hgt * 0.68; g.add(bulb);
+  return g;
+}

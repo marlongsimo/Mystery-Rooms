@@ -7,7 +7,7 @@
  */
 // Version im Import = Cache-Steuerung; core.js darf nur einmal (mit derselben URL) geladen werden
 import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group, wallMesh, walls } from "./core.js?v=3";
-import { woodMat, brassMat, velvetMat, leatherMat, damask, marble, persian, rbox, panel, turnedLeg, ornateFrame, std } from "./hd.js?v=1";
+import { woodMat, brassMat, velvetMat, leatherMat, damask, marble, persian, rbox, panel, turnedLeg, ornateFrame, std, tableLamp } from "./hd.js?v=2";
 import { tag } from "./gfx.js?v=1";
 
 const R = 3.2, H = 3.4;
@@ -181,8 +181,8 @@ defineRoom("rezeption", (ctx) => {
   bell.children[1].position.y = 0.02;
   add(place(hs("klingel", bell), "n", 0.73, 1.11, 1.35));
   // Tischlampe (warmes Licht)
-  // Tiffany-Lampe (Modell, CC BY 4.0 Wayfair – siehe assets/3d/LIZENZEN.md); Hauptlicht der Rezeption mit Schatten
-  const lamp = ctx.model("tiffany-lamp.glb", { fit: { h: 0.6 } });
+  // Tischlampe aus Code; Hauptlicht der Rezeption mit Schatten
+  const lamp = tableLamp(0.6, 0x7a4a26);
   add(place(lamp, "n", 0.84, 1.11, 1.1));
   const lampLight = new THREE.PointLight(0xffb066, 9, 0, 2); place(lampLight, "n", 0.84, 1.5, 1.2); lampLight.userData.shadow = true; add(lampLight);
   anim((dt, t) => { lampLight.intensity = 9 + Math.sin(t * 13) * 0.12 + (Math.random() < 0.004 ? -2 : 0); });
@@ -292,10 +292,13 @@ defineRoom("rezeption", (ctx) => {
   for (let i = 0; i < 9; i++) shelf.add(box(0.13, 0.46 - (i % 3) * 0.05, 0.25, lambert(cols[(i + 2) % cols.length]), -0.85 + i * 0.15 + 0.065, 0.64 + 0.23 - (i % 3) * 0.025, 0));
   add(place(hs("regal", shelf), "w", 0.26, 1.2, 0.17));
   // Sofa (roter Samt)
-  // Viktorianisches Ledersofa (Modell, CC BY 4.0 DGG); Ersatz aus Samt, falls das Modell nicht lädt; feste Klickfläche
-  const sofaOld = group(rbox(2.0, 0.42, 0.85, M.velvet, 0, 0.21, 0, 0.06), rbox(2.0, 0.6, 0.2, M.velvet, 0, 0.62, -0.33, 0.06), rbox(0.2, 0.62, 0.85, M.velvet, -1.0, 0.31, 0, 0.06), rbox(0.2, 0.62, 0.85, M.velvet, 1.0, 0.31, 0, 0.06));
-  const sofaModel = ctx.model("leather-sofa.glb", { fit: { w: 2.1 }, onLoad: () => { sofaOld.visible = false; } });
-  add(place(hs("sofa", group(sofaOld, sofaModel, box(2.1, 0.95, 0.9, ZONE, 0, 0.47, 0))), "w", 0.3, 0, 0.6));
+  // Samtsofa: Polster mit runden Kanten, Armrollen, Knöpfe in der Lehne, Holzzarge, gedrechselte Füße; feste Klickfläche
+  const sofa = group(rbox(1.9, 0.16, 0.8, M.velvet, 0, 0.42, 0.02, 0.07), rbox(1.95, 0.62, 0.22, M.velvet, 0, 0.74, -0.33, 0.09),
+    rbox(1.98, 0.14, 0.82, M.wood, 0, 0.27, 0, 0.03), box(2.1, 0.95, 0.9, ZONE, 0, 0.47, 0));
+  [-1, 1].forEach((sx) => { const arm = cyl(0.13, 0.13, 0.8, M.velvet, sx * 0.98, 0.62, 0.0, 24); arm.rotation.x = Math.PI / 2; sofa.add(arm, rbox(0.18, 0.36, 0.78, M.velvet, sx * 0.98, 0.44, 0, 0.06)); });
+  for (let i = 0; i < 5; i++) sofa.add(new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 6), M.brassDark).translateX(-0.7 + i * 0.35).translateY(0.82).translateZ(-0.21));
+  [[-0.85, -0.3], [0.85, -0.3], [-0.85, 0.32], [0.85, 0.32]].forEach(([x, z]) => { const l = turnedLeg(0.2, 0.035, M.wood); l.position.set(x, 0, z); sofa.add(l); });
+  add(place(hs("sofa", sofa), "w", 0.3, 0, 0.6));
   // Porträt Viktor Lehn – als einziges Bild exakt gerade
   const portrait = group(ornateFrame(0.8, 1.0, lambert(0xffffff, { map: portraitTex() }), brassMat(0x9a7434, 0.38)), plane(0.26, 0.06, lambert(0xffffff, { map: plaqueTex("V. LEHN", 256, 60, "#d4bc90", "#3a2a18", "600 30px Georgia, serif", 4) }), 0, -0.6, 0.0));
   add(place(hs("portraet", portrait), "w", 0.6, 2.25, 0.03));
@@ -308,8 +311,8 @@ defineRoom("rezeption", (ctx) => {
   chair.rotation.y = -0.9; // schaut zum Eingang (Süden)
   add(place(hs("sessel", chair), "w", 0.52, 0, 1.55)); // frei vor der Treppe, damit man unter sie leuchten kann
   // Beistelltisch mit Lampe
-  // Beistelltisch (gedrechselt) mit Jugendstil-Lampe (Modell, CC BY 4.0 DGG)
-  const side = group(cyl(0.24, 0.24, 0.035, M.woodLight, 0, 0.62, 0, 32), turnedLeg(0.6, 0.05, M.wood), cyl(0.18, 0.2, 0.03, M.wood, 0, 0.015, 0, 24), ctx.model("nouveau-lamp.glb", { fit: { h: 0.5 } }));
+  // Beistelltisch (gedrechselt) mit kleiner Tischlampe
+  const side = group(cyl(0.24, 0.24, 0.035, M.woodLight, 0, 0.62, 0, 32), turnedLeg(0.6, 0.05, M.wood), cyl(0.18, 0.2, 0.03, M.wood, 0, 0.015, 0, 24), tableLamp(0.42, 0x8a6a40));
   side.children[3].position.y = 0.64;
   add(place(side, "w", 0.46, 0, 0.55));
   const sideL = new THREE.PointLight(0xffa860, 1.6, 0, 2); place(sideL, "w", 0.46, 1.0, 0.55); add(sideL);

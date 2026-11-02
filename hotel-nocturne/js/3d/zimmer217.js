@@ -9,7 +9,7 @@
  */
 import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
 import { textTex, wallpaper, woodTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=2";
-import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame } from "./hd.js?v=1";
+import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame, tableLamp } from "./hd.js?v=2";
 import { tag } from "./gfx.js?v=1";
 
 const R = 2.6, H = 3.0;
@@ -122,8 +122,8 @@ defineRoom("zimmer217", (ctx) => {
   const lake = ornateFrame(0.96, 0.66, lambert(0xffffff, { map: lakeTex() }), brassMat(0x8a6830, 0.38), 0.05, 0.08);
   add(place(hs("bild_bett", lake), "e", 0.5, 1.78, 0.02));
   // Nachttische: links mit Lampe, rechts (Hotspot) mit Sanduhr
-  // Nachttisch links mit Jugendstil-Lampe (Modell, CC BY 4.0 DGG) – Hauptlicht mit Schatten
-  const nsL = group(rbox(0.45, 0.55, 0.4, M.woodDark, 0, 0.275, 0, 0.02), panel(0.36, 0.2, M.wood, 0, 0.4, 0.2), ctx.model("nouveau-lamp.glb", { fit: { h: 0.48 } }));
+  // Nachttisch links mit Tischlampe – Hauptlicht mit Schatten
+  const nsL = group(rbox(0.45, 0.55, 0.4, M.woodDark, 0, 0.275, 0, 0.02), panel(0.36, 0.2, M.wood, 0, 0.4, 0.2), tableLamp(0.48, 0x7a4a2a));
   nsL.children[2].position.y = 0.55;
   add(place(nsL, "e", 0.13, 0, 0.25));
   const lampL = new THREE.PointLight(0xffb066, 6, 0, 2); place(lampL, "e", 0.13, 0.95, 0.35); lampL.userData.shadow = true; add(lampL);

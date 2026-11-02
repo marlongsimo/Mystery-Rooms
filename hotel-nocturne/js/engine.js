@@ -1179,7 +1179,9 @@
     const showArrival = () => {
       el.className = "prolog show cine";
       el.onclick = null;
-      cine = playCinematic(el, P.arrival, { control: "skip", onDone: finish });
+      // 3D-Testmodus: Ankunft als Kamerafahrt durch die echte 3D-Rezeption (js/3d/intro.js) – sonst die Bildfolge
+      const c3 = N.view3d && N.view3d.cinema ? N.view3d.cinema(el, { steps: P.arrival, voice, onDone: finish }) : null;
+      cine = c3 || playCinematic(el, P.arrival, { control: "skip", onDone: finish });
     };
     if (casefile) showCase(0); else showArrival();
   }

@@ -187,6 +187,7 @@ const ptrs = new Map();
 let drag = null, pinch0 = null;
 function bindInput() {
   canvas.addEventListener("pointerdown", (e) => {
+    if (cine) return; // Intro läuft: Kamera gehört dem Drehbuch
     canvas.setPointerCapture(e.pointerId);
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = { d: Math.hypot(a.x - b.x, a.y - b.y), fov }; drag = null; return; }
@@ -204,7 +205,7 @@ function bindInput() {
       if (drag.moved > 8) { hideTip(); hideHint(); }
       return;
     }
-    if (e.pointerType === "mouse") hover(e.clientX, e.clientY);
+    if (e.pointerType === "mouse" && !cine) hover(e.clientX, e.clientY);
   });
   const up = (e) => {
     ptrs.delete(e.pointerId);
@@ -217,7 +218,7 @@ function bindInput() {
   canvas.addEventListener("pointerup", up);
   canvas.addEventListener("pointercancel", (e) => { ptrs.delete(e.pointerId); drag = null; pinch0 = null; });
   canvas.addEventListener("pointerleave", () => { if (!drag) hideTip(); });
-  canvas.addEventListener("wheel", (e) => { e.preventDefault(); setFov(fov * (e.deltaY > 0 ? 1.07 : 0.93)); }, { passive: false });
+  canvas.addEventListener("wheel", (e) => { e.preventDefault(); if (cine) return; setFov(fov * (e.deltaY > 0 ? 1.07 : 0.93)); }, { passive: false });
   canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 function setFov(v) { fov = Math.max(34, Math.min(80, v)); camera.fov = fov; camera.updateProjectionMatrix(); }
@@ -246,16 +247,19 @@ function frame() {
   if (!canvas.isConnected) { running = false; return; }
   requestAnimationFrame(frame);
   const dt = Math.min(0.05, clock.getDelta()), t = clock.elapsedTime;
-  if (targetYaw !== null) {
-    const d = targetYaw - yaw; yaw += d * Math.min(1, dt * 7);
-    if (Math.abs(d) < 0.002) { yaw = targetYaw; targetYaw = null; }
+  if (cine) cine.update(dt, t); // Intro: Kamera, Taschenlampe und Licht kommen aus dem Drehbuch
+  else {
+    if (targetYaw !== null) {
+      const d = targetYaw - yaw; yaw += d * Math.min(1, dt * 7);
+      if (Math.abs(d) < 0.002) { yaw = targetYaw; targetYaw = null; }
+    }
+    camera.rotation.set(pitch, yaw, 0, "YXZ");
+    // Taschenlampe: am Computer folgt sie der Maus, am Handy zeigt sie geradeaus
+    const L = E().isLight();
+    flash.intensity += ((L ? 40 : 0) - flash.intensity) * Math.min(1, dt * 10);
+    const aim = isTouch() ? new THREE.Vector2(0, 0) : flashAim;
+    flashTarget.position.set(aim.x * Math.tan(camera.fov * Math.PI / 360) * camera.aspect, aim.y * Math.tan(camera.fov * Math.PI / 360), -1);
   }
-  camera.rotation.set(pitch, yaw, 0, "YXZ");
-  // Taschenlampe: am Computer folgt sie der Maus, am Handy zeigt sie geradeaus
-  const L = E().isLight();
-  flash.intensity += ((L ? 40 : 0) - flash.intensity) * Math.min(1, dt * 10);
-  const aim = isTouch() ? new THREE.Vector2(0, 0) : flashAim;
-  flashTarget.position.set(aim.x * Math.tan(camera.fov * Math.PI / 360) * camera.aspect, aim.y * Math.tan(camera.fov * Math.PI / 360), -1);
   if (boltLight.intensity > 0) boltLight.intensity = Math.max(0, boltLight.intensity - dt * 22);
   built.anims.forEach((fn) => fn(dt, t));
   if (dustP) dustP.userData.tick(dt, t);
@@ -287,6 +291,7 @@ function applyState() {
   if (built.markers) built.markers.forEach((s) => { s.visible = on && ownerVisible(s.userData.e) && shown(s.userData.e.obj); });
 }
 function render(stage, r, i) {
+  if (cine) return; // während des Intros nicht umhängen
   if (!init()) return;
   if (!wrap.isConnected || wrap.parentNode !== stage) { stage.innerHTML = ""; stage.appendChild(wrap); }
   if (roomId !== r.id) { buildRoom(r); yaw = yawOf(i); pitch = -0.04; targetYaw = null; lastIndex = i; }
@@ -313,4 +318,33 @@ function aimAt(id) {
 }
 N.view3d = { supports, render, pickAt, aimAt, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0 }) };
 // Falls das Spiel schon läuft, als die Module fertig geladen waren: jetzt auf 3D umschalten
+/* ---------- Kinomodus für das Intro (js/3d/intro.js) ----------
+   Leiht sich Renderer, Kamera und den fertig gebauten Raum: Das Intro fährt durch dieselbe Szene,
+   in der danach gespielt wird – am Ende steht die Kamera genau auf der Startansicht. */
+let cine = null;
+export function cinemaHost() {
+  return {
+    begin(container, roomId, update) {
+      if (!BUILDERS[roomId] || !init()) return null;
+      container.appendChild(wrap);
+      buildRoom({ id: roomId }); yaw = 0; pitch = -0.04; targetYaw = null; lastIndex = 0;
+      applyState();
+      cine = { update }; hideTip(); if (hintEl) hintEl.classList.add("gone");
+      camera.far = 160; camera.updateProjectionMatrix();
+      resize(); startLoop();
+      const objOf = (id) => { const e = built.pick.find((x) => x.ids.includes(id)); return e ? e.obj : null; };
+      return { scene, camera, flash, bolt: boltLight, renderer, objOf, eye: built.eye.slice() };
+    },
+    end() {
+      if (!cine) return;
+      cine = null; fov = 68; camera.fov = fov; camera.far = 40; camera.updateProjectionMatrix();
+      if (built) camera.position.set(...built.eye);
+      yaw = 0; pitch = -0.04; targetYaw = null; lastIndex = 0; camera.rotation.set(pitch, yaw, 0, "YXZ");
+      if (boltLight) boltLight.position.set(0, 3, 6);
+      if (hintEl) { hintEl.classList.remove("gone"); setTimeout(() => hintEl.classList.add("gone"), 9000); }
+    },
+    active: () => Boolean(cine),
+    prepare: GFX.prepareScene, quality: GFX.Q,
+  };
+}
 export function ready() { if (N.engine && N.engine.refresh) N.engine.refresh(); }

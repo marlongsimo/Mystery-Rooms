@@ -58,7 +58,7 @@ const photoTex = () => textTex(400, 280, "#cbb796", (g) => {
   g.fillStyle = "#9a8462"; g.fillRect(0, 170, 400, 110);
   g.fillStyle = "#3e3020"; for (let i = 0; i < 5; i++) { const x = 70 + i * 65, y = 120 + (i % 2) * 6; g.beginPath(); g.arc(x, y, 18, 0, Math.PI * 2); g.fill(); g.fillRect(x - 24, y + 18, 48, 110); }
   g.fillStyle = "rgba(60,40,20,.25)"; g.fillRect(0, 0, 400, 280);
-  g.fillStyle = "#2a2119"; g.font = "italic 16px Georgia, serif"; g.fillText("Personal, Sommer 2009", 14, 268);
+  g.fillStyle = "#2a2119"; g.font = "italic 16px Georgia, serif"; g.fillText("Personal, Sommer 2008", 14, 268); // wie Dokument „personalfoto“
 });
 const pageTex = (lines = 14, red = false) => textTex(256, 340, "#ece2c8", (g) => {
   g.strokeStyle = "#8a7d66"; g.lineWidth = 2;
@@ -75,14 +75,15 @@ const dialTex = (needleTo2) => textTex(512, 256, "#1a120c", (g) => {
   pos.forEach((t, i) => { const a = Math.PI + (i + 0.5) / 4 * Math.PI; g.fillText(t, 256 + Math.cos(a) * 160, 230 + Math.sin(a) * 160); });
   const a2 = Math.PI + 2.5 / 4 * Math.PI; g.strokeStyle = "#d4362a"; g.lineWidth = 5; g.beginPath(); g.arc(256 + Math.cos(a2) * 160, 230 + Math.sin(a2) * 160, 36, 0, Math.PI * 2); g.stroke(); // rot eingekreiste 2
 });
+// Inhalt wie Dokument „zeitung“ (Seite 1): Lokalanzeiger, Freitag, 16. Oktober 2009
 const newsTex = () => textTex(300, 400, "#e4dccb", (g) => {
-  g.fillStyle = "#1b1612"; g.font = "700 30px Georgia, serif"; g.fillText("Nordstädter Kurier", 18, 44);
-  g.fillRect(18, 56, 264, 3); g.font = "700 25px Georgia, serif";
-  ["Hotel Nocturne:", "Sechs Gäste, eine", "Nacht, keine Spur"].forEach((t, i) => g.fillText(t, 18, 98 + i * 30));
+  g.fillStyle = "#1b1612"; g.font = "700 30px Georgia, serif"; g.fillText("LOKALANZEIGER", 18, 44);
+  g.fillRect(18, 56, 264, 3); g.font = "700 23px Georgia, serif";
+  ["Hotel Nocturne nach", "Unwetternacht", "geschlossen"].forEach((t, i) => g.fillText(t, 18, 96 + i * 28));
   g.fillStyle = "#6a6052"; g.fillRect(18, 190, 120, 90);
   g.fillStyle = "#5a5246"; for (let i = 0; i < 14; i++) g.fillRect(150, 192 + i * 13, 120 - (i % 3) * 18, 5);
   for (let i = 0; i < 8; i++) g.fillRect(18, 296 + i * 12, 250 - (i % 4) * 30, 5);
-  g.font = "13px Georgia, serif"; g.fillStyle = "#3a332a"; g.fillText("15. Oktober 2009", 18, 392);
+  g.font = "13px Georgia, serif"; g.fillStyle = "#3a332a"; g.fillText("Freitag, 16. Oktober 2009", 18, 392);
 });
 const glassTex = () => canvasTex(512, 256, (g, w, h) => {
   g.clearRect(0, 0, w, h); g.fillStyle = "rgba(230,220,200,.75)"; g.font = "500 72px Georgia, serif"; g.textAlign = "center"; g.textBaseline = "middle";

@@ -7,7 +7,7 @@ Stand: Prototyp **Rezeption** als 360°-Raum. Alle anderen Räume laufen auf der
 ## Grundsätze
 
 1. **Die Engine bleibt die einzige Wahrheit.** Die 3D-Schicht zeichnet nur. Ein Klick auf ein 3D-Objekt ruft `NOCTURNE.engine.hotspot(id)` – dieselbe Funktion wie ein Klick in 2D. Inventar, Telefon, Rätsel, Dokumente, Spielstand und Raumwechsel sind unverändert.
-2. **Die normale Version bleibt unberührt.** `index.html` lädt keine 3D-Dateien. Der Testmodus hat einen eigenen Spielstand (`nocturne_save_3d_v2`).
+2. **Die normale Version verhält sich unverändert.** Geändert wurden `engine.js` (kleine Schnittstelle, 2D-Pfad unverändert) und `index.html` (Link zum Testmodus); 3D-Dateien lädt `index.html` nicht. Der Testmodus hat einen eigenen Spielstand (`nocturne_save_3d_v2`).
 3. **Keine fremden Modelle (vorerst).** Alles ist mit three.js aus Code gebaut; Texturen (Tapete, Holz, Uhr, Schilder …) werden zur Laufzeit auf Canvas gezeichnet.
 
 ## Dateien
@@ -44,18 +44,24 @@ defineRoom("zimmer217", (ctx) => {
 | Hinweis | Umsetzung |
 |---|---|
 | Uhr steht auf 23:17, Glas gesprungen | Zifferblatt-Textur mit Zeigern auf 23:17 |
-| Gästeregister aufgeschlagen, lose Seite | Buch mit Lesebändchen, gelbliches Blatt (verschwindet nach dem Lesen, Klickfläche bleibt) |
+| Gästeregister aufgeschlagen, lose Seite | Buch mit Lesebändchen, gelbliches Blatt. Nach dem Lesen verschwindet das Blatt, die Stelle bleibt anklickbar – genau wie in 2D (der Hotspot hat dort keine Bedingung, nur die Zeichnung im Bild verschwindet). |
+| Personalfoto, Zeitungsartikel | Beschriftung wie in den Dokumenten: „Sommer 2008“, „Lokalanzeiger, Freitag, 16. Oktober 2009 – Hotel Nocturne nach Unwetternacht geschlossen“ |
 | Anzeige am Aufzug steht auf E, „2“ rot eingekreist | Skala mit Kreis um 2, Zeiger wandert nach dem Schlüsselschalter auf 2 |
 | Messingabdeckung, vier Schrauben | Platte → nach dem Schraubendreher Schlüsselschalter mit Lämpchen |
 | Unter der Treppe stockdunkel | Hohlraum schwarz; mit Taschenlampe (Lichtkegel folgt Maus/Blickmitte) sichtbar |
 | Nur das Porträt hängt gerade | Personalfoto und Zeitungsartikel leicht schief |
 | Ordner „ABR. 10/09“ | beschrifteter Ordner im Regal |
 
-## Tests (Playwright, Software-Rendering)
+## Tests
 
-- Alle Hotspots im Startzustand per 3D-Klick ausgelöst und mit 2D verglichen (gleicher Dialog).
-- Rezeption komplett in 3D durchgespielt: Code 2117 → Taschenlampe → Schraubendreher → Abdeckung → Schlüsselschalter → Aufzug → Zimmer 217 (2D).
-- Neuladen behält den Zustand; normaler Spielstand bleibt unberührt.
-- Touch (iPad, iPhone quer/hochkant emuliert): Tippen untersucht, Wischen dreht, ohne versehentliches Öffnen.
+Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m http.server 8765 &`):
+
+| Datei | Prüft | Dauer |
+|---|---|---|
+| `3d-hinweise.test.js` | Alle sichtbaren Texte der 3D-Texturen stehen so auch in der Raumdatei (keine erfundenen Namen/Daten) | < 1 s, ohne Browser |
+| `3d-rezeption.test.js` | Jeder Hotspot im Startzustand: 3D-Klick öffnet denselben Dialog wie 2D · Durchlauf Code 2117 → Taschenlampe → Schraubendreher → Abdeckung → Schlüsselschalter → Aufzug → Zimmer 217 · Neuladen · getrennter Spielstand | ca. 3 min (Software-Rendering) |
+| `3d-touch.test.js` | iPhone quer/hochkant (emuliert): Tippen untersucht, Wischen dreht ohne Fehlauslösung | ca. 1 min |
+
+Letzter Lauf (02.11.2026): 22/22 Hotspots gleich wie 2D, Durchlauf vollständig, keine Fehler.
 
 Nicht prüfbar hier: Bildrate und Gefühl auf echten Geräten, Safari/iOS-WebGL.

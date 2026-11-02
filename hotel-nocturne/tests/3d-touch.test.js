@@ -19,7 +19,7 @@ const { chromium, devices } = require('playwright');
     const pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('register')); await p.waitForTimeout(200);
     await p.touchscreen.tap(pt.x, pt.y); await p.waitForTimeout(600);
     const t = await p.evaluate(() => document.querySelector('#dialog').open ? document.querySelector('#dlgTitle').textContent : null);
-    await p.screenshot({ path: `touch-${dev.replace(/\W+/g, '_')}.png` });
+    await p.screenshot({ path: require('os').tmpdir() + `/touch-${dev.replace(/\W+/g, '_')}.png` });
     if (t) await p.tap('#closeDialog'); await p.waitForTimeout(300);
     const cdp = await ctx.newCDPSession(p); const c = await p.$eval('canvas.n3d', (x) => { const r = x.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
     const v0 = await p.textContent('#viewName');

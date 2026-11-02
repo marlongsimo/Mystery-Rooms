@@ -6,11 +6,12 @@
  * Braucht Playwright mit Chromium (Software-Rendering per SwiftShader reicht, ist aber langsam: ca. 3 Minuten).
  */
 const BASE = process.env.BASE || 'http://localhost:8765';
+const QUAL = process.env.Q || 'low'; // Grafikstufe; low = schnell im Software-Rendering, high/medium für Gerätetests
 const { chromium, devices } = require('playwright');
 (async () => { const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
   for (const dev of ['iPhone 13 landscape', 'iPhone 13']) {
     const ctx = await b.newContext({ ...devices[dev] }); const p = await ctx.newPage(); p.setDefaultTimeout(20000); p.on('pageerror', e => errs.push(dev + ' ' + e.message));
-    await p.goto(BASE + '/hotel-nocturne/3d.html'); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(400);
+    await p.goto(BASE + '/hotel-nocturne/3d.html?q=' + QUAL); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(400);
     await p.tap('#startButton'); await p.waitForTimeout(500);
     for (let i = 0; i < 10; i++) { const n = await p.$('[data-pz="next"]'); if (!n) break; await n.tap(); await p.waitForTimeout(200); }
     await p.waitForTimeout(300); if (await p.$('.cine-btn')) await p.tap('.cine-btn'); await p.waitForTimeout(800);

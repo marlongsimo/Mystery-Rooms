@@ -6,6 +6,7 @@
  * Braucht Playwright mit Chromium (Software-Rendering per SwiftShader reicht, ist aber langsam: ca. 3 Minuten).
  */
 const BASE = process.env.BASE || 'http://localhost:8765';
+const QUAL = process.env.Q || 'low'; // Grafikstufe; low = schnell im Software-Rendering, high/medium für Gerätetests
 const { chromium, devices } = require('playwright');
 const OUT = require('os').tmpdir() + '/';
 const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
@@ -32,7 +33,7 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
   // ---- 3D
   await p2.close(); const p = await b.newPage({ viewport: { width: 1280, height: 860 } }); p.setDefaultTimeout(15000);
   p.on('pageerror', e => errs.push('3D ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('3D console ' + m.text()); });
-  await enter(p, BASE + '/hotel-nocturne/3d.html');
+  await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL);
   const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return 'kein Objekt'; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350); return pt; };
   let same = 0, diff = [];
   for (const id of Object.keys(ref)) {
@@ -45,17 +46,17 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
   const st = () => p.evaluate(() => { const s = JSON.parse(localStorage.getItem('nocturne_save_3d_v2')); return { inv: s.inventory.join(','), flags: s.flags.filter((f) => !f.startsWith('evt_')).join(','), room: s.current }; });
   await click3d('schluesselkasten'); for (const k of '2117') await p.click(`[data-key="${k}"]`); await p.waitForTimeout(500);
   console.log('Code 2117 →', JSON.stringify(await st())); await closeDlg(p); await p.waitForTimeout(1200);
-  await p.screenshot({ path: OUT + 'p-keybox.png' });
+  await p.screenshot({ path: OUT + 'p-keybox.png', timeout: 90000 });
   await p.click('#phoneButton'); await p.waitForTimeout(300); await p.click('[data-app="licht"]'); await p.waitForTimeout(500);
   console.log('Taschenlampe an:', await p.evaluate(() => NOCTURNE.engine.isLight()));
   const pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('schraubendreher')); await p.mouse.move(pt.x, pt.y); await p.waitForTimeout(800);
-  await p.screenshot({ path: OUT + 'p-light.png' });
+  await p.screenshot({ path: OUT + 'p-light.png', timeout: 90000 });
   await click3d('schraubendreher'); console.log('Schraubendreher →', (await st()).inv); await closeDlg(p);
   await p.click('[data-slot="schraubendreher"]'); await p.waitForTimeout(200); await click3d('abdeckung'); await p.waitForTimeout(300);
   console.log('Abdeckung →', (await st()).flags); await closeDlg(p);
   await p.click('[data-slot="key217"]'); await p.waitForTimeout(200); await click3d('schalter'); await p.waitForTimeout(300);
   console.log('Schalter →', (await st()).flags); await closeDlg(p); await p.waitForTimeout(2500);
-  await p.evaluate(() => NOCTURNE.view3d.aimAt('aufzug_offen')); await p.waitForTimeout(400); await p.screenshot({ path: OUT + 'p-elevator.png' });
+  await p.evaluate(() => NOCTURNE.view3d.aimAt('aufzug_offen')); await p.waitForTimeout(400); await p.screenshot({ path: OUT + 'p-elevator.png', timeout: 90000 });
   // Schublade (reine Optik)
   const dr = await p.evaluate(() => NOCTURNE.view3d.aimAt('Schublade')); await p.mouse.click(dr.x, dr.y); await p.waitForTimeout(600);
   console.log('Schublade:', (await p.textContent('#narration')).slice(0, 60));

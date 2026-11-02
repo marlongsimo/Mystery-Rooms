@@ -10,6 +10,7 @@
  * Die Pfeile ‹ › drehen um 90° (= die vier Blickrichtungen der Raumdatei).
  */
 import * as THREE from "../../../platform/vendor/three-0.170.0/three.module.min.js";
+import * as GFX from "./gfx.js?v=1";
 
 const N = window.NOCTURNE;
 const E = () => N.engine;
@@ -69,7 +70,7 @@ export function walls(R) {
 
 /* ---------- Zustand der Ansicht ---------- */
 let renderer = null, webgl = true, scene = null, camera = null, canvas = null, wrap = null, tip = null, hintEl = null;
-let built = null, roomId = null, lastIndex = null, running = false;
+let built = null, roomId = null, lastIndex = null, running = false, fx = null, dustP = null;
 let yaw = 0, pitch = -0.04, targetYaw = null, fov = 68;
 let flash = null, flashTarget = null, flashAim = new THREE.Vector2(0, 0), boltLight = null;
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -86,6 +87,8 @@ function init() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isTouch() ? 1.5 : 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.3;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  if (GFX.Q.level === "low") renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   camera = new THREE.PerspectiveCamera(fov, 4 / 3, 0.05, 40);
   wrap = document.createElement("div"); wrap.className = "n3d-wrap"; wrap.appendChild(canvas);
@@ -103,6 +106,7 @@ function resize() {
   if (!wrap || !renderer) return;
   const w = wrap.clientWidth, h = wrap.clientHeight; if (!w || !h) return;
   renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  if (fx) fx.comp.setSize(w, h);
 }
 
 /* ---------- Raum aufbauen ---------- */
@@ -115,14 +119,16 @@ function buildRoom(r) {
     THREE, scene,
     add: (...o) => o.forEach((x) => scene.add(x)),
     /** Objekt an Hotspot-IDs binden. ids: Reihenfolge = Vorrang, falls mehrere gleichzeitig sichtbar sind. */
-    hs(ids, obj, opts = {}) { const e = { ids: [].concat(ids), obj, ...opts }; obj.traverse((m) => { if (m.isMesh) m.userData.owner = e; }); pick.push(e); return obj; },
+    hs(ids, obj, opts = {}) { const e = { ids: [].concat(ids), obj, ...opts }; obj.userData.owner = e; obj.traverse((m) => { if (m.isMesh) m.userData.owner = e; }); pick.push(e); return obj; },
     /** Zusätzliche Bedienung ohne Hotspot (z. B. Schubladen): reine Optik. */
-    prop(label, obj, onClick) { const e = { ids: [], label, onClick, obj }; obj.traverse((m) => { if (m.isMesh) m.userData.owner = e; }); pick.push(e); return obj; },
+    prop(label, obj, onClick) { const e = { ids: [], label, onClick, obj }; obj.userData.owner = e; obj.traverse((m) => { if (m.isMesh) m.userData.owner = e; }); pick.push(e); return obj; },
     /** fn(has, light) – wird bei jeder Zustandsänderung aufgerufen (Türen, sichtbare Gegenstände …). */
     state: (fn) => states.push(fn),
     /** fn(dt, t) – jedes Bild (Animationen, Flackern, Regen). */
     anim: (fn) => anims.push(fn),
     lerp: (cur, to, k) => cur + (to - cur) * k,
+    /** GLB aus assets/3d/models (siehe gfx.model); Rückgabe sofort, Inhalt kommt nach dem Laden. */
+    model: GFX.model, tag: GFX.tag, quality: GFX.Q,
   };
   // Grundlicht, Taschenlampe, Blitz
   scene.add(new THREE.HemisphereLight(0x6a7890, 0x221810, 1.1));
@@ -131,7 +137,15 @@ function buildRoom(r) {
   camera.add(flash); camera.add(flashTarget); flash.position.set(0, -0.05, 0); flash.target = flashTarget;
   boltLight = new THREE.DirectionalLight(0xbcd2ff, 0); boltLight.position.set(0, 3, 6); scene.add(boltLight);
   const b = BUILDERS[r.id](ctx);
-  built = { pick, states, anims, eye: (b && b.eye) || [0, 1.6, 0], markers: null };
+  built = { pick, states, anims, eye: (b && b.eye) || [0, 1.6, 0], markers: null, hd: Boolean(b && b.hd) };
+  fx = null; dustP = null;
+  if (built.hd) { // Grafikstufe HD (Rezeption, Zimmer 217): PBR, Umgebung, Schatten, Leuchten, Staub
+    GFX.prepareScene(scene);
+    GFX.setupFlashlight(flash);
+    const sc = scene; GFX.environment(renderer).then((env) => { if (env && sc === scene) { sc.environment = env; sc.environmentIntensity = (b && b.env) ?? 0.35; } });
+    if (GFX.Q.level !== "low") { dustP = GFX.dust((b && b.R) || 3, (b && b.H) || 3); scene.add(dustP); }
+    fx = GFX.composer(renderer, scene, camera); resize();
+  }
   camera.position.set(...built.eye);
   roomId = r.id;
 }
@@ -150,7 +164,8 @@ function hitAt(cx, cy) {
   const hits = ray.intersectObjects(built.pick.map((e) => e.obj), true);
   for (const h of hits) {
     if (!shown(h.object)) continue;
-    const e = h.object.userData.owner; if (!e) continue;
+    let o = h.object; while (o && !o.userData.owner) o = o.parent; // Modelle: Besitzer sitzt an der Gruppe
+    const e = o && o.userData.owner; if (!e) continue;
     if (e.onClick) return { e };
     const id = e.ids.find((x) => E().isVisible(x));
     if (id) return { e, id };
@@ -243,7 +258,15 @@ function frame() {
   flashTarget.position.set(aim.x * Math.tan(camera.fov * Math.PI / 360) * camera.aspect, aim.y * Math.tan(camera.fov * Math.PI / 360), -1);
   if (boltLight.intensity > 0) boltLight.intensity = Math.max(0, boltLight.intensity - dt * 22);
   built.anims.forEach((fn) => fn(dt, t));
-  renderer.render(scene, camera);
+  if (dustP) dustP.userData.tick(dt, t);
+  if (fx) { fx.vg.uniforms.uTime.value = t % 10; fx.comp.render(dt); GFX.watchPerformance(dt, lowerQuality); }
+  else renderer.render(scene, camera);
+}
+/** Zu langsam? Erst Leuchten und Punktschatten aus, dann alle Schatten, Staub und höhere Auflösung. */
+function lowerQuality(level) {
+  console.info("[Hotel Nocturne 3D] Qualität reduziert auf", level);
+  scene.traverse((o) => { if (o.isLight && o !== flash) o.castShadow = false; if (o.isMesh) o.castShadow = false; });
+  if (level === "low") { if (fx && fx.bloom) fx.bloom.enabled = false; flash.castShadow = false; renderer.setPixelRatio(1); if (dustP) dustP.visible = false; resize(); }
 }
 function startLoop() { if (running) return; running = true; clock.getDelta(); requestAnimationFrame(frame); }
 document.addEventListener("visibilitychange", () => { if (document.hidden) running = false; else if (canvas && canvas.isConnected) startLoop(); });
@@ -288,6 +311,6 @@ function aimAt(id) {
   const p = c.clone().project(camera), rc = canvas.getBoundingClientRect();
   return { x: rc.left + (p.x + 1) / 2 * rc.width, y: rc.top + (1 - p.y) / 2 * rc.height };
 }
-N.view3d = { supports, render, pickAt, aimAt, sync: () => syncView() };
+N.view3d = { supports, render, pickAt, aimAt, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0 }) };
 // Falls das Spiel schon läuft, als die Module fertig geladen waren: jetzt auf 3D umschalten
 export function ready() { if (N.engine && N.engine.refresh) N.engine.refresh(); }

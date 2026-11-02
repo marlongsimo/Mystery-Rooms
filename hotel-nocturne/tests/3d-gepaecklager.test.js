@@ -6,6 +6,7 @@
  * Aufruf: python3 -m http.server 8765 &  ·  node hotel-nocturne/tests/3d-gepaecklager.test.js   (ca. 3 Minuten)
  */
 const BASE = process.env.BASE || 'http://localhost:8765';
+const QUAL = process.env.Q || 'low'; // Grafikstufe; low = schnell im Software-Rendering, high/medium für Gerätetests
 const OUT = require('os').tmpdir() + '/';
 const { chromium } = require('playwright');
 const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
@@ -37,7 +38,7 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
   await p2.close();
   const p = await b.newPage({ viewport: { width: 1280, height: 860 } }); p.setDefaultTimeout(15000);
   p.on('pageerror', (e) => errs.push('3D ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push('3D console ' + m.text()); });
-  await enter(p, BASE + '/hotel-nocturne/3d.html', 'nocturne_save_3d_v2');
+  await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL, 'nocturne_save_3d_v2');
   console.log('3D aktiv im Gepäcklager:', await p.evaluate(() => document.querySelector('#scene').classList.contains('is3d')), '|', await p.textContent('#location'));
   for (let i = 0; i < 4; i++) { await p.waitForTimeout(1300); await p.screenshot({ path: `${OUT}gl-${i}.png` }); await p.click('#turnRight'); }
   const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return null; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350); return pt; };

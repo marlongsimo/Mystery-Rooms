@@ -7,8 +7,10 @@
  * Bildhinweise: Zimmernummer 217 · Ziffernschloss der Kommode (vier Stellen, 0000) · „Wer nachts wacht“ über dem Schrank ·
  * „für E.“ am Landschaftsbild · Kerze brennt · Gepäckschein „6“ unter dem Bett (nur im Lichtkegel) · Tor im Hof nur beim Blitz.
  */
-import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=2";
-import { textTex, wallpaper, woodTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=1";
+import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
+import { textTex, wallpaper, woodTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=2";
+import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame } from "./hd.js?v=1";
+import { tag } from "./gfx.js?v=1";
 
 const R = 2.6, H = 3.0;
 
@@ -58,21 +60,22 @@ const courtTex = () => canvasTex(512, 512, (g, w, h) => {
 defineRoom("zimmer217", (ctx) => {
   const { add, hs, prop, state, anim, lerp } = ctx;
   const M = {
-    wall: lambert(0xffffff, { map: wallpaper("#3a2a2a", "#46323a", "#5a4248") }), floor: lambert(0xffffff, { map: plankTex() }),
-    ceil: lambert(0x100c0b), trim: lambert(0x1e140e), wood: lambert(0xffffff, { map: woodTex("#3a271a", "#24170e") }),
-    woodDark: lambert(0xffffff, { map: woodTex("#2a1c12", "#180f09") }), brass: phong(0xb08c52), brassDark: phong(0x6e5632),
-    black: lambert(0x0c0a09), linen: lambert(0xd8cfbd), red: lambert(0x5a1a18), velvet: lambert(0x5a1616), paper: lambert(0xe9dfc6),
+    // HD: Damast in Bordeaux, gewachste Dielen, Nussholz, Messing, Samt
+    wall: tag(lambert(0xffffff, { map: damask("#2c161a", "#3e2028", "#5e4c32") }), { roughness: 0.85, normal: 0.9 }), floor: tag(lambert(0xffffff, { map: plankTex() }), { roughness: 0.5, clearcoat: 0.25, normal: 1.6, envMapIntensity: 0.5 }),
+    ceil: tag(lambert(0x18120e), { roughness: 0.95 }), trim: woodMat("#20140c", "#0e0804"), wood: woodMat("#3e2616", "#1e1008"),
+    woodDark: woodMat("#2a180c", "#120a04"), brass: brassMat(), brassDark: brassMat(0x6e5632, 0.45),
+    black: tag(lambert(0x0c0a09), { roughness: 0.4 }), linen: std(0xd8cfbd, { roughness: 0.92 }), red: velvetMat(0x4e1414, 0xa04040), velvet: velvetMat(0x5a1414, 0xb04848), paper: lambert(0xe9dfc6),
   };
   const { place } = shell(ctx, {
     R, H, wallMat: M.wall, floorMat: M.floor, ceilMat: M.ceil, trimMat: M.trim,
     holes: { n: [{ x: 0, y: 0, w: 1.0, h: 2.2 }], s: [{ x: 0, y: 0.8, w: 1.5, h: 1.6 }] },
   });
-  const rug = plane(2.6, 1.8, lambert(0x3a1714)); rug.rotation.x = -Math.PI / 2; rug.position.set(-0.2, 0.004, -0.3); add(rug);
+  const rug = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.012, 1.8), tag(lambert(0xffffff, { map: persian("#4a1418", "#1a2030", "#a07a40") }), { roughness: 0.95, normal: 2.2 })); rug.position.set(-0.2, 0.006, -0.3); add(rug);
 
   /* ================= NORD · Zimmertür ================= */
   const door = group(box(1.0, 2.2, 0.05, M.woodDark, 0, 1.1, -0.03),
     plane(0.34, 0.13, lambert(0xffffff, { map: numberPlate() }), 0, 1.88, 0.012),
-    box(0.7, 0.6, 0.01, M.wood, 0, 1.45, 0.0), box(0.7, 0.75, 0.01, M.wood, 0, 0.6, 0.0));
+    panel(0.7, 0.6, M.wood, 0, 1.45, 0.0), panel(0.7, 0.75, M.wood, 0, 0.6, 0.0));
   const knob = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 10), M.brass); knob.position.set(0.38, 1.0, 0.03); door.add(knob);
   const peep = cyl(0.012, 0.012, 0.02, M.brass, 0, 1.58, 0.01); peep.rotation.x = Math.PI / 2; door.add(peep);
   door.add(box(0.08, 2.28, 0.06, M.trim, -0.54, 1.14, 0.0), box(0.08, 2.28, 0.06, M.trim, 0.54, 1.14, 0.0), box(1.16, 0.08, 0.06, M.trim, 0, 2.24, 0.0));
@@ -83,7 +86,7 @@ defineRoom("zimmer217", (ctx) => {
   coat.children[3].position.set(0, 1.66, 0.06); coat.children[3].scale.set(1.3, 0.6, 1);
   add(place(hs("mantel", coat), "n", 0.2, 0, 0.35));
   // Spiegel, darunter an einer Kordel der alte Schlüssel
-  const mirror = group(box(0.6, 0.86, 0.04, phong(0x8a6a34)), plane(0.5, 0.76, phong(0x1a2426, { shininess: 120, specular: 0x8899aa }), 0, 0, 0.021));
+  const mirror = ornateFrame(0.62, 0.9, std(0x9aa4a8, { metalness: 1, roughness: 0.06 }), brassMat(0x9a7434, 0.35), 0.05, 0.07); // Spiegel spiegelt die Umgebung
   add(place(hs("spiegel", mirror), "n", 0.77, 1.6, 0.02));
   const oldKey = group(cyl(0.003, 0.003, 0.16, M.black, 0, 0.08, 0),
     new THREE.Mesh(new THREE.TorusGeometry(0.03, 0.007, 8, 16), M.brass), cyl(0.006, 0.006, 0.12, M.brass, 0, -0.08, 0), box(0.03, 0.025, 0.006, M.brass, 0.015, -0.13, 0));
@@ -103,23 +106,28 @@ defineRoom("zimmer217", (ctx) => {
 
   /* ================= OST · Bett ================= */
   // Bettkasten hoch genug, dass man darunter leuchten und tippen kann (Spalt 26 cm)
-  const bed = group(box(1.7, 1.25, 0.08, M.woodDark, 0, 0.63, 0.04), box(1.7, 0.24, 2.0, M.woodDark, 0, 0.38, 1.0),
-    box(1.6, 0.18, 1.9, M.linen, 0, 0.59, 1.0), box(1.66, 0.08, 1.4, M.red, 0, 0.7, 1.28), box(1.66, 0.14, 0.02, M.red, 0, 0.62, 1.98));
-  [-0.42, 0.42].forEach((x) => { const p = box(0.62, 0.12, 0.34, M.linen, x, 0.74, 0.3); bed.add(p); });
-  bed.add(box(0.5, 0.06, 0.02, lambert(0x1a1210), -0.4, 0.92, 0.09), box(0.5, 0.06, 0.02, lambert(0x1a1210), 0.4, 0.92, 0.09));
-  [[-0.8, 0.1], [0.8, 0.1], [-0.8, 1.95], [0.8, 1.95]].forEach(([x, z]) => bed.add(box(0.07, 0.26, 0.07, M.woodDark, x, 0.13, z)));
+  // Kopfteil mit Kassetten und geschwungenem Aufsatz, gedrechselte Pfosten, Samt-Tagesdecke
+  const crest = new THREE.Shape(); crest.moveTo(-0.85, 0); crest.lineTo(0.85, 0); crest.lineTo(0.85, 0.12); crest.quadraticCurveTo(0.4, 0.14, 0.2, 0.3); crest.quadraticCurveTo(0, 0.42, -0.2, 0.3); crest.quadraticCurveTo(-0.4, 0.14, -0.85, 0.12); crest.lineTo(-0.85, 0);
+  const crestM = new THREE.Mesh(new THREE.ExtrudeGeometry(crest, { depth: 0.06, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 2 }), M.woodDark); crestM.position.set(0, 1.24, 0.01);
+  const bed = group(rbox(1.7, 1.0, 0.08, M.woodDark, 0, 0.74, 0.04, 0.02), crestM, panel(0.7, 0.5, M.wood, -0.4, 0.95, 0.09), panel(0.7, 0.5, M.wood, 0.4, 0.95, 0.09),
+    rbox(1.7, 0.24, 2.0, M.woodDark, 0, 0.38, 1.0, 0.03), rbox(1.6, 0.18, 1.9, M.linen, 0, 0.59, 1.0, 0.06), rbox(1.7, 0.09, 1.42, M.red, 0, 0.7, 1.28, 0.04), rbox(1.7, 0.16, 0.04, M.red, 0, 0.6, 1.98, 0.02),
+    rbox(1.7, 0.42, 0.06, M.woodDark, 0, 0.5, 2.02, 0.02));
+  [-0.42, 0.42].forEach((x) => bed.add(rbox(0.62, 0.13, 0.36, M.linen, x, 0.74, 0.3, 0.06)));
+  [[-0.86, 0.04, 1.5], [0.86, 0.04, 1.5], [-0.86, 2.02, 0.85], [0.86, 2.02, 0.85]].forEach(([x, z, hgt]) => { const l = turnedLeg(hgt, 0.05, M.woodDark); l.position.set(x, 0, z); bed.add(l); });
   add(place(hs("bett", bed), "e", 0.5, 0, 0.0));
   // Brief auf der Tagesdecke
   const letter = plane(0.26, 0.18, lambert(0xffffff, { map: letterTex() })); letter.rotation.set(-Math.PI / 2, 0, 0.3);
   add(place(hs("brief_bett", group(letter, box(0.3, 0.05, 0.24, ZONE, 0, 0.02, 0))), "e", 0.64, 0.745, 1.2));
   // Landschaftsbild über dem Bett („für E.“)
-  const lake = group(box(0.9, 0.6, 0.04, phong(0x7a5a2c)), plane(0.8, 0.5, lambert(0xffffff, { map: lakeTex() }), 0, 0, 0.022));
+  const lake = ornateFrame(0.96, 0.66, lambert(0xffffff, { map: lakeTex() }), brassMat(0x8a6830, 0.38), 0.05, 0.08);
   add(place(hs("bild_bett", lake), "e", 0.5, 1.78, 0.02));
   // Nachttische: links mit Lampe, rechts (Hotspot) mit Sanduhr
-  const nsL = group(box(0.45, 0.55, 0.4, M.woodDark, 0, 0.275, 0), cyl(0.07, 0.09, 0.04, M.brassDark, 0, 0.57, 0), cyl(0.012, 0.012, 0.3, M.brass, 0, 0.72, 0), cyl(0.1, 0.18, 0.18, lambert(0xa8875a, { emissive: 0x5a3a14 }), 0, 0.92, 0, 20));
+  // Nachttisch links mit Jugendstil-Lampe (Modell, CC BY 4.0 DGG) – Hauptlicht mit Schatten
+  const nsL = group(rbox(0.45, 0.55, 0.4, M.woodDark, 0, 0.275, 0, 0.02), panel(0.36, 0.2, M.wood, 0, 0.4, 0.2), ctx.model("nouveau-lamp.glb", { fit: { h: 0.48 } }));
+  nsL.children[2].position.y = 0.55;
   add(place(nsL, "e", 0.13, 0, 0.25));
-  const lampL = new THREE.PointLight(0xffb066, 6, 0, 2); place(lampL, "e", 0.13, 1.0, 0.35); add(lampL);
-  const nsR = group(box(0.45, 0.55, 0.4, M.woodDark, 0, 0.275, 0), box(0.36, 0.14, 0.02, M.wood, 0, 0.38, 0.205), cyl(0.012, 0.012, 0.02, M.brass, 0, 0.38, 0.22));
+  const lampL = new THREE.PointLight(0xffb066, 6, 0, 2); place(lampL, "e", 0.13, 0.95, 0.35); lampL.userData.shadow = true; add(lampL);
+  const nsR = group(rbox(0.45, 0.55, 0.4, M.woodDark, 0, 0.275, 0, 0.02), panel(0.36, 0.16, M.wood, 0, 0.38, 0.2), cyl(0.014, 0.014, 0.03, M.brass, 0, 0.38, 0.235).rotateX(Math.PI / 2));
   add(place(hs("nachttisch", nsR), "e", 0.88, 0, 0.25));
   const glassMat = new THREE.MeshPhongMaterial({ color: 0xc8d4dc, transparent: true, opacity: 0.35, shininess: 90 });
   const hg = group(cyl(0.06, 0.06, 0.02, M.wood, 0, 0.01, 0), cyl(0.06, 0.06, 0.02, M.wood, 0, 0.23, 0),
@@ -154,7 +162,7 @@ defineRoom("zimmer217", (ctx) => {
   let winOpen = false; state((has) => { winOpen = has("fenster_auf"); });
   anim((dt) => { sashL.rotation.y = lerp(sashL.rotation.y, winOpen ? -1.25 : 0, Math.min(1, dt * 5)); });
   // Vorhänge (roter Samt), wehen bei offenem Fenster
-  const curtain = (u) => { const c = group(); for (let i = 0; i < 6; i++) c.add(box(0.09, 2.5, 0.05, M.velvet, -0.22 + i * 0.09, 1.3, (i % 2) * 0.04)); return place(c, "s", u, 0, 0.12); };
+  const curtain = (u) => { const c = group(); for (let i = 0; i < 7; i++) c.add(cyl(0.045, 0.05, 2.5, M.velvet, -0.24 + i * 0.08, 1.3, (i % 2) * 0.03, 12)); return place(c, "s", u, 0, 0.12); };
   const cL = curtain(0.31), cR = curtain(0.69);
   add(hs("vorhang", cL), cR);
   add(place(box(2.4, 0.03, 0.03, M.brassDark, 0, 0, 0), "s", 0.5, 2.62, 0.12)); // Vorhangstange
@@ -166,14 +174,14 @@ defineRoom("zimmer217", (ctx) => {
   add(place(hs("heizung", rad), "s", 0.5, 0, 0.12));
 
   /* ================= WEST · Schreibtisch, Kommode, Schrank ================= */
-  const desk = group(box(1.2, 0.05, 0.6, M.wood, 0, 0.76, 0));
-  [[-0.56, -0.26], [0.56, -0.26], [-0.56, 0.26], [0.56, 0.26]].forEach(([x, z]) => desk.add(box(0.05, 0.74, 0.05, M.woodDark, x, 0.37, z)));
+  const desk = group(rbox(1.24, 0.05, 0.64, M.wood, 0, 0.76, 0, 0.015), rbox(1.12, 0.12, 0.54, M.woodDark, 0, 0.67, 0, 0.01));
+  [[-0.56, -0.26], [0.56, -0.26], [-0.56, 0.26], [0.56, 0.26]].forEach(([x, z]) => { const l = turnedLeg(0.62, 0.035, M.woodDark); l.position.set(x, 0, z); desk.add(l); });
   const drawer = group(box(0.5, 0.11, 0.5, M.woodDark, 0, 0, -0.25), cyl(0.015, 0.015, 0.02, M.brass, 0, 0, 0.01)); drawer.children[1].rotation.x = Math.PI / 2;
   drawer.position.set(0.15, 0.67, 0.3); desk.add(drawer);
   add(place(desk, "w", 0.3, 0, 0.32));
   add(place(hs("schreibtisch", group(box(0.52, 0.14, 0.06, ZONE, 0.15, 0.67, 0.62))), "w", 0.3, 0, 0.0));
-  const chair = group(box(0.45, 0.05, 0.45, M.woodDark, 0, 0.46, 0), box(0.45, 0.5, 0.04, M.woodDark, 0, 0.73, -0.21));
-  [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]].forEach(([x, z]) => chair.add(box(0.04, 0.46, 0.04, M.woodDark, x, 0.23, z)));
+  const chair = group(rbox(0.46, 0.06, 0.46, M.woodDark, 0, 0.46, 0, 0.015), rbox(0.42, 0.06, 0.42, M.velvet, 0, 0.5, 0, 0.025), rbox(0.46, 0.5, 0.04, M.woodDark, 0, 0.75, -0.21, 0.015), rbox(0.3, 0.3, 0.02, M.velvet, 0, 0.78, -0.19, 0.01));
+  [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]].forEach(([x, z]) => { const l = turnedLeg(0.44, 0.024, M.woodDark); l.position.set(x, 0, z); chair.add(l); });
   chair.rotation.y = Math.PI; add(place(chair, "w", 0.32, 0, 1.0));
   // Kerzenständer mit brennender Kerze
   const flame = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.05, 10), basic(0xffd27a));
@@ -186,21 +194,23 @@ defineRoom("zimmer217", (ctx) => {
   const sheet = plane(0.21, 0.28, lambert(0xffffff, { map: sheetTex() })); sheet.rotation.set(-Math.PI / 2, 0, -0.2);
   add(place(hs("blatt", group(sheet, box(0.26, 0.04, 0.3, ZONE, 0, 0.02, 0)), { hideWhenHidden: true }), "w", 0.31, 0.79, 0.4));
   // Kommode mit Ziffernschloss; darauf das Porträtfoto
-  const kom = group(box(1.1, 1.0, 0.5, M.wood, 0, 0.5, 0));
-  [0.62, 0.34].forEach((y) => kom.add(box(1.0, 0.24, 0.02, M.woodDark, 0, y, 0.255)));
-  const top = group(box(1.0, 0.2, 0.46, M.woodDark, 0, 0, -0.22), cyl(0.015, 0.015, 0.02, M.brass, -0.3, 0, 0.01), cyl(0.015, 0.015, 0.02, M.brass, 0.3, 0, 0.01));
+  const kom = group(rbox(1.1, 0.95, 0.5, M.wood, 0, 0.5, 0, 0.015), rbox(1.18, 0.04, 0.56, M.woodDark, 0, 0.99, 0.01, 0.012), rbox(1.12, 0.08, 0.52, M.woodDark, 0, 0.04, 0, 0.01));
+  [0.62, 0.34].forEach((y) => { kom.add(panel(1.0, 0.24, M.woodDark, 0, y, 0.255, 0.04, 0.008)); [-0.3, 0.3].forEach((x) => kom.add(cyl(0.016, 0.016, 0.03, M.brass, x, y, 0.29).rotateX(Math.PI / 2))); });
+  const top = group(rbox(1.0, 0.2, 0.46, M.woodDark, 0, 0, -0.22, 0.012), cyl(0.015, 0.015, 0.02, M.brass, -0.3, 0, 0.01), cyl(0.015, 0.015, 0.02, M.brass, 0.3, 0, 0.01));
   top.children[1].rotation.x = top.children[2].rotation.x = Math.PI / 2; top.position.set(0, 0.86, 0.255); kom.add(top);
   const lock = plane(0.16, 0.08, lambert(0xffffff, { map: codeLockTex() }), 0, 0, 0.012); top.add(lock);
   add(place(hs("kommode", kom), "w", 0.61, 0, 0.25));
   let komOpen = false; state((has) => { komOpen = has("kommode_open"); lock.visible = !komOpen; });
   anim((dt) => { top.position.z = lerp(top.position.z, komOpen ? 0.6 : 0.255, Math.min(1, dt * 4)); });
-  const photo = group(box(0.2, 0.26, 0.02, phong(0x8a6a34), 0, 0.13, 0), plane(0.16, 0.21, lambert(0xffffff, { map: portraitTex() }), 0, 0.135, 0.011));
+  const photo = group(ornateFrame(0.2, 0.26, lambert(0xffffff, { map: portraitTex() }), brassMat(0x9a7434, 0.35), 0.02, 0.025)); photo.children[0].position.y = 0.13;
   photo.rotation.x = -0.12;
   add(place(hs("portraet217", photo), "w", 0.6, 1.0, 0.22));
   // Kleiderschrank mit Buchstabenrädern und Schnitzerei „Wer nachts wacht“
-  const ward = group(box(1.15, 2.3, 0.58, M.woodDark, 0, 1.15, 0), box(1.25, 0.14, 0.64, M.trim, 0, 2.37, 0.02));
+  // Kleiderschrank: Korpus, Kranzgesims, gedrechselte Füße, Türen mit Kassetten – Schnitzerei (2,16 m) und Buchstabenräder (1,3 m) bleiben frei
+  const ward = group(rbox(1.15, 2.2, 0.58, M.woodDark, 0, 1.2, 0, 0.02), rbox(1.27, 0.08, 0.66, M.trim, 0, 2.34, 0.02, 0.02), rbox(1.33, 0.06, 0.7, M.trim, 0, 2.41, 0.03, 0.02), rbox(1.2, 0.08, 0.62, M.trim, 0, 0.14, 0.01, 0.02));
+  [[-0.5, -0.22], [0.5, -0.22], [-0.5, 0.24], [0.5, 0.24]].forEach(([x, z]) => { const l = turnedLeg(0.1, 0.04, M.woodDark); l.position.set(x, 0, z); ward.add(l); });
   const carve = plane(0.92, 0.14, lambert(0xffffff, { map: carveTex() }), 0, 2.16, 0.292); ward.add(carve);
-  const doorPv = (sx) => { const pv = new THREE.Group(); pv.position.set(sx * 0.57, 0, 0.292); pv.add(box(0.56, 1.95, 0.03, M.wood, -sx * 0.28, 1.04, 0.015)); pv.add(box(0.02, 0.2, 0.03, M.brass, -sx * 0.52, 1.1, 0.04)); ward.add(pv); return pv; };
+  const doorPv = (sx) => { const pv = new THREE.Group(); pv.position.set(sx * 0.57, 0, 0.292); pv.add(rbox(0.56, 1.95, 0.03, M.wood, -sx * 0.28, 1.1, 0.015, 0.008), panel(0.44, 0.6, M.woodDark, -sx * 0.28, 1.66, 0.032, 0.05, 0.008), panel(0.44, 0.68, M.woodDark, -sx * 0.28, 0.62, 0.032, 0.05, 0.008)); pv.add(box(0.02, 0.2, 0.03, M.brass, -sx * 0.52, 1.1, 0.04)); ward.add(pv); return pv; };
   const wdL = doorPv(-1), wdR = doorPv(1);
   const wheels = plane(0.3, 0.09, lambert(0xffffff, { map: wheelsTex() }), 0, 1.3, 0.33); ward.add(wheels);
   ward.add(box(1.0, 0.03, 0.02, M.brassDark, 0, 1.85, 0.0)); // Kleiderstange innen
@@ -216,6 +226,6 @@ defineRoom("zimmer217", (ctx) => {
   const wl = group(box(0.07, 0.14, 0.04, M.brassDark), cyl(0.05, 0.09, 0.13, lambert(0xd9b98a, { emissive: 0x8a5a24 }), 0, 0.1, 0.09, 16));
   add(place(wl, "n", 0.33, 2.0, 0.02));
   const wlL = new THREE.PointLight(0xffb36b, 4, 0, 2); place(wlL, "n", 0.33, 2.1, 0.35); add(wlL);
-  return { eye: [0, 1.62, 0] };
+  return { eye: [0, 1.62, 0], hd: true, R, H, env: 0.3 };
 });
 ready();

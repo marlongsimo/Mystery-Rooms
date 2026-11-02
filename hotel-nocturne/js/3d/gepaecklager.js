@@ -8,8 +8,8 @@
  * „ARCHIV“ auf der Milchglastür · „← REZEPTION“ · „AUSGABE NUR GEGEN GEPÄCKSCHEIN“ · „WERTGEPÄCK“ ·
  * Wasserstandsmarke „14.10.2009 · 23:10 – WASSERSTAND KNIEHÖHE“ · Wasserrand auf Kniehöhe rundum.
  */
-import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=2";
-import { textTex, woodTex, plaqueTex, shell } from "./kit.js?v=1";
+import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
+import { textTex, woodTex, plaqueTex, shell } from "./kit.js?v=2";
 
 const R = 2.8, H = 3.0;
 

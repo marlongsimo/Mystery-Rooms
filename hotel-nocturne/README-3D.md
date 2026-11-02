@@ -25,6 +25,27 @@ Stand: **Rezeption**, **Zimmer 217** und **Gepäcklager** als 360°-Räume. Alle
 
 Änderungen an `js/engine.js` (2D unverändert): `saveKey` aus der Konfiguration, in `renderStage` 3D statt SVG, wenn `NOCTURNE.view3d.supports(raum)`; Ziehen eines Gegenstands auf ein 3D-Objekt; Schnittstelle `engine.hotspot / isVisible / hotspotData / has / isLight / selectedItem / say / setView / refresh`.
 
+## Grafikstufe HD (Rezeption, Zimmer 217)
+
+Räume melden sich mit `hd: true` an (Rückgabe des Raum-Builders). Das Gepäcklager ist bewusst noch nicht umgestellt.
+
+| Baustein | Datei | Inhalt |
+|---|---|---|
+| Grafikkern | `js/3d/gfx.js` | Qualitätsstufen (high/medium/low, `?q=`), automatisches Herunterschalten bei < 25 fps, PBR-Umwandlung mit Normalenkarten aus den Canvas-Texturen, HDRI-Umgebung, Schatten (Taschenlampe + ein Hauptlicht), Leuchten (Bloom), Vignette/Korn, GLB-Lader (Meshopt, WebP), Lichtkegel-Textur der Taschenlampe, Staub |
+| HD-Bausteine | `js/3d/hd.js` | Damasttapete, Marmor, Perserteppich, Holzmaserung; abgerundete Kanten, Kassetten, gedrechselte Beine, Zierrahmen; Materialien für Holz, Messing, Samt, Leder |
+| Assets | `assets/3d/` | Modelle und HDRI, Lizenzen in `assets/3d/LIZENZEN.md` |
+| three.js-Zusätze | `../platform/vendor/three-0.170.0/addons/` | GLTF-/EXR-Lader, Meshopt-Decoder, Nachbearbeitung, RoundedBox (MIT, Version 0.170.0 wie der Kern) |
+
+| Stufe | Gerät (automatisch) | Schatten | Leuchten | Staub | Auflösung |
+|---|---|---|---|---|---|
+| high | Computer | Taschenlampe 1024 px + Hauptlicht | ja | ja | bis 2× |
+| medium | Tablet | Taschenlampe 512 px | ja (halbe Auflösung) | ja | bis 1,5× |
+| low | Handy | nein | nein | nein | 1× |
+
+Rätselteile (Uhr, Schlösser, Schilder, Räder, Schnitzerei, Gepäckschein, Brief …) sind unverändert aus Code gebaut; Modelle ersetzen nur Möbel/Deko und haben immer eine feste unsichtbare Klickfläche.
+
+**Neue Modelle aufbereiten:** `npx @gltf-transform/cli optimize in.glb out.glb --texture-compress webp --texture-size 512 --compress meshopt --simplify true --simplify-ratio 0.5 --simplify-error 0.001`, Datei nach `assets/3d/models/`, Lizenz in `LIZENZEN.md` und in den Bildnachweisen von `3d.html` eintragen.
+
 ## Einen Raum ergänzen
 
 ```js
@@ -81,7 +102,7 @@ defineRoom("zimmer217", (ctx) => {
 
 ## Tests
 
-Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m http.server 8765 &`):
+Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m http.server 8765 &`). Die Funktionstests laufen in Stufe `low` (schnell im Software-Rendering); `Q=high node …` testet eine andere Stufe.
 
 | Datei | Prüft | Dauer |
 |---|---|---|
@@ -89,6 +110,7 @@ Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m h
 | `3d-rezeption.test.js` | Jeder Hotspot im Startzustand: 3D-Klick öffnet denselben Dialog wie 2D · Durchlauf Code 2117 → Taschenlampe → Schraubendreher → Abdeckung → Schlüsselschalter → Aufzug → Zimmer 217 · Neuladen · getrennter Spielstand | ca. 3 min (Software-Rendering) |
 | `3d-zimmer217.test.js` | Start direkt in Zimmer 217: jeder Hotspot 3D ↔ 2D · Kommode 4173 → Fensterereignis → Fußspuren und Blatt → Taschenlampe → Gepäckschein → Schrank ELIAS → Tür zurück in die Rezeption | ca. 3 min |
 | `3d-gepaecklager.test.js` | Start im Gepäcklager: jeder Hotspot 3D ↔ 2D · Gepäckschein → Koffer Nr. 6 → Käfigschlüssel → Käfig → Truhe 2694 → Ereignis Koffer 4/Wassermarke → Archivtür → Archiv | ca. 3 min |
+| `3d-hd.test.js` | Rezeption und Zimmer 217 in den Stufen high/medium/low: HD aktiv, Umgebung, Leuchten und Schatten je Stufe, alle Modelle geladen, keine Fehler; Bilder im Temp-Ordner | ca. 4 min |
 | `3d-touch.test.js` | iPhone quer/hochkant (emuliert): Tippen untersucht, Wischen dreht ohne Fehlauslösung | ca. 1 min |
 
 Letzter Lauf (02.11.2026): Rezeption 22/22, Zimmer 217 17/17, Gepäcklager 13/13 Hotspots gleich wie 2D (Startzustand), alle Durchläufe vollständig, keine Fehler.

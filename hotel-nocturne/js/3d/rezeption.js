@@ -6,7 +6,9 @@
  * nur das Porträt hängt gerade · lose Seite im Gästeregister · stockdunkle Ecke unter der Treppe (Taschenlampe).
  */
 // Version im Import = Cache-Steuerung; core.js darf nur einmal (mit derselben URL) geladen werden
-import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group, wallMesh, walls } from "./core.js?v=2";
+import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group, wallMesh, walls } from "./core.js?v=3";
+import { woodMat, brassMat, velvetMat, leatherMat, damask, marble, persian, rbox, panel, turnedLeg, ornateFrame, std } from "./hd.js?v=1";
+import { tag } from "./gfx.js?v=1";
 
 const R = 3.2, H = 3.4;
 
@@ -112,16 +114,17 @@ const binderLabel = (t) => textTex(64, 128, "#d6c9a6", (g) => { g.fillStyle = "#
 defineRoom("rezeption", (ctx) => {
   const { add, hs, prop, state, anim, lerp } = ctx;
   const { place } = walls(R);
+  // HD-Materialien (PBR): Damasttapete, poliertes Nussholz, Messing, Samt, Leder
   const M = {
-    wall: lambert(0xffffff, { map: wallpaper() }), wood: lambert(0xffffff, { map: woodTex() }), dark: lambert(0x1b130d),
-    woodLight: lambert(0xffffff, { map: woodTex("#5a3d26", "#3a2717") }), brass: phong(0xb08c52), brassDark: phong(0x6e5632),
-    black: lambert(0x0e0c0b), velvet: lambert(0x3e1210), leather: lambert(0x3a2418), paper: lambert(0xe9dfc6), ceiling: lambert(0x0f0d0c),
+    wall: tag(lambert(0xffffff, { map: damask() }), { roughness: 0.85, normal: 0.9 }), wood: woodMat("#3a2416", "#1c1008"), dark: tag(lambert(0x1b130d), { roughness: 0.6 }),
+    woodLight: woodMat("#4e2e18", "#24140a", { clearcoat: 0.3, roughness: 0.45, envMapIntensity: 0.45 }), brass: brassMat(), brassDark: brassMat(0x6e5632, 0.45),
+    black: tag(lambert(0x0e0c0b), { roughness: 0.4 }), velvet: velvetMat(0x4a1010, 0xb04040), leather: leatherMat(0x3a1e10), paper: lambert(0xe9dfc6), ceiling: tag(lambert(0x16120e), { roughness: 0.95 }),
   };
 
   /* ---------- Hülle: Boden, Decke, Wände mit Öffnungen ---------- */
-  const floor = plane(2 * R, 2 * R, lambert(0xffffff, { map: floorTex() })); floor.rotation.x = -Math.PI / 2; add(floor);
-  const rug = plane(3.4, 2.4, lambert(0x3a1210)); rug.rotation.x = -Math.PI / 2; rug.position.y = 0.005; add(rug);
-  const rugB = plane(3.0, 2.0, lambert(0x521a16)); rugB.rotation.x = -Math.PI / 2; rugB.position.y = 0.007; add(rugB);
+  const fm = marble(); fm.wrapS = fm.wrapT = THREE.RepeatWrapping; fm.repeat.set(R * 2, R * 2);
+  const floor = plane(2 * R, 2 * R, tag(lambert(0xffffff, { map: fm }), { roughness: 0.22, clearcoat: 0.6, normal: 0.4 })); floor.rotation.x = -Math.PI / 2; add(floor); // polierter Marmor
+  const rug = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.012, 2.3), tag(lambert(0xffffff, { map: persian() }), { roughness: 0.95, normal: 2.2 })); rug.position.y = 0.006; add(rug); // Perserteppich
   const ceil = plane(2 * R, 2 * R, M.ceiling); ceil.rotation.x = Math.PI / 2; ceil.position.y = H; add(ceil);
   const holes = {
     n: [], s: [{ x: 0, y: 0, w: 1.9, h: 2.8, arch: true }],
@@ -139,8 +142,13 @@ defineRoom("rezeption", (ctx) => {
 
   /* ================= NORD · Empfang ================= */
   // Tresen über fast die ganze Wand, mit zwei Schubladen (reine Optik)
-  const counter = group(box(3.9, 1.04, 0.7, M.wood, 0, 0.52, 0), box(4.1, 0.07, 0.86, M.woodLight, 0, 1.075, 0.04), box(4.1, 0.02, 0.02, M.brass, 0, 1.04, 0.47));
-  [-1.45, -0.48, 0.48, 1.45].forEach((x) => counter.add(box(0.85, 0.62, 0.02, M.dark, x, 0.42, 0.355)));
+  // Empfangstresen: Sockel, Kassettenfront mit Pilastern, polierte Platte mit Messingkante, Fußleiste aus Messing
+  const counter = group(rbox(3.9, 0.96, 0.7, M.wood, 0, 0.56, 0, 0.02), rbox(4.0, 0.1, 0.78, M.dark, 0, 0.05, 0.0, 0.02),
+    rbox(4.1, 0.07, 0.86, M.woodLight, 0, 1.075, 0.04, 0.03), rbox(4.12, 0.02, 0.88, M.brass, 0, 1.035, 0.04, 0.008));
+  [-1.45, -0.48, 0.48, 1.45].forEach((x) => counter.add(panel(0.8, 0.62, M.wood, x, 0.5, 0.36)));
+  [-1.94, -0.965, 0, 0.965, 1.94].forEach((x) => counter.add(rbox(0.09, 0.86, 0.05, M.woodLight, x, 0.55, 0.37, 0.012)));
+  const footRail = cyl(0.018, 0.018, 3.8, M.brass, 0, 0.2, 0.48); footRail.rotation.z = Math.PI / 2; counter.add(footRail);
+  [-1.6, 0, 1.6].forEach((x) => counter.add(cyl(0.012, 0.012, 0.13, M.brass, x, 0.2, 0.42).rotateX(Math.PI / 2)));
   add(place(counter, "n", 0.56, 0, 1.15)); // endet vor der Treppe in der Nordwest-Ecke
   ["links", "rechts"].forEach((side, i) => {
     const dr = group(box(0.9, 0.18, 0.5, M.woodLight, 0, 0, -0.24), box(0.18, 0.03, 0.03, M.brass, 0, 0, 0.02));
@@ -173,10 +181,10 @@ defineRoom("rezeption", (ctx) => {
   bell.children[1].position.y = 0.02;
   add(place(hs("klingel", bell), "n", 0.73, 1.11, 1.35));
   // Tischlampe (warmes Licht)
-  const shade = cyl(0.12, 0.22, 0.22, lambert(0x8a6a44, { emissive: 0x5a3a14, side: THREE.DoubleSide }), 0, 0.52, 0, 24); shade.material.transparent = false;
-  const lamp = group(cyl(0.09, 0.11, 0.04, M.brassDark, 0, 0.02, 0), cyl(0.015, 0.015, 0.42, M.brass, 0, 0.23, 0), shade);
+  // Tiffany-Lampe (Modell, CC BY 4.0 Wayfair – siehe assets/3d/LIZENZEN.md); Hauptlicht der Rezeption mit Schatten
+  const lamp = ctx.model("tiffany-lamp.glb", { fit: { h: 0.6 } });
   add(place(lamp, "n", 0.84, 1.11, 1.1));
-  const lampLight = new THREE.PointLight(0xffb066, 9, 0, 2); place(lampLight, "n", 0.84, 1.55, 1.2); add(lampLight);
+  const lampLight = new THREE.PointLight(0xffb066, 9, 0, 2); place(lampLight, "n", 0.84, 1.5, 1.2); lampLight.userData.shadow = true; add(lampLight);
   anim((dt, t) => { lampLight.intensity = 9 + Math.sin(t * 13) * 0.12 + (Math.random() < 0.004 ? -2 : 0); });
   // Schlüsselkasten (öffnet sich nach dem Code)
   const kb = group(box(0.72, 1.0, 0.12, M.wood, 0, 0, 0.06));
@@ -196,7 +204,7 @@ defineRoom("rezeption", (ctx) => {
   const clockSign = plane(0.62, 0.11, lambert(0xffffff, { map: plaqueTex("REZEPTION") })); clockSign.position.set(0, -0.5, 0.02); clockG.add(clockSign);
   add(place(hs("uhr", clockG), "n", 0.5, 2.68, 0.01));
   // Gerahmtes Personalfoto (hängt leicht schief)
-  const photo = group(box(0.78, 0.58, 0.04, M.dark), plane(0.66, 0.46, lambert(0xffffff, { map: photoTex() }), 0, 0, 0.022)); photo.rotation.z = -0.035;
+  const photo = ornateFrame(0.8, 0.6, lambert(0xffffff, { map: photoTex() }), woodMat("#2a1a10", "#120a04"), 0.04, 0.06); photo.rotation.z = -0.035; // hängt leicht schief
   add(place(hs("personalfoto", photo), "n", 0.8, 2.3, 0.03));
 
   /* ================= OST · Aufzug ================= */
@@ -204,7 +212,7 @@ defineRoom("rezeption", (ctx) => {
   const cab = group(box(1.5, 0.05, 1.4, lambert(0x2a2119), 0, 0, -0.7), box(1.5, 2.5, 0.05, lambert(0x6a4e30), 0, 1.25, -1.4), box(0.05, 2.5, 1.4, lambert(0x5a4228), -0.75, 1.25, -0.7), box(0.05, 2.5, 1.4, lambert(0x5a4228), 0.75, 1.25, -0.7), box(1.5, 0.05, 1.4, lambert(0x1a1410), 0, 2.5, -0.7), plane(0.7, 1.2, phong(0x3a4650, { shininess: 90 }), 0, 1.35, -1.37));
   const cabLight = new THREE.PointLight(0xffd28a, 0, 0, 2); cabLight.position.set(0, 2.3, -0.7); cab.add(cabLight);
   const cabZone = plane(1.5, 2.5, ZONE, 0, 1.25, -0.02); cab.add(cabZone);
-  const doorMat = phong(0x5e4a2c, { shininess: 30, specular: 0x3a2e1c }), doorL = box(0.75, 2.5, 0.04, doorMat, -0.375, 1.25, -0.03), doorR = box(0.75, 2.5, 0.04, doorMat, 0.375, 1.25, -0.03);
+  const doorMat = brassMat(0x4e3a22, 0.42), /* Bronze */ doorL = box(0.75, 2.5, 0.04, doorMat, -0.375, 1.25, -0.03), doorR = box(0.75, 2.5, 0.04, doorMat, 0.375, 1.25, -0.03);
   doorL.add(box(0.02, 2.3, 0.01, M.brassDark, 0.36, 0, 0.025)); doorR.add(box(0.02, 2.3, 0.01, M.brassDark, -0.36, 0, 0.025));
   const frame = group(box(0.12, 2.62, 0.08, M.brassDark, -0.81, 1.31, 0.03), box(0.12, 2.62, 0.08, M.brassDark, 0.81, 1.31, 0.03), box(1.74, 0.12, 0.08, M.brassDark, 0, 2.56, 0.03));
   const elev = group(cab, doorL, doorR, frame);
@@ -284,18 +292,25 @@ defineRoom("rezeption", (ctx) => {
   for (let i = 0; i < 9; i++) shelf.add(box(0.13, 0.46 - (i % 3) * 0.05, 0.25, lambert(cols[(i + 2) % cols.length]), -0.85 + i * 0.15 + 0.065, 0.64 + 0.23 - (i % 3) * 0.025, 0));
   add(place(hs("regal", shelf), "w", 0.26, 1.2, 0.17));
   // Sofa (roter Samt)
-  const sofa = group(box(2.0, 0.42, 0.85, M.velvet, 0, 0.21, 0), box(2.0, 0.6, 0.2, M.velvet, 0, 0.62, -0.33), box(0.2, 0.62, 0.85, M.velvet, -1.0, 0.31, 0), box(0.2, 0.62, 0.85, M.velvet, 1.0, 0.31, 0));
-  [-0.48, 0.48].forEach((cx) => sofa.add(box(0.9, 0.12, 0.6, lambert(0x4a1614), cx, 0.48, 0.05)));
-  add(place(hs("sofa", sofa), "w", 0.3, 0, 0.6));
+  // Viktorianisches Ledersofa (Modell, CC BY 4.0 DGG); Ersatz aus Samt, falls das Modell nicht lädt; feste Klickfläche
+  const sofaOld = group(rbox(2.0, 0.42, 0.85, M.velvet, 0, 0.21, 0, 0.06), rbox(2.0, 0.6, 0.2, M.velvet, 0, 0.62, -0.33, 0.06), rbox(0.2, 0.62, 0.85, M.velvet, -1.0, 0.31, 0, 0.06), rbox(0.2, 0.62, 0.85, M.velvet, 1.0, 0.31, 0, 0.06));
+  const sofaModel = ctx.model("leather-sofa.glb", { fit: { w: 2.1 }, onLoad: () => { sofaOld.visible = false; } });
+  add(place(hs("sofa", group(sofaOld, sofaModel, box(2.1, 0.95, 0.9, ZONE, 0, 0.47, 0))), "w", 0.3, 0, 0.6));
   // Porträt Viktor Lehn – als einziges Bild exakt gerade
-  const portrait = group(box(0.74, 0.92, 0.05, phong(0x8a6a34)), plane(0.6, 0.76, lambert(0xffffff, { map: portraitTex() }), 0, 0.04, 0.027), plane(0.26, 0.06, lambert(0xffffff, { map: plaqueTex("V. LEHN", 256, 60, "#d4bc90", "#3a2a18", "600 30px Georgia, serif", 4) }), 0, -0.39, 0.028));
+  const portrait = group(ornateFrame(0.8, 1.0, lambert(0xffffff, { map: portraitTex() }), brassMat(0x9a7434, 0.38)), plane(0.26, 0.06, lambert(0xffffff, { map: plaqueTex("V. LEHN", 256, 60, "#d4bc90", "#3a2a18", "600 30px Georgia, serif", 4) }), 0, -0.6, 0.0));
   add(place(hs("portraet", portrait), "w", 0.6, 2.25, 0.03));
   // Ledersessel, auf den Eingang gerichtet
-  const chair = group(box(0.85, 0.42, 0.8, M.leather, 0, 0.21, 0), box(0.85, 0.65, 0.18, M.leather, 0, 0.72, -0.31), box(0.16, 0.6, 0.8, M.leather, -0.42, 0.3, 0), box(0.16, 0.6, 0.8, M.leather, 0.42, 0.3, 0));
+  // Ohrensessel: gepolsterte Teile mit runden Kanten, gedrechselte Füße
+  const chair = group(rbox(0.82, 0.18, 0.76, M.leather, 0, 0.36, 0.02, 0.07), rbox(0.82, 0.78, 0.2, M.leather, 0, 0.82, -0.3, 0.08),
+    rbox(0.15, 0.36, 0.76, M.leather, -0.42, 0.5, 0, 0.07), rbox(0.15, 0.36, 0.76, M.leather, 0.42, 0.5, 0, 0.07),
+    rbox(0.2, 0.42, 0.1, M.leather, -0.36, 1.0, -0.22, 0.05), rbox(0.2, 0.42, 0.1, M.leather, 0.36, 1.0, -0.22, 0.05), rbox(0.78, 0.12, 0.7, M.wood, 0, 0.24, 0.02, 0.02));
+  [[-0.35, -0.3], [0.35, -0.3], [-0.35, 0.32], [0.35, 0.32]].forEach(([x, z]) => { const l = turnedLeg(0.2, 0.035, M.wood); l.position.set(x, 0, z); chair.add(l); });
   chair.rotation.y = -0.9; // schaut zum Eingang (Süden)
   add(place(hs("sessel", chair), "w", 0.52, 0, 1.55)); // frei vor der Treppe, damit man unter sie leuchten kann
   // Beistelltisch mit Lampe
-  const side = group(cyl(0.22, 0.22, 0.03, M.wood, 0, 0.6, 0), cyl(0.03, 0.03, 0.6, M.dark, 0, 0.3, 0), cyl(0.07, 0.13, 0.15, lambert(0xcaa77a, { emissive: 0x6a4214 }), 0, 0.9, 0, 16), cyl(0.01, 0.01, 0.2, M.brass, 0, 0.72, 0));
+  // Beistelltisch (gedrechselt) mit Jugendstil-Lampe (Modell, CC BY 4.0 DGG)
+  const side = group(cyl(0.24, 0.24, 0.035, M.woodLight, 0, 0.62, 0, 32), turnedLeg(0.6, 0.05, M.wood), cyl(0.18, 0.2, 0.03, M.wood, 0, 0.015, 0, 24), ctx.model("nouveau-lamp.glb", { fit: { h: 0.5 } }));
+  side.children[3].position.y = 0.64;
   add(place(side, "w", 0.46, 0, 0.55));
   const sideL = new THREE.PointLight(0xffa860, 1.6, 0, 2); place(sideL, "w", 0.46, 1.0, 0.55); add(sideL);
   // Treppe nach oben (steigt Richtung Norden), darunter stockdunkel
@@ -331,6 +346,6 @@ defineRoom("rezeption", (ctx) => {
 
   // Hinweis auf den Spieler: ruhiges Atmen der Hängeleuchte (Sturm)
   anim((dt, t) => { pendLight.intensity = 7 + Math.sin(t * 0.7) * 0.3; });
-  return { eye: [0, 1.62, 0.2] };
+  return { eye: [0, 1.62, 0.2], hd: true, R, H, env: 0.35 };
 });
 ready(); // läuft das Spiel schon, sofort auf 3D umschalten

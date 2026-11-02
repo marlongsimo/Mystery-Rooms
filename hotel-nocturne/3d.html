@@ -44,6 +44,7 @@
         <a href="#" class="text-link hidden" id="newGameLink">Neues Spiel beginnen</a>
         <section class="mp-root" id="mpEntry" aria-label="Gemeinsam spielen"></section>
         <p><a href="index.html" class="text-link">← Zur normalen Version</a> · <a href="../index.html" class="text-link">Alle Escape Rooms</a></p>
+        <details class="test3d-credits"><summary>Bildnachweise 3D</summary><p>Ledersofa „SheenWoodLeatherSofa“ © 2024 Darmstadt Graphics Group GmbH · Tiffany-Lampe „StainedGlassLamp“ © 2021 Wayfair, LLC · Jugendstil-Lampe „LightsPunctualLamp“ © 2021 DGG – alle <a href="https://creativecommons.org/licenses/by/4.0/" class="text-link">CC BY 4.0</a>, aus den Khronos glTF-Sample-Assets, für das Web verkleinert. Umgebungslicht „lobby“: Poly Haven, CC0. Alles Weitere aus Code. Details: assets/3d/LIZENZEN.md</p></details>
       </div>
       <div class="intro-visual" aria-hidden="true">
         <svg viewBox="0 0 600 700" class="facade">
@@ -204,8 +205,9 @@
   <script src="../platform/multiplayer/mp-core.js?v=1"></script>
   <script src="../platform/multiplayer/mp-lobby.js?v=1"></script>
   <script src="js/mp-adapter.js?v=1"></script>
-  <script type="module" src="js/3d/rezeption.js?v=4"></script>
-  <script type="module" src="js/3d/zimmer217.js?v=5"></script>
+  <script type="importmap">{ "imports": { "three": "../platform/vendor/three-0.170.0/three.module.min.js" } }</script>
+  <script type="module" src="js/3d/rezeption.js?v=7"></script>
+  <script type="module" src="js/3d/zimmer217.js?v=6"></script>
   <script type="module" src="js/3d/gepaecklager.js?v=4"></script>
 </body>
 </html>

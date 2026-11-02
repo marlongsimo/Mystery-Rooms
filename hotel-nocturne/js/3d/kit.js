@@ -2,7 +2,7 @@
  * HOTEL NOCTURNE – 3D-Baukasten für Räume (ab Zimmer 217)
  * Texturen und Raumhülle, die mehrere Räume teilen. Die Rezeption hat ihre Helfer noch lokal.
  */
-import { THREE, canvasTex, lambert, box, plane, wallMesh, walls } from "./core.js?v=2";
+import { THREE, canvasTex, lambert, box, plane, wallMesh, walls } from "./core.js?v=3";
 
 export const textTex = (w, h, bg, draw) => canvasTex(w, h, (g) => { if (bg) { g.fillStyle = bg; g.fillRect(0, 0, w, h); } draw(g, w, h); });
 

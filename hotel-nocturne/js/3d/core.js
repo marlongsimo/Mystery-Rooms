@@ -126,7 +126,7 @@ function buildRoom(r) {
   };
   // Grundlicht, Taschenlampe, Blitz
   scene.add(new THREE.HemisphereLight(0x6a7890, 0x221810, 1.1));
-  flash = new THREE.SpotLight(0xfff0d0, 0, 11, 0.33, 0.55, 1.4);
+  flash = new THREE.SpotLight(0xfff0d0, 0, 12, 0.42, 0.5, 1.2);
   flashTarget = new THREE.Object3D(); flashTarget.position.set(0, 0, -1);
   camera.add(flash); camera.add(flashTarget); flash.position.set(0, -0.05, 0); flash.target = flashTarget;
   boltLight = new THREE.DirectionalLight(0xbcd2ff, 0); boltLight.position.set(0, 3, 6); scene.add(boltLight);
@@ -238,7 +238,7 @@ function frame() {
   camera.rotation.set(pitch, yaw, 0, "YXZ");
   // Taschenlampe: am Computer folgt sie der Maus, am Handy zeigt sie geradeaus
   const L = E().isLight();
-  flash.intensity += ((L ? 26 : 0) - flash.intensity) * Math.min(1, dt * 10);
+  flash.intensity += ((L ? 40 : 0) - flash.intensity) * Math.min(1, dt * 10);
   const aim = isTouch() ? new THREE.Vector2(0, 0) : flashAim;
   flashTarget.position.set(aim.x * Math.tan(camera.fov * Math.PI / 360) * camera.aspect, aim.y * Math.tan(camera.fov * Math.PI / 360), -1);
   if (boltLight.intensity > 0) boltLight.intensity = Math.max(0, boltLight.intensity - dt * 22);

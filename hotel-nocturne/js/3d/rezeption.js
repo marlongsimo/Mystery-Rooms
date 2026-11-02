@@ -5,7 +5,8 @@
  * Bildhinweise, die in 3D erkennbar bleiben müssen: Uhr steht auf 23:17 · Anzeige am Aufzug mit rot eingekreister 2 ·
  * nur das Porträt hängt gerade · lose Seite im Gästeregister · stockdunkle Ecke unter der Treppe (Taschenlampe).
  */
-import { THREE, defineRoom, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group, wallMesh, walls } from "./core.js";
+// Version im Import = Cache-Steuerung; core.js darf nur einmal (mit derselben URL) geladen werden
+import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group, wallMesh, walls } from "./core.js?v=2";
 
 const R = 3.2, H = 3.4;
 
@@ -137,12 +138,12 @@ defineRoom("rezeption", (ctx) => {
 
   /* ================= NORD · Empfang ================= */
   // Tresen über fast die ganze Wand, mit zwei Schubladen (reine Optik)
-  const counter = group(box(4.6, 1.04, 0.7, M.wood, 0, 0.52, 0), box(4.8, 0.07, 0.86, M.woodLight, 0, 1.075, 0.04), box(4.8, 0.02, 0.02, M.brass, 0, 1.04, 0.47));
-  [-1.7, -0.57, 0.57, 1.7].forEach((x) => counter.add(box(1.0, 0.62, 0.02, M.dark, x, 0.42, 0.355)));
-  add(place(counter, "n", 0.5, 0, 1.15));
+  const counter = group(box(3.9, 1.04, 0.7, M.wood, 0, 0.52, 0), box(4.1, 0.07, 0.86, M.woodLight, 0, 1.075, 0.04), box(4.1, 0.02, 0.02, M.brass, 0, 1.04, 0.47));
+  [-1.45, -0.48, 0.48, 1.45].forEach((x) => counter.add(box(0.85, 0.62, 0.02, M.dark, x, 0.42, 0.355)));
+  add(place(counter, "n", 0.56, 0, 1.15)); // endet vor der Treppe in der Nordwest-Ecke
   ["links", "rechts"].forEach((side, i) => {
     const dr = group(box(0.9, 0.18, 0.5, M.woodLight, 0, 0, -0.24), box(0.18, 0.03, 0.03, M.brass, 0, 0, 0.02));
-    dr.position.set(i ? 1.15 : -1.15, 0.88, 0.36); const holder = group(dr); place(holder, "n", 0.5, 0, 1.15); add(holder);
+    dr.position.set(i ? 0.97 : -0.97, 0.88, 0.36); const holder = group(dr); place(holder, "n", 0.56, 0, 1.15); add(holder);
     let open = false;
     prop("Schublade", dr, () => { open = !open; const N = window.NOCTURNE; N.audio && N.audio.play && N.audio.play("click"); N.engine.say(open ? (i ? "Die Schublade klemmt kurz, dann gleitet sie auf. Gummibänder, eine leere Stempelkissendose. Nichts von Bedeutung." : "Quittungsblöcke, ein vertrockneter Kugelschreiber, Staub. Wer hier gearbeitet hat, ist vor langer Zeit gegangen.") : ""); });
     anim((dt) => { dr.position.z = lerp(dr.position.z, open ? 0.62 : 0.36, Math.min(1, dt * 8)); });
@@ -152,7 +153,7 @@ defineRoom("rezeption", (ctx) => {
   const phone = group(box(0.3, 0.08, 0.22, M.black, 0, 0.04, 0), box(0.26, 0.05, 0.07, M.black, 0, 0.1, -0.04), cyl(0.04, 0.04, 0.05, M.black, -0.11, 0.1, -0.04), cyl(0.04, 0.04, 0.05, M.black, 0.11, 0.1, -0.04), led);
   led.position.set(0.1, 0.085, 0.07);
   anim((dt, t) => { led.material.color.setHex(Math.sin(t * 6) > 0 ? 0xff2a1a : 0x3a0806); });
-  add(place(hs("telefon", phone), "n", 0.3, 1.11, 1.25));
+  add(place(hs("telefon", phone), "n", 0.33, 1.11, 1.25));
   // Gästeregister (aufgeschlagen) + lose Seite (Geheimnis)
   const book = group(box(0.62, 0.03, 0.42, lambert(0x4a1414), 0, 0.015, 0));
   const pl = plane(0.29, 0.39, lambert(0xffffff, { map: pageTex(14) })); pl.rotation.set(-Math.PI / 2, 0, 0.04); pl.position.set(-0.15, 0.036, 0); book.add(pl);
@@ -291,7 +292,7 @@ defineRoom("rezeption", (ctx) => {
   // Ledersessel, auf den Eingang gerichtet
   const chair = group(box(0.85, 0.42, 0.8, M.leather, 0, 0.21, 0), box(0.85, 0.65, 0.18, M.leather, 0, 0.72, -0.31), box(0.16, 0.6, 0.8, M.leather, -0.42, 0.3, 0), box(0.16, 0.6, 0.8, M.leather, 0.42, 0.3, 0));
   chair.rotation.y = -0.9; // schaut zum Eingang (Süden)
-  add(place(hs("sessel", chair), "w", 0.62, 0, 1.2));
+  add(place(hs("sessel", chair), "w", 0.52, 0, 1.55)); // frei vor der Treppe, damit man unter sie leuchten kann
   // Beistelltisch mit Lampe
   const side = group(cyl(0.22, 0.22, 0.03, M.wood, 0, 0.6, 0), cyl(0.03, 0.03, 0.6, M.dark, 0, 0.3, 0), cyl(0.07, 0.13, 0.15, lambert(0xcaa77a, { emissive: 0x6a4214 }), 0, 0.9, 0, 16), cyl(0.01, 0.01, 0.2, M.brass, 0, 0.72, 0));
   add(place(side, "w", 0.46, 0, 0.55));
@@ -313,9 +314,13 @@ defineRoom("rezeption", (ctx) => {
   const cornerZone = box(sx1 - sx0, 1.4, 1.2, ZONE, (sx0 + sx1) / 2, 0.7, 0.6); stair.add(cornerZone);
   hs("ecke", cornerZone);
   // Schraubendreher (nur im Lichtkegel)
-  const sd = group(cyl(0.018, 0.018, 0.13, lambert(0x9a1e14), 0, 0, 0), cyl(0.005, 0.005, 0.16, phong(0xb0b4b8), 0, 0.145, 0)); sd.rotation.z = Math.PI / 2 - 0.3; sd.rotation.x = Math.PI / 2;
-  sd.position.set(sx0 + 0.95, 0.03, 0.55); stair.add(sd);
-  sd.add(box(0.12, 0.3, 0.12, ZONE, 0, 0.07, 0));
+  // gut sichtbar, sobald der Lichtkegel darauf fällt: roter Griff, blanker Schaft, kleiner Glanzpunkt
+  const glint = new THREE.Mesh(new THREE.SphereGeometry(0.012, 10, 8), basic(0xffffff));
+  const sd = group(cyl(0.03, 0.03, 0.2, lambert(0xd0281a, { emissive: 0x2a0604 }), 0, 0, 0), cyl(0.009, 0.009, 0.24, phong(0xdfe3e8, { shininess: 120, specular: 0xffffff }), 0, 0.22, 0), glint);
+  glint.position.set(0, 0.3, 0.01);
+  sd.rotation.set(0, 0.5, Math.PI / 2); sd.position.set(sx0 + 1.0, 0.032, 0.85); stair.add(sd);
+  sd.add(box(0.16, 0.5, 0.16, ZONE, 0, 0.12, 0));
+  anim((dt, t) => { glint.scale.setScalar(0.7 + Math.abs(Math.sin(t * 2.2)) * 0.8); });
   hs("schraubendreher", sd, { hideWhenHidden: true });
   place(stair, "w", 0.5, 0, 0); add(stair);
   state((has, light) => {
@@ -327,3 +332,4 @@ defineRoom("rezeption", (ctx) => {
   anim((dt, t) => { pendLight.intensity = 7 + Math.sin(t * 0.7) * 0.3; });
   return { eye: [0, 1.62, 0.2] };
 });
+ready(); // läuft das Spiel schon, sofort auf 3D umschalten

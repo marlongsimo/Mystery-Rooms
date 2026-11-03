@@ -14,7 +14,7 @@ async function enter(p, url) {
   await p.goto(url); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(400);
   await p.click('#startButton'); await p.waitForTimeout(500);
   if (await p.$('.cf-cold .cine-btn')) { await p.click('.cf-cold .cine-btn'); await p.waitForTimeout(400); } // Vorspann (filmische Fallakte)
-  for (let i = 0; i < 10; i++) { const n = await p.$('[data-pz="next"]'); if (!n) break; await n.click(); await p.waitForTimeout(200); }
+  for (let i = 0; i < 10; i++) { const n = await p.$('[data-pz="next"]'); if (!n) break; await n.click({ force: true }); await p.waitForTimeout(300); } // Knöpfe blenden animiert ein
   await p.waitForTimeout(300); if (await p.$('.cine-btn')) await p.click('.cine-btn'); await p.waitForTimeout(700);
   if (await p.$('#dialog[open] [data-close]')) await p.click('#dialog[open] [data-close]'); await p.waitForTimeout(300);
 }

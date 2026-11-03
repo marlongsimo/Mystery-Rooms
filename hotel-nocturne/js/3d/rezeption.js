@@ -326,7 +326,7 @@ defineRoom("rezeption", (ctx) => {
   const screwTwist = twister(() => scr()[active]);
   const loosen = (i, amt) => { if (prog[i] >= 1) return; active = i; prog[i] = Math.max(0, Math.min(1, prog[i] + amt)); if (prog[i] >= 1) { fallT[i] = 0; snd("drop"); if (prog.every((v) => v >= 1)) { unscrewed = true; setTimeout(() => eng().hotspot("abdeckung"), 700); } } };
   const coverSpec = {
-    useItem: "schraubendreher", when: () => !eng().has("cover_open"), cam: [0, 0, 0.42], center: [0, 0, 0], fov: 45, exitDelay: 2600,
+    useItem: "schraubendreher", when: () => !eng().has("cover_open"), cam: [0, -0.03, 0.6], center: [0, -0.03, 0], fov: 45, exitDelay: 2600,
     hint: "Schraube antippen · gegen den Uhrzeigersinn drehen", value: () => prog.map((v) => v.toFixed(2)).join(" "),
     enter: () => { sdHand.visible = true; }, exit: () => { sdHand.visible = false; },
     parts: () => scr().map((sc, i) => ({ obj: sc, name: "schraube" + i, tap: () => { if (active !== i) { active = i; snd("click"); } else loosen(i, 0.25); },

@@ -233,8 +233,10 @@ defineRoom("keller", (ctx) => {
   const plan = plane(0.52, 0.69, std(0xffffff, { map: planTex(), roughness: 0.2 })); plan.rotation.z = 0.02;
   const planG = group(plan); const planA = inner(planG); const planGo = lift(ctx, (k) => { planA.position.set(0, -0.25 * k, 0.6 * k); }, 0.7);
   add(place(hs("wandplan", planG, { act: { play: () => { planGo(); snd("paper"); return 750; } } }), "s", 0.84, 1.95, 0.012));
+  // schwaches Arbeitslicht an der Schalttafel, sobald der Generator läuft (damit alle vier Hebel zu sehen sind)
+  const pilot = new THREE.PointLight(0xffd8a0, 0, 3.2, 2); pilot.position.set(0, 2.5, 0.9); board.add(pilot);
   let strom = false;
-  state((has) => { strom = has("strom"); lamps.forEach((l) => l.material.color.setHex(strom ? 0x9fe0b0 : 0x3a2a24)); display.paint(strom); });
+  state((has) => { strom = has("strom"); pilot.intensity = has("gen_laeuft") && !strom ? 1.4 : 0; lamps.forEach((l) => l.material.color.setHex(strom ? 0x9fe0b0 : 0x3a2a24)); display.paint(strom); });
   anim((dt) => { levers.forEach((lv, i) => { lv.rotation.x = lerp(lv.rotation.x, strom || down[i] ? Math.PI * 0.9 : 0, Math.min(1, dt * (hLock ? 12 : 6))); }); });
 
   /* ================= WEST · alte Wäscherei: Mangel, Säcke, Wäscheschrank, Stahltür ================= */
@@ -261,7 +263,7 @@ defineRoom("keller", (ctx) => {
   [-0.34, 0.34].forEach((x) => { cab.add(panel(0.6, 2.3, M.wood, x, 1.25, 0.305, 0.06, 0.01)); cab.add(box(0.03, 0.22, 0.03, std(0x806040, { metalness: 0.6, roughness: 0.4 }), x > 0 ? 0.06 : -0.06, 1.25, 0.34)); });
   const brackets = group(), screws = [];
   [[-0.72, 2.3], [0.72, 2.3], [-0.72, 0.25], [0.72, 0.25]].forEach(([x, y]) => { brackets.add(box(0.08, 0.1, 0.1, std(0x5a5c55, { metalness: 0.7, roughness: 0.5 }), x, y, 0.05));
-    const sc = group(new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 6), M.brass), box(0.004, 0.022, 0.004, M.black, 0, 0, 0.012), box(0.2, 0.2, 0.1, ZONE, 0, 0, 0));
+    const sc = group(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), M.brass), box(0.006, 0.034, 0.006, M.black, 0, 0, 0.02), box(0.24, 0.24, 0.1, ZONE, 0, 0, 0));
     sc.position.set(x + (x > 0 ? 0.03 : -0.03), y, 0.1); brackets.add(sc); screws.push({ g: sc, out: 0, turn: 0 }); });
   cab.add(brackets);
   // Mit dem Schraubendreher (gewählt) die vier Schrauben herausdrehen: gegen den Uhrzeigersinn drehen oder je zweimal antippen
@@ -269,7 +271,7 @@ defineRoom("keller", (ctx) => {
   const scDone = () => { if (!scFired && screws.every((s) => s.out >= 1)) { scFired = true; snd("screws"); setTimeout(() => eng().hotspot("waescheschrank"), 500); } };
   const scStep = (s, a) => { s.turn += a; s.out = Math.min(1, s.turn / (Math.PI * 2)); if (s.out >= 1) snd("click"); scDone(); };
   anim((dt) => { screws.forEach((s) => { s.g.rotation.z = s.turn; s.g.position.z = 0.1 + s.out * 0.05; s.g.visible = s.out < 1 || s.g.position.z < 0.14; }); });
-  const cabSpec = { useItem: "schraubendreher", when: () => !eng().has("schrank_weg"), cam: [0, 1.3, 3.1], center: [0, 1.27, 0.3], fov: 50, exitDelay: 1800,
+  const cabSpec = { useItem: "schraubendreher", when: () => !eng().has("schrank_weg"), cam: [0, 1.35, 2.9], center: [0, 1.3, 0.3], fov: 66, exitDelay: 1800,
     hint: "Vier Schrauben herausdrehen (gegen den Uhrzeigersinn oder antippen)", value: () => screws.filter((s) => s.out >= 1).length + "/4",
     enter: () => { scFired = false; screws.forEach((s) => { s.out = 0; s.turn = 0; }); },
     parts: () => screws.map((s, i) => ({ obj: s.g, name: "schraube" + i, tap: () => { scStep(s, Math.PI + 0.01); snd("key"); }, drag: (dx, dy, pt) => scStep(s, Math.max(0, -scTw[i].delta(pt))), release: () => scTw[i].reset() })) };

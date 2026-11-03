@@ -263,7 +263,7 @@ defineRoom("keller", (ctx) => {
   [-0.34, 0.34].forEach((x) => { cab.add(panel(0.6, 2.3, M.wood, x, 1.25, 0.305, 0.06, 0.01)); cab.add(box(0.03, 0.22, 0.03, std(0x806040, { metalness: 0.6, roughness: 0.4 }), x > 0 ? 0.06 : -0.06, 1.25, 0.34)); });
   const brackets = group(), screws = [];
   [[-0.72, 2.3], [0.72, 2.3], [-0.72, 0.25], [0.72, 0.25]].forEach(([x, y]) => { brackets.add(box(0.08, 0.1, 0.1, std(0x5a5c55, { metalness: 0.7, roughness: 0.5 }), x, y, 0.05));
-    const sc = group(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), M.brass), box(0.006, 0.034, 0.006, M.black, 0, 0, 0.02), box(0.24, 0.24, 0.1, ZONE, 0, 0, 0));
+    const sc = group(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), M.brass), box(0.006, 0.034, 0.006, M.black, 0, 0, 0.02), box(0.42, 0.42, 0.1, ZONE, 0, 0, 0)); // große Greiffläche: Drehgeste darf neben dem Kopf beginnen
     sc.position.set(x + (x > 0 ? 0.03 : -0.03), y, 0.1); brackets.add(sc); screws.push({ g: sc, out: 0, turn: 0 }); });
   cab.add(brackets);
   // Mit dem Schraubendreher (gewählt) die vier Schrauben herausdrehen: gegen den Uhrzeigersinn drehen oder je zweimal antippen

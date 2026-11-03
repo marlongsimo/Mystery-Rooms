@@ -8,7 +8,7 @@
   <title>Hotel Nocturne – 3D-Testmodus</title>
   <link rel="stylesheet" href="css/fonts.css?v=22">
   <link rel="stylesheet" href="css/style.css?v=22">
-  <link rel="stylesheet" href="css/3d.css?v=3">
+  <link rel="stylesheet" href="css/3d.css?v=4">
   <meta name="robots" content="noindex">
   <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
   <link rel="stylesheet" href="../platform/rating/rating.css?v=1">
@@ -38,7 +38,7 @@
         <p class="lead">Ein Hotel, sechs Gäste, die jene Nacht nicht überleben sollten, und eine Wahrheit, die seit siebzehn Jahren hinter verschlossenen Türen liegt.</p>
         <div class="intro-rule"></div>
         <p class="intro-note">RESERVIERUNG BESTÄTIGT<br><strong><span id="introName">Verehrter Gast</span> · Zimmer 217 · Check-in 23:17 Uhr</strong></p>
-        <p class="test3d-banner"><b>Testmodus 3D:</b> Rezeption, Zimmer 217, Gepäcklager, Archiv, Überwachungsraum und Keller sind begehbar als 360°-Räume – ziehen zum Umsehen, antippen zum Untersuchen. Die übrigen Räume laufen noch in der gewohnten Ansicht. Eigener Spielstand, die normale Version bleibt unberührt.</p>
+        <p class="test3d-banner"><b>Testmodus 3D:</b> Alle sieben Räume sind begehbar als 360°-Räume, Intro und Finale laufen als Kamerafahrt – ziehen zum Umsehen, antippen zum Untersuchen. Eigener Spielstand, die normale Version bleibt unberührt.</p>
         <button class="primary-button" id="startButton">Einchecken (Testmodus) <span>→</span></button>
         <p class="micro sp-only">SPIELZEIT CA. 90–120 MIN · ALLEIN ODER BIS ZU VIERT · MIT TON EMPFOHLEN</p>
         <a href="#" class="text-link hidden" id="newGameLink">Neues Spiel beginnen</a>
@@ -195,7 +195,7 @@
   <script src="js/rooms/06-keller.js?v=22"></script>
   <script src="js/rooms/07-buero.js?v=22"></script>
   <script src="js/prolog.js?v=23"></script>
-  <script src="js/engine.js?v=25"></script>
+  <script src="js/engine.js?v=26"></script>
   <!-- Multiplayer (optional): Plattform-Modul + Anbindung. Ohne diese Zeilen läuft das Spiel als Einzelspieler. -->
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>
@@ -211,6 +211,8 @@
   <script type="module" src="js/3d/archiv.js?v=1"></script>
   <script type="module" src="js/3d/ueberwachung.js?v=1"></script>
   <script type="module" src="js/3d/keller.js?v=1"></script>
+  <script type="module" src="js/3d/buero.js?v=1"></script>
+  <script type="module" src="js/3d/finale.js?v=1"></script>
   <script type="module" src="js/3d/intro.js?v=1"></script>
 </body>
 </html>

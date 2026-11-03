@@ -1086,7 +1086,7 @@
      control: "skip" (Überspringen beendet alles) oder "next" (Weiter → nächster Schritt) */
   const VOICE_DIR = "assets/audio/sprecher/";
   const voiceOn = (v) => { if (N.config.introVoice && v) A.voice(VOICE_DIR + v + ".mp3"); };
-  function playCinematic(el, steps, { control = "skip", onDone = () => {} } = {}) {
+  function playCinematic(el, steps, { control = "skip", onDone = () => {}, onStep = null, noScene = false } = {}) {
     let i = -1, timer = null, done = false;
     el.innerHTML = `<div class="cine-scene"></div><div class="cine-letter"></div><div class="cine-msg" aria-live="polite"></div>
       <div class="cine-text" aria-live="polite"></div><button class="cine-btn" type="button">${control === "skip" ? "Überspringen ›" : "Weiter ›"}</button>`;
@@ -1097,7 +1097,8 @@
       clearTimeout(timer); A.stopVoice();
       const st = steps[++i];
       if (!st) return finish();
-      if (st.scene) {
+      if (onStep) onStep(i, st); // 3D-Finale: Kamera/Licht zum Schritt
+      if (st.scene && !noScene) {
         sc.innerHTML = st.scene === "lobby" ? N.rooms[0].views[0].scene.replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') : st.scene;
         sc.className = "cine-scene"; void sc.offsetWidth; sc.classList.add("in");
       }
@@ -1259,7 +1260,11 @@
     A.ambient("rain");
     const el = $("#finale");
     el.className = "finale show cine";
-    finaleCine = playCinematic(el, r.finale.steps, { control: "next", onDone: () => { el.className = "finale"; finaleRunning = false; showEnding(); } });
+    // 3D-Testmodus: Schlussszene als Kamerafahrt (js/3d/finale.js) – Texte, Nachricht und Brief kommen weiter von hier
+    const f3 = N.view3d && N.view3d.finale ? N.view3d.finale(el) : null;
+    const done = () => { if (f3) f3.stop(); el.className = "finale"; finaleRunning = false; showEnding(); };
+    const cine = playCinematic(f3 ? f3.over : el, r.finale.steps, { control: "next", onDone: done, onStep: f3 ? f3.shot : null, noScene: Boolean(f3) });
+    finaleCine = f3 ? { stop: () => { cine.stop(); f3.stop(); } } : cine;
   }
 
   function showEnding() {

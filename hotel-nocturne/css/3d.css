@@ -88,3 +88,13 @@
   .cinefile *, .cf-cold * { animation-duration: 0s !important; animation-delay: 0s !important; }
   .cinefile .cf-props { animation: none !important; }
 }
+
+/* ---------- Finale in 3D (js/3d/finale.js): 3D-Bild unten, Texte/Nachricht/Brief der Engine darüber ---------- */
+.finale .c3-stage { position: absolute; inset: 0; }
+.finale .c3-dark { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 4s ease; pointer-events: none; z-index: 1; }
+.finale .c3-bar { position: absolute; left: 0; right: 0; height: 9vh; background: #000; z-index: 1; pointer-events: none; }
+.finale .c3-bar.top { top: 0; } .finale .c3-bar.bottom { bottom: 0; }
+.finale .c3-over { position: absolute; inset: 0; z-index: 2; }
+.finale .c3-over .cine-scene { display: none; }
+.finale .c3-over .cine-text { bottom: calc(9vh + 18px); }
+.finale .c3-over .cine-text:not(.big) p { background: #000000a0; }

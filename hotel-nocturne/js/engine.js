@@ -528,6 +528,10 @@
 
   /* Prüfung einer Eingabe – gemeinsam für den Dialog und die direkte Bedienung in 3D (tryLock) */
   function checkAnswer(p, value) {
+    if (p.type === "cipher") { // Stellung des inneren Rings (wie im Dialog: richtig = p.shift)
+      const k = Number(value);
+      return k === p.shift ? { ok: true } : { ok: false, msg: (p.wrongShift && p.wrongShift[k]) || "Der Text ist noch nicht lesbar." };
+    }
     if ((p.answers || []).map(norm).includes(norm(value))) return { ok: true };
     return { ok: false, msg: (p.wrong && p.wrong[norm(value)]) || p.wrongDefault || null };
   }

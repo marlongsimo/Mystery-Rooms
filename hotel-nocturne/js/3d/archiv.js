@@ -12,6 +12,7 @@ import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, pl
 import { textTex, plankTex, plaqueTex, shell } from "./kit.js?v=2";
 import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame } from "./hd.js?v=2";
 import { tag } from "./gfx.js?v=1";
+import { combinationLock, twister, lift } from "./interact.js?v=3";
 
 const R = 2.8, H = 3.2;
 const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -103,6 +104,8 @@ const steelTex = () => canvasTex(256, 512, (g, w, h) => {
 
 defineRoom("archiv", (ctx) => {
   const { add, hs, state, anim, lerp } = ctx;
+  const snd = ctx.sound, eng = ctx.engine;
+  const inner = (g) => { const a = new THREE.Group(); while (g.children.length) a.add(g.children[0]); g.add(a); return a; }; // innen animieren, außen bleibt die Platzierung
   const M = {
     wall: tag(lambert(0xffffff, { map: damask("#1e1a12", "#2c2618", "#4e4630") }), { roughness: 0.85, normal: 0.9 }),
     floor: tag(lambert(0xffffff, { map: plankTex("#2a1d14", "#120b06") }), { roughness: 0.55, clearcoat: 0.2, normal: 1.6, envMapIntensity: 0.4 }),
@@ -154,7 +157,8 @@ defineRoom("archiv", (ctx) => {
   // Protokollbuch 2009 (rot) rechts in der Jahresreihe – verschwindet beim Ereignis
   const pBook = group(box(0.05, 0.3, 0.24, std(0x7a2a24, { roughness: 0.6 }), 0, 0.15, 0), plane(0.03, 0.2, lambert(0xffffff, { map: textTex(32, 256, "#7a2a24", (g) => { g.save(); g.translate(16, 128); g.rotate(-Math.PI / 2); g.fillStyle = "#e6dcc3"; g.font = "600 15px DM Mono, monospace"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("PROTOKOLLE 2009", 0, 0); g.restore(); }) }), 0, 0.15, 0.121));
   pBook.add(box(0.09, 0.34, 0.28, ZONE, 0, 0.16, 0));
-  add(place(hs("protokollbuch_regal", pBook, { hideWhenHidden: true }), "n", 0.63 + 1.12 / (2 * R), 0.86, 0.24));
+  const pbA = inner(pBook); const pbGo = lift(ctx, (k) => { pbA.position.z = 0.16 * k; pbA.rotation.z = 0.12 * k; }, 0.5);
+  add(place(hs("protokollbuch_regal", pBook, { hideWhenHidden: true, act: { play: () => { pbGo(); snd("paper"); return 600; } } }), "n", 0.63 + 1.12 / (2 * R), 0.86, 0.24));
 
   // Lesetisch vor dem Regal; Staubrechteck, nach dem Ereignis das aufgeschlagene Buch
   const table = group(rbox(1.3, 0.05, 0.66, M.wood, 0, 0.76, 0, 0.015), rbox(1.2, 0.1, 0.56, M.woodDark, 0, 0.68, 0, 0.01));
@@ -180,8 +184,14 @@ defineRoom("archiv", (ctx) => {
   const fach = group(rbox(0.9, 0.18, 0.76, M.wood, 0, 0, -0.38, 0.01), plane(0.38, 0.09, lambert(0xffffff, { map: wheelsTex() }), 0, -0.02, 0.012), plane(0.22, 0.055, lambert(0xffffff, { map: carveTex() }), 0, 0.055, 0.011));
   fach.add(rbox(0.5, 0.012, 0.32, M.paper, 0, 0.08, -0.25, 0.004)); // dünne Akte im Fach
   fach.position.set(0, 0.66, 0.41);
-  const fachG = group(fach); add(place(hs("schreibtischfach", fachG), "e", 0.5, 0, 0.45));
-  let fOpen = false; state((has) => { fOpen = has("fach_offen"); fach.children[1].visible = !fOpen; });
+  // acht Buchstabenräder am Fach (Rätsel „fach“), direkt bedienbar
+  fach.children[1].visible = false;
+  const fLock = combinationLock(ctx, { pid: "fach", symbols: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", count: 8, brass: M.brass, dark: std(0x120e0b, { roughness: 0.6 }), handle: "knopf" });
+  fLock.group.scale.setScalar(0.27); fLock.group.position.set(0, -0.026, 0.012); fach.add(fLock.group);
+  const fachSpec = { when: () => !eng().isSolved("fach"), cam: [0, 0.72, 1.0], center: [0, 0.65, 0.42], fov: 36, exitDelay: 1600,
+    hint: "„Wohin?“ · Räder antippen oder wischen · Knopf drücken", value: fLock.value, parts: fLock.parts };
+  const fachG = group(fach); add(place(hs("schreibtischfach", fachG, { focus: fachSpec }), "e", 0.5, 0, 0.45));
+  let fOpen = false; state((has) => { fOpen = has("fach_offen"); fLock.group.visible = !fOpen; });
   anim((dt) => { fach.position.z = lerp(fach.position.z, fOpen ? 0.78 : 0.41, Math.min(1, dt * 3)); });
   // Grüne Bankerlampe (brennt) – Hauptlicht mit Schatten
   const shadeGeo = new THREE.CylinderGeometry(0.11, 0.11, 0.34, 24, 1, true, 0, Math.PI); shadeGeo.rotateZ(Math.PI / 2);
@@ -190,16 +200,21 @@ defineRoom("archiv", (ctx) => {
   const lamp = group(rbox(0.26, 0.04, 0.16, M.brass, 0, 0.02, 0, 0.01), cyl(0.012, 0.012, 0.36, M.brass, 0, 0.22, -0.04), shade, cyl(0.004, 0.004, 0.12, M.brass, 0.1, 0.3, 0.06));
   const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.025, 10, 8), basic(0xfff0c8)); bulb.position.set(0, 0.37, 0.05); lamp.add(bulb);
   lamp.add(box(0.36, 0.5, 0.26, ZONE, 0, 0.25, 0));
-  add(place(hs("leselampe", lamp), "e", 0.5 - 0.72 / (2 * R), 0.83, 0.55));
+  let lampOff = 0; const chain = lamp.children[3];
+  const lampGo = () => { lampOff = 0.6; snd("click"); setTimeout(() => snd("click"), 500); };
+  add(place(hs("leselampe", lamp, { act: { play: () => { lampGo(); return 700; } } }), "e", 0.5 - 0.72 / (2 * R), 0.83, 0.55));
+  anim((dt) => { if (lampOff > 0) { lampOff -= dt; chain.position.y = 0.3 - (lampOff > 0.4 ? 0.03 : 0); } else chain.position.y = 0.3; });
   const lampL = new THREE.PointLight(0xffd8a0, 6, 0, 2); place(lampL, "e", 0.5 - 0.72 / (2 * R), 1.12, 0.7); lampL.userData.shadow = true; add(lampL);
-  anim((dt, t) => { lampL.intensity = 6 * (0.97 + Math.sin(t * 9) * 0.015 + (Math.random() - 0.5) * 0.02); });
+  anim((dt, t) => { lampL.intensity = lampOff > 0.05 && lampOff < 0.5 ? 0.2 : 6 * (0.97 + Math.sin(t * 9) * 0.015 + (Math.random() - 0.5) * 0.02); });
   // Schreibmaschine mit eingespanntem Blatt
   const tw = group(rbox(0.42, 0.1, 0.32, std(0x1f1c19, { roughness: 0.35, metalness: 0.3 }), 0, 0.05, 0, 0.03), rbox(0.42, 0.08, 0.12, std(0x1f1c19, { roughness: 0.35, metalness: 0.3 }), 0, 0.12, -0.1, 0.03));
   const platen = cyl(0.03, 0.03, 0.46, M.black, 0, 0.17, -0.12); platen.rotation.z = Math.PI / 2; tw.add(platen);
   const sheet = plane(0.22, 0.17, lambert(0xffffff, { map: typeSheetTex(), side: THREE.DoubleSide }), 0, 0.25, -0.13); sheet.rotation.x = -0.25; tw.add(sheet);
   for (let r = 0; r < 3; r++) for (let i = 0; i < 9; i++) tw.add(cyl(0.011, 0.011, 0.012, std(0x3a3530, { roughness: 0.4 }), -0.16 + i * 0.04 + r * 0.01, 0.105 + r * 0.012, 0.11 - r * 0.045, 10));
   tw.rotation.y = 0.1; tw.add(box(0.48, 0.32, 0.36, ZONE, 0, 0.14, 0));
-  add(place(hs("schreibmaschine", tw), "e", 0.5 - 0.3 / (2 * R), 0.83, 0.5));
+  const twKeys = tw.children.slice(4, 31); let typeT = -1;
+  anim((dt) => { if (typeT < 0) return; typeT += dt; const n = Math.floor(typeT * 9); twKeys.forEach((k, i) => { k.position.y = (k.userData.y0 ??= k.position.y) - ((i * 7 + n * 5) % 27 === 0 && typeT < 1.1 ? 0.004 : 0); }); platen.position.x = -0.05 * Math.min(1, typeT); if (typeT > 1.4) { typeT = -1; platen.position.x = 0; } });
+  add(place(hs("schreibmaschine", tw, { act: { play: () => { typeT = 0; [0, 110, 230, 340, 470, 600].forEach((ms) => setTimeout(() => snd("key"), ms)); return 800; } } }), "e", 0.5 - 0.3 / (2 * R), 0.83, 0.5));
   // Brief von Tomasz
   const letter = plane(0.22, 0.165, lambert(0xffffff, { map: letterTex() })); letter.rotation.set(-Math.PI / 2, 0, -0.08);
   add(place(hs("brief_tomasz", group(letter, box(0.26, 0.03, 0.2, ZONE, 0, 0.01, 0))), "e", 0.5 + 0.1 / (2 * R), 0.832, 0.62));
@@ -208,8 +223,23 @@ defineRoom("archiv", (ctx) => {
   const discI = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.012, 40), [M.brassDark, std(0xffffff, { map: cipherTex(250, 150, "#8a6e45", "#1a120a", "#3a2c1b"), metalness: 0.5, roughness: 0.4, transparent: true }), M.brassDark]);
   discI.position.y = 0.008;
   const cipher = group(discO, discI, box(0.24, 0.05, 0.24, ZONE, 0, 0.02, 0));
-  add(place(hs("chiffrierscheibe", cipher), "e", 0.5 + 0.42 / (2 * R), 0.84, 0.55));
-  anim((dt, t) => { discI.rotation.y = Math.sin(t * 0.3) * 0.05; });
+  // Innerer Ring direkt drehen (rastet je Buchstabe ein), Prüfknopf aus Messing; Prüfung durch die Engine (Stellung, wie im Dialog)
+  const CSTEP = (Math.PI * 2) / 26; let cK = 0, cAng = 0, cDrag = false; const cTw = twister(ctx, () => cipher);
+  const chk = group(cyl(0.016, 0.018, 0.016, M.brass, 0, 0.008, 0, 20), cyl(0.011, 0.011, 0.01, M.brassDark, 0, 0.02, 0, 16)); chk.position.set(0.15, 0, 0.05); cipher.add(chk);
+  const mark = new THREE.Mesh(new THREE.ConeGeometry(0.008, 0.02, 3), M.brassDark); mark.rotation.x = Math.PI / 2; mark.position.set(0, 0.012, -0.118); cipher.add(mark); // Markierung oben
+  let chkT = -1;
+  const cipherSpec = { when: () => !eng().isSolved("chiffre"), cam: [0, 0.36, 0.2], center: [0, 0, 0], fov: 42, exitDelay: 1600,
+    hint: "Inneren Ring drehen · Knopf rechts prüft", value: () => String(cK),
+    parts: () => [
+      { obj: discI, name: "ring", tap: (h, info) => { cK = (cK + 1) % 26; snd("key"); }, drag: (dx, dy, pt) => { cDrag = true; cAng += cTw.delta(pt); }, release: (moved) => { cDrag = false; cTw.reset(); if (moved) { cK = ((Math.round(cAng / CSTEP) % 26) + 26) % 26; cAng = cK * CSTEP; snd("key"); } } },
+      { obj: chk, name: "pruefen", tap: () => { chkT = 0; eng().tryLock("chiffre", cK); } },
+    ] };
+  add(place(hs("chiffrierscheibe", cipher, { focus: cipherSpec }), "e", 0.5 + 0.42 / (2 * R), 0.84, 0.55));
+  anim((dt, t) => {
+    if (!cDrag) { let target = cK * CSTEP; while (target - cAng > Math.PI) target -= Math.PI * 2; while (cAng - target > Math.PI) target += Math.PI * 2; cAng += (target - cAng) * Math.min(1, dt * 12); }
+    discI.rotation.y = -cAng + (eng().isSolved("chiffre") || cK ? 0 : Math.sin(t * 0.3) * 0.05); // im Uhrzeigersinn = Stellung steigt (wie im Dialog)
+    if (chkT >= 0) { chkT += dt; chk.children[1].position.y = 0.02 - Math.sin(Math.min(1, chkT * 5) * Math.PI) * 0.006; if (chkT > 0.2) chkT = -1; }
+  });
   // Papierstapel (Deko)
   const stack = group(); for (let i = 0; i < 6; i++) { const s = rbox(0.24, 0.012, 0.32, M.paper, (Math.random() - 0.5) * 0.02, 0.006 + i * 0.013, (Math.random() - 0.5) * 0.02, 0.003); s.rotation.y = (Math.random() - 0.5) * 0.1; stack.add(s); }
   add(place(stack, "e", 0.5 + 0.75 / (2 * R), 0.83, 0.45));
@@ -234,19 +264,31 @@ defineRoom("archiv", (ctx) => {
   }
   add(place(hs("aktenschrank", cab), "s", 0.5, 0, 0.32));
   const wHolder = group(drawerW, box(C, C, 0.1, ZONE, drawerW.position.x, drawerW.position.y, 0.33));
-  add(place(hs("schublade_w", wHolder), "s", 0.5, 0, 0.32));
+  // Mit dem Schraubendreher aufhebeln (Schraubendreher gewählt): Klinge im Spalt, nach unten drücken (oder dreimal antippen)
+  const pry = group(cyl(0.004, 0.004, 0.09, std(0xb8bcc0, { metalness: 1, roughness: 0.25 }), 0, 0, 0.045), cyl(0.016, 0.019, 0.1, std(0x8a2a1c, { roughness: 0.35 }), 0, 0, 0.14, 8), box(0.06, 0.06, 0.24, ZONE, 0, 0, 0.12));
+  pry.children[0].rotation.x = pry.children[1].rotation.x = Math.PI / 2; pry.position.set(drawerW.position.x, drawerW.position.y + C / 2 - 0.02, 0.33); pry.visible = false; wHolder.add(pry);
+  let pryK = 0, pryFired = false;
+  const pryDone = () => { if (!pryFired && pryK >= 1) { pryFired = true; snd("drop"); setTimeout(() => { pry.visible = false; eng().hotspot("schublade_w"); }, 400); } };
+  const pryS = { useItem: "schraubendreher", when: () => !eng().has("fachw_offen"), cam: [drawerW.position.x, drawerW.position.y + 0.05, 0.85], center: [drawerW.position.x, drawerW.position.y, 0.32], fov: 40, exitDelay: 1500,
+    hint: "Schraubendreher nach unten drücken (oder antippen)", value: () => pryK.toFixed(2),
+    enter: () => { pryK = 0; pryFired = false; pry.visible = true; }, exit: () => { if (!pryFired) pry.visible = false; },
+    parts: () => [{ obj: pry, name: "hebel", tap: () => { pryK = Math.min(1, pryK + 0.34); snd("creak"); pryDone(); }, drag: (dx, dy) => { pryK = Math.max(0, Math.min(1, pryK + dy * 0.008)); pryDone(); } }] };
+  anim(() => { if (pry.visible) { pry.rotation.x = -0.6 * pryK; } });
+  add(place(hs("schublade_w", wHolder, { focus: pryS }), "s", 0.5, 0, 0.32));
   let wOpen = false; state((has) => { wOpen = has("fachw_offen"); });
-  anim((dt) => { drawerW.position.z = lerp(drawerW.position.z, wOpen ? 0.62 : 0.31, Math.min(1, dt * 4)); });
+  anim((dt) => { drawerW.position.z = lerp(drawerW.position.z, wOpen ? 0.62 : 0.31 + (pry.visible ? pryK * 0.03 : 0), Math.min(1, dt * 4)); });
   // Karton „Personal 2009“ oben auf dem Schrank, quer darauf die Akte „Voss, E.“
   const kTop = y0 + nrow * C + 0.095;
   const karton = group(rbox(0.7, 0.26, 0.42, M.card, 0, 0.13, 0, 0.01), plane(0.42, 0.1, lambert(0xffffff, { map: plaqueTex("PERSONAL 2009", 384, 90, "#2a2119", "#cfc3a6", "600 36px DM Mono, monospace", 3) }), 0, 0.13, 0.212));
   for (let i = 0; i < 5; i++) karton.add(rbox(0.012, 0.08, 0.32, M.paper, -0.24 + i * 0.12, 0.27 + (i % 2) * 0.01, 0, 0.003));
-  add(place(hs("personalkasten", karton), "s", 0.5 - 0.35 / (2 * R), kTop, 0.32));
+  const files = karton.children.slice(2); const kGo = lift(ctx, (k) => { files.forEach((f, i) => { f.position.y = 0.27 + (i % 2) * 0.01 + k * (0.06 + i * 0.015); }); }, 0.5);
+  add(place(hs("personalkasten", karton, { act: { play: () => { kGo(); snd("paper"); return 600; } } }), "s", 0.5 - 0.35 / (2 * R), kTop, 0.32));
   const akte = group(rbox(0.36, 0.02, 0.25, std(0xcfc3a6, { roughness: 0.9 }), 0, 0.01, 0, 0.004), plane(0.2, 0.045, lambert(0xffffff, { map: plaqueTex("VOSS, E.", 256, 60, "#2a2119", "#efe6d2", "600 30px DM Mono, monospace", 2) }), 0, 0.022, 0.06));
   akte.children[1].rotation.x = -Math.PI / 2; akte.add(box(0.4, 0.06, 0.3, ZONE, 0, 0.02, 0));
   // lehnt schräg am Karton (über Augenhöhe – flach liegend wäre sie von unten nicht zu sehen)
   akte.rotation.set(1.15, -0.12, 0.05);
-  add(place(hs("akte_elias", akte), "s", 0.5 + 0.22 / (2 * R), kTop + 0.12, 0.2));
+  const akA = inner(akte); const akGo = lift(ctx, (k) => { akA.position.set(0, -0.9 * k, 1.5 * k); akA.rotation.x = -0.9 * k; }, 0.9);
+  add(place(hs("akte_elias", akte, { act: { play: () => { akGo(); snd("paper"); return 950; } } }), "s", 0.5 + 0.22 / (2 * R), kTop + 0.12, 0.2));
   // Archivkartons in den Ecken (Deko)
   [[0.1, 0], [0.1, 0.31], [0.9, 0], [0.88, 0.31], [0.9, 0.62]].forEach(([u, y], i) => add(place(group(rbox(0.42, 0.3, 0.34, M.card, 0, 0.15, 0, 0.01), plane(0.3, 0.15, lambert(0xffffff, { map: boxTex(["RECHNUNGEN", "LIEFERANTEN", "GÄSTE 2008", "WARTUNG", "BANKETT"][i]) }), 0, 0.15, 0.171)).rotateY((i % 2 ? 0.08 : -0.06)), "s", u, y, 0.3)));
 
@@ -261,8 +303,10 @@ defineRoom("archiv", (ctx) => {
   let pOpen = false; state((has) => { pOpen = has("planlade_offen"); keyhole.visible = !pOpen; });
   anim((dt) => { planDrawer.position.z = lerp(planDrawer.position.z, pOpen ? 1.05 : 0.476, Math.min(1, dt * 3)); });
   const proto = (label, rot) => { const pl = plane(0.24, 0.17, lambert(0xffffff, { map: protoTex(label) })); pl.rotation.set(-Math.PI / 2, 0, rot); return group(pl, box(0.28, 0.03, 0.22, ZONE, 0, 0.01, 0)); };
-  add(place(hs("protokoll_a", proto("A · 117", 0.07)), "w", 0.33 - 0.45 / (2 * R), 0.943, 0.45));
-  add(place(hs("protokoll_b", proto("B · 118", -0.05)), "w", 0.33 - 0.12 / (2 * R), 0.943, 0.45));
+  const protoAct = (g) => { const a = inner(g); const go = lift(ctx, (k) => { a.position.set(0, 0.55 * k, 0.55 * k); a.rotation.x = 1.25 * k; }, 0.7); return { play: () => { go(); snd("paper"); return 750; } }; };
+  const pA = proto("A · 117", 0.07), pB = proto("B · 118", -0.05);
+  add(place(hs("protokoll_a", pA, { act: protoAct(pA) }), "w", 0.33 - 0.45 / (2 * R), 0.943, 0.45));
+  add(place(hs("protokoll_b", pB, { act: protoAct(pB) }), "w", 0.33 - 0.12 / (2 * R), 0.943, 0.45));
   // Stahltür (Sicherheitsbereich UG), dahinter Treppe nach unten
   const down = group(box(1.0, 0.05, 2.6, M.ceil, 0, 2.2, -1.3), box(0.05, 2.6, 2.6, lambert(0x2a2a26), -0.5, 1.0, -1.3), box(0.05, 2.6, 2.6, lambert(0x2a2a26), 0.5, 1.0, -1.3), box(1.0, 3, 0.05, basic(0x030303), 0, 0, -2.6));
   for (let i = 0; i < 7; i++) down.add(box(0.95, 0.05, 0.3, lambert(0x2a2a26), 0, -0.2 * (i + 1) + 0.02, -0.35 - i * 0.3));
@@ -276,11 +320,27 @@ defineRoom("archiv", (ctx) => {
   const signT = textTex(512, 128, "#cdbd9b", (g) => { g.fillStyle = "#2a2119"; g.font = "600 34px DM Mono, monospace"; g.textAlign = "center"; g.fillText("SICHERHEITSBEREICH UG", 256, 54); g.font = "500 28px DM Mono, monospace"; g.fillText("ZUTRITT NUR PERSONAL", 256, 100); });
   const sign = plane(0.78, 0.19, lambert(0xffffff, { map: signT }), 0, 2.48, 0.02);
   const pad = group(rbox(0.13, 0.2, 0.03, std(0x1a1a18, { metalness: 0.5, roughness: 0.4 }), 0, 0, 0, 0.008), plane(0.11, 0.17, lambert(0xffffff, { map: keypadTex() }), 0, 0, 0.016));
-  const led = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 6), new THREE.MeshBasicMaterial({ color: 0xc0392b })); led.position.set(0, -0.085, 0.02); pad.add(led);
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 6), new THREE.MeshBasicMaterial({ color: 0xc0392b })); led.position.set(0.045, 0.085, 0.02); pad.add(led);
+  // echtes Tastenfeld: zwölf Tasten, Anzeige mit den eingegebenen Ziffern; nach vier Ziffern prüft die Engine (Rätsel „pin“)
+  pad.children[1].visible = false;
+  const dispC = document.createElement("canvas"); dispC.width = 128; dispC.height = 40; const dispT = new THREE.CanvasTexture(dispC); dispT.colorSpace = THREE.SRGBColorSpace;
+  const drawDisp = (txt, col = "#9fe0b0") => { const g = dispC.getContext("2d"); g.fillStyle = "#0b2a1e"; g.fillRect(0, 0, 128, 40); g.fillStyle = col; g.font = "600 28px DM Mono, monospace"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(txt, 64, 22); dispT.needsUpdate = true; };
+  let pinEntry = ""; drawDisp("– – – –");
+  pad.add(plane(0.09, 0.028, new THREE.MeshBasicMaterial({ map: dispT, toneMapped: false }), -0.01, 0.07, 0.016));
+  const keyTexs = {}; const keyTex = (k) => keyTexs[k] ??= canvasTex(64, 64, (g) => { g.fillStyle = "#3d3d38"; g.fillRect(0, 0, 64, 64); g.fillStyle = "#d8d8c8"; g.font = "600 38px DM Mono, monospace"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(k, 32, 34); });
+  const padKeys = "123456789*0#".split("").map((k, i) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.028, 0.026, 0.01), [std(0x3d3d38), std(0x3d3d38), std(0x3d3d38), std(0x3d3d38), new THREE.MeshStandardMaterial({ map: keyTex(k), roughness: 0.5 }), std(0x3d3d38)]);
+    b.position.set(-0.036 + (i % 3) * 0.036, 0.03 - Math.floor(i / 3) * 0.033, 0.02); b.userData.k = k; pad.add(b); return b; });
+  let pressT = {};
+  const pinPress = (b) => { pressT[b.userData.k] = 0; snd("key"); const k = b.userData.k; if (!/\d/.test(k)) { pinEntry = ""; drawDisp("– – – –"); return; }
+    pinEntry += k; drawDisp(pinEntry.padEnd(4, "–").split("").join(" "));
+    if (pinEntry.length === 4) { const v = pinEntry; pinEntry = ""; setTimeout(() => { const r = eng().tryLock("pin", v); if (!r.ok) { drawDisp("FEHLER", "#e05a4a"); setTimeout(() => drawDisp("– – – –"), 900); } else drawDisp("OFFEN"); }, 250); } };
+  anim((dt) => { padKeys.forEach((b) => { const t = pressT[b.userData.k]; if (t === undefined) return; pressT[b.userData.k] = t + dt; b.position.z = 0.02 - (t < 0.15 ? 0.004 : 0); if (t > 0.2) delete pressT[b.userData.k]; }); });
   pad.position.set(0.78, 1.35, 0.02);
   const steel = group(down, sPv, sFrame, sign, pad);
   add(place(steel, "w", 0.74, 0, 0));
-  add(place(hs(["stahltuer_offen", "stahltuer"], group(box(1.0, 2.2, 0.3, ZONE, 0, 1.1, 0), box(0.2, 0.3, 0.1, ZONE, 0.78, 1.35, 0.03))), "w", 0.74, 0, 0));
+  const pinSpec = { when: (id) => id === "stahltuer" && !eng().has("sicherheit_offen"), cam: [0.78, 1.38, 0.42], center: [0.78, 1.35, 0.02], fov: 40, exitDelay: 1800,
+    hint: "Vier Ziffern eintippen · * löscht", value: () => pinEntry, parts: () => padKeys.map((b) => ({ obj: b, name: "taste" + b.userData.k, tap: () => pinPress(b) })) };
+  add(place(hs(["stahltuer_offen", "stahltuer"], group(box(1.0, 2.2, 0.3, ZONE, 0, 1.1, 0), box(0.2, 0.3, 0.1, ZONE, 0.78, 1.35, 0.03)), { focus: pinSpec }), "w", 0.74, 0, 0));
   let sOpen = false; state((has) => { sOpen = has("sicherheit_offen"); led.material.color.setHex(sOpen ? 0x6fbf5a : 0xc0392b); });
   anim((dt) => { sPv.rotation.y = lerp(sPv.rotation.y, sOpen ? 1.3 : 0, Math.min(1, dt * 2)); });
   const ledL = new THREE.PointLight(0xff4030, 0.4, 1.2, 2); place(ledL, "w", 0.74 + 0.78 / (2 * R), 1.3, 0.12); add(ledL);

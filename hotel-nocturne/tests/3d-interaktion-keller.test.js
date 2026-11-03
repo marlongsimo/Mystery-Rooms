@@ -70,8 +70,9 @@ const SAVE = { v: 2, started: true, finished: false, current: 'keller', unlocked
   for (let i = 0; i < 24 && !(await st()).flags.includes('strom'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('strom'), 'C-A-D-B → Strom'); await p.waitForTimeout(9000); await waitMoment(); await closeDlg(); await closeDlg();
   // Wäscheschrank: vier Schrauben
-  await p.click('[data-slot="schraubendreher"]'); await p.waitForTimeout(200);
-  await aimClick('waescheschrank'); f = await settle();
+  await p.waitForFunction(() => !NOCTURNE.engine.blocked() && !document.querySelector('#dialog').open, null, { timeout: 30000 }).catch(() => {}); await p.waitForTimeout(1000);
+  for (let k = 0; k < 3; k++) { await closeDlg(); if (await p.evaluate(() => NOCTURNE.engine.selectedItem() !== 'schraubendreher')) await p.click('[data-slot="schraubendreher"]'); await p.waitForTimeout(300);
+    await aimClick('waescheschrank'); f = await settle(); if (f && f.id === 'waescheschrank') break; console.log('  Versuch', k + 1, '– Dialog:', await dlg(), '| Erzählung:', (await narr()).slice(0, 50)); }
   check(Boolean(f) && f.id === 'waescheschrank', 'Schraubendreher am Wäscheschrank → Nahansicht');
   const sc = await part('schraube0'); const r = 26; await p.mouse.move(sc.x + r, sc.y); await p.mouse.down();
   for (let i = 1; i <= 18; i++) { const a = -(i / 16) * Math.PI * 2; await p.mouse.move(sc.x + r * Math.cos(a), sc.y + r * Math.sin(a)); await p.waitForTimeout(25); } await p.mouse.up();

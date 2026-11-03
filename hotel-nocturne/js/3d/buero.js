@@ -196,7 +196,7 @@ defineRoom("buero", (ctx) => {
     torIn += k; tdDraw(torIn.padEnd(4, "–").split("").join(" "));
     if (torIn.length === 4) { const v = torIn; torIn = ""; setTimeout(() => { const r = eng().tryLock("tor", v); if (r.ok) tdDraw("OFFEN"); else { tdDraw("– – – –", "#e05a4a"); setTimeout(() => tdDraw("– – – –"), 900); } }, 250); } };
   anim((dt) => { tKeys.forEach((b) => { const t = tPress[b.userData.k]; if (t === undefined) return; tPress[b.userData.k] = t + dt; b.position.z = t < 0.15 ? 0.012 : 0.016; if (t > 0.2) delete tPress[b.userData.k]; }); });
-  const torSpec = { when: (id) => id === "b_tunnel" && !eng().isSolved("tor"), cam: [0.3, 1.66, -2.42], center: [0.24, 1.66, -2.92], fov: 42, exitDelay: 2600,
+  const torSpec = { when: (id) => id === "b_tunnel" && !eng().isSolved("tor"), cam: [0.1, 1.76, -2.22], center: [0.1, 1.72, -2.92], fov: 45, exitDelay: 2600,
     hint: "Vier Ziffern eintippen · * löscht", value: () => torIn, enter: () => { torIn = ""; tdDraw("– – – –"); }, parts: () => tKeys.map((b) => ({ obj: b, name: "taste" + b.userData.k, tap: () => torPress(b) })) };
   let tRat = -1; anim((dt) => { if (tRat < 0) return; tRat += dt; tPv.position.z = -0.02 + Math.sin(tRat * 60) * 0.005 * (1 - tRat / 0.5); if (tRat > 0.5) { tRat = -1; tPv.position.z = -0.02; } });
   add(place(hs(["b_tunnel", "b_tunnel_zu"], group(box(0.98, 2.2, 0.3, ZONE, 0, 1.1, 0)), { focus: torSpec, act: { when: (id) => id === "b_tunnel_zu", play: () => { tRat = 0; snd("click"); return 550; } } }), "w", 0.745, 0, 0));

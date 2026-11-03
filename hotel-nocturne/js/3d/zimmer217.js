@@ -11,7 +11,7 @@ import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, 
 import { textTex, wallpaper, woodTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=2";
 import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame, tableLamp } from "./hd.js?v=2";
 import { tag } from "./gfx.js?v=1";
-import { combinationLock } from "./interact.js?v=1";
+import { combinationLock } from "./interact.js?v=2";
 
 const R = 2.6, H = 3.0;
 

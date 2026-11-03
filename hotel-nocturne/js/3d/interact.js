@@ -27,6 +27,9 @@ export function combinationLock(ctx, { pid, symbols = "0123456789", count = 4, b
     [-1, 1].forEach((s) => { const rim = new THREE.Mesh(new THREE.CylinderGeometry(R * 1.05, R * 1.05, 0.005, 32), brass); rim.rotation.z = Math.PI / 2; rim.position.x = (s * wheelWidth) / 2; w.add(rim); });
     group.add(w); wheels.push(w);
   }
+  // Sichtfenster: Messingleisten über und unter der eingestellten Reihe – man sieht nur das gewählte Zeichen je Rolle
+  const coverH = R * 1.05 - symH * 0.62, zc = R * 0.55 + R + 0.004;
+  [-1, 1].forEach((s) => { const c = new THREE.Mesh(new THREE.BoxGeometry(width - 0.02, coverH, 0.008), brass); c.position.set(0, s * (symH * 0.62 + coverH / 2), zc); group.add(c); });
   // Griff/Bügel unter den Rollen
   const pull = new THREE.Group(); pull.position.set(0, -(R + 0.09), 0.035);
   if (handle === "buegel") { const t = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.009, 10, 24, Math.PI), brass); t.rotation.z = Math.PI; pull.add(t); }

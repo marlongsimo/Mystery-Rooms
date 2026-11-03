@@ -19,7 +19,7 @@ async function enter(p, url) {
   if (await p.$('#dialog[open] [data-close]')) await p.click('#dialog[open] [data-close]'); await p.waitForTimeout(300);
 }
 const dlgTitle = (p) => p.evaluate(() => { const d = document.querySelector('#dialog'); return d.open ? document.querySelector('#dlgTitle').textContent : null; });
-const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelector('#dialog').open)) { await p.click('#closeDialog'); await p.waitForTimeout(250); } };
+const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelector('#dialog').open)) { await p.click('#closeDialog'); await p.waitForTimeout(1500); } }; // angehobene Gegenstände (Foto, Schirm) schweben erst zurück
 (async () => {
   const b = await chromium.launch(ARGS); const errs = [];
   // ---- 2D: Referenz-Titel je Hotspot

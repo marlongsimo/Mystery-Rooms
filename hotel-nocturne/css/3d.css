@@ -109,8 +109,8 @@
 @keyframes c3-noise { 50% { background-position: 0 1px, 0 0; } }
 
 /* Nahansicht: Rätsel direkt am Objekt (core.js) */
-.n3d-focus { position: absolute; left: 50%; bottom: 14px; transform: translate(-50%, 12px); display: flex; gap: 10px; align-items: center; padding: 6px; background: #0d0a08d8; border: 1px solid #b69a6d66; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 3; max-width: calc(100% - 24px); }
-.n3d-focus.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+.n3d-focus { position: absolute; left: 12px; top: 44px; transform: translate(0, -12px); flex-direction: column; align-items: stretch; max-width: 210px; /* klein oben links: verdeckt keine Schlossteile */ display: flex; gap: 10px; align-items: center; padding: 6px; background: #0d0a08d8; border: 1px solid #b69a6d66; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 3; max-width: calc(100% - 24px); }
+.n3d-focus.show { opacity: 1; pointer-events: auto; transform: translate(0, 0); }
 .n3d-focus button { background: none; border: 1px solid #5a4a33; color: #d4bc90; font: 12px "DM Mono", monospace; letter-spacing: .05em; padding: 8px 12px; cursor: pointer; white-space: nowrap; }
 .n3d-focus button:hover { border-color: #b69a6d; color: #f0e0bc; }
 .n3d-focus-hint { color: #a89a80; font: 12px "DM Mono", monospace; text-align: center; }

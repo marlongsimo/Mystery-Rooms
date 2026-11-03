@@ -256,7 +256,7 @@ defineRoom("rezeption", (ctx) => {
   const turnTo = (i, d) => { digits[i] = ((d % 10) + 10) % 10; A3.play("key"); };
   let pullT = -1, shakeT = -1;
   const lockSpec = {
-    when: () => !E3().isSolved("keybox"), cam: [0, -0.16, 0.72], center: [0, -0.16, 0.24], fov: 40, exitDelay: 1600,
+    when: () => !E3().isSolved("keybox"), cam: [0, -0.16, 0.8], center: [0, -0.16, 0.24], fov: 40, exitDelay: 1600,
     hint: "Rollen antippen oder wischen · Bügel ziehen zum Öffnen", value: () => digits.join(""),
     parts: () => [
       ...wheels.map((w, i) => ({ obj: w, name: "rad" + i, tap: (h, info) => turnTo(i, digits[i] + (info && !info.above ? -1 : 1)), // oben antippen: +1, unten: −1

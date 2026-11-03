@@ -98,3 +98,12 @@
 .finale .c3-over .cine-scene { display: none; }
 .finale .c3-over .cine-text { bottom: calc(9vh + 18px); }
 .finale .c3-over .cine-text:not(.big) p { background: #000000a0; }
+/* Rückblende 23:24 im Bild von Kamera 3 (Finale) */
+.finale .c3-cam { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .2s;
+  background: repeating-linear-gradient(180deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,.6) 100%); }
+.finale.cam3 .c3-cam { opacity: 1; animation: c3-noise .12s steps(2) infinite; }
+.finale.cam3 .c3-stage { filter: grayscale(1) sepia(.5) hue-rotate(65deg) saturate(1.8) contrast(1.3) brightness(1.15); }
+.finale .c3-ts, .finale .c3-rec { position: absolute; top: calc(9vh + 14px); font: 600 clamp(12px, 1.6vw, 17px) var(--mono, monospace); color: #e6f5c9; text-shadow: 0 0 6px #9fe0b088; letter-spacing: .06em; }
+.finale .c3-ts { left: 18px; } .finale .c3-rec { right: 18px; color: #e05a4a; animation: cf-blink 1s steps(2) infinite; }
+.finale.c3-glitch .c3-stage { filter: brightness(2.4) contrast(2) blur(1px); transform: translateX(6px) skewX(-2deg); }
+@keyframes c3-noise { 50% { background-position: 0 1px, 0 0; } }

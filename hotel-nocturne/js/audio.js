@@ -112,6 +112,8 @@
     power: () => { noise({ d: 0.03, v: 0.4, freq: 2400 }); tone({ f: 100, type: "sawtooth", d: 1.4, v: 0.03, slide: 20, delay: 0.1 }); tone({ f: 880, d: 0.2, v: 0.03, delay: 0.5 }); noise({ d: 0.03, v: 0.3, freq: 2400, delay: 0.7 }); },
     screws: () => { for (let i = 0; i < 4; i++) { noise({ d: 0.18, v: 0.12, freq: 3200, delay: i * 0.45 }); tone({ f: 1500, d: 0.05, v: 0.02, delay: i * 0.45 + 0.2 }); } },
     slide: () => { noise({ d: 1.3, v: 0.22, freq: 260, type: "lowpass" }); tone({ f: 120, type: "sawtooth", d: 0.9, v: 0.02, slide: -30, delay: 0.2 }); noise({ d: 0.12, v: 0.3, freq: 600, delay: 1.25 }); },
+    chirp: () => { const f = 2600 + Math.random() * 1400; tone({ f, d: 0.09, v: 0.025, slide: 900 }); tone({ f: f * 1.1, d: 0.07, v: 0.02, slide: -700, delay: 0.12 }); if (Math.random() < 0.5) tone({ f: f * 0.9, d: 0.08, v: 0.02, slide: 600, delay: 0.26 }); }, // Vogel in der Morgendämmerung (Finale)
+    glitch: () => { noise({ d: 0.25, v: 0.22, freq: 3500 }); tone({ f: 60, type: "square", d: 0.2, v: 0.03 }); noise({ d: 0.12, v: 0.15, freq: 900, delay: 0.18 }); }, // Bildstörung (Rückblende Kamera 3)
     thunder: () => { noise({ d: 2.6, v: 0.5, freq: 160, type: "lowpass" }); noise({ d: 1.4, v: 0.35, freq: 90, type: "lowpass", delay: 0.3 }); },
   };
 

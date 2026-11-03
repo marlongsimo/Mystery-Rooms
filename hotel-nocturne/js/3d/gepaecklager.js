@@ -11,7 +11,8 @@
 import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
 import { textTex, woodTex, plaqueTex, shell } from "./kit.js?v=2";
 import { std, rbox, panel, leatherMat, brassMat, woodMat } from "./hd.js?v=2";
-import { tag as pbr } from "./gfx.js?v=1"; // „tag“ heißen hier die Messinganhänger der Koffer
+import { tag as pbr } from "./gfx.js?v=1";
+import { combinationLock, keyTurn, keyMesh, lift } from "./interact.js?v=3"; // „tag“ heißen hier die Messinganhänger der Koffer
 
 const R = 2.8, H = 3.0;
 
@@ -58,6 +59,8 @@ const ledgerTex = () => textTex(300, 160, "#d8cdb6", (g) => {
 
 defineRoom("gepaecklager", (ctx) => {
   const { add, hs, state, anim, lerp } = ctx;
+  const snd = ctx.sound, eng = ctx.engine;
+  let burst = 0; // Notbeleuchtung: kurz heftig flackern
   const M = {
     // HD: rauer Beton mit Flutrand, nasser glänzender Boden, Stahl mit Rost, Holz mit Maserung, Messing
     wall: pbr(lambert(0xffffff, { map: wallTex() }), { roughness: 0.92, normal: 1.6 }), floor: pbr(lambert(0xffffff, { map: concrete("#2c2c29", false) }), { roughness: 0.3, clearcoat: 0.6, normal: 1.4, envMapIntensity: 0.6 }),
@@ -94,16 +97,18 @@ defineRoom("gepaecklager", (ctx) => {
   const stairZone = box(1.6, 1.0, 1.4, ZONE, 0, 0.5, -0.5);
   add(place(hs("treppe", group(stairZone)), "n", 0.5, 0, 0));
   const doorZone = box(0.95, 2.05, 0.2, ZONE, 0, 2.8, -3.5);
-  add(place(hs(["archivtuer_offen", "archivtuer"], group(doorZone)), "n", 0.5, 0, 0));
+  const aKey = keyMesh(M.brassDark, 1.2); aKey.position.set(0.8, 0.84, 0.05); aDoor.add(aKey); aDoor.add(box(0.03, 0.05, 0.01, M.black, 0.8, 0.84, 0.03)); // Bartschloss unter der Klinke
+  const aSpec = keyTurn(ctx, { key: aKey, item: "archivschluessel", hotspot: "archivtuer", when: (id) => id === "archivtuer" && !eng().has("archiv_offen"), cam: [0.35, 2.72, -2.95], center: [0.35, 2.64, -3.5] });
+  add(place(hs(["archivtuer_offen", "archivtuer"], group(doorZone), { focus: aSpec }), "n", 0.5, 0, 0));
   let aOpen = false; state((has) => { aOpen = has("archiv_offen"); });
   anim((dt) => { doorPv.rotation.y = lerp(doorPv.rotation.y, aOpen ? 1.5 : 0, Math.min(1, dt * 3)); });
   // Schild „← REZEPTION“ links an der Wand
   add(place(plane(0.5, 0.11, lambert(0xffffff, { map: plaqueTex("← REZEPTION", 384, 84, "#2a2826", "#c8c0a8", "500 34px DM Mono, monospace", 4) })), "n", 0.25, 1.95, 0.01));
   // Notbeleuchtung (flackert) rechts neben der Treppe
   const emer = group(box(0.3, 0.14, 0.08, lambert(0x2a2a28)), plane(0.24, 0.08, basic(0xfff0c0), 0, 0, 0.041));
-  add(place(hs("notlicht", emer), "n", 0.77, 2.3, 0.04));
+  add(place(hs("notlicht", emer, { act: { play: () => { burst = 1.2; snd("light"); return 500; } } }), "n", 0.77, 2.3, 0.04));
   const emL = new THREE.PointLight(0xffe0a8, 5, 0, 2); place(emL, "n", 0.77, 2.2, 0.4); add(emL);
-  let flick = 1; anim((dt, t) => { if (Math.random() < 0.035) flick = Math.random() < 0.5 ? 0.15 : 1; flick = lerp(flick, 1, dt * 2); emL.intensity = 5 * flick; emer.children[1].material.color.setScalar(0.3 + 0.7 * flick); });
+  let flick = 1; anim((dt, t) => { if (burst > 0) burst -= dt; if (Math.random() < (burst > 0 ? 0.4 : 0.035)) flick = Math.random() < 0.5 ? 0.15 : 1; flick = lerp(flick, 1, dt * 2); emL.intensity = 5 * flick; emer.children[1].material.color.setScalar(0.3 + 0.7 * flick); });
   // Wasserflecken (Wasserrand auf Kniehöhe) – Klickfläche unten links
   add(place(hs("wasserflecken", group(box(1.3, 0.5, 0.05, ZONE, 0, 0.35, 0.03))), "n", 0.14, 0, 0.0));
 
@@ -126,18 +131,22 @@ defineRoom("gepaecklager", (ctx) => {
   const k2 = suitcase(0.62, 0.36, 0.42, 0x5a3a22);
   const knight = group(cyl(0.035, 0.045, 0.03, lambert(0x1a1612), 0, 0.2, 0), box(0.04, 0.09, 0.07, lambert(0x1a1612), 0, 0.26, 0.0), box(0.035, 0.05, 0.08, lambert(0x1a1612), 0, 0.31, 0.02));
   k2.add(knight); const t2 = tag(2); t2.position.set(0.24, 0.0, 0.215); k2.add(t2);
-  add(place(hs("koffer2", k2), "e", 0.27, 1.17 + 0.18, 0.33));
+  const tagShow = (t) => lift(ctx, (k) => { t.rotation.set(-0.5 * k, 0, 0); t.scale.setScalar(1 + k * 1.6); t.position.z = 0.215 + 0.12 * k; }, 0.5);
+  const k2Go = tagShow(t2);
+  add(place(hs("koffer2", k2, { act: { play: () => { k2Go(); snd("click"); return 650; } } }), "e", 0.27, 1.17 + 0.18, 0.33));
   // Koffer 9: grün, Notenblatt unter dem Riemen
   const k9 = suitcase(0.62, 0.36, 0.42, 0x2a3e34);
   const notes = plane(0.24, 0.17, lambert(0xffffff, { map: sheetMusic() })); notes.rotation.x = -Math.PI / 2; notes.position.set(0, 0.182, 0); k9.add(notes);
   const t9 = tag(9); t9.position.set(0.24, 0.0, 0.215); k9.add(t9);
-  add(place(hs("koffer9", k9), "e", 0.5, 1.17 + 0.18, 0.33));
+  const k9Go = tagShow(t9);
+  add(place(hs("koffer9", k9, { act: { play: () => { k9Go(); snd("click"); return 650; } } }), "e", 0.5, 1.17 + 0.18, 0.33));
   // Koffer 4: schwarz, Kompass am Griff – rutscht beim Ereignis vom Regal
   const k4 = suitcase(0.62, 0.34, 0.42, 0x141414);
   const comp = group(cyl(0.05, 0.05, 0.015, M.brass), plane(0.08, 0.08, lambert(0xd8cfb8)));
   comp.rotation.x = Math.PI / 2; comp.children[1].rotation.x = -Math.PI / 2; comp.children[1].position.y = 0.009; comp.position.set(-0.15, 0.0, 0.22); k4.add(comp);
   const t4 = tag(4); t4.position.set(0.24, 0.0, 0.215); k4.add(t4);
-  const k4Holder = group(k4); add(place(hs(["koffer4_boden", "koffer4"], k4Holder), "e", 0.73, 0, 0.33));
+  const k4Go = tagShow(t4);
+  const k4Holder = group(k4); add(place(hs(["koffer4_boden", "koffer4"], k4Holder, { act: { when: (id) => id === "koffer4", play: () => { k4Go(); snd("click"); return 650; } } }), "e", 0.73, 0, 0.33));
   const onShelf = new THREE.Vector3(0, 0.37 + 0.17, 0), onFloor = new THREE.Vector3(-0.05, 0.17, 0.75);
   k4.position.copy(onShelf);
   let slid = false; state((has) => { slid = has("koffer_gerutscht"); });
@@ -148,7 +157,9 @@ defineRoom("gepaecklager", (ctx) => {
   // Eimer unter dem tropfenden Rohr
   const bucket = group(cyl(0.18, 0.14, 0.34, std(0x5a5c5e, { metalness: 0.7, roughness: 0.4 }), 0, 0.17, 0), new THREE.Mesh(new THREE.CircleGeometry(0.17, 20), new THREE.MeshStandardMaterial({ color: 0x10161c, roughness: 0.03, metalness: 0.4 })));
   bucket.children[1].rotation.x = -Math.PI / 2; bucket.children[1].position.y = 0.32;
-  add(place(hs("eimer", bucket), "e", 0.9, 0, 0.45));
+  const splash = new THREE.Mesh(new THREE.CircleGeometry(0.4, 24), new THREE.MeshStandardMaterial({ color: 0x14181c, roughness: 0.03, metalness: 0.4, transparent: true, opacity: 0 })); splash.rotation.x = -Math.PI / 2; splash.position.y = 0.006; bucket.add(splash);
+  let sloshT = -1; anim((dt) => { if (sloshT < 0) return; sloshT += dt; bucket.children[1].rotation.x = -Math.PI / 2 + Math.sin(sloshT * 18) * 0.15 * Math.max(0, 1 - sloshT); bucket.rotation.z = Math.sin(sloshT * 14) * 0.04 * Math.max(0, 1 - sloshT); splash.material.opacity = Math.min(0.85, sloshT * 3) * Math.max(0, 1 - (sloshT - 2) / 3); splash.scale.setScalar(0.5 + Math.min(1, sloshT)); if (sloshT > 5) sloshT = -1; });
+  add(place(hs("eimer", bucket, { act: { play: () => { sloshT = 0; snd("drip"); setTimeout(() => snd("drip"), 160); return 600; } } }), "e", 0.9, 0, 0.45));
   const drop = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), phong(0x9ab4c8, { shininess: 120 })); add(place(drop, "e", 0.9, H - 0.3, 0.45));
   anim((dt) => { drop.position.y -= dt * 3.2; if (drop.position.y < 0.34) drop.position.y = H - 0.3; });
 
@@ -166,7 +177,16 @@ defineRoom("gepaecklager", (ctx) => {
   const sign = plane(1.1, 0.1, lambert(0xffffff, { map: plaqueTex("AUSGABE NUR GEGEN GEPÄCKSCHEIN", 768, 70, "#2a2826", "#c8c0a8", "500 30px DM Mono, monospace", 3) }), 0, 2.1, 0.02);
   const chamber = group(box(1.04, 0.05, 0.6, M.wood, 0, 1.04, -0.3), box(1.04, 0.9, 0.04, basic(0x0a0a0a), 0, 1.5, -0.6));
   const hatch = group(hatchFrame, flapPv, sign, chamber);
-  add(place(hs("klappe", hatch), "s", 0.5, 0, 0.02));
+  const ticket = group(plane(0.13, 0.08, new THREE.MeshStandardMaterial({ map: canvasTex(160, 96, (g, w, h) => { g.fillStyle = "#d8cdb6"; g.fillRect(0, 0, w, h); g.fillStyle = "#9a8a6a"; g.fillRect(56, 0, 48, 18); g.fillStyle = "#2a2119"; g.font = "600 46px DM Mono, monospace"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("6", 80, 58); }), roughness: 0.85, side: THREE.DoubleSide })), box(0.16, 0.12, 0.04, ZONE, 0, 0, 0));
+  ticket.position.set(0, 1.16, 0.16); ticket.visible = false; hatch.add(ticket);
+  let tIn = 0, tFired = false;
+  const slotSpec = { useItem: "gepaeckschein", when: () => !eng().has("koffer_da"), cam: [0, 1.15, 0.62], center: [0, 1.1, 0.1], fov: 45, exitDelay: 1200,
+    hint: "Schein nach unten in den Schlitz schieben (oder antippen)", value: () => tIn.toFixed(2),
+    enter: () => { tIn = 0; tFired = false; ticket.visible = true; }, exit: () => { if (!tFired) ticket.visible = false; },
+    parts: () => [{ obj: ticket, name: "schein", tap: () => { tIn = Math.min(1, tIn + 0.5); snd("paper"); slotDone(); }, drag: (dx, dy) => { tIn = Math.max(0, Math.min(1, tIn + dy * 0.008)); slotDone(); } }] };
+  const slotDone = () => { if (!tFired && tIn >= 1) { tFired = true; setTimeout(() => { ticket.visible = false; eng().hotspot("klappe"); }, 450); } };
+  anim(() => { if (ticket.visible) { ticket.position.y = 1.16 - tIn * 0.09; ticket.scale.y = 1 - tIn * 0.6; } });
+  add(place(hs("klappe", hatch, { focus: slotSpec }), "s", 0.5, 0, 0.02));
   // Koffer Nr. 6 (Mara Vale), blauer Schal, rotes Notizbuch, Käfigschlüssel
   const k6 = suitcase(0.7, 0.3, 0.45, 0x5a3a22);
   const scarf = box(0.5, 0.05, 0.3, lambert(0x2a4a8a), 0, 0.17, 0); k6.add(scarf);
@@ -185,7 +205,9 @@ defineRoom("gepaecklager", (ctx) => {
   // Tischklingel, Gepäckverzeichnis
   const bell = group(cyl(0.07, 0.08, 0.02, M.brassDark, 0, 0.01, 0), new THREE.Mesh(new THREE.SphereGeometry(0.06, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), M.brass));
   bell.children[1].position.y = 0.02;
-  add(place(hs("klingel3", bell), "s", 0.25, 1.05, 0.9));
+  const plunger = cyl(0.008, 0.008, 0.03, M.brass, 0, 0.09, 0); bell.add(plunger);
+  let bellT = -1; anim((dt) => { if (bellT >= 0) { bellT += dt; plunger.position.y = 0.09 - Math.sin(Math.min(1, bellT * 5) * Math.PI) * 0.012; if (bellT > 0.2) bellT = -1; } });
+  add(place(hs("klingel3", bell, { act: { play: () => { bellT = 0; return 200; } } }), "s", 0.25, 1.05, 0.9));
   const ledger = plane(0.42, 0.24, lambert(0xffffff, { map: ledgerTex() })); ledger.rotation.set(-Math.PI / 2, 0, 0.08);
   add(place(hs("verzeichnis", group(ledger, box(0.44, 0.04, 0.26, ZONE, 0, 0.02, 0))), "s", 0.73, 1.056, 0.9));
   // Papierkorb mit Streifen
@@ -213,14 +235,19 @@ defineRoom("gepaecklager", (ctx) => {
   const chest = group(rbox(0.9, 0.42, 0.5, M.wood, 0, 0.21, 0, 0.015), box(0.92, 0.04, 0.04, M.brassDark, 0, 0.1, 0.25), box(0.92, 0.04, 0.04, M.brassDark, 0, 0.36, 0.25), panel(0.36, 0.2, M.wood, -0.22, 0.22, 0.252, 0.03, 0.006), panel(0.36, 0.2, M.wood, 0.22, 0.22, 0.252, 0.03, 0.006));
   const lidPv = new THREE.Group(); lidPv.position.set(0, 0.42, -0.25);
   lidPv.add(rbox(0.92, 0.12, 0.52, M.wood, 0, 0.06, 0.25, 0.03), box(0.94, 0.03, 0.04, M.brassDark, 0, 0.06, 0.51)); chest.add(lidPv);
-  const cl = plane(0.18, 0.08, lambert(0xffffff, { map: lockTex() }), 0, 0.3, 0.255); chest.add(cl);
+  const tLock = combinationLock(ctx, { pid: "truhe", brass: M.brass, dark: std(0x120e0b, { roughness: 0.6 }) });
+  const cl = tLock.group; cl.scale.setScalar(0.38); cl.position.set(0, 0.24, 0.255); chest.add(cl);
   chest.position.set(0, 0, 0.55); cage.add(chest);
   add(place(cage, "w", 0.5, 0, 0));
   // Klickflächen: Käfigtür, Käfigseite, Truhe (erst bei offener Tür)
-  add(place(hs("kaefigtuer", group(box(0.84, 2.4, 0.1, ZONE, 0, 1.25, depth))), "w", 0.5, 0, 0));
+  const cKey = keyMesh(M.brass, 1); cKey.position.set(0.75, 1.1, 0.06); gate.add(cKey);
+  const cageSpec = keyTurn(ctx, { key: cKey, item: "kaefigschluessel", hotspot: "kaefigtuer", when: () => !eng().has("kaefig_offen"), cam: [0.33, 1.16, depth + 0.5], center: [0.33, 1.1, depth + 0.03] });
+  add(place(hs("kaefigtuer", group(box(0.84, 2.4, 0.1, ZONE, 0, 1.25, depth)), { focus: cageSpec }), "w", 0.5, 0, 0));
   add(place(hs("kaefig_seite", group(box(0.9, 2.4, 0.1, ZONE, -0.9, 1.25, depth))), "w", 0.5, 0, 0));
   const chestZone = group(box(0.95, 0.6, 0.55, ZONE, 0, 0.3, 0.55));
-  add(place(hs("truhe", chestZone), "w", 0.5, 0, 0));
+  const truheSpec = { when: () => eng().has("kaefig_offen") && !eng().isSolved("truhe"), cam: [0, 0.42, 1.3], center: [0, 0.24, 0.8], fov: 40, exitDelay: 1600,
+    hint: "Rollen antippen oder wischen · Bügel ziehen zum Öffnen", value: tLock.value, parts: tLock.parts };
+  add(place(hs("truhe", chestZone, { focus: truheSpec }), "w", 0.5, 0, 0));
   let gOpen = false, cOpen = false; state((has) => { gOpen = has("kaefig_offen"); cOpen = has("truhe_offen"); cl.visible = !cOpen; });
   anim((dt) => { const k = Math.min(1, dt * 3); gatePv.rotation.y = lerp(gatePv.rotation.y, gOpen ? -1.9 : 0, k); lidPv.rotation.x = lerp(lidPv.rotation.x, cOpen ? -1.2 : 0, k); });
   const cageBulb = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), basic(0xffe6b8)); add(place(cageBulb, "w", 0.5, 2.6, 0.55));

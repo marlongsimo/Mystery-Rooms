@@ -51,3 +51,42 @@ export function combinationLock(ctx, { pid, symbols = "0123456789", count = 4, b
   ];
   return { group, parts, value, radius: R, width };
 }
+
+/** Drehgeste um einen Bildschirmpunkt (Schlüssel, Schraube): Winkeländerung je Zeigerbewegung, Uhrzeigersinn positiv (Bildschirm-y nach unten). */
+export function twister(ctx, objFn) {
+  let last = null;
+  return { delta(p) { const c = ctx.screenOf(objFn()); const a = Math.atan2(p.y - c.y, p.x - c.x); let d = 0; if (last !== null) { d = a - last; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; } last = a; return d; }, reset() { last = null; } };
+}
+
+/**
+ * Schlüssel im Schloss selbst drehen: { key (Mesh/Gruppe, steckt sichtbar beim Heranfahren), item, hotspot, when, cam, center }.
+ * Im Uhrzeigersinn um 90° (oder dreimal antippen) → engine.hotspot(hotspot) mit gewähltem Gegenstand – die Engine löst wie bisher.
+ */
+export function keyTurn(ctx, { key, item, hotspot, when, cam, center, fov = 45, hint = "Schlüssel im Uhrzeigersinn drehen (oder antippen)" }) {
+  let turn = 0, fired = false; const tw = twister(ctx, () => key);
+  const zone = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.1), new THREE.MeshBasicMaterial({ visible: false })); zone.position.z = 0.05; key.add(zone);
+  key.visible = false;
+  const done = () => { if (!fired && turn >= Math.PI / 2 * 0.95) { fired = true; turn = Math.PI / 2; snd("click"); setTimeout(() => ctx.engine().hotspot(hotspot), 350); setTimeout(() => { key.visible = false; }, 2600); } };
+  ctx.anim(() => { if (key.visible) key.rotation.z = -turn; });
+  return { useItem: item, when, cam, center, fov, exitDelay: 1500, hint, value: () => turn.toFixed(2),
+    enter: () => { turn = 0; fired = false; key.visible = true; }, exit: () => { if (!fired) key.visible = false; },
+    parts: () => [{ obj: key, name: "schluessel", tap: () => { turn = Math.min(Math.PI / 2, turn + Math.PI / 6); snd("key"); done(); },
+      drag: (dx, dy, pt) => { turn = Math.max(0, Math.min(Math.PI / 2, turn + tw.delta(pt))); done(); }, release: () => tw.reset() }] };
+}
+
+/** Einfacher Bartschlüssel als Modell (Ring, Halm, Bart), zeigt nach −z ins Schloss. */
+export function keyMesh(mat, size = 1) {
+  const g = new THREE.Group();
+  const shank = new THREE.Mesh(new THREE.CylinderGeometry(0.006 * size, 0.006 * size, 0.06 * size, 10), mat); shank.rotation.x = Math.PI / 2; shank.position.z = 0.03 * size; g.add(shank);
+  const bow = new THREE.Mesh(new THREE.TorusGeometry(0.02 * size, 0.006 * size, 8, 18), mat); bow.position.z = 0.068 * size; g.add(bow);
+  return g;
+}
+
+/** Gegenstand kurz zeigen und zurück, sobald der Text geschlossen ist: apply(k) mit k 0…1. Rückgabe: Auslöser. */
+export function lift(ctx, apply, rise = 0.8, minHold = 1.8) {
+  const st = { t: -1 };
+  ctx.anim((dt) => { if (st.t < 0) return; st.t += dt;
+    const out = st.t < rise ? st.t / rise : (ctx.engine().blocked() || st.t < minHold ? 1 : Math.max(0, 1 - (st.t - minHold) * 1.6)); apply(out * out * (3 - 2 * out));
+    if (out <= 0 && st.t > minHold) { st.t = -1; apply(0); } });
+  return () => { st.t = 0; };
+}

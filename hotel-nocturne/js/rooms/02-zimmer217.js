@@ -203,7 +203,9 @@
           { id: "kerzenstaender", label: "Kerzenständer", x: 14.2, y: 33, w: 7.5, h: 20, title: "Der Kerzenständer", text: "Die Kerze brennt – jemand muss sie vor Kurzem angezündet haben. Du hebst den Ständer vorsichtig an: Unter dem Fuß klebt ein Etikett mit einer <b>1</b>." },
           { id: "schreibtisch", label: "Schreibtischschublade", x: 25, y: 55.5, w: 16.7, h: 7, title: "Die Schreibtischschublade", text: "Hotelbriefpapier, ein Brieföffner und ein Fahrplan der Regionalbahn von 2009. Nichts davon scheint wichtig." },
           { id: "blatt", label: "Blatt Papier", x: 26.7, y: 48.9, w: 7.5, h: 4.4, if: "fenster_auf", title: "Ein Blatt auf dem Schreibtisch", text: "Eben lag es noch nicht hier.", doc: "blatt" },
-          { id: "portraet217", label: "Porträtfoto", x: 56.7, y: 41.1, w: 8.3, h: 11.7, title: "Ein Porträtfoto", text: "Eine ältere Aufnahme: eine Frau mit denselben Augen wie Mara. Du drehst den Rahmen um: Auf der Rückseite steht mit Kreide eine <b>3</b>." },
+          // Vor der Kommode kennt man Mara noch nicht (Brief und Foto liegen darin) – darum erst danach der Vergleich mit ihr
+          { id: "portraet217", label: "Porträtfoto", x: 56.7, y: 41.1, w: 8.3, h: 11.7, unless: "kommode_open", title: "Ein Porträtfoto", text: "Eine ältere Aufnahme: eine Frau mit ernsten, wachen Augen. Du drehst den Rahmen um: Auf der Rückseite steht mit Kreide eine <b>3</b>." },
+          { id: "portraet217_mara", label: "Porträtfoto", x: 56.7, y: 41.1, w: 8.3, h: 11.7, if: "kommode_open", title: "Ein Porträtfoto", text: "Eine ältere Aufnahme: eine Frau mit denselben Augen wie Mara. Du drehst den Rahmen um: Auf der Rückseite steht mit Kreide eine <b>3</b>." },
           { id: "kommode", label: "Kommode", x: 48.3, y: 54.4, w: 25, h: 32.2, title: "Die Kommode", lock: "anordnung" },
           { id: "schrank", label: "Kleiderschrank", x: 77.5, y: 18.9, w: 19.2, h: 70, title: "Der Kleiderschrank", lock: "schrank" },
         ],

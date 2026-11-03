@@ -237,7 +237,7 @@ defineRoom("zimmer217", (ctx) => {
   const three = label("3", 0.14, 0.18, "600 210px Georgia, serif", "#efe9da", "#3a2c22"); three.rotation.y = Math.PI; three.position.set(0, 0.13, -0.012); photo.add(three); // Kreide auf der Rückseite
   const phA = inner(photo);
   const phGo = lift((k) => { phA.position.set(0.6 * k, 0.55 * k, 1.5 * k); phA.rotation.set(0.12 * k, Math.PI * Math.min(1, k * 1.3), 0); phA.scale.setScalar(1 + k * 0.6); }, 1.0);
-  add(place(hs("portraet217", photo, { act: { play: () => { phGo(); snd("paper"); return 1100; } } }), "w", 0.6, 1.0, 0.22));
+  add(place(hs(["portraet217_mara", "portraet217"], photo, { act: { play: () => { phGo(); snd("paper"); return 1100; } } }), "w", 0.6, 1.0, 0.22));
   // Kleiderschrank mit Buchstabenrädern und Schnitzerei „Wer nachts wacht“
   // Kleiderschrank: Korpus, Kranzgesims, gedrechselte Füße, Türen mit Kassetten – Schnitzerei (2,16 m) und Buchstabenräder (1,3 m) bleiben frei
   const ward = group(rbox(1.15, 2.2, 0.58, M.woodDark, 0, 1.2, 0, 0.02), rbox(1.27, 0.08, 0.66, M.trim, 0, 2.34, 0.02, 0.02), rbox(1.33, 0.06, 0.7, M.trim, 0, 2.41, 0.03, 0.02), rbox(1.2, 0.08, 0.62, M.trim, 0, 0.14, 0.01, 0.02));

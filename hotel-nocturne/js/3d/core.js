@@ -316,7 +316,13 @@ function aimAt(id) {
   const p = c.clone().project(camera), rc = canvas.getBoundingClientRect();
   return { x: rc.left + (p.x + 1) / 2 * rc.width, y: rc.top + (1 - p.y) / 2 * rc.height };
 }
-N.view3d = { supports, render, pickAt, aimAt, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0 }) };
+/** Fehlersuche: alle Treffer eines Strahls (Besitzer-IDs, sichtbar?, Abstand). */
+function debugHits(cx, cy) {
+  if (!built) return [];
+  const rc = canvas.getBoundingClientRect(); ndc.set(((cx - rc.left) / rc.width) * 2 - 1, -((cy - rc.top) / rc.height) * 2 + 1); ray.setFromCamera(ndc, camera);
+  return ray.intersectObjects(built.pick.map((e) => e.obj), true).slice(0, 6).map((h) => { let o = h.object; while (o && !o.userData.owner) o = o.parent; const e = o && o.userData.owner; return `${e ? e.ids.join("/") : "?"}${shown(h.object) ? "" : "(versteckt)"}@${h.distance.toFixed(2)}`; });
+}
+N.view3d = { supports, render, pickAt, aimAt, debugHits, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0 }) };
 // Falls das Spiel schon läuft, als die Module fertig geladen waren: jetzt auf 3D umschalten
 /* ---------- Kinomodus für das Intro (js/3d/intro.js) ----------
    Leiht sich Renderer, Kamera und den fertig gebauten Raum: Das Intro fährt durch dieselbe Szene,

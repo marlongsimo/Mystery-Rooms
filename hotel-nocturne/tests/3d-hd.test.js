@@ -14,6 +14,7 @@ const SAVES = {
   zimmer217: { ...base, current: 'zimmer217', unlocked: ['rezeption', 'zimmer217'], visited: ['rezeption', 'zimmer217'], completed: ['rezeption'], solved: ['keybox', 'werkzeug', 'cover', 'elevator'], flags: ['keybox_open', 'taken_schraubendreher', 'cover_open', 'elevator_open'], inventory: ['key217', 'hotelplan', 'schraubendreher'] },
   archiv: { ...base, current: 'archiv', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], completed: ['rezeption', 'zimmer217', 'gepaecklager'], solved: [], flags: ['archiv_offen'], inventory: ['hotelplan', 'schraubendreher'] },
   ueberwachung: { ...base, current: 'ueberwachung', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], completed: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], solved: [], flags: ['sicherheit_offen'], inventory: ['backupband'] },
+  keller: { ...base, current: 'keller', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung', 'keller'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung', 'keller'], completed: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], solved: [], flags: ['f3_drin', 'gen_laeuft', 'strom'], inventory: [] },
 };
 const EXPECT = { high: { bloom: true, shadows: true }, medium: { bloom: true, shadows: true }, low: { bloom: false, shadows: false } };
 (async () => {

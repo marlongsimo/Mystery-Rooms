@@ -46,6 +46,7 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
     const pt = await click3d(id); const t = await dlgTitle(p);
     if (t === ref[id]) same++; else diff.push(`${id}: 2D „${ref[id]}“ / 3D „${t}“ ${pt === 'kein Objekt' ? '(kein Objekt)' : ''}`);
     await closeDlg(p);
+    if (/personalfoto|schirmstaender/.test(id)) await p.waitForTimeout(4000); // schwebt erst an seinen Platz zurück
   }
   console.log(`Hotspots im Startzustand: ${same} von ${Object.keys(ref).length} gleich wie 2D`); diff.forEach((d) => console.log('  ≠', d));
   // ---- Durchspielen in 3D

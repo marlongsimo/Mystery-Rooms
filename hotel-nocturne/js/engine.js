@@ -526,6 +526,22 @@
     return "";
   }
 
+  /* Prüfung einer Eingabe – gemeinsam für den Dialog und die direkte Bedienung in 3D (tryLock) */
+  function checkAnswer(p, value) {
+    if ((p.answers || []).map(norm).includes(norm(value))) return { ok: true };
+    return { ok: false, msg: (p.wrong && p.wrong[norm(value)]) || p.wrongDefault || null };
+  }
+  /** 3D: Eingabe am Objekt (z. B. Ziffernrollen am Schlüsselkasten). Erfolg wie im Dialog, Fehler als Text unter der Szene. */
+  function tryLock(pid, value) {
+    const p = PUZ[pid];
+    if (!p || isSolved(pid)) return { ok: false, solved: Boolean(p) };
+    const r = checkAnswer(p, value);
+    if (r.ok) { succeed(p); return { ok: true }; }
+    A.play(p.failSound || "error");
+    setNarration(fill(r.msg || "Nichts passiert. Das scheint nicht die richtige Lösung zu sein."));
+    return r;
+  }
+
   function bindLock(p) {
     const root = $("#dlgBody .lock");
     const fb = $(".lock-feedback", root);
@@ -535,8 +551,9 @@
       root.classList.remove("shake"); void root.offsetWidth; root.classList.add("shake");
     };
     const attempt = (value) => {
-      if ((p.answers || []).map(norm).includes(norm(value))) { succeed(p); return true; }
-      fail((p.wrong && p.wrong[norm(value)]) || p.wrongDefault || null);
+      const r = checkAnswer(p, value);
+      if (r.ok) { succeed(p); return true; }
+      fail(r.msg);
       return false;
     };
     if (p.type === "code") {
@@ -817,7 +834,11 @@
   }
   function openItem(id) {
     const it = N.items[id];
-    openDialog({ kicker: "RUCKSACK", title: it.name, wide: it.doc && N.docs[it.doc].kind === "plan", html: `<p class="inspect-text">${fill(it.text)}</p>${it.doc ? docHtml(it.doc) : ""}` });
+    // 3D-Testmodus: Gegenstand mit Modell → „Genauer ansehen“ (drehen, zoomen; js/3d/inspect.js)
+    const in3d = Boolean(N.view3d && N.view3d.canInspect && N.view3d.canInspect(id));
+    openDialog({ kicker: "RUCKSACK", title: it.name, wide: it.doc && N.docs[it.doc].kind === "plan",
+      html: `<p class="inspect-text">${fill(it.text)}</p>${it.doc ? docHtml(it.doc) : ""}${in3d ? `<div class="button-row"><button type="button" class="ghost-button small" data-inspect3d="${id}">⟲ Genauer ansehen</button></div>` : ""}`,
+      after: in3d ? () => { const b = $("[data-inspect3d]", dlg); if (b) b.onclick = () => { closeDialog(); N.view3d.inspect(id); }; } : null });
   }
   (() => {
     let drag = null;
@@ -1453,6 +1474,7 @@
     position() { const r = room(); return { room: r.id, roomName: r.name, view: r.views ? r.views[viewIndex(r)].name : null }; },
     /* Schnittstelle für die 3D-Ansicht (js/3d): dieselben Hotspots, dieselbe Logik */
     hotspot: (id) => onHotspot(id),
+    tryLock: (pid, value) => tryLock(pid, value), isSolved: (pid) => isSolved(pid), openItem: (id) => openItem(id),
     isVisible: (id) => { const h = hotspotsOf(room()).find((x) => x.id === id); return Boolean(h) && visible(h); },
     hotspotData: (id) => hotspotsOf(room()).find((x) => x.id === id) || null,
     has, isLight: () => light, toggleLight: (on) => toggleLight(on), selectedItem: () => selected,

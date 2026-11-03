@@ -52,9 +52,7 @@ const plaqueTex = (text, w = 512, h = 96, fg = "#b69a6d", bg = "#1a120c", font =
 const keyboxFace = () => textTex(256, 340, "#3a2a1c", (g, w) => {
   g.strokeStyle = "#7a5f3e"; g.lineWidth = 6; g.strokeRect(10, 10, w - 20, 320);
   g.fillStyle = "#c9b28a"; g.font = "600 24px Georgia, serif"; g.textAlign = "center"; if ("letterSpacing" in g) g.letterSpacing = "6px"; g.fillText("SCHLÜSSEL", w / 2, 62);
-  g.fillStyle = "#14100c"; g.fillRect(70, 120, 116, 150);
-  g.fillStyle = "#b69a6d"; for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) g.fillRect(84 + c * 33, 134 + r * 33, 24, 24);
-  g.fillStyle = "#e05a3a"; g.beginPath(); g.arc(128, 292, 7, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#b69a6d"; g.font = "italic 12px Georgia, serif"; g.fillText("NUR FÜR DAS PERSONAL", w / 2, 108); // Gravur über dem Zahlenschloss (3D-Objekt)
 });
 const photoTex = () => textTex(400, 280, "#cbb796", (g) => {
   g.fillStyle = "#9a8462"; g.fillRect(0, 170, 400, 110);
@@ -191,11 +189,42 @@ defineRoom("rezeption", (ctx) => {
   const kbInner = group(box(0.66, 0.94, 0.01, M.dark, 0, 0, 0.125)); kbInner.position.z = 0.002;
   for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) { const hook = cyl(0.008, 0.008, 0.05, M.brass, -0.24 + c * 0.16, 0.3 - r * 0.2, 0.15); hook.rotation.x = Math.PI / 2; kbInner.add(hook); if ((r * 4 + c) % 3 === 0) kbInner.add(box(0.03, 0.08, 0.005, M.brass, -0.24 + c * 0.16, 0.25 - r * 0.2, 0.16)); }
   kb.add(kbInner);
-  const kbDoorPivot = new THREE.Group(); kbDoorPivot.position.set(-0.36, 0, 0.135);
+  const kbDoorPivot = new THREE.Group(); kbDoorPivot.position.set(-0.36, 0, 0.19); // vor den Haken (die ragen bis z ≈ 0,175)
   const kbDoor = plane(0.72, 1.0, lambert(0xffffff, { map: keyboxFace() })); kbDoor.position.x = 0.36; kbDoorPivot.add(kbDoor);
   const kbBack = plane(0.72, 1.0, M.dark); kbBack.rotation.y = Math.PI; kbBack.position.set(0.36, 0, -0.002); kbDoorPivot.add(kbBack);
+  // Messing-Zahlenschloss mit vier Ziffernrollen und Bügel – direkt bedienbar (Nahansicht), Prüfung durch die Engine (tryLock)
+  const lock = new THREE.Group(); lock.position.set(0.36, -0.08, 0.012); kbDoorPivot.add(lock);
+  lock.add(rbox(0.38, 0.26, 0.03, M.brass, 0, 0, 0.015, 0.012), rbox(0.33, 0.1, 0.012, M.dark, 0, 0.0, 0.032, 0.004));
+  const digitMats = Array.from({ length: 10 }, (_, d) => new THREE.MeshStandardMaterial({ map: textTex(64, 64, "#1a120c", (g) => { g.fillStyle = "#e8d2a0"; g.font = "600 46px Georgia, serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(String(d), 32, 35); }), roughness: 0.5 }));
+  const wheels = [], digits = [0, 0, 0, 0], wheelAng = [0, 0, 0, 0], RW = 0.042, STEP = (Math.PI * 2) / 10;
+  for (let i = 0; i < 4; i++) {
+    const w = new THREE.Group(); w.position.set(-0.117 + i * 0.078, 0, 0.03);
+    const drum = cyl(RW * 0.92, RW * 0.92, 0.056, M.brassDark, 0, 0, 0, 24); drum.rotation.z = Math.PI / 2; w.add(drum);
+    for (let d = 0; d < 10; d++) { const a = d * STEP; const pl = plane(0.05, 0.025, digitMats[d]); pl.position.set(0, RW * Math.sin(a), RW * Math.cos(a)); pl.rotation.x = -a; w.add(pl); }
+    [-0.03, 0.03].forEach((x) => { const rim = cyl(RW * 1.05, RW * 1.05, 0.005, M.brass, x, 0, 0, 24); rim.rotation.z = Math.PI / 2; w.add(rim); });
+    lock.add(w); wheels.push(w);
+  }
+  const shackle = group(new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.009, 10, 24, Math.PI), M.brass), box(0.12, 0.04, 0.03, ZONE, 0, 0.025, 0)); shackle.position.set(0, -0.15, 0.035); shackle.rotation.z = Math.PI; lock.add(shackle);
+  const N3 = window.NOCTURNE, E3 = () => N3.engine, A3 = { play: (n) => N3.audio && N3.audio.play(n) };
+  let dragging = -1;
+  const turnTo = (i, d) => { digits[i] = ((d % 10) + 10) % 10; A3.play("key"); };
+  let pullT = -1, shakeT = -1;
+  const lockSpec = {
+    when: () => !E3().isSolved("keybox"), cam: [0, -0.16, 0.72], center: [0, -0.16, 0.24], fov: 40, exitDelay: 1600,
+    hint: "Rollen antippen oder wischen · Bügel ziehen zum Öffnen", value: () => digits.join(""),
+    parts: () => [
+      ...wheels.map((w, i) => ({ obj: w, name: "rad" + i, tap: (h, info) => turnTo(i, digits[i] + (info && !info.above ? -1 : 1)), // oben antippen: +1, unten: −1
+        drag: (dx, dy) => { dragging = i; wheelAng[i] += dy * 0.03; }, release: (moved) => { dragging = -1; if (moved) turnTo(i, Math.round(wheelAng[i] / STEP)); } })),
+      { obj: shackle, name: "buegel", tap: () => { pullT = 0; const r = E3().tryLock("keybox", digits.join("")); if (!r.ok) shakeT = 0; } },
+    ],
+  };
   kb.add(kbDoorPivot);
-  add(place(hs("schluesselkasten", kb), "n", 0.31, 1.9, 0.0));
+  add(place(hs("schluesselkasten", kb, { focus: lockSpec }), "n", 0.31, 1.9, 0.0));
+  anim((dt) => {
+    wheels.forEach((w, i) => { if (dragging !== i) wheelAng[i] += (digits[i] * STEP - wheelAng[i]) * Math.min(1, dt * 12); w.rotation.x = wheelAng[i]; });
+    if (pullT >= 0) { pullT += dt; shackle.position.y = -0.15 - Math.sin(Math.min(1, pullT * 3) * Math.PI) * 0.025; if (pullT > 0.4) pullT = -1; }
+    if (shakeT >= 0) { shakeT += dt; lock.position.x = 0.36 + Math.sin(shakeT * 60) * 0.004 * (1 - shakeT / 0.4); if (shakeT > 0.4) { shakeT = -1; lock.position.x = 0.36; } }
+  });
   let kbOpen = false; state((has) => { kbOpen = has("keybox_open"); });
   anim((dt) => { kbDoorPivot.rotation.y = lerp(kbDoorPivot.rotation.y, kbOpen ? -1.75 : 0, Math.min(1, dt * 4)); });
   // Wanduhr (23:17) mit Messingrand und Schild
@@ -230,11 +259,33 @@ defineRoom("rezeption", (ctx) => {
   // Messingabdeckung (verschraubt) → Schlüsselschalter
   const cover = group(box(0.2, 0.32, 0.02, M.brass, 0, 0, 0.01));
   [[-0.075, 0.13], [0.075, 0.13], [-0.075, -0.13], [0.075, -0.13]].forEach(([x, y]) => { const s = cyl(0.012, 0.012, 0.01, M.brassDark, x, y, 0.022); s.rotation.x = Math.PI / 2; cover.add(s); });
+  const coverAnim = new THREE.Group(); while (cover.children.length) coverAnim.add(cover.children[0]); cover.add(coverAnim); // innen animieren, außen sitzt die Wandposition
   const sw = group(box(0.2, 0.32, 0.015, M.black, 0, 0, 0.008), cyl(0.035, 0.035, 0.02, M.brass, 0, 0.04, 0.02), new THREE.Mesh(new THREE.SphereGeometry(0.014, 10, 8), basic(0xff2a1a)));
   sw.children[1].rotation.x = Math.PI / 2; sw.children[2].position.set(0, -0.08, 0.02);
-  add(place(hs("abdeckung", cover, { hideWhenHidden: true }), "e", 0.7, 1.45, 0.0));
+  add(place(hs("abdeckung", cover), "e", 0.7, 1.45, 0.0));
   add(place(hs("schalter", sw, { hideWhenHidden: true }), "e", 0.7, 1.45, 0.0));
-  state((has) => { sw.children[2].material.color.setHex(has("elevator_open") ? 0x36d06a : 0xff2a1a); });
+  // Sichtbare Handlung: Schrauben drehen sich nacheinander heraus, die Platte kippt und fällt zu Boden (beim Laden: liegt schon unten)
+  const screws = coverAnim.children.slice(1, 5); let coverT = -1, coverWas = null;
+  const plateDown = () => { coverAnim.position.y = -1.45 + 0.012; coverAnim.position.z = 0.35; coverAnim.rotation.set(-Math.PI / 2, 0, 0.4); screws.forEach((sc) => { sc.visible = false; }); };
+  // Schlüssel im Schalter: steckt, dreht sich um 90°, wird nach kurzer Zeit wieder abgezogen
+  const swKey = group(cyl(0.006, 0.006, 0.05, M.brass, 0, 0, 0.03), new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.005, 8, 16), M.brass));
+  swKey.children[0].rotation.x = Math.PI / 2; swKey.children[1].position.z = 0.06; swKey.position.set(0, 0.04, 0.02); swKey.visible = false; sw.add(swKey);
+  let keyT = -1, elWas = null;
+  state((has) => {
+    sw.children[2].material.color.setHex(has("elevator_open") ? 0x36d06a : 0xff2a1a);
+    const c = has("cover_open"); if (coverWas === null && c) plateDown(); else if (coverWas === false && c) coverT = 0; coverWas = c;
+    const el = has("elevator_open"); if (elWas === false && el) { keyT = 0; swKey.visible = true; } elWas = el;
+  });
+  anim((dt) => {
+    if (coverT >= 0) {
+      coverT += dt;
+      screws.forEach((sc, i) => { const k = Math.min(1, Math.max(0, (coverT - i * 0.35) / 0.35)); sc.rotation.y = k * 9; sc.position.z = 0.022 + k * 0.03; if (k >= 1) sc.visible = false; });
+      const f = Math.max(0, coverT - 1.5);
+      if (f > 0) { const k = Math.min(1, f / 0.7); coverAnim.rotation.x = -k * k * Math.PI / 2; coverAnim.rotation.z = k * 0.4; coverAnim.position.z = k * 0.35; coverAnim.position.y = -k * k * (1.45 - 0.012); }
+      if (f > 0.7) { plateDown(); coverT = -1; }
+    }
+    if (keyT >= 0) { keyT += dt; swKey.rotation.z = -Math.min(1, keyT / 0.6) * Math.PI / 2; if (keyT > 3) { swKey.visible = false; keyT = -1; } }
+  });
   // Vertrocknete Palme
   const palm = group(cyl(0.24, 0.17, 0.5, lambert(0x2a2016), 0, 0.25, 0), cyl(0.22, 0.22, 0.02, lambert(0x1a130d), 0, 0.49, 0));
   for (let i = 0; i < 11; i++) { const f = box(0.022, 0.9 + (i % 3) * 0.12, 0.008, lambert(i % 2 ? 0x5a4a2c : 0x6b5a34), 0, 0, 0); const p = new THREE.Group(); p.add(f); f.position.y = 0.5; p.position.y = 0.5; p.rotation.set(0.35 + (i % 4) * 0.2, (i / 11) * Math.PI * 2, 0); palm.add(p); }

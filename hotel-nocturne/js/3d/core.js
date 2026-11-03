@@ -96,6 +96,11 @@ function init() {
   hintEl = document.createElement("div"); hintEl.className = "n3d-hint";
   hintEl.innerHTML = isTouch() ? "Wischen zum Umsehen · Antippen zum Untersuchen" : "Ziehen zum Umsehen · Klicken zum Untersuchen · Mausrad: Zoom";
   wrap.appendChild(hintEl); setTimeout(() => hintEl.classList.add("gone"), 9000);
+  focusUI = document.createElement("div"); focusUI.className = "n3d-focus";
+  focusUI.innerHTML = `<button type="button" data-f="back">‹ Zurück</button><span class="n3d-focus-hint"></span><button type="button" data-f="classic" title="Rätsel im gewohnten Fenster lösen">Klassisch lösen</button>`;
+  focusUI.addEventListener("click", (ev) => { const b = ev.target.closest("[data-f]"); if (!b || !focus) return; const id = focus.id; exitFocus(); if (b.dataset.f === "classic") E().hotspot(id); });
+  wrap.appendChild(focusUI);
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && focus && !E().blocked()) exitFocus(); });
   bindInput();
   new ResizeObserver(resize).observe(wrap);
   // Blitz der Engine (body.flash) auch im 3D-Raum
@@ -175,11 +180,63 @@ function hitAt(cx, cy) {
 }
 export function pickAt(cx, cy) { const h = hitAt(cx, cy); return h && h.id ? h.id : null; }
 function activate(cx, cy) {
+  if (focus && !focus.leaving) { focusTap(cx, cy); return; }
+  if (focus) endFocus(); // Klick während der Rückfahrt: sofort zurück und normal weiter
   const h = hitAt(cx, cy);
   if (!h) return;
   if (h.e.onClick) { h.e.onClick(); return; }
   hideHint();
+  // Direkt bedienbares Objekt (z. B. Ziffernrollen): Kamera fährt heran – außer ein Gegenstand ist ausgewählt (dann „benutzen“)
+  if (h.e.focus && !E().selectedItem() && h.e.focus.when(h.id)) { enterFocus(h.e, h.id); return; }
   E().hotspot(h.id);
+}
+
+/* ---------- Nahansicht: Rätsel direkt am Objekt bedienen ----------
+   hs(ids, obj, { focus: { when(id), cam:[x,y,z], center:[x,y,z] (lokal zum Objekt), fov, hint, parts: () => [{ obj, tap(hit), drag(dx, dy), release() }],
+   enter(), exit() } }). Tippen/Ziehen wirkt in der Nahansicht nur auf die Teile, nicht auf den Raum. Der Dialog bleibt als „Klassisch lösen“. */
+let focus = null, focusUI = null;
+function focusParts() { return focus ? focus.parts : []; }
+function partAt(cx, cy) {
+  const rc = canvas.getBoundingClientRect();
+  ndc.set(((cx - rc.left) / rc.width) * 2 - 1, -((cy - rc.top) / rc.height) * 2 + 1); ray.setFromCamera(ndc, camera);
+  const ps = focusParts(); if (!ps.length) return null;
+  const hits = ray.intersectObjects(ps.map((p) => p.obj), true);
+  for (const h of hits) { let o = h.object; while (o && !o.userData.part) o = o.parent; if (o && shown(o)) return { part: o.userData.part, hit: h }; }
+  return null;
+}
+function focusTap(cx, cy) {
+  const r = partAt(cx, cy); if (!r || !r.part.tap) return;
+  // „über/unter der Achse“ nach Bildschirmposition (unabhängig vom Blickwinkel)
+  const rc = canvas.getBoundingClientRect(), o = r.part.obj.getWorldPosition(new THREE.Vector3()).project(camera);
+  r.part.tap(r.hit, { above: cy < rc.top + (1 - o.y) / 2 * rc.height });
+}
+function enterFocus(e, id) {
+  const sp = e.focus; e.obj.updateMatrixWorld(true);
+  const parts = sp.parts ? sp.parts() : [];
+  parts.forEach((p) => { p.obj.userData.part = p; });
+  const fwd = new THREE.Vector3(); camera.getWorldDirection(fwd);
+  focus = { e, id, sp, parts, camPos: e.obj.localToWorld(new THREE.Vector3(...(sp.cam || [0, 0, 0.6]))), look: e.obj.localToWorld(new THREE.Vector3(...(sp.center || [0, 0, 0]))),
+    curLook: camera.position.clone().add(fwd.multiplyScalar(2)), fov0: fov, fov: sp.fov || 50, leaving: false, exitTimer: null };
+  hideTip(); hideHint(); targetYaw = null;
+  if (focusUI) { focusUI.querySelector(".n3d-focus-hint").textContent = sp.hint || ""; focusUI.classList.add("show"); }
+  if (sp.enter) sp.enter();
+}
+function exitFocus(immediate = false) {
+  if (!focus || focus.leaving) { if (immediate && focus) endFocus(); return; }
+  clearTimeout(focus.exitTimer);
+  focus.leaving = true;
+  focus.back = camera.position.clone().set(...built.eye).add(new THREE.Vector3(0, 0, -2).applyEuler(new THREE.Euler(pitch, yaw, 0, "YXZ")));
+  if (focusUI) focusUI.classList.remove("show");
+  if (focus.sp.exit) focus.sp.exit();
+  if (immediate) endFocus();
+}
+function endFocus() { if (!focus) return; focus.parts.forEach((p) => { delete p.obj.userData.part; }); fov = focus.fov0; focus = null; camera.position.set(...built.eye); camera.rotation.set(pitch, yaw, 0, "YXZ"); camera.fov = fov; camera.updateProjectionMatrix(); if (focusUI) focusUI.classList.remove("show"); }
+function focusCamera(dt) {
+  const k = Math.min(1, dt * 5);
+  const toPos = focus.leaving ? new THREE.Vector3(...built.eye) : focus.camPos, toLook = focus.leaving ? focus.back : focus.look, toFov = focus.leaving ? focus.fov0 : focus.fov;
+  camera.position.lerp(toPos, k); focus.curLook.lerp(toLook, k); camera.lookAt(focus.curLook);
+  camera.fov += (toFov - camera.fov) * k; camera.updateProjectionMatrix();
+  if (focus.leaving && camera.position.distanceTo(toPos) < 0.02) endFocus();
 }
 
 /* ---------- Eingabe: Ziehen = umsehen, Tippen = untersuchen ---------- */
@@ -192,6 +249,7 @@ function bindInput() {
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch0 = { d: Math.hypot(a.x - b.x, a.y - b.y), fov }; drag = null; return; }
     drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), moved: 0 };
+    if (focus) { const r = partAt(e.clientX, e.clientY); drag.part = r && r.part.drag ? r.part : null; } // Nahansicht: Teil greifen statt umsehen
     targetYaw = null;
   });
   canvas.addEventListener("pointermove", (e) => {
@@ -200,6 +258,7 @@ function bindInput() {
     if (drag) {
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
       drag.moved += Math.abs(dx) + Math.abs(dy);
+      if (focus) { if (drag.part) drag.part.drag(dx, dy); return; } // in der Nahansicht dreht sich der Raum nicht
       const k = (e.pointerType === "touch" ? 0.0062 : 0.0045) * fov / 68;
       yaw += dx * k; pitch = Math.max(-1.05, Math.min(1.0, pitch + dy * k));
       if (drag.moved > 8) { hideTip(); hideHint(); }
@@ -212,17 +271,19 @@ function bindInput() {
     if (ptrs.size < 2) pinch0 = null;
     if (!drag) return;
     const d = drag; drag = null;
-    if (d.moved < 8 && performance.now() - d.t < 700) activate(e.clientX, e.clientY);
+    if (d.part && d.part.release) d.part.release(d.moved >= 8);
+    if (d.moved < 8 && performance.now() - d.t < (focus ? 2000 : 700)) activate(e.clientX, e.clientY); // Nahansicht: großzügiger (Rollen antippen)
     syncView();
   };
   canvas.addEventListener("pointerup", up);
   canvas.addEventListener("pointercancel", (e) => { ptrs.delete(e.pointerId); drag = null; pinch0 = null; });
   canvas.addEventListener("pointerleave", () => { if (!drag) hideTip(); });
-  canvas.addEventListener("wheel", (e) => { e.preventDefault(); if (cine) return; setFov(fov * (e.deltaY > 0 ? 1.07 : 0.93)); }, { passive: false });
+  canvas.addEventListener("wheel", (e) => { e.preventDefault(); if (cine || focus) return; setFov(fov * (e.deltaY > 0 ? 1.07 : 0.93)); }, { passive: false });
   canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 function setFov(v) { fov = Math.max(34, Math.min(80, v)); camera.fov = fov; camera.updateProjectionMatrix(); }
 function hover(cx, cy) {
+  if (focus) { const r = partAt(cx, cy); canvas.style.cursor = r ? (r.part.drag ? "ns-resize" : "pointer") : "default"; hideTip(); return; }
   const rc = canvas.getBoundingClientRect();
   flashAim.set(((cx - rc.left) / rc.width) * 2 - 1, -((cy - rc.top) / rc.height) * 2 + 1);
   const h = hitAt(cx, cy);
@@ -249,11 +310,14 @@ function frame() {
   const dt = Math.min(0.05, clock.getDelta()), t = clock.elapsedTime;
   if (cine) cine.update(dt, t); // Intro: Kamera, Taschenlampe und Licht kommen aus dem Drehbuch
   else {
-    if (targetYaw !== null) {
-      const d = targetYaw - yaw; yaw += d * Math.min(1, dt * 7);
-      if (Math.abs(d) < 0.002) { yaw = targetYaw; targetYaw = null; }
+    if (focus) focusCamera(dt);
+    else {
+      if (targetYaw !== null) {
+        const d = targetYaw - yaw; yaw += d * Math.min(1, dt * 7);
+        if (Math.abs(d) < 0.002) { yaw = targetYaw; targetYaw = null; }
+      }
+      camera.rotation.set(pitch, yaw, 0, "YXZ");
     }
-    camera.rotation.set(pitch, yaw, 0, "YXZ");
     // Taschenlampe: am Computer folgt sie der Maus, am Handy zeigt sie geradeaus
     const L = E().isLight();
     flash.intensity += ((L ? 40 : 0) - flash.intensity) * Math.min(1, dt * 10);
@@ -278,6 +342,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) runni
 /* ---------- Schnittstelle für die Engine ---------- */
 function applyState() {
   const has = (f) => E().has(f), L = E().isLight();
+  if (focus && !focus.leaving && !focus.exitTimer && !focus.sp.when(focus.id)) focus.exitTimer = setTimeout(() => exitFocus(), focus.sp.exitDelay ?? 1400); // gelöst → zurück
   built.states.forEach((fn) => fn(has, L));
   built.pick.forEach((e) => { if (e.hideWhenHidden) e.obj.visible = e.ids.some((id) => E().isVisible(id)); });
   // Hotspot-Hilfe (Menü „Hotspots anzeigen“): kleine Leuchtpunkte
@@ -294,6 +359,7 @@ function render(stage, r, i) {
   if (cine) return; // während des Intros nicht umhängen
   if (!init()) return;
   if (!wrap.isConnected || wrap.parentNode !== stage) { stage.innerHTML = ""; stage.appendChild(wrap); }
+  if (focus && (roomId !== r.id || i !== lastIndex)) exitFocus(true);
   if (roomId !== r.id) { buildRoom(r); yaw = yawOf(i); pitch = -0.04; targetYaw = null; lastIndex = i; }
   else if (i !== lastIndex) { // ‹ › oder Tastatur: sanft auf die neue Ansicht drehen (kürzester Weg)
     lastIndex = i;
@@ -333,7 +399,12 @@ function debugHits(cx, cy) {
   const rc = canvas.getBoundingClientRect(); ndc.set(((cx - rc.left) / rc.width) * 2 - 1, -((cy - rc.top) / rc.height) * 2 + 1); ray.setFromCamera(ndc, camera);
   return ray.intersectObjects(built.pick.map((e) => e.obj), true).slice(0, 6).map((h) => { let o = h.object; while (o && !o.userData.owner) o = o.parent; const e = o && o.userData.owner; return `${e ? e.ids.join("/") : "?"}${shown(h.object) ? "" : "(versteckt)"}@${h.distance.toFixed(2)}`; });
 }
-N.view3d = { supports, render, pickAt, aimAt, debugHits, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0, ...sceneStats() }) };
+/** Für Tests: Nahansicht und Bildschirmpunkte ihrer Teile. */
+function focusInfo() {
+  if (!focus) return null; const rc = canvas.getBoundingClientRect();
+  return { id: focus.id, leaving: focus.leaving, arrived: camera.position.distanceTo(focus.camPos) < 0.01, value: focus.sp.value ? focus.sp.value() : null, parts: focus.parts.map((p) => { const c = new THREE.Box3().setFromObject(p.obj).getCenter(new THREE.Vector3()).project(camera); return { name: p.name || "", x: rc.left + (c.x + 1) / 2 * rc.width, y: rc.top + (1 - c.y) / 2 * rc.height }; }) };
+}
+N.view3d = { supports, render, pickAt, aimAt, debugHits, focusInfo, focusExit: () => exitFocus(), sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0, ...sceneStats() }) };
 // Falls das Spiel schon läuft, als die Module fertig geladen waren: jetzt auf 3D umschalten
 /* ---------- Kinomodus für das Intro (js/3d/intro.js) ----------
    Leiht sich Renderer, Kamera und den fertig gebauten Raum: Das Intro fährt durch dieselbe Szene,

@@ -13,6 +13,7 @@ const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', 
 async function enter(p, url) {
   await p.goto(url); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(400);
   await p.click('#startButton'); await p.waitForTimeout(500);
+  if (await p.$('.cf-cold .cine-btn')) { await p.click('.cf-cold .cine-btn'); await p.waitForTimeout(400); } // Vorspann (filmische Fallakte)
   for (let i = 0; i < 10; i++) { const n = await p.$('[data-pz="next"]'); if (!n) break; await n.click(); await p.waitForTimeout(200); }
   await p.waitForTimeout(300); if (await p.$('.cine-btn')) await p.click('.cine-btn'); await p.waitForTimeout(700);
   if (await p.$('#dialog[open] [data-close]')) await p.click('#dialog[open] [data-close]'); await p.waitForTimeout(300);
@@ -34,7 +35,10 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
   await p2.close(); const p = await b.newPage({ viewport: { width: 1280, height: 860 } }); p.setDefaultTimeout(15000);
   p.on('pageerror', e => errs.push('3D ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('3D console ' + m.text()); });
   await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL);
-  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return 'kein Objekt'; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350); return pt; };
+  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return 'kein Objekt'; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350);
+    // direkt bedienbare Objekte öffnen die Nahansicht – für den Vergleich mit 2D den klassischen Dialog nehmen
+    if (await p.evaluate(() => { const f = NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo(); return Boolean(f && !f.leaving); })) { await p.waitForTimeout(500); await p.click('.n3d-focus [data-f="classic"]'); await p.waitForTimeout(500); }
+    return pt; };
   let same = 0, diff = [];
   for (const id of Object.keys(ref)) {
     const pt = await click3d(id); const t = await dlgTitle(p);

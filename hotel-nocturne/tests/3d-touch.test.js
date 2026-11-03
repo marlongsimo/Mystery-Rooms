@@ -13,6 +13,7 @@ const { chromium, devices } = require('playwright');
     const ctx = await b.newContext({ ...devices[dev] }); const p = await ctx.newPage(); p.setDefaultTimeout(20000); p.on('pageerror', e => errs.push(dev + ' ' + e.message));
     await p.goto(BASE + '/hotel-nocturne/3d.html?q=' + QUAL); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(400);
     await p.tap('#startButton'); await p.waitForTimeout(500);
+    if (await p.$('.cf-cold .cine-btn')) { await p.tap('.cf-cold .cine-btn'); await p.waitForTimeout(400); } // Vorspann (filmische Fallakte)
     for (let i = 0; i < 10; i++) { const n = await p.$('[data-pz="next"]'); if (!n) break; await n.tap(); await p.waitForTimeout(200); }
     await p.waitForTimeout(300); if (await p.$('.cine-btn')) await p.tap('.cine-btn'); await p.waitForTimeout(800);
     if (await p.$('#dialog[open] [data-close]')) await p.tap('#dialog[open] [data-close]'); await p.waitForTimeout(500);

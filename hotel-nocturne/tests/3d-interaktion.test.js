@@ -75,17 +75,50 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   await p.click('#phoneButton'); await p.waitForTimeout(300); await p.click('[data-app="licht"]'); await p.waitForTimeout(500);
   await click3d('schraubendreher'); await closeDlg(p);
   await p.click('#phoneButton'); await p.waitForTimeout(300); await p.click('[data-app="licht"]'); await p.waitForTimeout(500); await closeDlg(p);
-  await p.click('[data-slot="schraubendreher"]'); await p.waitForTimeout(200); await click3d('abdeckung'); await p.waitForTimeout(300); await closeDlg(p);
-  check((await st()).flags.includes('cover_open'), 'Schraubendreher an der Abdeckung → cover_open');
-  await p.evaluate(() => NOCTURNE.view3d.aimAt('schalter')); await p.waitForTimeout(700); await p.screenshot({ path: OUT + 'ia-schrauben.png', timeout: 90000 });
-  await p.waitForTimeout(4000); await p.screenshot({ path: OUT + 'ia-platte.png', timeout: 90000 });
-  await p.click('[data-slot="key217"]'); await p.waitForTimeout(200); await click3d('schalter'); await p.waitForTimeout(300); await closeDlg(p);
-  check((await st()).flags.includes('elevator_open'), 'Schlüssel im Schalter → elevator_open');
-  await p.evaluate(() => NOCTURNE.view3d.aimAt('schalter')); await p.waitForTimeout(500); await p.screenshot({ path: OUT + 'ia-schluessel.png', timeout: 90000 });
+  // Kreisende Geste um einen Bildschirmpunkt (dir −1 = gegen den Uhrzeigersinn, +1 = im Uhrzeigersinn)
+  const twist = async (pt, turns, dir) => { const r = 28, steps = Math.ceil(Math.abs(turns) * 16); await p.mouse.move(pt.x, pt.y); await p.mouse.down(); await p.mouse.move(pt.x + r, pt.y);
+    for (let i = 1; i <= steps; i++) { const a = dir * (i / 16) * Math.PI * 2; await p.mouse.move(pt.x + r * Math.cos(a), pt.y + r * Math.sin(a)); await p.waitForTimeout(25); } await p.mouse.up(); await p.waitForTimeout(250); };
+  // Wrong item first: key on the cover → engine message, no close-up
+  await p.click('[data-slot="key217"]'); await p.waitForTimeout(200); await click3d('abdeckung'); await p.waitForTimeout(400);
+  check(!(await focus()) && /Schrauben nicht los/.test(await narr()), 'Falscher Gegenstand an der Abdeckung → Text der Engine, keine Nahansicht');
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200); // Auswahl aufheben (zweiter Klick auf den Gegenstand hieße „ansehen“)
+  // Screwdriver → close-up, unscrew four screws counter-clockwise
+  await p.click('[data-slot="schraubendreher"]'); await p.waitForTimeout(200); await click3d('abdeckung'); f = await settle();
+  check(Boolean(f) && f.parts.length === 4, `Schraubendreher an der Abdeckung → Nahansicht mit ${f ? f.parts.length : 0} Schrauben`);
+  const sc0 = f.parts[0]; await p.mouse.click(sc0.x, sc0.y); await p.waitForTimeout(300); const vb = (await focus()).value; await twist(sc0, 0.6, 1); // im Uhrzeigersinn: zieht fester an
+  const v0 = (await focus()).value; check(parseFloat(v0) <= parseFloat(vb), `Im Uhrzeigersinn gedreht → Schraube kommt nicht heraus (${vb.split(' ')[0]} → ${v0.split(' ')[0]})`);
+  for (let i = 0; i < 4; i++) { const sc = (await focus()).parts[i]; await p.mouse.click(sc.x, sc.y); await p.waitForTimeout(250); await twist(sc, 2.3, -1); if (i === 1) await p.screenshot({ path: OUT + 'ia-schrauben.png', timeout: 90000 }); }
+  await p.waitForTimeout(2500);
+  check((await st()).flags.includes('cover_open'), 'Vier Schrauben herausgedreht → Engine löst „Abdeckung“ (cover_open)');
+  await closeDlg(p); await p.waitForTimeout(4000); await p.evaluate(() => NOCTURNE.view3d.aimAt('schalter')); await p.waitForTimeout(800); await p.screenshot({ path: OUT + 'ia-platte.png', timeout: 90000 });
+  // Key in the elevator switch: quarter turn clockwise
+  await p.click('[data-slot="key217"]'); await p.waitForTimeout(200); await click3d('schalter'); f = await settle();
+  check(Boolean(f) && f.id === 'schalter', 'Schlüssel 217 am Schalter → Nahansicht, Schlüssel steckt');
+  await p.screenshot({ path: OUT + 'ia-schluessel.png', timeout: 90000 });
+  await twist(f.parts[0], 0.3, 1); await p.waitForTimeout(1500);
+  check((await st()).flags.includes('elevator_open'), 'Schlüssel im Uhrzeigersinn gedreht → elevator_open');
+  for (let i = 0; i < 20 && !(await dlgOpen(p)); i++) await p.waitForTimeout(250); // Erfolgsfenster abwarten (langsame Umgebung)
+  await closeDlg(p); await p.waitForTimeout(2500);
+  // Short actions, then the usual text
+  for (const [id, title] of [['telefon', 'Das Telefon'], ['klingel', 'Die Tischklingel'], ['fussmatte', 'Die Fußmatte'], ['sofa', 'Das Sofa'], ['regal', 'Das Aktenregal'], ['eingangstuer', 'Die Eingangstür'], ['personalfoto', 'Ein gerahmtes Foto'], ['schirmstaender', 'Der Schirmständer']]) {
+    const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); await p.waitForTimeout(150); await p.mouse.click(pt.x, pt.y);
+    if (id === 'personalfoto' || id === 'schirmstaender') { await p.waitForTimeout(700); await p.screenshot({ path: OUT + `ia-hand-${id}.png`, timeout: 90000 }); }
+    let t = null; for (let i = 0; i < 20 && !t; i++) { await p.waitForTimeout(250); t = await p.evaluate(() => (document.querySelector('#dialog').open ? document.querySelector('#dlgTitle').textContent : null)); }
+    check(t === title, `${id}: Handlung, dann „${t}“`); await closeDlg(p); await p.waitForTimeout(600);
+  }
+  // Register: turn pages, loose sheet, read
+  await click3d('register'); f = await settle();
+  check(Boolean(f) && f.id === 'register' && f.value === '0', 'Gästeregister → Nahansicht');
+  const pr = f.parts.find((x) => x.name === 'rechts'); await p.mouse.click(pr.x, pr.y); await p.waitForTimeout(1500);
+  check((await focus()).value === '1', 'Rechte Seite → umgeblättert'); await p.screenshot({ path: OUT + 'ia-register.png', timeout: 90000 });
+  const pl = (await focus()).parts.find((x) => x.name === 'links'); await p.mouse.click(pl.x, pl.y); await p.waitForTimeout(1500);
+  check((await focus()).value === '0', 'Linke Seite → zurückgeblättert');
+  const pl2 = (await focus()).parts.find((x) => x.name === 'links'); await p.mouse.click(pl2.x, pl2.y); await p.waitForTimeout(900);
+  check((await p.textContent('#dlgTitle')) === 'Das Gästeregister', 'Linke Seite vom 14. Oktober → Register lesen'); await closeDlg(p); await p.keyboard.press('Escape'); await p.waitForTimeout(1500);
   // Genauer ansehen
   await p.click('[data-slot="key217"]'); await p.waitForTimeout(200); await p.click('[data-slot="key217"]'); await p.waitForTimeout(500);
   check(Boolean(await p.$('#dialog[open] [data-inspect3d="key217"]')), 'Rucksack: Schlüssel 217 hat „Genauer ansehen“');
-  await p.click('[data-inspect3d="key217"]'); await p.waitForTimeout(1500);
+  await p.click('[data-inspect3d="key217"]', { timeout: 90000 }); await p.waitForTimeout(1500); // Spiegelungsumgebung: im Software-Rendering ~15 s, auf echter Grafik Millisekunden
   const i0 = await p.evaluate(() => NOCTURNE.view3d.inspectInfo());
   check(Boolean(i0) && Boolean(await p.$('.n3d-inspect canvas')), 'Ansicht geöffnet');
   await p.screenshot({ path: OUT + 'ia-key-vorn.png', timeout: 90000 });
@@ -109,6 +142,23 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   for (const k of '2117') await q.click(`[data-key="${k}"]`); await q.waitForTimeout(800);
   const s2 = await q.evaluate(() => JSON.parse(localStorage.getItem('nocturne_save_v2')).flags);
   check(/Uhr erinnert/.test(fb) && s2.includes('keybox_open') && !e2.length, 'Normale Version: Dialog-Zahlenschloss wie bisher (Fehlertext, dann 2117 offen)');
+  // Personaltür (Schlüssel aus Zimmer 217): vorbereiteter Spielstand
+  const SAVE = { v: 2, started: true, finished: false, current: 'rezeption', unlocked: ['rezeption', 'zimmer217'], visited: ['rezeption', 'zimmer217'], completed: ['rezeption'], views: { rezeption: 1 },
+    solved: ['keybox', 'werkzeug', 'cover', 'elevator', 'anordnung', 'schrank', 'gepaeckschein'], flags: ['keybox_open', 'taken_schraubendreher', 'cover_open', 'elevator_open', 'kommode_open', 'evt_fenster', 'fenster_auf', 'schrank_open', 'taken_gepaeckschein'],
+    inventory: ['key217', 'hotelplan', 'schraubendreher', 'personalschluessel', 'gepaeckschein'], docs: ['reservierung'], newDocs: [], messages: [], unread: [], secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 600000, notes: '', sound: false, music: false, showHotspots: false, goals: {} };
+  const d = await b.newPage({ viewport: { width: 1280, height: 860 } }); d.setDefaultTimeout(90000); // Aufbau der HD-Rezeption beim Start: im Software-Rendering langsam const e4 = []; d.on('pageerror', (e) => e4.push(e.message));
+  await d.addInitScript((s) => { if (!sessionStorage.getItem('seeded')) { localStorage.clear(); localStorage.setItem('nocturne_save_3d_v2', JSON.stringify(s)); sessionStorage.setItem('seeded', '1'); } }, SAVE);
+  await d.goto(BASE + '/hotel-nocturne/3d.html?q=' + QUAL, { timeout: 60000 }); await d.waitForTimeout(500); await d.click('#startButton'); await d.waitForTimeout(1500); if (await d.$('#dialog[open] #closeDialog')) await d.click('#closeDialog');
+  await d.click('[data-slot="personalschluessel"]'); await d.waitForTimeout(200);
+  const dp = await d.evaluate(() => NOCTURNE.view3d.aimAt('personaltuer')); await d.waitForTimeout(150); await d.mouse.click(dp.x, dp.y);
+  let df = null; for (let i = 0; i < 120; i++) { df = await d.evaluate(() => NOCTURNE.view3d.focusInfo()); if (df && df.arrived) break; await d.waitForTimeout(250); }
+  check(Boolean(df) && df.id === 'personaltuer', 'Personalschlüssel an der Tür „Personal“ → Nahansicht');
+  await d.screenshot({ path: OUT + 'ia-personaltuer.png', timeout: 90000 });
+  for (let i = 0; i < 3; i++) { const k = (await d.evaluate(() => NOCTURNE.view3d.focusInfo())).parts[0]; await d.mouse.click(k.x, k.y); await d.waitForTimeout(350); } // dreimal antippen = 90°
+  await d.waitForTimeout(1500);
+  const dfl = await d.evaluate(() => JSON.parse(localStorage.getItem('nocturne_save_3d_v2')).flags);
+  check(dfl.includes('personal_open') && !e4.length, 'Schlüssel per Antippen gedreht → Tür „Personal“ offen');
+  await d.close();
   // iPad (Touch): Nahansicht per Fingertipp, Rolle antippen
   const ctx = await b.newContext({ ...devices['iPad Pro 11 landscape'], deviceScaleFactor: 1 }); const t3 = await ctx.newPage(); t3.setDefaultTimeout(30000); const e3 = []; t3.on('pageerror', (e) => e3.push(e.message));
   await t3.goto(BASE + '/hotel-nocturne/3d.html?q=' + QUAL, { timeout: 60000 }); await t3.evaluate(() => localStorage.clear()); await t3.reload({ timeout: 60000 }); await t3.waitForTimeout(400);

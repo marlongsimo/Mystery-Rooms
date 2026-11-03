@@ -36,6 +36,8 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
   p.on('pageerror', e => errs.push('3D ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('3D console ' + m.text()); });
   await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL);
   const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return 'kein Objekt'; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350);
+    // Objekte mit kurzer Handlung öffnen den Text erst danach
+    for (let i = 0; i < 8; i++) { if (await p.evaluate(() => document.querySelector('#dialog').open || Boolean(NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo()))) break; await p.waitForTimeout(250); }
     // direkt bedienbare Objekte öffnen die Nahansicht – für den Vergleich mit 2D den klassischen Dialog nehmen
     if (await p.evaluate(() => { const f = NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo(); return Boolean(f && !f.leaving); })) { await p.waitForTimeout(500); await p.click('.n3d-focus [data-f="classic"]'); await p.waitForTimeout(500); }
     return pt; };

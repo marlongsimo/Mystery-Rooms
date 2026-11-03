@@ -111,6 +111,10 @@ const binderLabel = (t) => textTex(64, 128, "#d6c9a6", (g) => { g.fillStyle = "#
 
 defineRoom("rezeption", (ctx) => {
   const { add, hs, prop, state, anim, lerp } = ctx;
+  const snd = ctx.sound, eng = ctx.engine;
+  let tNow = 0; anim((dt, t) => { tNow = t; });
+  // Drehgeste um einen Punkt auf dem Bildschirm (Schraube, Schlüssel): liefert die Winkeländerung je Zeigerbewegung (Bildschirm: y nach unten → Uhrzeigersinn = positiv)
+  const twister = (objFn) => { let last = null; return { delta(p) { const c = ctx.screenOf(objFn()); const a = Math.atan2(p.y - c.y, p.x - c.x); let d = 0; if (last !== null) { d = a - last; if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; } last = a; return d; }, reset() { last = null; } }; };
   const { place } = walls(R);
   // HD-Materialien (PBR): Damasttapete, poliertes Nussholz, Messing, Samt, Leder
   const M = {
@@ -159,25 +163,67 @@ defineRoom("rezeption", (ctx) => {
   const led = new THREE.Mesh(new THREE.SphereGeometry(0.012, 10, 8), basic(0xff2a1a));
   const phone = group(box(0.3, 0.08, 0.22, M.black, 0, 0.04, 0), box(0.26, 0.05, 0.07, M.black, 0, 0.1, -0.04), cyl(0.04, 0.04, 0.05, M.black, -0.11, 0.1, -0.04), cyl(0.04, 0.04, 0.05, M.black, 0.11, 0.1, -0.04), led);
   led.position.set(0.1, 0.085, 0.07);
-  anim((dt, t) => { led.material.color.setHex(Math.sin(t * 6) > 0 ? 0xff2a1a : 0x3a0806); });
-  add(place(hs("telefon", phone), "n", 0.33, 1.11, 1.25));
+  // Anrufbeantworter: Wiedergabetaste und Kassettenfenster mit zwei Spulen
+  const playBtn = rbox(0.05, 0.02, 0.03, std(0x3a3a38, { roughness: 0.5 }), -0.07, 0.085, 0.07, 0.006); phone.add(playBtn);
+  const reels = [-0.035, 0.035].map((x) => { const r = new THREE.Group(); r.position.set(x, 0.081, 0.0); r.add(cyl(0.018, 0.018, 0.004, std(0x1a1a18), 0, 0, 0, 12)); for (let k = 0; k < 3; k++) r.add(box(0.03, 0.005, 0.004, std(0xcfc6b0), 0, 0.003, 0).rotateY(k * Math.PI / 3)); phone.add(r); return r; });
+  let played = false, pressT = -1, reelT = -1;
+  anim((dt, t) => { led.material.color.setHex(played ? 0x3a0806 : Math.sin(t * 6) > 0 ? 0xff2a1a : 0x3a0806);
+    if (pressT >= 0) { pressT += dt; playBtn.position.y = 0.085 - Math.sin(Math.min(1, pressT * 4) * Math.PI) * 0.008; if (pressT > 0.3) pressT = -1; }
+    if (reelT >= 0) { reelT += dt; reels.forEach((r) => { r.rotation.y += dt * 6; }); if (reelT > 8) reelT = -1; } });
+  add(place(hs("telefon", phone, { act: { play: () => { pressT = 0; reelT = 0; played = true; snd("click"); return 650; } } }), "n", 0.33, 1.11, 1.25));
   // Gästeregister (aufgeschlagen) + lose Seite (Geheimnis)
   const book = group(box(0.62, 0.03, 0.42, lambert(0x4a1414), 0, 0.015, 0));
   const pl = plane(0.29, 0.39, lambert(0xffffff, { map: pageTex(14) })); pl.rotation.set(-Math.PI / 2, 0, 0.04); pl.position.set(-0.15, 0.036, 0); book.add(pl);
   const pr = plane(0.29, 0.39, lambert(0xffffff, { map: pageTex(10, true) })); pr.rotation.set(-Math.PI / 2, 0, -0.04); pr.position.set(0.15, 0.036, 0); book.add(pr);
   book.add(box(0.012, 0.004, 0.3, lambert(0x8a1a14), 0.02, 0.04, 0.05)); // Lesebändchen
-  add(place(hs("register", book), "n", 0.49, 1.11, 1.3));
+  // Selbst blättern (Nahansicht): rechte Seite antippen = vor, linke = zurück; auf der Seite vom 14. Oktober öffnet die linke Seite das Register zum Lesen.
+  // Beim Umblättern rutscht die lose Seite (Geheimnis) zwischen den Seiten hervor.
+  const leftTex = [pl.material.map, pageTex(12), pageTex(0)], rightTex = [pr.material.map, pageTex(3), pageTex(0)];
+  const flipPv = new THREE.Group(); flipPv.position.set(0, 0.037, 0); flipPv.visible = false; book.add(flipPv);
+  const flipFront = plane(0.29, 0.39, lambert(0xffffff, { map: rightTex[0] })); flipFront.rotation.x = -Math.PI / 2; flipFront.position.x = 0.15;
+  const flipBack = plane(0.29, 0.39, lambert(0xffffff, { map: leftTex[1] })); flipBack.rotation.x = Math.PI / 2; flipBack.rotation.z = Math.PI; flipBack.position.set(0.15, -0.001, 0);
+  flipPv.add(flipFront, flipBack);
+  let regK = 0, flipT = -1, flipDir = 1;
+  const setMap = (m, t) => { m.material.map = t; m.material.needsUpdate = true; };
+  const flip = (dir) => {
+    if (flipT >= 0) return; const to = regK + dir; if (to < 0 || to > 2) return;
+    flipDir = dir; flipT = 0; flipPv.visible = true; snd("paper");
+    if (dir > 0) { setMap(flipFront, rightTex[regK]); setMap(flipBack, leftTex[to]); setMap(pr, rightTex[to]); }
+    else { setMap(flipFront, rightTex[to]); setMap(flipBack, leftTex[regK]); setMap(pl, leftTex[to]); }
+    regK = to;
+  };
+  anim((dt) => {
+    if (flipT < 0) return; flipT += dt; const k = Math.min(1, flipT / 0.6), e = k * k * (3 - 2 * k);
+    flipPv.rotation.z = flipDir > 0 ? e * Math.PI : (1 - e) * Math.PI; flipPv.position.y = 0.037 + Math.sin(e * Math.PI) * 0.01;
+    if (k >= 1) { flipT = -1; flipPv.visible = false; if (flipDir > 0) setMap(pl, leftTex[regK]); else setMap(pr, rightTex[regK]); }
+  });
+  const regSpec = {
+    when: () => true, cam: [0, 0.52, 0.32], center: [0, 0.03, -0.02], fov: 50,
+    hint: "Rechte Seite: weiterblättern · linke Seite: zurück bzw. lesen", value: () => String(regK),
+    parts: () => [
+      { obj: pr, name: "rechts", tap: () => flip(1) },
+      { obj: pl, name: "links", tap: () => { if (regK === 0) eng().hotspot("register"); else flip(-1); } },
+      ...(loose.visible ? [{ obj: looseG, name: "lose", tap: () => eng().hotspot("kinderzeichnung") }] : []),
+    ],
+  };
+  add(place(hs("register", book, { focus: regSpec }), "n", 0.49, 1.11, 1.3));
   const loose = plane(0.1, 0.12, lambert(0xd8c99e, { side: THREE.DoubleSide })); loose.rotation.set(-Math.PI / 2 + 0.5, 0, 0.3);
   const looseZone = box(0.16, 0.08, 0.16, ZONE, 0, 0.04, 0);
   const looseG = group(loose, looseZone); loose.position.set(0, 0.05, 0);
   add(place(hs("kinderzeichnung", looseG), "n", 0.443, 1.15, 1.46));
   state((has) => { loose.visible = !has("kinderzeichnung_gesehen"); });
+  // nach dem Umblättern rutscht sie weiter heraus und liegt auf der rechten Seite
+  const looseHome = looseG.position.clone(), looseRot = looseG.rotation.y; let looseOut = 0;
+  anim((dt) => { const to = regK > 0 && loose.visible ? 1 : 0; looseOut += (to - looseOut) * Math.min(1, dt * 3); if (looseOut < 0.001 && to === 0) return;
+    const tgt = book.localToWorld(new THREE.Vector3(0.12, 0.0, 0.05)).sub(new THREE.Vector3(0, 0.04, 0));
+    looseG.position.lerpVectors(looseHome, tgt, looseOut); looseG.rotation.y = looseRot + looseOut * 0.4; loose.rotation.x = -Math.PI / 2 + 0.5 * (1 - looseOut); });
   // Zettel, Tischklingel
   const note = plane(0.24, 0.17, lambert(0xffffff, { map: noteTex() })); note.rotation.set(-Math.PI / 2, 0, -0.12);
   add(place(hs("zettel", group(note, box(0.26, 0.04, 0.2, ZONE, 0, 0.02, 0))), "n", 0.64, 1.116, 1.35));
   const bell = group(cyl(0.07, 0.08, 0.02, M.brassDark, 0, 0.01, 0), new THREE.Mesh(new THREE.SphereGeometry(0.06, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), M.brass), cyl(0.008, 0.008, 0.03, M.brass, 0, 0.075, 0));
   bell.children[1].position.y = 0.02;
-  add(place(hs("klingel", bell), "n", 0.73, 1.11, 1.35));
+  let bellT = -1; anim((dt) => { if (bellT >= 0) { bellT += dt; bell.children[2].position.y = 0.075 - Math.sin(Math.min(1, bellT * 5) * Math.PI) * 0.012; if (bellT > 0.2) bellT = -1; } });
+  add(place(hs("klingel", bell, { act: { play: () => { bellT = 0; return 200; } } }), "n", 0.73, 1.11, 1.35));
   // Tischlampe (warmes Licht)
   // Tischlampe aus Code; Hauptlicht der Rezeption mit Schatten
   const lamp = tableLamp(0.6, 0x7a4a26);
@@ -234,7 +280,17 @@ defineRoom("rezeption", (ctx) => {
   add(place(hs("uhr", clockG), "n", 0.5, 2.68, 0.01));
   // Gerahmtes Personalfoto (hängt leicht schief)
   const photo = ornateFrame(0.8, 0.6, lambert(0xffffff, { map: photoTex() }), woodMat("#2a1a10", "#120a04"), 0.04, 0.06); photo.rotation.z = -0.035; // hängt leicht schief
-  add(place(hs("personalfoto", photo), "n", 0.8, 2.3, 0.03));
+  // In die Hand nehmen: das Foto kommt von der Wand vor die Augen und dreht sich um – Rückseite wie im Dokument „personalfoto“
+  const photoBack = plane(0.68, 0.48, lambert(0xffffff, { map: textTex(512, 360, "#d8ccb0", (g, w, h) => {
+    g.fillStyle = "#2c2a5a"; g.textAlign = "center"; g.font = "italic 19px Georgia, serif"; g.fillText("v. l. n. r.: Greta (Küche) · Tomasz (Haustechnik) ·", w / 2, 70); g.fillText("V. Lehn · Elias Voss (Nacht) · Ilse (Empfang)", w / 2, 100);
+    g.font = "italic 34px Georgia, serif"; g.fillText("Für M. – damit du weißt,", w / 2, 190); g.fillText("wo ich nachts bin.", w / 2, 236); g.font = "italic 28px Georgia, serif"; g.fillText("E.", w * 0.78, 300); }) }));
+  photoBack.rotation.y = Math.PI; photoBack.position.z = -0.03;
+  const photoAnim = new THREE.Group(); while (photo.children.length) photoAnim.add(photo.children[0]); photoAnim.add(photoBack); photo.add(photoAnim);
+  const photoHold = { t: -1 };
+  anim((dt) => { if (photoHold.t < 0) return; photoHold.t += dt; const out = photoHold.t < 0.9 ? photoHold.t / 0.9 : (eng().blocked() || photoHold.t < 2 ? 1 : Math.max(0, 1 - (photoHold.t - 2) * 1.5)); const k = out * out * (3 - 2 * out);
+    photoAnim.position.set(-1.2 * k, -0.62 * k, 2.55 * k); photoAnim.rotation.set(0, Math.PI * Math.min(1, Math.max(0, (photoHold.t - 0.45) / 0.5)) * (out >= 1 || photoHold.t < 2 ? 1 : out), 0.035 * k);
+    if (out <= 0 && photoHold.t > 2) { photoHold.t = -1; photoAnim.position.set(0, 0, 0); photoAnim.rotation.set(0, 0, 0); } });
+  add(place(hs("personalfoto", photo, { act: { play: () => { photoHold.t = 0; snd("paper"); return 1050; } } }), "n", 0.8, 2.3, 0.03));
 
   /* ================= OST · Aufzug ================= */
   // Kabine hinter der Wand, Türen gleiten auf
@@ -262,18 +318,51 @@ defineRoom("rezeption", (ctx) => {
   const coverAnim = new THREE.Group(); while (cover.children.length) coverAnim.add(cover.children[0]); cover.add(coverAnim); // innen animieren, außen sitzt die Wandposition
   const sw = group(box(0.2, 0.32, 0.015, M.black, 0, 0, 0.008), cyl(0.035, 0.035, 0.02, M.brass, 0, 0.04, 0.02), new THREE.Mesh(new THREE.SphereGeometry(0.014, 10, 8), basic(0xff2a1a)));
   sw.children[1].rotation.x = Math.PI / 2; sw.children[2].position.set(0, -0.08, 0.02);
-  add(place(hs("abdeckung", cover), "e", 0.7, 1.45, 0.0));
-  add(place(hs("schalter", sw, { hideWhenHidden: true }), "e", 0.7, 1.45, 0.0));
+  // Selbst aufschrauben: Schraubendreher gewählt → Nahansicht; Schraube antippen setzt an, gegen den Uhrzeigersinn drehen (oder antippen) – nach vier Schrauben benutzt die Engine den Schraubendreher
+  const sdHand = group(cyl(0.004, 0.004, 0.09, std(0xb8bcc0, { metalness: 1, roughness: 0.25 }), 0, 0, 0.045), cyl(0.016, 0.019, 0.1, std(0x8a2a1c, { roughness: 0.35 }), 0, 0, 0.14, 8));
+  sdHand.children.forEach((c) => { c.rotation.x = Math.PI / 2; }); sdHand.visible = false; coverAnim.add(sdHand);
+  const prog = [0, 0, 0, 0], fallT = [-1, -1, -1, -1]; let active = 0, unscrewed = false;
+  const scr = () => coverAnim.children.slice(1, 5);
+  const screwTwist = twister(() => scr()[active]);
+  const loosen = (i, amt) => { if (prog[i] >= 1) return; active = i; prog[i] = Math.max(0, Math.min(1, prog[i] + amt)); if (prog[i] >= 1) { fallT[i] = 0; snd("drop"); if (prog.every((v) => v >= 1)) { unscrewed = true; setTimeout(() => eng().hotspot("abdeckung"), 700); } } };
+  const coverSpec = {
+    useItem: "schraubendreher", when: () => !eng().has("cover_open"), cam: [0, 0, 0.42], center: [0, 0, 0], fov: 45, exitDelay: 2600,
+    hint: "Schraube antippen · gegen den Uhrzeigersinn drehen", value: () => prog.map((v) => v.toFixed(2)).join(" "),
+    enter: () => { sdHand.visible = true; }, exit: () => { sdHand.visible = false; },
+    parts: () => scr().map((sc, i) => ({ obj: sc, name: "schraube" + i, tap: () => { if (active !== i) { active = i; snd("click"); } else loosen(i, 0.25); },
+      drag: (dx, dy, pt) => { active = i; const d = screwTwist.delta(pt); loosen(i, d < 0 ? -d / (Math.PI * 4) : -d / (Math.PI * 8)); }, release: () => screwTwist.reset() })),
+  };
+  anim((dt) => {
+    const list = scr();
+    if (!coverWas) list.forEach((sc, i) => { if (fallT[i] < 0) { sc.rotation.y = prog[i] * Math.PI * 4; sc.position.z = 0.022 + prog[i] * 0.03; } });
+    fallT.forEach((t, i) => { if (t < 0) return; fallT[i] += dt; const sc = list[i]; sc.position.y += -dt * 2.2 * fallT[i] * 4; sc.position.z += dt * 0.4; if (fallT[i] > 0.6) { sc.visible = false; fallT[i] = -2; } });
+    if (sdHand.visible) { const sc = list[active]; sdHand.position.set(sc.position.x, sc.position.y, sc.position.z); sdHand.rotation.z = prog[active] * Math.PI * 4; }
+  });
+  add(place(hs("abdeckung", cover, { focus: coverSpec }), "e", 0.7, 1.45, 0.0));
+  // Schlüssel im Schalter selbst drehen (Schlüssel 217 gewählt): im Uhrzeigersinn um 90° oder antippen
+  let swTurn = 0; const swTw = twister(() => swKey); // Drehpunkt = Schlüssel (nicht die Schaltermitte)
+  let swFired = false;
+  const swDone = () => { if (!swFired && swTurn >= Math.PI / 2 * 0.95 && !eng().has("elevator_open")) { swFired = true; swTurn = Math.PI / 2; snd("click"); setTimeout(() => eng().hotspot("schalter"), 350); } }; // nur einmal auslösen
+  const swSpec = {
+    useItem: "key217", when: () => eng().has("cover_open") && !eng().has("elevator_open"), cam: [0, 0.03, 0.38], center: [0, 0.03, 0], fov: 45, exitDelay: 1800,
+    hint: "Schlüssel im Uhrzeigersinn drehen (oder antippen)", value: () => swTurn.toFixed(2),
+    enter: () => { swTurn = 0; swFired = false; swKey.visible = true; swKey.rotation.z = 0; }, exit: () => { if (!eng().has("elevator_open")) swKey.visible = false; },
+    parts: () => [{ obj: swKeyZone, name: "schluessel", tap: () => { swTurn = Math.min(Math.PI / 2, swTurn + Math.PI / 6); snd("key"); swDone(); },
+      drag: (dx, dy, pt) => { swTurn = Math.max(0, Math.min(Math.PI / 2, swTurn + swTw.delta(pt))); swDone(); }, release: () => swTw.reset() }],
+  };
+  add(place(hs("schalter", sw, { hideWhenHidden: true, focus: swSpec }), "e", 0.7, 1.45, 0.0));
   // Sichtbare Handlung: Schrauben drehen sich nacheinander heraus, die Platte kippt und fällt zu Boden (beim Laden: liegt schon unten)
   const screws = coverAnim.children.slice(1, 5); let coverT = -1, coverWas = null;
   const plateDown = () => { coverAnim.position.y = -1.45 + 0.012; coverAnim.position.z = 0.35; coverAnim.rotation.set(-Math.PI / 2, 0, 0.4); screws.forEach((sc) => { sc.visible = false; }); };
   // Schlüssel im Schalter: steckt, dreht sich um 90°, wird nach kurzer Zeit wieder abgezogen
   const swKey = group(cyl(0.006, 0.006, 0.05, M.brass, 0, 0, 0.03), new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.005, 8, 16), M.brass));
   swKey.children[0].rotation.x = Math.PI / 2; swKey.children[1].position.z = 0.06; swKey.position.set(0, 0.04, 0.02); swKey.visible = false; sw.add(swKey);
+  const swKeyZone = box(0.14, 0.14, 0.1, ZONE, 0, 0.04, 0.05); sw.add(swKeyZone);
+  anim(() => { if (keyT < 0 && swKey.visible) swKey.rotation.z = -swTurn; });
   let keyT = -1, elWas = null;
   state((has) => {
     sw.children[2].material.color.setHex(has("elevator_open") ? 0x36d06a : 0xff2a1a);
-    const c = has("cover_open"); if (coverWas === null && c) plateDown(); else if (coverWas === false && c) coverT = 0; coverWas = c;
+    const c = has("cover_open"); if (coverWas === null && c) plateDown(); else if (coverWas === false && c) coverT = unscrewed ? 1.5 : 0; coverWas = c;
     const el = has("elevator_open"); if (elWas === false && el) { keyT = 0; swKey.visible = true; } elWas = el;
   });
   anim((dt) => {
@@ -299,8 +388,23 @@ defineRoom("rezeption", (ctx) => {
   const pDoor = box(1.0, 2.3, 0.05, lambert(0xffffff, { map: woodTex("#2e2117", "#1a120b") }), -0.5, 1.15, 0); pdPivot.add(pDoor);
   const pSign = plane(0.42, 0.1, lambert(0xffffff, { map: plaqueTex("PERSONAL", 384, 96, "#d4bc90", "#2a1d14", "600 40px Georgia, serif", 6) }), -0.5, 1.75, 0.03); pdPivot.add(pSign);
   const knob = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 10), M.brass); knob.position.set(-0.9, 1.05, 0.05); pdPivot.add(knob);
+  // Schlüsselschild und Personalschlüssel (selbst drehen, wenn der Schlüssel gewählt ist)
+  const escut = rbox(0.05, 0.1, 0.012, M.brass, -0.9, 0.9, 0.031, 0.006); pdPivot.add(escut); pdPivot.add(box(0.008, 0.026, 0.004, M.black, -0.9, 0.9, 0.038));
+  const pKey = group(cyl(0.006, 0.006, 0.05, M.brassDark, 0, 0, 0.03), new THREE.Mesh(new THREE.TorusGeometry(0.02, 0.006, 8, 16), M.brassDark), box(0.14, 0.14, 0.1, ZONE, 0, 0, 0.05));
+  pKey.children[0].rotation.x = Math.PI / 2; pKey.children[1].position.z = 0.065; pKey.position.set(-0.9, 0.9, 0.035); pKey.visible = false; pdPivot.add(pKey);
+  let pTurn = 0, pKeyT = -1; const pTw = twister(() => pKey);
+  let pFired = false;
+  const pDone = () => { if (!pFired && pTurn >= Math.PI / 2 * 0.95 && !eng().has("personal_open")) { pFired = true; pTurn = Math.PI / 2; snd("click"); setTimeout(() => eng().hotspot("personaltuer"), 350); pKeyT = 0; } };
+  const doorSpec = {
+    useItem: "personalschluessel", when: (id) => id === "personaltuer" && !eng().has("personal_open"), cam: [-0.4, 0.9, 0.5], center: [-0.4, 0.9, 0.04], fov: 45, exitDelay: 1500,
+    hint: "Schlüssel im Uhrzeigersinn drehen (oder antippen)", value: () => pTurn.toFixed(2),
+    enter: () => { pTurn = 0; pFired = false; pKey.visible = true; }, exit: () => { if (!eng().has("personal_open")) pKey.visible = false; },
+    parts: () => [{ obj: pKey, name: "schluessel", tap: () => { pTurn = Math.min(Math.PI / 2, pTurn + Math.PI / 6); snd("key"); pDone(); },
+      drag: (dx, dy, pt) => { pTurn = Math.max(0, Math.min(Math.PI / 2, pTurn + pTw.delta(pt))); pDone(); }, release: () => pTw.reset() }],
+  };
+  anim((dt) => { if (pKey.visible) pKey.rotation.z = -pTurn; if (pKeyT >= 0) { pKeyT += dt; if (pKeyT > 2.5) { pKey.visible = false; pKeyT = -1; } } });
   const pFrame = group(box(0.08, 2.38, 0.06, M.dark, -0.54, 1.19, 0.02), box(0.08, 2.38, 0.06, M.dark, 0.54, 1.19, 0.02), box(1.16, 0.08, 0.06, M.dark, 0, 2.34, 0.02));
-  add(place(hs(["personaltreppe", "personaltuer"], group(stairsDown, pdPivot, pFrame)), "e", 0.86, 0, 0));
+  add(place(hs(["personaltreppe", "personaltuer"], group(stairsDown, pdPivot, pFrame), { focus: doorSpec }), "e", 0.86, 0, 0));
   let pOpen = false; state((has) => { pOpen = has("personal_open"); });
   anim((dt) => { pdPivot.rotation.y = lerp(pdPivot.rotation.y, pOpen ? 1.6 : 0, Math.min(1, dt * 3)); });
   // Hängeleuchte in der Raummitte
@@ -315,18 +419,31 @@ defineRoom("rezeption", (ctx) => {
   const door = group(outside, plane(1.9, 2.8, glassMat, 0, 1.4, -0.03), letters,
     box(0.08, 2.8, 0.1, M.dark, -0.95, 1.4, 0), box(0.08, 2.8, 0.1, M.dark, 0.95, 1.4, 0), box(0.06, 2.4, 0.08, M.dark, 0, 1.2, 0.01),
     cyl(0.015, 0.015, 0.5, M.brass, -0.12, 1.15, 0.07), cyl(0.015, 0.015, 0.5, M.brass, 0.12, 1.15, 0.07));
-  add(place(hs("eingangstuer", door), "s", 0.5, 0, 0.0));
+  let rattleT = -1; anim((dt) => { if (rattleT >= 0) { rattleT += dt; door.children.forEach((c, i) => { if (i >= 3) c.position.x = (c.userData.x0 ??= c.position.x) + Math.sin(rattleT * 55) * 0.006 * (1 - rattleT / 0.7); }); if (rattleT > 0.7) { rattleT = -1; door.children.forEach((c) => { if (c.userData.x0 !== undefined) c.position.x = c.userData.x0; }); } } });
+  add(place(hs("eingangstuer", door, { act: { play: () => { rattleT = 0; snd("click"); setTimeout(() => snd("click"), 180); return 750; } } }), "s", 0.5, 0, 0.0));
   anim((dt) => { outside.material.map.offset.y += dt * 0.9; });
   // Schirmständer mit E.V.-Schirm
   const umb = group(cyl(0.13, 0.12, 0.55, lambert(0x22180f), 0, 0.275, 0), cyl(0.015, 0.03, 0.95, M.black, 0.02, 0.6, 0));
   const handle = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.012, 8, 16, Math.PI), lambert(0x4a2e1a)); handle.position.set(0.07, 1.08, 0); umb.add(handle);
-  add(place(hs("schirmstaender", umb), "s", 0.23, 0, 0.35));
+  // In die Hand nehmen: Schirm hebt sich heraus, der Griff mit „E.V.“ dreht sich zur Kamera
+  const umbAnim = new THREE.Group(); umb.remove(umb.children[1]); umb.remove(handle);
+  const shaftU = cyl(0.015, 0.03, 0.95, M.black, 0, 0.6, 0); umbAnim.add(shaftU, handle);
+  const ev = plane(0.06, 0.03, new THREE.MeshStandardMaterial({ map: textTex(128, 64, null, (g) => { g.fillStyle = "#d8b48a"; g.font = "italic 600 40px Georgia, serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("E.V.", 64, 34); }), transparent: true, roughness: 0.6 })); ev.position.set(0.07, 1.04, 0.013); umbAnim.add(ev);
+  umbAnim.position.x = 0.02; shaftU.position.x = 0; handle.position.x = 0.05; ev.position.x = 0.05; umb.add(umbAnim);
+  const umbHold = { t: -1 };
+  anim((dt) => { if (umbHold.t < 0) return; umbHold.t += dt; const out = umbHold.t < 0.9 ? umbHold.t / 0.9 : (eng().blocked() || umbHold.t < 2 ? 1 : Math.max(0, 1 - (umbHold.t - 2) * 1.5)); const k = out * out * (3 - 2 * out);
+    umbAnim.position.set(0.02 + 1.0 * k, 0.55 * k, 1.75 * k); umbAnim.rotation.set(0.25 * k, -0.5 * k, 0);
+    if (out <= 0 && umbHold.t > 2) { umbHold.t = -1; umbAnim.position.set(0.02, 0, 0); umbAnim.rotation.set(0, 0, 0); } });
+  add(place(hs("schirmstaender", umb, { act: { play: () => { umbHold.t = 0; snd("pickup"); return 1000; } } }), "s", 0.23, 0, 0.35));
   // Gerahmter Zeitungsartikel (schief)
   const news = group(box(0.62, 0.8, 0.04, M.dark), plane(0.52, 0.7, lambert(0xffffff, { map: newsTex() }), 0, 0, 0.022)); news.rotation.z = 0.03;
   add(place(hs("zeitung", news), "s", 0.82, 1.9, 0.03));
   // Fußmatte
-  const mat = plane(1.4, 0.55, lambert(0xffffff, { map: matTex() })); mat.rotation.x = -Math.PI / 2;
-  add(place(hs("fussmatte", group(mat, box(1.4, 0.03, 0.55, ZONE, 0, 0.015, 0))), "s", 0.5, 0.012, 0.75));
+  const mat = plane(1.4, 0.55, lambert(0xffffff, { map: matTex(), side: THREE.DoubleSide })); mat.rotation.x = -Math.PI / 2;
+  const matPv = new THREE.Group(); matPv.position.z = -0.275; mat.position.z = 0.275; matPv.add(mat); // Drehpunkt an der hinteren Kante
+  const dustUnder = plane(1.3, 0.5, new THREE.MeshLambertMaterial({ color: 0x8a7e68, transparent: true, opacity: 0.35, depthWrite: false })); dustUnder.rotation.x = -Math.PI / 2; dustUnder.position.y = -0.008;
+  let matT = -1; anim((dt) => { if (matT >= 0) { matT += dt; const k = matT < 2.2 ? Math.min(1, matT * 3) : Math.max(0, 1 - (matT - 2.2) * 2); matPv.rotation.x = -k * 0.75; if (matT > 2.8 && !eng().blocked()) { matT = -1; matPv.rotation.x = 0; } else if (matT > 2.7 && eng().blocked()) matT = 2.2 - 0.01; } });
+  add(place(hs("fussmatte", group(matPv, dustUnder, box(1.4, 0.03, 0.55, ZONE, 0, 0.015, 0)), { act: { play: () => { matT = 0; snd("paper"); return 600; } } }), "s", 0.5, 0.012, 0.75));
   // Wandleuchte
   const sconce = group(box(0.08, 0.16, 0.04, M.brassDark), cyl(0.06, 0.11, 0.16, lambert(0xd9b98a, { emissive: 0x8a5a24 }), 0, 0.12, 0.1, 18));
   add(place(sconce, "s", 0.21, 2.3, 0.02));
@@ -341,7 +458,9 @@ defineRoom("rezeption", (ctx) => {
   const abrL = plane(0.08, 0.16, lambert(0xffffff, { map: binderLabel("ABR. 10/09") })); abrL.position.set(x + 0.07, 0.32, 0.132); shelf.add(abrL);
   x += 0.16; [0x243330, 0x4a1f1c, 0x2a221b].forEach((c, i) => { shelf.add(box(0.12, 0.5, 0.26, lambert(c), x + 0.06, 0.27, 0)); x += 0.14; });
   for (let i = 0; i < 9; i++) shelf.add(box(0.13, 0.46 - (i % 3) * 0.05, 0.25, lambert(cols[(i + 2) % cols.length]), -0.85 + i * 0.15 + 0.065, 0.64 + 0.23 - (i % 3) * 0.025, 0));
-  add(place(hs("regal", shelf), "w", 0.26, 1.2, 0.17));
+  const abrG = group(); shelf.remove(abr); shelf.remove(abrL); abrG.add(abr, abrL); shelf.add(abrG);
+  let abrT = -1; anim((dt) => { if (abrT >= 0) { abrT += dt; const out = abrT < 0.6 ? abrT / 0.6 : (eng().blocked() || abrT < 1.5 ? 1 : Math.max(0, 1 - (abrT - 1.5) * 2)); abrG.position.z = out * 0.2; abrG.rotation.z = out * 0.08; if (out <= 0 && abrT > 1.5) { abrT = -1; abrG.position.z = 0; abrG.rotation.z = 0; } } });
+  add(place(hs("regal", shelf, { act: { play: () => { abrT = 0; snd("paper"); return 650; } } }), "w", 0.26, 1.2, 0.17));
   // Sofa (roter Samt)
   // Samtsofa: Polster mit runden Kanten, Armrollen, Knöpfe in der Lehne, Holzzarge, gedrechselte Füße; feste Klickfläche
   const sofa = group(rbox(1.9, 0.16, 0.8, M.velvet, 0, 0.42, 0.02, 0.07), rbox(1.95, 0.62, 0.22, M.velvet, 0, 0.74, -0.33, 0.09),
@@ -349,7 +468,10 @@ defineRoom("rezeption", (ctx) => {
   [-1, 1].forEach((sx) => { const arm = cyl(0.13, 0.13, 0.8, M.velvet, sx * 0.98, 0.62, 0.0, 24); arm.rotation.x = Math.PI / 2; sofa.add(arm, rbox(0.18, 0.36, 0.78, M.velvet, sx * 0.98, 0.44, 0, 0.06)); });
   for (let i = 0; i < 5; i++) sofa.add(new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 6), M.brassDark).translateX(-0.7 + i * 0.35).translateY(0.82).translateZ(-0.21));
   [[-0.85, -0.3], [0.85, -0.3], [-0.85, 0.32], [0.85, 0.32]].forEach(([x, z]) => { const l = turnedLeg(0.2, 0.035, M.wood); l.position.set(x, 0, z); sofa.add(l); });
-  add(place(hs("sofa", sofa), "w", 0.3, 0, 0.6));
+  const cushion = sofa.children[0];
+  const tin = group(cyl(0.05, 0.05, 0.03, std(0x8a2a2a, { metalness: 0.6, roughness: 0.4 }), 0, 0, 0, 20), cyl(0.051, 0.051, 0.008, std(0xc9a466, { metalness: 0.8, roughness: 0.3 }), 0, 0.016, 0, 20)); tin.position.set(0.35, 0.36, 0.1); tin.visible = false; sofa.add(tin);
+  let cushT = -1; anim((dt) => { if (cushT >= 0) { cushT += dt; const up = cushT < 0.5 ? cushT / 0.5 : (eng().blocked() || cushT < 1.5 ? 1 : Math.max(0, 1 - (cushT - 1.5) * 2)); cushion.position.y = 0.42 + up * 0.12; cushion.rotation.x = -up * 0.25; tin.visible = up > 0.2; if (up <= 0 && cushT > 1.5) { cushT = -1; } } });
+  add(place(hs("sofa", sofa, { act: { play: () => { cushT = 0; return 600; } } }), "w", 0.3, 0, 0.6));
   // Porträt Viktor Lehn – als einziges Bild exakt gerade
   const portrait = group(ornateFrame(0.8, 1.0, lambert(0xffffff, { map: portraitTex() }), brassMat(0x9a7434, 0.38)), plane(0.26, 0.06, lambert(0xffffff, { map: plaqueTex("V. LEHN", 256, 60, "#d4bc90", "#3a2a18", "600 30px Georgia, serif", 4) }), 0, -0.6, 0.0));
   add(place(hs("portraet", portrait), "w", 0.6, 2.25, 0.03));

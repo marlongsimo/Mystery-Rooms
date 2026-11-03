@@ -134,6 +134,9 @@ function buildRoom(r) {
     lerp: (cur, to, k) => cur + (to - cur) * k,
     /** GLB aus assets/3d/models (siehe gfx.model); Rückgabe sofort, Inhalt kommt nach dem Laden. */
     model: GFX.model, tag: GFX.tag, quality: GFX.Q,
+    /** Bildschirmpunkt eines Objekts oder Weltpunkts (für Drehgesten um eine Schraube, einen Schlüssel …). */
+    screenOf(o) { const v = o.isVector3 ? o.clone() : o.getWorldPosition(new THREE.Vector3()); v.project(camera); const rc = canvas.getBoundingClientRect(); return { x: rc.left + (v.x + 1) / 2 * rc.width, y: rc.top + (1 - v.y) / 2 * rc.height }; },
+    engine: () => E(), sound: (n) => N.audio && N.audio.play && N.audio.play(n),
   };
   // Grundlicht, Taschenlampe, Blitz
   scene.add(new THREE.HemisphereLight(0x6a7890, 0x221810, 1.1));
@@ -186,15 +189,24 @@ function activate(cx, cy) {
   if (!h) return;
   if (h.e.onClick) { h.e.onClick(); return; }
   hideHint();
-  // Direkt bedienbares Objekt (z. B. Ziffernrollen): Kamera fährt heran – außer ein Gegenstand ist ausgewählt (dann „benutzen“)
-  if (h.e.focus && !E().selectedItem() && h.e.focus.when(h.id)) { enterFocus(h.e, h.id); return; }
+  // Direkt bedienbares Objekt: Kamera fährt heran. Ohne Gegenstand (Zahlenschloss …) oder mit dem passenden (focus.useItem:
+  // Schraubendreher an der Abdeckung, Schlüssel im Schalter). Ein falscher Gegenstand geht wie bisher an die Engine („passt nicht“).
+  const sel = E().selectedItem(), fo = h.e.focus;
+  if (fo && (sel ? fo.useItem === sel : !fo.useItem) && fo.when(h.id)) { enterFocus(h.e, h.id); return; }
+  // „Erst handeln, dann lesen“: kurze Animation (Taste drücken, Matte anheben …), danach der gewohnte Text/Dialog der Engine
+  if (h.e.act && !sel && (!h.e.act.when || h.e.act.when(h.id))) {
+    if (actBusy) return; actBusy = true;
+    const ms = h.e.act.play(h.id); const id = h.id;
+    setTimeout(() => { actBusy = false; if (built) E().hotspot(id); }, ms ?? 700);
+    return;
+  }
   E().hotspot(h.id);
 }
 
 /* ---------- Nahansicht: Rätsel direkt am Objekt bedienen ----------
    hs(ids, obj, { focus: { when(id), cam:[x,y,z], center:[x,y,z] (lokal zum Objekt), fov, hint, parts: () => [{ obj, tap(hit), drag(dx, dy), release() }],
    enter(), exit() } }). Tippen/Ziehen wirkt in der Nahansicht nur auf die Teile, nicht auf den Raum. Der Dialog bleibt als „Klassisch lösen“. */
-let focus = null, focusUI = null;
+let focus = null, focusUI = null, actBusy = false;
 function focusParts() { return focus ? focus.parts : []; }
 function partAt(cx, cy) {
   const rc = canvas.getBoundingClientRect();
@@ -258,7 +270,7 @@ function bindInput() {
     if (drag) {
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
       drag.moved += Math.abs(dx) + Math.abs(dy);
-      if (focus) { if (drag.part) drag.part.drag(dx, dy); return; } // in der Nahansicht dreht sich der Raum nicht
+      if (focus) { if (drag.part) drag.part.drag(dx, dy, { x: e.clientX, y: e.clientY }); return; } // in der Nahansicht dreht sich der Raum nicht
       const k = (e.pointerType === "touch" ? 0.0062 : 0.0045) * fov / 68;
       yaw += dx * k; pitch = Math.max(-1.05, Math.min(1.0, pitch + dy * k));
       if (drag.moved > 8) { hideTip(); hideHint(); }
@@ -305,7 +317,7 @@ function syncView() { const i = sector(); if (i !== lastIndex) { lastIndex = i; 
 /* ---------- Bildschleife ---------- */
 function frame() {
   if (!running) return;
-  if (!canvas.isConnected) { running = false; return; }
+  if (paused || !canvas.isConnected) { running = false; return; }
   requestAnimationFrame(frame);
   const dt = Math.min(0.05, clock.getDelta()), t = clock.elapsedTime;
   if (cine) cine.update(dt, t); // Intro: Kamera, Taschenlampe und Licht kommen aus dem Drehbuch
@@ -336,7 +348,9 @@ function lowerQuality(level) {
   scene.traverse((o) => { if (o.isLight && o !== flash) o.castShadow = false; if (o.isMesh) o.castShadow = false; });
   if (level === "low") { if (fx && fx.bloom) fx.bloom.enabled = false; flash.castShadow = false; renderer.setPixelRatio(1); if (dustP) dustP.visible = false; resize(); }
 }
-function startLoop() { if (running) return; running = true; clock.getDelta(); requestAnimationFrame(frame); }
+let paused = false; // z. B. während ein Gegenstand groß angesehen wird (inspect.js): Raumbild anhalten, spart Leistung
+function setPaused(v) { paused = Boolean(v); if (!paused && canvas && canvas.isConnected) startLoop(); }
+function startLoop() { if (running || paused) return; running = true; clock.getDelta(); requestAnimationFrame(frame); }
 document.addEventListener("visibilitychange", () => { if (document.hidden) running = false; else if (canvas && canvas.isConnected) startLoop(); });
 
 /* ---------- Schnittstelle für die Engine ---------- */
@@ -374,6 +388,7 @@ function supports(r) { return Boolean(BUILDERS[r.id]) && webgl && (renderer || i
 /** Für automatische Tests: Kamera auf das Objekt eines Hotspots richten, Bildschirmpunkt zurückgeben. */
 function aimAt(id) {
   if (!built) return null;
+  if (focus && focus.leaving) endFocus(); // Rückfahrt abschließen, sonst passt der Bildschirmpunkt nicht zur Kamera
   const e = built.pick.find((x) => x.ids.includes(id) || x.label === id); if (!e) return null;
   const c = e.aimLocal ? e.obj.localToWorld(new THREE.Vector3(...e.aimLocal)) : new THREE.Box3().setFromObject(e.obj).getCenter(new THREE.Vector3());
   const d = c.clone().sub(camera.position);
@@ -404,7 +419,7 @@ function focusInfo() {
   if (!focus) return null; const rc = canvas.getBoundingClientRect();
   return { id: focus.id, leaving: focus.leaving, arrived: camera.position.distanceTo(focus.camPos) < 0.01, value: focus.sp.value ? focus.sp.value() : null, parts: focus.parts.map((p) => { const c = new THREE.Box3().setFromObject(p.obj).getCenter(new THREE.Vector3()).project(camera); return { name: p.name || "", x: rc.left + (c.x + 1) / 2 * rc.width, y: rc.top + (1 - c.y) / 2 * rc.height }; }) };
 }
-N.view3d = { supports, render, pickAt, aimAt, debugHits, focusInfo, focusExit: () => exitFocus(), sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0, ...sceneStats() }) };
+N.view3d = { supports, render, pickAt, aimAt, debugHits, focusInfo, focusExit: () => exitFocus(), pause: setPaused, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0, ...sceneStats() }) };
 // Falls das Spiel schon läuft, als die Module fertig geladen waren: jetzt auf 3D umschalten
 /* ---------- Kinomodus für das Intro (js/3d/intro.js) ----------
    Leiht sich Renderer, Kamera und den fertig gebauten Raum: Das Intro fährt durch dieselbe Szene,

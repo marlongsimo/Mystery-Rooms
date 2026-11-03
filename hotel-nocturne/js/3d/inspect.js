@@ -54,6 +54,7 @@ function envFor(renderer) { // einfache Studio-Umgebung für Metallglanz
 function inspect(id) {
   if (!MODELS[id]) return false;
   close();
+  if (N.view3d.pause) N.view3d.pause(true); // Raumbild anhalten, solange der Gegenstand groß zu sehen ist
   const it = N.items[id] || { name: id };
   const el = document.createElement("div"); el.className = "n3d-inspect";
   el.innerHTML = `<div class="n3d-inspect-head"><b>${it.name}</b><button type="button" data-close aria-label="Schließen">✕</button></div><canvas></canvas><p class="n3d-inspect-hint">Ziehen zum Drehen · Mausrad oder zwei Finger zum Zoomen</p>`;
@@ -91,7 +92,7 @@ function inspect(id) {
     info: () => ({ id, rx, ry, dist }) };
   return true;
 }
-function close() { if (open) { const o = open; open = null; o.stop(); } }
+function close() { if (open) { const o = open; open = null; o.stop(); if (N.view3d.pause) N.view3d.pause(false); } }
 
 N.view3d.canInspect = (id) => Boolean(MODELS[id]);
 N.view3d.inspect = (id) => { try { return inspect(id); } catch (e) { console.warn("[Hotel Nocturne 3D] Ansehen nicht möglich:", e); close(); return false; } };

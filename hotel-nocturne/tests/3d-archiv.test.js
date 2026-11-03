@@ -41,7 +41,7 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
   await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL, 'nocturne_save_3d_v2');
   console.log('3D aktiv im Archiv:', await p.evaluate(() => document.querySelector('#scene').classList.contains('is3d')), '|', await p.textContent('#location'));
   for (let i = 0; i < 4; i++) { await p.waitForTimeout(1300); await p.screenshot({ path: `${OUT}ar-${i}.png`, timeout: 90000 }); await p.click('#turnRight'); }
-  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return null; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350);
+  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return null; await p.waitForTimeout(700); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350);
     // kurze Handlungen öffnen den Text erst danach; bedienbare Objekte öffnen die Nahansicht → hier den klassischen Dialog nehmen
     for (let i = 0; i < 8; i++) { if (await p.evaluate(() => document.querySelector('#dialog').open || Boolean(NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo()))) break; await p.waitForTimeout(250); }
     if (await p.evaluate(() => { const f = NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo(); return Boolean(f && !f.leaving); })) { await p.waitForTimeout(500); await p.click('.n3d-focus [data-f="classic"]'); await p.waitForTimeout(600); }

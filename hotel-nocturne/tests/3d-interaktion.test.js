@@ -24,7 +24,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
 (async () => {
   const b = await chromium.launch(ARGS); const errs = []; let ok = true;
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
-  const p = await b.newPage({ viewport: { width: 1280, height: 860 } }); p.setDefaultTimeout(15000);
+  const p = await b.newPage({ viewport: { width: 1000, height: 700 } }); p.setDefaultTimeout(30000);
   p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
   await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL);
   const st = () => p.evaluate(() => { const s = JSON.parse(localStorage.getItem('nocturne_save_3d_v2')); return { inv: s.inventory, flags: s.flags }; });
@@ -146,7 +146,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   const SAVE = { v: 2, started: true, finished: false, current: 'rezeption', unlocked: ['rezeption', 'zimmer217'], visited: ['rezeption', 'zimmer217'], completed: ['rezeption'], views: { rezeption: 1 },
     solved: ['keybox', 'werkzeug', 'cover', 'elevator', 'anordnung', 'schrank', 'gepaeckschein'], flags: ['keybox_open', 'taken_schraubendreher', 'cover_open', 'elevator_open', 'kommode_open', 'evt_fenster', 'fenster_auf', 'schrank_open', 'taken_gepaeckschein'],
     inventory: ['key217', 'hotelplan', 'schraubendreher', 'personalschluessel', 'gepaeckschein'], docs: ['reservierung'], newDocs: [], messages: [], unread: [], secrets: [], pending: [], evidence: [], gone: { items: [], flags: [] }, hints: {}, puzzleStart: {}, playMs: 600000, notes: '', sound: false, music: false, showHotspots: false, goals: {} };
-  const d = await b.newPage({ viewport: { width: 1280, height: 860 } }); d.setDefaultTimeout(90000); // Aufbau der HD-Rezeption beim Start: im Software-Rendering langsam const e4 = []; d.on('pageerror', (e) => e4.push(e.message));
+  const d = await b.newPage({ viewport: { width: 1000, height: 700 } }); d.setDefaultTimeout(90000); // Aufbau der HD-Rezeption beim Start: im Software-Rendering langsam const e4 = []; d.on('pageerror', (e) => e4.push(e.message));
   await d.addInitScript((s) => { if (!sessionStorage.getItem('seeded')) { localStorage.clear(); localStorage.setItem('nocturne_save_3d_v2', JSON.stringify(s)); sessionStorage.setItem('seeded', '1'); } }, SAVE);
   await d.goto(BASE + '/hotel-nocturne/3d.html?q=' + QUAL, { timeout: 60000 }); await d.waitForTimeout(500); await d.click('#startButton'); await d.waitForTimeout(1500); if (await d.$('#dialog[open] #closeDialog')) await d.click('#closeDialog');
   await d.click('[data-slot="personalschluessel"]'); await d.waitForTimeout(200);

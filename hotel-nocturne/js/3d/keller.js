@@ -231,11 +231,11 @@ defineRoom("keller", (ctx) => {
     parts: () => levers.map((lv, i) => ({ obj: lv, name: "hebel" + "ABCD"[i], tap: () => hPull(i), drag: (dx, dy) => { if (dy > 4) hPull(i); } })) };
   add(place(hs(["schalttafel_an", "schalttafel", "schalttafel_tot"], board, { focus: leverSpec }), "s", 0.47, 0, 0.02));
   const plan = plane(0.52, 0.69, std(0xffffff, { map: planTex(), roughness: 0.2 })); plan.rotation.z = 0.02;
+  const planG = group(plan); const planA = inner(planG); const planGo = lift(ctx, (k) => { planA.position.set(0, -0.25 * k, 0.6 * k); }, 0.7);
   add(place(hs("wandplan", planG, { act: { play: () => { planGo(); snd("paper"); return 750; } } }), "s", 0.84, 1.95, 0.012));
   let strom = false;
   state((has) => { strom = has("strom"); lamps.forEach((l) => l.material.color.setHex(strom ? 0x9fe0b0 : 0x3a2a24)); display.paint(strom); });
   anim((dt) => { levers.forEach((lv, i) => { lv.rotation.x = lerp(lv.rotation.x, strom || down[i] ? Math.PI * 0.9 : 0, Math.min(1, dt * (hLock ? 12 : 6))); }); });
-  const planG = group(plan); const planA = inner(planG); const planGo = lift(ctx, (k) => { planA.position.set(0, -0.25 * k, 0.6 * k); }, 0.7);
 
   /* ================= WEST · alte Wäscherei: Mangel, Säcke, Wäscheschrank, Stahltür ================= */
   add(place(plane(1.2, 0.18, new THREE.MeshStandardMaterial({ map: plaqueTex("WÄSCHEREI", 512, 76, "#7a786e", "#3a3a35", `600 40px ${MONO}`, 14), roughness: 0.9 })), "w", 0.28, 2.75, 0.012));

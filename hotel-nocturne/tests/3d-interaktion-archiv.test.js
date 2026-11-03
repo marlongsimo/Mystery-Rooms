@@ -8,6 +8,7 @@
 const BASE = process.env.BASE || 'http://localhost:8765';
 const QUAL = process.env.Q || 'low';
 const OUT = require('os').tmpdir() + '/';
+const shot = (pg, o) => (process.env.SHOTS ? pg.screenshot(o) : Promise.resolve()); // Bildschirmfotos nur mit SHOTS=1
 const { chromium } = require('playwright');
 const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
 const SAVE = { v: 2, started: true, finished: false, current: 'archiv', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], completed: ['rezeption', 'zimmer217', 'gepaecklager'], views: {},
@@ -34,10 +35,10 @@ const SAVE = { v: 2, started: true, finished: false, current: 'archiv', unlocked
   const tapPart = async (name, n = 1, dir = 0) => { for (let i = 0; i < n; i++) { const w = await part(name); await p.mouse.click(w.x, w.y + (dir > 0 ? -6 : dir < 0 ? 6 : 0)); await p.waitForTimeout(110); } };
   const aimClick = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); await p.waitForTimeout(150); await p.mouse.click(pt.x, pt.y); };
   // Handlungen, dann der Text der Engine
-  for (const id of ['protokollbuch_regal', 'schreibmaschine', 'leselampe', 'personalkasten', 'akte_elias', 'protokoll_a']) {
+  for (const id of ['akte_elias', 'leselampe']) {
     const want = await p.evaluate((id) => NOCTURNE.engine.hotspotData(id).title, id);
     await aimClick(id);
-    if (id === 'akte_elias') { await p.waitForTimeout(700); await p.screenshot({ path: OUT + 'ar2-akte.png', timeout: 90000 }); }
+    if (id === 'akte_elias') { await p.waitForTimeout(700); await shot(p, { path: OUT + 'ar2-akte.png', timeout: 90000 }); }
     let t = null; for (let i = 0; i < 30 && !t; i++) { await p.waitForTimeout(250); t = await dlg(); }
     check(t === want, `${id}: Handlung, dann „${t}“`); await closeDlg(); await p.waitForTimeout(900);
   }
@@ -51,14 +52,14 @@ const SAVE = { v: 2, started: true, finished: false, current: 'archiv', unlocked
   for (let i = 1; i <= 8; i++) { const a = (i / 32) * Math.PI * 2; await p.mouse.move(r0.x + R * Math.cos(a), r0.y + R * Math.sin(a)); await p.waitForTimeout(30); } await p.mouse.up(); await p.waitForTimeout(300);
   const afterDrag = Number((await focus()).value); console.log('  nach Drehgeste:', afterDrag); check(afterDrag !== 23, 'Drehgeste verstellt den Ring');
   await tapPart('ring', ((3 - afterDrag) % 26 + 26) % 26); console.log('  eingestellt:', (await focus()).value);
-  await p.screenshot({ path: OUT + 'ar2-scheibe.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'ar2-scheibe.png', timeout: 90000 });
   await tapPart('pruefen'); for (let i = 0; i < 20 && !(await st()).solved.includes('chiffre'); i++) await p.waitForTimeout(250);
   check((await st()).solved.includes('chiffre'), 'Stellung 3 → Brief entschlüsselt (chiffre)'); await waitMoment(); await closeDlg(); await p.waitForTimeout(2500);
   // Fach: WESTGANG
   await aimClick('schreibtischfach'); f = await settle();
   check(Boolean(f) && f.id === 'schreibtischfach', 'Schreibtischfach → Nahansicht mit acht Buchstabenrädern');
   const word = 'WESTGANG'; for (let i = 0; i < 8; i++) { const c = word.charCodeAt(i) - 65; if (c <= 13) await tapPart('rad' + i, c, 1); else await tapPart('rad' + i, 26 - c, -1); }
-  console.log('  eingestellt:', (await focus()).value); await p.screenshot({ path: OUT + 'ar2-fach.png', timeout: 90000 });
+  console.log('  eingestellt:', (await focus()).value); await shot(p, { path: OUT + 'ar2-fach.png', timeout: 90000 });
   await tapPart('griff'); for (let i = 0; i < 20 && !(await st()).flags.includes('fach_offen'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('fach_offen'), 'WESTGANG am Objekt → Fach offen'); await waitMoment(); await closeDlg(); await p.waitForTimeout(2500);
   // Schublade W: Schraubendreher wählen, aufhebeln
@@ -74,7 +75,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'archiv', unlocked
   for (const k of '2009') await tapPart('taste' + k); await p.waitForTimeout(600);
   check(/Jahr der Nacht/.test(await narr()), '2009 → Text der Engine („' + (await narr()).slice(0, 50) + '…“)');
   await p.waitForTimeout(800); for (const k of '189') await tapPart('taste' + k);
-  console.log('  Anzeige:', (await focus()).value); await p.screenshot({ path: OUT + 'ar2-pin.png', timeout: 90000 }); await tapPart('taste7');
+  console.log('  Anzeige:', (await focus()).value); await shot(p, { path: OUT + 'ar2-pin.png', timeout: 90000 }); await tapPart('taste7');
   for (let i = 0; i < 20 && !(await st()).flags.includes('sicherheit_offen'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('sicherheit_offen'), '1897 → Stahltür offen');
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;

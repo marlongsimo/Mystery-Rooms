@@ -113,6 +113,11 @@ defineRoom("zimmer217", (ctx) => {
 
 Im Ordner `tests/` (Aufruf aus dem Repository-Wurzelordner, vorher `python3 -m http.server 8765 &`). Die Funktionstests laufen in Stufe `low` (schnell im Software-Rendering); `Q=high node …` testet eine andere Stufe.
 
+**Gezielt testen:** `hotel-nocturne/tests/run-3d.sh <raum>` startet nur die Tests eines Raums (Bedienung + Rundgang), nacheinander und mit Server.
+`kern` nach Änderungen an `core.js`, `interact.js` oder `engine.js`; `alle` für den Gesamtlauf (lange, z. B. vor einer Veröffentlichung).
+Die Bedienungstests prüfen jede direkte Bedienung (Schlösser, Tastenfelder, Drehen, Schieben, je ein Fehlversuch) und nur noch zwei Stichproben
+der kurzen Handlungen; Bildschirmfotos entstehen nur mit `SHOTS=1`.
+
 | Datei | Prüft | Dauer |
 |---|---|---|
 | `3d-hinweise.test.js` | Alle sichtbaren Texte der 3D-Texturen stehen so auch in der Raumdatei (keine erfundenen Namen/Daten) | < 1 s, ohne Browser |

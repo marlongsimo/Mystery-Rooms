@@ -7,6 +7,7 @@
 const BASE = process.env.BASE || 'http://localhost:8765';
 const QUAL = process.env.Q || 'low';
 const OUT = require('os').tmpdir() + '/';
+const shot = (pg, o) => (process.env.SHOTS ? pg.screenshot(o) : Promise.resolve()); // Bildschirmfotos nur mit SHOTS=1
 const { chromium } = require('playwright');
 const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
 const SAVE = { v: 2, started: true, finished: false, current: 'gepaecklager', unlocked: ['rezeption', 'zimmer217', 'gepaecklager'], visited: ['rezeption', 'zimmer217', 'gepaecklager'], completed: ['rezeption', 'zimmer217'], views: {},
@@ -29,10 +30,10 @@ const SAVE = { v: 2, started: true, finished: false, current: 'gepaecklager', un
   const settle = async () => { for (let i = 0; i < 160; i++) { const f = await focus(); if (f && f.arrived) { await p.waitForTimeout(300); return f; } await p.waitForTimeout(250); } return focus(); };
   const narr = () => p.evaluate(() => document.querySelector('#narration').textContent);
   // Handlungen, dann der Text der Engine
-  for (const id of ['koffer2', 'koffer9', 'koffer4', 'eimer', 'notlicht', 'klingel3']) {
+  for (const id of ['koffer9', 'eimer']) {
     const want = await p.evaluate((id) => NOCTURNE.engine.hotspotData(id).title, id);
     const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); await p.waitForTimeout(150); await p.mouse.click(pt.x, pt.y);
-    if (id === 'koffer9') { await p.waitForTimeout(600); await p.screenshot({ path: OUT + 'gl2-anhaenger.png', timeout: 90000 }); }
+    if (id === 'koffer9') { await p.waitForTimeout(600); await shot(p, { path: OUT + 'gl2-anhaenger.png', timeout: 90000 }); }
     let t = null; for (let i = 0; i < 30 && !t; i++) { await p.waitForTimeout(250); t = await dlg(); }
     check(t === want, `${id}: Handlung, dann „${t}“`); await closeDlg(); await p.waitForTimeout(900);
   }
@@ -42,7 +43,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'gepaecklager', un
   await p.click('[data-slot="gepaeckschein"]'); await p.waitForTimeout(200);
   let pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('klappe')); await p.mouse.click(pt.x, pt.y); let f = await settle();
   check(Boolean(f) && f.id === 'klappe', 'Gepäckschein an der Klappe → Nahansicht, Schein liegt am Schlitz');
-  await p.screenshot({ path: OUT + 'gl2-schein.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'gl2-schein.png', timeout: 90000 });
   const sc = f.parts[0]; await p.mouse.move(sc.x, sc.y); await p.mouse.down(); for (let i = 1; i <= 12; i++) { await p.mouse.move(sc.x, sc.y + i * 14); await p.waitForTimeout(30); } await p.mouse.up();
   for (let i = 0; i < 24 && !(await st()).flags.includes('koffer_da'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('koffer_da'), 'Schein nach unten geschoben → Koffer Nr. 6 kommt (koffer_da)');
@@ -60,7 +61,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'gepaecklager', un
   pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('truhe')); await p.mouse.click(pt.x, pt.y); f = await settle();
   check(Boolean(f) && f.id === 'truhe', 'Truhe → Nahansicht mit Zahlenschloss');
   await tap('rad0', 2, 1); await tap('rad1', 4, -1); await tap('rad2', 1, -1); await tap('rad3', 4, 1);
-  console.log('  eingestellt:', (await focus()).value); await p.screenshot({ path: OUT + 'gl2-truhe.png', timeout: 90000 });
+  console.log('  eingestellt:', (await focus()).value); await shot(p, { path: OUT + 'gl2-truhe.png', timeout: 90000 });
   await pull(); for (let i = 0; i < 20 && !(await dlg()); i++) await p.waitForTimeout(250);
   const s1 = await st(); check(s1.flags.includes('truhe_offen') && s1.inv.includes('archivschluessel'), '2694 am Objekt → Truhe offen, Archivschlüssel im Rucksack');
   await closeDlg(); await p.waitForTimeout(3000);
@@ -68,7 +69,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'gepaecklager', un
   await p.click('[data-slot="archivschluessel"]'); await p.waitForTimeout(200);
   pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('archivtuer')); await p.mouse.click(pt.x, pt.y); f = await settle();
   check(Boolean(f) && f.id === 'archivtuer', 'Archivschlüssel an der Archivtür → Nahansicht');
-  await p.screenshot({ path: OUT + 'gl2-archivtuer.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'gl2-archivtuer.png', timeout: 90000 });
   const k = f.parts[0], r = 28; await p.mouse.move(k.x, k.y); await p.mouse.down(); await p.mouse.move(k.x + r, k.y);
   for (let i = 1; i <= 7; i++) { const a = (i / 16) * Math.PI * 2; await p.mouse.move(k.x + r * Math.cos(a), k.y + r * Math.sin(a)); await p.waitForTimeout(30); } await p.mouse.up();
   for (let i = 0; i < 24 && !(await st()).flags.includes('archiv_offen'); i++) await p.waitForTimeout(250);

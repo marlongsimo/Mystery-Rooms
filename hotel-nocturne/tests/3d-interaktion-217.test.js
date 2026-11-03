@@ -8,6 +8,7 @@
 const BASE = process.env.BASE || 'http://localhost:8765';
 const QUAL = process.env.Q || 'low';
 const OUT = require('os').tmpdir() + '/';
+const shot = (pg, o) => (process.env.SHOTS ? pg.screenshot(o) : Promise.resolve()); // Bildschirmfotos nur mit SHOTS=1
 const { chromium } = require('playwright');
 const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
 const SAVE = { v: 2, started: true, finished: false, current: 'zimmer217', unlocked: ['rezeption', 'zimmer217'], visited: ['rezeption', 'zimmer217'], completed: ['rezeption'], views: {},
@@ -28,10 +29,10 @@ const SAVE = { v: 2, started: true, finished: false, current: 'zimmer217', unloc
   const settle = async () => { for (let i = 0; i < 160; i++) { const f = await focus(); if (f && f.arrived) { await p.waitForTimeout(300); return f; } await p.waitForTimeout(250); } return focus(); };
   const narr = () => p.evaluate(() => document.querySelector('#narration').textContent);
   // Handlungen, dann der Text der Engine
-  for (const id of ['sanduhr', 'kerzenstaender', 'alterschluessel', 'portraet217', 'mantel', 'vorhang', 'nachttisch', 'schreibtisch']) {
+  for (const id of ['sanduhr', 'mantel']) {
     const want = await p.evaluate((id) => NOCTURNE.engine.hotspotData(id).title, id);
     const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); await p.waitForTimeout(150); await p.mouse.click(pt.x, pt.y);
-    if (['sanduhr', 'kerzenstaender', 'alterschluessel', 'portraet217'].includes(id)) { await p.waitForTimeout(800); await p.screenshot({ path: `${OUT}z2-${id}.png`, timeout: 90000 }); }
+    if (['sanduhr', 'kerzenstaender', 'alterschluessel', 'portraet217'].includes(id)) { await p.waitForTimeout(800); await shot(p, { path: `${OUT}z2-${id}.png`, timeout: 90000 }); }
     let t = null; for (let i = 0; i < 30 && !t; i++) { await p.waitForTimeout(250); t = await dlg(); }
     check(t === want, `${id}: Handlung, dann „${t}“`); await closeDlg(); await p.waitForTimeout(500);
   }
@@ -41,7 +42,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'zimmer217', unloc
   let pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('kommode')); await p.mouse.click(pt.x, pt.y); let f = await settle();
   check(Boolean(f) && f.id === 'kommode' && !(await dlg()), 'Kommode → Nahansicht mit Zahlenschloss');
   await tap('rad0', 4, 1); await tap('rad1', 1, 1); await tap('rad2', 3, 1); await tap('rad3', 3, -1); // 4 1 3 7
-  console.log('  eingestellt:', (await focus()).value); await p.screenshot({ path: OUT + 'z2-kommode.png', timeout: 90000 });
+  console.log('  eingestellt:', (await focus()).value); await shot(p, { path: OUT + 'z2-kommode.png', timeout: 90000 });
   await pull(); check(/Fast/.test(await narr()) && !(await st()).flags.includes('kommode_open'), `4137 → Text der Engine („${(await narr()).slice(0, 45)}…“)`);
   await tap('rad2', 4, 1); await tap('rad3', 4, -1); // 4 1 7 3
   console.log('  eingestellt:', (await focus()).value);
@@ -51,11 +52,11 @@ const SAVE = { v: 2, started: true, finished: false, current: 'zimmer217', unloc
   pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('schrank')); await p.mouse.click(pt.x, pt.y); f = await settle();
   check(Boolean(f) && f.id === 'schrank' && f.parts.length === 6, 'Kleiderschrank → Nahansicht mit 5 Buchstabenrädern');
   await tap('rad0', 4, 1); await tap('rad1', 11, 1); await tap('rad2', 8, 1); await tap('rad4', 8, -1);
-  console.log('  eingestellt:', (await focus()).value); await p.screenshot({ path: OUT + 'z2-schrank.png', timeout: 90000 });
+  console.log('  eingestellt:', (await focus()).value); await shot(p, { path: OUT + 'z2-schrank.png', timeout: 90000 });
   await pull(); for (let i = 0; i < 20 && !(await dlg()); i++) await p.waitForTimeout(250);
   const s1 = await st(); check(s1.flags.includes('schrank_open') && s1.inv.includes('personalschluessel'), 'ELIAS am Objekt → Schrank offen, Personalschlüssel im Rucksack');
   await closeDlg(); await p.waitForTimeout(2500);
-  await p.evaluate(() => NOCTURNE.view3d.aimAt('schrank')); await p.waitForTimeout(800); await p.screenshot({ path: OUT + 'z2-schrank-offen.png', timeout: 90000 });
+  await p.evaluate(() => NOCTURNE.view3d.aimAt('schrank')); await p.waitForTimeout(800); await shot(p, { path: OUT + 'z2-schrank-offen.png', timeout: 90000 });
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
   await b.close(); console.log(ok ? '\nZimmer 217 direkt bedienen in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);
 })();

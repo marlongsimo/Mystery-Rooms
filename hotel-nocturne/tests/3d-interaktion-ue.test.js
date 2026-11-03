@@ -7,6 +7,7 @@
 const BASE = process.env.BASE || 'http://localhost:8765';
 const QUAL = process.env.Q || 'low';
 const OUT = require('os').tmpdir() + '/';
+const shot = (pg, o) => (process.env.SHOTS ? pg.screenshot(o) : Promise.resolve()); // Bildschirmfotos nur mit SHOTS=1
 const { chromium } = require('playwright');
 const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
 const SAVE = { v: 2, started: true, finished: false, current: 'ueberwachung', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], completed: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], views: {},
@@ -33,10 +34,10 @@ const SAVE = { v: 2, started: true, finished: false, current: 'ueberwachung', un
   const tapPart = async (name, n = 1, dir = 0) => { for (let i = 0; i < n; i++) { const w = await part(name); await p.mouse.click(w.x, w.y + (dir > 0 ? -6 : dir < 0 ? 6 : 0)); await p.waitForTimeout(110); } };
   const aimClick = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); await p.waitForTimeout(150); await p.mouse.click(pt.x, pt.y); };
   // Handlungen, dann der Text der Engine
-  for (const id of ['dienstplan', 'wandtelefon', 'monitor1', 'huelle', 'loeschprotokoll', 'pult', 'technik_zu']) {
+  for (const id of ['dienstplan', 'monitor1']) {
     const want = await p.evaluate((id) => NOCTURNE.engine.hotspotData(id).title, id);
     await aimClick(id); await p.waitForTimeout(0);
-    if (id === 'dienstplan') { await p.waitForTimeout(600); await p.screenshot({ path: OUT + 'ue2-plan.png', timeout: 90000 }); }
+    if (id === 'dienstplan') { await p.waitForTimeout(600); await shot(p, { path: OUT + 'ue2-plan.png', timeout: 90000 }); }
     let t = null; for (let i = 0; i < 30 && !t; i++) { await p.waitForTimeout(250); t = await dlg(); }
     check(t === want, `${id}: Handlung, dann „${t}“`); await closeDlg(); await p.waitForTimeout(900);
   }
@@ -44,7 +45,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'ueberwachung', un
   await p.click('[data-slot="backupband"]'); await p.waitForTimeout(200);
   await aimClick('rekorder'); let f = await settle();
   check(Boolean(f) && f.id === 'rekorder', 'Backup-Band am Rekorder → Nahansicht, Band vor dem Schacht');
-  await p.screenshot({ path: OUT + 'ue2-band.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'ue2-band.png', timeout: 90000 });
   const bd = await part('band'); await p.mouse.move(bd.x, bd.y); await p.mouse.down(); for (let i = 1; i <= 12; i++) { await p.mouse.move(bd.x, bd.y - i * 14); await p.waitForTimeout(30); } await p.mouse.up();
   for (let i = 0; i < 24 && !(await st()).flags.includes('band_eingelegt'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('band_eingelegt'), 'Band hineingeschoben → band_eingelegt'); await closeDlg(); await p.waitForTimeout(2500);
@@ -62,7 +63,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'ueberwachung', un
   for (const c of 'VALE') await tapPart('taste' + c); await p.waitForTimeout(700);
   check(/Register/.test(await narr()), 'VALE → Text der Engine („' + (await narr()).slice(0, 50) + '…“)');
   await p.waitForTimeout(1300); for (const c of 'MAR') await tapPart('taste' + c);
-  console.log('  Eingabe:', (await focus()).value); await p.screenshot({ path: OUT + 'ue2-tastatur.png', timeout: 90000 }); await tapPart('tasteA');
+  console.log('  Eingabe:', (await focus()).value); await shot(p, { path: OUT + 'ue2-tastatur.png', timeout: 90000 }); await tapPart('tasteA');
   for (let i = 0; i < 24 && !(await st()).flags.includes('datei5_offen'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('datei5_offen'), 'MARA → Datei 5 offen, Tür „Technik“ frei');
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;

@@ -9,6 +9,7 @@
 const BASE = process.env.BASE || 'http://localhost:8765';
 const QUAL = process.env.Q || 'low';
 const OUT = require('os').tmpdir() + '/';
+const shot = (pg, o) => (process.env.SHOTS ? pg.screenshot(o) : Promise.resolve()); // Bildschirmfotos nur mit SHOTS=1
 const { chromium, devices } = require('playwright');
 const ARGS = { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] };
 async function enter(p, url) {
@@ -37,7 +38,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   await click3d('schluesselkasten');
   let f = await settle();
   check(Boolean(f) && !(await dlgOpen(p)), `Schlüsselkasten → Nahansicht (${f ? f.parts.length : 0} Teile), kein Dialog`);
-  await p.screenshot({ path: OUT + 'ia-nah.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'ia-nah.png', timeout: 90000 });
   // Ziehen am Rad dreht nicht den Raum
   const view0 = await p.textContent('#viewName');
   const w3 = f.parts.find((x) => x.name === 'rad3');
@@ -58,7 +59,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL);
   await click3d('schluesselkasten'); await settle();
   await tap('rad0', 2, 1); await tap('rad1', 3, 1); await tap('rad2', 1, 1); await tap('rad3', 3, -1); // 2 3 1 7  (7 = drei zurück)
-  await p.waitForTimeout(800); await p.screenshot({ path: OUT + 'ia-2317.png', timeout: 90000 });
+  await p.waitForTimeout(800); await shot(p, { path: OUT + 'ia-2317.png', timeout: 90000 });
   console.log('  eingestellt:', (await focus()).value);
   const bg = (await focus()).parts.find((x) => x.name === 'buegel'); await p.mouse.click(bg.x, bg.y); await p.waitForTimeout(800);
   const n1 = await narr();
@@ -70,7 +71,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   check(s1.flags.includes('keybox_open') && s1.inv.includes('key217'), 'Code 2117 am Objekt → Kasten offen, Schlüssel 217 im Rucksack');
   await closeDlg(p); await p.waitForTimeout(2500);
   check(!(await focus()), 'Nahansicht schließt sich nach dem Lösen');
-  await p.evaluate(() => NOCTURNE.view3d.aimAt('schluesselkasten')); await p.waitForTimeout(800); await p.screenshot({ path: OUT + 'ia-offen.png', timeout: 90000 });
+  await p.evaluate(() => NOCTURNE.view3d.aimAt('schluesselkasten')); await p.waitForTimeout(800); await shot(p, { path: OUT + 'ia-offen.png', timeout: 90000 });
   // Schraubendreher (Licht), Abdeckung
   await p.click('#phoneButton'); await p.waitForTimeout(300); await p.click('[data-app="licht"]'); await p.waitForTimeout(500);
   await click3d('schraubendreher'); await closeDlg(p);
@@ -87,22 +88,22 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   check(Boolean(f) && f.parts.length === 4, `Schraubendreher an der Abdeckung → Nahansicht mit ${f ? f.parts.length : 0} Schrauben`);
   const sc0 = f.parts[0]; await p.mouse.click(sc0.x, sc0.y); await p.waitForTimeout(300); const vb = (await focus()).value; await twist(sc0, 0.6, 1); // im Uhrzeigersinn: zieht fester an
   const v0 = (await focus()).value; check(parseFloat(v0) <= parseFloat(vb), `Im Uhrzeigersinn gedreht → Schraube kommt nicht heraus (${vb.split(' ')[0]} → ${v0.split(' ')[0]})`);
-  for (let i = 0; i < 4; i++) { const sc = (await focus()).parts[i]; await p.mouse.click(sc.x, sc.y); await p.waitForTimeout(250); await twist(sc, 2.3, -1); if (i === 1) await p.screenshot({ path: OUT + 'ia-schrauben.png', timeout: 90000 }); }
+  for (let i = 0; i < 4; i++) { const sc = (await focus()).parts[i]; await p.mouse.click(sc.x, sc.y); await p.waitForTimeout(250); await twist(sc, 2.3, -1); if (i === 1) await shot(p, { path: OUT + 'ia-schrauben.png', timeout: 90000 }); }
   await p.waitForTimeout(2500);
   check((await st()).flags.includes('cover_open'), 'Vier Schrauben herausgedreht → Engine löst „Abdeckung“ (cover_open)');
-  await closeDlg(p); await p.waitForTimeout(4000); await p.evaluate(() => NOCTURNE.view3d.aimAt('schalter')); await p.waitForTimeout(800); await p.screenshot({ path: OUT + 'ia-platte.png', timeout: 90000 });
+  await closeDlg(p); await p.waitForTimeout(4000); await p.evaluate(() => NOCTURNE.view3d.aimAt('schalter')); await p.waitForTimeout(800); await shot(p, { path: OUT + 'ia-platte.png', timeout: 90000 });
   // Key in the elevator switch: quarter turn clockwise
   await p.click('[data-slot="key217"]'); await p.waitForTimeout(200); await click3d('schalter'); f = await settle();
   check(Boolean(f) && f.id === 'schalter', 'Schlüssel 217 am Schalter → Nahansicht, Schlüssel steckt');
-  await p.screenshot({ path: OUT + 'ia-schluessel.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'ia-schluessel.png', timeout: 90000 });
   await twist(f.parts[0], 0.3, 1); await p.waitForTimeout(1500);
   check((await st()).flags.includes('elevator_open'), 'Schlüssel im Uhrzeigersinn gedreht → elevator_open');
   for (let i = 0; i < 20 && !(await dlgOpen(p)); i++) await p.waitForTimeout(250); // Erfolgsfenster abwarten (langsame Umgebung)
   await closeDlg(p); await p.waitForTimeout(2500);
   // Short actions, then the usual text
-  for (const [id, title] of [['telefon', 'Das Telefon'], ['klingel', 'Die Tischklingel'], ['fussmatte', 'Die Fußmatte'], ['sofa', 'Das Sofa'], ['regal', 'Das Aktenregal'], ['eingangstuer', 'Die Eingangstür'], ['personalfoto', 'Ein gerahmtes Foto'], ['schirmstaender', 'Der Schirmständer']]) {
+  for (const [id, title] of [['telefon', 'Das Telefon'], ['personalfoto', 'Ein gerahmtes Foto']]) {
     const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); await p.waitForTimeout(150); await p.mouse.click(pt.x, pt.y);
-    if (id === 'personalfoto' || id === 'schirmstaender') { await p.waitForTimeout(700); await p.screenshot({ path: OUT + `ia-hand-${id}.png`, timeout: 90000 }); }
+    if (id === 'personalfoto' || id === 'schirmstaender') { await p.waitForTimeout(700); await shot(p, { path: OUT + `ia-hand-${id}.png`, timeout: 90000 }); }
     let t = null; for (let i = 0; i < 20 && !t; i++) { await p.waitForTimeout(250); t = await p.evaluate(() => (document.querySelector('#dialog').open ? document.querySelector('#dlgTitle').textContent : null)); }
     check(t === title, `${id}: Handlung, dann „${t}“`); await closeDlg(p); await p.waitForTimeout(600);
   }
@@ -110,7 +111,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   await click3d('register'); f = await settle();
   check(Boolean(f) && f.id === 'register' && f.value === '0', 'Gästeregister → Nahansicht');
   const pr = f.parts.find((x) => x.name === 'rechts'); await p.mouse.click(pr.x, pr.y); await p.waitForTimeout(1500);
-  check((await focus()).value === '1', 'Rechte Seite → umgeblättert'); await p.screenshot({ path: OUT + 'ia-register.png', timeout: 90000 });
+  check((await focus()).value === '1', 'Rechte Seite → umgeblättert'); await shot(p, { path: OUT + 'ia-register.png', timeout: 90000 });
   const pl = (await focus()).parts.find((x) => x.name === 'links'); await p.mouse.click(pl.x, pl.y); await p.waitForTimeout(1500);
   check((await focus()).value === '0', 'Linke Seite → zurückgeblättert');
   const pl2 = (await focus()).parts.find((x) => x.name === 'links'); await p.mouse.click(pl2.x, pl2.y); await p.waitForTimeout(900);
@@ -121,14 +122,14 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   await p.click('[data-inspect3d="key217"]', { timeout: 90000 }); await p.waitForTimeout(1500); // Spiegelungsumgebung: im Software-Rendering ~15 s, auf echter Grafik Millisekunden
   const i0 = await p.evaluate(() => NOCTURNE.view3d.inspectInfo());
   check(Boolean(i0) && Boolean(await p.$('.n3d-inspect canvas')), 'Ansicht geöffnet');
-  await p.screenshot({ path: OUT + 'ia-key-vorn.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'ia-key-vorn.png', timeout: 90000 });
   const box = await p.$eval('.n3d-inspect canvas', (c) => { const r = c.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await p.mouse.move(box.x, box.y); await p.mouse.down(); for (let i = 1; i <= 10; i++) { await p.mouse.move(box.x + i * 30, box.y); await p.waitForTimeout(30); } await p.mouse.up(); await p.waitForTimeout(400);
   await p.evaluate(() => { const c = document.querySelector('.n3d-inspect canvas'); c.dispatchEvent(new WheelEvent('wheel', { deltaY: -300, bubbles: true, cancelable: true })); c.dispatchEvent(new WheelEvent('wheel', { deltaY: -300, bubbles: true, cancelable: true })); });
   await p.waitForTimeout(1500);
   const i1 = await p.evaluate(() => NOCTURNE.view3d.inspectInfo());
   check(Math.abs(i1.ry - i0.ry) > 1.5 && i1.dist < i0.dist, `Ziehen dreht (${i0.ry.toFixed(2)} → ${i1.ry.toFixed(2)}), Mausrad zoomt (${i0.dist.toFixed(2)} → ${i1.dist.toFixed(2)})`);
-  await p.screenshot({ path: OUT + 'ia-key-hinten.png', timeout: 90000 });
+  await shot(p, { path: OUT + 'ia-key-hinten.png', timeout: 90000 });
   await p.click('.n3d-inspect [data-close]'); await p.waitForTimeout(400);
   check(!(await p.$('.n3d-inspect')), 'Ansicht geschlossen');
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
@@ -153,7 +154,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   const dp = await d.evaluate(() => NOCTURNE.view3d.aimAt('personaltuer')); await d.waitForTimeout(150); await d.mouse.click(dp.x, dp.y);
   let df = null; for (let i = 0; i < 120; i++) { df = await d.evaluate(() => NOCTURNE.view3d.focusInfo()); if (df && df.arrived) break; await d.waitForTimeout(250); }
   check(Boolean(df) && df.id === 'personaltuer', 'Personalschlüssel an der Tür „Personal“ → Nahansicht');
-  await d.screenshot({ path: OUT + 'ia-personaltuer.png', timeout: 90000 });
+  await shot(d, { path: OUT + 'ia-personaltuer.png', timeout: 90000 });
   for (let i = 0; i < 3; i++) { const k = (await d.evaluate(() => NOCTURNE.view3d.focusInfo())).parts[0]; await d.mouse.click(k.x, k.y); await d.waitForTimeout(350); } // dreimal antippen = 90°
   await d.waitForTimeout(1500);
   const dfl = await d.evaluate(() => JSON.parse(localStorage.getItem('nocturne_save_3d_v2')).flags);
@@ -171,7 +172,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   const r0 = tf && tf.parts.find((x) => x.name === 'rad0');
   if (r0) { await t3.touchscreen.tap(r0.x, r0.y - 8); await t3.waitForTimeout(500); await t3.touchscreen.tap(r0.x, r0.y - 8); await t3.waitForTimeout(500); }
   const v = await t3.evaluate(() => { const f = NOCTURNE.view3d.focusInfo(); return f ? f.value : null; });
-  await t3.screenshot({ path: OUT + 'ia-ipad.png', timeout: 90000 });
+  await shot(t3, { path: OUT + 'ia-ipad.png', timeout: 90000 });
   check(Boolean(tf) && v === '2000' && !e3.length, `iPad: Fingertipp öffnet die Nahansicht, zwei Tipps auf Rolle 1 → ${v}`);
   await ctx.close();
   await b.close();

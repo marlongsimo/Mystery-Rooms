@@ -13,7 +13,7 @@ declare -A T=(
   [gepaecklager]="3d-interaktion-gl 3d-gepaecklager"
   [archiv]="3d-interaktion-archiv 3d-archiv"
   [ueberwachung]="3d-interaktion-ue 3d-ueberwachung"
-  [keller]="3d-keller"
+  [keller]="3d-interaktion-keller 3d-keller"
   [buero]="3d-buero"
   [kern]="3d-interaktion 3d-rezeption 3d-gepaecklager 3d-archiv 3d-ueberwachung"
 )

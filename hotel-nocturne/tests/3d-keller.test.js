@@ -43,7 +43,11 @@ const light = async (p) => { await p.click('#phoneButton'); await p.waitForTimeo
   p.on('pageerror', (e) => errs.push('3D ' + e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push('3D console ' + m.text()); });
   await enter(p, BASE + '/hotel-nocturne/3d.html?q=' + QUAL, 'nocturne_save_3d_v2');
   console.log('3D aktiv im Keller:', await p.evaluate(() => document.querySelector('#scene').classList.contains('is3d')), '|', await p.textContent('#location'));
-  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return null; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350); return pt; };
+  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return null; await p.waitForTimeout(700); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350);
+    // kurze Handlungen öffnen den Text erst danach; bedienbare Objekte öffnen die Nahansicht → hier den klassischen Dialog nehmen
+    for (let i = 0; i < 8; i++) { if (await p.evaluate(() => document.querySelector('#dialog').open || Boolean(NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo()))) break; await p.waitForTimeout(250); }
+    if (await p.evaluate(() => { const f = NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo(); return Boolean(f && !f.leaving); })) { await p.waitForTimeout(500); await p.click('.n3d-focus [data-f="classic"]'); await p.waitForTimeout(600); }
+    return pt; };
   await p.waitForTimeout(1500); await p.screenshot({ path: OUT + 'ke-dunkel.png', timeout: 90000 });
   const darkGen = await click3d('generator'); console.log('Ohne Licht: Generator anklickbar?', Boolean(darkGen && await dlgTitle(p))); await closeDlg(p);
   await click3d('k_treppe'); await p.waitForTimeout(400); console.log('Ohne Licht: Treppe →', JSON.parse(await p.evaluate(() => localStorage.getItem('nocturne_save_3d_v2'))).current);
@@ -56,7 +60,11 @@ const light = async (p) => { await p.click('#phoneButton'); await p.waitForTimeo
   console.log(errs.join('\n') || 'no errors'); await b.close();
 })();
 async function play(p, ref, errs) {
-  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return null; await p.waitForTimeout(120); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350); return pt; };
+  const click3d = async (id) => { const pt = await p.evaluate((id) => NOCTURNE.view3d.aimAt(id), id); if (!pt) return null; await p.waitForTimeout(700); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(350);
+    // kurze Handlungen öffnen den Text erst danach; bedienbare Objekte öffnen die Nahansicht → hier den klassischen Dialog nehmen
+    for (let i = 0; i < 8; i++) { if (await p.evaluate(() => document.querySelector('#dialog').open || Boolean(NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo()))) break; await p.waitForTimeout(250); }
+    if (await p.evaluate(() => { const f = NOCTURNE.view3d.focusInfo && NOCTURNE.view3d.focusInfo(); return Boolean(f && !f.leaving); })) { await p.waitForTimeout(500); await p.click('.n3d-focus [data-f="classic"]'); await p.waitForTimeout(600); }
+    return pt; };
   const st = () => p.evaluate(() => { const s = JSON.parse(localStorage.getItem('nocturne_save_3d_v2')); return { inv: s.inventory.join(','), flags: s.flags.filter((f) => !f.startsWith('evt_')), room: s.current }; });
   const waitMoment = () => p.waitForFunction(() => !document.querySelector('#moment').classList.contains('show'), null, { timeout: 15000 }).catch(() => {});
   console.log('Zweite Seite:', await p.textContent('#location'));
@@ -64,7 +72,7 @@ async function play(p, ref, errs) {
   console.log('Licht an:', await p.evaluate(() => NOCTURNE.engine.isLight()));
   for (let i = 0; i < 4; i++) { await p.waitForTimeout(1500); await p.screenshot({ path: `${OUT}ke-licht-${i}.png`, timeout: 90000 }); await p.click('#turnRight'); }
   let same = 0; const diff = [];
-  for (const id of Object.keys(ref)) { const pt = await click3d(id); const t = await dlgTitle(p); if (t === ref[id]) same++; else diff.push(`${id}: 2D „${ref[id]}“ / 3D „${t}“${pt ? '' : ' (kein Objekt)'}`); await closeDlg(p); }
+  for (const id of Object.keys(ref)) { const pt = await click3d(id); let t = await dlgTitle(p); for (let i = 0; i < 12 && !t; i++) { await p.waitForTimeout(250); t = await dlgTitle(p); } if (t === ref[id]) same++; else diff.push(`${id}: 2D „${ref[id]}“ / 3D „${t}“${pt ? '' : ' (kein Objekt)'}`); await closeDlg(p); await p.waitForTimeout(700); }
   console.log(`Hotspots mit Taschenlampe: ${same} von ${Object.keys(ref).length} gleich wie 2D`); diff.forEach((d) => console.log('  ≠', d));
   await p.click('[data-slot="sicherung"]'); await click3d('sicherungsfach'); await p.waitForTimeout(800); await closeDlg(p); await waitMoment(); await closeDlg(p);
   console.log('Sicherung F3 →', (await st()).flags.includes('f3_drin'));

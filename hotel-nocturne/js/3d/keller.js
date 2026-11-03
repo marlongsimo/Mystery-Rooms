@@ -11,6 +11,7 @@ import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, pl
 import { textTex, plaqueTex, shell } from "./kit.js?v=2";
 import { woodMat, brassMat, std, rbox, panel } from "./hd.js?v=2";
 import { tag } from "./gfx.js?v=1";
+import { lift, twister } from "./interact.js?v=3";
 
 const R = 2.8, H = 3.6, WATER = 0.12, LAND = 1.33;
 const MONO = "DM Mono, monospace";
@@ -62,6 +63,9 @@ const keyLabel = (t) => plaqueTex(t, 192, 64, "#9aa39a", "#1a1f1b", `600 24px ${
 
 defineRoom("keller", (ctx) => {
   const { add, hs, state, anim, lerp, scene } = ctx;
+  const snd = ctx.sound, eng = ctx.engine;
+  const inner = (g) => { const a = new THREE.Group(); while (g.children.length) a.add(g.children[0]); g.add(a); return a; };
+  const pulse = (dur, fn) => { let t = -1; anim((dt) => { if (t < 0) return; t += dt; fn(Math.min(1, t / dur), t); if (t >= dur) { fn(1, t); t = -1; } }); return () => { t = 0; }; };
   const wt = wallTex();
   const M = {
     wall: tag(lambert(0xffffff, { map: wt }), { roughness: 0.92, normal: 1.4 }), floor: tag(lambert(0xffffff, { map: floorTex() }), { roughness: 0.9 }),
@@ -138,7 +142,8 @@ defineRoom("keller", (ctx) => {
   for (let i = 0; i < 9; i++) body.add(rbox(0.11, 0.11, 0.02, M.black, 0.62 + (i % 3) * 0.14, 0.62 + Math.floor(i / 3) * 0.14, 0.48, 0.01)); // Lüftungsgitter
   const exhaust = cyl(0.06, 0.06, 2.1, M.rust, -0.75, 2.4, -0.25); body.add(exhaust);
   gen.add(body);
-  add(place(hs("generator", gen, { aimLocal: [0.76, 0.62, 0.49] }), "e", 0.47, 0, 0.75));
+  let knock = 0; const genGo = pulse(0.5, (k, t) => { knock = Math.sin(t * 70) * 0.006 * (1 - k); });
+  add(place(hs("generator", gen, { aimLocal: [0.76, 0.62, 0.49], act: { play: () => { genGo(); snd("drop"); return 500; } } }), "e", 0.47, 0, 0.75));
   // Bedienfeld vorn links: Starter, Zündung, Hahn, Choke
   const ctl = group(rbox(0.92, 0.48, 0.04, std(0x1a1f1b, { roughness: 0.5 }), 0, 0, 0, 0.01));
   const starter = cyl(0.045, 0.045, 0.04, M.red, -0.33, 0.04, 0.04); starter.rotation.x = Math.PI / 2; ctl.add(rbox(0.1, 0.14, 0.03, std(0x7a2620), -0.33, 0.04, 0.025, 0.01), starter);
@@ -147,27 +152,55 @@ defineRoom("keller", (ctx) => {
   const choke = group(cyl(0.008, 0.008, 0.08, M.steel, 0, 0, 0.04).rotateX(Math.PI / 2), new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), std(0xd8d0b8))); choke.children[1].position.z = 0.08; choke.position.set(0.33, 0.04, 0.02); ctl.add(choke);
   ["STARTER", "ZÜNDUNG", "HAHN", "CHOKE"].forEach((t, i) => ctl.add(plane(0.17, 0.05, lambert(0xffffff, { map: keyLabel(t) }), -0.33 + i * 0.22, -0.16, 0.022)));
   const redLed = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), new THREE.MeshBasicMaterial({ color: 0x3a2a24, toneMapped: false })); redLed.position.set(0.4, 0.2, 0.03); ctl.add(redLed);
-  add(place(hs(["bedienfeld_an", "bedienfeld", "bedienfeld_tot"], ctl), "e", 0.47 - 0.42 / (2 * R), 0.82, 1.24));
+  // Bedienelemente selbst betätigen (Generator-Reihenfolge, Prüfung durch die Engine wie im Dialog: jeder Schritt sofort)
+  const ctlOn = { starter: 0, zuendung: 0, hahn: 0, choke: 0 }; let gSeq = [], gLock = false, startT = -1;
+  const ctlObj = { starter: ctl.children[2], zuendung: key, hahn: valve, choke };
+  const ctlZone = (o) => { o.add(box(0.15, 0.17, 0.12, ZONE, 0, 0, 0.03)); return o; };
+  const gReset = () => { gSeq = []; Object.keys(ctlOn).forEach((k) => { ctlOn[k] = 0; }); gLock = false; };
+  const gPress = (id) => { if (gLock || ctlOn[id] || eng().has("gen_laeuft")) return; ctlOn[id] = 1; gSeq.push(id); if (id === "starter") startT = 0;
+    const r = eng().tryLock("generator", gSeq.join(","));
+    if (r.ok) setTimeout(() => { ctlOn.choke = 0; snd("valve"); }, 700); else if (!r.partial) { gLock = true; setTimeout(gReset, 900); } };
+  const genSpec = { when: (id) => id === "bedienfeld" && !eng().has("gen_laeuft"), cam: [0, 0.04, 0.95], center: [0, 0, 0], fov: 40, exitDelay: 2200,
+    hint: "Bedienelemente in der richtigen Reihenfolge betätigen", value: () => gSeq.join(","), enter: gReset,
+    parts: () => Object.keys(ctlObj).map((id) => ({ obj: ctlObj[id], name: id, tap: () => gPress(id) })) };
+  Object.values(ctlObj).forEach(ctlZone);
+  add(place(hs(["bedienfeld_an", "bedienfeld", "bedienfeld_tot"], ctl, { focus: genSpec }), "e", 0.47 - 0.42 / (2 * R), 0.82, 1.24));
   // Messgerät und Kontrollleuchte
   const needle = box(0.006, 0.075, 0.004, std(0xa3302a), 0, 0.035, 0); const needlePv = new THREE.Group(); needlePv.add(needle); needlePv.position.set(0, 0.02, 0.025);
   const gauge = group(cyl(0.11, 0.11, 0.04, M.genGreen, 0, 0, 0, 32).rotateX(Math.PI / 2), plane(0.19, 0.19, new THREE.MeshStandardMaterial({ map: gaugeTex(), transparent: true, roughness: 0.3 }), 0, 0, 0.022), needlePv);
   const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), new THREE.MeshBasicMaterial({ color: 0x3a2a24, toneMapped: false })); lamp.position.set(0, -0.2, 0.02); gauge.add(lamp);
-  add(place(hs(["messgeraet2", "messgeraet"], gauge), "e", 0.47 + 0.55 / (2 * R), 1.12, 1.24));
+  let twitch = 0; const gaugeGo = pulse(0.9, (k, t) => { twitch = Math.sin(t * 20) * 0.25 * (1 - k); });
+  add(place(hs(["messgeraet2", "messgeraet"], gauge, { act: { play: () => { gaugeGo(); snd("click"); return 600; } } }), "e", 0.47 + 0.55 / (2 * R), 1.12, 1.24));
   const lampL = new THREE.PointLight(0x9fe0b0, 0, 1.8, 2); place(lampL, "e", 0.47 + 0.55 / (2 * R), 0.95, 1.5); add(lampL);
   // Sicherungsfach F3 an der Wand rechts
   const fuseFill = group(rbox(0.06, 0.14, 0.05, std(0xc9a466, { roughness: 0.5 }), 0, 0, 0, 0.02), box(0.065, 0.04, 0.052, std(0xe6dcc3), 0, 0, 0));
   const fach = group(rbox(0.3, 0.44, 0.12, M.steel, 0, 0, 0, 0.015), plane(0.22, 0.06, lambert(0xffffff, { map: plaqueTex("F3 · 30 A", 256, 64, "#2a2119", "#e6c48a", `600 30px ${MONO}`, 2) }), 0, 0.15, 0.062), box(0.12, 0.22, 0.02, M.black, 0, -0.04, 0.055));
   fuseFill.position.set(0, -0.04, 0.07); fach.add(fuseFill);
-  add(place(hs(["sicherungsfach2", "sicherungsfach"], fach), "e", 0.8, 1.15, 0.06));
+  // Ersatzsicherung (gewählt) selbst einsetzen: hineindrücken (wischen oder antippen)
+  const fuseHand = group(rbox(0.06, 0.14, 0.05, std(0xc9a466, { roughness: 0.5 }), 0, 0, 0, 0.02), box(0.065, 0.04, 0.052, std(0xe6dcc3), 0, 0, 0), box(0.12, 0.2, 0.1, ZONE, 0, 0, 0));
+  fuseHand.visible = false; fach.add(fuseHand);
+  let fPush = 0, fFired = false;
+  const fDone = () => { if (!fFired && fPush >= 1) { fFired = true; snd("lever"); setTimeout(() => { fuseHand.visible = false; eng().hotspot("sicherungsfach"); }, 350); } };
+  anim(() => { if (fuseHand.visible) fuseHand.position.set(0, -0.04, 0.07 + (1 - fPush) * 0.22); });
+  const fuseSpec = { useItem: "sicherung", when: () => !eng().has("f3_drin"), cam: [0.05, 0.02, 0.62], center: [0, -0.04, 0.1], fov: 40, exitDelay: 1500,
+    hint: "Sicherung ins Fach drücken (wischen oder antippen)", value: () => fPush.toFixed(2),
+    enter: () => { fPush = 0; fFired = false; fuseHand.visible = true; }, exit: () => { if (!fFired) fuseHand.visible = false; },
+    parts: () => [{ obj: fuseHand, name: "sicherung", tap: () => { fPush = Math.min(1, fPush + 0.5); snd("click"); fDone(); }, drag: (dx, dy) => { fPush = Math.min(1, fPush + Math.hypot(dx, dy) * 0.006); fDone(); } }] };
+  add(place(hs(["sicherungsfach2", "sicherungsfach"], fach, { focus: fuseSpec }), "e", 0.8, 1.15, 0.06));
   // Startanleitung (laminiert)
   const manual = plane(0.42, 0.62, std(0xffffff, { map: manualTex(), roughness: 0.25 })); manual.rotation.z = -0.025;
-  add(place(hs("anleitung", group(manual)), "e", 0.9, 1.9, 0.012));
+  const manG = group(manual); const manA = inner(manG); const manGo = lift(ctx, (k) => { manA.position.set(0, -0.2 * k, 0.5 * k); }, 0.7);
+  add(place(hs("anleitung", manG, { act: { play: () => { manGo(); snd("paper"); return 750; } } }), "e", 0.9, 1.9, 0.012));
   let f3 = false, run_ = false;
-  state((has) => { f3 = has("f3_drin"); run_ = has("gen_laeuft"); fuseFill.visible = f3; lamp.material.color.setHex(run_ ? 0x9fe0b0 : 0x3a2a24); redLed.material.color.setHex(f3 && !run_ ? 0xd4443a : 0x3a2a24); valve.rotation.z = run_ ? Math.PI / 2 : 0; key.rotation.z = run_ ? -0.8 : 0; });
+  state((has) => { f3 = has("f3_drin"); run_ = has("gen_laeuft"); fuseFill.visible = f3; lamp.material.color.setHex(run_ ? 0x9fe0b0 : 0x3a2a24); redLed.material.color.setHex(f3 && !run_ ? 0xd4443a : 0x3a2a24); });
   anim((dt, t) => {
     const target = run_ ? -0.3 + Math.sin(t * 13) * 0.03 + Math.sin(t * 5.3) * 0.02 : -1.08;
-    needlePv.rotation.z = lerp(needlePv.rotation.z, target, Math.min(1, dt * 3));
-    body.position.set(run_ ? (Math.random() - 0.5) * 0.004 : 0, run_ ? (Math.random() - 0.5) * 0.004 : 0, 0);
+    needlePv.rotation.z = lerp(needlePv.rotation.z, target, Math.min(1, dt * 3)) + twitch * 0.1;
+    body.position.set((run_ ? (Math.random() - 0.5) * 0.004 : 0) + knock, run_ ? (Math.random() - 0.5) * 0.004 : 0, 0);
+    const k = Math.min(1, dt * 10), on = (id) => run_ ? (id === "choke" ? 0 : 1) : ctlOn[id];
+    valve.rotation.z = lerp(valve.rotation.z, on("hahn") ? Math.PI / 2 : 0, k); key.rotation.z = lerp(key.rotation.z, on("zuendung") ? -0.8 : 0, k);
+    choke.position.z = lerp(choke.position.z, on("choke") ? 0.06 : 0.02, k);
+    if (startT >= 0) { startT += dt; if (startT > 0.35) startT = -1; } ctlObj.starter.position.z = startT >= 0 ? 0.025 : 0.04;
     lampL.intensity = run_ ? 0.35 * (0.85 + Math.random() * 0.2) : 0;
   });
 
@@ -187,19 +220,30 @@ defineRoom("keller", (ctx) => {
     board.add(lv); levers.push(lv);
     const lp = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 8), new THREE.MeshBasicMaterial({ color: 0x3a2a24, toneMapped: false })); lp.position.set(x, 2.06, 0.24); board.add(lp); lamps.push(lp);
   });
-  add(place(hs(["schalttafel_an", "schalttafel", "schalttafel_tot"], board), "s", 0.47, 0, 0.02));
+  // Hebel selbst umlegen; nach dem vierten prüft die Engine (Rätsel „hebel“), falsch → alle schnappen zurück
+  const down = [0, 0, 0, 0]; let hSeq = [], hLock = false;
+  levers.forEach((lv) => lv.add(box(0.3, 0.55, 0.16, ZONE, 0, 0.25, 0.05)));
+  const hReset = () => { hSeq = []; down.fill(0); hLock = false; };
+  const hPull = (i) => { if (hLock || down[i] || eng().has("strom")) return; down[i] = 1; hSeq.push("ABCD"[i]);
+    const r = eng().tryLock("hebel", hSeq.join(",")); if (!r.ok && !r.partial) { hLock = true; setTimeout(hReset, 700); } };
+  const leverSpec = { when: (id) => id === "schalttafel" && !eng().has("strom"), cam: [0, 1.75, 2.3], center: [0, 1.7, 0.25], fov: 45, exitDelay: 2200,
+    hint: "Hebel in der richtigen Reihenfolge umlegen", value: () => hSeq.join(","), enter: () => { if (!hLock) hReset(); },
+    parts: () => levers.map((lv, i) => ({ obj: lv, name: "hebel" + "ABCD"[i], tap: () => hPull(i), drag: (dx, dy) => { if (dy > 4) hPull(i); } })) };
+  add(place(hs(["schalttafel_an", "schalttafel", "schalttafel_tot"], board, { focus: leverSpec }), "s", 0.47, 0, 0.02));
   const plan = plane(0.52, 0.69, std(0xffffff, { map: planTex(), roughness: 0.2 })); plan.rotation.z = 0.02;
-  add(place(hs("wandplan", group(plan)), "s", 0.84, 1.95, 0.012));
+  add(place(hs("wandplan", planG, { act: { play: () => { planGo(); snd("paper"); return 750; } } }), "s", 0.84, 1.95, 0.012));
   let strom = false;
   state((has) => { strom = has("strom"); lamps.forEach((l) => l.material.color.setHex(strom ? 0x9fe0b0 : 0x3a2a24)); display.paint(strom); });
-  anim((dt) => { levers.forEach((lv) => { lv.rotation.x = lerp(lv.rotation.x, strom ? Math.PI * 0.9 : 0, Math.min(1, dt * 6)); }); });
+  anim((dt) => { levers.forEach((lv, i) => { lv.rotation.x = lerp(lv.rotation.x, strom || down[i] ? Math.PI * 0.9 : 0, Math.min(1, dt * (hLock ? 12 : 6))); }); });
+  const planG = group(plan); const planA = inner(planG); const planGo = lift(ctx, (k) => { planA.position.set(0, -0.25 * k, 0.6 * k); }, 0.7);
 
   /* ================= WEST · alte Wäscherei: Mangel, Säcke, Wäscheschrank, Stahltür ================= */
   add(place(plane(1.2, 0.18, new THREE.MeshStandardMaterial({ map: plaqueTex("WÄSCHEREI", 512, 76, "#7a786e", "#3a3a35", `600 40px ${MONO}`, 14), roughness: 0.9 })), "w", 0.28, 2.75, 0.012));
   const mangel = group(rbox(1.4, 0.1, 0.6, M.steelDark, 0, 0.92, 0, 0.02), cyl(0.18, 0.18, 1.25, std(0x55574f, { metalness: 0.5, roughness: 0.6 }), 0, 1.12, 0.05).rotateZ(Math.PI / 2), rbox(1.3, 0.08, 0.5, M.steelDark, 0, 1.36, -0.05, 0.02));
   [[-0.62, -0.25], [0.62, -0.25], [-0.62, 0.25], [0.62, 0.25]].forEach(([x, z]) => mangel.add(box(0.07, 0.88, 0.07, M.steelDark, x, 0.44, z)));
   const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.02, 8, 24), M.steel); wheel.rotation.y = Math.PI / 2; wheel.position.set(0.8, 1.12, 0.05); mangel.add(wheel);
-  add(place(hs("mangel", mangel, { aimLocal: [0, 1.12, 0.2] }), "w", 0.26, 0, 0.55));
+  const mgGo = pulse(1.2, (k) => { wheel.rotation.x = Math.sin(k * Math.PI) * 0.35; mangel.children[1].rotation.x = Math.sin(k * Math.PI) * 0.05; });
+  add(place(hs("mangel", mangel, { aimLocal: [0, 1.12, 0.2], act: { play: () => { mgGo(); snd("creak"); return 900; } } }), "w", 0.26, 0, 0.55));
   [[0.08, 0.3, 0.32], [0.14, 0.42, 0.26], [0.05, 0.62, 0.22]].forEach(([u, d, r]) => { const s = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10), M.cloth); s.scale.set(1.2, 0.7, 1); add(place(s, "w", u, r * 0.5, d)); });
   // Hinter dem Schrank: Stahltür ohne Klinke, Magnetschloss; dahinter ein schmaler Gang bergauf
   const gang = group(box(0.9, 0.04, 3.4, M.ceil, 0, 2.3, -1.7), box(0.04, 2.6, 3.4, M.wall, -0.45, 1.3, -1.7), box(0.04, 2.6, 3.4, M.wall, 0.45, 1.3, -1.7), box(0.9, 2.6, 0.04, basic(0x020202), 0, 1.3, -3.4));
@@ -210,13 +254,26 @@ defineRoom("keller", (ctx) => {
   sPv.add(sDoor);
   const mag = group(rbox(0.07, 0.24, 0.05, M.steelDark, 0, 0, 0, 0.01)); const magLed = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), new THREE.MeshBasicMaterial({ color: 0x5a2a24, toneMapped: false })); magLed.position.set(0, 0.07, 0.03); mag.add(magLed); mag.position.set(0.5, 1.1, 0.03);
   add(place(group(gang, sPv, mag, box(0.06, 2.2, 0.08, M.steelDark, -0.47, 1.1, 0), box(0.06, 2.2, 0.08, M.steelDark, 0.47, 1.1, 0), box(1.0, 0.06, 0.08, M.steelDark, 0, 2.18, 0)), "w", 0.74, 0, 0));
-  add(place(hs(["durchgang", "stahltuer_auf", "stahltuer"], group(box(0.9, 2.15, 0.3, ZONE, 0, 1.08, 0))), "w", 0.74, 0, 0));
+  let sRat = -1; anim((dt) => { if (sRat < 0) return; sRat += dt; sDoor.position.z = Math.sin(sRat * 60) * 0.005 * (1 - sRat / 0.5); if (sRat > 0.5) { sRat = -1; sDoor.position.z = 0; } });
+  add(place(hs(["durchgang", "stahltuer_auf", "stahltuer"], group(box(0.9, 2.15, 0.3, ZONE, 0, 1.08, 0)), { act: { when: (id) => id === "stahltuer", play: () => { sRat = 0; snd("click"); return 550; } } }), "w", 0.74, 0, 0));
   // Wäscheschrank, mit vier Winkeln an die Wand geschraubt; rutscht nach dem Schraubendreher zur Seite
   const cab = group(rbox(1.4, 2.5, 0.6, M.wood, 0, 1.25, 0, 0.02), rbox(1.48, 0.08, 0.66, M.wood, 0, 2.52, 0.01, 0.015));
   [-0.34, 0.34].forEach((x) => { cab.add(panel(0.6, 2.3, M.wood, x, 1.25, 0.305, 0.06, 0.01)); cab.add(box(0.03, 0.22, 0.03, std(0x806040, { metalness: 0.6, roughness: 0.4 }), x > 0 ? 0.06 : -0.06, 1.25, 0.34)); });
-  const brackets = group(); [[-0.72, 2.3], [0.72, 2.3], [-0.72, 0.25], [0.72, 0.25]].forEach(([x, y]) => { brackets.add(box(0.08, 0.1, 0.1, std(0x5a5c55, { metalness: 0.7, roughness: 0.5 }), x, y, 0.05)); brackets.add(new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 6), M.brass).translateX(x + (x > 0 ? 0.03 : -0.03)).translateY(y).translateZ(0.1)); });
+  const brackets = group(), screws = [];
+  [[-0.72, 2.3], [0.72, 2.3], [-0.72, 0.25], [0.72, 0.25]].forEach(([x, y]) => { brackets.add(box(0.08, 0.1, 0.1, std(0x5a5c55, { metalness: 0.7, roughness: 0.5 }), x, y, 0.05));
+    const sc = group(new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 6), M.brass), box(0.004, 0.022, 0.004, M.black, 0, 0, 0.012), box(0.2, 0.2, 0.1, ZONE, 0, 0, 0));
+    sc.position.set(x + (x > 0 ? 0.03 : -0.03), y, 0.1); brackets.add(sc); screws.push({ g: sc, out: 0, turn: 0 }); });
   cab.add(brackets);
-  add(place(hs(["schrank_weg", "waescheschrank"], cab), "w", 0.73, 0, 0.32));
+  // Mit dem Schraubendreher (gewählt) die vier Schrauben herausdrehen: gegen den Uhrzeigersinn drehen oder je zweimal antippen
+  let scFired = false; const scTw = screws.map((s) => twister(ctx, () => s.g));
+  const scDone = () => { if (!scFired && screws.every((s) => s.out >= 1)) { scFired = true; snd("screws"); setTimeout(() => eng().hotspot("waescheschrank"), 500); } };
+  const scStep = (s, a) => { s.turn += a; s.out = Math.min(1, s.turn / (Math.PI * 2)); if (s.out >= 1) snd("click"); scDone(); };
+  anim((dt) => { screws.forEach((s) => { s.g.rotation.z = s.turn; s.g.position.z = 0.1 + s.out * 0.05; s.g.visible = s.out < 1 || s.g.position.z < 0.14; }); });
+  const cabSpec = { useItem: "schraubendreher", when: () => !eng().has("schrank_weg"), cam: [0, 1.3, 3.1], center: [0, 1.27, 0.3], fov: 50, exitDelay: 1800,
+    hint: "Vier Schrauben herausdrehen (gegen den Uhrzeigersinn oder antippen)", value: () => screws.filter((s) => s.out >= 1).length + "/4",
+    enter: () => { scFired = false; screws.forEach((s) => { s.out = 0; s.turn = 0; }); },
+    parts: () => screws.map((s, i) => ({ obj: s.g, name: "schraube" + i, tap: () => { scStep(s, Math.PI + 0.01); snd("key"); }, drag: (dx, dy, pt) => scStep(s, Math.max(0, -scTw[i].delta(pt))), release: () => scTw[i].reset() })) };
+  add(place(hs(["schrank_weg", "waescheschrank"], cab, { focus: cabSpec }), "w", 0.73, 0, 0.32));
   const cabFrom = cab.position.clone();
   const tmp = new THREE.Object3D(); place(tmp, "w", 0.515, 0, 0.32); const cabAway = tmp.position.clone();
   let weg = false, offen = false;

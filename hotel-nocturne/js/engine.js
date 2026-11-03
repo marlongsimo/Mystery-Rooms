@@ -532,6 +532,13 @@
       const k = Number(value);
       return k === p.shift ? { ok: true } : { ok: false, msg: (p.wrongShift && p.wrongShift[k]) || "Der Text ist noch nicht lesbar." };
     }
+    if (p.type === "sequence") { // Reihenfolge der Bedienelemente, z. B. "hahn,choke" (wie im Dialog: checkEach prüft jeden Schritt sofort)
+      const seq = String(value).split(",").filter(Boolean), k = seq.length - 1;
+      if (p.checkEach && k >= 0 && seq[k] !== p.answer[k]) return { ok: false, msg: (p.wrongStep && p.wrongStep[seq[k]]) || p.wrongDefault };
+      if (seq.length < p.answer.length) return { ok: false, partial: true };
+      if (seq.join() === p.answer.join()) return { ok: true };
+      return { ok: false, msg: (p.wrongOrders && p.wrongOrders[seq.join(",")]) || p.wrongDefault };
+    }
     if ((p.answers || []).map(norm).includes(norm(value))) return { ok: true };
     return { ok: false, msg: (p.wrong && p.wrong[norm(value)]) || p.wrongDefault || null };
   }
@@ -541,6 +548,7 @@
     if (!p || isSolved(pid)) return { ok: false, solved: Boolean(p) };
     const r = checkAnswer(p, value);
     if (r.ok) { succeed(p); return { ok: true }; }
+    if (r.partial) { A.play(p.pressSound || "key"); return r; } // Reihenfolge noch nicht vollständig
     A.play(p.failSound || "error");
     setNarration(fill(r.msg || "Nichts passiert. Das scheint nicht die richtige Lösung zu sein."));
     return r;

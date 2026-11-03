@@ -51,7 +51,8 @@ const SAVE = { v: 2, started: true, finished: false, current: 'ueberwachung', un
   check((await st()).flags.includes('band_eingelegt'), 'Band hineingeschoben → band_eingelegt'); await closeDlg(); await p.waitForTimeout(2500);
   await p.evaluate(() => { NOCTURNE.view3d.aimAt('monitor1'); NOCTURNE.view3d.sync(); }); await p.waitForTimeout(4000); await waitMoment(); await closeDlg(); await p.waitForTimeout(500); await closeDlg();
   // Zeitleiste klassisch (bleibt ein Dialog)
-  await aimClick('terminal'); for (let i = 0; i < 12 && !(await dlg()); i++) await p.waitForTimeout(250);
+  for (let k = 0; k < 3 && !(await p.$('[data-move]')); k++) { await waitMoment(); await closeDlg(); await p.waitForTimeout(1000); await aimClick('terminal'); for (let i = 0; i < 16 && !(await p.$('[data-move]')); i++) await p.waitForTimeout(250); }
+  console.log('  Zeitleiste offen:', Boolean(await p.$('[data-move]')), '| Erzählung:', (await narr()).slice(0, 60));
   const move = async (i, d) => { await p.click(`[data-move="${d}"][data-i="${i}"]`); await p.waitForTimeout(150); };
   await move(2, -1); await move(1, -1); await move(3, -1); await move(2, -1); await move(3, -1);
   await p.click('[data-sort-check]'); await p.waitForTimeout(1500); await closeDlg(); await waitMoment(); await closeDlg();

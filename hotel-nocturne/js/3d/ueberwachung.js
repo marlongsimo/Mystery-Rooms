@@ -11,6 +11,7 @@ import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, pl
 import { textTex, plaqueTex, shell } from "./kit.js?v=2";
 import { brassMat, std, rbox, panel } from "./hd.js?v=2";
 import { tag } from "./gfx.js?v=1";
+import { lift } from "./interact.js?v=3";
 
 const R = 2.6, H = 2.8;
 const MONO = "DM Mono, monospace";
@@ -59,6 +60,9 @@ const noise = (g, w, h, k = 1) => { for (let i = 0; i < 900 * k; i++) { const v 
 
 defineRoom("ueberwachung", (ctx) => {
   const { add, hs, state, anim, lerp } = ctx;
+  const snd = ctx.sound, eng = ctx.engine;
+  const inner = (g) => { const a = new THREE.Group(); while (g.children.length) a.add(g.children[0]); g.add(a); return a; };
+  const pulse = (dur, fn) => { let t = -1; anim((dt) => { if (t < 0) return; t += dt; fn(Math.min(1, t / dur), t); if (t >= dur) { fn(1, t); t = -1; } }); return () => { t = 0; }; }; // kurze Animation k 0…1
   const wt = blockWall(); wt.repeat.set(1, 1);
   const M = {
     wall: tag(lambert(0xffffff, { map: wt }), { roughness: 0.9, normal: 1.4 }),
@@ -94,12 +98,16 @@ defineRoom("ueberwachung", (ctx) => {
   let flick = 1; anim((dt) => { if (Math.random() < 0.03) flick = Math.random() < 0.5 ? 0.12 : 1; flick = lerp(flick, 1, dt * 2.5); doorL.intensity = 4 * flick; cage.children[1].material.emissiveIntensity = 1.5 * flick; });
   // Dienstplan
   const roster = group(plane(0.42, 0.52, lambert(0xffffff, { map: rosterTex() })), box(0.03, 0.03, 0.02, M.brass, 0, 0.24, 0.01)); roster.rotation.z = 0.02;
-  add(place(hs("dienstplan", roster), "n", 0.76, 1.45, 0.01));
+  const roA = inner(roster); const roGo = lift(ctx, (k) => { roA.position.set(0, -0.15 * k, 0.55 * k); roA.rotation.z = -0.02 * k; }, 0.7);
+  add(place(hs("dienstplan", roster, { act: { play: () => { roGo(); snd("paper"); return 750; } } }), "n", 0.76, 1.45, 0.01));
   // Wandtelefon mit herausgerissenem Kabel
   const phone = group(rbox(0.2, 0.32, 0.09, M.plastic, 0, 0, 0, 0.02), rbox(0.07, 0.26, 0.06, M.black, -0.04, 0.0, 0.07, 0.025), box(0.08, 0.05, 0.01, std(0x0a0b0a), 0.05, 0.08, 0.05));
   const cable = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0.0, -0.15, 0.04), new THREE.Vector3(-0.05, -0.4, 0.06), new THREE.Vector3(0.06, -0.62, 0.05), new THREE.Vector3(-0.02, -0.82, 0.07)]), 24, 0.008, 6), M.black);
   phone.add(cable, box(0.24, 0.6, 0.1, ZONE, 0, -0.18, 0.04));
-  add(place(hs("wandtelefon", phone), "n", 0.215, 1.35, 0.05));
+  const cPiv = new THREE.Group(); cPiv.position.set(0, -0.15, 0.04); cable.position.set(0, 0.15, -0.04); phone.remove(cable); cPiv.add(cable); phone.add(cPiv);
+  const hand = phone.children[1];
+  const phGo = pulse(1.6, (k, t) => { const d = 1 - k; cPiv.rotation.z = Math.sin(t * 9) * 0.25 * d; cPiv.rotation.x = Math.sin(t * 6) * 0.1 * d; hand.position.z = 0.07 + (t < 0.35 ? Math.sin(t * 9) * 0.03 : 0); });
+  add(place(hs("wandtelefon", phone, { act: { play: () => { phGo(); snd("click"); return 650; } } }), "n", 0.215, 1.35, 0.05));
   // Uhr (23:17)
   const clock = group(cyl(0.17, 0.17, 0.04, M.black, 0, 0, 0, 32).rotateX(Math.PI / 2), plane(0.28, 0.28, new THREE.MeshStandardMaterial({ map: clockTex(), transparent: true, roughness: 0.4 }), 0, 0, 0.022));
   add(place(hs("ue_uhr", clock), "n", 0.275, 2.25, 0.03));
@@ -140,7 +148,8 @@ defineRoom("ueberwachung", (ctx) => {
   const monIds = [["monitor1"], ["monitor2_live", "monitor2b", "monitor2"], ["monitor3b", "monitor3"], ["monitor4"]];
   mons.forEach((m, i) => {
     m.g.add(plane(0.3, 0.06, lambert(0xffffff, { map: label(monNames[i]) }), 0, -monH / 2 - 0.1, 0.005));
-    add(place(hs(monIds[i], m.g), "e", us[i], 1.75, 0.52));
+    const glass = m.g.children[2]; const go = pulse(0.6, (k, t) => { glass.scale.set(1 + Math.sin(t * 50) * 0.03 * (1 - k), 1 - (k < 0.15 ? 0.9 * (1 - k / 0.15) : 0), 1); });
+    add(place(hs(monIds[i], m.g, { act: { play: () => { go(); snd("glitch"); return 550; } } }), "e", us[i], 1.75, 0.52));
   });
   // Lämpchen unter den Monitoren (Monitor 3 rot, nach dem Band grün), Hinweis „NUR ÜBER REKORDER“
   const leds = us.map((u, i) => { const l = new THREE.Mesh(new THREE.SphereGeometry(0.018, 10, 8), new THREE.MeshBasicMaterial({ color: i === 2 ? 0xd4443a : 0x7fa36d, toneMapped: false })); add(place(l, "e", u, 0.98, 0.61)); return l; });
@@ -167,7 +176,8 @@ defineRoom("ueberwachung", (ctx) => {
   add(place(hs("bandregal", shelf), "s", 0.29, 0, 0.02));
   const huelle = group(box(0.034, 0.2, 0.19, std(0x2a1414, { roughness: 0.5 }), 0, 0.1, 0), plane(0.03, 0.18, lambert(0xffffff, { map: tapeLabel() }), 0, 0.1, 0.0955));
   huelle.rotation.z = 0.08; huelle.add(box(0.08, 0.26, 0.22, ZONE, 0, 0.1, 0));
-  add(place(hs("huelle", huelle), "s", 0.29 + (-0.94 + 14 * 0.11) / (2 * R), 1.115, 0.22));
+  const huA = inner(huelle); const huGo = lift(ctx, (k) => { huA.position.set(0, 0.08 * k, 0.32 * k); huA.rotation.y = 0.9 * k; }, 0.6);
+  add(place(hs("huelle", huelle, { act: { play: () => { huGo(); snd("tape"); return 650; } } }), "s", 0.29 + (-0.94 + 14 * 0.11) / (2 * R), 1.115, 0.22));
   // Tisch mit Rekorder, Eingangsmonitor, Druckerstreifen
   const table = group(rbox(1.9, 0.05, 0.75, M.wood, 0, 0.76, 0, 0.01));
   [[-0.88, -0.32], [0.88, -0.32], [-0.88, 0.32], [0.88, 0.32]].forEach(([x, z]) => table.add(box(0.05, 0.74, 0.05, M.steelDark, x, 0.37, z)));
@@ -177,14 +187,25 @@ defineRoom("ueberwachung", (ctx) => {
   [-0.36, -0.29, -0.22].forEach((x) => rec.add(cyl(0.016, 0.016, 0.02, std(0x4a4f48), x, 0.045, 0.252).rotateX(Math.PI / 2)));
   const tapeIn = box(0.4, 0.024, 0.06, M.black, -0.18, 0.1, 0.24); rec.add(tapeIn);
   rec.add(box(1.04, 0.22, 0.54, ZONE, 0, 0.1, 0));
-  add(place(hs("rekorder", rec), "s", 0.72, 0.785, 0.4));
+  // Backup-Band (gewählt) selbst in den Schacht schieben: nach oben wischen (= hinein) oder antippen
+  const cass = group(rbox(0.4, 0.026, 0.24, M.black, 0, 0, 0, 0.006), plane(0.2, 0.05, lambert(0xffffff, { map: label("BACKUP · CAM 3") }), 0, 0.014, 0.04), box(0.44, 0.08, 0.3, ZONE, 0, 0, 0));
+  cass.children[1].rotation.x = -Math.PI / 2; cass.visible = false; rec.add(cass);
+  let push = 0, pushFired = false;
+  const pushDone = () => { if (!pushFired && push >= 1) { pushFired = true; snd("tape"); setTimeout(() => { cass.visible = false; eng().hotspot("rekorder"); }, 450); } };
+  anim(() => { if (cass.visible) cass.position.set(-0.18, 0.1, 0.42 - push * 0.3); });
+  const recSpec = { useItem: "backupband", when: () => !eng().has("band_eingelegt"), cam: [-0.12, 0.42, 0.95], center: [-0.15, 0.08, 0.3], fov: 40, exitDelay: 1500,
+    hint: "Band in den Schacht schieben (wischen oder antippen)", value: () => push.toFixed(2),
+    enter: () => { push = 0; pushFired = false; cass.visible = true; }, exit: () => { if (!pushFired) cass.visible = false; },
+    parts: () => [{ obj: cass, name: "band", tap: () => { push = Math.min(1, push + 0.34); snd("slide"); pushDone(); }, drag: (dx, dy) => { push = Math.max(0, Math.min(1, push - dy * 0.008)); pushDone(); } }] };
+  add(place(hs("rekorder", rec, { focus: recSpec }), "s", 0.72, 0.785, 0.4));
   state((has) => { const b = has("band_eingelegt"); tapeIn.visible = b; recDisp.paint(b); });
   // Druckerstreifen: aus dem Rekorder nach oben gerollt und über die Kante gebogen
   const sg = new THREE.PlaneGeometry(0.05, 0.36, 1, 12), pp = sg.attributes.position;
   for (let i = 0; i < pp.count; i++) { const y = pp.getY(i) + 0.18; pp.setZ(i, Math.sin(y * 7) * 0.05 - y * 0.05); pp.setY(i, y); }
   sg.computeVertexNormals();
   const strip = new THREE.Mesh(sg, new THREE.MeshStandardMaterial({ map: stripTex(), roughness: 0.9, side: THREE.DoubleSide }));
-  add(place(hs("loeschprotokoll", group(strip, box(0.1, 0.38, 0.12, ZONE, 0, 0.18, 0))), "s", 0.72 + 0.25 / (2 * R), 0.95, 0.5));
+  const stGo = pulse(1.2, (k, t) => { strip.rotation.x = Math.sin(t * 14) * 0.12 * (1 - k); strip.rotation.y = Math.sin(t * 9) * 0.08 * (1 - k); });
+  add(place(hs("loeschprotokoll", group(strip, box(0.1, 0.38, 0.12, ZONE, 0, 0.18, 0)), { act: { play: () => { stGo(); snd("paper"); return 600; } } }), "s", 0.72 + 0.25 / (2 * R), 0.95, 0.5));
   // Eingangsmonitor auf dem Rekorder
   const inMon = screen(256, 160, (g, w, h) => { g.fillStyle = "#060908"; g.fillRect(0, 0, w, h); g.fillStyle = "#b6e0c4"; g.font = `600 17px ${MONO}`; g.textAlign = "center"; g.fillText("EINGANG REKORDER", w / 2, h / 2 + 6); }); inMon.paint();
   const im = group(rbox(0.5, 0.36, 0.34, M.plastic, 0, 0.18, -0.12, 0.04), plane(0.42, 0.27, new THREE.MeshBasicMaterial({ map: inMon.tex, toneMapped: false }), 0, 0.18, 0.052));
@@ -203,20 +224,41 @@ defineRoom("ueberwachung", (ctx) => {
   const techKeyMat = new THREE.MeshStandardMaterial({ map: keyTex("TECHNIK", "#e6c48a"), roughness: 0.5, emissive: 0x000000 });
   keys.add(rbox(0.42, 0.035, 0.12, techKeyMat, 0.35, 0.035, 0.0, 0.01));
   add(place(desk, "w", pu, 0, 0));
-  add(place(hs("pult", group(box(pw - 0.2, 0.2, 0.66, ZONE, 0, 1.0, 0.56))), "w", pu, 0, 0));
+  const pultGo = pulse(1.0, (k) => { keys.children.forEach((c, i) => { const ph = k * 5 - i; c.position.y = 0.035 - (ph > 0 && ph < 1 ? 0.012 : 0); }); });
+  add(place(hs("pult", group(box(pw - 0.2, 0.2, 0.66, ZONE, 0, 1.0, 0.56)), { act: { play: () => { pultGo(); [0, 200, 400, 600, 800].forEach((ms) => setTimeout(() => snd("click"), ms)); return 1000; } } }), "w", pu, 0, 0));
   // Indexterminal (Text je nach Fortschritt wie in 2D)
   const term = screen(320, 240, (g, w, h, s) => {
     g.fillStyle = "#060908"; g.fillRect(0, 0, w, h); g.font = `600 22px ${MONO}`;
-    const L = s.d ? [["TÜR TECHNIK"], ["FREIGEGEBEN", "#9fe0b0"], ["F3 FEHLT!", "#e6c48a"]] : s.z ? [["DATEI 5 · IDX 5281"], ["GESPERRT", "#d4443a"], ["KENNWORT?", "#e6c48a"]] : s.b ? [["INDEXTERMINAL"], ["4 AUFNAHMEN"], ["ORDNEN …"]] : [["INDEXTERMINAL"], ["DATENSATZ CAM 3", "#d4443a"], ["FEHLT"]];
+    const L = s.d ? [["TÜR TECHNIK"], ["FREIGEGEBEN", "#9fe0b0"], ["F3 FEHLT!", "#e6c48a"]] : s.z && s.x ? [["DATEI 5 · IDX 5281"], ["ZUGRIFF", "#d4443a"], ["VERWEIGERT", "#d4443a"]] : s.z && s.k !== undefined ? [["DATEI 5 · IDX 5281"], ["KENNWORT:", "#e6c48a"], [(s.k || "").padEnd(4, "_").split("").join(" ")]] : s.z ? [["DATEI 5 · IDX 5281"], ["GESPERRT", "#d4443a"], ["KENNWORT?", "#e6c48a"]] : s.b ? [["INDEXTERMINAL"], ["4 AUFNAHMEN"], ["ORDNEN …"]] : [["INDEXTERMINAL"], ["DATENSATZ CAM 3", "#d4443a"], ["FEHLT"]];
     L.forEach(([t, c], i) => { g.fillStyle = c || "#b6e0c4"; g.fillText(t, 18, 60 + i * 40); });
     if (Math.floor(performance.now() / 500) % 2) { g.fillStyle = "#b6e0c4"; g.fillRect(18, 60 + L.length * 40 - 18, 12, 20); }
   });
   const tm = crt(() => {}); tm.g.children[2].material.map = term.tex; // gleiches Gehäuse wie die Monitore, eigenes Bild
-  const note = plane(0.09, 0.06, lambert(0xe6dcc3), monW / 2 - 0.08, -monH / 2 + 0.05, 0.07); note.rotation.z = 0.1; tm.g.add(note);
-  add(place(hs(["terminal_datei5", "terminal", "terminal_leer"], tm.g), "w", 0.5, 1.42, 0.2));
+  // Elias’ Zettel am Bildschirmrand (lesbar, Text wie im Dokument „kennwortzettel“)
+  const noteTex = canvasTex(256, 168, (g, w, h) => { g.fillStyle = "#efe3b4"; g.fillRect(0, 0, w, h); g.fillStyle = "#2c2a5a"; g.font = "italic 22px Caveat, 'Segoe Script', cursive"; ["Kennwort wie immer:", "der Name, der in keinem", "Register stehen durfte.", "            – E."].forEach((l, i) => g.fillText(l, 12, 36 + i * 36)); });
+  const note = plane(0.15, 0.1, lambert(0xffffff, { map: noteTex }), monW / 2 - 0.02, -monH / 2 + 0.02, 0.075); note.rotation.z = 0.08; tm.g.add(note);
+  // Tastatur vor dem Terminal (QWERTZ); Eingabe erscheint auf dem Bildschirm, nach vier Buchstaben oder ⏎ prüft die Engine (Rätsel „datei5“)
+  const kb = new THREE.Group(); kb.position.set(0, -monH / 2 - 0.16, 0.32); kb.rotation.x = -1.15; tm.g.add(kb);
+  kb.add(rbox(0.58, 0.2, 0.03, M.plastic, 0, 0, -0.018, 0.01));
+  const kTex = {}; const kt = (c) => kTex[c] ??= canvasTex(64, 64, (g) => { g.fillStyle = "#2b2e2a"; g.fillRect(0, 0, 64, 64); g.fillStyle = "#cfd8cc"; g.font = `600 ${c.length > 1 ? 22 : 34}px ${MONO}`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(c, 32, 34); });
+  const kbKeys = [];
+  ["QWERTZUIOP", "ASDFGHJKL", "YXCVBNM"].forEach((row, r) => [...row].forEach((c, i) => kbKeys.push({ c, x: -0.25 + r * 0.025 + i * 0.05, y: 0.06 - r * 0.05 })));
+  kbKeys.push({ c: "⌫", x: 0.235, y: -0.04, w: 0.07 }, { c: "⏎", x: 0.235, y: 0.01, w: 0.07 });
+  kbKeys.forEach((k) => { const w = k.w || 0.042; k.m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.042, 0.016), [M.plastic, M.plastic, M.plastic, M.plastic, new THREE.MeshStandardMaterial({ map: kt(k.c), roughness: 0.6 }), M.plastic]); k.m.position.set(k.x, k.y, 0.006); kb.add(k.m); });
+  let pw5 = "", pwFlash = 0; const kPress = {};
+  const typeKey = (k) => { kPress[k.c] = 0; snd("key");
+    if (k.c === "⌫") pw5 = pw5.slice(0, -1); else if (k.c !== "⏎" && pw5.length < 4) pw5 += k.c;
+    if ((pw5.length === 4 || k.c === "⏎") && pw5.length) { const v = pw5; setTimeout(() => { const r = eng().tryLock("datei5", v); if (!r.ok) { pwFlash = 1.2; pw5 = ""; } }, 250); }
+    tS = { ...tS, k: pw5 }; term.paint(tS); };
+  anim((dt) => { kbKeys.forEach((k) => { const t = kPress[k.c]; if (t === undefined) return; kPress[k.c] = t + dt; k.m.position.z = t < 0.12 ? 0.0 : 0.006; if (t > 0.15) delete kPress[k.c]; }); if (pwFlash > 0) { pwFlash -= dt; tS = { ...tS, x: pwFlash > 0 }; } });
+  const termSpec = { when: (id) => id === "terminal_datei5" && !eng().isSolved("datei5"), cam: [0, 0.02, 0.95], center: [0, -0.12, 0.12], fov: 40, exitDelay: 1800,
+    hint: "Kennwort tippen · ⏎ prüft", value: () => pw5, enter: () => { pw5 = ""; eng().fileDoc && eng().fileDoc("kennwortzettel"); tS = { ...tS, k: "" }; },
+    exit: () => { tS = { ...tS, k: undefined }; }, parts: () => kbKeys.map((k) => ({ obj: k.m, name: "taste" + k.c, tap: () => typeKey(k) })) };
+  state((has) => { kb.visible = has("zeitleiste_ok"); });
+  add(place(hs(["terminal_datei5", "terminal", "terminal_leer"], tm.g, { focus: termSpec }), "w", 0.5, 1.42, 0.2));
   const termL = new THREE.PointLight(0x9fe0b0, 1.6, 0, 2); place(termL, "w", 0.5, 1.4, 0.9); add(termL);
   let tS = { b: false, z: false, d: false }, tAcc = 0;
-  state((has) => { tS = { b: has("band_eingelegt"), z: has("zeitleiste_ok"), d: has("datei5_offen") }; term.paint(tS); techKeyMat.emissive.setHex(tS.d ? 0x8a6a20 : 0x000000); });
+  state((has) => { tS = { ...tS, b: has("band_eingelegt"), z: has("zeitleiste_ok"), d: has("datei5_offen") }; term.paint(tS); techKeyMat.emissive.setHex(tS.d ? 0x8a6a20 : 0x000000); });
   anim((dt) => { tAcc += dt; if (tAcc > 0.5) { tAcc = 0; term.paint(tS); } });
   // Unter dem Pult: ohne Licht schwarz (Abdeckung), mit Taschenlampe die Kiste „Ersatzteile T.“
   const under = group(), shade = new THREE.Mesh(new THREE.PlaneGeometry(pw - 0.14, 0.86), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.96, depthWrite: false }));
@@ -236,7 +278,8 @@ defineRoom("ueberwachung", (ctx) => {
   const tLed = new THREE.Mesh(new THREE.SphereGeometry(0.02, 10, 8), new THREE.MeshBasicMaterial({ color: 0xd4443a, toneMapped: false })); tLed.position.set(0.66, 1.3, 0.04);
   const tFrame = group(box(0.08, 2.26, 0.1, M.steelDark, -0.54, 1.13, 0), box(0.08, 2.26, 0.1, M.steelDark, 0.54, 1.13, 0), box(1.16, 0.08, 0.1, M.steelDark, 0, 2.24, 0));
   add(place(group(corr, tPv, tFrame, tLed), "w", 0.81, 0, 0));
-  add(place(hs(["technik", "technik_zu"], group(box(1.0, 2.2, 0.3, ZONE, 0, 1.1, 0))), "w", 0.81, 0, 0));
+  let rattle = -1; anim((dt) => { if (rattle < 0) return; rattle += dt; tDoor.position.z = Math.sin(rattle * 60) * 0.006 * (1 - rattle / 0.5); if (rattle > 0.5) { rattle = -1; tDoor.position.z = 0; } });
+  add(place(hs(["technik", "technik_zu"], group(box(1.0, 2.2, 0.3, ZONE, 0, 1.1, 0)), { act: { when: (id) => id === "technik_zu", play: () => { rattle = 0; snd("click"); return 550; } } }), "w", 0.81, 0, 0));
   let tOpen = false; state((has) => { tOpen = has("datei5_offen"); tLed.material.color.setHex(tOpen ? 0x7fa36d : 0xd4443a); });
   anim((dt) => { tPv.rotation.y = lerp(tPv.rotation.y, tOpen ? 1.3 : 0, Math.min(1, dt * 2)); });
 

@@ -1479,6 +1479,8 @@
     /* Schnittstelle für die 3D-Ansicht (js/3d): dieselben Hotspots, dieselbe Logik */
     hotspot: (id) => onHotspot(id),
     tryLock: (pid, value) => tryLock(pid, value), isSolved: (pid) => isSolved(pid), openItem: (id) => openItem(id),
+    /** Dokument in die Akte legen (z. B. ein Zettel, den man in 3D direkt liest); true, wenn es neu war. */
+    fileDoc: (id) => { const n = addDoc(id); if (n) { save(); renderSide(); } return n; },
     isVisible: (id) => { const h = hotspotsOf(room()).find((x) => x.id === id); return Boolean(h) && visible(h); },
     hotspotData: (id) => hotspotsOf(room()).find((x) => x.id === id) || null,
     has, isLight: () => light, toggleLight: (on) => toggleLight(on), selectedItem: () => selected,

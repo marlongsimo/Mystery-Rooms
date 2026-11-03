@@ -238,7 +238,7 @@ defineRoom("ueberwachung", (ctx) => {
   const noteTex = canvasTex(256, 168, (g, w, h) => { g.fillStyle = "#efe3b4"; g.fillRect(0, 0, w, h); g.fillStyle = "#2c2a5a"; g.font = "italic 22px Caveat, 'Segoe Script', cursive"; ["Kennwort wie immer:", "der Name, der in keinem", "Register stehen durfte.", "            – E."].forEach((l, i) => g.fillText(l, 12, 36 + i * 36)); });
   const note = plane(0.15, 0.1, lambert(0xffffff, { map: noteTex }), monW / 2 - 0.02, -monH / 2 + 0.02, 0.075); note.rotation.z = 0.08; tm.g.add(note);
   // Tastatur vor dem Terminal (QWERTZ); Eingabe erscheint auf dem Bildschirm, nach vier Buchstaben oder ⏎ prüft die Engine (Rätsel „datei5“)
-  const kb = new THREE.Group(); kb.position.set(0, -monH / 2 - 0.16, 0.32); kb.rotation.x = -1.15; tm.g.add(kb);
+  const kb = new THREE.Group(); kb.position.set(0, -monH / 2 - 0.085, 0.36); kb.rotation.x = -1.29; tm.g.add(kb); // liegt auf der Pultschräge
   kb.add(rbox(0.58, 0.2, 0.03, M.plastic, 0, 0, -0.018, 0.01));
   const kTex = {}; const kt = (c) => kTex[c] ??= canvasTex(64, 64, (g) => { g.fillStyle = "#2b2e2a"; g.fillRect(0, 0, 64, 64); g.fillStyle = "#cfd8cc"; g.font = `600 ${c.length > 1 ? 22 : 34}px ${MONO}`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(c, 32, 34); });
   const kbKeys = [];
@@ -251,7 +251,7 @@ defineRoom("ueberwachung", (ctx) => {
     if ((pw5.length === 4 || k.c === "⏎") && pw5.length) { const v = pw5; setTimeout(() => { const r = eng().tryLock("datei5", v); if (!r.ok) { pwFlash = 1.2; pw5 = ""; } }, 250); }
     tS = { ...tS, k: pw5 }; term.paint(tS); };
   anim((dt) => { kbKeys.forEach((k) => { const t = kPress[k.c]; if (t === undefined) return; kPress[k.c] = t + dt; k.m.position.z = t < 0.12 ? 0.0 : 0.006; if (t > 0.15) delete kPress[k.c]; }); if (pwFlash > 0) { pwFlash -= dt; tS = { ...tS, x: pwFlash > 0 }; } });
-  const termSpec = { when: (id) => id === "terminal_datei5" && !eng().isSolved("datei5"), cam: [0, 0.02, 0.95], center: [0, -0.12, 0.12], fov: 40, exitDelay: 1800,
+  const termSpec = { when: (id) => id === "terminal_datei5" && !eng().isSolved("datei5"), cam: [0, 0.27, 0.95], center: [0, -0.16, 0.22], fov: 42, exitDelay: 1800,
     hint: "Kennwort tippen · ⏎ prüft", value: () => pw5, enter: () => { pw5 = ""; eng().fileDoc && eng().fileDoc("kennwortzettel"); tS = { ...tS, k: "" }; },
     exit: () => { tS = { ...tS, k: undefined }; }, parts: () => kbKeys.map((k) => ({ obj: k.m, name: "taste" + k.c, tap: () => typeKey(k) })) };
   state((has) => { kb.visible = has("zeitleiste_ok"); });

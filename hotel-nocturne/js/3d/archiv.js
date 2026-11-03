@@ -188,7 +188,7 @@ defineRoom("archiv", (ctx) => {
   fach.children[1].visible = false;
   const fLock = combinationLock(ctx, { pid: "fach", symbols: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", count: 8, brass: M.brass, dark: std(0x120e0b, { roughness: 0.6 }), handle: "knopf" });
   fLock.group.scale.setScalar(0.3); fLock.group.position.set(0, -0.03, 0.012); fach.add(fLock.group);
-  const fachSpec = { when: () => !eng().isSolved("fach"), cam: [0, 0.65, 0.73], center: [0, 0.63, 0.42], fov: 32, exitDelay: 1600,
+  const fachSpec = { when: () => !eng().isSolved("fach"), cam: [0, 0.67, 0.86], center: [0, 0.645, 0.42], fov: 34, exitDelay: 1600,
     hint: "„Wohin?“ · Räder antippen oder wischen · Knopf drücken", value: fLock.value, parts: fLock.parts };
   const fachG = group(fach); add(place(hs("schreibtischfach", fachG, { focus: fachSpec }), "e", 0.5, 0, 0.45));
   let fOpen = false; state((has) => { fOpen = has("fach_offen"); fLock.group.visible = !fOpen; });

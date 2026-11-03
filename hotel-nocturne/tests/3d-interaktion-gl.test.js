@@ -46,7 +46,7 @@ const SAVE = { v: 2, started: true, finished: false, current: 'gepaecklager', un
   const sc = f.parts[0]; await p.mouse.move(sc.x, sc.y); await p.mouse.down(); for (let i = 1; i <= 12; i++) { await p.mouse.move(sc.x, sc.y + i * 14); await p.waitForTimeout(30); } await p.mouse.up();
   for (let i = 0; i < 24 && !(await st()).flags.includes('koffer_da'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('koffer_da'), 'Schein nach unten geschoben → Koffer Nr. 6 kommt (koffer_da)');
-  await closeDlg(); await p.waitForTimeout(3000);
+  for (let i = 0; i < 24 && !(await dlg()); i++) await p.waitForTimeout(250); await closeDlg(); await p.waitForTimeout(3000); await closeDlg();
   // Käfigschlüssel nehmen und selbst drehen
   pt = await p.evaluate(() => NOCTURNE.view3d.aimAt('kaefigschluessel')); await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(800); await closeDlg();
   check((await st()).inv.includes('kaefigschluessel'), 'Käfigschlüssel genommen');

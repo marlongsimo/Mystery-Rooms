@@ -12,6 +12,7 @@ const base = { v: 2, started: true, finished: false, views: {}, docs: ['reservie
 const SAVES = {
   rezeption: { ...base, current: 'rezeption', unlocked: ['rezeption'], visited: ['rezeption'], completed: [], solved: [], flags: [], inventory: [] },
   zimmer217: { ...base, current: 'zimmer217', unlocked: ['rezeption', 'zimmer217'], visited: ['rezeption', 'zimmer217'], completed: ['rezeption'], solved: ['keybox', 'werkzeug', 'cover', 'elevator'], flags: ['keybox_open', 'taken_schraubendreher', 'cover_open', 'elevator_open'], inventory: ['key217', 'hotelplan', 'schraubendreher'] },
+  gepaecklager: { ...base, current: 'gepaecklager', unlocked: ['rezeption', 'zimmer217', 'gepaecklager'], visited: ['rezeption', 'zimmer217', 'gepaecklager'], completed: ['rezeption', 'zimmer217'], solved: [], flags: [], inventory: ['gepaeckschein'] },
   archiv: { ...base, current: 'archiv', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], completed: ['rezeption', 'zimmer217', 'gepaecklager'], solved: [], flags: ['archiv_offen'], inventory: ['hotelplan', 'schraubendreher'] },
   ueberwachung: { ...base, current: 'ueberwachung', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], completed: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv'], solved: [], flags: ['sicherheit_offen'], inventory: ['backupband'] },
   keller: { ...base, current: 'keller', unlocked: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung', 'keller'], visited: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung', 'keller'], completed: ['rezeption', 'zimmer217', 'gepaecklager', 'archiv', 'ueberwachung'], solved: [], flags: ['f3_drin', 'gen_laeuft', 'strom'], inventory: [] },
@@ -19,7 +20,8 @@ const SAVES = {
 const EXPECT = { high: { bloom: true, shadows: true }, medium: { bloom: true, shadows: true }, low: { bloom: false, shadows: false } };
 (async () => {
   const b = await chromium.launch(ARGS); let fail = 0;
-  for (const room of Object.keys(SAVES)) for (const q of ['high', 'medium', 'low']) {
+  // Nur einzelne Räume: ROOMS=archiv,keller node tests/3d-hd.test.js
+  for (const room of Object.keys(SAVES).filter((r) => !process.env.ROOMS || process.env.ROOMS.split(',').includes(r))) for (const q of ['high', 'medium', 'low']) {
     const p = await b.newPage({ viewport: { width: 1280, height: 860 } }); p.setDefaultTimeout(30000); const errs = [];
     p.on('pageerror', (e) => errs.push(e.message)); p.on('response', (r) => { if (r.status() >= 400) errs.push(r.status() + ' ' + r.url()); });
     p.on('console', (m) => { if (m.type() === 'error' || /Modell nicht geladen/.test(m.text())) errs.push(m.text()); });

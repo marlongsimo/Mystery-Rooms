@@ -10,6 +10,8 @@
  */
 import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
 import { textTex, woodTex, plaqueTex, shell } from "./kit.js?v=2";
+import { std, rbox, panel, leatherMat, brassMat, woodMat } from "./hd.js?v=2";
+import { tag as pbr } from "./gfx.js?v=1"; // „tag“ heißen hier die Messinganhänger der Koffer
 
 const R = 2.8, H = 3.0;
 
@@ -57,14 +59,15 @@ const ledgerTex = () => textTex(300, 160, "#d8cdb6", (g) => {
 defineRoom("gepaecklager", (ctx) => {
   const { add, hs, state, anim, lerp } = ctx;
   const M = {
-    wall: lambert(0xffffff, { map: wallTex() }), floor: phong(0xffffff, { map: concrete("#2c2c29", false), shininess: 70, specular: 0x2a3036 }),
-    ceil: lambert(0x1a1a18), trim: lambert(0x222220), metal: phong(0x4a4c4e, { shininess: 40 }), rust: lambert(0x5a3e2a),
-    wood: lambert(0xffffff, { map: woodTex("#3a2a1c", "#22170e") }), brass: phong(0xb08c52), brassDark: phong(0x6e5632), black: lambert(0x0f0f0e),
+    // HD: rauer Beton mit Flutrand, nasser glänzender Boden, Stahl mit Rost, Holz mit Maserung, Messing
+    wall: pbr(lambert(0xffffff, { map: wallTex() }), { roughness: 0.92, normal: 1.6 }), floor: pbr(lambert(0xffffff, { map: concrete("#2c2c29", false) }), { roughness: 0.3, clearcoat: 0.6, normal: 1.4, envMapIntensity: 0.6 }),
+    ceil: pbr(lambert(0x1a1a18), { roughness: 0.95 }), trim: std(0x222220, { roughness: 0.8 }), metal: std(0x4a4c4e, { metalness: 0.75, roughness: 0.45 }), rust: std(0x5a3e2a, { metalness: 0.45, roughness: 0.8 }),
+    wood: woodMat("#3a2a1c", "#22170e"), brass: brassMat(), brassDark: brassMat(0x6e5632, 0.45), black: std(0x0f0f0e, { roughness: 0.6 }),
   };
   if (M.floor.map) M.floor.map.repeat.set(2 * R, 2 * R);
   const { place } = shell(ctx, { R, H, wallMat: M.wall, floorMat: M.floor, ceilMat: M.ceil, trimMat: M.trim, holes: { n: [{ x: 0, y: 0, w: 1.7, h: 2.8 }] } });
   // Pfützen (glänzend)
-  [[0.6, 0.9, 0.9], [-1.1, -0.4, 0.6], [1.6, -1.4, 0.7]].forEach(([x, z, r]) => { const p = new THREE.Mesh(new THREE.CircleGeometry(r, 24), phong(0x14181c, { shininess: 120, specular: 0x5a6a7a, transparent: true, opacity: 0.8 })); p.rotation.x = -Math.PI / 2; p.scale.y = 0.6; p.position.set(x, 0.004, z); add(p); });
+  [[0.6, 0.9, 0.9], [-1.1, -0.4, 0.6], [1.6, -1.4, 0.7]].forEach(([x, z, r]) => { const p = new THREE.Mesh(new THREE.CircleGeometry(r, 24), new THREE.MeshStandardMaterial({ color: 0x0c1014, roughness: 0.03, metalness: 0.4, transparent: true, opacity: 0.85, envMapIntensity: 1.2 })); p.rotation.x = -Math.PI / 2; p.scale.y = 0.6; p.position.set(x, 0.004, z); add(p); });
   // Rohre unter der Decke
   [[-0.9, 0.09], [-0.55, 0.06]].forEach(([z, r]) => { const p = cyl(r, r, 2 * R, M.rust, 0, H - 0.25 - r, z); p.rotation.z = Math.PI / 2; add(p); });
   const pipeE = cyl(0.05, 0.05, 2 * R, M.rust, R - 0.2, H - 0.22, 0); pipeE.rotation.x = Math.PI / 2; add(pipeE);
@@ -109,7 +112,15 @@ defineRoom("gepaecklager", (ctx) => {
   [[-1.9], [0], [1.9]].forEach(([x]) => shelf.add(box(0.06, 2.4, 0.06, M.metal, x, 1.2, 0.0), box(0.06, 2.4, 0.06, M.metal, x, 1.2, 0.55)));
   [0.35, 1.15, 1.95].forEach((y) => shelf.add(box(3.9, 0.04, 0.6, M.metal, 0, y, 0.28)));
   add(place(shelf, "e", 0.5, 0, 0.05));
-  const suitcase = (w, h, d, color) => { const s = group(box(w, h, d, lambert(color)), box(w * 0.3, 0.03, 0.05, M.black, 0, h / 2 + 0.03, 0)); [-w / 2 + 0.06, w / 2 - 0.06].forEach((x) => s.add(box(0.04, h + 0.005, d + 0.005, lambert(0x2a2016), x, 0, 0))); return s; };
+  // Lederkoffer: runde Kanten, zwei Riemen, Messingecken, Griff mit Bügel
+  const suitcase = (w, h, d, color) => {
+    const s = group(rbox(w, h, d, leatherMat(color), 0, 0, 0, 0.035));
+    const strap = leatherMat(0x2a2016);
+    [-w / 2 + 0.08, w / 2 - 0.08].forEach((x) => s.add(rbox(0.045, h + 0.008, d + 0.008, strap, x, 0, 0, 0.01), rbox(0.05, 0.035, 0.012, M.brass, x, 0.0, d / 2 + 0.008, 0.004)));
+    [-1, 1].forEach((sx) => [-1, 1].forEach((sy) => s.add(rbox(0.05, 0.05, d + 0.012, M.brass, sx * (w / 2 - 0.02), sy * (h / 2 - 0.02), 0, 0.012))));
+    const hd = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.012, 8, 16, Math.PI), leatherMat(0x1a120c)); hd.position.y = h / 2 + 0.005; s.add(hd, box(w * 0.3, 0.02, 0.04, M.brassDark, 0, h / 2 + 0.005, 0));
+    return s;
+  };
   const tag = (n) => { const t = group(cyl(0.004, 0.004, 0.08, M.black, 0, 0.04, 0), plane(0.075, 0.1, lambert(0xffffff, { map: tagTex(n) }), 0, -0.04, 0.003)); return t; };
   // Koffer 2: braunes Leder, Springerfigur
   const k2 = suitcase(0.62, 0.36, 0.42, 0x5a3a22);
@@ -135,20 +146,21 @@ defineRoom("gepaecklager", (ctx) => {
   const mark = plane(0.7, 0.17, new THREE.MeshLambertMaterial({ map: markTex(), transparent: true }));
   add(place(hs("wassermarke", group(mark), { hideWhenHidden: true }), "e", 0.73, 0.5, 0.012));
   // Eimer unter dem tropfenden Rohr
-  const bucket = group(cyl(0.18, 0.14, 0.34, phong(0x5a5c5e), 0, 0.17, 0), new THREE.Mesh(new THREE.CircleGeometry(0.17, 20), phong(0x10161c, { shininess: 120, specular: 0x7a8a9a })));
+  const bucket = group(cyl(0.18, 0.14, 0.34, std(0x5a5c5e, { metalness: 0.7, roughness: 0.4 }), 0, 0.17, 0), new THREE.Mesh(new THREE.CircleGeometry(0.17, 20), new THREE.MeshStandardMaterial({ color: 0x10161c, roughness: 0.03, metalness: 0.4 })));
   bucket.children[1].rotation.x = -Math.PI / 2; bucket.children[1].position.y = 0.32;
   add(place(hs("eimer", bucket), "e", 0.9, 0, 0.45));
   const drop = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), phong(0x9ab4c8, { shininess: 120 })); add(place(drop, "e", 0.9, H - 0.3, 0.45));
   anim((dt) => { drop.position.y -= dt * 3.2; if (drop.position.y < 0.34) drop.position.y = H - 0.3; });
 
   /* ================= SÜD · Ausgabe ================= */
-  const counter = group(box(3.4, 1.0, 0.7, M.wood, 0, 0.5, 0), box(3.5, 0.05, 0.8, lambert(0x4a3622), 0, 1.025, 0.02));
+  const counter = group(rbox(3.4, 1.0, 0.7, M.wood, 0, 0.5, 0, 0.015), rbox(3.5, 0.05, 0.8, woodMat("#4a3622", "#2a1c10"), 0, 1.025, 0.02, 0.012));
+  [-1.1, 0, 1.1].forEach((x) => counter.add(panel(0.9, 0.7, M.wood, x, 0.5, 0.355, 0.05, 0.01))); // Kassettenfront
   add(place(counter, "s", 0.5, 0, 0.75));
   // Ausgabefenster in der Wand hinter dem Tresen: Stahlklappe, darunter Schlitz; dahinter die Kammer mit Koffer Nr. 6
   const hatchFrame = group(box(1.2, 0.08, 0.1, M.metal, 0, 1.97, 0.05), box(0.08, 0.95, 0.1, M.metal, -0.56, 1.5, 0.05), box(0.08, 0.95, 0.1, M.metal, 0.56, 1.5, 0.05), box(1.2, 0.04, 0.12, M.metal, 0, 1.03, 0.05));
   const slot = box(0.3, 0.015, 0.02, M.black, 0, 1.08, 0.11); hatchFrame.add(slot);
   const flapPv = new THREE.Group(); flapPv.position.set(0, 1.95, 0.08);
-  const flap = box(1.04, 0.86, 0.03, phong(0x585a5c, { shininess: 30 }), 0, -0.43, 0);
+  const flap = rbox(1.04, 0.86, 0.03, std(0x585a5c, { metalness: 0.7, roughness: 0.5 }), 0, -0.43, 0, 0.008);
   for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) { const r = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 5), M.metal); r.position.set(-0.45 + i * 0.3, -0.1 - j * 0.33, 0.02); flapPv.add(r); }
   flapPv.add(flap);
   const sign = plane(1.1, 0.1, lambert(0xffffff, { map: plaqueTex("AUSGABE NUR GEGEN GEPÄCKSCHEIN", 768, 70, "#2a2826", "#c8c0a8", "500 30px DM Mono, monospace", 3) }), 0, 2.1, 0.02);
@@ -186,7 +198,7 @@ defineRoom("gepaecklager", (ctx) => {
   const counterL = new THREE.PointLight(0xffd4a0, 4.5, 0, 2); place(counterL, "s", 0.5, 2.4, 1.0); add(counterL);
 
   /* ================= WEST · Gitterkäfig mit Truhe ================= */
-  const cage = new THREE.Group(), barMat = phong(0x3a3c3e, { shininess: 50 });
+  const cage = new THREE.Group(), barMat = std(0x3a3c3e, { metalness: 0.75, roughness: 0.42 });
   const cx0 = -1.35, cx1 = 1.5, depth = 1.15; // links Platz für den Papierkorb in der Südwest-Ecke
   for (let x = cx0; x <= cx1 + 0.001; x += 0.16) { if (x > -0.42 && x < 0.42) continue; cage.add(cyl(0.012, 0.012, 2.5, barMat, x, 1.25, depth)); }
   for (let z = 0.16; z < depth; z += 0.16) { cage.add(cyl(0.012, 0.012, 2.5, barMat, cx0, 1.25, z), cyl(0.012, 0.012, 2.5, barMat, cx1, 1.25, z)); }
@@ -198,9 +210,9 @@ defineRoom("gepaecklager", (ctx) => {
   gate.add(box(0.84, 0.04, 0.04, barMat, 0.42, 0.1, 0), box(0.84, 0.04, 0.04, barMat, 0.42, 2.4, 0), box(0.08, 0.11, 0.05, M.brassDark, 0.75, 1.1, 0.03));
   gatePv.add(gate); cage.add(gatePv);
   // Truhe mit Zahlenschloss 0000
-  const chest = group(box(0.9, 0.42, 0.5, M.wood, 0, 0.21, 0), box(0.92, 0.04, 0.04, M.brassDark, 0, 0.1, 0.25), box(0.92, 0.04, 0.04, M.brassDark, 0, 0.36, 0.25));
+  const chest = group(rbox(0.9, 0.42, 0.5, M.wood, 0, 0.21, 0, 0.015), box(0.92, 0.04, 0.04, M.brassDark, 0, 0.1, 0.25), box(0.92, 0.04, 0.04, M.brassDark, 0, 0.36, 0.25), panel(0.36, 0.2, M.wood, -0.22, 0.22, 0.252, 0.03, 0.006), panel(0.36, 0.2, M.wood, 0.22, 0.22, 0.252, 0.03, 0.006));
   const lidPv = new THREE.Group(); lidPv.position.set(0, 0.42, -0.25);
-  lidPv.add(box(0.92, 0.12, 0.52, M.wood, 0, 0.06, 0.25)); chest.add(lidPv);
+  lidPv.add(rbox(0.92, 0.12, 0.52, M.wood, 0, 0.06, 0.25, 0.03), box(0.94, 0.03, 0.04, M.brassDark, 0, 0.06, 0.51)); chest.add(lidPv);
   const cl = plane(0.18, 0.08, lambert(0xffffff, { map: lockTex() }), 0, 0.3, 0.255); chest.add(cl);
   chest.position.set(0, 0, 0.55); cage.add(chest);
   add(place(cage, "w", 0.5, 0, 0));
@@ -212,7 +224,7 @@ defineRoom("gepaecklager", (ctx) => {
   let gOpen = false, cOpen = false; state((has) => { gOpen = has("kaefig_offen"); cOpen = has("truhe_offen"); cl.visible = !cOpen; });
   anim((dt) => { const k = Math.min(1, dt * 3); gatePv.rotation.y = lerp(gatePv.rotation.y, gOpen ? -1.9 : 0, k); lidPv.rotation.x = lerp(lidPv.rotation.x, cOpen ? -1.2 : 0, k); });
   const cageBulb = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), basic(0xffe6b8)); add(place(cageBulb, "w", 0.5, 2.6, 0.55));
-  const cageL = new THREE.PointLight(0xffd0a0, 5.5, 0, 2); place(cageL, "w", 0.5, 2.3, 0.7); add(cageL);
-  return { eye: [0, 1.62, 0] };
+  const cageL = new THREE.PointLight(0xffd0a0, 5.5, 0, 2); place(cageL, "w", 0.5, 2.3, 0.7); cageL.userData.shadow = true; add(cageL);
+  return { eye: [0, 1.62, 0], hd: true, R, H, env: 0.2 };
 });
 ready();

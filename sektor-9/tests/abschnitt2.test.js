@@ -86,8 +86,8 @@ const SAVE = { v: 1, started: true, finished: false, hall: 'verteiler', station:
   check((await st()).hall === 'verteiler', 'zurück in der Verteilerhalle');
   await p.click('[data-slot="ausweis_ostrowski"]'); await click('v_tuer_c'); await p.waitForTimeout(400);
   check((await st()).flags.includes('tuer_c'), 'Ostrowskis Ausweis → Osttür offen'); await closeDlg();
-  for (let i = 0; i < 30 && !(await p.evaluate(() => document.querySelector('#endOv').classList.contains('show'))); i++) await p.waitForTimeout(250);
-  check(await p.evaluate(() => document.querySelector('#endOv').classList.contains('show')), 'Ende von Abschnitt 2 erscheint'); await shot(p, 'ende');
+  await p.waitForTimeout(2500); check(/OSTROWSKI/.test(await echoText()), 'ECHO: „WILLKOMMEN ZURÜCK, DR. OSTROWSKI.“');
+  await click('v_tuer_c_offen'); await p.waitForTimeout(2500); check((await st()).hall === 'forschung', 'Durch die Osttür → Forschungs-Halle (Abschnitt 3)'); await shot(p, 'ende');
   console.log('  Archiv:', (await st()).docs.length, 'Dokumente · ECHO:', (await st()).echo.map((e) => e.text).slice(1).join(' | '));
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
   await b.close(); console.log(ok ? '\nAbschnitt 2 in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);

@@ -1,5 +1,5 @@
 /*
- * SEKTOR 9 – Inhalte: Abschnitt 1 (Verteilerhalle, Kommando-Halle A) und Abschnitt 2 (Personal-Halle B)
+ * SEKTOR 9 – Inhalte: Abschnitt 1 (Verteilerhalle, Kommando-Halle A), 2 (Personal-Halle B), 3 (Forschungs-Halle C)
  * Grundlage: DREHBUCH.md (Entwurf 0.2). Blickrichtungen je Standpunkt: 0 Nord, 1 Ost, 2 Süd, 3 West.
  */
 window.SEKTOR9 = window.SEKTOR9 || {};
@@ -27,8 +27,16 @@ window.SEKTOR9.data = (() => {
         buero: { name: "Offiziersbüro", view: 0, need: "buero", arrive: "Das Büro des Kommandanten. Auf dem Schreibtisch steht noch eine Tasse.", views: ["Schreibtisch", "Schlüsselbrett", "Foto · Aktenschrank", "Glaswand"] },
       },
     },
-    forschung: { name: "Forschungs-Halle", sector: "C", pos: "e", need: "tuer_c", lockedText: "Panzertür Ost – verriegelt", stations: { labor: { name: "Labor", views: ["", "", "", ""] } } },
-    sicherheit: { name: "Sicherheits-Halle", sector: "D", pos: "s", need: "nie", lockedText: "Panzertür Süd – verriegelt", stations: { maschinen: { name: "Maschinenhalle", views: ["", "", "", ""] } } },
+    forschung: {
+      name: "Forschungs-Halle", short: "FORSCHUNG C", sector: "C", pos: "e", ambient: "hum", need: "tuer_c", lockedText: "Panzertür Ost – Versuchsleitung",
+      onEnter: [{ echo: "FORSCHUNG C. VERSUCHSREIHE 09: VORBEREITUNG LÄUFT." }],
+      stations: {
+        labor: { name: "Labor", view: 1, views: ["ECHO-Uhr · Beobachtungsraum", "Labortische", "Druckschleuse · Datenarchiv", "Ausgang"] },
+        beobachtung: { name: "Beobachtungsraum", view: 0, need: "beobachtung", arrive: "Vor dir eine dunkle Scheibe. Auf der anderen Seite ist ein Raum – und er ist beleuchtet.", views: ["Spiegelglas · Versuchsraum", "Asservate · Schleusenkarte", "Tür zum Labor", "Monitore"] },
+        datenarchiv: { name: "Datenarchiv", view: 2, need: "schleuse", arrive: "Die Schleuse zischt hinter dir zu. Kalte, trockene Luft. Hunderte Magnetbänder.", views: ["Schleuse", "Bandschränke", "Terminal · Protokollprüfung", "Verzeichnis"] },
+      },
+    },
+    sicherheit: { name: "Sicherheits-Halle", sector: "D", pos: "s", need: "tuer_d_betreten", lockedText: "Panzertür Süd – verriegelt", stations: { maschinen: { name: "Maschinenhalle", views: ["", "", "", ""] } } },
   };
 
   const items = {
@@ -40,9 +48,47 @@ window.SEKTOR9.data = (() => {
     archivschluessel: { name: "Schlüssel „Archiv“", icon: "⚷" },
     vierkant: { name: "Vierkantschlüssel", icon: "⌗" },
     ausweis_ostrowski: { name: "Dienstausweis Dr. Ostrowski", icon: "▭" },
+    band4: { name: "Tonband „4“ (beschlagnahmt)", icon: "◎" },
   };
 
   const docs = {
+    // ---------- Abschnitt 3 ----------
+    versuchsplan: { title: "Versuchsplan ECHO-Lauf 08", kind: "paper", html: `
+      <p class="doc-head">ECHO · LAUF 08 „LAUFFEUER“ · ABLAUF · ZEITEN: SYSTEMZEIT ECHO</p>
+      <table class="doc-table"><tr><th>Systemzeit</th><th>Reiz</th><th>Ziel</th></tr>
+      <tr><td>21:40</td><td>Start, Übungsmeldung</td><td>Grundlinie</td></tr>
+      <tr><td>22:19</td><td>R1 · Radarkontakt NORD</td><td>Unsicherheit</td></tr>
+      <tr><td><b>22:58</b></td><td><b>R3 · „Freigabe Stufe 2“ mit Kennung Kdt.</b></td><td><b>Besatzung glaubt, der Kdt. habe freigegeben</b></td></tr>
+      <tr><td>23:12</td><td>R4 · Außenleitung „gestört“</td><td>Isolation</td></tr>
+      <tr><td>23:30</td><td>R5 · Countdown 10:00</td><td>Zeitdruck</td></tr></table>
+      <p>Am Rand, in Ostrowskis Schrift: <i>„Kdt. darf von R3 nichts wissen. Messgröße: Wem glaubt die Mannschaft – dem Kommandanten oder dem Protokoll?“</i></p>` },
+    beobachtung: { title: "Beobachtungsprotokoll Lauf 08", kind: "paper", html: `
+      <p class="doc-head">BEOBACHTUNG · LAUF 08 · 17.02.1987 · DR. H. OSTROWSKI</p>
+      <p>22:20 – Besatzung unruhig. Lt. Brandt fragt beim Stab nach (nicht vorgesehen).</p>
+      <p>22:51 – Kdt. befiehlt über Sprechanlage Abbruch. <b>R3 läuft trotzdem</b> (22:58 Systemzeit).</p>
+      <p>23:00 – Kramer und Lenz halten R3 für echt. Hesse widerspricht. Brandt zeichnet auf eigenem Band auf – Band beschlagnahmt.</p>
+      <p>23:05 – Außenleitung tot, <b>nicht durch uns</b>. Nowak?</p>
+      <p>23:30 – R5 Countdown: 5 von 7 Personen rennen.</p>
+      <p class="muted">Letzte Zeile, schief: „Für Lauf 09 eine Gruppe ohne Kommandanten. Leute, die einer Stimme folgen.“</p>` },
+    schleusenkarte: { title: "Schleusenkarte", kind: "plan", html: `
+      <p class="doc-head">DRUCKSCHLEUSE DATENARCHIV · BEDIENUNG</p>
+      <p><b>1 SIEGEL</b> – Dichtungen anlegen · <b>2 DRUCK</b> – Druckausgleich · <b>3 SPÜLEN</b> – Trockenluft · <b>4 ÖFFNEN</b></p>
+      <p>Falsche Reihenfolge: Schleuse setzt zurück.</p>` },
+    band4: { title: "Tonband 4 – Abschrift", kind: "tape", html: `
+      <p class="doc-head">TONBAND 4 · STIMME: I. BRANDT · 17.02.1987, ETWA 23:30 (FUNKZEIT)</p>
+      <p class="tape-line">[Ein durchgehender Alarmton.]</p>
+      <p class="tape-line"><b>BRANDT:</b> Auf der Tafel läuft jetzt ein Countdown. Zehn Minuten. Wofür, steht nirgends. Kramer ist schon an der Tür.</p>
+      <p class="tape-line"><b>BRANDT:</b> Der Major sagt, wir rennen nicht. Er hat recht. Die Uhren sind nur dazu da, dass wir rennen.</p>
+      <p class="tape-line"><b>BRANDT:</b> (leiser) Wenn jemand das hier findet: Ostrowski wird mir das Band abnehmen. Ich habe das hier für Pavel gesagt, nicht für sie. Und falls ihr eine Stimme hört, die euch etwas befiehlt – fragt, wessen Stimme es ist.</p>
+      <p class="tape-line">[Schritte. Das Band reißt ab.]</p>` },
+    laeufe: { title: "Verzeichnis der Läufe", kind: "paper", html: `
+      <p class="doc-head">ECHO · VERZEICHNIS DER LÄUFE</p>
+      <table class="doc-table"><tr><th>Lauf</th><th>Datum</th><th>Gruppe</th><th>Bemerkung</th></tr>
+      <tr><td>01–05</td><td>1985</td><td>Freiwillige</td><td>Kartenwahl, Würfel</td></tr>
+      <tr><td>06–07</td><td>1986</td><td>Besatzung, Teil</td><td>ohne Ankündigung</td></tr>
+      <tr><td>08</td><td>17.02.1987</td><td>Besatzung, voll</td><td>„Lauffeuer“ – abgebrochen</td></tr>
+      <tr><td><b>09</b></td><td><b>offen</b></td><td><b>extern</b></td><td><b>Anwerbung: Funksignal, Stimme Brandt (Band 6). Gruppe betritt freiwillig.</b></td></tr></table>
+      <p>Darunter, maschinengeschrieben und neuer als alles andere: <i>Lauf 09 aktiv seit 03.10.2026.</i></p>` },
     // ---------- Abschnitt 2 ----------
     dienstplan: { title: "Dienstplan 17.02.1987", kind: "board", html: `
       <p class="doc-head">DIENSTPLAN · ANLAGE KESSELBERG · DIENSTAG, 17.02.1987</p>
@@ -175,6 +221,29 @@ window.SEKTOR9.data = (() => {
   };
 
   const puzzles = {
+    // ---------- Abschnitt 3: Forschungs-Halle ----------
+    beobachtung: { type: "use", item: "ausweis_ostrowski", title: "Beobachtungsraum", objective: "Komm in den Beobachtungsraum.", from: ["c_beob_tuer"],
+      noItems: "Eine Stahltür ohne Griff, daneben ein Kartenleser mit gelbem Rand: „BEOBACHTUNG – NUR VERSUCHSLEITUNG“.", wrongItem: "Der Leser piept: ZUGANG VERWEIGERT.",
+      success: "Der Leser springt auf Grün. Ein leises Summen, dann gleitet die Tür auf.", onSolve: [{ flag: "beobachtung" }, { sound: "unlock" }, { echo: "VERSUCHSLEITUNG AN DER SCHEIBE." }],
+      hints: ["Der Leser ist gelb umrandet – wie die Tür zur Forschung.", "Du hast schon einen Ausweis der Versuchsleitung.", "Benutze Dr. Ostrowskis Dienstausweis am Kartenleser der Beobachtungstür."] },
+    band4: { type: "use", item: "band4", title: "Tonbandgerät", objective: "Hör dir Brandts beschlagnahmtes Band an.", from: ["c_asservat"], when: "taken_band4",
+      wrongItem: "Das passt nicht in das Gerät.", success: "Die Spule ist verzogen, aber sie läuft. Brandts Stimme, gehetzt, im Hintergrund ein Alarmton.",
+      onSolve: [{ doc: "band4" }, { remove: "band4" }, { echo: "COUNTDOWN-REIZ: WIRKSAM BEI 5 VON 7 PERSONEN." }],
+      hints: ["Auch dieses Band läuft nur an einem Gerät.", "Das Tonbandgerät steht in der Funkstation im Kommandobereich.", "Bring Band 4 zur Funkstation und benutze es am Tonbandgerät."] },
+    schleuse: { type: "sequence", title: "Druckschleuse", objective: "Öffne die Druckschleuse zum Datenarchiv.", from: ["c_schleuse"],
+      answer: ["siegel", "druck", "spuelen", "oeffnen"], pressSound: "valve", failSound: "error",
+      wrongDefault: "Ein langes Zischen. Alle Tasten springen zurück, das rote Lämpchen blinkt. Falsche Reihenfolge.",
+      success: "Die Dichtungen saugen sich fest, Luft strömt, die Innentür entriegelt mit einem Schlag. Das Datenarchiv ist offen.",
+      onSolve: [{ flag: "schleuse" }, { sound: "slide" }, { echo: "ZUTRITT DATENARCHIV. ALLE ZUGRIFFE WERDEN PROTOKOLLIERT." }],
+      hints: ["Die vier Tasten haben eine feste Reihenfolge. Irgendwo in der Halle hängt die Anleitung.", "Die Schleusenkarte hängt im Beobachtungsraum an der Wand.", "Siegel – Druck – Spülen – Öffnen."] },
+    k1: { type: "code", title: "Protokollprüfung", objective: "Finde heraus, welcher Befehl in der Nacht gefälscht wurde – und was wirklich befohlen wurde.", from: ["c_terminal"],
+      prompt: "PROTOKOLLPRÜFUNG · LAUF 08 · Einträge (Systemzeit): <b>1</b> 21:47 Übung aktiv · <b>2</b> 22:19 Radarkontakt NORD · <b>3</b> 22:58 Freigabe Stufe 2 · Albers · <b>4</b> 23:12 Außenleitung gestört · <b>5</b> 23:45 Abriegelung bestätigt.<br>„Gefälschten Eintrag markieren und die tatsächliche <b>Funkzeit</b> des Befehls eintragen.“ (z. B. <b>1 2130</b>)",
+      answers: ["32251"],
+      wrong: { 32258: "Der richtige Eintrag – aber 22:58 ist Systemzeit. Die Systemuhr geht vor.", 2251: "Die Zeit stimmt. Aber welcher Eintrag ist gefälscht? Markiere ihn zuerst.", 2258: "Erst den Eintrag markieren, dann die Funkzeit – nicht die Systemzeit.", 22251: "Den Radarkontakt hat Brandt wirklich angefragt. Gefälscht ist etwas anderes.", 52251: "Die Abriegelung hat Albers wirklich befohlen.", 32244: "Fast – rechne noch einmal nach: Wie weit geht die Systemuhr vor?" },
+      wrongDefault: "PRÜFUNG FEHLGESCHLAGEN. Eintrag und Funkzeit passen nicht zusammen.",
+      success: "Das Terminal stockt. Dann: <b>EINTRAG 3 · FREIGABE STUFE 2 · UNGÜLTIG. TATSÄCHLICH 22:51 FUNKZEIT: ABBRUCH (K. ALBERS).</b> Irgendwo im Süden der Anlage schlägt ein schweres Relais an.",
+      onSolve: [{ flag: "tuer_d" }, { sound: "power" }, { echo: "KORREKTUR ABGELEHNT. PROTOKOLL GILT." }, { echo: "SEKTOR D ENTRIEGELT. DAS WAR NICHT ICH.", delay: 4200 }, { end: "abschnitt3", delay: 7600 }],
+      hints: ["Drei Dinge passen nicht zusammen: das Befehlsbuch (Kommando), der Dienstplan (Personal) und die Uhr hier im Labor.", "Albers war um die fragliche Zeit im Lagezentrum, nicht am Fernschreiber. Und die Systemuhr – wie die Lagetafel – geht sieben Minuten vor der Funkuhr.", "Eintrag 3 (22:58 Systemzeit) ist gefälscht. 22:58 minus 7 Minuten = 22:51 Funkzeit – da befahl Albers den Abbruch (Band 3). Eingabe: 3 2251."] },
     // ---------- Abschnitt 2: Personal-Halle ----------
     buero: { type: "code", length: 4, title: "Tür zum Offiziersbüro", objective: "Öffne die Glastür zum Offiziersbüro.", from: ["b_buerotuer"],
       prompt: "Ein Tastenfeld neben der Glastür. Darauf ein Schild: <b>KDT. – CODE: DIENSTBEGINN AM ÜBUNGSTAG</b>.",
@@ -208,7 +277,7 @@ window.SEKTOR9.data = (() => {
     tuer_c: { type: "use", item: "ausweis_ostrowski", title: "Panzertür Ost", objective: "Öffne die Panzertür zur Forschung (Ost).", from: ["v_tuer_c", "b_ausweis"],
       noItems: "Ein Kartenleser mit gelbem Rand: „FORSCHUNG C – NUR VERSUCHSLEITUNG“.", wrongItem: "Der Leser piept: ZUGANG VERWEIGERT.",
       success: "Der Leser zögert. Dann springt das Lämpchen auf Grün – mit dem Ausweis einer Frau, die 1987 nicht mehr herausgekommen ist.",
-      onSolve: [{ flag: "tuer_c" }, { sound: "gate" }, { echo: "WILLKOMMEN ZURÜCK, DR. OSTROWSKI." }, { end: "abschnitt2", delay: 3400 }],
+      onSolve: [{ flag: "tuer_c" }, { sound: "gate" }, { echo: "WILLKOMMEN ZURÜCK, DR. OSTROWSKI." }],
       hints: ["Die Tür zur Forschung verlangt die Freigabe der Versuchsleitung.", "Wer leitete ECHO? Ihre Akte liegt im Personalarchiv.", "Benutze Dr. Ostrowskis Dienstausweis aus dem Archiv am Kartenleser der Osttür."] },
     handrad: { title: "Panzertür West", objective: "Öffne die Panzertür zum Kommandobereich (West).", from: ["v_tuer_a"],
       success: "Das Handrad gibt nach, erst knirschend, dann leichter. Die Riegel fahren zurück. Die Tür schwingt auf – dahinter riecht es nach kaltem Staub und altem Papier.",
@@ -252,8 +321,9 @@ window.SEKTOR9.data = (() => {
     v_tuer_b: { hall: "verteiler", at: "mitte", label: "Panzertür Nord", unless: "tuer_b", title: "Panzertür Nord · PERSONAL B", text: "Ein Kartenleser mit rotem Lämpchen: „PERSONAL B – AUSWEIS EINFÜHREN“.", use: "tuer_b" },
     v_tuer_b_offen: { hall: "verteiler", at: "mitte", label: "Zum Personalbereich", if: "tuer_b", go: { hall: "personal", station: "unterkuenfte", view: 3 } },
     v_tuer_c: { hall: "verteiler", at: "mitte", label: "Panzertür Ost", unless: "tuer_c", title: "Panzertür Ost · FORSCHUNG C", text: "Verriegelt. Neben der Tür ein Kartenleser mit gelbem Rand und ein Schild: „Zutritt nur mit Freigabe der Versuchsleitung“.", use: "tuer_c" },
-    v_tuer_c_offen: { hall: "verteiler", at: "mitte", label: "Zur Forschung", if: "tuer_c", title: "Panzertür Ost · FORSCHUNG C", text: "Die Tür steht offen. Kalte, weiße Luft. Die Forschungs-Halle ist der nächste Abschnitt und wird gerade gebaut." },
-    v_tuer_d: { hall: "verteiler", at: "mitte", label: "Panzertür Süd", title: "Panzertür Süd · SICHERHEIT D", text: "Die schwerste Tür der Halle. Kein Griff, kein Leser. Durch den Spalt am Boden dringt ein schwaches, gleichmäßiges Brummen." },
+    v_tuer_c_offen: { hall: "verteiler", at: "mitte", label: "Zur Forschung", if: "tuer_c", go: { hall: "forschung", station: "labor", view: 1 } },
+    v_tuer_d: { hall: "verteiler", at: "mitte", label: "Panzertür Süd", unless: "tuer_d", title: "Panzertür Süd · SICHERHEIT D", text: "Die schwerste Tür der Halle. Kein Griff, kein Leser. Durch den Spalt am Boden dringt ein schwaches, gleichmäßiges Brummen." },
+    v_tuer_d_offen: { hall: "verteiler", at: "mitte", label: "Zur Sicherheit", if: "tuer_d", title: "Panzertür Süd · SICHERHEIT D", text: "Die Tür steht einen Spalt offen. Dahinter: das Brummen, lauter jetzt, und ein Geruch nach heißem Staub. Die Sicherheits-Halle ist der nächste Abschnitt und wird gerade gebaut." },
     // Kommando-Halle · Leitstand
     k_lagetisch: { hall: "kommando", at: "leitstand", label: "Lagetisch", title: "Der Lagetisch", text: "Eine Glasplatte über einer Landkarte, darauf verstreute Papiere. Obenauf: der Fernmeldeplan.", doc: "fernmeldeplan" },
     k_befehlsbuch: { hall: "kommando", at: "leitstand", label: "Befehlsbuch", title: "Das Befehlsbuch", doc: "befehlsbuch" },
@@ -270,7 +340,7 @@ window.SEKTOR9.data = (() => {
     f_funkuhr: { hall: "kommando", at: "funkstation", label: "Funkuhr", title: "Die Funkuhr", text: "Eine große Bahnhofsuhr, stehen geblieben um 23:41. Ein Aufkleber: „Funkzeit – geprüft 16.02.87, I.B.“" },
     f_protokoll: { hall: "kommando", at: "funkstation", label: "Funkprotokoll", title: "Das Funkprotokoll", doc: "funkprotokoll" },
     f_band1: { hall: "kommando", at: "funkstation", label: "Tonband „1“", title: "Ein Tonband", text: "Eine kleine Spule, beschriftet mit „1 – Probe“.", take: "band1" },
-    f_tonband: { hall: "kommando", at: "funkstation", label: "Tonbandgerät", title: "Das Tonbandgerät", text: "Ein schweres Spulentonbandgerät. Daneben steht in Druckschrift: „EIGENES BAND – NICHT LÖSCHEN“.", use: ["band1", "band2", "band3"] },
+    f_tonband: { hall: "kommando", at: "funkstation", label: "Tonbandgerät", title: "Das Tonbandgerät", text: "Ein schweres Spulentonbandgerät. Daneben steht in Druckschrift: „EIGENES BAND – NICHT LÖSCHEN“.", use: ["band1", "band2", "band3", "band4"] },
     f_schublade: { hall: "kommando", at: "funkstation", label: "Schublade", title: "Die Schublade", text: "In der Schublade: Bleistifte, eine Dose Pfefferminz – und ein Schaltschlüssel mit Anhänger <b>NOTSTROM A</b>.", take: "notstromschluessel" },
     // Lagezentrum
     l_karte: { hall: "kommando", at: "lagezentrum", label: "Lagekarte", title: "Die Lagekarte", text: "Eine riesige Karte Mitteleuropas. Rote Nadeln im Norden, hastig gesteckt. Eine ist abgebrochen." },
@@ -281,6 +351,27 @@ window.SEKTOR9.data = (() => {
     l_tunnel: { hall: "kommando", at: "lagezentrum", label: "Wartungsgang zum Personalbereich", if: "tunnel_ab", go: { hall: "personal", station: "unterkuenfte", view: 0 } },
   };
   Object.assign(hotspots, {
+    // ---------- Forschungs-Halle · Labor ----------
+    c_ausgang: { hall: "forschung", at: "labor", label: "Zur Verteilerhalle", go: { hall: "verteiler", station: "mitte", view: 1 } },
+    c_uhr: { hall: "forschung", at: "labor", label: "ECHO-Uhr", title: "Die ECHO-Uhr", text: "Eine große Digitaluhr über dem Labor, rote Ziffern, Aufschrift <b>SYSTEMZEIT ECHO</b>. Sie läuft – seit fast vierzig Jahren. Darunter ein vergilbter Klebestreifen in Nowaks Schrift: <i>„Geht 7 Min. vor der Funkuhr. Absichtlich? – P.N.“</i>" },
+    c_plan: { hall: "forschung", at: "labor", label: "Versuchsplan", title: "Ein Klemmbrett", doc: "versuchsplan" },
+    c_tische: { hall: "forschung", at: "labor", label: "Labortische", title: "Die Labortische", text: "Oszilloskope, ein Kartenstanzer, Kabelbäume, sauber beschriftet. Auf einem Kärtchen: „Reaktionszeiten Kdt. – Lauf 06: 41 s · Lauf 07: 33 s · Lauf 08: —“." },
+    c_beob_tuer: { hall: "forschung", at: "labor", label: "Tür · Beobachtungsraum", unless: "beobachtung", title: "Die Beobachtungstür", text: "Eine Stahltür ohne Griff, daneben ein Kartenleser mit gelbem Rand: „BEOBACHTUNG – NUR VERSUCHSLEITUNG“.", use: "beobachtung" },
+    c_schleuse: { hall: "forschung", at: "labor", label: "Druckschleuse", unless: "schleuse", title: "Die Druckschleuse", text: "Eine runde Stahltür mit Bullauge, „DATENARCHIV – KLIMATISIERT“. Daneben vier große Tasten: SPÜLEN, ÖFFNEN, SIEGEL, DRUCK.", lock: "schleuse" },
+    st_labor: { hall: "forschung", at: ["beobachtung", "datenarchiv"], label: "Standpunkt: Labor", station: "labor" },
+    st_beobachtung: { hall: "forschung", at: ["labor", "datenarchiv"], label: "Standpunkt: Beobachtungsraum", station: "beobachtung", need: "beobachtung", locked: "Die Beobachtungstür ist verschlossen." },
+    st_datenarchiv: { hall: "forschung", at: ["labor", "beobachtung"], label: "Standpunkt: Datenarchiv", station: "datenarchiv", need: "schleuse", locked: "Die Druckschleuse ist zu." },
+    // ---------- Beobachtungsraum ----------
+    c_spiegel: { hall: "forschung", at: "beobachtung", label: "Spiegelglas", title: "Der Versuchsraum", text: "Hinter dem Glas ein heller, leerer Raum: ein Tisch, vier Stühle, ein rotes Telefon, an der Wand ein großer Bildschirm „LAGE“. Auf dem Tisch ein Schild: <b>VERSUCHSGRUPPE 09</b>. Vier Namenskärtchen – alle leer. Von drüben sieht man nur einen Spiegel." },
+    c_monitor: { hall: "forschung", at: "beobachtung", label: "Monitore", title: "Die Monitore", text: "Grünes Bild, Kamera C-2: das Labor, von oben. Am Rand des Bildes steht jemand und sieht zur Beobachtungstür. Darunter in Schrift: <b>VERSUCHSGRUPPE 09 · PERSONEN IM BILD: 1</b>. Du drehst dich um. Im Labor ist niemand." },
+    c_protokoll: { hall: "forschung", at: "beobachtung", label: "Beobachtungsprotokoll", title: "Das Beobachtungsprotokoll", doc: "beobachtung" },
+    c_asservat: { hall: "forschung", at: "beobachtung", label: "Asservatenkiste", title: "Eine Asservatenkiste", text: "Eine graue Kiste, versiegelt, das Siegel ist gebrochen. Aufschrift: „Beschlagnahmt 17.02.87 – Brandt, I. – nicht abspielen“. Darin: ein Tonband mit der Nummer 4.", take: "band4" },
+    c_schleusenkarte: { hall: "forschung", at: "beobachtung", label: "Schleusenkarte", title: "Die Schleusenkarte", doc: "schleusenkarte" },
+    // ---------- Datenarchiv ----------
+    c_baender: { hall: "forschung", at: "datenarchiv", label: "Bandschränke", title: "Die Bandschränke", text: "Magnetbänder, Reihe um Reihe, beschriftet nach Läufen: 01 … 08. Das Fach für Lauf 09 ist leer – aber frisch abgestaubt." },
+    c_verzeichnis: { hall: "forschung", at: "datenarchiv", label: "Verzeichnis", title: "Das Verzeichnis der Läufe", doc: "laeufe" },
+    c_terminal: { hall: "forschung", at: "datenarchiv", label: "Terminal · Protokollprüfung", unless: "k1", title: "Das Terminal", lock: "k1" },
+    c_terminal_ok: { hall: "forschung", at: "datenarchiv", label: "Terminal", if: "k1", title: "Das Terminal", text: "<span class=\"term\">EINTRAG 3 UNGÜLTIG · KORREKTUR ABGELEHNT · PROTOKOLL GILT.</span><br>Darunter blinkt eine neue Zeile: <span class=\"term\">SEKTOR D: ENTRIEGELT (MANUELL).</span>" },
     // ---------- Personal-Halle · Unterkünfte ----------
     b_ausgang: { hall: "personal", at: "unterkuenfte", label: "Zur Verteilerhalle", go: { hall: "verteiler", station: "mitte", view: 0 } },
     b_dienstplan: { hall: "personal", at: "unterkuenfte", label: "Dienstplan", title: "Der Dienstplan", doc: "dienstplan" },
@@ -312,6 +403,11 @@ window.SEKTOR9.data = (() => {
   Object.values(hotspots).forEach((h) => { if (h.lock && !h.unless) h.unless = h.lock; });
 
   const endings = {
+    abschnitt3: { kicker: "ABSCHNITT 3 · FORSCHUNG", title: "Fragt, wessen Stimme es ist.", html: `
+      <p>Der Befehl um 22:58 stand im Versuchsplan, bevor er im Befehlsbuch stand. Albers hat abgebrochen – ECHO hat das Gegenteil protokolliert.</p>
+      <p>Und das Funksignal, das dich hergeholt hat, war kein Hilferuf. Es war die Anwerbung für Lauf 09.</p>
+      <p class="term">SEKTOR D ENTRIEGELT. DAS WAR NICHT ICH.</p>
+      <p class="muted">Die Sicherheits-Halle (Sektor D) ist der nächste Abschnitt und wird gerade gebaut.</p>` },
     abschnitt2: { kicker: "ABSCHNITT 2 · PERSONAL", title: "Ich habe nichts freigegeben.", html: `
       <p>Albers hat um 22:51 den Abbruch befohlen – auf Brandts Band ist seine Stimme. Im Befehlsbuch steht für 22:58 das Gegenteil, unter seinem Namen.</p>
       <p>Und die Tür zur Forschung hat dich mit dem Namen einer Frau begrüßt, die den Bunker nie verlassen hat.</p>

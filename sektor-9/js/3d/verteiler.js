@@ -41,14 +41,16 @@ defineRoom("verteiler", (ctx) => {
     parts: () => [{ obj: wh, name: "handrad", tap: () => { turn = Math.min(NEED, turn + Math.PI); snd("creak"); done(); }, drag: (dx, dy, pt) => { turn = Math.max(0, Math.min(NEED, turn - tw.delta(pt))); if (Math.random() < 0.08) snd("creak"); done(); }, release: () => tw.reset() }] };
   hs(["v_tuer_a_offen", "v_tuer_a"], doors.a.g, { focus: wheelSpec, aimLocal: [0, 1.2, 0.3] });
   hs(["v_tuer_b_offen", "v_tuer_b"], doors.b.g, { aimLocal: [0, 1.2, 0.3] });
-  hs("v_tuer_c", doors.c.g, { aimLocal: [0, 1.2, 0.3] });
-  hs("v_tuer_d", doors.d.g, { aimLocal: [0, 1.2, 0.3] });
-  let aOpen = false, bOpen = false;
-  state(() => { aOpen = eng().isSolved("handrad"); bOpen = eng().has("tuer_b"); doors.a.top.material.color.setHex(aOpen ? 0x8fd19e : 0xd0473a); doors.b.top.material.color.setHex(bOpen ? 0x8fd19e : 0xd0473a); if (doors.b.led) doors.b.led.material.color.setHex(bOpen ? 0x8fd19e : 0xd0473a); aLight.intensity = aOpen ? 3 : 0; });
+  hs(["v_tuer_c_offen", "v_tuer_c"], doors.c.g, { aimLocal: [0, 1.2, 0.3] });
+  hs(["v_tuer_d_offen", "v_tuer_d"], doors.d.g, { aimLocal: [0, 1.2, 0.3] });
+  let aOpen = false, bOpen = false, cOpen = false, dOpen = false;
+  state(() => { aOpen = eng().isSolved("handrad"); bOpen = eng().has("tuer_b"); cOpen = eng().has("tuer_c"); dOpen = eng().has("tuer_d"); doors.c.top.material.color.setHex(cOpen ? 0x8fd19e : 0xd0473a); doors.d.top.material.color.setHex(dOpen ? 0x8fd19e : 0xd0473a); doors.a.top.material.color.setHex(aOpen ? 0x8fd19e : 0xd0473a); doors.b.top.material.color.setHex(bOpen ? 0x8fd19e : 0xd0473a); if (doors.b.led) doors.b.led.material.color.setHex(bOpen ? 0x8fd19e : 0xd0473a); aLight.intensity = aOpen ? 3 : 0; });
   anim((dt) => {
     wh.rotation.z = fired || aOpen ? wh.rotation.z + (aOpen ? 0 : dt * 2) : turn; // gegen den Uhrzeigersinn = positive Drehung um +z
     doors.a.pivot.rotation.y = lerp(doors.a.pivot.rotation.y, aOpen ? -1.45 : 0, Math.min(1, dt * 1.2));
     doors.b.pivot.rotation.y = lerp(doors.b.pivot.rotation.y, bOpen ? -1.45 : 0, Math.min(1, dt * 1.2));
+    doors.c.pivot.rotation.y = lerp(doors.c.pivot.rotation.y, cOpen ? -1.45 : 0, Math.min(1, dt * 1.2));
+    doors.d.pivot.rotation.y = lerp(doors.d.pivot.rotation.y, dOpen ? -0.35 : 0, Math.min(1, dt * 0.6)); // Süd: nur einen Spalt
   });
 
   // ECHO-Terminal in der Mitte (Blick nach Norden)

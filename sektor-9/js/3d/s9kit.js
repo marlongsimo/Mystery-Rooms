@@ -150,7 +150,7 @@ export const lines = (g, W, H, n = 12, x0 = 16, y0 = 30) => { g.fillStyle = "#2a
  * Tastenfeld mit Anzeige: zwölf Tasten, nach `len` Ziffern prüft die Engine (tryLock). Rückgabe: { g, parts(), value(), reset() }.
  * enabled(): ohne Strom bleibt die Anzeige dunkel.
  */
-export function keypad(ctx, M, { pid, len = 4, enabled = () => true, size = 1 }) {
+export function keypad(ctx, M, { pid, len = 4, enabled = () => true, size = 1, prefix = null }) { // prefix(): z. B. markierter Eintrag, wird vor die Ziffern gesetzt
   const g = new THREE.Group(); const snd = ctx.sound;
   g.add(box(0.15 * size, 0.22 * size, 0.03, M.paintGrey, 0, 0, -0.012));
   const dC = document.createElement("canvas"); dC.width = 128; dC.height = 40; const dT = new THREE.CanvasTexture(dC); dT.colorSpace = THREE.SRGBColorSpace;
@@ -162,7 +162,7 @@ export function keypad(ctx, M, { pid, len = 4, enabled = () => true, size = 1 })
   let entry = ""; const press = {};
   const tap = (b) => { const k = b.userData.k; press[k] = 0; snd("key"); if (!enabled()) { draw(""); return; } if (!/\d/.test(k)) { entry = ""; draw(blank); return; }
     entry += k; draw(entry.padEnd(len, "–").split("").join(" "));
-    if (entry.length === len) { const v = entry; entry = ""; setTimeout(() => { const r = ctx.engine().tryLock(pid, v); if (r.ok) draw("OFFEN"); else { draw("FEHLER", "#d0473a"); setTimeout(() => draw(blank), 900); } }, 250); } };
+    if (entry.length === len) { const v = entry; entry = ""; setTimeout(() => { const r = ctx.engine().tryLock(pid, (prefix ? prefix() : "") + v); if (r.ok) draw("OFFEN"); else { draw("FEHLER", "#d0473a"); setTimeout(() => draw(blank), 900); } }, 250); } };
   ctx.anim((dt) => { keys.forEach((b) => { const t = press[b.userData.k]; if (t === undefined) return; press[b.userData.k] = t + dt; b.position.z = t < 0.15 ? 0.001 : 0.006; if (t > 0.2) delete press[b.userData.k]; }); });
   return { g, parts: () => keys.map((b) => ({ obj: b, name: "taste" + b.userData.k, tap: () => tap(b) })), value: () => entry, reset: () => { entry = ""; draw(blank); } };
 }

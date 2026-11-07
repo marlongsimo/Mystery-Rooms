@@ -63,7 +63,7 @@ defineRoom("kommando", (ctx) => {
   const fclock = group(cyl(0.26, 0.26, 0.06, M.black, 0, 0, 0, 36).rotateX(Math.PI / 2), plane(0.48, 0.48, new THREE.MeshLambertMaterial({ map: clockTex, transparent: true }), 0, 0, 0.032));
   fclock.position.set(-4.12, GY + 1.85, -4.0); fclock.rotation.y = Math.PI / 2; add(hs("f_funkuhr", fclock));
   // Licht in der Funkstation: Schreibtischlampe, grünes Leuchten der Geräte
-  const dl = cageLamp(M, 0xffd090, 2.2, 5); dl.g.position.set(-1.4, GY + 2.6, -4.4); add(dl.g);
+  const dl = cageLamp(M, 0xffd090, 4.2, 6); const dl2 = cageLamp(M, 0xffd090, 2.6, 5); dl2.g.position.set(2.6, GY + 2.6, -3.8); add(dl2.g); dl.g.position.set(-1.4, GY + 2.6, -4.4); add(dl.g);
   const rackGlow = new THREE.PointLight(0x8fd19e, 0.8, 4, 2); rackGlow.position.set(0, GY + 1.4, -4.9); add(rackGlow);
 
   /* ===== Treppe (Ostseite) mit Gittertür ===== */

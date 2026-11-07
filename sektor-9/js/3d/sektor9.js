@@ -29,10 +29,10 @@ defineRoom("sektor9", (ctx) => {
   const coreL = new THREE.PointLight(0xff3b2a, 3, 6, 2); coreL.position.set(0, 1.6, 0); core.add(coreL);
   add(hs("n_kern", group(core, box(3.2, 2.6, 3.2, ZONE, 0, 1.3, 0)), { aimLocal: [0, 1.5, 1.2] }));
   // Entscheidungspult (zwischen Spieler und Maschine, Front nach Süden)
-  const pult = new THREE.Group(); pult.position.set(0, 0, 2.15); add(pult);
+  const pult = new THREE.Group(); pult.position.set(0, 0, 1.75); add(pult);
   pult.add(box(2.2, 0.95, 0.6, M.paintGrey, 0, 0.475, 0));
   const top = box(2.2, 0.05, 0.55, M.paint, 0, 1.0, 0.05); top.rotation.x = -0.35; pult.add(top);
-  const mkBtn = (x, col, text, id) => { const b = group(cyl(0.12, 0.12, 0.06, new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 0.25, roughness: 0.4 }), 0, 0, 0, 24), plane(0.5, 0.09, label(text, 512, 92, "#e8e2cc", "#1a1d1a", 44), 0, -0.2, 0.0), box(0.5, 0.45, 0.2, ZONE, 0, -0.05, 0));
+  const mkBtn = (x, col, text, id) => { const b = group(cyl(0.075, 0.075, 0.05, new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 0.25, roughness: 0.4 }), 0, 0, 0, 24), plane(0.46, 0.08, label(text, 512, 92, "#e8e2cc", "#1a1d1a", 44), 0, 0.14, 0.0), box(0.5, 0.4, 0.2, ZONE, 0, 0.04, 0)); // Beschriftung über der Taste
     b.children[0].rotation.x = Math.PI / 2; b.children[1].position.z = 0.002; b.position.set(x, 1.05, 0.34); b.rotation.x = -0.35; pult.add(b); hs(id, b); return b; }; // Taste bleibt am Pult
   const bA = mkBtn(-0.7, 0x6b7a70, "ABSCHALTEN", "n_a"), bB = mkBtn(0, 0xc9a030, "SENDEN", "n_b"), bC = mkBtn(0.7, 0xd0473a, "FORTSETZEN", "n_c");
   // Ostrowskis Schreibtisch (Ost)

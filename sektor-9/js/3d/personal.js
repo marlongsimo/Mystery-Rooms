@@ -64,7 +64,8 @@ defineRoom("personal", (ctx) => {
   hatchF.add(tunB);
   const tunL = new THREE.PointLight(0xffc98a, 0, 3, 2); tunL.position.set(0, 0.4, -1.2); hatchF.add(tunL);
   const vSpec = keyTurn(ctx, { key: vkey, item: "vierkant", hotspot: "b_klappe", when: () => !eng().has("tunnel_ab"), cam: [0.4, 0.55, 0.75], center: [0.5, 0.4, 0], fov: 44, hint: "Vierkant im Uhrzeigersinn drehen (oder antippen)" });
-  add(hs(["b_tunnel", "b_klappe"], group(hatchF, box(1.0, 1.0, 0.3, ZONE, -2.4, 0.55, -4.85)), { focus: { ...vSpec, cam: [-2.0, 0.75, -4.1], center: [-1.72, 0.55, -4.93] } }));
+  add(hs(["b_tunnel", "b_klappe"], group(hatchF, box(1.0, 1.0, 0.3, ZONE, -2.4, 0.55, -4.85)), { focus: { ...vSpec, cam: [-2.25, 0.95, -3.85], center: [-2.3, 0.55, -4.95] } }));
+  const hl = cageLamp(M, 0xffc890, 1.8, 3.5); hl.g.position.set(-2.4, 1.55, -4.75); add(hl.g); // Lampe über der Wartungsklappe
   let tOpen = false; state(() => { tOpen = eng().has("tunnel_ab"); tunL.intensity = tOpen ? 1.4 : 0; });
   anim((dt) => { hPivot.rotation.y = lerp(hPivot.rotation.y, tOpen ? -1.6 : 0, Math.min(1, dt * 2)); });
   // Dienstplan an der Südwand

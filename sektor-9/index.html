@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d0c">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="SEKTOR 9 – Das letzte Protokoll. Ein Mystery-Escape-Room in 3D im Browser (in Entwicklung).">
+  <title>SEKTOR 9 – Das letzte Protokoll</title>
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <!-- ========== TITEL ========== -->
+  <section id="title" class="title-screen">
+    <div class="title-copy">
+      <p class="eyebrow">ANLAGE KESSELBERG · VERSIEGELT SEIT 1987</p>
+      <h1>SEKTOR <span>9</span></h1>
+      <p class="subtitle">Das letzte Protokoll</p>
+      <p class="lead">Ein Funksignal aus einem Bunker, der seit fast vierzig Jahren schweigt. Eine Frauenstimme warnt davor, Sektor 9 zu öffnen. Du gehst trotzdem hinein.</p>
+      <div class="title-actions">
+        <button class="btn big" id="startBtn">Einsatz beginnen</button>
+        <button class="btn ghost hidden" id="newBtn">Neu beginnen</button>
+      </div>
+      <p class="muted small">Vorschau · Abschnitt 1 von 5 (Verteilerhalle und Kommandobereich) · allein spielbar · 3D, ziehen zum Umsehen, tippen zum Untersuchen</p>
+      <p class="muted small"><a href="../index.html">← Mystery Rooms</a></p>
+    </div>
+  </section>
+
+  <!-- ========== SPIEL ========== -->
+  <section id="game" class="game hidden">
+    <header class="topbar">
+      <div class="brand">SEKTOR <b>9</b></div>
+      <div class="top-meta"><span class="live-dot" aria-hidden="true"></span><span id="clock">00:00</span><span class="sep">·</span><span id="location">VERTEILERHALLE</span></div>
+      <div class="top-actions"><button class="icon-button" id="soundToggle" aria-label="Ton an oder aus" title="Ton">♪</button></div>
+    </header>
+    <div class="layout">
+      <div id="scene" class="scene">
+        <div id="stage" class="stage"></div>
+        <div class="view-bar"><button class="turn" id="turnLeft" aria-label="Nach links drehen">‹</button><span id="viewName"></span><button class="turn" id="turnRight" aria-label="Nach rechts drehen">›</button></div>
+        <div id="narration" class="narration" aria-live="polite"></div>
+        <div id="echoToast" class="echo-toast" aria-live="polite"></div>
+      </div>
+      <aside class="side">
+        <h2 class="side-h">AUSRÜSTUNG</h2>
+        <div id="inventory" class="inventory"></div>
+        <p id="invHint" class="inv-hint"></p>
+        <div class="side-buttons">
+          <button class="side-btn" id="mapBtn"><span aria-hidden="true">⌖</span>Karte</button>
+          <button class="side-btn" id="archiveBtn"><span aria-hidden="true">▤</span>Archiv <b id="archiveCount">0</b></button>
+          <button class="side-btn echo-btn" id="echoBtn"><span aria-hidden="true">◉</span>ECHO</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ========== FENSTER ========== -->
+  <dialog id="dialog" class="dialog">
+    <p id="dlgKicker" class="eyebrow"></p>
+    <h2 id="dlgTitle"></h2>
+    <div id="dlgBody"></div>
+    <button class="btn" id="closeDialog">Schließen</button>
+  </dialog>
+  <div class="overlay" id="mapOv"><div class="ov-panel"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">BUNKERKARTE</h2><div class="ov-body"></div></div></div>
+  <div class="overlay" id="archiveOv"><div class="ov-panel wide"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">ARCHIV</h2><div class="ov-body"></div></div></div>
+  <div class="overlay" id="echoOv"><div class="ov-panel term"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">ECHO</h2><div class="ov-body"></div></div></div>
+  <div class="overlay" id="endOv"><div class="ov-panel"><div class="ov-body"></div></div></div>
+
+  <script src="js/data.js?v=1"></script>
+  <script src="js/audio.js?v=1"></script>
+  <script src="js/engine.js?v=1"></script>
+  <script type="importmap">{ "imports": { "three": "../platform/vendor/three-0.170.0/three.module.min.js" } }</script>
+  <script type="module" src="js/3d/verteiler.js?v=1"></script>
+  <script type="module" src="js/3d/kommando.js?v=1"></script>
+</body>
+</html>

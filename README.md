@@ -44,7 +44,7 @@ Jedes Spiel hat ein eigenes Spielprinzip.
 | Hotel Nocturne | vorhanden | ja (31.10.2026) |
 | Der letzte Fall | vorhanden | ja, Version 1 und Version 2 |
 | DEADLINE.exe | vorhanden | ja (01.11.2026: zwei Spieler, alle Siegel, gemeinsamer Entwurf, Ende) |
-| SEKTOR 9 | **fehlt noch** (`sektor-9`, Präfix z. B. `ECHO`) | Anbindung fertig; Test bisher nur bis „nicht verfügbar“ (Eintrag fehlt) |
+| SEKTOR 9 | vorhanden (`ECHO-XXXXXX`) | ja (07.11.2026: zwei Spieler – gemeinsamer Stand, Positionen, Team-Archiv, Funk, Neuladen, Verlassen) |
 
 ## Bewertungen
 

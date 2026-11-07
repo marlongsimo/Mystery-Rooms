@@ -2,7 +2,7 @@
 
 Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselketten und Enden: [`DREHBUCH.md`](DREHBUCH.md).
 
-**Stand:** Abschnitte 1–2 von 5 (Verteilerhalle, Kommando-Halle A, Personal-Halle B). Allein spielbar; gemeinsames Spielen ist angebunden, aber erst nach dem Eintrag in `game_catalog` freigeschaltet (siehe unten). Es folgen die Sektoren C und D, die Tonbänder 4–6 und die Enden.
+**Stand:** Abschnitte 1–2 von 5 (Verteilerhalle, Kommando-Halle A, Personal-Halle B). Allein oder gemeinsam mit bis zu vier Personen spielbar. Es folgen die Sektoren C und D, die Tonbänder 4–6 und die Enden.
 
 ## Aufbau
 
@@ -37,5 +37,5 @@ Anbindung `js/mp-adapter.js` an `platform/multiplayer` (nur vorhandene Funktione
 
 Pro Person bleiben Standpunkt, Hinweise, ECHO-Protokoll und **eigene Funde**. Ein Fund geht erst mit „Mit dem Team teilen“ ins Team-Archiv.
 
-**Freischalten:** Im Supabase-Dashboard einen Eintrag in `game_catalog` anlegen (`slug` = `sektor-9`, Titel, Code-Präfix z. B. `ECHO`, `enabled = true`), dann in `js/mp-adapter.js` `ENABLED = true` setzen. Bis dahin erscheint die Lobby nur mit `?mp=1` in der Adresse.
+`game_catalog` enthält `sektor-9` (Codes `ECHO-XXXXXX`). Getestet am 07.11.2026 mit zwei Browserprofilen über die echte Datenbank: 24 von 24 Prüfungen (Lobby, Bereitschaft, Start, gemeinsamer Stand, Meldung, Positionen, Team-Archiv, Funk in beide Richtungen, Neuladen, Verlassen, Einzelspieler-Stand unberührt).
 Test: `node sektor-9/tests/mehrspieler.test.js` (zwei Browserprofile gegen die echte Datenbank).

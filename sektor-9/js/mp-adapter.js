@@ -16,7 +16,7 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const GAME = "sektor-9", MAX = 4;
   // Freigabe: erst wenn „sektor-9“ in der Supabase-Tabelle game_catalog steht (Dashboard). Bis dahin nur mit ?mp=1 sichtbar (Tests).
-  const ENABLED = false;
+  const ENABLED = true; // game_catalog-Eintrag „sektor-9“ (Präfix ECHO) ist angelegt
   if (!ENABLED && !/[?&]mp=1\b/.test(location.search)) { root.remove(); return; }
   const COLORS = ["#e0b45a", "#6fb7e0", "#e07a6a", "#b48ee0", "#8fd19e"];
   if (!window.MRMultiplayer || !window.MRLobby) { root.innerHTML = `<p class="mp-entry-copy">Gemeinsames Spielen ist gerade nicht verfügbar. Allein geht es jederzeit.</p>`; return; }

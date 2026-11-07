@@ -45,14 +45,14 @@ defineRoom("personal", (ctx) => {
   // Feldbetten (Doppelstock) an der Nordwand
   const beds = new THREE.Group();
   const blanket = std(0x4a5a3c, { roughness: 0.95 }), sheetM = std(0xd8d4c4, { roughness: 0.95 });
-  for (let i = 0; i < 6; i++) {
-    const bx = -8.0 + i * 0.95, b = new THREE.Group(); b.position.set(bx, 0, -4.4);
+  for (let i = 0; i < 5; i++) {
+    const bx = -8.0 + i * 0.95, b = new THREE.Group(); b.position.set(bx, 0, -4.0); // Kopfende an der Nordwand
     [[-0.42, -0.45], [0.42, -0.45], [-0.42, 0.45], [0.42, 0.45]].forEach(([x, z]) => b.add(cyl(0.025, 0.025, 1.7, M.steelDark, z, 0.85, x, 8)));
     [0.4, 1.35].forEach((y) => { b.add(box(0.85, 0.06, 1.9, M.steelDark, 0, y, 0)); b.add(box(0.8, 0.14, 1.85, sheetM, 0, y + 0.1, 0)); b.add(box(0.82, 0.05, 1.3, blanket, 0, y + 0.19, 0.25)); b.add(box(0.5, 0.1, 0.3, sheetM, 0, y + 0.22, -0.75)); });
-    b.rotation.y = Math.PI / 2; beds.add(b);
+    beds.add(b);
   }
   const paper = sheet(0.4, 0.3, (g, w, h) => { g.fillStyle = "#222"; g.font = `600 22px serif`; g.fillText("16. FEBRUAR 1987", 14, 34); lines(g, w, h, 8, 14, 50); }, M, 0.3); paper.position.set(-6.1, 0.66, -4.2); beds.add(paper);
-  add(hs("b_betten", group(beds, box(5.8, 1.9, 1.0, ZONE, -5.6, 0.95, -4.4)), {}));
+  add(hs("b_betten", group(beds, box(4.7, 1.9, 1.9, ZONE, -6.1, 0.95, -4.0)), {})); // endet vor der Wartungsklappe
   // Wartungsklappe in der Nordwand (Vierkant)
   const hatchF = new THREE.Group(); hatchF.position.set(-2.4, 0.15, -4.98);
   hatchF.add(box(0.92, 0.08, 0.08, M.steelDark, 0, 0.84, 0), box(0.92, 0.08, 0.08, M.steelDark, 0, -0.04, 0), box(0.08, 0.92, 0.08, M.steelDark, -0.44, 0.4, 0), box(0.08, 0.92, 0.08, M.steelDark, 0.44, 0.4, 0));

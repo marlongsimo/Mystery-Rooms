@@ -98,7 +98,8 @@ export function stationMark(text, { sign = true, signY = 2.2 } = {}) {
   ring.rotation.x = -Math.PI / 2; ring.position.y = 0.02; g.add(ring);
   const disc = new THREE.Mesh(new THREE.CircleGeometry(0.32, 32), new THREE.MeshBasicMaterial({ color: 0x8fd19e, transparent: true, opacity: 0.12, toneMapped: false })); disc.rotation.x = -Math.PI / 2; disc.position.y = 0.019; g.add(disc);
   if (sign) { const s = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.18), new THREE.MeshBasicMaterial({ map: plaqueTex("▸ " + text, 512, 100, "#8fd19e", "#0b120d", `500 40px ${MONO}`, 4), toneMapped: false, transparent: true, opacity: 0.92 })); s.position.y = signY; s.userData.billboard = true; g.add(s); }
-  g.add(box(0.9, signY + 0.2, 0.9, new THREE.MeshBasicMaterial({ visible: false }), 0, (signY + 0.2) / 2, 0)); // Klickfläche
+  g.add(box(0.9, 0.5, 0.9, new THREE.MeshBasicMaterial({ visible: false }), 0, 0.25, 0)); // Klickfläche am Boden
+  if (sign) g.add(box(1.0, 0.3, 0.2, new THREE.MeshBasicMaterial({ visible: false }), 0, signY, 0)); // Klickfläche am Schild
   g.userData.ring = ring;
   return g;
 }

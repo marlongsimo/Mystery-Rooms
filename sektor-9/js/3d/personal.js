@@ -166,9 +166,10 @@ defineRoom("personal", (ctx) => {
   const exitL = new THREE.PointLight(0xffc98a, 1.2, 4, 2); exitL.position.set(-3, 2.2, 4.3); add(exitL);
 
   /* ===== Standpunkte ===== */
-  const mU = stationMark("UNTERKÜNFTE", { signY: 2.1 }); mU.position.set(-5, 0, 2.2); add(hs("st_unterkuenfte", mU));
-  const mA = stationMark("PERSONALARCHIV", { signY: 2.1 }); mA.position.set(1.0, 0, -1.4); add(hs("st_archiv", mA));
-  const mB = stationMark("OFFIZIERSBÜRO", { signY: 2.1 }); mB.position.set(6.8, 0, -1.6); add(hs("st_buero", mB));
+  // Schilder über Käfig und Glaswänden, damit sie von jedem Standpunkt aus frei anklickbar sind
+  const mU = stationMark("UNTERKÜNFTE", { signY: 2.9 }); mU.position.set(-5, 0, 2.2); add(hs("st_unterkuenfte", mU, { aimLocal: [0, 2.9, 0] }));
+  const mA = stationMark("PERSONALARCHIV", { signY: 2.9 }); mA.position.set(1.0, 0, -1.4); add(hs("st_archiv", mA, { aimLocal: [0, 2.9, 0] }));
+  const mB = stationMark("OFFIZIERSBÜRO", { signY: 2.9 }); mB.position.set(6.8, 0, -1.6); add(hs("st_buero", mB, { aimLocal: [0, 2.9, 0] }));
   const marks = { unterkuenfte: mU, archiv: mA, buero: mB };
   animateMarks(ctx, Object.values(marks));
   anim(() => { const here = eng().state().station; Object.entries(marks).forEach(([k, m]) => { m.visible = k !== here; }); });

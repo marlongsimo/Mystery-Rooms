@@ -196,9 +196,9 @@ defineRoom("kommando", (ctx) => {
   anim((dt) => { if (spin > 0) { spin -= dt; reels.forEach((r, i) => { r.rotation.y += dt * (i ? 5 : 3.5); }); } });
 
   /* ===== Standpunkte ===== */
-  const mL = stationMark("LEITSTAND", { signY: 2.3 }); mL.position.set(0, 0, 2.6); add(hs("st_leitstand", mL));
-  const mF = stationMark("FUNKSTATION", { signY: 1.9 }); mF.position.set(0, GY, -3.4); add(hs("st_funkstation", mF));
-  const mZ = stationMark("LAGEZENTRUM", { signY: 2.3 }); mZ.position.set(-5.2, 0, 0.4); add(hs("st_lagezentrum", mZ));
+  const mL = stationMark("LEITSTAND", { signY: 2.3 }); mL.position.set(0, 0, 2.6); add(hs("st_leitstand", mL, { aimLocal: [0, 2.3, 0] }));
+  const mF = stationMark("FUNKSTATION", { signY: 1.9 }); mF.position.set(0, GY, -3.4); add(hs("st_funkstation", mF, { aimLocal: [0, 1.9, 0] }));
+  const mZ = stationMark("LAGEZENTRUM", { signY: 2.3 }); mZ.position.set(-5.2, 0, 0.4); add(hs("st_lagezentrum", mZ, { aimLocal: [0, 2.3, 0] }));
   const marks = { leitstand: mL, funkstation: mF, lagezentrum: mZ };
   animateMarks(ctx, Object.values(marks));
   anim(() => { const here = eng().state().station; Object.entries(marks).forEach(([k, m]) => { m.visible = k !== here; }); });

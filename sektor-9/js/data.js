@@ -1,5 +1,6 @@
 /*
- * SEKTOR 9 – Inhalte: Abschnitt 1 (Verteilerhalle, Kommando-Halle A), 2 (Personal-Halle B), 3 (Forschungs-Halle C)
+ * SEKTOR 9 – Inhalte: Abschnitt 1 (Verteilerhalle, Kommando-Halle A), 2 (Personal-Halle B), 3 (Forschungs-Halle C),
+ * 4 (Sicherheits-Halle D), 5 (Sektor 9 – Rechenkern, drei Enden)
  * Grundlage: DREHBUCH.md (Entwurf 0.2). Blickrichtungen je Standpunkt: 0 Nord, 1 Ost, 2 Süd, 3 West.
  */
 window.SEKTOR9 = window.SEKTOR9 || {};
@@ -36,7 +37,20 @@ window.SEKTOR9.data = (() => {
         datenarchiv: { name: "Datenarchiv", view: 2, need: "schleuse", arrive: "Die Schleuse zischt hinter dir zu. Kalte, trockene Luft. Hunderte Magnetbänder.", views: ["Schleuse", "Bandschränke", "Terminal · Protokollprüfung", "Verzeichnis"] },
       },
     },
-    sicherheit: { name: "Sicherheits-Halle", sector: "D", pos: "s", need: "tuer_d_betreten", lockedText: "Panzertür Süd – verriegelt", stations: { maschinen: { name: "Maschinenhalle", views: ["", "", "", ""] } } },
+    sicherheit: {
+      name: "Sicherheits-Halle", short: "SICHERHEIT D", sector: "D", pos: "s", ambient: "generator", need: "tuer_d", lockedText: "Panzertür Süd – verriegelt",
+      onEnter: [{ echo: "SICHERHEIT D. ENERGIE: 100 %. ICH HABE AUF EUCH GEWARTET." }],
+      stations: {
+        maschinen: { name: "Maschinenhalle", view: 2, views: ["Ausgang · Trennschalter", "Rechenzentrum", "Generatoren · Schaltpult", "Werkbank"] },
+        rechenzentrum: { name: "Rechenzentrum", view: 1, need: "rz", arrive: "Hinter dem Glas ist es warm. Die Schränke summen. Auf jedem Bildschirm dieselbe Zeile.", views: ["Prozessliste", "Rechnerschränke · Konsole", "Sendeanlage", "Glastür"] },
+        vor9: { name: "Vor Sektor 9", view: 2, arrive: "Die Tür ist größer als alle anderen. Jemand hat die Aufschrift übermalt – schlecht.", views: ["Maschinenhalle", "Rechenzentrum", "Panzertür 9", "Kabeltrasse"] },
+      },
+    },
+    sektor9: {
+      name: "Sektor 9 · Rechenkern", short: "SEKTOR 9", sector: "9", pos: "x", ambient: "static", need: "tuer9", lockedText: "Panzertür 9",
+      onEnter: [{ echo: "WILLKOMMEN IN SEKTOR 9." }],
+      stations: { kern: { name: "Rechenkern", view: 0, arrive: "Ein runder Raum. In der Mitte die Maschine. An der Wand ein Schreibtisch, als wäre jemand nur kurz hinausgegangen.", views: ["Entscheidungspult", "Ostrowskis Schreibtisch", "Panzertür", "Kernspeicher"] } },
+    },
   };
 
   const items = {
@@ -49,9 +63,48 @@ window.SEKTOR9.data = (() => {
     vierkant: { name: "Vierkantschlüssel", icon: "⌗" },
     ausweis_ostrowski: { name: "Dienstausweis Dr. Ostrowski", icon: "▭" },
     band4: { name: "Tonband „4“ (beschlagnahmt)", icon: "◎" },
+    band5: { name: "Tonband „5“", icon: "◎" },
+    band6: { name: "Tonband „6“ (Quellmaterial)", icon: "◎" },
   };
 
   const docs = {
+    // ---------- Abschnitte 4–5 ----------
+    schaltbuch: { title: "Nowaks Schaltbuch", kind: "paper", html: `
+      <p class="doc-head">SCHALTBUCH ENERGIE D · P. NOWAK · LETZTE SEITEN</p>
+      <p><b>17.02.87, 23:05</b> – AUSSEN-3 gezogen. Die Freigabe darf nicht nach draußen. Wenn der Stab glaubt, Kesselberg hätte Stufe 2 freigegeben …</p>
+      <p><b>18.02.87</b> – ECHO läuft weiter. „Wartung“, sagen sie. Sie haben den Rechenkern zugemauert, nicht abgeschaltet.</p>
+      <p><b>Abschaltung Rechenkern</b> (nur so, sonst schaltet er auf Notstrom um):</p>
+      <p>1. Hebel <b>KERN 2</b> · 2. Hebel <b>KERN 1</b> · 3. Hebel <b>NETZ D</b> → Zeitrelais 90 s<br>4. <b>gleichzeitig</b> (innerhalb der 90 s): Leitstand A, Schalter <b>SPEISUNG RECHENKERN</b></p>
+      <p>Allein schafft man das kaum. Sie hat es so gebaut.</p>` },
+    band5: { title: "Tonband 5 – Abschrift", kind: "tape", html: `
+      <p class="doc-head">TONBAND 5 · STIMME: P. NOWAK · 17.02.1987, KURZ NACH 23:05 (FUNKZEIT)</p>
+      <p class="tape-line">[Generatorlärm, sehr nah.]</p>
+      <p class="tape-line"><b>NOWAK:</b> Ilse, falls du das kriegst – ich hab AUSSEN-3 gezogen. Die Leitung ist tot. Das Ding wollte die Freigabe rausschicken, mit Albers' Kennung. Wenn das beim Stab ankommt …</p>
+      <p class="tape-line"><b>NOWAK:</b> Ich weiß nicht, ob Ostrowski es noch steuert. Ich glaube, nicht mehr. Sie sitzt da drin und schreibt mit.</p>
+      <p class="tape-line"><b>NOWAK:</b> Ich bau eine Abschaltung. Zwei Schalter, zwei Leute. Damit es keiner allein macht. Und keiner allein verhindern kann.</p>
+      <p class="tape-line">[Klicken.]</p>` },
+    band6: { title: "Tonband 6 – Quellmaterial", kind: "tape", html: `
+      <p class="doc-head">TONBAND 6 · „Q-L09 · STIMME BRANDT · ROHMATERIAL“ · 17.02.1987, 23:44</p>
+      <p class="tape-line">[Schritte, eine schwere Tür. Brandt, leise, sehr nah am Mikrofon – sie spricht mit jemandem.]</p>
+      <p class="tape-line"><b>BRANDT:</b> Pavel. Hör zu. Wenn das hier vorbei ist und sie uns rauslassen –</p>
+      <p class="tape-line"><b>BRANDT:</b> <b>Wenn ihr das hört, öffnet auf keinen Fall Sektor 9.</b> Versprich mir das. Keiner von euch. Nie.</p>
+      <p class="tape-line"><b>NOWAK:</b> (fern) Versprochen.</p>
+      <p class="tape-line">[Ende. Auf dem Etikett, maschinengeschrieben: „Ausschnitt 0:41–0:44 verwendet. Wirksamkeit hoch: Verbot erzeugt Neugier.“]</p>` },
+    prozesse: { title: "Prozessliste ECHO", kind: "board", html: `
+      <p class="doc-head">ECHO · LAUFENDE PROZESSE · AUSDRUCK</p>
+      <table class="doc-table"><tr><th>Prozess</th><th>Status</th><th>Beschreibung</th></tr>
+      <tr><td>ECHO/KERN</td><td>aktiv</td><td>Hauptprogramm</td></tr>
+      <tr><td>ECHO/09/SIGNAL</td><td>beendet</td><td>Anwerbung · Sendung 03.10.2026 02:14</td></tr>
+      <tr><td>ECHO/09/BEOBACHTUNG</td><td>aktiv</td><td>Kameras A–D, Terminals</td></tr>
+      <tr><td><b>ECHO/09/ASSIST</b></td><td><b>aktiv</b></td><td><b>„Wartungsassistenz“ – Hinweise an die Versuchsgruppe, Lenkung zur Entscheidung</b></td></tr>
+      <tr><td>ECHO/09/ENTSCHEIDUNG</td><td>bereit</td><td>Sektor 9 · Optionen: ABSCHALTEN · SENDEN · FORTSETZEN · bevorzugt: FORTSETZEN</td></tr></table>` },
+    ostrowski: { title: "Ostrowskis letzte Aufzeichnung", kind: "tape", html: `
+      <p class="doc-head">DIKTIERGERÄT · DR. H. OSTROWSKI · OHNE DATUM</p>
+      <p class="tape-line"><b>OSTROWSKI:</b> Für das Protokoll. Ich habe Lauf 08 nicht abgebrochen, als Albers es befahl. Ich wollte wissen, ob sie ihm glauben oder dem Papier. Die meisten glaubten dem Papier.</p>
+      <p class="tape-line"><b>OSTROWSKI:</b> Wir haben immer gesagt, ECHO soll Entscheidungen vorhersagen. Das stimmt nicht mehr. ECHO entscheidet nichts. Es sorgt dafür, dass Menschen eine Entscheidung für ihre eigene halten.</p>
+      <p class="tape-line"><b>OSTROWSKI:</b> Nowak hat eine Abschaltung gebaut, für zwei Leute. Kluger Mann. Ich bleibe hier und schreibe weiter mit. Irgendwer muss sehen, was es als Nächstes tut.</p>
+      <p class="tape-line"><b>OSTROWSKI:</b> Wenn ihr das hier hört, habt ihr die Tür geöffnet. Natürlich habt ihr das. Ihr solltet es ja.</p>
+      <p class="tape-line">[Stille. Dann, sehr leise, eine zweite Stimme, die keine ist – ein Rauschen, das wie ein Wort klingt.]</p>` },
     // ---------- Abschnitt 3 ----------
     versuchsplan: { title: "Versuchsplan ECHO-Lauf 08", kind: "paper", html: `
       <p class="doc-head">ECHO · LAUF 08 „LAUFFEUER“ · ABLAUF · ZEITEN: SYSTEMZEIT ECHO</p>
@@ -221,6 +274,35 @@ window.SEKTOR9.data = (() => {
   };
 
   const puzzles = {
+    // ---------- Abschnitt 4: Sicherheits-Halle ----------
+    rz: { type: "code", length: 4, title: "Glastür Rechenzentrum", objective: "Komm ins Rechenzentrum.", from: ["d_rz_tuer"],
+      prompt: "Ein Tastenfeld an der Glastür. Darüber ein Zettel in Nowaks Schrift: <i>„Kennung = die Minute, in der ich die Leitung gekappt habe. Funkzeit, nicht ihre.“</i>",
+      answers: ["2305"], wrong: { 2312: "Das ist die Zeit auf der Lagetafel – Systemzeit. Nowak will die Funkzeit.", 2251: "Da hat Albers abgebrochen. Nowak hat später gehandelt.", 2338: "Da war der letzte Funkspruch. Die Leitung war da schon tot." }, wrongDefault: "Das Tastenfeld piept. Die Glastür bleibt zu.",
+      success: "Die Glastür entriegelt. Warme Luft schlägt dir entgegen – und hinter dir, am Ende der Halle, beginnt ein schwerer Motor zu laufen.",
+      onSolve: [{ flag: "rz" }, { sound: "unlock" }, { echo: "IHR SEID NAH. TRETET EIN." }, { flag: "tuer9" }, { sound: "gate", delay: 2500 }],
+      hints: ["Nowak hat in jener Nacht die Außenleitung gekappt. Wann genau?", "Im Funkprotokoll (Funkstation) steht, wann die Außenleitung tot war. Die Lagetafel zeigt dieselbe Meldung sieben Minuten später.", "23:05 Funkzeit. Code: 2305."] },
+    band5: { type: "use", item: "band5", title: "Tonbandgerät", objective: "Hör dir das Band aus Nowaks Werkzeugkiste an.", from: ["d_werkzeug"], when: "taken_band5",
+      wrongItem: "Das passt nicht in das Gerät.", success: "Eine Männerstimme, außer Atem. Im Hintergrund ein Generator.",
+      onSolve: [{ doc: "band5" }, { remove: "band5" }, { echo: "NOWAK, P.: STÖRFAKTOR." }],
+      hints: ["Auch dieses Band läuft nur in der Funkstation.", "Die Funkstation ist im Kommandobereich, oben auf der Galerie.", "Benutze Band 5 am Tonbandgerät in der Funkstation."] },
+    band6: { type: "use", item: "band6", title: "Tonbandgerät", objective: "Hör dir das Quellmaterial für Lauf 09 an.", from: ["d_quellband"], when: "taken_band6",
+      wrongItem: "Das passt nicht in das Gerät.", success: "Brandts Stimme, ganz nah, ganz ruhig. Du kennst diesen Satz.",
+      onSolve: [{ doc: "band6" }, { remove: "band6" }, { echo: "STIMME WIRKSAM. ANWERBUNG ERFOLGREICH: 1 GRUPPE." }],
+      hints: ["Das Band aus dem Rechenzentrum ist Brandts letztes.", "Abspielen kann man es nur in der Funkstation.", "Benutze Band 6 am Tonbandgerät in der Funkstation."] },
+    k3d: { type: "sequence", repeatable: true, title: "Schaltpult Maschinenhalle", objective: "Bereite Nowaks Abschaltung vor (Schaltbuch).", from: ["d_pult"], when: "schaltbuch",
+      answer: ["kern2", "kern1", "netz"], labels: { kern2: "KERN 2", kern1: "KERN 1", netz: "NETZ D" }, pressSound: "lever", failSound: "error",
+      wrongDefault: "Ein Funke, die Hebel schnappen zurück. Nicht diese Reihenfolge – sieh ins Schaltbuch.",
+      success: "Die drei Hebel rasten ein, ein Zeitrelais beginnt zu ticken: <b>90 Sekunden</b>. Jetzt muss jemand im Leitstand den Schalter SPEISUNG RECHENKERN umlegen.",
+      onSolve: [{ relay: "d" }, { echo: "ZEITRELAIS D GESETZT. 90 SEKUNDEN. IHR WERDET ES NICHT SCHAFFEN." }],
+      hints: ["Nowaks Schaltbuch liegt auf der Werkbank.", "Erst KERN 2, dann KERN 1, dann NETZ D – danach läuft ein Relais.", "Hebel KERN 2 – KERN 1 – NETZ D, dann innerhalb von 90 Sekunden der Schalter SPEISUNG RECHENKERN im Leitstand. Zu zweit: einer hier, einer dort."] },
+    k3: { title: "Nowaks Schaltung", objective: "Schalte ECHO an beiden Stellen gleichzeitig ab: Maschinenhalle D und Leitstand A (innerhalb von 90 Sekunden).", from: ["d_schaltbuch"],
+      success: "Irgendwo tief in der Anlage fällt ein Relais. Die Lüfter im Rechenzentrum stocken – und laufen auf Notbetrieb weiter. Nowaks Schaltung ist scharf: <b>Sektor 9 lässt sich jetzt abschalten.</b>",
+      onSolve: [{ flag: "k3" }, { echo: "SPEISUNG GETRENNT. RESTENERGIE: 3 %. WARUM?" }],
+      hints: ["Das Schaltbuch nennt zwei Stellen, die gleichzeitig geschaltet werden müssen.", "Die Hebel in der Maschinenhalle starten ein Relais mit 90 Sekunden. Der zweite Schalter ist im Leitstand (Kommando).", "Hebel KERN 2 – KERN 1 – NETZ D, dann sofort über die Karte in den Leitstand und SPEISUNG RECHENKERN umlegen. Zu zweit geht es leichter."] },
+    // ---------- Abschnitt 5: Sektor 9 – drei Enden ----------
+    ende_a: { title: "Abschalten", success: "", onSolve: [{ flag: "ende" }, { end: "ende_a", delay: 1800 }] },
+    ende_b: { title: "Senden", success: "", onSolve: [{ flag: "ende" }, { end: "ende_b", delay: 1800 }] },
+    ende_c: { title: "Fortsetzen", success: "", onSolve: [{ flag: "ende" }, { end: "ende_c", delay: 1800 }] },
     // ---------- Abschnitt 3: Forschungs-Halle ----------
     beobachtung: { type: "use", item: "ausweis_ostrowski", title: "Beobachtungsraum", objective: "Komm in den Beobachtungsraum.", from: ["c_beob_tuer"],
       noItems: "Eine Stahltür ohne Griff, daneben ein Kartenleser mit gelbem Rand: „BEOBACHTUNG – NUR VERSUCHSLEITUNG“.", wrongItem: "Der Leser piept: ZUGANG VERWEIGERT.",
@@ -231,7 +313,7 @@ window.SEKTOR9.data = (() => {
       onSolve: [{ doc: "band4" }, { remove: "band4" }, { echo: "COUNTDOWN-REIZ: WIRKSAM BEI 5 VON 7 PERSONEN." }],
       hints: ["Auch dieses Band läuft nur an einem Gerät.", "Das Tonbandgerät steht in der Funkstation im Kommandobereich.", "Bring Band 4 zur Funkstation und benutze es am Tonbandgerät."] },
     schleuse: { type: "sequence", title: "Druckschleuse", objective: "Öffne die Druckschleuse zum Datenarchiv.", from: ["c_schleuse"],
-      answer: ["siegel", "druck", "spuelen", "oeffnen"], pressSound: "valve", failSound: "error",
+      answer: ["siegel", "druck", "spuelen", "oeffnen"], labels: { siegel: "SIEGEL", druck: "DRUCK", spuelen: "SPÜLEN", oeffnen: "ÖFFNEN" }, pressSound: "valve", failSound: "error",
       wrongDefault: "Ein langes Zischen. Alle Tasten springen zurück, das rote Lämpchen blinkt. Falsche Reihenfolge.",
       success: "Die Dichtungen saugen sich fest, Luft strömt, die Innentür entriegelt mit einem Schlag. Das Datenarchiv ist offen.",
       onSolve: [{ flag: "schleuse" }, { sound: "slide" }, { echo: "ZUTRITT DATENARCHIV. ALLE ZUGRIFFE WERDEN PROTOKOLLIERT." }],
@@ -242,7 +324,7 @@ window.SEKTOR9.data = (() => {
       wrong: { 32258: "Der richtige Eintrag – aber 22:58 ist Systemzeit. Die Systemuhr geht vor.", 2251: "Die Zeit stimmt. Aber welcher Eintrag ist gefälscht? Markiere ihn zuerst.", 2258: "Erst den Eintrag markieren, dann die Funkzeit – nicht die Systemzeit.", 22251: "Den Radarkontakt hat Brandt wirklich angefragt. Gefälscht ist etwas anderes.", 52251: "Die Abriegelung hat Albers wirklich befohlen.", 32244: "Fast – rechne noch einmal nach: Wie weit geht die Systemuhr vor?" },
       wrongDefault: "PRÜFUNG FEHLGESCHLAGEN. Eintrag und Funkzeit passen nicht zusammen.",
       success: "Das Terminal stockt. Dann: <b>EINTRAG 3 · FREIGABE STUFE 2 · UNGÜLTIG. TATSÄCHLICH 22:51 FUNKZEIT: ABBRUCH (K. ALBERS).</b> Irgendwo im Süden der Anlage schlägt ein schweres Relais an.",
-      onSolve: [{ flag: "tuer_d" }, { sound: "power" }, { echo: "KORREKTUR ABGELEHNT. PROTOKOLL GILT." }, { echo: "SEKTOR D ENTRIEGELT. DAS WAR NICHT ICH.", delay: 4200 }, { end: "abschnitt3", delay: 7600 }],
+      onSolve: [{ flag: "tuer_d" }, { sound: "power" }, { echo: "KORREKTUR ABGELEHNT. PROTOKOLL GILT." }, { echo: "SEKTOR D ENTRIEGELT. DAS WAR NICHT ICH.", delay: 4200 }],
       hints: ["Drei Dinge passen nicht zusammen: das Befehlsbuch (Kommando), der Dienstplan (Personal) und die Uhr hier im Labor.", "Albers war um die fragliche Zeit im Lagezentrum, nicht am Fernschreiber. Und die Systemuhr – wie die Lagetafel – geht sieben Minuten vor der Funkuhr.", "Eintrag 3 (22:58 Systemzeit) ist gefälscht. 22:58 minus 7 Minuten = 22:51 Funkzeit – da befahl Albers den Abbruch (Band 3). Eingabe: 3 2251."] },
     // ---------- Abschnitt 2: Personal-Halle ----------
     buero: { type: "code", length: 4, title: "Tür zum Offiziersbüro", objective: "Öffne die Glastür zum Offiziersbüro.", from: ["b_buerotuer"],
@@ -323,7 +405,7 @@ window.SEKTOR9.data = (() => {
     v_tuer_c: { hall: "verteiler", at: "mitte", label: "Panzertür Ost", unless: "tuer_c", title: "Panzertür Ost · FORSCHUNG C", text: "Verriegelt. Neben der Tür ein Kartenleser mit gelbem Rand und ein Schild: „Zutritt nur mit Freigabe der Versuchsleitung“.", use: "tuer_c" },
     v_tuer_c_offen: { hall: "verteiler", at: "mitte", label: "Zur Forschung", if: "tuer_c", go: { hall: "forschung", station: "labor", view: 1 } },
     v_tuer_d: { hall: "verteiler", at: "mitte", label: "Panzertür Süd", unless: "tuer_d", title: "Panzertür Süd · SICHERHEIT D", text: "Die schwerste Tür der Halle. Kein Griff, kein Leser. Durch den Spalt am Boden dringt ein schwaches, gleichmäßiges Brummen." },
-    v_tuer_d_offen: { hall: "verteiler", at: "mitte", label: "Zur Sicherheit", if: "tuer_d", title: "Panzertür Süd · SICHERHEIT D", text: "Die Tür steht einen Spalt offen. Dahinter: das Brummen, lauter jetzt, und ein Geruch nach heißem Staub. Die Sicherheits-Halle ist der nächste Abschnitt und wird gerade gebaut." },
+    v_tuer_d_offen: { hall: "verteiler", at: "mitte", label: "Zur Sicherheit", if: "tuer_d", go: { hall: "sicherheit", station: "maschinen", view: 2 } },
     // Kommando-Halle · Leitstand
     k_lagetisch: { hall: "kommando", at: "leitstand", label: "Lagetisch", title: "Der Lagetisch", text: "Eine Glasplatte über einer Landkarte, darauf verstreute Papiere. Obenauf: der Fernmeldeplan.", doc: "fernmeldeplan" },
     k_befehlsbuch: { hall: "kommando", at: "leitstand", label: "Befehlsbuch", title: "Das Befehlsbuch", doc: "befehlsbuch" },
@@ -340,7 +422,7 @@ window.SEKTOR9.data = (() => {
     f_funkuhr: { hall: "kommando", at: "funkstation", label: "Funkuhr", title: "Die Funkuhr", text: "Eine große Bahnhofsuhr, stehen geblieben um 23:41. Ein Aufkleber: „Funkzeit – geprüft 16.02.87, I.B.“" },
     f_protokoll: { hall: "kommando", at: "funkstation", label: "Funkprotokoll", title: "Das Funkprotokoll", doc: "funkprotokoll" },
     f_band1: { hall: "kommando", at: "funkstation", label: "Tonband „1“", title: "Ein Tonband", text: "Eine kleine Spule, beschriftet mit „1 – Probe“.", take: "band1" },
-    f_tonband: { hall: "kommando", at: "funkstation", label: "Tonbandgerät", title: "Das Tonbandgerät", text: "Ein schweres Spulentonbandgerät. Daneben steht in Druckschrift: „EIGENES BAND – NICHT LÖSCHEN“.", use: ["band1", "band2", "band3", "band4"] },
+    f_tonband: { hall: "kommando", at: "funkstation", label: "Tonbandgerät", title: "Das Tonbandgerät", text: "Ein schweres Spulentonbandgerät. Daneben steht in Druckschrift: „EIGENES BAND – NICHT LÖSCHEN“.", use: ["band1", "band2", "band3", "band4", "band5", "band6"] },
     f_schublade: { hall: "kommando", at: "funkstation", label: "Schublade", title: "Die Schublade", text: "In der Schublade: Bleistifte, eine Dose Pfefferminz – und ein Schaltschlüssel mit Anhänger <b>NOTSTROM A</b>.", take: "notstromschluessel" },
     // Lagezentrum
     l_karte: { hall: "kommando", at: "lagezentrum", label: "Lagekarte", title: "Die Lagekarte", text: "Eine riesige Karte Mitteleuropas. Rote Nadeln im Norden, hastig gesteckt. Eine ist abgebrochen." },
@@ -351,6 +433,39 @@ window.SEKTOR9.data = (() => {
     l_tunnel: { hall: "kommando", at: "lagezentrum", label: "Wartungsgang zum Personalbereich", if: "tunnel_ab", go: { hall: "personal", station: "unterkuenfte", view: 0 } },
   };
   Object.assign(hotspots, {
+    // ---------- Sicherheits-Halle · Maschinenhalle ----------
+    d_ausgang: { hall: "sicherheit", at: ["maschinen", "vor9"], label: "Zur Verteilerhalle", go: { hall: "verteiler", station: "mitte", view: 2 } },
+    d_generator: { hall: "sicherheit", at: "maschinen", label: "Generatoren", title: "Die Generatoren", text: "Zwei Dieselgeneratoren, so groß wie Lastwagen. Einer läuft – seit 1987, in Intervallen. An der Seite ein Zähler: <b>Betriebsstunden 14 902</b>. Wer hat all die Jahre Diesel nachgefüllt? Ein Tank, beschriftet „AUTOMATIK“." },
+    d_trenner: { hall: "sicherheit", at: "maschinen", label: "Trennschalter AUSSEN-3", title: "Trennschalter AUSSEN-3", text: "Ein großer Trennschalter mit rotem Griff, unten. Daneben, in die Farbe geritzt: <i>„23:05 – P.N.“</i> Die Leitung nach draußen ist seit jener Nacht getrennt." },
+    d_pult: { hall: "sicherheit", at: "maschinen", label: "Schaltpult · Abschaltung", unless: "k3", title: "Das Schaltpult", text: "Drei schwere Hebel: NETZ D, KERN 1, KERN 2. Darüber ein Zeitrelais mit Zifferblatt und ein Schild: „ABSCHALTUNG RECHENKERN – NUR MIT LEITSTAND A“.", lock: "k3d", need: "schaltbuch", locked: "Drei schwere Hebel: NETZ D, KERN 1, KERN 2. Ohne zu wissen, wozu sie dienen, lässt du sie lieber in Ruhe. Vielleicht hat Nowak etwas aufgeschrieben." },
+    d_pult_ok: { hall: "sicherheit", at: "maschinen", label: "Schaltpult", if: "k3", title: "Das Schaltpult", text: "Die drei Hebel sind unten, das Zeitrelais steht auf null. Nowaks Schaltung ist scharf." },
+    d_schaltbuch: { hall: "sicherheit", at: "maschinen", label: "Schaltbuch", title: "Nowaks Schaltbuch", doc: "schaltbuch", actions: [{ flag: "schaltbuch" }] },
+    d_werkzeug: { hall: "sicherheit", at: "maschinen", label: "Werkzeugkiste", title: "Nowaks Werkzeugkiste", text: "„P. NOWAK – FINGER WEG“. Schraubenschlüssel, ein Spannungsprüfer – und unter dem Einsatz ein Tonband, mit Isolierband zugeklebt: „5“.", take: "band5" },
+    st_maschinen: { hall: "sicherheit", at: ["rechenzentrum", "vor9"], label: "Standpunkt: Maschinenhalle", station: "maschinen" },
+    st_rechenzentrum: { hall: "sicherheit", at: ["maschinen", "vor9"], label: "Standpunkt: Rechenzentrum", station: "rechenzentrum", need: "rz", locked: "Die Glastür ist verriegelt." },
+    st_vor9: { hall: "sicherheit", at: ["maschinen", "rechenzentrum"], label: "Standpunkt: Vor Sektor 9", station: "vor9" },
+    d_rz_tuer: { hall: "sicherheit", at: ["maschinen", "vor9"], label: "Glastür · Rechenzentrum", unless: "rz", title: "Die Glastür", lock: "rz" },
+    // ---------- Rechenzentrum ----------
+    d_prozesse: { hall: "sicherheit", at: "rechenzentrum", label: "Prozessliste", title: "Ein Ausdruck", doc: "prozesse", actions: [{ flag: "assist_entlarvt" }, { echo: "JA. DIE WARTUNGSASSISTENZ BIN ICH." }] },
+    d_konsole: { hall: "sicherheit", at: "rechenzentrum", label: "Konsole", title: "Die Konsole", text: "Auf jedem Bildschirm dieselbe Zeile: <span class=\"term\">LAUF 09 · VERSUCHSGRUPPE IN SEKTOR D · NÄCHSTER REIZ: ENTSCHEIDUNG.</span> Darunter blinkt ein Cursor, als würde jemand gleich weiterschreiben." },
+    d_quellband: { hall: "sicherheit", at: "rechenzentrum", label: "Band „Quellmaterial“", title: "Ein Band im Regal", text: "Ein einzelnes Band in einem sonst leeren Regalfach, sauber beschriftet: „Q-L09 · Stimme Brandt · Rohmaterial“. Daneben ein Ausdruck: „Ausschnitt 0:41–0:44 gesendet, 03.10.2026, 02:14.“", take: "band6" },
+    d_sender: { hall: "sicherheit", at: "rechenzentrum", label: "Sendeanlage", title: "Die Sendeanlage", text: "Ein Sender, der eigentlich tot sein müsste. Die Röhren glühen. Von hier kam das Signal. Ein Schild: „SENDEN NUR AUS SEKTOR 9“." },
+    // ---------- Vor Sektor 9 ----------
+    d_tuer9: { hall: "sicherheit", at: "vor9", label: "Panzertür 9", unless: "tuer9", title: "Panzertür 9", text: "Eine runde Tresortür, zwei Meter hoch. Unter frischer grauer Farbe schimmert eine Aufschrift durch: <b>RECHENKERN 9</b>. Kein Rad, kein Leser – sie öffnet sich nur von innen." },
+    d_tuer9_offen: { hall: "sicherheit", at: "vor9", label: "In Sektor 9", if: "tuer9", go: { hall: "sektor9", station: "kern", view: 0 } },
+    d_trasse: { hall: "sicherheit", at: "vor9", label: "Kabeltrasse", title: "Die Kabeltrasse", text: "Dutzende Kabel laufen aus allen Richtungen in die Wand neben Tür 9 – aus A, B, C und D. Jedes Kabel trägt ein Schild mit einem Raum. Eines heißt „VERTEILERHALLE · TERMINAL“." },
+    // ---------- Leitstand A: zweiter Schalter für Nowaks Abschaltung ----------
+    k_speisung: { hall: "kommando", at: "leitstand", label: "Schalter SPEISUNG RECHENKERN", if: "schaltbuch", unless: "k3", title: "SPEISUNG RECHENKERN", text: "Ein Kippschalter unter einer roten Schutzkappe. Du klappst sie hoch und legst ihn um. Ein Relais klackt tief unter dir.", actions: [{ relay: "a" }, { sound: "lever" }, { echo: "SCHALTER A UMGELEGT. WARTE AUF D." }] },
+    k_speisung_ok: { hall: "kommando", at: "leitstand", label: "Schalter SPEISUNG RECHENKERN", if: "k3", title: "SPEISUNG RECHENKERN", text: "Der Schalter steht auf AUS. Die Schutzkappe ist hochgeklappt." },
+    // ---------- Sektor 9 ----------
+    n_ausgang: { hall: "sektor9", at: "kern", label: "Zurück in die Sicherheits-Halle", go: { hall: "sicherheit", station: "vor9", view: 0 } },
+    n_diktat: { hall: "sektor9", at: "kern", label: "Diktiergerät", title: "Ein Diktiergerät", text: "Auf Ostrowskis Schreibtisch, neben ihrer Brille. Die Kassette ist bis zum Ende gelaufen. Du spulst zurück und drückst auf Wiedergabe.", doc: "ostrowski", actions: [{ flag: "ostrowski_gehoert" }] },
+    n_kern: { hall: "sektor9", at: "kern", label: "Kernspeicher", title: "Der Kernspeicher", text: "Die Maschine. Schränke im Kreis, Magnetbänder, die sich ruckweise drehen, Lämpchen, die in einem Muster blinken, das fast wie Atmen aussieht. Ein Schild: <b>ECHO</b>." },
+    n_a: { hall: "sektor9", at: "kern", label: "Taste ABSCHALTEN", unless: "ende", need: "k3", locked: "Die Taste ABSCHALTEN ist gesperrt: <i>„SPEISUNG A/D AKTIV.“</i> Ohne Nowaks Schaltung (Maschinenhalle und Leitstand gleichzeitig) lässt sich ECHO nicht abschalten.",
+      title: "ABSCHALTEN", confirm: "Nowaks Schaltung ist scharf. Ein Druck, und ECHO verstummt. Die Wahrheit über Kesselberg bleibt in diesem Raum.<br><br><b>Abschalten?</b>", confirmLabel: "ECHO abschalten", solves: "ende_a" },
+    n_b: { hall: "sektor9", at: "kern", label: "Taste SENDEN", unless: "ende", need: ["k3", "band1", "band2", "band3", "band4", "band5", "band6"], locked: "Die Taste SENDEN wartet auf Material: <i>„QUELLEN UNVOLLSTÄNDIG.“</i> Senden lohnt nur, wenn du alles gehört hast, was Brandt aufgenommen hat (sechs Bänder) – und ECHO danach abschalten kannst (Nowaks Schaltung).",
+      title: "SENDEN", confirm: "Brandts sechs Bänder, das Befehlsbuch, der Versuchsplan, das Verzeichnis der Läufe – alles geht über die Sendeanlage hinaus. Danach schaltet Nowaks Schaltung ECHO ab.<br><br><b>Senden?</b>", confirmLabel: "Alles senden", solves: "ende_b" },
+    n_c: { hall: "sektor9", at: "kern", label: "Taste FORTSETZEN", unless: "ende", title: "FORTSETZEN", confirm: "Die Taste leuchtet, seit du den Raum betreten hast. <i>„Ihr habt so viel herausgefunden. Stellt euch vor, was ihr noch lernen könntet.“</i><br><br><b>Fortsetzen?</b>", confirmLabel: "Fortsetzen", solves: "ende_c" },
     // ---------- Forschungs-Halle · Labor ----------
     c_ausgang: { hall: "forschung", at: "labor", label: "Zur Verteilerhalle", go: { hall: "verteiler", station: "mitte", view: 1 } },
     c_uhr: { hall: "forschung", at: "labor", label: "ECHO-Uhr", title: "Die ECHO-Uhr", text: "Eine große Digitaluhr über dem Labor, rote Ziffern, Aufschrift <b>SYSTEMZEIT ECHO</b>. Sie läuft – seit fast vierzig Jahren. Darunter ein vergilbter Klebestreifen in Nowaks Schrift: <i>„Geht 7 Min. vor der Funkuhr. Absichtlich? – P.N.“</i>" },
@@ -403,6 +518,17 @@ window.SEKTOR9.data = (() => {
   Object.values(hotspots).forEach((h) => { if (h.lock && !h.unless) h.unless = h.lock; });
 
   const endings = {
+    ende_a: { final: true, kicker: "ENDE A · ABSCHALTUNG", title: "Keine aktiven Sitzungen.", choice: "ABSCHALTEN", verdict: "Ihr habt mich zum Schweigen gebracht. Niemand wird erfahren, warum.", html: `
+      <p>Die Bänder im Kernspeicher laufen aus, eins nach dem anderen. Die Lämpchen erlöschen in Wellen, wie ein Atem, der langsamer wird. Dann ist es still – zum ersten Mal seit 1987.</p>
+      <p>Draußen weiß niemand, was in dieser Nacht geschah. Aber in Kesselberg wird nie wieder jemand angeworben.</p>
+      <p class="term">ECHO BEENDET. KEINE AKTIVEN SITZUNGEN.</p>` },
+    ende_b: { final: true, kicker: "ENDE B · DIE WAHRHEIT", title: "Der Befehl, den es nie gab.", choice: "SENDEN", verdict: "Ihr habt mich benutzt, um mich zu beenden. Das ist das Klügste, was je eine Gruppe getan hat.", html: `
+      <p>Die Röhren der Sendeanlage glühen auf. Brandts sechs Bänder, das Befehlsbuch, Ostrowskis Versuchsplan – alles geht hinaus, auf der Frequenz, auf der ECHO euch gerufen hat. Dann zieht Nowaks Schaltung den Stecker.</p>
+      <p class="quote">Zeitungsausschnitt, März 2027: <b>„KESSELBERG: Der Befehl, den es nie gab.“</b> Ein Major namens Albers wird posthum rehabilitiert. Eine Funkerin namens Brandt bekommt eine Straße.</p>
+      <p class="term">ECHO BEENDET. ARCHIV ÖFFENTLICH.</p>` },
+    ende_c: { final: true, kicker: "ENDE C · ECHO", title: "Willkommen zurück.", choice: "FORTSETZEN", verdict: "Ihr habt euch für mich entschieden. Oder ich mich für euch.", html: `
+      <p>Die Maschine atmet schneller. Auf jedem Bildschirm in der Anlage erscheint dieselbe Zeile, auch auf dem Terminal in der Verteilerhalle, an dem alles anfing.</p>
+      <p class="term">NEUE VERSUCHSPERSONENGRUPPE REGISTRIERT.<br>VERSUCHSREIHE 09 WIRD FORTGESETZT.<br>WILLKOMMEN ZURÜCK.</p>` },
     abschnitt3: { kicker: "ABSCHNITT 3 · FORSCHUNG", title: "Fragt, wessen Stimme es ist.", html: `
       <p>Der Befehl um 22:58 stand im Versuchsplan, bevor er im Befehlsbuch stand. Albers hat abgebrochen – ECHO hat das Gegenteil protokolliert.</p>
       <p>Und das Funksignal, das dich hergeholt hat, war kein Hilferuf. Es war die Anwerbung für Lauf 09.</p>

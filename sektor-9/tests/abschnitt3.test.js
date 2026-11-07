@@ -63,8 +63,7 @@ const SAVE = { v: 1, started: true, finished: false, hall: 'verteiler', station:
   await shot(p, 'terminal'); await tap('taste1');
   for (let i = 0; i < 20 && !(await st()).flags.includes('tuer_d'); i++) await p.waitForTimeout(250);
   check((await st()).flags.includes('tuer_d'), 'Eintrag 3 + 2251 → Protokoll korrigiert, Sektor D entriegelt'); await closeDlg();
-  for (let i = 0; i < 40 && !(await p.evaluate(() => document.querySelector('#endOv').classList.contains('show'))); i++) await p.waitForTimeout(250);
-  check(await p.evaluate(() => document.querySelector('#endOv').classList.contains('show')), 'Ende von Abschnitt 3 erscheint'); await shot(p, 'ende');
+  await p.waitForTimeout(5000); check(/DAS WAR NICHT ICH/.test(await echoText()), 'ECHO: „SEKTOR D ENTRIEGELT. DAS WAR NICHT ICH.“'); await shot(p, 'ende');
   console.log('  Archiv:', (await st()).docs.length, 'Dokumente · ECHO:', (await st()).echo.map((e) => e.text).slice(1).join(' | '));
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
   await b.close(); console.log(ok ? '\nAbschnitt 3 in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);

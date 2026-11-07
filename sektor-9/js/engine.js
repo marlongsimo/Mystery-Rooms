@@ -19,7 +19,7 @@
   /* ---------- Zustand ---------- */
   const fresh = () => ({ v: 1, started: false, finished: false, hall: D.start.hall, station: D.start.station, view: D.start.view || 0,
     flags: [], solved: [], inventory: [...(D.start.inventory || [])], docs: [...(D.start.docs || [])], newDocs: [], seen: [], hints: {},
-    echo: [], playMs: 0, sound: true, teamDocs: [], gone: { items: [] } });
+    echo: [], playMs: 0, sound: true, teamDocs: [], gone: { items: [] }, relay: { d: 0, a: 0 }, ending: null });
   let S = fresh(), selected = null, blockedUntil = 0;
   function load() { try { const s = JSON.parse(localStorage.getItem(saveKey) || "null"); if (s && s.v === 1) S = { ...fresh(), ...s }; } catch (e) { /* neu */ } }
   function save() { try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privat */ } if (mp && mp.changed) mp.changed(); }
@@ -73,6 +73,7 @@
       if (a.sound) A.play(a.sound);
       if (a.echo) setTimeout(() => echo(a.echo), a.delay || 900);
       if (a.end) setTimeout(() => showEnd(a.end), a.delay || 600);
+      if (a.relay) { S.relay[a.relay] = Date.now(); relayTick(); checkK3(); }
     }
   }
   function succeed(p) {
@@ -94,6 +95,7 @@
   function tryLock(pid, value) {
     const p = D.puzzles[pid]; if (!p || isSolved(pid)) return { ok: false, solved: Boolean(p) };
     const r = checkAnswer(p, value);
+    if (r.ok && p.repeatable) { run(p.onSolve); A.play(p.sound || "lever"); setNarration(p.success); save(); refresh(); return { ok: true, repeat: true }; }
     if (r.ok) { succeed(p); refresh(); return { ok: true }; }
     if (r.partial) { A.play("key"); return r; }
     A.play(p.failSound || "error"); setNarration(esc(r.msg || "Nichts passiert.")); return r;
@@ -116,6 +118,12 @@
       if (uses.length) { A.play("error"); setNarration(esc(uses[0].wrongItem || "Das passt hier nicht.")); return; }
       setNarration(`${esc(D.items[it].name)} hilft hier nicht weiter.`); return;
     }
+    if (h.need && !cond(h.need)) { openDialog({ kicker: `${hall().name.toUpperCase()} · ${station().name.toUpperCase()}`, title: h.title || h.label, html: `<p class="inspect-text">${h.locked || "Noch nicht."}</p>` }); A.play("error"); return; }
+    if (h.confirm) { // Entscheidung: erst bestätigen
+      openDialog({ kicker: "ENTSCHEIDUNG", title: h.title || h.label, html: `<p class="inspect-text">${h.confirm}</p><div class="confirm-row"><button class="btn" data-confirm="${id}">${esc(h.confirmLabel || "Bestätigen")}</button></div>`,
+        after: (root) => { root.querySelector("[data-confirm]").onclick = () => { closeDialog(); if (h.solves && !isSolved(h.solves)) { S.solved.push(h.solves); run(D.puzzles[h.solves].onSolve); A.play("relay"); save(); refresh(); } }; } });
+      return;
+    }
     const parts = [];
     if (h.text) parts.push(`<p class="inspect-text">${h.text}</p>`);
     if (h.doc) { parts.push(docHtml(h.doc)); if (addDoc(h.doc)) parts.push(`<p class="found-note">▤ Ins Archiv gelegt</p>`); }
@@ -131,11 +139,27 @@
     openDialog({ kicker: `${hall().name.toUpperCase()} · ${station().name.toUpperCase()}`, title: h.title || h.label, html: parts.join(""), wide: Boolean(h.doc && D.docs[h.doc].wide), after: pu ? (root) => bindLock(root, pu) : null });
   }
   function lockHtml(p) {
+    if (p.type === "sequence") { // Tasten/Hebel nacheinander (gleiche Prüfung wie am Objekt)
+      const ids = [...p.answer].sort((a, b) => (p.labels[a] || a).localeCompare(p.labels[b] || b));
+      return `<div class="lock"><p class="lock-prompt">${p.prompt || "Nacheinander betätigen:"}</p><div class="seq-row">${ids.map((id) => `<button type="button" class="btn ghost" data-seq="${id}">${esc(p.labels[id] || id)}</button>`).join("")}</div><p class="seq-trail muted small">&nbsp;</p><p class="lock-fb" aria-live="polite"></p></div>`;
+    }
     const inp = p.type === "code" ? `<input class="lock-input" inputmode="numeric" maxlength="${p.length || 4}" autocomplete="off" placeholder="${"–".repeat(p.length || 4)}">`
       : `<input class="lock-input" maxlength="${p.length || 12}" autocomplete="off" placeholder="${"_".repeat(p.length || 6)}">`;
     return `<div class="lock"><p class="lock-prompt">${p.prompt || ""}</p><div class="lock-row">${inp}<button type="button" class="btn" data-lock-try>${p.button || "Prüfen"}</button></div><p class="lock-fb" aria-live="polite"></p></div>`;
   }
   function bindLock(root, p) {
+    if (p.type === "sequence") {
+      let seq = []; const fb = $(".lock-fb", root), trail = $(".seq-trail", root);
+      const reset = () => { seq = []; $$("[data-seq]", root).forEach((b) => b.classList.remove("on")); trail.innerHTML = "&nbsp;"; };
+      $$("[data-seq]", root).forEach((b) => { b.onclick = () => {
+        if (seq.includes(b.dataset.seq)) return; seq.push(b.dataset.seq); b.classList.add("on"); trail.textContent = seq.map((x) => p.labels[x] || x).join(" → ");
+        const r = checkAnswer(p, seq.join(","));
+        if (r.partial) { A.play(p.pressSound || "key"); return; }
+        if (r.ok) { closeDialog(); if (p.repeatable) { run(p.onSolve); A.play(p.sound || "lever"); setNarration(p.success); save(); refresh(); } else { succeed(p); refresh(); } return; }
+        A.play(p.failSound || "error"); fb.textContent = r.msg || "Nichts passiert."; setTimeout(reset, 700);
+      }; });
+      return;
+    }
     const inp = $(".lock-input", root), fb = $(".lock-fb", root), go = () => {
       const r = checkAnswer(p, inp.value);
       if (r.ok) { closeDialog(); succeed(p); refresh(); return; }
@@ -224,18 +248,44 @@
       const shown = p.hints.slice(0, used).map((t, i) => `<p class="hint-text"><b>Stufe ${i + 1}:</b> ${t}</p>`).join("");
       return `<div class="task"><p class="task-title">▸ ${esc(p.objective)}</p>${shown}${used < p.hints.length ? `<button class="btn small" data-hint="${p.id}">Hinweis ${used + 1} von ${p.hints.length} anfordern</button>` : ""}</div>`;
     }).join("") || `<p class="muted">Keine offenen Aufgaben bekannt. Untersuche die Anlage.</p>`;
-    overlay("echoOv", `<div class="echo-term"><div class="echo-head">WARTUNGSASSISTENZ · KESSELBERG · ${sessions()} ${sessions() === 1 ? "SITZUNG" : "SITZUNGEN"}</div><div class="echo-log">${log}</div><h3>Offene Aufgaben</h3>${tasks}</div>`);
+    overlay("echoOv", `<div class="echo-term"><div class="echo-head">${has("assist_entlarvt") ? "ECHO/09/ASSIST" : "WARTUNGSASSISTENZ"} · KESSELBERG · ${sessions()} ${sessions() === 1 ? "SITZUNG" : "SITZUNGEN"}</div><div class="echo-log">${log}</div><h3>Offene Aufgaben</h3>${tasks}</div>`);
+  }
+
+  /* ---------- Nowaks Relais (K3): Maschinenhalle D und Leitstand A innerhalb von 90 Sekunden ---------- */
+  const RELAY_MS = 90000;
+  function checkK3() {
+    const { d, a } = S.relay; if (isSolved("k3") || !d || !a) return;
+    if (Math.abs(d - a) <= RELAY_MS) { const p = D.puzzles.k3; S.solved.push("k3"); run(p.onSolve); A.play("power"); save(); if (S.started) { openDialog({ kicker: "GELÖST", title: p.title, html: `<p class="inspect-text">${p.success}</p>` }); refresh(); } }
+  }
+  let relayTimer = null;
+  function relayTick() {
+    clearInterval(relayTimer);
+    const box = $("#relayBox"); if (!box) return;
+    const step = () => {
+      const { d, a } = S.relay, t0 = Math.max(d, a), left = Math.ceil((t0 + RELAY_MS - Date.now()) / 1000);
+      if (isSolved("k3") || !t0 || left <= 0 || (d && a && Math.abs(d - a) <= RELAY_MS)) { box.classList.remove("show"); clearInterval(relayTimer); if (!isSolved("k3") && t0 && left <= 0 && !relayTick.warned) { relayTick.warned = true; echo("ZEITRELAIS ABGELAUFEN. ABSCHALTUNG UNVOLLSTÄNDIG."); } return; }
+      relayTick.warned = false;
+      box.innerHTML = `NOWAK-RELAIS · <b>${left}</b> s · ${d ? "D ✓" : "D –"} · ${a ? "A ✓" : "A –"}`; box.classList.add("show");
+    };
+    step(); relayTimer = setInterval(step, 500);
   }
 
   /* ---------- Ende eines Abschnitts ---------- */
   function showEnd(id) {
     const e = D.endings[id]; S.finished = Boolean(e.final); save(); // Abschnittsende ist kein Spielende
-    overlay("endOv", `<div class="end-card"><p class="eyebrow">${esc(e.kicker)}</p><h2>${esc(e.title)}</h2>${e.html}<p class="muted small">Spielzeit ${clockText()} · Hinweise genutzt: ${Object.values(S.hints).reduce((a, b) => a + b, 0)}</p><button class="btn" data-restart>Neu beginnen</button></div>`);
+    const hints = Object.values(S.hints).reduce((a, b) => a + b, 0);
+    const evalHtml = e.final ? `<div class="echo-eval"><p class="echo-head">ECHO · AUSWERTUNG VERSUCHSGRUPPE 09</p>
+      <p class="term">Dauer: ${clockText()} · Personen: ${sessions()} · Dokumente gesichtet: ${knownDocs().length}${mp ? ` · davon geteilt: ${S.teamDocs.length}` : ""}</p>
+      <p class="term">Angeforderte Hinweise: ${hints}. ${hints ? "Jeder davon kam von mir." : "Ihr habt mich nicht gefragt. Ihr habt mir trotzdem zugehört."}</p>
+      <p class="term">Entscheidung: ${esc(e.choice)}. ${esc(e.verdict)}</p>
+      <p class="muted">Habt ihr das selbst entschieden?</p></div>` : "";
+    overlay("endOv", `<div class="end-card"><p class="eyebrow">${esc(e.kicker)}</p><h2>${esc(e.title)}</h2>${e.html}${evalHtml}<p class="muted small">Spielzeit ${clockText()} · Hinweise genutzt: ${hints}</p><button class="btn" data-restart>Neu beginnen</button></div>`);
   }
 
   /* ---------- Start ---------- */
   const sessions = () => (mp ? Math.max(1, team.length + 1) : 1);
   function start() {
+    setTimeout(relayTick, 500);
     S.started = true; save();
     $("#title").classList.add("hidden"); $("#game").classList.remove("hidden");
     A.setEnabled(S.sound); A.ambient(hall().ambient || null); refresh();
@@ -277,7 +327,7 @@
      Pro Person: Halle, Standpunkt, Blickrichtung, eigene Funde (docs), seen, hints, echo, Spielzeit. */
   const localFlag = (f) => f === "briefed" || f.startsWith("entered_");
   function exportShared() {
-    return { v: 1, solved: S.solved.slice(), flags: S.flags.filter((f) => !localFlag(f)), inventory: S.inventory.slice(), gone: { items: S.gone.items.slice() }, teamDocs: S.teamDocs.slice(), finished: Boolean(S.finished) };
+    return { v: 1, relay: { d: S.relay.d, a: S.relay.a }, solved: S.solved.slice(), flags: S.flags.filter((f) => !localFlag(f)), inventory: S.inventory.slice(), gone: { items: S.gone.items.slice() }, teamDocs: S.teamDocs.slice(), finished: Boolean(S.finished) };
   }
   function normalizeShared(sh) { if (!sh) return sh; const gi = (sh.gone && sh.gone.items) || []; return { ...sh, inventory: (sh.inventory || []).filter((x) => !gi.includes(x)) }; }
   const add = (arr, x) => (arr.includes(x) ? false : (arr.push(x), true));
@@ -285,6 +335,7 @@
   function applyShared(raw) {
     const sh = normalizeShared(raw); if (!sh || typeof sh !== "object") return [];
     const news = [], newly = []; let changed = false;
+    if (sh.relay) { ["d", "a"].forEach((k) => { const v = Number(sh.relay[k]) || 0; if (v > (S.relay[k] || 0)) { S.relay[k] = v; changed = true; news.push(k === "d" ? "⚡ Relais in der Maschinenhalle gesetzt" : "⚡ Schalter im Leitstand umgelegt"); } }); relayTick(); }
     ((sh.gone && sh.gone.items) || []).forEach((x) => { changed = add(S.gone.items, x) || changed; });
     (sh.solved || []).forEach((x) => { if (add(S.solved, x)) { changed = true; newly.push(x); } });
     (sh.flags || []).forEach((f) => { if (!localFlag(f)) changed = add(S.flags, f) || changed; });
@@ -294,7 +345,7 @@
     (sh.teamDocs || []).forEach((id) => { if (D.docs[id] && add(S.teamDocs, id)) { changed = true; if (!S.docs.includes(id)) { S.newDocs.push(id); news.push("▤ " + D.docs[id].title); } } });
     newly.forEach((pid) => { const p = D.puzzles[pid]; if (!p) return; news.unshift("✓ " + p.title); run((p.onSolve || []).filter((a) => a.echo || a.end)); }); // ECHO spricht zu allen
     if (!changed) return [];
-    save();
+    save(); checkK3();
     if (S.started) {
       if (dlgOpen && $("#dlgBody .lock") && newly.length) { closeDialog(); setNarration("Jemand aus deinem Team hat das gerade gelöst."); }
       renderSide(); refresh();

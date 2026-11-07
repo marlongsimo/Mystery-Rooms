@@ -116,6 +116,13 @@ defineRoom("kommando", (ctx) => {
   swPlate.add(box(0.5, 0.5, 0.2, ZONE, 0, 0, 0.1));
   add(con);
   hs(["k_konsole_an", "k_konsole"], swPlate, { focus: keySpec });
+  // Zweiter Schalter für Nowaks Abschaltung: SPEISUNG RECHENKERN (Kippschalter unter roter Schutzkappe)
+  const sp = group(box(0.3, 0.3, 0.04, M.steelDark, 0, 0, 0), plane(0.28, 0.06, label("SPEISUNG RECHENKERN", 512, 100, "#e8e2cc", "#6b2a22", 40), 0, 0.11, 0.025), box(0.04, 0.1, 0.04, M.steel, 0, -0.02, 0.04), box(0.45, 0.45, 0.2, ZONE, 0, 0, 0.1));
+  const capPv = new THREE.Group(); capPv.position.set(0, 0.04, 0.05); capPv.add(box(0.12, 0.02, 0.14, std(0xc0392b, { transparent: true, opacity: 0.8 }), 0, 0, -0.06)); sp.add(capPv);
+  sp.position.set(-0.4, 0.7, 0.47); con.add(sp);
+  let spOn = false; state(() => { spOn = eng().has("k3") || Boolean(eng().state().relay && eng().state().relay.a && Date.now() - eng().state().relay.a < 90000); });
+  anim((dt) => { capPv.rotation.x = lerp(capPv.rotation.x, spOn ? -1.6 : 0, Math.min(1, dt * 5)); sp.children[2].rotation.x = lerp(sp.children[2].rotation.x, spOn ? 0.6 : -0.6, Math.min(1, dt * 8)); });
+  hs(["k_speisung_ok", "k_speisung"], sp, { act: { when: (id) => id === "k_speisung", play: () => { spOn = true; snd("click"); return 600; } } });
   // Befehlsbuch auf der Konsole
   const book = group(box(0.34, 0.05, 0.46, M.red, 0, 0.025, 0), box(0.32, 0.01, 0.44, M.paper, 0, 0.052, 0), box(0.45, 0.15, 0.55, ZONE, 0, 0.05, 0));
   book.position.set(-1.2, 0.97, 4.4); book.rotation.y = 0.2; add(hs("k_befehlsbuch", book));

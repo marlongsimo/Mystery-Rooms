@@ -27,7 +27,7 @@ const shot = (p, name) => (process.env.SHOTS ? p.screenshot({ path: OUT + 's9-' 
   const tap = async (n, k = 1, dir = 0) => { for (let i = 0; i < k; i++) { const w = await part(n); await p.mouse.click(w.x, w.y + (dir > 0 ? -6 : dir < 0 ? 6 : 0)); await p.waitForTimeout(120); } };
   const aim = async (id) => { const pt = await p.evaluate((id) => SEKTOR9.view3d.aimAt(id), id); await p.waitForTimeout(200); return pt; };
   const click = async (id) => { const pt = await aim(id); if (!pt) return false; await p.mouse.click(pt.x, pt.y); await p.waitForTimeout(500); return true; };
-  const waitGlide = async () => { for (let i = 0; i < 40 && (await p.evaluate(() => SEKTOR9.view3d.gliding())); i++) await p.waitForTimeout(200); await p.waitForTimeout(300); };
+  const waitGlide = async () => { for (let i = 0; i < 100 && (await p.evaluate(() => SEKTOR9.view3d.gliding())); i++) await p.waitForTimeout(200); await p.waitForTimeout(300); };
   const echoText = () => p.evaluate(() => document.querySelector('#echoToast').textContent);
   const narr = () => p.evaluate(() => document.querySelector('#narration').textContent);
   await p.waitForTimeout(2000); check(/AKTIVE SITZUNG/.test(await echoText()), 'ECHO meldet sich: „' + (await echoText()).slice(0, 50) + '“');

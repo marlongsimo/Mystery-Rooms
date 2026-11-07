@@ -55,11 +55,11 @@ defineRoom("verteiler", (ctx) => {
   const desk = group(box(1.3, 0.9, 0.7, M.paint, 0, 0.45, 0), box(1.36, 0.04, 0.76, M.steelDark, 0, 0.92, 0));
   const t = crt(M, 0.52, 0.4); t.g.position.set(0, 1.2, -0.05); t.g.rotation.x = -0.08; desk.add(t.g);
   desk.add(box(0.6, 0.03, 0.22, M.black, 0, 0.95, 0.18)); // Tastatur
-  desk.position.set(0, 0, -1.6); add(hs("v_terminal", desk));
+  desk.position.set(-2.1, 0, -1.9); desk.rotation.y = 0.55; add(hs("v_terminal", desk)); // seitlich, damit die Nordtür frei bleibt
   let blink = 0;
   const paintTerm = () => t.paint((g, w, h) => { termText(g, ["ANLAGE KESSELBERG", "", "VERSUCHSGRUPPE ERKANNT.", "STATUS: 1 AKTIVE SITZUNG.", "", "WARTUNGSASSISTENZ BEREIT." + (blink % 2 ? " _" : "")], { size: 17, step: 30, y: 36 }); });
   paintTerm(); anim((dt) => { blink += dt * 2; if (Math.floor(blink) !== Math.floor(blink - dt * 2)) paintTerm(); });
-  const termL = new THREE.PointLight(0x8fd19e, 1.4, 4, 2); termL.position.set(0, 1.3, -1.0); add(termL);
+  const termL = new THREE.PointLight(0x8fd19e, 1.4, 4, 2); termL.position.set(-1.6, 1.3, -1.3); add(termL);
 
   // Anlagenplan an der Westwand (rechts neben der Tür A)
   const planTex = canvasTex(512, 384, (g, w, h) => {

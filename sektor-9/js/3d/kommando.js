@@ -86,6 +86,7 @@ defineRoom("kommando", (ctx) => {
   const gateSpec = { when: () => !eng().isSolved("galerie"), cam: [0.45, 1.25, 0.75], center: [0.45, 1.15, 0.05], fov: 42, exitDelay: 1600,
     hint: "Räder oben/unten antippen oder wischen · Bügel ziehen", value: lock.value, parts: lock.parts };
   add(hs("k_gitter", group(gate, box(0.3, 2.4, 1.6, ZONE, 5.75, 1.2, 3.1)), { focus: { ...gateSpec, cam: [4.95, 1.25, 2.8], center: [5.72, 1.15, 2.8] } })); // Gruppe im Ursprung: Kamera in Hallenkoordinaten
+  const gl = cageLamp(M, 0xffc890, 2.2, 4); gl.g.position.set(5.2, 2.7, 2.8); add(gl.g); // Lampe über der Gittertür
   let gOpen = false; state(() => { gOpen = eng().isSolved("galerie"); lock.group.visible = !gOpen; });
   anim((dt) => { gPivot.rotation.y = lerp(gPivot.rotation.y, gOpen ? 1.6 : 0, Math.min(1, dt * 1.5)); });
 

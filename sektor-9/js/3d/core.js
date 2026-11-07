@@ -401,6 +401,7 @@ function render(stage, r, i) {
   if (!init()) return;
   if (!wrap.isConnected || wrap.parentNode !== stage) { stage.innerHTML = ""; stage.appendChild(wrap); }
   if (focus && (roomId !== r.id || i !== lastIndex || (r.station && r.station !== stationId))) exitFocus(true);
+  if (roomId !== r.id || (r.station && r.station !== stationId)) hideTip();
   if (roomId !== r.id) { buildRoom(r); yaw = yawOf(i); pitch = -0.04; targetYaw = null; lastIndex = i; }
   else if (r.station && r.station !== stationId) { lastIndex = i; moveTo(r.station, yawOf(i)); }
   else if (i !== lastIndex) { // ‹ › oder Tastatur: sanft auf die neue Ansicht drehen (kürzester Weg)

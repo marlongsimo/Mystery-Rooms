@@ -218,7 +218,7 @@
 
   /* ---------- Ende eines Abschnitts ---------- */
   function showEnd(id) {
-    const e = D.endings[id]; S.finished = true; save();
+    const e = D.endings[id]; S.finished = Boolean(e.final); save(); // Abschnittsende ist kein Spielende
     overlay("endOv", `<div class="end-card"><p class="eyebrow">${esc(e.kicker)}</p><h2>${esc(e.title)}</h2>${e.html}<p class="muted small">Spielzeit ${clockText()} · Hinweise genutzt: ${Object.values(S.hints).reduce((a, b) => a + b, 0)}</p><button class="btn" data-restart>Neu beginnen</button></div>`);
   }
 

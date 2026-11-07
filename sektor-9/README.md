@@ -2,7 +2,15 @@
 
 Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselketten und Enden: [`DREHBUCH.md`](DREHBUCH.md).
 
-**Stand:** Abschnitte 1–3 von 5 (Verteilerhalle, Kommando-Halle A, Personal-Halle B, Forschungs-Halle C mit Kette K1 „Der letzte Befehl“). Allein oder gemeinsam mit bis zu vier Personen spielbar. Es folgen Sektor D mit Sektor 9 selbst, die Tonbänder 5–6, die Kette K3 (Abschaltung zu zweit) und die drei Enden.
+**Stand:** vollständig spielbar – alle fünf Abschnitte (Verteilerhalle, Kommando A, Personal B, Forschung C, Sicherheit D, Sektor 9) mit drei Enden. Allein oder gemeinsam mit bis zu vier Personen.
+
+| Abschnitt | Halle | Kern |
+|---|---|---|
+| 1 | Verteilerhalle, Kommando A | Handrad, Gitter 4625, Notstrom, Band 1, Kassette 2338 (Funkzeit ≠ Lagetafel) |
+| 2 | Personal B | Bürotür 1730, Käfig, Spind 0311, Wartungsgang A–B, Bänder 2–3 (die sieben Minuten, Albers’ Abbruch) |
+| 3 | Forschung C | ECHO-Uhr (Ortszeit + 7 Min.), Versuchsplan, Beobachtungsraum, Band 4, Schleuse, **K1**: Terminal „3 2251“ |
+| 4 | Sicherheit D | Schaltbuch, Band 5, Glastür 2305, Prozessliste (Hilfe = ECHO), Band 6 (Quelle des Funksignals), **K3**: Hebel + Leitstand-Schalter innerhalb von 90 s |
+| 5 | Sektor 9 | Ostrowskis letzte Aufzeichnung, Entscheidung: **A** Abschalten (K3) · **B** Senden (K3 + alle sechs Bänder) · **C** Fortsetzen – danach ECHOs Auswertung |
 
 ## Aufbau
 
@@ -25,7 +33,10 @@ python3 -m http.server 8765 &      # im Repository-Wurzelordner
 node sektor-9/tests/abschnitt1.test.js        # Abschnitt 1 in 3D, SHOTS=1 für Bildschirmfotos
 node sektor-9/tests/abschnitt2.test.js        # Abschnitt 2 (Spielstand nach Abschnitt 1)
 node sektor-9/tests/abschnitt3.test.js        # Abschnitt 3 (Spielstand nach Abschnitt 2)
+node sektor-9/tests/abschnitt4.test.js        # Abschnitte 4–5 bis Ende B
+node sektor-9/tests/enden.test.js             # Bedingungen der Enden, Ende A und C
 node sektor-9/tests/mehrspieler.test.js       # zu zweit gegen die echte Datenbank
+node sektor-9/tests/mehrspieler-k3.test.js    # Nowaks Abschaltung zu zweit (echte Datenbank)
 ```
 
 ## Gemeinsam spielen

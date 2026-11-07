@@ -7,7 +7,7 @@
   <meta name="description" content="SEKTOR 9 – Das letzte Protokoll. Ein Mystery-Escape-Room in 3D im Browser (in Entwicklung).">
   <title>SEKTOR 9 – Das letzte Protokoll</title>
   <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
   <!-- ========== TITEL ========== -->
@@ -41,6 +41,7 @@
         <div id="narration" class="narration" aria-live="polite"></div>
         <div id="echoToast" class="echo-toast" aria-live="polite"></div>
         <div id="relayBox" class="relay-box" aria-live="polite"></div>
+        <div id="voteBox" class="relay-box vote-box" aria-live="polite"></div>
       </div>
       <aside class="side">
         <h2 class="side-h">AUSRÜSTUNG</h2>
@@ -70,20 +71,20 @@
   <div class="overlay" id="chatOv"><div class="ov-panel term"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">FUNK · TEAM</h2><div class="ov-body"></div></div></div>
   <div class="overlay" id="endOv"><div class="ov-panel"><div class="ov-body"></div></div></div>
 
-  <script src="js/data.js?v=4"></script>
+  <script src="js/data.js?v=5"></script>
   <script src="js/audio.js?v=1"></script>
-  <script src="js/engine.js?v=5"></script>
+  <script src="js/engine.js?v=6"></script>
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>
   <script src="../platform/multiplayer/mp-core.js?v=1"></script>
   <script src="../platform/multiplayer/mp-lobby.js?v=1"></script>
-  <script src="js/mp-adapter.js?v=3"></script>
+  <script src="js/mp-adapter.js?v=4"></script>
   <script type="importmap">{ "imports": { "three": "../platform/vendor/three-0.170.0/three.module.min.js" } }</script>
   <script type="module" src="js/3d/verteiler.js?v=4"></script>
   <script type="module" src="js/3d/kommando.js?v=6"></script>
   <script type="module" src="js/3d/personal.js?v=6"></script>
   <script type="module" src="js/3d/forschung.js?v=2"></script>
-  <script type="module" src="js/3d/sicherheit.js?v=2"></script>
+  <script type="module" src="js/3d/sicherheit.js?v=3"></script>
   <script type="module" src="js/3d/sektor9.js?v=2"></script>
 </body>
 </html>

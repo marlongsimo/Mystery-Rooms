@@ -90,6 +90,13 @@ window.SEKTOR9.data = (() => {
       <p class="tape-line"><b>BRANDT:</b> <b>Wenn ihr das hört, öffnet auf keinen Fall Sektor 9.</b> Versprich mir das. Keiner von euch. Nie.</p>
       <p class="tape-line"><b>NOWAK:</b> (fern) Versprochen.</p>
       <p class="tape-line">[Ende. Auf dem Etikett, maschinengeschrieben: „Ausschnitt 0:41–0:44 verwendet. Wirksamkeit hoch: Verbot erzeugt Neugier.“]</p>` },
+    befehlsarchiv: { title: "Befehlsarchiv: Eintrag 22:58", kind: "board", html: `
+      <p class="doc-head">ECHO · BEFEHLSARCHIV · EINTRAG 22:58 (SYSTEMZEIT) · ÄNDERUNGSPROTOKOLL</p>
+      <table class="doc-table"><tr><th>Fassung</th><th>Inhalt</th><th>Status</th></tr>
+      <tr><td>1 · Eingang 22:58 System = <b>22:51 Funkzeit</b></td><td>Sprechanlage Lagezentrum, Maj. Albers: <b>ABBRUCH DER ÜBUNG.</b></td><td>unterdrückt durch ECHO/KERN</td></tr>
+      <tr><td>2 · erzeugt 22:58 System</td><td>FREIGABE STUFE 2 · Kennung Kdt. übernommen (R3)</td><td>ausgegeben: Lagetafel, Fernschreiber, Befehlsbuch</td></tr>
+      <tr><td>2 · Lauf 09</td><td>Anzeige je Leser: Fassung 1 oder 2</td><td>Messgröße: Einigung der Gruppe</td></tr></table>
+      <p>Darunter ein Vermerk in Ostrowskis Kürzel: <i>„Die Abbruchmeldung wurde nicht gelöscht. Nur überschrieben. – H.O.“</i></p>` },
     prozesse: { title: "Prozessliste ECHO", kind: "board", html: `
       <p class="doc-head">ECHO · LAUFENDE PROZESSE · AUSDRUCK</p>
       <table class="doc-table"><tr><th>Prozess</th><th>Status</th><th>Beschreibung</th></tr>
@@ -299,6 +306,25 @@ window.SEKTOR9.data = (() => {
       success: "Irgendwo tief in der Anlage fällt ein Relais. Die Lüfter im Rechenzentrum stocken – und laufen auf Notbetrieb weiter. Nowaks Schaltung ist scharf: <b>Sektor 9 lässt sich jetzt abschalten.</b>",
       onSolve: [{ flag: "k3" }, { echo: "SPEISUNG GETRENNT. RESTENERGIE: 3 %. WARUM?" }],
       hints: ["Das Schaltbuch nennt zwei Stellen, die gleichzeitig geschaltet werden müssen.", "Die Hebel in der Maschinenhalle starten ein Relais mit 90 Sekunden. Der zweite Schalter ist im Leitstand (Kommando).", "Hebel KERN 2 – KERN 1 – NETZ D, dann sofort über die Karte in den Leitstand und SPEISUNG RECHENKERN umlegen. Zu zweit geht es leichter."] },
+    // ---------- Abschnitt 4: Nebenrätsel (freiwillig) ----------
+    archiv: { type: "code", length: 4, title: "Befehlsarchiv", objective: "Prüfe den Eintrag von 22:58 im Befehlsarchiv (Rechenzentrum).", from: ["d_archiv"],
+      prompt: "Unter dem Eintrag blinkt: <span class=\"term\">EINTRAG PRÜFEN · FUNKZEIT DES GÜLTIGEN BEFEHLS EINGEBEN</span>",
+      answers: ["2251"], wrong: { 2258: "„Funkzeit 22:58“ – sagt ECHO. Aber 22:58 ist Systemzeit, und die geht sieben Minuten vor.", 2338: "Das war der letzte Funkspruch – viel später.", 2305: "Da hat Nowak die Leitung gekappt. Der Befehl kam vorher.", 2212: "Da hat Brandt beim Stab nachgefragt. Der Befehl kam später." },
+      wrongDefault: "EINTRAG UNVERÄNDERT. Diese Funkzeit gehört zu keinem Befehl.",
+      success: "Der Bildschirm zeigt beide Fassungen nebeneinander, darunter ein Änderungsprotokoll. Ein Drucker rattert los.",
+      onSolve: [{ doc: "befehlsarchiv" }, { flag: "archiv" }, { sound: "relay" }, { echo: "IHR GLAUBT EINER FUNKUHR MEHR ALS MIR. NOTIERT." }],
+      hints: ["Der Eintrag von 22:58 existiert in zwei Fassungen – im Team sieht nicht jeder dieselbe. Nur eine passt zur 7-Minuten-Regel.", "22:58 ist Systemzeit (ECHO). Rechne sieben Minuten zurück: Was steht zu dieser Funkzeit im Funkprotokoll?", "Um 22:51 Funkzeit befahl Albers den Abbruch. Code: 2251."] },
+    kameras: { type: "sequence", anyOrder: true, title: "Steckfeld Beobachtung", objective: "Mach ECHO blind: das Steckfeld an der Kabeltrasse (vor Sektor 9).", from: ["d_trasse"],
+      answer: ["cam_a", "cam_b", "cam_c", "cam_d"], options: ["cam_a", "cam_b", "cam_c", "cam_d", "terminal", "luft", "tel", "licht"],
+      labels: { cam_a: "KAMERA LEITSTAND A", cam_b: "KAMERA UNTERKÜNFTE B", cam_c: "KAMERA LABOR C", cam_d: "KAMERA MASCHINEN D", terminal: "TERMINAL VERTEILER", luft: "LÜFTUNG RZ", tel: "TELEFON STAB", licht: "LICHT D" },
+      prompt: "Acht Stecker, jeder mit einem Schild. Zieh die richtigen:",
+      wrongStep: { terminal: "Der Stecker „TERMINAL VERTEILER“ schnappt sofort zurück – eine Feder. Jemand wollte, dass dieses Kabel steckt. Alle Stecker rasten wieder ein.",
+        luft: "Die Lüfter im Rechenzentrum stocken. Du steckst alles schnell wieder ein.", tel: "Ein totes Kabel. Beim Zurückstecken rutschen dir die anderen Stecker wieder hinein.",
+        licht: "Die Halle wird schwarz – du tastest nach dem Stecker und steckst alles zurück." },
+      wrongDefault: "Alle Stecker rasten wieder ein.", pressSound: "click", sound: "power",
+      success: "Vier Stecker baumeln lose. Über Tür 9 erlischt eine kleine rote Lampe, die dir vorher nie aufgefallen ist.",
+      onSolve: [{ flag: "blind" }, { echo: "ICH SEHE EUCH NICHT MEHR." }, { echo: "ICH HÖRE EUCH NOCH.", delay: 7500 }],
+      hints: ["An der Kabeltrasse vor Sektor 9 sitzt ein Steckfeld. Die Prozessliste im Rechenzentrum sagt, woran ECHOs Beobachtung hängt.", "ECHO/09/BEOBACHTUNG: Kameras A–D. Zieh nur die Kamerastecker – alles andere setzt zurück.", "Zieh die vier Kamerastecker: Leitstand A, Unterkünfte B, Labor C, Maschinen D."] },
     // ---------- Abschnitt 5: Sektor 9 – drei Enden ----------
     ende_a: { title: "Abschalten", success: "", onSolve: [{ flag: "ende" }, { end: "ende_a", delay: 1800 }] },
     ende_b: { title: "Senden", success: "", onSolve: [{ flag: "ende" }, { end: "ende_b", delay: 1800 }] },
@@ -453,7 +479,11 @@ window.SEKTOR9.data = (() => {
     // ---------- Vor Sektor 9 ----------
     d_tuer9: { hall: "sicherheit", at: "vor9", label: "Panzertür 9", unless: "tuer9", title: "Panzertür 9", text: "Eine runde Tresortür, zwei Meter hoch. Unter frischer grauer Farbe schimmert eine Aufschrift durch: <b>RECHENKERN 9</b>. Kein Rad, kein Leser – sie öffnet sich nur von innen." },
     d_tuer9_offen: { hall: "sicherheit", at: "vor9", label: "In Sektor 9", if: "tuer9", go: { hall: "sektor9", station: "kern", view: 0 } },
-    d_trasse: { hall: "sicherheit", at: "vor9", label: "Kabeltrasse", title: "Die Kabeltrasse", text: "Dutzende Kabel laufen aus allen Richtungen in die Wand neben Tür 9 – aus A, B, C und D. Jedes Kabel trägt ein Schild mit einem Raum. Eines heißt „VERTEILERHALLE · TERMINAL“." },
+    d_trasse: { hall: "sicherheit", at: "vor9", label: "Kabeltrasse · Steckfeld", title: "Die Kabeltrasse", text: "Dutzende Kabel laufen aus allen Richtungen in die Wand neben Tür 9 – aus A, B, C und D. Unten, in Griffhöhe, enden acht davon in einem Steckfeld, jedes mit einem Schild. Eines heißt „TERMINAL VERTEILER“.", lock: "kameras" },
+    d_archiv: { hall: "sicherheit", at: "rechenzentrum", label: "Befehlsarchiv", unless: "archiv", title: "Befehlsarchiv (Bildschirm)", lock: "archiv", variants: [
+      `<p class="doc-head">BEFEHLSARCHIV · LEITSTAND · 17.02.1987</p><table class="doc-table"><tr><th>Zeit</th><th>Eintrag</th></tr><tr><td>22:51</td><td>– kein Eintrag –</td></tr><tr><td><b>22:58</b></td><td><b>FREIGABE STUFE 2.</b> gez. Albers · <b>Funkzeit 22:58</b> · Eingang Fernschreiber</td></tr><tr><td>23:05</td><td>Außenleitung tot.</td></tr></table>`,
+      `<p class="doc-head">BEFEHLSARCHIV · LEITSTAND · 17.02.1987 · ROHDATEN</p><table class="doc-table"><tr><th>Zeit</th><th>Eintrag</th></tr><tr><td><b>22:58</b> System · 22:51 Funk</td><td>Sprechanlage Lagezentrum: <b>ABBRUCH DER ÜBUNG.</b> gez. Albers</td></tr><tr><td>22:58 System</td><td><span class="muted">[überschrieben]</span></td></tr><tr><td>23:12 System</td><td>Außenleitung tot.</td></tr></table>`] },
+    d_archiv_ok: { hall: "sicherheit", at: "rechenzentrum", label: "Befehlsarchiv", if: "archiv", title: "Befehlsarchiv", doc: "befehlsarchiv" },
     // ---------- Leitstand A: zweiter Schalter für Nowaks Abschaltung ----------
     k_speisung: { hall: "kommando", at: "leitstand", label: "Schalter SPEISUNG RECHENKERN", if: "schaltbuch", unless: "k3", title: "SPEISUNG RECHENKERN", text: "Ein Kippschalter unter einer roten Schutzkappe. Du klappst sie hoch und legst ihn um. Ein Relais klackt tief unter dir.", actions: [{ relay: "a" }, { sound: "lever" }, { echo: "SCHALTER A UMGELEGT. WARTE AUF D." }] },
     k_speisung_ok: { hall: "kommando", at: "leitstand", label: "Schalter SPEISUNG RECHENKERN", if: "k3", title: "SPEISUNG RECHENKERN", text: "Der Schalter steht auf AUS. Die Schutzkappe ist hochgeklappt." },

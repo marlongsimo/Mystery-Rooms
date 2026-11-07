@@ -185,3 +185,10 @@ a { color: var(--green); }
 .echo-eval { margin: 18px 0 6px; padding: 14px; border: 1px solid var(--green-d); background: #050806; text-align: left; }
 .echo-eval .echo-head { font: 500 11px var(--mono); letter-spacing: .2em; color: var(--red); margin: 0 0 8px; }
 .echo-eval p { margin: 6px 0; }
+
+/* Abstimmung im Team (Sektor 9) und ECHOs Empfehlung */
+.vote-box { top: 14px; bottom: auto; border-color: var(--amber, #e0b45a); background: #141006ee; color: #f0dca8; line-height: 1.6; }
+.vote-box b { font-size: 12.5px; color: #fff; }
+.echo-rec { margin: 10px 0 14px; padding: 10px 12px; border: 1px dashed var(--red); background: #140605; }
+.echo-rec .echo-head { color: var(--red); margin: 0 0 6px; }
+.echo-rec p { margin: 4px 0; }

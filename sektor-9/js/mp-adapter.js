@@ -60,6 +60,8 @@
       changed: () => link && link.changed(),
       sendChat,
       code: () => (client.session ? client.session.room_code : ""),
+      name: () => (client.user ? client.playerName(client.user.id) : ""),
+      slot: () => Math.max(0, client.players.findIndex((p) => client.user && p.user_id === client.user.id)),
       leave: () => { if (confirm("Sitzung wirklich verlassen? Als Host beendest du sie damit für alle.")) lobby.leave(); },
     });
     link = window.MRMultiplayer.sync(client, {

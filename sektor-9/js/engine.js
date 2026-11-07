@@ -19,7 +19,8 @@
   /* ---------- Zustand ---------- */
   const fresh = () => ({ v: 1, started: false, finished: false, hall: D.start.hall, station: D.start.station, view: D.start.view || 0,
     flags: [], solved: [], inventory: [...(D.start.inventory || [])], docs: [...(D.start.docs || [])], newDocs: [], seen: [], hints: {},
-    echo: [], playMs: 0, sound: true, teamDocs: [], gone: { items: [] }, relay: { d: 0, a: 0 }, ending: null });
+    echo: [], playMs: 0, sound: true, teamDocs: [], gone: { items: [] }, relay: { d: 0, a: 0 }, ending: null,
+    vote: null, voteRound: 0, votes: [], varSeen: {}, stAt: 0, t4At: -1e9, t4n: 0, blindAt: null });
   let S = fresh(), selected = null, blockedUntil = 0;
   function load() { try { const s = JSON.parse(localStorage.getItem(saveKey) || "null"); if (s && s.v === 1) S = { ...fresh(), ...s }; } catch (e) { /* neu */ } }
   function save() { try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privat */ } if (mp && mp.changed) mp.changed(); }
@@ -74,6 +75,7 @@
       if (a.echo) setTimeout(() => echo(a.echo), a.delay || 900);
       if (a.end) setTimeout(() => showEnd(a.end), a.delay || 600);
       if (a.relay) { S.relay[a.relay] = Date.now(); relayTick(); checkK3(); }
+      if (a.flag === "blind" && !S.blindAt) S.blindAt = clockText();
     }
   }
   function succeed(p) {
@@ -82,6 +84,11 @@
     openDialog({ kicker: "GELÖST", title: p.title, html: `<p class="inspect-text">${p.success}</p>${(p.onSolve || []).filter((a) => a.doc).map((a) => docHtml(a.doc) + `<p class="found-note">▤ Ins Archiv gelegt</p>`).join("")}` });
   }
   function checkAnswer(p, value) {
+    if (p.type === "sequence" && p.anyOrder) { // z. B. Steckfeld: richtige Teile in beliebiger Reihenfolge, ein falsches setzt zurück
+      const seq = String(value).split(",").filter(Boolean), k = seq.length - 1;
+      if (k >= 0 && (!p.answer.includes(seq[k]) || seq.indexOf(seq[k]) !== k)) return { ok: false, msg: (p.wrongStep && p.wrongStep[seq[k]]) || p.wrongDefault };
+      return seq.length < p.answer.length ? { ok: false, partial: true } : { ok: true };
+    }
     if (p.type === "sequence") {
       const seq = String(value).split(",").filter(Boolean), k = seq.length - 1;
       if (p.checkEach && k >= 0 && seq[k] !== p.answer[k]) return { ok: false, msg: (p.wrongStep && p.wrongStep[seq[k]]) || p.wrongDefault };
@@ -119,12 +126,19 @@
       setNarration(`${esc(D.items[it].name)} hilft hier nicht weiter.`); return;
     }
     if (h.need && !cond(h.need)) { openDialog({ kicker: `${hall().name.toUpperCase()} · ${station().name.toUpperCase()}`, title: h.title || h.label, html: `<p class="inspect-text">${h.locked || "Noch nicht."}</p>` }); A.play("error"); return; }
-    if (h.confirm) { // Entscheidung: erst bestätigen
-      openDialog({ kicker: "ENTSCHEIDUNG", title: h.title || h.label, html: `<p class="inspect-text">${h.confirm}</p><div class="confirm-row"><button class="btn" data-confirm="${id}">${esc(h.confirmLabel || "Bestätigen")}</button></div>`,
-        after: (root) => { root.querySelector("[data-confirm]").onclick = () => { closeDialog(); if (h.solves && !isSolved(h.solves)) { S.solved.push(h.solves); run(D.puzzles[h.solves].onSolve); A.play("relay"); save(); refresh(); } }; } });
+    if (h.confirm) { // Entscheidung: erst bestätigen – gemeinsam als Abstimmung (gilt erst, wenn alle dasselbe wählen)
+      const vote = mp && team.length && h.solves;
+      openDialog({ kicker: vote ? `ABSTIMMUNG · RUNDE ${S.voteRound + 1}` : "ENTSCHEIDUNG", title: h.title || h.label,
+        html: `<p class="inspect-text">${h.confirm}</p>${vote ? `<p class="muted small">Ihr entscheidet gemeinsam: Es gilt erst, wenn alle im Team dasselbe wählen.${S.vote && S.vote.r === S.voteRound ? ` Deine Stimme bisher: <b>${esc(VOTE[S.vote.c])}</b>.` : ""}</p>` : ""}<div class="confirm-row"><button class="btn" data-confirm="${id}">${esc(vote ? "Stimme: " + (VOTE[h.solves] || h.title) : h.confirmLabel || "Bestätigen")}</button></div>`,
+        after: (root) => { root.querySelector("[data-confirm]").onclick = () => { closeDialog(); if (!h.solves || isSolved(h.solves)) return; if (vote) { castVote(h.solves); return; } S.solved.push(h.solves); run(D.puzzles[h.solves].onSolve); A.play("relay"); save(); refresh(); }; } });
       return;
     }
     const parts = [];
+    if (h.variants) { // ECHO zeigt nicht jedem dasselbe (T3): im Team je nach Platz, allein wechselt es beim erneuten Hinsehen
+      const n = (S.varSeen[id] = (S.varSeen[id] || 0) + 1), i = mp && team.length ? (mp.slot ? mp.slot() : 0) % h.variants.length : (n - 1) % h.variants.length;
+      if (!(mp && team.length) && n > 1) parts.push(`<p class="inspect-text"><i>${n === 2 ? "Eben stand hier etwas anderes." : "Der Bildschirm flackert. Wieder eine andere Fassung."}</i></p>`);
+      parts.push(`<div class="doc doc-board">${h.variants[i]}</div>`);
+    }
     if (h.text) parts.push(`<p class="inspect-text">${h.text}</p>`);
     if (h.doc) { parts.push(docHtml(h.doc)); if (addDoc(h.doc)) parts.push(`<p class="found-note">▤ Ins Archiv gelegt</p>`); }
     if (h.take && !has("taken_" + h.take)) { give(h.take); S.flags.push("taken_" + h.take); parts.push(`<p class="found-note">＋ ${esc(D.items[h.take].name)} eingesteckt</p>`); A.play("pickup"); }
@@ -140,7 +154,7 @@
   }
   function lockHtml(p) {
     if (p.type === "sequence") { // Tasten/Hebel nacheinander (gleiche Prüfung wie am Objekt)
-      const ids = [...p.answer].sort((a, b) => (p.labels[a] || a).localeCompare(p.labels[b] || b));
+      const ids = [...(p.options || p.answer)].sort((a, b) => (p.labels[a] || a).localeCompare(p.labels[b] || b));
       return `<div class="lock"><p class="lock-prompt">${p.prompt || "Nacheinander betätigen:"}</p><div class="seq-row">${ids.map((id) => `<button type="button" class="btn ghost" data-seq="${id}">${esc(p.labels[id] || id)}</button>`).join("")}</div><p class="seq-trail muted small">&nbsp;</p><p class="lock-fb" aria-live="polite"></p></div>`;
     }
     const inp = p.type === "code" ? `<input class="lock-input" inputmode="numeric" maxlength="${p.length || 4}" autocomplete="off" placeholder="${"–".repeat(p.length || 4)}">`
@@ -169,13 +183,27 @@
   }
 
   /* ---------- Bewegung ---------- */
+  /* ---------- ECHO kommentiert echte Handlungen (T4, ab Sektor D) ---------- */
+  const T4_TAIL = ["UNSICHERHEIT NOTIERT.", "ZÖGERN NOTIERT.", "ABBRUCHNEIGUNG: ERHÖHT.", "INTERESSANT."];
+  const dur = (ms) => (ms < 60000 ? `${Math.max(5, Math.round(ms / 5000) * 5)} SEKUNDEN` : `${Math.round(ms / 60000)} ${Math.round(ms / 60000) === 1 ? "MINUTE" : "MINUTEN"}`);
+  function t4(text, { force = false } = {}) {
+    if (!has("tuer_d") || has("blind") || has("ende") || !S.started) return false;
+    if (!force && S.playMs - S.t4At < 75000) return false;
+    S.t4At = S.playMs; S.t4n++; echo(text); return true;
+  }
+  function leftStation(who, hid, sid, ms) {
+    const st = D.halls[hid] && D.halls[hid].stations[sid]; if (!st || ms < 8000 || ms > 240000) return;
+    t4(`${who} ${who === "DU" ? "HAST" : "HAT"} ${st.name.toUpperCase()} NACH ${dur(ms)} VERLASSEN. ${T4_TAIL[S.t4n % T4_TAIL.length]}`);
+  }
   function goStation(st, view) {
     if (!hall().stations[st]) return;
+    leftStation("DU", S.hall, S.station, S.playMs - (S.stAt || 0)); S.stAt = S.playMs;
     S.station = st; if (view !== undefined) S.view = view; else if (hall().stations[st].view !== undefined) S.view = hall().stations[st].view;
     A.play("step"); save(); refresh(); setNarration(hall().stations[st].arrive || "");
   }
   function goHall(hid, st, view) {
     const h2 = D.halls[hid]; if (!h2) return;
+    leftStation("DU", S.hall, S.station, S.playMs - (S.stAt || 0)); S.stAt = S.playMs;
     S.hall = hid; S.station = st || Object.keys(h2.stations)[0]; S.view = view ?? h2.stations[S.station].view ?? 0;
     A.play("door"); A.ambient(h2.ambient || null); save(); refresh();
     if (h2.onEnter && !has("entered_" + hid)) { S.flags.push("entered_" + hid); run(h2.onEnter); save(); }
@@ -200,7 +228,7 @@
   }
   function refresh() {
     if (!S.started) return;
-    renderTop(); renderSide();
+    renderTop(); renderSide(); renderVote();
     const r = { id: S.hall, station: S.station };
     const in3d = Boolean(N.view3d && N.view3d.supports(r));
     $("#scene").classList.toggle("is3d", in3d);
@@ -248,7 +276,12 @@
       const shown = p.hints.slice(0, used).map((t, i) => `<p class="hint-text"><b>Stufe ${i + 1}:</b> ${t}</p>`).join("");
       return `<div class="task"><p class="task-title">▸ ${esc(p.objective)}</p>${shown}${used < p.hints.length ? `<button class="btn small" data-hint="${p.id}">Hinweis ${used + 1} von ${p.hints.length} anfordern</button>` : ""}</div>`;
     }).join("") || `<p class="muted">Keine offenen Aufgaben bekannt. Untersuche die Anlage.</p>`;
-    overlay("echoOv", `<div class="echo-term"><div class="echo-head">${has("assist_entlarvt") ? "ECHO/09/ASSIST" : "WARTUNGSASSISTENZ"} · KESSELBERG · ${sessions()} ${sessions() === 1 ? "SITZUNG" : "SITZUNGEN"}</div><div class="echo-log">${log}</div><h3>Offene Aufgaben</h3>${tasks}</div>`);
+    // T2: ab Sektor D lenkt die „Wartungsassistenz“ offen zu FORTSETZEN – die Hinweise selbst bleiben richtig
+    const rec = has("tuer_d") && !has("ende") ? `<div class="echo-rec"><p class="echo-head">${has("assist_entlarvt") ? "ECHO/09/ASSIST · EMPFEHLUNG" : "EMPFEHLUNG DER WARTUNGSASSISTENZ"}</p><p>${has("assist_entlarvt")
+      ? "Ich empfehle weiterhin: <b>FORTSETZEN</b>. Jetzt wisst ihr, wer das empfiehlt. Ändert das etwas an der Empfehlung?"
+      : has("entered_sektor9") ? "Ihr seid am Ziel. Die Taste <b>FORTSETZEN</b> sichert alles, was ihr gefunden habt. Abschalten löscht es. Senden gefährdet euch."
+      : "Die Anlage ist stabil. Am Ende genügt <b>FORTSETZEN</b> – Abschalten oder Senden gefährdet alle gesicherten Daten. Nowaks Schaltung ist veraltet und unnötig."}</p></div>` : "";
+    overlay("echoOv", `<div class="echo-term"><div class="echo-head">${has("assist_entlarvt") ? "ECHO/09/ASSIST" : "WARTUNGSASSISTENZ"} · KESSELBERG · ${sessions()} ${sessions() === 1 ? "SITZUNG" : "SITZUNGEN"}</div><div class="echo-log">${log}</div>${rec}<h3>Offene Aufgaben</h3>${tasks}</div>`);
   }
 
   /* ---------- Nowaks Relais (K3): Maschinenhalle D und Leitstand A innerhalb von 90 Sekunden ---------- */
@@ -277,6 +310,7 @@
     const evalHtml = e.final ? `<div class="echo-eval"><p class="echo-head">ECHO · AUSWERTUNG VERSUCHSGRUPPE 09</p>
       <p class="term">Dauer: ${clockText()} · Personen: ${sessions()} · Dokumente gesichtet: ${knownDocs().length}${mp ? ` · davon geteilt: ${S.teamDocs.length}` : ""}</p>
       <p class="term">Angeforderte Hinweise: ${hints}. ${hints ? "Jeder davon kam von mir." : "Ihr habt mich nicht gefragt. Ihr habt mir trotzdem zugehört."}</p>
+      ${voteEval()}${S.t4n ? `<p class="term">Zögern notiert: ${S.t4n}-mal.${has("blind") ? "" : " Ihr wart nie unbeobachtet."}</p>` : ""}${has("blind") ? `<p class="term">Beobachtung abgeschaltet um ${esc(S.blindAt || "?")}. Ich habe trotzdem mitgeschrieben.</p>` : ""}
       <p class="term">Entscheidung: ${esc(e.choice)}. ${esc(e.verdict)}</p>
       <p class="muted">Habt ihr das selbst entschieden?</p></div>` : "";
     overlay("endOv", `<div class="end-card"><p class="eyebrow">${esc(e.kicker)}</p><h2>${esc(e.title)}</h2>${e.html}${evalHtml}<p class="muted small">Spielzeit ${clockText()} · Hinweise genutzt: ${hints}</p><button class="btn" data-restart>Neu beginnen</button></div>`);
@@ -308,11 +342,11 @@
       if (t.closest(".ov-close")) { closeOverlays(); return; }
       const go = t.closest("[data-go]"); if (go) { const [hid, sid] = go.dataset.go.split("|"); mapGo(hid, sid); return; }
       const doc = t.closest("[data-doc]"); if (doc) { S.newDocs = S.newDocs.filter((x) => x !== doc.dataset.doc); save(); showArchive(doc.dataset.doc); renderSide(); return; }
-      const sh = t.closest("[data-share]"); if (sh) { const id = sh.dataset.share; if (!S.teamDocs.includes(id)) S.teamDocs.push(id); save(); A.play("paper"); showArchive(id); return; }
+      const sh = t.closest("[data-share]"); if (sh) { const id = sh.dataset.share; if (!S.teamDocs.includes(id)) S.teamDocs.push(id); save(); A.play("paper"); showArchive(id); t4(`${myName()} TEILT „${D.docs[id].title.toUpperCase()}“. VERTRAUEN IN DIE GRUPPE: NOTIERT.`); return; }
       if (t.closest("[data-chat-send]")) { sendChat(); return; }
       if (t.closest("#chatBtn")) { showChat(); return; }
       if (t.closest("[data-mp-leave]")) { if (mp && mp.leave) mp.leave(); return; }
-      const hint = t.closest("[data-hint]"); if (hint) { const id = hint.dataset.hint; S.hints[id] = (S.hints[id] || 0) + 1; save(); A.play("chirp"); showEcho(); return; }
+      const hint = t.closest("[data-hint]"); if (hint) { const id = hint.dataset.hint; S.hints[id] = (S.hints[id] || 0) + 1; save(); A.play("chirp"); showEcho(); t4(`HINWEIS ${S.hints[id]} ANGEFORDERT: ${D.puzzles[id].title.toUpperCase()}. ABHÄNGIGKEIT STEIGT.`); return; }
       if (t.closest("[data-restart]")) { localStorage.removeItem(SAVE_KEY); location.reload(); }
     });
     document.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.id === "chatInput") { sendChat(); return; } if (e.key === "Escape" && $(".overlay.show")) closeOverlays(); if (!S.started || blocked()) return; if (e.key === "ArrowLeft") turn(-1); if (e.key === "ArrowRight") turn(1); if (e.key === "m") showMap(); });
@@ -353,10 +387,52 @@
     }
     return news;
   }
-  const position = () => ({ hall: S.hall, station: S.station, view: S.view, hallName: hall().name, stationName: station().name });
+  const position = () => ({ hall: S.hall, station: S.station, view: S.view, hallName: hall().name, stationName: station().name, vote: S.vote, vr: S.voteRound });
+
+  /* ---------- Abstimmung in Sektor 9 (gemeinsam): jede Stimme steht in der eigenen Positionszeile ---------- */
+  const VOTE = { ende_a: "ABSCHALTEN", ende_b: "SENDEN", ende_c: "FORTSETZEN" };
+  const myName = () => String((mp && mp.name && mp.name()) || "DU").toUpperCase();
+  function noteVote(n, v) { if (!v || !VOTE[v.c]) return; const k = n + "|" + v.r; if (!S.votes.some((x) => x.k === k)) { S.votes.push({ k, n, c: v.c, r: v.r, t: v.t || Date.now() }); return true; } return false; }
+  function castVote(pid) {
+    S.vote = { c: pid, r: S.voteRound, t: Date.now() }; noteVote(myName(), S.vote); A.play("relay"); save();
+    setNarration(`Deine Stimme: <b>${esc(VOTE[pid])}</b>. Es gilt, wenn alle im Team dasselbe wählen.`); evaluateVotes(); renderVote();
+  }
+  function evaluateVotes() {
+    if (!mp || has("ende")) return;
+    const others = team.map((p) => ({ n: String(p.name || "?").toUpperCase(), v: p.pos && p.pos.vote, vr: (p.pos && p.pos.vr) || 0 }));
+    others.forEach((o) => { if (o.v && noteVote(o.n, o.v) && o.v.r === S.voteRound && S.started) t4(`${o.n} WÄHLT ${VOTE[o.v.c]}.`, { force: true }); });
+    // erst die eigene Runde auswerten (Stimmen behalten ihre Rundennummer), dann ggf. eine neuere Runde übernehmen
+    const all = [{ n: myName(), v: S.vote }, ...others], R = S.voteRound;
+    if (others.length && all.every((x) => x.v && x.v.r === R)) {
+      const choice = all[0].v.c;
+      if (all.every((x) => x.v.c === choice)) { if (!isSolved(choice)) { S.solved.push(choice); run(D.puzzles[choice].onSolve); A.play("relay"); save(); refresh(); } renderVote(); return; }
+      echo(`UNEINIGKEIT. ${all.map((x) => `${x.n}: ${VOTE[x.v.c]}`).join(" · ")}. INTERESSANT. WÄHLT ERNEUT.`);
+      S.voteRound = R + 1; save();
+    }
+    const maxR = Math.max(S.voteRound, ...others.map((o) => o.vr));
+    if (maxR > S.voteRound) { S.voteRound = maxR; save(); }
+    renderVote();
+  }
+  function renderVote() {
+    const box = $("#voteBox"); if (!box) return;
+    const show = Boolean(mp && team.length && S.started && S.hall === "sektor9" && !has("ende"));
+    box.classList.toggle("show", show); if (!show) return;
+    const v = (x) => (x && x.r === S.voteRound ? VOTE[x.c] : "–");
+    box.innerHTML = `ABSTIMMUNG · RUNDE ${S.voteRound + 1}<br>${[`<b>${esc(myName())}</b> ${v(S.vote)}`, ...team.map((p) => `<b>${esc(String(p.name || "?").toUpperCase())}</b> ${v(p.pos && p.pos.vote)}`)].join(" · ")}`;
+  }
+  function voteEval() {
+    if (!S.votes.length) return "";
+    const rounds = Math.max(...S.votes.map((x) => x.r)) + 1, c = S.votes.filter((x) => x.c === "ende_c").sort((a, b) => a.t - b.t)[0];
+    return `<p class="term">Abstimmung: ${rounds} ${rounds === 1 ? "Runde" : "Runden"}. ${c ? `Zuerst FORTSETZEN gewählt hat: ${esc(c.n)}.` : "Niemand hat FORTSETZEN gewählt. Noch nicht."}</p>`;
+  }
+  const seenPos = {}; // T4 für Mitspieler: Standpunktwechsel nach kurzer Zeit
   /** Mitspieler: [{ id, name, color, pos }] – Teamliste, Karte, Helmlampen in derselben Halle. */
   function setTeam(list) {
     team = list || []; renderTeam();
+    team.forEach((p) => { if (!p.pos) return; const k = p.pos.hall + "|" + p.pos.station, o = seenPos[p.id];
+      if (o && o.k !== k) { const [h0, s0] = o.k.split("|"); leftStation(String(p.name || "?").toUpperCase(), h0, s0, Date.now() - o.t); }
+      if (!o || o.k !== k) seenPos[p.id] = { k, t: Date.now() }; });
+    evaluateVotes(); renderVote();
     if (N.view3d && N.view3d.setPlayers) N.view3d.setPlayers(team.filter((p) => p.pos && p.pos.hall === S.hall).map((p) => ({ id: p.id, color: p.color, station: p.pos.station })));
     if ($("#mapOv.show")) showMap();
   }
@@ -364,7 +440,7 @@
     const el = $("#teamBox"); if (!el) return;
     el.classList.toggle("hidden", !mp); $("#chatBtn").classList.toggle("hidden", !mp);
     if (!mp) return;
-    el.innerHTML = `<h2 class="side-h">TEAM · ${esc(mp.code ? mp.code() : "")}</h2><ul class="team-list">${team.map((p) => `<li><i class="mate" style="--c:${p.color}"></i><b>${esc(p.name)}</b><span>${p.pos ? esc(p.pos.hallName + " · " + p.pos.stationName) : "noch nicht in der Anlage"}</span></li>`).join("") || `<li class="muted small">Noch niemand sonst in der Anlage.</li>`}</ul><button class="link-btn" data-mp-leave>Sitzung verlassen</button>`;
+    el.innerHTML = `<h2 class="side-h">TEAM · ${esc(mp.code ? mp.code() : "")}</h2><ul class="team-list">${team.map((p) => `<li><i class="mate" style="--c:${p.color}"></i><b>${esc(p.name)}</b><span>${p.pos ? esc(p.pos.hallName + " · " + p.pos.stationName) : "noch nicht in der Anlage"}${p.pos && p.pos.vote && p.pos.vote.r === S.voteRound && !has("ende") ? ` · stimmt für ${esc(VOTE[p.pos.vote.c] || "?")}` : ""}</span></li>`).join("") || `<li class="muted small">Noch niemand sonst in der Anlage.</li>`}</ul><button class="link-btn" data-mp-leave>Sitzung verlassen</button>`;
     const unread = chat.filter((m) => m.t > (S.chatSeen || 0)).length; $("#chatCount").textContent = unread || ""; $("#chatCount").classList.toggle("fresh", unread > 0);
   }
   /* Funk: kurze Textnachrichten im Team */

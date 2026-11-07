@@ -9,8 +9,10 @@ Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselk
 | 1 | Verteilerhalle, Kommando A | Handrad, Gitter 4625, Notstrom, Band 1, Kassette 2338 (Funkzeit ≠ Lagetafel) |
 | 2 | Personal B | Bürotür 1730, Käfig, Spind 0311, Wartungsgang A–B, Bänder 2–3 (die sieben Minuten, Albers’ Abbruch) |
 | 3 | Forschung C | ECHO-Uhr (Ortszeit + 7 Min.), Versuchsplan, Beobachtungsraum, Band 4, Schleuse, **K1**: Terminal „3 2251“ |
-| 4 | Sicherheit D | Schaltbuch, Band 5, Glastür 2305, Prozessliste (Hilfe = ECHO), Band 6 (Quelle des Funksignals), **K3**: Hebel + Leitstand-Schalter innerhalb von 90 s |
-| 5 | Sektor 9 | Ostrowskis letzte Aufzeichnung, Entscheidung: **A** Abschalten (K3) · **B** Senden (K3 + alle sechs Bänder) · **C** Fortsetzen – danach ECHOs Auswertung |
+| 4 | Sicherheit D | Schaltbuch, Band 5, Glastür 2305, Prozessliste (Hilfe = ECHO), Band 6 (Quelle des Funksignals), **K3**: Hebel + Leitstand-Schalter innerhalb von 90 s · freiwillig: **Befehlsarchiv** (Eintrag 22:58 in zwei Fassungen, Code 2251), **Steckfeld** (vier Kamerastecker → ECHO blind) |
+| 5 | Sektor 9 | Ostrowskis letzte Aufzeichnung, Entscheidung: **A** Abschalten (K3) · **B** Senden (K3 + alle sechs Bänder) · **C** Fortsetzen – im Team als **Abstimmung** (gilt erst, wenn alle dasselbe wählen) – danach ECHOs Auswertung |
+
+**ECHO lenkt (Drehbuch, Abschnitt 5):** Ab Sektor D empfiehlt die „Wartungsassistenz“ im ECHO-Terminal offen FORTSETZEN (T2, die Hinweise bleiben richtig). Das Befehlsarchiv zeigt nicht jedem dieselbe Fassung (T3: im Team je nach Platz, allein wechselt sie beim erneuten Hinsehen). ECHO kommentiert echte Handlungen: kurzes Verweilen, Hinweise, geteilte Funde, Stimmen (T4) – bis das Steckfeld gezogen ist. Die Auswertung nennt Abstimmungsrunden, wer zuerst FORTSETZEN gewählt hat, wie oft Zögern notiert wurde und ob die Beobachtung abgeschaltet war (T6).
 
 ## Aufbau
 
@@ -35,8 +37,10 @@ node sektor-9/tests/abschnitt2.test.js        # Abschnitt 2 (Spielstand nach Abs
 node sektor-9/tests/abschnitt3.test.js        # Abschnitt 3 (Spielstand nach Abschnitt 2)
 node sektor-9/tests/abschnitt4.test.js        # Abschnitte 4–5 bis Ende B
 node sektor-9/tests/enden.test.js             # Bedingungen der Enden, Ende A und C
+node sektor-9/tests/nebenraetsel.test.js      # Befehlsarchiv, Steckfeld, ECHOs Empfehlung und Kommentare
 node sektor-9/tests/mehrspieler.test.js       # zu zweit gegen die echte Datenbank
 node sektor-9/tests/mehrspieler-k3.test.js    # Nowaks Abschaltung zu zweit (echte Datenbank)
+node sektor-9/tests/mehrspieler-abstimmung.test.js  # Abstimmung im Rechenkern zu zweit (echte Datenbank)
 ```
 
 ## Gemeinsam spielen
@@ -46,7 +50,7 @@ Anbindung `js/mp-adapter.js` an `platform/multiplayer` (nur vorhandene Funktione
 | Eintrag (`set_session_state`) | Inhalt |
 |---|---|
 | `shared` | gelöste Rätsel, Zustände, Ausrüstungs-Vorrat, verbrauchte Gegenstände (`gone`), Team-Archiv |
-| `pos:<Nutzer-ID>` | Halle, Standpunkt, Blickrichtung – Teamliste, Punkte auf der Karte, Helmlampe in derselben Halle |
+| `pos:<Nutzer-ID>` | Halle, Standpunkt, Blickrichtung – Teamliste, Punkte auf der Karte, Helmlampe in derselben Halle · eigene Stimme im Rechenkern (`vote`, `vr` = Runde) |
 | `chat` | Funk im Team, Nachrichten werden vereinigt |
 
 Pro Person bleiben Standpunkt, Hinweise, ECHO-Protokoll und **eigene Funde**. Ein Fund geht erst mit „Mit dem Team teilen“ ins Team-Archiv.

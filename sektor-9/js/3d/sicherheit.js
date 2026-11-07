@@ -4,10 +4,15 @@
  *     Schaltpult mit drei Hebeln (KERN 2 – KERN 1 – NETZ D → Zeitrelais 90 s; zweiter Schalter im Leitstand A).
  *   Rechenzentrum (Ost, Glaskasten mit Tastenfeld 2305): Rechnerschränke, Konsole, Prozessliste, Band 6 (Quellmaterial), Sendeanlage.
  *   Vor Sektor 9 (Süd): runde Panzertür 9 (öffnet sich von innen, sobald man im Rechenzentrum ist), Kabeltrasse.
+ *   Nebenrätsel: Befehlsarchiv (Bildschirm im Rechenzentrum, Eintrag 22:58 in zwei Fassungen) und Steckfeld an der Kabeltrasse
+ *     (vier Kamerastecker ziehen → ECHO ist blind; falsche Stecker setzen zurück).
  * Koordinaten: x −9…9 (West…Ost), z −6…6 (Nord…Süd), Höhe 6,5 m. Eingang Nordwand (x = 0).
  */
 import { THREE, defineRoom, ready, box, cyl, plane, group, ZONE, canvasTex } from "./core.js?v=1";
 import { mats, shellBox, crt, termText, cageLamp, tube, pipe, label, stencil, stationMark, animateMarks, sheet, lines, keypad, MONO, std } from "./s9kit.js?v=1";
+
+const ECHO_PLUGS = [["cam_a", "KAMERA LEITSTAND A"], ["terminal", "TERMINAL VERTEILER"], ["cam_c", "KAMERA LABOR C"], ["luft", "LÜFTUNG RZ"],
+  ["tel", "TELEFON STAB"], ["cam_b", "KAMERA UNTERKÜNFTE B"], ["licht", "LICHT D"], ["cam_d", "KAMERA MASCHINEN D"]];
 
 defineRoom("sicherheit", (ctx) => {
   const { add, hs, state, anim, lerp, scene } = ctx;
@@ -94,6 +99,12 @@ defineRoom("sicherheit", (ctx) => {
   sender.position.set(6.0, 0, 0.0); sender.rotation.y = Math.PI; add(hs("d_sender", sender));
   anim((dt, t) => tubesS.forEach((tb, i) => { tb.material.emissiveIntensity = 1.0 + Math.sin(t * 3 + i) * 0.4; }));
   const rzL = new THREE.PointLight(0x9fe0b0, 2.0, 7, 2); rzL.position.set(6, 2.6, -2.2); add(rzL);
+  // Befehlsarchiv: eigener Bildschirm an der Nordglaswand
+  const arch = crt(M, 0.56, 0.42, [320, 240]);
+  const paintArch = () => { const ok = eng().isSolved("archiv"); arch.paint((g) => termText(g, ok ? ["BEFEHLSARCHIV", "EINTRAG 22:58", "", ["FASSUNG 1: ABBRUCH", "#8fd19e"], ["FASSUNG 2: ERZEUGT", "#e07a6a"], "", "PROTOKOLL GEDRUCKT"] : ["BEFEHLSARCHIV", "LEITSTAND 17.02.87", "", ["22:58  EINTRAG", "#e0b45a"], ["PRUEFEN? _", "#e0b45a"]], { size: 19, step: 28, y: 32 })); };
+  const archG = group(box(0.9, 0.78, 0.6, M.paintGrey, 0, 0.39, 0), arch.g, plane(0.6, 0.08, label("BEFEHLSARCHIV", 512, 80, "#e8e2cc", "#2d3a30", 40), 0, 0.68, 0.305), box(1.0, 1.6, 0.8, ZONE, 0, 0.8, 0));
+  arch.g.position.set(0, 1.08, 0); archG.position.set(4.2, 0, -4.5); archG.rotation.y = -0.45; add(hs(["d_archiv_ok", "d_archiv"], archG));
+  state(paintArch);
 
   /* ===== Vor Sektor 9: runde Panzertür in der Südwand ===== */
   const vault = new THREE.Group(); vault.position.set(0, 1.5, 5.9); add(vault);
@@ -110,7 +121,25 @@ defineRoom("sicherheit", (ctx) => {
   let v9 = false; state(() => { v9 = eng().has("tuer9"); });
   anim((dt) => { vPivot.rotation.y = lerp(vPivot.rotation.y, v9 ? 1.25 : 0, Math.min(1, dt * 0.5)); vL.intensity = v9 ? 3 : 0; });
   const trasse = group(); for (let i = 0; i < 10; i++) trasse.add(box(0.05, 0.05, 6, M.black, 2.0 + i * 0.07, 4.6 + (i % 3) * 0.08, 2.9));
-  trasse.add(box(0.9, 0.4, 6, ZONE, 2.3, 4.6, 2.9)); add(hs("d_trasse", trasse));
+  add(trasse, box(0.3, 3.2, 0.08, M.black, 2.6, 3.0, 5.9)); // Kabelstrang hinunter zum Steckfeld
+  // Steckfeld (Südwand, Griffhöhe): acht Stecker, vier davon für ECHOs Kameras
+  const P = ECHO_PLUGS, panel = new THREE.Group(); panel.position.set(2.6, 1.3, 5.9); panel.rotation.y = Math.PI; add(panel);
+  panel.add(box(1.36, 0.78, 0.08, M.paintGrey, 0, 0, 0), plane(1.1, 0.08, label("BEOBACHTUNG / VERSORGUNG · NICHT TRENNEN", 1024, 80, "#e8e2cc", "#6b2a22", 30), 0, 0.33, 0.045));
+  const plugs = P.map(([id, name], i) => { const x = -0.48 + (i % 4) * 0.32, y = i < 4 ? 0.1 : -0.2;
+    panel.add(cyl(0.05, 0.05, 0.02, M.black, x, y, 0.05, 14).rotateX(Math.PI / 2), plane(0.29, 0.05, label(name, 512, 88, "#e8e2cc", "#2d3a30", 34), x, y - 0.1, 0.045));
+    const pg = group(cyl(0.035, 0.035, 0.12, M.red, 0, 0, 0.06, 12).rotateX(Math.PI / 2), box(0.2, 0.16, 0.2, ZONE, 0, 0, 0.08));
+    pg.position.set(x, y, 0.05); pg.userData = { id, x, y }; panel.add(pg); return pg; });
+  let pseq = [], pLock = false;
+  const pullPlug = (pg) => { const id = pg.userData.id; if (pLock || pseq.includes(id) || eng().isSolved("kameras")) return; pseq.push(id); snd("click");
+    const r = eng().tryLock("kameras", pseq.join(",")); if (!r.ok && !r.partial) { pLock = true; setTimeout(() => { pseq = []; pLock = false; }, 900); } };
+  const camLamp = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff2a1a, toneMapped: false })); camLamp.position.set(0, 3.25, 5.75); add(camLamp);
+  anim((dt, t) => { const blind = eng().has("blind");
+    plugs.forEach((pg) => { const out = pseq.includes(pg.userData.id) || (blind && pg.userData.id.startsWith("cam_")); pg.position.z = lerp(pg.position.z, out ? 0.2 : 0.05, Math.min(1, dt * 10)); pg.rotation.x = lerp(pg.rotation.x, out ? -0.6 : 0, Math.min(1, dt * 8)); });
+    camLamp.visible = !blind && Math.sin(t * 1.3) > -0.6; });
+  const plugSpec = { when: (id) => id === "d_trasse" && !eng().isSolved("kameras"), cam: [0, 0.05, 1.9], center: [0, -0.04, 0], fov: 42, exitDelay: 2600,
+    hint: "Stecker antippen, um ihn zu ziehen", value: () => pseq.join(","), enter: () => { if (!pLock) pseq = []; },
+    parts: () => plugs.map((pg) => ({ obj: pg, name: "stecker_" + pg.userData.id, tap: () => pullPlug(pg), drag: (dx, dy) => { if (Math.abs(dy) > 4 || Math.abs(dx) > 4) pullPlug(pg); } })) };
+  panel.add(hs("d_trasse", group(box(1.5, 0.95, 0.4, ZONE, 0, 0, 0.1)), { focus: plugSpec }));
 
   /* ===== Licht ===== */
   const lamps = [[-5, -3], [-5, 3], [0, 0], [0, 4]].map(([x, z]) => { const l = cageLamp(M, 0xffb060, 4, 10); l.g.position.set(x, H - 1.2, z); add(l.g); return l; });

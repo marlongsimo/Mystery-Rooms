@@ -20,7 +20,7 @@
   const fresh = () => ({ v: 1, started: false, finished: false, hall: D.start.hall, station: D.start.station, view: D.start.view || 0,
     flags: [], solved: [], inventory: [...(D.start.inventory || [])], docs: [...(D.start.docs || [])], newDocs: [], seen: [], hints: {},
     echo: [], playMs: 0, sound: true, teamDocs: [], gone: { items: [] }, relay: { d: 0, a: 0 }, ending: null,
-    vote: null, voteRound: 0, votes: [], varSeen: {}, stAt: 0, t4At: -1e9, t4n: 0, blindAt: null });
+    vote: null, voteRound: 0, votes: [], varSeen: {}, stAt: 0, t4At: -1e9, t4n: 0, blindAt: null, fake: null, noCountdown: false });
   let S = fresh(), selected = null, blockedUntil = 0;
   function load() { try { const s = JSON.parse(localStorage.getItem(saveKey) || "null"); if (s && s.v === 1) S = { ...fresh(), ...s }; } catch (e) { /* neu */ } }
   function save() { try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privat */ } if (mp && mp.changed) mp.changed(); }
@@ -76,6 +76,7 @@
       if (a.end) setTimeout(() => showEnd(a.end), a.delay || 600);
       if (a.relay) { S.relay[a.relay] = Date.now(); relayTick(); checkK3(); }
       if (a.flag === "blind" && !S.blindAt) S.blindAt = clockText();
+      if (a.countdown && !S.fake) { S.fake = { end: S.playMs + a.countdown * 1000, moves: 0, done: false }; fakeTick(); }
     }
   }
   function succeed(p) {
@@ -183,6 +184,19 @@
   }
 
   /* ---------- Bewegung ---------- */
+  /* ---------- Falscher Countdown (T5): läuft mit der Spielzeit, bei null passiert nichts ---------- */
+  function fakeTick() {
+    const box = $("#fakeBox"); if (!box) return;
+    const f = S.fake, live = f && !f.done;
+    if (live && S.playMs >= f.end) { f.done = true; save(); echo("DRUCKAUSGLEICH ABGESCHLOSSEN. ES GAB NIE EINEN DRUCKABFALL."); setTimeout(() => echo(f.moves ? `${f.moves}-MAL DEN STANDPUNKT GEWECHSELT. IHR SEID GERANNT.` : "IHR SEID NICHT GERANNT. BEMERKENSWERT."), 6800); }
+    const show = Boolean(live && !f.done && S.started && !S.noCountdown && S.hall !== "sektor9"); // im Rechenkern steht dort die Abstimmung
+    box.classList.toggle("show", show); if (!show) return;
+    const left = Math.max(0, Math.ceil((f.end - S.playMs) / 1000)), mm = Math.floor(left / 60), ss = left % 60;
+    box.innerHTML = `DRUCKABFALL SEKTOR D · <b>${mm}:${String(ss).padStart(2, "0")}</b> <button type="button" class="link-btn" data-nocount title="Der Countdown hat keine Folgen fürs Spiel">ausblenden</button>`;
+    if (ss === 0 && left !== fakeTick.last) A.play("chirp"); fakeTick.last = left;
+  }
+  const fakeMove = () => { if (S.fake && !S.fake.done) S.fake.moves++; };
+
   /* ---------- ECHO kommentiert echte Handlungen (T4, ab Sektor D) ---------- */
   const T4_TAIL = ["UNSICHERHEIT NOTIERT.", "ZÖGERN NOTIERT.", "ABBRUCHNEIGUNG: ERHÖHT.", "INTERESSANT."];
   const dur = (ms) => (ms < 60000 ? `${Math.max(5, Math.round(ms / 5000) * 5)} SEKUNDEN` : `${Math.round(ms / 60000)} ${Math.round(ms / 60000) === 1 ? "MINUTE" : "MINUTEN"}`);
@@ -197,13 +211,13 @@
   }
   function goStation(st, view) {
     if (!hall().stations[st]) return;
-    leftStation("DU", S.hall, S.station, S.playMs - (S.stAt || 0)); S.stAt = S.playMs;
+    leftStation("DU", S.hall, S.station, S.playMs - (S.stAt || 0)); S.stAt = S.playMs; fakeMove();
     S.station = st; if (view !== undefined) S.view = view; else if (hall().stations[st].view !== undefined) S.view = hall().stations[st].view;
     A.play("step"); save(); refresh(); setNarration(hall().stations[st].arrive || "");
   }
   function goHall(hid, st, view) {
     const h2 = D.halls[hid]; if (!h2) return;
-    leftStation("DU", S.hall, S.station, S.playMs - (S.stAt || 0)); S.stAt = S.playMs;
+    leftStation("DU", S.hall, S.station, S.playMs - (S.stAt || 0)); S.stAt = S.playMs; fakeMove();
     S.hall = hid; S.station = st || Object.keys(h2.stations)[0]; S.view = view ?? h2.stations[S.station].view ?? 0;
     A.play("door"); A.ambient(h2.ambient || null); save(); refresh();
     if (h2.onEnter && !has("entered_" + hid)) { S.flags.push("entered_" + hid); run(h2.onEnter); save(); }
@@ -310,7 +324,7 @@
     const evalHtml = e.final ? `<div class="echo-eval"><p class="echo-head">ECHO · AUSWERTUNG VERSUCHSGRUPPE 09</p>
       <p class="term">Dauer: ${clockText()} · Personen: ${sessions()} · Dokumente gesichtet: ${knownDocs().length}${mp ? ` · davon geteilt: ${S.teamDocs.length}` : ""}</p>
       <p class="term">Angeforderte Hinweise: ${hints}. ${hints ? "Jeder davon kam von mir." : "Ihr habt mich nicht gefragt. Ihr habt mir trotzdem zugehört."}</p>
-      ${voteEval()}${S.t4n ? `<p class="term">Zögern notiert: ${S.t4n}-mal.${has("blind") ? "" : " Ihr wart nie unbeobachtet."}</p>` : ""}${has("blind") ? `<p class="term">Beobachtung abgeschaltet um ${esc(S.blindAt || "?")}. Ich habe trotzdem mitgeschrieben.</p>` : ""}
+      ${voteEval()}${S.t4n ? `<p class="term">Zögern notiert: ${S.t4n}-mal.${has("blind") ? "" : " Ihr wart nie unbeobachtet."}</p>` : ""}${S.fake && S.fake.done ? `<p class="term">Countdown Sektor D: ${S.fake.moves}-mal den Standpunkt gewechselt, während er lief. Es gab nie einen Druckabfall.</p>` : ""}${has("blind") ? `<p class="term">Beobachtung abgeschaltet um ${esc(S.blindAt || "?")}. Ich habe trotzdem mitgeschrieben.</p>` : ""}
       <p class="term">Entscheidung: ${esc(e.choice)}. ${esc(e.verdict)}</p>
       <p class="muted">Habt ihr das selbst entschieden?</p></div>` : "";
     overlay("endOv", `<div class="end-card"><p class="eyebrow">${esc(e.kicker)}</p><h2>${esc(e.title)}</h2>${e.html}${evalHtml}<p class="muted small">Spielzeit ${clockText()} · Hinweise genutzt: ${hints}</p><button class="btn" data-restart>Neu beginnen</button></div>`);
@@ -327,7 +341,7 @@
     if (D.start.echo && !S.echo.length) setTimeout(() => echo(D.start.echo.replace("1 AKTIVE SITZUNG", sessions() === 1 ? "1 AKTIVE SITZUNG" : `${sessions()} AKTIVE SITZUNGEN`)), 2600);
   }
   let last = performance.now();
-  setInterval(() => { const n = performance.now(); if (S.started && !document.hidden) { S.playMs += n - last; $("#clock").textContent = clockText(); } last = n; }, 1000);
+  setInterval(() => { const n = performance.now(); if (S.started && !document.hidden) { S.playMs += n - last; $("#clock").textContent = clockText(); fakeTick(); } last = n; }, 1000);
 
   function bind() {
     $("#startBtn").onclick = () => { if ($("#startBtn").dataset.fresh) { S = fresh(); } start(); };
@@ -338,6 +352,7 @@
     document.addEventListener("click", (e) => {
       const t = e.target;
       const slot = t.closest("[data-slot]"); if (slot) { const id = slot.dataset.slot; selected = selected === id ? null : id; A.play("click"); renderSide(); return; }
+      if (t.closest("[data-nocount]")) { S.noCountdown = true; save(); fakeTick(); setNarration("Countdown ausgeblendet. Er hat keine Folgen für das Spiel."); return; }
       if (t.closest("[data-drop]")) { e.preventDefault(); selected = null; renderSide(); return; }
       if (t.closest(".ov-close")) { closeOverlays(); return; }
       const go = t.closest("[data-go]"); if (go) { const [hid, sid] = go.dataset.go.split("|"); mapGo(hid, sid); return; }

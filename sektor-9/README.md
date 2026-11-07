@@ -12,7 +12,7 @@ Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselk
 | 4 | Sicherheit D | Schaltbuch, Band 5, Glastür 2305, Prozessliste (Hilfe = ECHO), Band 6 (Quelle des Funksignals), **K3**: Hebel + Leitstand-Schalter innerhalb von 90 s · freiwillig: **Befehlsarchiv** (Eintrag 22:58 in zwei Fassungen, Code 2251), **Steckfeld** (vier Kamerastecker → ECHO blind) |
 | 5 | Sektor 9 | Ostrowskis letzte Aufzeichnung, Entscheidung: **A** Abschalten (K3) · **B** Senden (K3 + alle sechs Bänder) · **C** Fortsetzen – im Team als **Abstimmung** (gilt erst, wenn alle dasselbe wählen) – danach ECHOs Auswertung |
 
-**ECHO lenkt (Drehbuch, Abschnitt 5):** Ab Sektor D empfiehlt die „Wartungsassistenz“ im ECHO-Terminal offen FORTSETZEN (T2, die Hinweise bleiben richtig). Das Befehlsarchiv zeigt nicht jedem dieselbe Fassung (T3: im Team je nach Platz, allein wechselt sie beim erneuten Hinsehen). ECHO kommentiert echte Handlungen: kurzes Verweilen, Hinweise, geteilte Funde, Stimmen (T4) – bis das Steckfeld gezogen ist. Die Auswertung nennt Abstimmungsrunden, wer zuerst FORTSETZEN gewählt hat, wie oft Zögern notiert wurde und ob die Beobachtung abgeschaltet war (T6).
+**ECHO lenkt (Drehbuch, Abschnitt 5):** Ab Sektor D empfiehlt die „Wartungsassistenz“ im ECHO-Terminal offen FORTSETZEN (T2, die Hinweise bleiben richtig). Das Befehlsarchiv zeigt nicht jedem dieselbe Fassung (T3: im Team je nach Platz, allein wechselt sie beim erneuten Hinsehen). ECHO kommentiert echte Handlungen: kurzes Verweilen, Hinweise, geteilte Funde, Stimmen (T4) – bis das Steckfeld gezogen ist. Beim ersten Betreten von Sektor D läuft ein falscher Countdown „Druckabfall in 10:00“ (T5): Er läuft mit der Spielzeit, bei null passiert nichts, ECHO zählt nur, wie oft ihr den Standpunkt gewechselt habt; „ausblenden“ schaltet ihn ab. Die Auswertung nennt Abstimmungsrunden, wer zuerst FORTSETZEN gewählt hat, wie oft Zögern notiert wurde und ob die Beobachtung abgeschaltet war (T6).
 
 ## Aufbau
 
@@ -38,6 +38,7 @@ node sektor-9/tests/abschnitt3.test.js        # Abschnitt 3 (Spielstand nach Abs
 node sektor-9/tests/abschnitt4.test.js        # Abschnitte 4–5 bis Ende B
 node sektor-9/tests/enden.test.js             # Bedingungen der Enden, Ende A und C
 node sektor-9/tests/nebenraetsel.test.js      # Befehlsarchiv, Steckfeld, ECHOs Empfehlung und Kommentare
+node sektor-9/tests/countdown.test.js         # falscher Countdown in Sektor D
 node sektor-9/tests/mehrspieler.test.js       # zu zweit gegen die echte Datenbank
 node sektor-9/tests/mehrspieler-k3.test.js    # Nowaks Abschaltung zu zweit (echte Datenbank)
 node sektor-9/tests/mehrspieler-abstimmung.test.js  # Abstimmung im Rechenkern zu zweit (echte Datenbank)

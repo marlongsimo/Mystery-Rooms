@@ -39,7 +39,7 @@ window.SEKTOR9.data = (() => {
     },
     sicherheit: {
       name: "Sicherheits-Halle", short: "SICHERHEIT D", sector: "D", pos: "s", ambient: "generator", need: "tuer_d", lockedText: "Panzertür Süd – verriegelt",
-      onEnter: [{ echo: "SICHERHEIT D. ENERGIE: 100 %. ICH HABE AUF EUCH GEWARTET." }],
+      onEnter: [{ echo: "SICHERHEIT D. ENERGIE: 100 %. ICH HABE AUF EUCH GEWARTET." }, { echo: "WARNUNG: DRUCKABFALL SEKTOR D IN 10:00. ENTSCHEIDET SCHNELL.", delay: 7800 }, { countdown: 600 }],
       stations: {
         maschinen: { name: "Maschinenhalle", view: 2, views: ["Ausgang · Trennschalter", "Rechenzentrum", "Generatoren · Schaltpult", "Werkbank"] },
         rechenzentrum: { name: "Rechenzentrum", view: 1, need: "rz", arrive: "Hinter dem Glas ist es warm. Die Schränke summen. Auf jedem Bildschirm dieselbe Zeile.", views: ["Prozessliste", "Rechnerschränke · Konsole", "Sendeanlage", "Glastür"] },

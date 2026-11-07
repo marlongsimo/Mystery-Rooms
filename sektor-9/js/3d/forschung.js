@@ -36,7 +36,7 @@ defineRoom("forschung", (ctx) => {
     for (let i = 0; i < 3; i++) { const o = crt(M, 0.28, 0.2, [160, 120]); o.paint((c, w, h) => { c.strokeStyle = "#8fd19e"; c.lineWidth = 3; c.beginPath(); for (let x = 0; x < w; x += 4) c.lineTo(x, h / 2 + Math.sin(x * (0.05 + i * 0.03)) * 30); c.stroke(); }); o.g.scale.setScalar(0.9); o.g.position.set(-1.4 + i * 1.3, 1.15, -0.1); g.add(o.g); }
     g.add(box(0.5, 0.18, 0.35, M.paintGrey, 1.6, 1.03, 0.1)); g.position.set(-4.2, 0, z); g.rotation.y = rot; return g; };
   const bN = bench(-4.85, 0), bS = bench(4.85, Math.PI);
-  add(hs("c_tische", group(bN, bS, box(4.4, 1.4, 0.9, ZONE, -4.2, 0.7, 4.85))));
+  add(hs("c_tische", group(bN, bS, box(4.4, 1.4, 0.9, ZONE, -4.2, 0.7, 4.85)), { aimLocal: [-4.2, 1.0, 4.6] }));
   const clip = group(box(0.26, 0.012, 0.34, M.wood, 0, 0.006, 0), sheet(0.22, 0.3, (g, w, h) => { g.fillStyle = "#222"; g.font = `600 13px ${MONO}`; g.fillText("LAUF 08 · ABLAUF", 12, 22); lines(g, w, h, 10, 12, 40); }, M, 0), box(0.06, 0.02, 0.03, M.steel, 0, 0.018, -0.15), box(0.34, 0.06, 0.42, ZONE, 0, 0.02, 0));
   clip.children[1].position.y = 0.014; clip.position.set(-4.6, 0.95, -4.7); clip.rotation.y = 0.2; add(hs("c_plan", clip));
   const exitD = group(box(1.9, 2.5, 0.1, new THREE.MeshBasicMaterial({ color: 0x070807 }), 0, 1.25, 0), plane(1.4, 0.24, stencil("VERTEILER", 1024, 160, "#5a6a60", 110), 0, 2.75, 0.06), box(1.9, 2.5, 0.4, ZONE, 0, 1.25, 0));
@@ -120,8 +120,8 @@ defineRoom("forschung", (ctx) => {
   // Zeilen auf dem Bildschirm als antippbare Teile (unsichtbare Leisten vor dem Glas)
   const rowParts = entries.map((t, i) => { const r = box(0.56, 0.05, 0.02, ZONE, 0, 0.45 / 2 - (48 + 15 + i * 34) / 300 * 0.45, 0.04); term.g.add(r); r.userData.i = i + 1; return r; });
   const kp = keypad(ctx, M, { pid: "k1", prefix: () => (mark ? String(mark) : ""), size: 1.3 });
-  kp.g.position.set(5.6, 0.8, 4.78); kp.g.rotation.set(-1.2, Math.PI, 0, "YXZ"); add(kp.g); // liegt schräg, Tasten zum Spieler
-  const k1Spec = { when: () => !eng().isSolved("k1"), cam: [5.15, 1.45, 4.05], center: [5.2, 0.98, 4.95], fov: 44, exitDelay: 3000,
+  kp.g.position.set(5.0, 0.79, 4.66); kp.g.rotation.set(-1.2, Math.PI, 0, "YXZ"); add(kp.g); // liegt schräg, Tasten zum Spieler
+  const k1Spec = { when: () => !eng().isSolved("k1"), cam: [5.0, 1.5, 3.95], center: [5.0, 0.98, 4.85], fov: 46, exitDelay: 3000,
     hint: "Gefälschten Eintrag antippen · Funkzeit eintippen", value: () => mark + "|" + kp.value(), enter: () => { kp.reset(); },
     parts: () => [...rowParts.map((r) => ({ obj: r, name: "zeile" + r.userData.i, tap: () => { mark = r.userData.i; snd("key"); paintTerm(); } })), ...kp.parts()] };
   add(hs(["c_terminal_ok", "c_terminal"], group(box(1.6, 1.0, 0.8, ZONE, 5, 1.0, 5.0)), { focus: k1Spec }));

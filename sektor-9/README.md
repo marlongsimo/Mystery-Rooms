@@ -2,7 +2,7 @@
 
 Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselketten und Enden: [`DREHBUCH.md`](DREHBUCH.md).
 
-**Stand:** Abschnitte 1–2 von 5 (Verteilerhalle, Kommando-Halle A, Personal-Halle B). Allein oder gemeinsam mit bis zu vier Personen spielbar. Es folgen die Sektoren C und D, die Tonbänder 4–6 und die Enden.
+**Stand:** Abschnitte 1–3 von 5 (Verteilerhalle, Kommando-Halle A, Personal-Halle B, Forschungs-Halle C mit Kette K1 „Der letzte Befehl“). Allein oder gemeinsam mit bis zu vier Personen spielbar. Es folgen Sektor D mit Sektor 9 selbst, die Tonbänder 5–6, die Kette K3 (Abschaltung zu zweit) und die drei Enden.
 
 ## Aufbau
 
@@ -22,7 +22,10 @@ Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselk
 
 ```
 python3 -m http.server 8765 &      # im Repository-Wurzelordner
-node sektor-9/tests/abschnitt1.test.js        # ganzer Abschnitt 1 in 3D, SHOTS=1 für Bildschirmfotos
+node sektor-9/tests/abschnitt1.test.js        # Abschnitt 1 in 3D, SHOTS=1 für Bildschirmfotos
+node sektor-9/tests/abschnitt2.test.js        # Abschnitt 2 (Spielstand nach Abschnitt 1)
+node sektor-9/tests/abschnitt3.test.js        # Abschnitt 3 (Spielstand nach Abschnitt 2)
+node sektor-9/tests/mehrspieler.test.js       # zu zweit gegen die echte Datenbank
 ```
 
 ## Gemeinsam spielen

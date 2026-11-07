@@ -180,7 +180,7 @@ a { color: var(--green); }
 
 .seq-row { display: flex; flex-wrap: wrap; gap: 8px; } .seq-row .btn.on { background: var(--green-d); color: var(--text); }
 .confirm-row { margin-top: 14px; }
-.relay-box { position: absolute; left: 14px; top: 14px; padding: 8px 12px; background: #1a0705ee; border: 1px solid var(--red); color: #ffb0a0; font: 12.5px var(--mono); letter-spacing: .08em; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 3; }
+.relay-box { position: absolute; left: 14px; bottom: 60px; padding: 8px 12px; background: #1a0705ee; border: 1px solid var(--red); color: #ffb0a0; font: 12.5px var(--mono); letter-spacing: .08em; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 3; }
 .relay-box.show { opacity: 1; } .relay-box b { color: #fff; font-size: 15px; }
 .echo-eval { margin: 18px 0 6px; padding: 14px; border: 1px solid var(--green-d); background: #050806; text-align: left; }
 .echo-eval .echo-head { font: 500 11px var(--mono); letter-spacing: .2em; color: var(--red); margin: 0 0 8px; }

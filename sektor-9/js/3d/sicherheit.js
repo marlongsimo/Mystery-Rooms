@@ -50,7 +50,7 @@ defineRoom("sicherheit", (ctx) => {
     levers.forEach((pv) => { const down = done || seq.includes(pv.userData.id) || left > 0; pv.rotation.x = lerp(pv.rotation.x, down ? 1.2 : 0, Math.min(1, dt * 8)); });
     rAcc += dt; if (rAcc > 0.25) { rAcc = 0; const c = rC.getContext("2d"); c.fillStyle = "#120404"; c.fillRect(0, 0, 256, 64); c.fillStyle = done ? "#8fd19e" : left > 0 ? "#ff3b2a" : "#5a2a22"; c.font = `600 36px ${MONO}`; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(done ? "SCHARF" : left > 0 ? `${Math.ceil(left)} s` : "-- s", 128, 34); rT.needsUpdate = true; }
   });
-  const pultSpec = { when: (id) => id === "d_pult" && eng().has("schaltbuch") && !eng().isSolved("k3"), cam: [-2.4, 1.6, -0.4], center: [-2.4, 0.8, 0.3], fov: 44, exitDelay: 2600,
+  const pultSpec = { when: (id) => id === "d_pult" && eng().has("schaltbuch") && !eng().isSolved("k3"), cam: [-2.4, 1.75, -1.55], center: [-2.4, 0.85, 0.35], fov: 46, exitDelay: 2600,
     hint: "Hebel in der Reihenfolge aus dem Schaltbuch umlegen", value: () => seq.join(","), enter: () => { if (!sLock && relayLeft() <= 0) seq = []; },
     parts: () => levers.map((pv) => ({ obj: pv, name: "hebel_" + pv.userData.id, tap: () => pull(pv), drag: (dx, dy) => { if (dy > 4) pull(pv); } })) };
   add(hs(["d_pult_ok", "d_pult"], group(box(2.2, 1.3, 0.8, ZONE, -2.4, 0.65, 0.6)), { focus: pultSpec }));

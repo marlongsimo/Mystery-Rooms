@@ -14,7 +14,7 @@ defineRoom("kommando", (ctx) => {
   const M = mats(), snd = ctx.sound, eng = ctx.engine;
   const W = 16, D = 12, H = 7.5, GY = 3.2;
   const hemi = scene.children.find((c) => c.isHemisphereLight); if (hemi) hemi.intensity = 0.32;
-  shellBox(ctx, { W, D, H, M, holes: { s: [{ x: 4.5, y: 0, w: 1.9, h: 2.5 }] } });
+  shellBox(ctx, { W, D, H, M, holes: { s: [{ x: 4.5, y: 0, w: 1.9, h: 2.5 }, { x: 6.4, y: 0, w: 1.1, h: 1.5 }] } }); // Ausgang · Wartungsgang hinter dem Kartenschrank
   add(pipe(M, W, 0.12, 0, H - 0.4, 5.4), pipe(M, W, 0.07, 0, H - 0.65, 5.7), pipe(M, D, 0.1, 7.4, H - 0.4, 0, Math.PI / 2));
   for (let i = 0; i < 5; i++) add(box(0.4, H, 0.25, M.wall, -6 + i * 3, H / 2, 5.88)); // Wandpfeiler Süd
 
@@ -163,7 +163,13 @@ defineRoom("kommando", (ctx) => {
   // Kartenschrank (Südwand des Lagezentrums)
   const ks = group(box(1.8, 1.1, 0.9, M.paintGrey, 0, 0.55, 0));
   for (let i = 0; i < 6; i++) ks.add(box(1.7, 0.14, 0.02, M.paint, 0, 0.12 + i * 0.17, 0.46), box(0.2, 0.03, 0.03, M.steel, 0, 0.12 + i * 0.17, 0.48));
-  ks.position.set(-6.4, 0, 5.4); ks.rotation.y = Math.PI; add(hs("l_schrank", ks));
+  ks.position.set(-6.4, 0, 5.4); ks.rotation.y = Math.PI; add(hs(["l_tunnel", "l_schrank"], ks));
+  // dahinter: Wartungsgang A–B (öffnet sich von der Personal-Seite); der Schrank rollt dann zur Seite
+  const tunA = group(box(1.1, 0.05, 3, M.ceil, 0, 1.5, 1.5), box(0.05, 1.5, 3, M.wall, -0.55, 0.75, 1.5), box(0.05, 1.5, 3, M.wall, 0.55, 0.75, 1.5), box(1.1, 1.5, 0.05, new THREE.MeshBasicMaterial({ color: 0x020202 }), 0, 0.75, 3));
+  tunA.position.set(-6.4, 0, 6); add(tunA);
+  const tunAL = new THREE.PointLight(0xffc98a, 0, 3, 2); tunAL.position.set(-6.4, 0.9, 6.8); add(tunAL);
+  let abOpen = false; state(() => { abOpen = eng().has("tunnel_ab"); tunAL.intensity = abOpen ? 1.4 : 0; });
+  anim((dt) => { ks.position.x = lerp(ks.position.x, abOpen ? -4.6 : -6.4, Math.min(1, dt * 1.5)); });
   // Leuchtstoffröhren im Lagezentrum (erst mit Notstrom)
   const tubes = [[-6.3, -2.5], [-6.3, 0.5], [-6.3, 3.5]].map(([x, z]) => { const t = tube(M, 1.6); t.g.position.set(x, 4.2, z); t.g.rotation.y = Math.PI / 2; t.light.distance = 8; add(t.g); return t; });
 

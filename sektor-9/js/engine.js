@@ -107,8 +107,11 @@
     // Gegenstand benutzen
     if (selected) {
       const it = selected; selected = null; renderSide();
-      const pu = h.use && D.puzzles[h.use];
-      if (pu && !isSolved(pu.id)) { if (pu.item === it) { succeed(pu); refresh(); } else { A.play("error"); setNarration(esc(pu.wrongItem || "Das passt hier nicht.")); } return; }
+      // ein Hotspot kann mehrere Gegenstände annehmen (z. B. Tonbandgerät: Band 1, 2, 3)
+      const uses = [].concat(h.use || []).map((u) => D.puzzles[u]).filter((u) => u && !isSolved(u.id));
+      const pu = uses.find((u) => u.item === it);
+      if (pu) { succeed(pu); refresh(); return; }
+      if (uses.length) { A.play("error"); setNarration(esc(uses[0].wrongItem || "Das passt hier nicht.")); return; }
       setNarration(`${esc(D.items[it].name)} hilft hier nicht weiter.`); return;
     }
     const parts = [];
@@ -119,7 +122,8 @@
     if (h.actions) run(h.actions);
     const pu = h.lock && D.puzzles[h.lock];
     if (pu && !isSolved(pu.id)) parts.push(lockHtml(pu));
-    if (h.use && D.puzzles[h.use] && !isSolved(h.use) && !h.text) parts.push(`<p class="inspect-text">${D.puzzles[h.use].noItems || ""}</p>`);
+    const openUse = [].concat(h.use || []).find((u) => D.puzzles[u] && !isSolved(u));
+    if (openUse && !h.text) parts.push(`<p class="inspect-text">${D.puzzles[openUse].noItems || ""}</p>`);
     save();
     if (!parts.length) return;
     openDialog({ kicker: `${hall().name.toUpperCase()} · ${station().name.toUpperCase()}`, title: h.title || h.label, html: parts.join(""), wide: Boolean(h.doc && D.docs[h.doc].wide), after: pu ? (root) => bindLock(root, pu) : null });

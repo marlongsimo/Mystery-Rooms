@@ -81,9 +81,9 @@ const shot = (p, name) => (process.env.SHOTS ? p.screenshot({ path: OUT + 's9-' 
   await click('st_leitstand'); await waitGlide(); await click('k_ausgang'); await p.waitForTimeout(2200);
   check((await st()).hall === 'verteiler', 'zurück in der Verteilerhalle');
   await p.click('[data-slot="karte_b"]'); await click('v_tuer_b'); await p.waitForTimeout(400);
-  check((await st()).flags.includes('tuer_b'), 'Karte am Leser → Nordtür offen'); await closeDlg();
-  for (let i = 0; i < 30 && !(await p.evaluate(() => document.querySelector('#endOv').classList.contains('show'))); i++) await p.waitForTimeout(250);
-  check(await p.evaluate(() => document.querySelector('#endOv').classList.contains('show')), 'Ende von Abschnitt 1 erscheint'); await shot(p, 'ende');
+  check((await st()).flags.includes('tuer_b'), 'Karte am Leser → Nordtür offen'); await closeDlg(); await p.waitForTimeout(2500);
+  check(/PHASE 1 ABGESCHLOSSEN/.test(await echoText()), 'ECHO: Phase 1 abgeschlossen');
+  await click('v_tuer_b_offen'); await p.waitForTimeout(2500); check((await st()).hall === 'personal', 'Durch die Nordtür → Personal-Halle (Abschnitt 2)'); await shot(p, 'ende');
   console.log('  ECHO-Protokoll:', (await st()).echo.map((e) => e.text).join(' | '));
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
   await b.close(); console.log(ok ? '\nAbschnitt 1 in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);

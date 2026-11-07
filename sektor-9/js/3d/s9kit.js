@@ -144,3 +144,36 @@ export function sheet(w, h, draw, M, tilt = 0) {
   m.rotation.x = -Math.PI / 2; m.rotation.z = tilt; return m;
 }
 export const lines = (g, W, H, n = 12, x0 = 16, y0 = 30) => { g.fillStyle = "#2a2a2a"; for (let i = 0; i < n; i++) g.fillRect(x0, y0 + i * ((H - y0 - 10) / n), (W - 2 * x0) * (0.5 + ((i * 37) % 50) / 100), 3); };
+
+/**
+ * Tastenfeld mit Anzeige: zwölf Tasten, nach `len` Ziffern prüft die Engine (tryLock). Rückgabe: { g, parts(), value(), reset() }.
+ * enabled(): ohne Strom bleibt die Anzeige dunkel.
+ */
+export function keypad(ctx, M, { pid, len = 4, enabled = () => true, size = 1 }) {
+  const g = new THREE.Group(); const snd = ctx.sound;
+  g.add(box(0.15 * size, 0.22 * size, 0.03, M.paintGrey, 0, 0, -0.012));
+  const dC = document.createElement("canvas"); dC.width = 128; dC.height = 40; const dT = new THREE.CanvasTexture(dC); dT.colorSpace = THREE.SRGBColorSpace;
+  const draw = (txt, col = "#8fd19e") => { const c = dC.getContext("2d"); c.fillStyle = "#06140b"; c.fillRect(0, 0, 128, 40); c.fillStyle = col; c.font = `600 26px ${MONO}`; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(txt, 64, 22); dT.needsUpdate = true; };
+  const blank = "– ".repeat(len).trim(); draw(blank);
+  g.add(plane(0.12 * size, 0.035 * size, new THREE.MeshBasicMaterial({ map: dT, toneMapped: false }), 0, 0.075 * size, 0.005));
+  const texs = {}; const kt = (k) => texs[k] ??= canvasTex(64, 64, (c) => { c.fillStyle = "#2b2f2b"; c.fillRect(0, 0, 64, 64); c.fillStyle = "#d8dccf"; c.font = `600 36px ${MONO}`; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(k, 32, 34); });
+  const keys = "123456789*0#".split("").map((k, i) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.032 * size, 0.028 * size, 0.012), [M.black, M.black, M.black, M.black, new THREE.MeshStandardMaterial({ map: kt(k), roughness: 0.6 }), M.black]); b.position.set((-0.04 + (i % 3) * 0.04) * size, (0.02 - Math.floor(i / 3) * 0.036) * size, 0.006); b.userData.k = k; g.add(b); return b; });
+  let entry = ""; const press = {};
+  const tap = (b) => { const k = b.userData.k; press[k] = 0; snd("key"); if (!enabled()) { draw(""); return; } if (!/\d/.test(k)) { entry = ""; draw(blank); return; }
+    entry += k; draw(entry.padEnd(len, "–").split("").join(" "));
+    if (entry.length === len) { const v = entry; entry = ""; setTimeout(() => { const r = ctx.engine().tryLock(pid, v); if (r.ok) draw("OFFEN"); else { draw("FEHLER", "#d0473a"); setTimeout(() => draw(blank), 900); } }, 250); } };
+  ctx.anim((dt) => { keys.forEach((b) => { const t = press[b.userData.k]; if (t === undefined) return; press[b.userData.k] = t + dt; b.position.z = t < 0.15 ? 0.001 : 0.006; if (t > 0.2) delete press[b.userData.k]; }); });
+  return { g, parts: () => keys.map((b) => ({ obj: b, name: "taste" + b.userData.k, tap: () => tap(b) })), value: () => entry, reset: () => { entry = ""; draw(blank); } };
+}
+/** Spind (Stahlschrank) mit Tür an der linken Kante. Lokal: Front +z, Unterkante y = 0. */
+export function locker(M, { w = 0.72, h = 1.9, d = 0.5, name = "", nr = "" } = {}) {
+  const g = new THREE.Group();
+  g.add(box(w, h, d, M.paintGrey, 0, h / 2, 0), box(w, 0.08, d + 0.02, M.steelDark, 0, 0.04, 0));
+  const pivot = new THREE.Group(); pivot.position.set(-w / 2 + 0.01, 0, d / 2 + 0.01); g.add(pivot);
+  const door = new THREE.Group(); door.position.x = w / 2 - 0.01; pivot.add(door);
+  door.add(box(w - 0.03, h - 0.12, 0.02, M.paint, 0, h / 2 + 0.03, 0));
+  for (let i = 0; i < 5; i++) door.add(box(w * 0.5, 0.018, 0.01, M.steelDark, 0, h - 0.25 - i * 0.05, 0.014));
+  door.add(box(0.03, 0.14, 0.03, M.steel, w / 2 - 0.08, h * 0.52, 0.025));
+  if (name) door.add(plane(w * 0.6, 0.07, label(`${nr} · ${name}`, 512, 72, "#2a2a2a", "#d8d0b4", 34), 0, h - 0.62, 0.012));
+  return { g, pivot, door };
+}

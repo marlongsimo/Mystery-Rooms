@@ -87,7 +87,7 @@ defineRoom("personal", (ctx) => {
   [cx0, cx1].forEach((x) => [cz1, -5].forEach((z) => add(box(0.08, 2.7, 0.08, M.steelDark, x, 1.35, z))));
   add(box(cx1 - cx0, 0.08, 0.08, M.steelDark, (cx0 + cx1) / 2, 2.62, cz1));
   // Käfigtür mit Vorhängeschloss
-  const cdoor = new THREE.Group(); cdoor.position.set(-0.6, 0, cz1 + 0.02);
+  const cdoor = new THREE.Group(); cdoor.position.set(1.6, 0, cz1 + 0.02); // rechts in der Gitterwand: die Sichtlinie Unterkünfte → Büro bleibt frei
   const cPivot = new THREE.Group(); cdoor.add(cPivot);
   cPivot.add(plane(1.1, 2.3, meshMat, 0.55, 1.15, 0.01), box(1.1, 0.05, 0.05, M.steelDark, 0.55, 2.3, 0.02), box(0.05, 2.3, 0.05, M.steelDark, 1.08, 1.15, 0.02));
   const padlock = group(box(0.11, 0.09, 0.05, M.steel, 0, 0, 0), new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.009, 8, 16, Math.PI), M.steel));
@@ -95,7 +95,7 @@ defineRoom("personal", (ctx) => {
   cPivot.add(plane(0.34, 0.08, label("ARCHIV – NUR KDT.", 512, 112, "#e8e2cc", "#6b2a22", 42), 0.55, 1.75, 0.04));
   const aKey = keyMesh(M.steel, 0.9); aKey.position.set(0, -0.015, 0.03); padlock.add(aKey);
   const cSpec = keyTurn(ctx, { key: aKey, item: "archivschluessel", hotspot: "b_kaefigtuer", when: () => !eng().has("kaefig"), cam: [0.4, 1.2, 1.3], center: [0.45, 1.1, 0.07], fov: 40 });
-  add(hs("b_kaefigtuer", group(cdoor, box(1.2, 2.4, 0.3, ZONE, -0.05, 1.2, cz1 + 0.05)), { focus: { ...cSpec, cam: [0.45, 1.25, cz1 + 0.75], center: [0.45, 1.1, cz1 + 0.09] } }));
+  add(hs("b_kaefigtuer", group(cdoor, box(1.2, 2.3, 0.3, ZONE, 2.15, 1.15, cz1 + 0.05)), { focus: { ...cSpec, cam: [2.65, 1.25, cz1 + 0.75], center: [2.65, 1.1, cz1 + 0.09] } }));
   let cOpen = false; state(() => { cOpen = eng().has("kaefig"); });
   anim((dt) => { cPivot.rotation.y = lerp(cPivot.rotation.y, cOpen ? 1.5 : 0, Math.min(1, dt * 2)); padlock.visible = !cOpen; });
   // Inhalt: Regale an der Nordwand, Karteischrank, Aktentisch

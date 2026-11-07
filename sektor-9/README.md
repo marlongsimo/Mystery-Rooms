@@ -2,7 +2,7 @@
 
 Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselketten und Enden: [`DREHBUCH.md`](DREHBUCH.md).
 
-**Stand:** Abschnitt 1 von 5, allein spielbar. Er umfasst die Verteilerhalle und die Kommando-Halle (Sektor A) mit drei Standpunkten. Mehrspieler, die Sektoren B bis D, die Tonbänder 2–6 und die Enden folgen.
+**Stand:** Abschnitte 1–2 von 5 (Verteilerhalle, Kommando-Halle A, Personal-Halle B). Allein spielbar; gemeinsames Spielen ist angebunden, aber erst nach dem Eintrag in `game_catalog` freigeschaltet (siehe unten). Es folgen die Sektoren C und D, die Tonbänder 4–6 und die Enden.
 
 ## Aufbau
 
@@ -24,3 +24,18 @@ Kooperativer Mystery-Escape-Room in 3D im Browser. Geschichte, Figuren, Rätselk
 python3 -m http.server 8765 &      # im Repository-Wurzelordner
 node sektor-9/tests/abschnitt1.test.js        # ganzer Abschnitt 1 in 3D, SHOTS=1 für Bildschirmfotos
 ```
+
+## Gemeinsam spielen
+
+Anbindung `js/mp-adapter.js` an `platform/multiplayer` (nur vorhandene Funktionen, nur Publishable Key, keine eigenen Tabellen):
+
+| Eintrag (`set_session_state`) | Inhalt |
+|---|---|
+| `shared` | gelöste Rätsel, Zustände, Ausrüstungs-Vorrat, verbrauchte Gegenstände (`gone`), Team-Archiv |
+| `pos:<Nutzer-ID>` | Halle, Standpunkt, Blickrichtung – Teamliste, Punkte auf der Karte, Helmlampe in derselben Halle |
+| `chat` | Funk im Team, Nachrichten werden vereinigt |
+
+Pro Person bleiben Standpunkt, Hinweise, ECHO-Protokoll und **eigene Funde**. Ein Fund geht erst mit „Mit dem Team teilen“ ins Team-Archiv.
+
+**Freischalten:** Im Supabase-Dashboard einen Eintrag in `game_catalog` anlegen (`slug` = `sektor-9`, Titel, Code-Präfix z. B. `ECHO`, `enabled = true`), dann in `js/mp-adapter.js` `ENABLED = true` setzen. Bis dahin erscheint die Lobby nur mit `?mp=1` in der Adresse.
+Test: `node sektor-9/tests/mehrspieler.test.js` (zwei Browserprofile gegen die echte Datenbank).

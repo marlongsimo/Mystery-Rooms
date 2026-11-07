@@ -3,13 +3,15 @@
  *
  * Aufbau der Welt (js/data.js): Hallen → Standpunkte → vier Blickrichtungen. Hotspots gehören zu einem oder mehreren
  * Standpunkten einer Halle. Die 3D-Schicht (js/3d/core.js) zeichnet nur und ruft engine.hotspot(id).
- * Spielstand: localStorage (allein). Für das gemeinsame Spielen ist alles, was geteilt wird, in S zusammengefasst
- * (flags, solved, inventory, docs) – ein Mehrspieler-Adapter kann später genau diesen Teil synchronisieren.
+ * Spielstand: localStorage. Gemeinsam spielen (js/mp-adapter.js, Plattform platform/multiplayer): geteilt werden gelöste Rätsel,
+ * Zustände, der Ausrüstungs-Vorrat und das Team-Archiv. Funde liegen zuerst nur im eigenen Archiv, bis man sie teilt.
  */
 (() => {
   const N = window.SEKTOR9;
   const D = N.data, A = N.audio || { play() {}, ambient() {}, setEnabled() {} };
   const SAVE_KEY = "sektor9_save_v1";
+  let saveKey = SAVE_KEY, mp = null; // mp: Hooks des Mehrspieler-Adapters { saveKey, changed(), sendChat(text), leave() }
+  let team = [], chat = [];
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const norm = (v) => String(v || "").toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9ÄÖÜ]/g, "");
@@ -17,10 +19,10 @@
   /* ---------- Zustand ---------- */
   const fresh = () => ({ v: 1, started: false, finished: false, hall: D.start.hall, station: D.start.station, view: D.start.view || 0,
     flags: [], solved: [], inventory: [...(D.start.inventory || [])], docs: [...(D.start.docs || [])], newDocs: [], seen: [], hints: {},
-    echo: [], playMs: 0, sound: true });
+    echo: [], playMs: 0, sound: true, teamDocs: [], gone: { items: [] } });
   let S = fresh(), selected = null, blockedUntil = 0;
-  function load() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null"); if (s && s.v === 1) S = { ...fresh(), ...s }; } catch (e) { /* neu */ } }
-  function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* privat */ } }
+  function load() { try { const s = JSON.parse(localStorage.getItem(saveKey) || "null"); if (s && s.v === 1) S = { ...fresh(), ...s }; } catch (e) { /* neu */ } }
+  function save() { try { localStorage.setItem(saveKey, JSON.stringify(S)); } catch (e) { /* privat */ } if (mp && mp.changed) mp.changed(); }
 
   const has = (f) => S.flags.includes(f);
   const isSolved = (p) => S.solved.includes(p);
@@ -66,7 +68,7 @@
       if (a.unflag) S.flags = S.flags.filter((f) => f !== a.unflag);
       if (a.solve && !isSolved(a.solve)) S.solved.push(a.solve);
       if (a.give) give(a.give);
-      if (a.remove) { S.inventory = S.inventory.filter((x) => x !== a.remove); if (selected === a.remove) selected = null; }
+      if (a.remove) { S.inventory = S.inventory.filter((x) => x !== a.remove); if (!S.gone.items.includes(a.remove)) S.gone.items.push(a.remove); if (selected === a.remove) selected = null; }
       if (a.doc) addDoc(a.doc);
       if (a.sound) A.play(a.sound);
       if (a.echo) setTimeout(() => echo(a.echo), a.delay || 900);
@@ -169,7 +171,8 @@
       inv.insertAdjacentHTML("beforeend", it ? `<button class="slot${selected === id ? " selected" : ""}" data-slot="${id}" title="${esc(it.name)}"><span aria-hidden="true">${it.icon || "▣"}</span><small>${esc(it.name)}</small></button>` : `<span class="slot empty"></span>`);
     }
     $("#invHint").innerHTML = selected ? `<b>${esc(D.items[selected].name)}</b> in der Hand – tippe auf die Stelle, an der du es benutzen willst. <a href="#" data-drop>Weglegen</a>` : "Gegenstand antippen, um ihn zu benutzen.";
-    $("#archiveCount").textContent = S.docs.length; $("#archiveCount").classList.toggle("fresh", S.newDocs.length > 0);
+    $("#archiveCount").textContent = knownDocs().length; $("#archiveCount").classList.toggle("fresh", S.newDocs.length > 0);
+    renderTeam();
   }
   function refresh() {
     if (!S.started) return;
@@ -189,7 +192,8 @@
       const open = !h.need || cond(h.need), here = hid === S.hall;
       const sts = Object.entries(h.stations).map(([sid, s]) => {
         const can = open && (!s.need || cond(s.need)) && (hid !== S.hall || sid !== S.station);
-        return `<button class="map-st${here && sid === S.station ? " here" : ""}" ${can ? `data-go="${hid}|${sid}"` : "disabled"}>${here && sid === S.station ? "● " : ""}${esc(s.name)}</button>`;
+        const mates = team.filter((p) => p.pos && p.pos.hall === hid && p.pos.station === sid).map((p) => `<i class="mate" style="--c:${p.color}" title="${esc(p.name)}"></i>`).join("");
+        return `<button class="map-st${here && sid === S.station ? " here" : ""}" ${can ? `data-go="${hid}|${sid}"` : "disabled"}>${here && sid === S.station ? "● " : ""}${esc(s.name)}${mates}</button>`;
       }).join("");
       return `<div class="map-hall map-${h.pos || "c"}${open ? "" : " locked"}${here ? " current" : ""}"><h3>${esc(h.name)}${h.sector ? ` <small>SEKTOR ${h.sector}</small>` : ""}</h3>${open ? sts : `<p class="map-locked">${esc(h.lockedText || "Verschlossen")}</p>`}</div>`;
     }).join("");
@@ -201,9 +205,16 @@
     // in eine andere Halle nur über die Verteilerhalle: Weg ist frei, wenn die Halle offen ist
     goHall(hid, sid);
   }
+  const knownDocs = () => [...new Set([...S.docs, ...S.teamDocs])].filter((id) => D.docs[id]);
   function showArchive(openId) {
-    const list = S.docs.map((id) => `<li><button data-doc="${id}">${esc(D.docs[id].title)}${S.newDocs.includes(id) ? " <i>NEU</i>" : ""}</button></li>`).join("");
-    overlay("archiveOv", `<div class="archive"><ol class="arch-list">${list || "<li class='muted'>Noch leer.</li>"}</ol><div class="arch-view">${openId ? `<h3>${esc(D.docs[openId].title)}</h3>${docHtml(openId)}` : `<p class="muted">Wähle ein Dokument.</p>`}</div></div>`);
+    const li = (id) => `<li><button data-doc="${id}">${esc(D.docs[id].title)}${S.newDocs.includes(id) ? " <i>NEU</i>" : ""}${mp && S.teamDocs.includes(id) && !S.docs.includes(id) ? " <i class='team'>TEAM</i>" : ""}</button></li>`;
+    let list;
+    if (mp) { // gemeinsam: eigene, noch nicht geteilte Funde getrennt vom Team-Archiv
+      const mine = S.docs.filter((id) => !S.teamDocs.includes(id)), shared = S.teamDocs.filter((id) => D.docs[id]);
+      list = `<li class="arch-h">NUR BEI DIR</li>${mine.map(li).join("") || "<li class='muted small'>nichts Ungeteiltes</li>"}<li class="arch-h">TEAM-ARCHIV</li>${shared.map(li).join("") || "<li class='muted small'>noch leer</li>"}`;
+    } else list = S.docs.map(li).join("") || "<li class='muted'>Noch leer.</li>";
+    const share = openId && mp && !S.teamDocs.includes(openId) ? `<button class="btn small" data-share="${openId}">Mit dem Team teilen</button><p class="muted small">Erst geteilte Funde sehen auch die anderen.</p>` : openId && mp ? `<p class="found-note">✓ Im Team-Archiv</p>` : "";
+    overlay("archiveOv", `<div class="archive"><ol class="arch-list">${list}</ol><div class="arch-view">${openId ? `<h3>${esc(D.docs[openId].title)}</h3>${docHtml(openId)}${share}` : `<p class="muted">Wähle ein Dokument.</p>`}</div></div>`);
   }
   function showEcho() {
     const open = Object.values(D.puzzles).filter((p) => !isSolved(p.id) && p.objective && (!p.when || cond(p.when)) && (p.from || []).some((h) => S.seen.includes(h)));
@@ -213,7 +224,7 @@
       const shown = p.hints.slice(0, used).map((t, i) => `<p class="hint-text"><b>Stufe ${i + 1}:</b> ${t}</p>`).join("");
       return `<div class="task"><p class="task-title">▸ ${esc(p.objective)}</p>${shown}${used < p.hints.length ? `<button class="btn small" data-hint="${p.id}">Hinweis ${used + 1} von ${p.hints.length} anfordern</button>` : ""}</div>`;
     }).join("") || `<p class="muted">Keine offenen Aufgaben bekannt. Untersuche die Anlage.</p>`;
-    overlay("echoOv", `<div class="echo-term"><div class="echo-head">WARTUNGSASSISTENZ · KESSELBERG · SITZUNG 1</div><div class="echo-log">${log}</div><h3>Offene Aufgaben</h3>${tasks}</div>`);
+    overlay("echoOv", `<div class="echo-term"><div class="echo-head">WARTUNGSASSISTENZ · KESSELBERG · ${sessions()} ${sessions() === 1 ? "SITZUNG" : "SITZUNGEN"}</div><div class="echo-log">${log}</div><h3>Offene Aufgaben</h3>${tasks}</div>`);
   }
 
   /* ---------- Ende eines Abschnitts ---------- */
@@ -223,12 +234,13 @@
   }
 
   /* ---------- Start ---------- */
+  const sessions = () => (mp ? Math.max(1, team.length + 1) : 1);
   function start() {
     S.started = true; save();
     $("#title").classList.add("hidden"); $("#game").classList.remove("hidden");
     A.setEnabled(S.sound); A.ambient(hall().ambient || null); refresh();
     if (!has("briefed")) { S.flags.push("briefed"); save(); setTimeout(() => openDialog({ kicker: "EINSATZAUFTRAG", title: D.docs.auftrag.title, html: docHtml("auftrag") + `<p class="found-note">▤ Liegt im Archiv</p>` }), 400); }
-    if (D.start.echo && !S.echo.length) setTimeout(() => echo(D.start.echo), 2600);
+    if (D.start.echo && !S.echo.length) setTimeout(() => echo(D.start.echo.replace("1 AKTIVE SITZUNG", sessions() === 1 ? "1 AKTIVE SITZUNG" : `${sessions()} AKTIVE SITZUNGEN`)), 2600);
   }
   let last = performance.now();
   setInterval(() => { const n = performance.now(); if (S.started && !document.hidden) { S.playMs += n - last; $("#clock").textContent = clockText(); } last = n; }, 1000);
@@ -246,17 +258,81 @@
       if (t.closest(".ov-close")) { closeOverlays(); return; }
       const go = t.closest("[data-go]"); if (go) { const [hid, sid] = go.dataset.go.split("|"); mapGo(hid, sid); return; }
       const doc = t.closest("[data-doc]"); if (doc) { S.newDocs = S.newDocs.filter((x) => x !== doc.dataset.doc); save(); showArchive(doc.dataset.doc); renderSide(); return; }
+      const sh = t.closest("[data-share]"); if (sh) { const id = sh.dataset.share; if (!S.teamDocs.includes(id)) S.teamDocs.push(id); save(); A.play("paper"); showArchive(id); return; }
+      if (t.closest("[data-chat-send]")) { sendChat(); return; }
+      if (t.closest("#chatBtn")) { showChat(); return; }
+      if (t.closest("[data-mp-leave]")) { if (mp && mp.leave) mp.leave(); return; }
       const hint = t.closest("[data-hint]"); if (hint) { const id = hint.dataset.hint; S.hints[id] = (S.hints[id] || 0) + 1; save(); A.play("chirp"); showEcho(); return; }
       if (t.closest("[data-restart]")) { localStorage.removeItem(SAVE_KEY); location.reload(); }
     });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $(".overlay.show")) closeOverlays(); if (!S.started || blocked()) return; if (e.key === "ArrowLeft") turn(-1); if (e.key === "ArrowRight") turn(1); if (e.key === "m") showMap(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.id === "chatInput") { sendChat(); return; } if (e.key === "Escape" && $(".overlay.show")) closeOverlays(); if (!S.started || blocked()) return; if (e.key === "ArrowLeft") turn(-1); if (e.key === "ArrowRight") turn(1); if (e.key === "m") showMap(); });
     load();
     if (S.started) { $("#startBtn").textContent = "Einsatz fortsetzen"; $("#newBtn").classList.remove("hidden"); }
     $("#newBtn").onclick = () => { localStorage.removeItem(SAVE_KEY); S = fresh(); start(); };
     $("#soundToggle").classList.toggle("muted", !S.sound);
   }
 
+  /* ---------- Mehrspieler-Schnittstelle (für js/mp-adapter.js) ----------
+     Gemeinsam: solved, flags (ohne persönliche), inventory (Vorrat), gone.items (verbraucht), teamDocs, finished.
+     Pro Person: Halle, Standpunkt, Blickrichtung, eigene Funde (docs), seen, hints, echo, Spielzeit. */
+  const localFlag = (f) => f === "briefed" || f.startsWith("entered_");
+  function exportShared() {
+    return { v: 1, solved: S.solved.slice(), flags: S.flags.filter((f) => !localFlag(f)), inventory: S.inventory.slice(), gone: { items: S.gone.items.slice() }, teamDocs: S.teamDocs.slice(), finished: Boolean(S.finished) };
+  }
+  function normalizeShared(sh) { if (!sh) return sh; const gi = (sh.gone && sh.gone.items) || []; return { ...sh, inventory: (sh.inventory || []).filter((x) => !gi.includes(x)) }; }
+  const add = (arr, x) => (arr.includes(x) ? false : (arr.push(x), true));
+  /** Stand des Teams übernehmen; Rückgabe: was neu ist (für eine kurze Meldung). */
+  function applyShared(raw) {
+    const sh = normalizeShared(raw); if (!sh || typeof sh !== "object") return [];
+    const news = [], newly = []; let changed = false;
+    ((sh.gone && sh.gone.items) || []).forEach((x) => { changed = add(S.gone.items, x) || changed; });
+    (sh.solved || []).forEach((x) => { if (add(S.solved, x)) { changed = true; newly.push(x); } });
+    (sh.flags || []).forEach((f) => { if (!localFlag(f)) changed = add(S.flags, f) || changed; });
+    (sh.inventory || []).forEach((x) => { if (D.items[x] && !S.gone.items.includes(x) && add(S.inventory, x)) { changed = true; news.push((D.items[x].icon || "▣") + " " + D.items[x].name); } });
+    const il = S.inventory.length; S.inventory = S.inventory.filter((x) => !S.gone.items.includes(x)); changed = changed || il !== S.inventory.length;
+    if (selected && !S.inventory.includes(selected)) selected = null;
+    (sh.teamDocs || []).forEach((id) => { if (D.docs[id] && add(S.teamDocs, id)) { changed = true; if (!S.docs.includes(id)) { S.newDocs.push(id); news.push("▤ " + D.docs[id].title); } } });
+    newly.forEach((pid) => { const p = D.puzzles[pid]; if (!p) return; news.unshift("✓ " + p.title); run((p.onSolve || []).filter((a) => a.echo || a.end)); }); // ECHO spricht zu allen
+    if (!changed) return [];
+    save();
+    if (S.started) {
+      if (dlgOpen && $("#dlgBody .lock") && newly.length) { closeDialog(); setNarration("Jemand aus deinem Team hat das gerade gelöst."); }
+      renderSide(); refresh();
+      if ($("#archiveOv.show")) showArchive();
+    }
+    return news;
+  }
+  const position = () => ({ hall: S.hall, station: S.station, view: S.view, hallName: hall().name, stationName: station().name });
+  /** Mitspieler: [{ id, name, color, pos }] – Teamliste, Karte, Helmlampen in derselben Halle. */
+  function setTeam(list) {
+    team = list || []; renderTeam();
+    if (N.view3d && N.view3d.setPlayers) N.view3d.setPlayers(team.filter((p) => p.pos && p.pos.hall === S.hall).map((p) => ({ id: p.id, color: p.color, station: p.pos.station })));
+    if ($("#mapOv.show")) showMap();
+  }
+  function renderTeam() {
+    const el = $("#teamBox"); if (!el) return;
+    el.classList.toggle("hidden", !mp); $("#chatBtn").classList.toggle("hidden", !mp);
+    if (!mp) return;
+    el.innerHTML = `<h2 class="side-h">TEAM · ${esc(mp.code ? mp.code() : "")}</h2><ul class="team-list">${team.map((p) => `<li><i class="mate" style="--c:${p.color}"></i><b>${esc(p.name)}</b><span>${p.pos ? esc(p.pos.hallName + " · " + p.pos.stationName) : "noch nicht in der Anlage"}</span></li>`).join("") || `<li class="muted small">Noch niemand sonst in der Anlage.</li>`}</ul><button class="link-btn" data-mp-leave>Sitzung verlassen</button>`;
+    const unread = chat.filter((m) => m.t > (S.chatSeen || 0)).length; $("#chatCount").textContent = unread || ""; $("#chatCount").classList.toggle("fresh", unread > 0);
+  }
+  /* Funk: kurze Textnachrichten im Team */
+  function setChat(msgs) { chat = (msgs || []).slice().sort((a, b) => a.t - b.t).slice(-120); if ($("#chatOv.show")) showChat(true); else { renderTeam(); if (chat.length && chat[chat.length - 1].mine === false) A.play("chirp"); } }
+  function showChat(keep) {
+    S.chatSeen = Date.now(); save();
+    const log = chat.map((m) => `<div class="chat-line${m.mine ? " mine" : ""}"><b style="color:${m.color || "inherit"}">${esc(m.n)}</b> ${esc(m.x)}</div>`).join("") || `<p class="muted small">Noch kein Funkverkehr. Was ihr hier schreibt, lesen alle im Team.</p>`;
+    const val = keep && $("#chatInput") ? $("#chatInput").value : "";
+    overlay("chatOv", `<div class="chat"><div class="chat-log">${log}</div><div class="chat-row"><input id="chatInput" maxlength="240" autocomplete="off" placeholder="Nachricht ans Team"><button class="btn small" data-chat-send>Senden</button></div></div>`);
+    const inp = $("#chatInput"); inp.value = val; inp.focus(); const lg = $(".chat-log"); lg.scrollTop = lg.scrollHeight; renderTeam();
+  }
+  function sendChat() { const inp = $("#chatInput"); const x = inp && inp.value.trim(); if (!x || !mp || !mp.sendChat) return; inp.value = ""; mp.sendChat(x); }
+  function enterMultiplayer(hooks) { mp = hooks; saveKey = hooks.saveKey; S = fresh(); selected = null; load(); renderTeam(); }
+  function leaveMultiplayer() { mp = null; saveKey = SAVE_KEY; team = []; chat = []; S = fresh(); selected = null; load(); renderTeam(); if (N.view3d && N.view3d.setPlayers) N.view3d.setPlayers([]); }
+  /** Lobby-Vorbereitung: Einsatzauftrag lesen, danach „bereit“. */
+  function showBriefing(done) { openDialog({ kicker: "EINSATZAUFTRAG", title: D.docs.auftrag.title, html: docHtml("auftrag") }); const d = $("#dialog"); const once = () => { d.removeEventListener("close", once); if (!has("briefed")) S.flags.push("briefed"); save(); done && done(); }; d.addEventListener("close", once); }
+
   N.engine = {
+    exportShared, normalizeShared, applyShared, position, setTeam, setChat, enterMultiplayer, leaveMultiplayer, showBriefing, start, isMultiplayer: () => Boolean(mp), inGame: () => S.started,
     hotspot, hotspotData: (id) => H(id), isVisible, selectedItem: () => selected, isLight: () => false, has, blocked, setView, refresh,
     tryLock, isSolved, openItem: () => {}, echo, goStation, goHall, state: () => S, turn,
   };

@@ -155,3 +155,24 @@ a { color: var(--green); }
 .n3d-focus button { background: none; border: 1px solid var(--green-d); color: var(--green); font: 12px var(--mono); letter-spacing: .05em; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
 .n3d-focus-hint { color: var(--muted); font: 12px var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
 @media (max-width: 1100px) { .n3d-focus-hint { display: none; } }
+
+/* Gemeinsam spielen */
+.mp-root { --mp-accent: #8fd19e; --mp-accent-2: #a9e3b6; --mp-text: #d9dccf; --mp-text-2: #b7bdb0; --mp-muted: #8a9186; --mp-line: #2c332e; --mp-panel: linear-gradient(145deg, #121513, #0b0d0c); --mp-field: #050605; --mp-ok: #8fd19e; --mp-error: #d0473a; --mp-serif: "DM Mono", monospace; --mp-mono: "DM Mono", monospace; --mp-sans: "DM Sans", system-ui, sans-serif; margin: 22px 0 10px; }
+.mp-entry-copy { color: var(--muted); font-size: 13px; }
+.team-box { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.team-list { list-style: none; margin: 0 0 8px; padding: 0; }
+.team-list li { display: grid; grid-template-columns: 14px 1fr; gap: 2px 8px; align-items: center; padding: 5px 0; font-size: 13px; }
+.team-list li span { grid-column: 2; color: var(--muted); font: 11px var(--mono); letter-spacing: .04em; }
+.mate { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); margin-left: 6px; vertical-align: middle; }
+.team-list .mate { margin: 0; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--muted); font: 11.5px var(--mono); text-decoration: underline; cursor: pointer; }
+.arch-list .arch-h { font: 500 10.5px var(--mono); letter-spacing: .16em; color: var(--green); padding: 10px 4px 4px; }
+.arch-list i.team { color: var(--green); }
+.chat-log { border: 1px solid var(--green-d); padding: 10px; height: min(50vh, 360px); overflow-y: auto; font: 13px/1.5 var(--sans); color: var(--text); margin-bottom: 10px; }
+.chat-line { margin: 4px 0; } .chat-line b { font: 500 12px var(--mono); margin-right: 6px; } .chat-line.mine { color: var(--beige); }
+.chat-row { display: flex; gap: 8px; }
+.chat-row input { flex: 1; min-width: 0; background: #050605; border: 1px solid var(--green-d); color: var(--text); font: 14px var(--sans); padding: 9px 12px; }
+.mp-toast { position: fixed; left: 50%; bottom: 22px; z-index: 60; transform: translate(-50%, 30px); opacity: 0; pointer-events: none; max-width: min(92vw, 560px); padding: 11px 16px; background: #050806f2; border: 1px solid var(--green-d); color: var(--text); font-size: 13px; line-height: 1.5; box-shadow: 0 12px 30px #000a; transition: opacity .3s, transform .3s; }
+.mp-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.mp-toast b { color: var(--green); font-weight: 600; }
+@media (max-width: 820px) { .team-box { grid-column: 1 / -1; margin-top: 4px; padding-top: 6px; } .side-buttons { grid-template-columns: repeat(4, auto); } }

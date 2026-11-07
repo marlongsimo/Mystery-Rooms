@@ -6,7 +6,8 @@
   <meta name="theme-color" content="#0b0d0c">
   <meta name="description" content="SEKTOR 9 – Das letzte Protokoll. Ein Mystery-Escape-Room in 3D im Browser (in Entwicklung).">
   <title>SEKTOR 9 – Das letzte Protokoll</title>
-  <link rel="stylesheet" href="css/style.css?v=1">
+  <link rel="stylesheet" href="../platform/multiplayer/mp-lobby.css?v=1">
+  <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
   <!-- ========== TITEL ========== -->
@@ -20,7 +21,8 @@
         <button class="btn big" id="startBtn">Einsatz beginnen</button>
         <button class="btn ghost hidden" id="newBtn">Neu beginnen</button>
       </div>
-      <p class="muted small">Vorschau · Abschnitte 1–2 von 5 (Verteilerhalle, Kommando- und Personalbereich) · allein spielbar · 3D, ziehen zum Umsehen, tippen zum Untersuchen</p>
+      <p class="muted small">Vorschau · Abschnitte 1–2 von 5 (Verteilerhalle, Kommando- und Personalbereich) · allein oder zu zweit bis viert · 3D, ziehen zum Umsehen, tippen zum Untersuchen</p>
+      <section class="mp-root" id="mpEntry" aria-label="Gemeinsam spielen"></section>
       <p class="muted small"><a href="../index.html">← Mystery Rooms</a></p>
     </div>
   </section>
@@ -47,7 +49,9 @@
           <button class="side-btn" id="mapBtn"><span aria-hidden="true">⌖</span>Karte</button>
           <button class="side-btn" id="archiveBtn"><span aria-hidden="true">▤</span>Archiv <b id="archiveCount">0</b></button>
           <button class="side-btn echo-btn" id="echoBtn"><span aria-hidden="true">◉</span>ECHO</button>
+          <button class="side-btn hidden" id="chatBtn"><span aria-hidden="true">⌁</span>Funk <b id="chatCount"></b></button>
         </div>
+        <div id="teamBox" class="team-box hidden"></div>
       </aside>
     </div>
   </section>
@@ -62,11 +66,17 @@
   <div class="overlay" id="mapOv"><div class="ov-panel"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">BUNKERKARTE</h2><div class="ov-body"></div></div></div>
   <div class="overlay" id="archiveOv"><div class="ov-panel wide"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">ARCHIV</h2><div class="ov-body"></div></div></div>
   <div class="overlay" id="echoOv"><div class="ov-panel term"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">ECHO</h2><div class="ov-body"></div></div></div>
+  <div class="overlay" id="chatOv"><div class="ov-panel term"><button class="ov-close" aria-label="Schließen">✕</button><h2 class="ov-title">FUNK · TEAM</h2><div class="ov-body"></div></div></div>
   <div class="overlay" id="endOv"><div class="ov-panel"><div class="ov-body"></div></div></div>
 
   <script src="js/data.js?v=2"></script>
   <script src="js/audio.js?v=1"></script>
-  <script src="js/engine.js?v=3"></script>
+  <script src="js/engine.js?v=4"></script>
+  <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
+  <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-core.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-lobby.js?v=1"></script>
+  <script src="js/mp-adapter.js?v=2"></script>
   <script type="importmap">{ "imports": { "three": "../platform/vendor/three-0.170.0/three.module.min.js" } }</script>
   <script type="module" src="js/3d/verteiler.js?v=2"></script>
   <script type="module" src="js/3d/kommando.js?v=4"></script>

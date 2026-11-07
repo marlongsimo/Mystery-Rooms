@@ -1,6 +1,6 @@
 # SEKTOR 9 – Das letzte Protokoll · Drehbuch-Gerüst
 
-Stand: Entwurf 0.1 · Grundlage: Game-Design-Konzept 1.0 · Darstellung: **3D von Anfang an** (Technik aus Hotel Nocturne).
+Stand: Entwurf 0.2 (vier Hallen) · Grundlage: Game-Design-Konzept 1.0 · Darstellung: **3D von Anfang an** (Technik aus Hotel Nocturne).
 Alles hier ist ein Vorschlag zur Abstimmung. Was entschieden werden muss, steht in Abschnitt 10.
 
 ---
@@ -15,7 +15,7 @@ Alles hier ist ein Vorschlag zur Abstimmung. Was entschieden werden muss, steht 
 | Technik | Pavel Nowak | **Pavel Nowak** (bleibt) | keine Überschneidung |
 | Zwischenfall | 14. Oktober 1987 | **17. Februar 1987**, Kernzeit 22:51/22:58 | Hotel Nocturne spielt am 14. Oktober, mit 23:17 und 23:24 als Schlüsselzeiten |
 | Anlage | ohne Namen | **Anlage KESSELBERG**, betrieben vom fiktiven *Stab für Krisenkommunikation (SKK)* | glaubwürdig, keine echte Behörde |
-| Räume | 17 Unterräume | **12 Räume + Verteilerhalle** (Abschnitt 4) | in 3D ist jeder Raum Aufwand; 12 trägt 4 Stunden |
+| Räume | 4 Sektoren mit 17 Unterräumen | **4 große Hallen mit je 3 Standpunkten + Verteilerhalle** (Abschnitt 4) | ein Sektor als zusammenhängender Raum wirkt echter; weniger Ladepausen beim Zurückgehen |
 | Spieler | 2–5 | **ausgelegt für 2–4**, spielbar zu fünft | zu fünft steht sonst jemand herum |
 
 ---
@@ -68,36 +68,48 @@ Die Figuren widersprechen sich, weil jede nur ihren Ausschnitt kannte. Die Spiel
 
 ---
 
-## 4. Anlage und Räume (12 Räume + Verteilerhalle)
+## 4. Anlage: vier Hallen mit je drei Standpunkten, dazu die Verteilerhalle
+
+Jeder Sektor ist **eine durchgehende 3D-Halle**. Er wird einmal geladen und bleibt geladen, solange man darin ist. In jeder Halle gibt es **drei Standpunkte**. Ein Klick auf einen Standpunkt (Bodenmarkierung, Leuchte) oder auf die Karte lässt die Kamera durch die Halle gleiten. Am Standpunkt dreht man sich wie in Hotel Nocturne. Frei herumlaufen kann man nicht, das hält die Bedienung einfach und die Leistung planbar.
+
+Jede Halle öffnet sich **in Stufen**: Gitter, Glaswände, Schleusen und fehlender Strom sperren Bereiche, bis ein Rätsel sie freigibt. Gesperrte Bereiche **sieht** man aber schon, und das macht neugierig.
 
 ```
-                 [B  PERSONAL · Nord]
-            Unterkünfte · Offiziersbüro · Personalarchiv
-                        │
-[A KOMMANDO · West] ─── VERTEILERHALLE ─── [C FORSCHUNG · Ost]
- Funkstation              (Karte, Terminal       Labor · Beobachtungsraum
- Leitstand                „1 AKTIVE SITZUNG“)    Datenarchiv
- Lagezentrum                    │
-                 [D  SICHERHEIT · Süd]
-            Energieversorgung · Rechenzentrum · SEKTOR 9
+                      [B  PERSONAL-HALLE · Nord]
+              Unterkünfte ── Personalarchiv (Gitterkäfig) ── Offiziersbüro
+                               │
+[A KOMMANDO-HALLE · West] ── VERTEILERHALLE ── [C FORSCHUNGS-HALLE · Ost]
+ Leitstand (unten)              Karte · ECHO-Terminal      Labor (Mitte)
+ Funkstation (Galerie)          „1 AKTIVE SITZUNG“         Beobachtungsraum (Spiegelglas)
+ Lagezentrum (Seitenschiff)        │                       Datenarchiv (hinter Schleuse)
+                      [D  SICHERHEITS-HALLE · Süd]
+              Maschinenhalle ── Rechenzentrum (Glaskasten) ── Panzertür SEKTOR 9
 ```
 
-| Sektor | Räume | Frei ab | Kern-Inhalt |
-|---|---|---|---|
-| Verteilerhalle | Halle mit Karte und ECHO-Terminal | Start | Auftrag, Karte, erste ECHO-Meldung |
-| A Kommando | Funkstation, Leitstand, Lagezentrum | Start | Funkprotokolle, Befehlsbuch, Tonbandgerät |
-| B Personal | Unterkünfte, Offiziersbüro, Personalarchiv | Rätsel in A | Dienstpläne, Spinde, Briefe, Räumungsliste |
-| C Forschung | Labor, Beobachtungsraum, Datenarchiv | Rätsel in B | Versuchsakten, ECHO-Uhr, Beobachtungsprotokolle |
-| D Sicherheit | Energieversorgung, Rechenzentrum, Sektor 9 | Kette K1 | Schaltbuch, Serverlog, Ostrowskis letzte Aufzeichnung |
+| Halle | Bild | Standpunkte | Zu Beginn gesperrt | Öffnet durch |
+|---|---|---|---|---|
+| **Verteilerhalle** | runder Betonraum, vier Panzertüren, Notbeleuchtung, das ECHO-Terminal in der Mitte | ein Standpunkt | die Türen nach B, C und D | Fortschritt in den Hallen |
+| **A · Kommando** | zwei Ebenen: unten der Leitstand mit Lagetisch und Konsolen, oben auf der Galerie die Funkstation hinter Glas, seitlich das Lagezentrum mit großer Wandkarte | Leitstand · Funkstation · Lagezentrum | Treppe zur Galerie (Gittertür mit Zahlenschloss), Lagezentrum ohne Licht | Funkprotokoll lesen → Code; Notstromschalter im Leitstand |
+| **B · Personal** | lange Mannschaftshalle mit Spindreihen und Feldbetten, in der Mitte das Personalarchiv als Gitterkäfig, am Ende das Offiziersbüro mit Glaswand | Unterkünfte · Personalarchiv · Offiziersbüro | Käfigtür, Bürotür | Spindschlüssel aus A; Dienstplan-Rätsel |
+| **C · Forschung** | weißes, kaltes Labor in der Mitte. Der Beobachtungsraum blickt durch Spiegelglas in den Versuchsraum. Das Datenarchiv liegt hinter einer Druckschleuse | Labor · Beobachtungsraum · Datenarchiv | Beobachtungsraum (Kartenleser), Schleuse | Ostrowskis Ausweis (aus B); Schleusenfolge |
+| **D · Sicherheit** | Maschinenhalle mit Generatoren und Kabeltrassen. Das Rechenzentrum ist ein Glaskasten mit Schränken. Am Hallenende ragt die Panzertür von SEKTOR 9 auf, **vom ersten Moment an sichtbar** | Maschinenhalle · Rechenzentrum · vor Sektor 9 | Rechenzentrum, Panzertür | Kette K2; Ketten K3 oder K4 |
 
-**Geheime Verbindungen** (Abkürzungen, die man später braucht, weil man oft zurück muss):
+**Was die eine Halle pro Sektor bringt:**
+- Vom Leitstand sieht man hinauf zur Funkstation.
+- Im Labor spürt man das Spiegelglas im Rücken.
+- In der Maschinenhalle steht Sektor 9 immer am Ende des Blicks.
+- Zwei Spieler im selben Sektor stehen in derselben Halle. Jeder sieht die Helmlampe des anderen als farbigen Lichtpunkt an dessen Standpunkt.
+
+**Wie sich die Hallen über das Spiel verändern** (Abschnitt 8): Zu Beginn brennt nur Notlicht. Nach dem Strom in A werden die Hallen nacheinander hell. In Phase 4 schaltet ECHO auf rotes Warnlicht. Zum Finale bleibt nur der Lichtstreifen unter der Panzertür von Sektor 9.
+
+**Geheime Verbindungen** (Abkürzungen zwischen den Hallen, nötig, weil man oft zurück muss):
 
 | Verbindung | Wo | Freigabe |
 |---|---|---|
-| A–B Wartungstunnel | hinter dem Kartenschrank im Lagezentrum | Nowaks Wartungsplan (aus B) |
-| B–C Versorgungsgang | Wäscheschacht in den Unterkünften | Versorgungsplan aus zwei Hälften (B + C) |
-| C–D Forschungskorridor | Schleuse im Datenarchiv | Ostrowskis Freigabekarte |
-| A–D Notfallverbindung | Bodenluke im Leitstand | Kette K3 |
+| A–B Wartungstunnel | hinter dem Kartenschrank im Lagezentrum (A) | Nowaks Wartungsplan (aus B) |
+| B–C Versorgungsgang | Wäscheschacht in den Unterkünften (B) | Versorgungsplan aus zwei Hälften (B + C) |
+| C–D Forschungskorridor | hinter der Schleuse im Datenarchiv (C) | Ostrowskis Freigabekarte |
+| A–D Notfallverbindung | Bodenluke im Leitstand (A) | Kette K3 |
 
 ---
 
@@ -122,7 +134,7 @@ Damit die Schlussfrage „Habt ihr selbst entschieden?“ trifft, muss ECHO die 
 
 ## 6. Rätselketten über mehrere Sektoren
 
-Jede Kette braucht Informationen aus mindestens drei Räumen in verschiedenen Sektoren. Die Teile liegen so, dass man sie **parallel** holen kann.
+Jede Kette braucht Informationen von mindestens drei Standpunkten in verschiedenen Hallen. Die Teile liegen so, dass man sie **parallel** holen kann.
 
 | Kette | Frage | Teile | Ergebnis |
 |---|---|---|---|
@@ -131,7 +143,7 @@ Jede Kette braucht Informationen aus mindestens drei Räumen in verschiedenen Se
 | **K3 · Nowaks Schaltung** | Wie schaltet man ECHO ab? | Spind mit Skizze (B), Schaltbuch mit Hebelreihenfolge (D), Leitstand-Schalter nur gleichzeitig mit D (A + D, **zwei Spieler zur selben Zeit**) | Ende A möglich, Notfallverbindung A–D |
 | **K4 · Brandts Bänder** | Was geschah wirklich zwischen 22:40 und 23:40? | 6 Bänder in A, B und C. Nur das Gerät in der Funkstation (A) spielt sie ab, Band 5 läuft zu schnell (Drehzahl im Labor C bestimmen) | Beweis für Ende B, Durchschauen von T1 und T5 |
 
-Dazu kommen 8 bis 10 Einzelrätsel in den Räumen: Schlösser, Terminals und Geräte, alle in 3D direkt bedienbar wie in Hotel Nocturne.
+Dazu kommen 8 bis 10 Einzelrätsel in den Hallen: Schlösser, Terminals und Geräte, alle in 3D direkt bedienbar wie in Hotel Nocturne.
 
 **Echtes Zusammenspiel:**
 - K3 verlangt zwei Spieler gleichzeitig an zwei Orten.
@@ -179,8 +191,11 @@ Nach **jedem** Ende kommt T6: ECHOs Auswertung der Gruppe. Erst sie stellt die F
   - **Bunkerkarte** als Überlagerung, mit farbigen Punkten für die Positionen der Mitspieler
   - **Tonbandgerät** als Gerät mit Abspielen, Spulen und Drehzahl, dazu Abschriften
   - **Terminals** mit eigener Oberfläche
-  - Raumwechsel über die Karte statt über Türen in Reihe
-- **Leistung:** Es ist immer nur der aktuelle Raum geladen. 12 Räume sind dann kein Problem. Ziel ist, dass ein iPad flüssig läuft, deshalb liegen die Räume unter dem Gewicht des Hotel-Nocturne-Intros.
+  - **Standpunkte:** mehrere Augenpunkte je Halle mit Kamerafahrt dazwischen (Klick auf die Bodenmarkierung oder die Karte); Nahansicht, Gesten und Schlösser bleiben unverändert. Hotel Nocturne kann das später auch nutzen
+  - **Bereiche in Stufen:** Gitter, Glaswände, Schleusen und Licht hängen am Spielstand wie bisher die Türen
+  - **Mitspieler in der Halle:** farbige Helmlampe am Standpunkt eines anderen Spielers
+  - Hallenwechsel über die Karte und die Panzertüren der Verteilerhalle
+- **Leistung:** Es ist immer nur eine Halle geladen. Eine Halle darf deutlich mehr Objekte haben als ein Hotel-Nocturne-Raum, muss aber gebaut sein für ein flüssiges iPad: einfache Formen und wenige Lichter in der Ferne, Details und Schatten erst nah am Standpunkt, gesperrte Bereiche erst beim Öffnen voll aufgebaut. Ziel ist pro Halle höchstens das Gewicht des Hotel-Nocturne-Intros (rund 875 Objekte, 12 Lichter), besser weniger.
 
 ---
 
@@ -189,4 +204,4 @@ Nach **jedem** Ende kommt T6: ECHOs Auswertung der Gruppe. Erst sie stellt die F
 1. **Namen und Datum:** Übernehmen wir die Vorschläge aus Abschnitt 0, oder soll Sektor 9 bewusst im selben Universum wie Hotel Nocturne spielen?
 2. **Datenbank:** Positionen und Chat ohne Verlauf gehen über Echtzeit-Kanäle ohne neue Tabelle. Für Chat-Verlauf, persönliche Funde und Wiederherstellungsschlüssel braucht es vermutlich **neue Tabellen oder Funktionen**. Wer legt sie an, und dürfen sie neben den bestehenden liegen?
 3. **Tonbänder:** echte Sprecher, künstliche Stimme oder vorerst nur Abschriften?
-4. **Erster spielbarer Abschnitt:** Verteilerhalle und Sektor A in 3D, für 2 Spieler, etwa 45 Minuten, mit Karte, Positionen, gemeinsamem Archiv und einem raumübergreifenden Rätsel. Passt das als erster Schritt?
+4. **Erster spielbarer Abschnitt:** Verteilerhalle und Kommando-Halle (A) in 3D mit allen drei Standpunkten, für 2 Spieler, etwa 45 Minuten, mit Karte, Positionen, gemeinsamem Archiv und einem Rätsel über zwei Standpunkte. Damit lassen sich auch Standpunkte und Leistung auf dem iPad früh prüfen. Passt das als erster Schritt?

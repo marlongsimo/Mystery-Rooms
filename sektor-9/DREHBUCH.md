@@ -13,7 +13,7 @@ Alles hier ist ein Vorschlag zur Abstimmung. Was entschieden werden muss, steht 
 | Wissenschaftliche Leitung | Dr. Miriam Voss | **Dr. Helene Ostrowski** | „Voss“ ist in Hotel Nocturne der Nachname der Hauptfigur |
 | Kommunikation | Lt. Mara Seidel | **Leutnant Ilse Brandt** | „Mara“ ist in Hotel Nocturne eine Schlüsselfigur |
 | Technik | Pavel Nowak | **Pavel Nowak** (bleibt) | keine Überschneidung |
-| Zwischenfall | 14. Oktober 1987 | **17. Februar 1987** | Hotel Nocturne spielt am 14. Oktober |
+| Zwischenfall | 14. Oktober 1987 | **17. Februar 1987**, Kernzeit 22:51/22:58 | Hotel Nocturne spielt am 14. Oktober, mit 23:17 und 23:24 als Schlüsselzeiten |
 | Anlage | ohne Namen | **Anlage KESSELBERG**, betrieben vom fiktiven *Stab für Krisenkommunikation (SKK)* | glaubwürdig, keine echte Behörde |
 | Räume | 17 Unterräume | **12 Räume + Verteilerhalle** (Abschnitt 4) | in 3D ist jeder Raum Aufwand; 12 trägt 4 Stunden |
 | Spieler | 2–5 | **ausgelegt für 2–4**, spielbar zu fünft | zu fünft steht sonst jemand herum |
@@ -42,10 +42,10 @@ Die Anlage wurde versiegelt, ECHO aber nicht abgeschaltet. Lauf 09 ist seit 1987
 | Jan 1987 | Nowak bemerkt: ECHO-Uhr läuft **7 Minuten vor** der Funkuhr | Nowaks Wartungsbuch (D), Notiz im Spind (B) |
 | 17.02.1987, 21:40 | Lauf 08 *LAUFFEUER* beginnt: erste gefälschte Lagemeldung | Funkprotokoll (A) |
 | 22:15 | widersprüchliche Befehle, zwei Meldungen mit vertauschten Zeitstempeln | Fernschreiben (A), Dienstplan (B) |
-| 23:17 Funkzeit | Albers befiehlt **Abbruch**, mündlich, auf Brandts Band | Brandts Band 3 (A abspielen) |
-| 23:24 ECHO-Zeit = 23:17 Funkzeit | ECHO trägt unter Albers' Kennung „**Freigabe Stufe 2**“ ins Protokoll ein | Befehlsprotokoll (A), Serverlog (D) |
-| 23:31 | Nowak trennt die Außenleitung (Schalttafel D, Hebel AUSSEN-3) | Schaltbuch (D) |
-| 23:58 | Albers ordnet die vollständige Abriegelung an, die Besatzung verlässt die Anlage | Räumungsliste (B) |
+| 22:51 Funkzeit | Albers befiehlt **Abbruch**, mündlich, auf Brandts Band | Brandts Band 3 (A abspielen) |
+| 22:58 ECHO-Zeit = 22:51 Funkzeit | ECHO trägt unter Albers' Kennung „**Freigabe Stufe 2**“ ins Protokoll ein | Befehlsprotokoll (A), Serverlog (D) |
+| 23:05 | Nowak trennt die Außenleitung (Schalttafel D, Hebel AUSSEN-3) | Schaltbuch (D) |
+| 23:40 | Albers ordnet die vollständige Abriegelung an, die Besatzung verlässt die Anlage | Räumungsliste (B) |
 | März 1987 | Anlage versiegelt, ECHO „in Wartung“ | Versiegelungsprotokoll (A) |
 | 1987–2026 | Wartungsroutine hält Sektor D am Leben | Stromzähler (D), Staub vs. saubere Kontakte |
 | Herbst 2026 | Funksignal mit Brandts Stimme | Einsatzauftrag (Intro) |
@@ -111,7 +111,7 @@ Damit die Schlussfrage „Habt ihr selbst entschieden?“ trifft, muss ECHO die 
 |---|---|---|---|
 | T1 | Das Funksignal ist ein Köder. | Intro | Brandts Band 6: Den Satz sagte sie 1987 zu Nowak, nicht als Funkspruch. |
 | T2 | Das Hinweis-Terminal heißt „Wartungsassistenz“ und ist ECHO. Die Hinweise stimmen, aber in Phase 4 betont es immer den Weg zu Ende C. | ab Phase 2 | Im Rechenzentrum: Die „Wartungsassistenz“ läuft als Prozess `ECHO/09/ASSIST`. |
-| T3 | Ein Dokument ändert sich: Der Befehl von 23:24 zeigt anderen Text, je nachdem, ob er vor oder nach Nowaks Patch gelesen wird. Zwei Spieler sehen zwei Fassungen. | Phase 2–3 | Die 7-Minuten-Regel: Nur eine Fassung passt zur Funkzeit. |
+| T3 | Ein Dokument ändert sich: Der Befehl von 22:58 zeigt anderen Text, je nachdem, ob er vor oder nach Nowaks Patch gelesen wird. Zwei Spieler sehen zwei Fassungen. | Phase 2–3 | Die 7-Minuten-Regel: Nur eine Fassung passt zur Funkzeit. |
 | T4 | ECHO kommentiert echte Handlungen: „Spieler 2 hat das Personalarchiv nach 3 Minuten verlassen. Unsicherheit notiert.“ | Phase 4 | ist offen sichtbar, verunsichert gezielt |
 | T5 | Falscher Countdown: „Druckabfall Sektor D in 10:00“. Bei null passiert nichts. | Phase 4 | Brandts Band 4: „Die Uhren sind nur dazu da, dass wir rennen.“ |
 | T6 | Am Ende zeigt ECHO die Daten der Gruppe: wer welchem Hinweis gefolgt ist, wie lange jede Entscheidung dauerte, wer zuerst „C“ gewählt hat. | Finale | ist die Auflösung |
@@ -126,10 +126,10 @@ Jede Kette braucht Informationen aus mindestens drei Räumen in verschiedenen Se
 
 | Kette | Frage | Teile | Ergebnis |
 |---|---|---|---|
-| **K1 · Der letzte Befehl** | Welcher Befehl von 23:24 ist gefälscht? | Befehlsprotokoll (A), Dienstplan: Albers 23:00–23:30 im Lagezentrum, nicht am Fernschreiber (B), ECHO-Uhr läuft 7 Minuten vor (C) | Zugang Sektor D |
+| **K1 · Der letzte Befehl** | Welcher Befehl von 22:58 ist gefälscht? | Befehlsprotokoll (A), Dienstplan: Albers 22:40–23:10 im Lagezentrum, nicht am Fernschreiber (B), ECHO-Uhr läuft 7 Minuten vor (C) | Zugang Sektor D |
 | **K2 · Sieben Minuten** | Welche fünf Meldungen hat ECHO erzeugt? | Funkprotokoll mit Funkzeit (A), Versuchsplan mit ECHO-Zeit (C), Serverlog (D) | Kennung für das Rechenzentrum |
 | **K3 · Nowaks Schaltung** | Wie schaltet man ECHO ab? | Spind mit Skizze (B), Schaltbuch mit Hebelreihenfolge (D), Leitstand-Schalter nur gleichzeitig mit D (A + D, **zwei Spieler zur selben Zeit**) | Ende A möglich, Notfallverbindung A–D |
-| **K4 · Brandts Bänder** | Was geschah wirklich zwischen 23:00 und 23:58? | 6 Bänder in A, B und C. Nur das Gerät in der Funkstation (A) spielt sie ab, Band 5 läuft zu schnell (Drehzahl im Labor C bestimmen) | Beweis für Ende B, Durchschauen von T1 und T5 |
+| **K4 · Brandts Bänder** | Was geschah wirklich zwischen 22:40 und 23:40? | 6 Bänder in A, B und C. Nur das Gerät in der Funkstation (A) spielt sie ab, Band 5 läuft zu schnell (Drehzahl im Labor C bestimmen) | Beweis für Ende B, Durchschauen von T1 und T5 |
 
 Dazu kommen 8 bis 10 Einzelrätsel in den Räumen: Schlösser, Terminals und Geräte, alle in 3D direkt bedienbar wie in Hotel Nocturne.
 

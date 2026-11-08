@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.6 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.7 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -325,13 +325,13 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 
 **Regel 4:** Trumpfkarten spielst du aus, wann du willst, oder gar nicht.
 
-**Regel 5:** Niemand zeigt die vertraulichen Seiten seines Rollenblatts vor dem Finale.
+**Regel 5:** Niemand zeigt den vertraulichen Teil oder die Runden seines Rollenblatts vor dem Finale.
 
 ## 10. Standards für die Rollenblätter (freigegeben am Musterblatt R03)
 
 | Bestandteil | Festlegung |
 |---|---|
-| Umfang | vier Seiten je Rolle: 1 Charakter und Vorgeschichte · 2 Kleidung · 3 Was du weißt · 4 vertraulich: Geheimnis, Ziele, Spielhinweise |
+| Aufbau (ab 0.7) | **sofort sichtbar:** Charakter (Wer du bist, Vorgeschichte) · Kleidung · Vertraulich (Geheimnis, Ziele, was bis zur Rede geschah, Beim Empfang). **Nach Runden:** Runde 1 „Nach dem Fund“ (Abend ab 20:40, Phase 2) · Runde 2 „Jetzt fällt dir ein“ (Wissen über andere, Trumpf, Phase 3) · Runde 3 „Die letzte Ermittlung“ (Phase 4). Die Runden öffnen mit denselben Losungswörtern wie die Beweise. **Grundsatz:** Vor dem Fund weiß keine unschuldige Rolle etwas über die Mordnacht. Nur R08 kennt die Tat von Anfang an, damit sie sich vorbereiten kann. |
 | Varianten | weiblich und männlich, eine Rollen-ID (R01–R10), nur Name, Anrede und Pronomen wechseln. `[w / m]` = eigene Rolle, `{Rxx: w / m}` = andere Rolle |
 | Charakterbeschreibung | ca. 100–150 Wörter: Name, Alter, Beruf, Beziehung zum Opfer, Eigenschaften, Kurzbeschreibung |
 | Vorgeschichte | ca. 300–400 Wörter, mit Verbindungen zu den anderen Gästen |

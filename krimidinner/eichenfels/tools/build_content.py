@@ -121,15 +121,15 @@ for path in sorted(glob.glob(os.path.join(ROOT, "rollen", "R*.md"))):
     lines = src.split("\n")
     title = re.sub(r"^#\s*Rollenblatt\s+R\d\d\s*·\s*", "", lines[0]).strip()
     body = "\n".join(l for l in lines[1:] if not l.startswith("*Schreibweise"))
+    PARTS = ["Charakter", "Kleidung", "Vertraulich", "Runde 1", "Runde 2", "Runde 3"]
     pages = {}
-    for chunk in re.split(r"(?=^## Seite \d)", body, flags=re.M):
-        m = re.match(r"^## Seite (\d) · (.*)", chunk)
+    for chunk in re.split(r"(?=^## (?:Charakter|Kleidung|Vertraulich|Runde \d) · )", body, flags=re.M):
+        m = re.match(r"^## (Charakter|Kleidung|Vertraulich|Runde \d) · (.*)", chunk)
         if not m: continue
-        n = int(m.group(1))
         rest = chunk.split("\n", 1)[1] if "\n" in chunk else ""
-        pages.setdefault(n, []).append(f"## {m.group(2)}\n{rest}")
-    assert sorted(pages) == [1, 2, 3, 4], (rid, sorted(pages))
-    roles[rid] = {"title": title, "pages": [veil(md("\n".join(pages[n]).replace("\n---\n", "\n"))) for n in (1, 2, 3, 4)], "culprit": "TÄTERROLLE" in lines[0]}
+        pages.setdefault(m.group(1), []).append(f"## {m.group(2)}\n{rest}")
+    assert sorted(pages) == sorted(PARTS), (rid, sorted(pages))
+    roles[rid] = {"title": title, "pages": [veil(md("\n".join(pages[k]).replace("\n---\n", "\n"))) for k in PARTS], "culprit": "TÄTERROLLE" in lines[0]}
 
 # ---------- Beweiskarten ----------
 cards, rnd = {}, None
@@ -157,11 +157,28 @@ assert len(cards) == 14, sorted(cards)
 gh = read("GASTGEBERHEFT.md")
 a_part, b_part = gh.split("# Teil B", 1)
 a_part = a_part.split("# Teil A", 1)[1]
-host_a = md("# Teil A" + a_part.replace("\n---\n---\n", "\n"))
+a_src = a_part.replace("\n---\n---\n", "\n")
+host_a = md("# Teil A" + a_src)
+# Abschnitte des Gastgeberhefts einzeln (für den geführten Ablauf)
+sections = {}
+for chunk in re.split(r"(?=^## )", a_src, flags=re.M):
+    m = re.match(r"^## (.*)", chunk)
+    if not m: continue
+    key = m.group(1).split(" · ")[0].strip()  # „A1“ … „Phase 1“ … „Finale“
+    sections[key] = {"title": m.group(1).strip(), "html": md(chunk.split("\n", 1)[1])}
+# Wissen der Nebenfiguren (A8) und Impulse (A7) als Daten
+npc = []
+a8 = a_src.split("## A8", 1)[1].split("\n## ", 1)[0]
+for row in re.findall(r"^\| (R\d\d) \| (\d) \| (.+) \|$", a8, flags=re.M):
+    npc.append({"role": row[0], "phase": int(row[1]), "html": inline(row[2])})
+impulses = {}
+a7 = a_src.split("## A7", 1)[1].split("\n## ", 1)[0]
+for m in re.finditer(r"^- \*\*(Phase \d|Immer):\*\* (.+)$", a7, flags=re.M):
+    impulses[m.group(1)] = inline(m.group(2))
 host_b = veil(md("# Teil B" + b_part))
 guide = md(read("ANLEITUNG.md").split("\n", 1)[1])
 
-data = {"roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide}
+data = {"roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide, "sections": sections, "npc": npc, "impulses": impulses}
 out = "/* Erzeugt von tools/build_content.py aus den .md-Dateien – nicht von Hand bearbeiten. */\nwindow.KD_CONTENT = " + json.dumps(data, ensure_ascii=False) + ";\n"
 os.makedirs(os.path.join(ROOT, "js"), exist_ok=True)
 with open(os.path.join(ROOT, "js", "content.js"), "w", encoding="utf-8") as f:

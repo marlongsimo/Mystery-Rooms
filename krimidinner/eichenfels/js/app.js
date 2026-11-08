@@ -173,86 +173,133 @@
     if (prefill) open();
   }
 
-  /* Rollenblatt */
-  let tab = "s1";
+  /* Rollenblatt: Charakter, Kleidung, Vertraulich sofort – Runde 1–3 erst mit dem Losungswort */
+  const PARTS = [["Charakter", "Charakter"], ["Kleidung", "Kleidung"], ["Vertraulich", "Vertraulich"], ["Runde 1", "Runde 1"], ["Runde 2", "Runde 2"], ["Runde 3", "Runde 3"]];
+  const WORDS_HINT = "Die Spielleitung liest zu Beginn jeder Runde ein <b>Losungswort</b> vor. Es öffnet die neuen Beweise und den nächsten Abschnitt deines Rollenblatts.";
+  function rolePart(d, k, forPrint) {
+    const role = C.roles[d.role], isM = male(d.variants, d.role);
+    const div = document.createElement("div"); div.className = "doc" + (k >= 2 ? " secret" : "");
+    const label = k >= 3 ? `<span class="stamp">${PARTS[k][1].toUpperCase()}</span>${forPrint ? `<p class="dossier-head">ERST ÖFFNEN, WENN DIE SPIELLEITUNG DAS LOSUNGSWORT DER ${PARTS[k][1].toUpperCase()} NENNT</p>` : ""}` : k === 2 ? `<span class="stamp">VERTRAULICH</span>` : "";
+    div.innerHTML = label + `<p class="dossier-head">STERNWARTE EICHENFELS · DOSSIER${forPrint ? "" : " " + d.role} · ${PARTS[k][1].toUpperCase()}</p>` + (k === 0 && forPrint ? `<h1>${esc(NAMES[d.role][isM ? 1 : 0])}</h1>` : "") + resolve(unveil(role.pages[k]), d.variants, d.role);
+    pruneVariantTable(div, isM);
+    return div;
+  }
+  function unlockForm(me, after) {
+    const box = document.createElement("div");
+    box.innerHTML = `<p>${WORDS_HINT}</p><div class="unlock"><input type="text" class="code" id="word" placeholder="LOSUNGSWORT" autocomplete="off" style="letter-spacing:.12em;font-size:18px"><button class="btn" id="unl">Freischalten</button></div><p class="fb" id="fb"></p>`;
+    const tryWord = () => {
+      const w = $("#word", box).value.trim().toUpperCase().replace(/\s+/g, "");
+      const r = ROUNDS.find((x) => x.word === w), open = me.open || {};
+      if (w === EXTRA.word) open.extra = true;
+      else if (r) { for (let k = 1; k <= r.no; k++) open[k] = true; }
+      else { $("#fb", box).textContent = "Dieses Losungswort kennt das Spiel nicht."; return; }
+      me.open = open; store.set("kd_eich_me", me); after(r ? r.no : null);
+    };
+    $("#unl", box).onclick = tryWord; $("#word", box).addEventListener("keydown", (e) => { if (e.key === "Enter") tryWord(); });
+    return box;
+  }
+  let tab = "p0";
   function viewRolle() {
     const me = store.get("kd_eich_me", null), d = me && decode(me.code);
     if (!d || d.host) { go("code"); return; }
-    const role = C.roles[d.role], isM = male(d.variants, d.role), name = NAMES[d.role][isM ? 1 : 0];
-    const tabs = [["s1", "Charakter"], ["s2", "Kleidung"], ["s3", "Was du weißt"], ["s4", "Vertraulich"], ["bew", "Beweise"], ["anl", "Regeln"]];
+    const role = C.roles[d.role], isM = male(d.variants, d.role), name = NAMES[d.role][isM ? 1 : 0], open = me.open || {};
+    const tabs = PARTS.map(([, l], k) => [`p${k}`, k >= 3 && !open[k - 2] ? `🔒 ${l}` : l]).concat([["bew", "Beweise"], ["anl", "Regeln"]]);
     app.innerHTML = `<p class="eyebrow">Dein Rollenblatt · ${d.role}</p><h1>${esc(name)}</h1><p class="muted">${esc(role.title.replace(/\s*—.*$/, ""))}</p>
-      <nav class="tabs no-print">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${tab === k ? "on" : ""}${k === "s4" ? " secret" : ""}">${l}</button>`).join("")}</nav><section id="pane"></section>`;
+      <nav class="tabs no-print">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${tab === k ? "on" : ""}${k === "p2" ? " secret" : ""}">${l}</button>`).join("")}</nav><section id="pane"></section>`;
     $$("[data-tab]").forEach((b) => b.onclick = () => { tab = b.dataset.tab; viewRolle(); });
     const pane = $("#pane");
-    const page = (i) => { const div = document.createElement("div"); div.className = "doc" + (i === 3 ? " secret" : ""); div.innerHTML = (i === 3 ? `<span class="stamp">VERTRAULICH</span>` : "") + `<p class="dossier-head">STERNWARTE EICHENFELS · DOSSIER ${d.role} · SEITE ${i + 1}</p>` + resolve(unveil(role.pages[i]), d.variants, d.role); pruneVariantTable(div, isM); return div; };
-    if (tab.startsWith("s")) {
-      const i = +tab[1] - 1;
-      if (i === 3 && !me.s4) {
-        pane.innerHTML = `<div class="seal"><span class="stamp">VERTRAULICH</span><p>Diese Seite ist nur für dich: dein Geheimnis, deine Ziele, deine Spielhinweise. Achte darauf, dass niemand mitliest.</p><button class="btn" id="s4">Öffnen</button></div>`;
-        $("#s4").onclick = () => { me.s4 = true; store.set("kd_eich_me", me); viewRolle(); };
-      } else pane.appendChild(page(i));
+    const printBtn = () => {
       pane.insertAdjacentHTML("beforeend", `<p class="row no-print" style="margin-top:18px"><button class="btn ghost small" id="prt">Mein Rollenblatt drucken</button><a class="btn ghost small" href="#start">Start</a></p>`);
-      $("#prt").onclick = () => { $("#print").innerHTML = ""; for (let k = 0; k < 4; k++) { const w = document.createElement("div"); w.className = "p-doc"; w.appendChild(page(k)); $("#print").appendChild(w); } window.print(); };
+      $("#prt").onclick = () => { $("#print").innerHTML = ""; PARTS.forEach((_, k) => { const w = document.createElement("div"); w.className = "p-doc"; w.appendChild(rolePart(d, k, true)); $("#print").appendChild(w); }); window.print(); };
+    };
+    if (tab.startsWith("p")) {
+      const k = +tab.slice(1);
+      if (k === 2 && !me.s4) {
+        pane.innerHTML = `<div class="seal"><span class="stamp">VERTRAULICH</span><p>Dieser Teil ist nur für dich: dein Geheimnis, deine Ziele und wie du dich beim Empfang verhältst. Achte darauf, dass niemand mitliest.</p><button class="btn" id="s4">Öffnen</button></div>`;
+        $("#s4").onclick = () => { me.s4 = true; store.set("kd_eich_me", me); viewRolle(); };
+        return;
+      }
+      if (k >= 3 && !open[k - 2]) {
+        pane.innerHTML = `<div class="seal"><span class="stamp">${PARTS[k][1].toUpperCase()}</span><p>Was deine Figur in dieser Runde weiß, öffnet sich erst, wenn die Spielleitung das Losungswort nennt. So weiß niemand vorher mehr, als er soll.</p></div>`;
+        pane.appendChild(unlockForm(me, (r) => { if (r) tab = `p${Math.min(5, r + 2)}`; viewRolle(); }));
+        return;
+      }
+      pane.appendChild(rolePart(d, k));
+      printBtn();
       return;
     }
     if (tab === "anl") { pane.innerHTML = `<div class="guide">${C.guide}</div>`; return; }
     // Beweise
-    const open = me.open || {};
     const unlocked = ROUNDS.filter((r) => open[r.no]);
-    pane.innerHTML = `<p>Die Spielleitung liest zu Beginn jeder Runde ein <b>Losungswort</b> vor. Gib es hier ein, dann siehst du die Beweise dieser Runde.</p>
-      <div class="unlock"><input type="text" class="code" id="word" placeholder="LOSUNGSWORT" autocomplete="off" style="letter-spacing:.12em;font-size:18px"><button class="btn" id="unl">Freischalten</button></div><p class="fb" id="fb"></p>
-      ${unlocked.length ? "" : `<p class="muted">Noch keine Beweise freigegeben.</p>`}
-      <div class="cardlist">${unlocked.slice().reverse().map((r) => `<h3>${esc(r.name)}</h3>` + cardsFor(r.no, d.n, open.extra).map((id) => cardHtml(id, d.variants)).join("")).join("")}</div>`;
-    const tryWord = () => {
-      const w = $("#word").value.trim().toUpperCase().replace(/\s+/g, "");
-      const r = ROUNDS.find((x) => x.word === w);
-      if (w === EXTRA.word) { open.extra = true; } else if (r) { for (let k = 1; k <= r.no; k++) open[k] = true; } else { $("#fb").textContent = "Dieses Losungswort kennt das Spiel nicht."; return; }
-      me.open = open; store.set("kd_eich_me", me); viewRolle();
-    };
-    $("#unl").onclick = tryWord; $("#word").addEventListener("keydown", (e) => { if (e.key === "Enter") tryWord(); });
+    pane.appendChild(unlockForm(me, () => viewRolle()));
+    pane.insertAdjacentHTML("beforeend", `${unlocked.length ? "" : `<p class="muted">Noch keine Beweise freigegeben.</p>`}
+      <div class="cardlist">${unlocked.slice().reverse().map((r) => `<h3>${esc(r.name)}</h3>` + cardsFor(r.no, d.n, open.extra).map((id) => cardHtml(id, d.variants)).join("")).join("")}</div>`);
   }
 
-  /* Spielleitung */
-  let htab = "ablauf";
+  /* Spielleitung: geführter Ablauf Schritt für Schritt */
+  const STEPS = [
+    { key: "vorb", title: "Vorbereitung", secs: ["A1", "A2", "A3", "A4"] },
+    { key: "start", title: "Start · Regeln vorlesen", secs: ["A5"], mins: 5 },
+    { key: "p1", title: "Phase 1 · Der Empfang", secs: ["Phase 1"], phase: 1, mins: 20 },
+    { key: "p2", title: "Phase 2 · Der Mord", secs: ["Phase 2"], phase: 2, round: 1, mins: 20 },
+    { key: "p3", title: "Phase 3 · Geheimnisse und Intrigen", secs: ["Phase 3"], phase: 3, round: 2, mins: 30 },
+    { key: "p4", title: "Phase 4 · Die letzte Ermittlung", secs: ["Phase 4"], phase: 4, round: 3, mins: 25 },
+    { key: "fin", title: "Finale · Anklage und Auflösung", secs: ["Finale"], phase: 5, round: 4, mins: 25 },
+  ];
+  const filterNpcTable = (root, c) => $$("table", root).forEach((t) => { const th = $("thead th", t); if (th && th.textContent.trim() === "Nebenfigur") $$("tbody tr", t).forEach((tr) => { if (c.includes(tr.children[0].textContent.trim())) tr.remove(); }); });
+  const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+  let htab = "ablauf", timerTick = null;
   function viewLeitung() {
+    clearInterval(timerTick);
     const host = store.get("kd_eich_host", null), d = host && decode(host.code);
     if (!d || !d.host) { viewCode(); $("h1").textContent = "Spielleitungscode eingeben"; return; }
-    const c = cast(d.n), seen = host.seen || {};
-    const tabs = [["ablauf", "Ablauf & Vorlesetexte"], ["runden", "Runden & Beweise"], ["druck", "Drucken"], ["loesung", "Lösung"]];
+    const c = cast(d.n), seen = host.seen || (host.seen = {}), save = () => store.set("kd_eich_host", host);
+    const tabs = [["ablauf", "Ablauf"], ["heft", "Gastgeberheft"], ["druck", "Drucken"], ["loesung", "Lösung"]];
     app.innerHTML = `<p class="eyebrow">Spielleitung · ${d.n} Personen · Code ${d.code}</p><h1>Der Abend</h1>
       <nav class="tabs no-print">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${htab === k ? "on" : ""}${k === "loesung" ? " secret" : ""}">${l}</button>`).join("")}</nav><section id="pane"></section>`;
     $$("[data-tab]").forEach((b) => b.onclick = () => { htab = b.dataset.tab; viewLeitung(); });
     const pane = $("#pane");
     if (htab === "ablauf") {
-      pane.innerHTML = `<p class="note">Besetzt: ${c.map((id) => id).join(" · ")}. Nebenfiguren: ${IDS.filter((id) => !c.includes(id)).join(" · ") || "keine"}. ${c.includes("R07") ? "" : "B8 kommt in Runde 2 dazu. "}${c.includes("R04") ? "B12 nur, wenn Lindner die Aufnahme bis Runde 3 nicht vorlegt (Losungswort FUNK)." : "B12 kommt in Runde 3 dazu."}</p>
-        <div class="hostdoc">${resolve(C.hostA, d.variants)}</div>`;
-      // Nebenfiguren-Tabelle: nur nicht besetzte Rollen zeigen
-      $$(".hostdoc table").forEach((t) => { if ($("thead th", t) && $("thead th", t).textContent.trim() === "Nebenfigur") $$("tbody tr", t).forEach((tr) => { if (c.includes(tr.children[0].textContent.trim())) tr.remove(); }); });
-      return;
-    }
-    if (htab === "runden") {
-      pane.innerHTML = `<p>Öffne eine Runde erst, wenn die Phase beginnt. Lies dann das <b>Losungswort</b> vor: Wer es eingibt, sieht die Beweise auf dem eigenen Handy. Ohne Handys zeigst du die Karten hier oder legst die gedruckten Karten auf den Tisch.</p>
-        <div class="rounds">${ROUNDS.map((r) => `<div class="round ${r.cls}"><h3>${esc(r.name)}</h3><p class="muted small">${r.phase} · ${cardsFor(r.no, d.n, false).join(", ")}</p>
-          ${seen[r.no] ? `<div class="word">${r.word}</div><button class="btn small" data-cards="${r.no}">Karten zeigen</button>` : `<button class="btn ghost small" data-round="${r.no}">${r.no === 4 ? "Finale öffnen – erst nach der Anklage" : "Runde öffnen"}</button>`}</div>`).join("")}
-          ${c.includes("R04") ? `<div class="round r3"><h3>Zusatz · Lindners Aufnahme (B12)</h3><p class="muted small">Nur wenn Lindner die Aufnahme bis Runde 3 nicht vorgelegt hat.</p>${seen.extra ? `<div class="word">${EXTRA.word}</div><button class="btn small" data-cards="extra">Karte zeigen</button>` : `<button class="btn ghost small" data-round="extra">Freigeben</button>`}</div>` : ""}</div>`;
+      const i = Math.max(0, Math.min(STEPS.length - 1, host.step || 0)), st = STEPS[i], timers = host.timers || (host.timers = {});
+      const missing = IDS.filter((id) => !c.includes(id));
+      const npc = st.phase ? C.npc.filter((n) => n.phase === st.phase && missing.includes(n.role)) : [];
+      const imp = st.phase && st.phase >= 2 && st.phase <= 4 ? [C.impulses["Phase " + st.phase], C.impulses.Immer].filter(Boolean) : [];
+      const r = st.round ? ROUNDS[st.round - 1] : null, roundOpen = r && seen[r.no];
+      pane.innerHTML = `<div class="steps no-print">${STEPS.map((s, k) => `<button data-step="${k}" class="${k === i ? "on" : k < i ? "done" : ""}" title="${esc(s.title)}">${k === 0 ? "Vorb." : k === 1 ? "Start" : k === STEPS.length - 1 ? "Finale" : "P" + (k - 1)}</button>`).join("")}</div>
+        <div class="step-head"><h2>${esc(st.title)}</h2>${st.mins ? `<div class="timer"><span id="tm">${timers[st.key] ? mmss(Date.now() - timers[st.key]) : "0:00"}</span> / ca. ${st.mins} Min. <button class="btn ghost small" id="tstart">${timers[st.key] ? "neu starten" : "Zeit starten"}</button></div>` : ""}</div>
+        ${i === 0 ? `<p class="note">Bei euch besetzt: ${c.join(" · ")}. Nebenfiguren: ${missing.join(" · ") || "keine"}. Was die Nebenfiguren wissen, bietet dir der Ablauf in der passenden Phase zum Vorlesen an.</p>` : ""}
+        ${r ? `<div class="round ${r.cls}"><h3>Losungswort für die Gäste</h3>${roundOpen ? `<div class="word">${r.word}</div><p class="small muted">Öffnet: ${cardsFor(r.no, d.n, false).join(", ")}${r.no <= 3 ? ` und im Rollenblatt Runde ${r.no}` : ""}.</p><button class="btn small" data-cards="${r.no}">Karten zeigen</button>` : `<p class="small muted">${r.no === 4 ? "Erst, wenn alle ihre Anklage abgegeben haben." : "Zu Beginn dieser Phase öffnen und vorlesen."}</p><button class="btn small" data-round="${r.no}">${r.no === 4 ? "Finale-Karten öffnen" : "Losungswort anzeigen"}</button>`}
+          ${st.round === 3 && c.includes("R04") ? `<p class="small" style="margin-top:12px">Hat Lindner die Aufnahme noch nicht vorgelegt? Dann zusätzlich: ${seen.extra ? `<b class="word" style="font-size:18px">${EXTRA.word}</b> <button class="btn ghost small" data-cards="extra">B12 zeigen</button>` : `<button class="btn ghost small" data-round="extra">Zusatzwort FUNK anzeigen</button>`}</p>` : ""}</div>` : ""}
+        ${npc.length ? `<div class="npc"><h3>Fehlende Rollen · zum Vorlesen</h3><p class="small muted">Diese Figuren spielt bei euch niemand. Lies vor, was sie wissen – am besten, sobald das Gespräch darauf kommt.</p>${npc.map((n) => `<blockquote><b>${n.role}</b> ${resolve(n.html, d.variants)}</blockquote>`).join("")}</div>` : ""}
+        <div class="hostdoc step-doc">${st.secs.map((k) => C.sections[k] ? (st.secs.length > 1 ? `<h2>${esc(C.sections[k].title)}</h2>` : "") + resolve(C.sections[k].html, d.variants) : "").join("")}</div>
+        ${imp.length ? `<details class="imp"><summary>Wenn es stockt</summary><ul>${imp.map((x) => `<li>${x}</li>`).join("")}</ul></details>` : ""}
+        ${st.key === "fin" ? `<p class="note red">Nach dem Vorlesen der Anklagen: Reiter <b>Lösung</b> öffnen.</p>` : ""}
+        <div class="row stepnav no-print"><button class="btn ghost" id="prev" ${i === 0 ? "disabled" : ""}>← Zurück</button><button class="btn" id="next" ${i === STEPS.length - 1 ? "disabled" : ""}>Weiter: ${i < STEPS.length - 1 ? esc(STEPS[i + 1].title.split(" · ")[0]) : ""} →</button></div>`;
+      filterNpcTable(pane, c);
+      $$("[data-step]").forEach((b) => b.onclick = () => { host.step = +b.dataset.step; save(); viewLeitung(); });
+      if ($("#prev")) $("#prev").onclick = () => { host.step = i - 1; save(); viewLeitung(); };
+      if ($("#next")) $("#next").onclick = () => { host.step = i + 1; save(); viewLeitung(); };
+      if ($("#tstart")) $("#tstart").onclick = () => { timers[st.key] = Date.now(); save(); viewLeitung(); };
+      if (timers[st.key]) timerTick = setInterval(() => { const el = $("#tm"); if (!el) { clearInterval(timerTick); return; } const ms = Date.now() - timers[st.key]; el.textContent = mmss(ms); el.classList.toggle("over", ms > st.mins * 60000); }, 1000);
       $$("[data-round]").forEach((b) => b.onclick = () => {
         const k = b.dataset.round;
         if (k === "4" && !confirm("Haben alle ihre Anklage abgegeben? Die Finale-Karten verraten die Lösung.")) return;
-        seen[k] = true; host.seen = seen; store.set("kd_eich_host", host); viewLeitung();
+        seen[k] = true; save(); viewLeitung();
       });
-      $$("[data-cards]").forEach((b) => b.onclick = () => {
-        const k = b.dataset.cards, ids = k === "extra" ? ["B12"] : cardsFor(+k, d.n, false);
-        showOverlay(`<div class="cardlist">${ids.map((id) => cardHtml(id, d.variants)).join("")}</div>`);
-      });
+      $$("[data-cards]").forEach((b) => b.onclick = () => { const k = b.dataset.cards, ids = k === "extra" ? ["B12"] : cardsFor(+k, d.n, false); showOverlay(`<div class="cardlist">${ids.map((id) => cardHtml(id, d.variants)).join("")}</div>`); });
+      return;
+    }
+    if (htab === "heft") {
+      pane.innerHTML = `<div class="hostdoc">${resolve(C.hostA, d.variants)}</div>`; filterNpcTable(pane, c);
       return;
     }
     if (htab === "druck") {
       pane.innerHTML = `<p>Für einen Abend ohne Handys. Der Browser öffnet den Druckdialog, dort kannst du auch „Als PDF sichern“ wählen.</p>
         <div class="rounds">
-          <div class="round"><h3>Beweiskarten</h3><p class="muted small">A6, vier pro Seite, nach Runden. Finale-Karten in einen Umschlag „Erst nach der Anklage öffnen“.</p><button class="btn small" data-p="cards">Drucken</button></div>
-          <div class="round"><h3>Gastgeberheft Teil A</h3><p class="muted small">Ablauf, Vorlesetexte, Anklagezettel. Keine Lösung.</p><button class="btn small" data-p="hostA">Drucken</button></div>
+          <div class="round"><h3>Beweiskarten</h3><p class="muted small">A6, vier pro Seite, nach Runden. Der Grundriss (B3) als eigenes Blatt. Finale-Karten in einen Umschlag „Erst nach der Anklage öffnen“.</p><button class="btn small" data-p="cards">Drucken</button></div>
+          <div class="round"><h3>Gastgeberheft Teil A</h3><p class="muted small">Ablauf, Vorlesetexte, Wissen der Nebenfiguren, Anklagezettel. Keine Lösung.</p><button class="btn small" data-p="hostA">Drucken</button></div>
           <div class="round"><h3>Spielanleitung</h3><p class="muted small">Für alle, ohne Lösung.</p><button class="btn small" data-p="guide">Drucken</button></div>
-          <div class="round r3"><h3>Alle Rollenblätter</h3><p class="muted small">Jedes Blatt beginnt auf einer neuen Seite, die vertrauliche Seite 4 einzeln. <b>Du siehst dabei alle Rollen.</b> Wenn du mitspielst, lass jede Person ihr Blatt lieber selbst drucken (im Rollenblatt: „Drucken“). Ohne Namen, in zufälliger Reihenfolge – jede Person zieht verdeckt einen Umschlag.</p><button class="btn ghost small" data-p="roles">Trotzdem drucken</button></div>
+          <div class="round r3"><h3>Alle Rollenblätter</h3><p class="muted small">Jede Rolle mit sechs Teilen, jeder auf eigener Seite: Charakter, Kleidung, Vertraulich und Runde 1–3. Die Runden gehören in eigene Umschläge („Erst bei Runde … öffnen“). <b>Du siehst dabei alle Rollen.</b> Wenn du mitspielst, lass jede Person ihr Blatt lieber selbst drucken. Ohne Namen, in zufälliger Reihenfolge.</p><button class="btn ghost small" data-p="roles">Trotzdem drucken</button></div>
         </div>`;
       $$("[data-p]").forEach((b) => b.onclick = () => printDocs(b.dataset.p, d));
       return;
@@ -260,7 +307,7 @@
     // Lösung
     if (!seen.solution) {
       pane.innerHTML = `<div class="seal"><span class="stamp">VERSIEGELT</span><p>Teil B des Gastgeberhefts enthält die Lösung. Öffne ihn erst, wenn alle Anklagezettel abgegeben und vorgelesen sind.</p><button class="btn" id="sol">Siegel brechen</button></div>`;
-      $("#sol").onclick = () => { if (!confirm("Wirklich öffnen? Danach kennst du die Lösung.")) return; seen.solution = true; host.seen = seen; store.set("kd_eich_host", host); viewLeitung(); };
+      $("#sol").onclick = () => { if (!confirm("Wirklich öffnen? Danach kennst du die Lösung.")) return; seen.solution = true; save(); viewLeitung(); };
       return;
     }
     pane.innerHTML = `<div class="hostdoc">${resolve(unveil(C.hostB), d.variants)}</div><p class="row" style="margin-top:14px"><button class="btn ghost small" data-p="hostB">Teil B drucken</button></p>`;
@@ -280,13 +327,7 @@
     }
     if (what === "roles") {
       const ids = cast(d.n).slice().sort(() => Math.random() - 0.5);
-      ids.forEach((id) => {
-        const isM = male(d.variants, id), role = C.roles[id];
-        for (let k = 0; k < 4; k++) {
-          const w = add(`<div class="doc${k === 3 ? " secret" : ""}">${k === 3 ? `<span class="stamp">VERTRAULICH</span>` : ""}<p class="dossier-head">STERNWARTE EICHENFELS · DOSSIER · SEITE ${k + 1}</p>${k === 0 ? `<h1>${esc(NAMES[id][isM ? 1 : 0])}</h1>` : ""}${resolve(unveil(role.pages[k]), d.variants, id)}</div>`);
-          pruneVariantTable(w, isM);
-        }
-      });
+      ids.forEach((id) => { const pd = { ...d, role: id }; PARTS.forEach((_, k) => { const w = document.createElement("div"); w.className = "p-doc"; w.appendChild(rolePart(pd, k, true)); P.appendChild(w); }); });
     }
     window.print();
   }

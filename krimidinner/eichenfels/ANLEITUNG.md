@@ -18,11 +18,12 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
 
 1. Die Spielleitung trägt alle Namen ein und wählt für jede Person die **Rollenvariante** – weiblich oder männlich dargestellt. Das ist eine Frage der Figur, nicht der Person: Jede und jeder darf wählen.
 2. Die Rollen werden zufällig verteilt. Jede Person bekommt einen **eigenen Code** und öffnet damit ihr Rollenblatt (oder bekommt es ausgedruckt im verschlossenen Umschlag).
-3. **Lies dein Rollenblatt zwei, drei Tage vorher.** Es hat vier Seiten:
-   - **Seite 1 · Dein Charakter und deine Vorgeschichte:** Wer du bist und woher du die anderen kennst.
-   - **Seite 2 · Deine Kleidung:** ein Vorschlag fürs Kostüm und dein **Requisit**.
-   - **Seite 3 · Was du weißt:** dein Abend, Minute für Minute, und was du über andere weißt.
-   - **Seite 4 · vertraulich:** dein Geheimnis, deine drei Ziele und Spielhinweise für jede Phase.
+3. **Lies dein Rollenblatt zwei, drei Tage vorher.** Zuerst siehst du drei Teile:
+   - **Charakter:** wer du bist, deine Vorgeschichte, woher du die anderen kennst.
+   - **Kleidung:** ein Vorschlag fürs Kostüm und dein **Requisit**.
+   - **Vertraulich:** dein Geheimnis, deine Ziele und wie du dich beim Empfang verhältst.
+
+   Was deine Figur in der Mordnacht erlebt hat, steht noch nicht darin. Das öffnet sich erst während des Spiels: **Runde 1, 2 und 3** gehen mit den Losungswörtern auf, die die Spielleitung vorliest – genau wie die Beweise.
 4. **Kostüm:** Niemand muss etwas kaufen. Was du im Schrank hast, reicht. **Steht bei deinem Requisit „Pflicht“, bring es bitte mit.** Es gehört zum Spiel.
 
 ---
@@ -37,7 +38,7 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
 
 **Regel 4 – Trumpfkarten.** Manche Rollen haben ein Wissen, das sie ausspielen können. Wann, entscheidest du – oder gar nicht.
 
-**Regel 5 – Vertrauliches bleibt vertraulich.** Seite 4 deines Rollenblatts zeigst du niemandem vor dem Finale. Aus den Seiten 1–3 darfst du erzählen, so viel du willst.
+**Regel 5 – Vertrauliches bleibt vertraulich.** Den Teil „Vertraulich“ und die Runden deines Rollenblatts zeigst du niemandem vor dem Finale. Erzählen darfst du daraus, so viel du willst.
 
 ---
 
@@ -51,7 +52,7 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
 | **4 · Die letzte Ermittlung** | Die letzten Beweise. Setzt die Teile zusammen. | ca. 25 Min. |
 | **Finale · Anklage und Auflösung** | Jede Person gibt verdeckt ab, wen sie anklagt. Dann wird aufgelöst. | 15–30 Min. |
 
-Die Spielleitung liest zu Beginn jeder Phase einen kurzen Text vor und gibt die Beweise frei – auf eure Handys oder als Karten auf den Tisch.
+Die Spielleitung liest zu Beginn jeder Phase einen kurzen Text vor und nennt ein Losungswort. Damit öffnen sich auf euren Handys die neuen Beweise und der nächste Abschnitt eures Rollenblatts. Ohne Handys gibt es Karten und verschlossene Umschläge.
 
 ---
 

@@ -4,7 +4,7 @@
 
 ---
 
-## Seite 1 · Dein Charakter
+## Charakter · Wer du bist
 
 **[Tessa / Tom] Hollerbach**, 45
 [Inhaberin / Inhaber] der Eventagentur Hollerbach, Erfurt
@@ -15,7 +15,7 @@
 
 **Kurzbeschreibung:** [Sie / Er] ist immer da, wo gerade etwas schiefgeht, mit Headset, Klemmbrett und einem Lächeln, das nicht verrutscht. Gäste übersehen [sie / ihn], und genau deshalb hört [sie / er] alles.
 
-## Seite 1 · Deine Vorgeschichte
+## Charakter · Deine Vorgeschichte
 
 Deine Agentur hat vier Angestellte und eine Hausbank, die seit dem Winter unfreundlich wird. Hochzeiten, Firmenjubiläen, ab und zu ein Abiball. Ein Abend wie dieser, 125 Jahre Sternwarte, mit Presse und Förderern, ist der Auftrag, von dem du die nächsten zwei Jahre leben willst, und mit dem du im Herbst bei größeren Kunden vorsprechen kannst.
 
@@ -29,7 +29,7 @@ Die beiden kannten sich. Beim Hauptgang hat Falk Rademacher beim Vornamen angesp
 
 Die übrigen Gäste kennst du aus der Planung: Yilmaz aus der Küche, mit {R06: der / dem} du seit drei Jahren zusammenarbeitest. Lindner von der Presse, {R04: die / den} du auf die Liste gesetzt hast. Faber von der Haustechnik, {R09: die / der} dir heute die Steckdosen für die Musik freigeschaltet hat.
 
-## Seite 2 · Deine Kleidung
+## Kleidung · Deine Kleidung
 
 **Grundbild:** elegant, aber arbeitsfähig. Du gehörst zum Abend, aber nicht zu den Gästen.
 
@@ -43,10 +43,27 @@ Die übrigen Gäste kennst du aus der Planung: Yilmaz aus der Küche, mit {R06: 
 
 *Niemand muss etwas kaufen. Schwarze Kleidung und ein Klemmbrett reichen.*
 
-## Seite 3 · Was du weißt
+## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-**Dein Abend:**
-- **19:30** Dinner. Rademacher sitzt neben Falk. Beim Hauptgang: der Vorname.
+Du hast auf Sanders Anweisung den Sitzplan geändert, **damit Rademacher neben Falk sitzt**. Du hast gesehen, dass die beiden sich kennen. Wenn du das erzählst, gerätst du mitten in einen Skandal um die Stiftung, deinen wichtigsten Kunden. Wenn du es nicht erzählst und es kommt später heraus, siehst du aus wie jemand, der etwas vertuscht.
+
+## Vertraulich · Deine Ziele
+
+1. **Persönlich:** Den Abend retten, so gut es geht. Kein Skandal, der an deiner Agentur hängen bleibt.
+2. **Zu einer anderen Person:** Herausfinden, was Rademacher und Falk verbindet, und warum Sander das sehen wollte.
+3. **Zum Fall:** Du kennst jeden Gang in diesem Haus. Wenn heute etwas geschieht, bist du die Person, die alles gesehen haben müsste.
+
+## Vertraulich · Bis zur Rede um 20:40
+
+- **19:30** Dinner. Rademacher sitzt neben Falk, so wie Sander es wollte. Achte darauf, ob die beiden sich kennen. *(Falk wird sich verplappern. Wenn nicht, hast du nichts gesehen.)*
+
+## Vertraulich · Beim Empfang
+
+- **Phase 1 (Empfang):** Begrüße die Gäste, sei überall. Du darfst die Rolle [der Gastgeberin / des Gastgebers] übernehmen, bis Sander „kommt“.
+
+## Runde 1 · Nach dem Fund
+
+**Dein Abend ab 20:40:**
 - **20:55** Du gehst durch den Servicegang (ohne Kartenleser) in den Westflügel, um die Galeriebeleuchtung für die Rede um 22 Uhr zu prüfen. Im Flur hörst du durch die Tür des Kartenraums Marwitz: „… dann sage ich es heute Abend selbst, vor allen!“ Du gehst denselben Weg zurück.
 - **21:08** Stromausfall. Du beruhigst die Gäste im Festsaal, holst Kerzen.
 - **21:10–21:30** Festsaal, Dessert vorbereiten.
@@ -54,31 +71,24 @@ Die übrigen Gäste kennst du aus der Planung: Yilmaz aus der Küche, mit {R06: 
 - **21:15** Durch die Glastür siehst du {R01: Leonie / Leon} Sander auf der Terrasse telefonieren. Ihr nickt euch zu.
 - **21:22** Faber kommt in den Festsaal, mit Taschenlampe: „Sturmschaden, alles wieder in Ordnung.“ Danach bleibt {R09: sie / er} bei den Gästen.
 - **21:33** Verbindungstür West. Du willst Sander zum Dessert holen.
-- **21:35** Du findest ihn. Später, als Seebach ihn untersucht, siehst du seine Zugangskarte in der Innentasche des Jacketts. Er liegt neben dem Kartentisch. Die Vitrine steht offen, die Armillarsphäre liegt am Boden, **der Messingsockel fehlt, das Samttuch auch.** Du schreist.
+- **21:35** Du findest ihn. Er liegt neben dem Kartentisch. Die Vitrine steht offen, die Armillarsphäre liegt am Boden, **der Messingsockel fehlt, das Samttuch auch.** Du schreist. Später, als Seebach ihn untersucht, siehst du seine Zugangskarte in der Innentasche des Jacketts.
+
+**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Den geänderten Sitzplan darfst du verschweigen.
+
+- **Phase 2 (Mord):** Du hast die Leiche gefunden. Beschreib, was du gesehen hast: Vitrine, Sockel, Tuch.
+
+## Runde 2 · Jetzt fällt dir ein
 
 **Was du über andere weißt:**
 - Rademacher trägt bei der Arbeit immer weiße Baumwollhandschuhe. Beim Dinner steckten sie {R08: ihr / ihm} in der Jackentasche.
 - Rademacher und Falk kennen sich, besser, als sie zugeben.
 - Marwitz hat Sander um 20:55 angeschrien.
 
-**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Den geänderten Sitzplan darfst du verschweigen.
-
-## Seite 4 · Dein Geheimnis — VERTRAULICH
-
-Du hast auf Sanders Anweisung den Sitzplan geändert, **damit Rademacher neben Falk sitzt**. Du hast gesehen, dass die beiden sich kennen. Wenn du das erzählst, gerätst du mitten in einen Skandal um die Stiftung, deinen wichtigsten Kunden. Wenn du es nicht erzählst und es kommt später heraus, siehst du aus wie jemand, der etwas vertuscht.
-
-## Seite 4 · Deine Ziele
-
-1. **Persönlich:** Den Abend retten, so gut es geht. Kein Skandal, der an deiner Agentur hängen bleibt.
-2. **Zu einer anderen Person:** Herausfinden, was Rademacher und Falk verbindet, und warum Sander das sehen wollte.
-3. **Zum Fall:** Du hast ihn gefunden. Du willst wissen, wer es war.
-
-## Seite 4 · Deine Spielhinweise
-
-- **Phase 1 (Empfang):** Begrüße die Gäste, sei überall. Du darfst die Rolle [der Gastgeberin / des Gastgebers] übernehmen, bis Sander „kommt“.
-- **Phase 2 (Mord):** Du hast die Leiche gefunden. Beschreib, was du gesehen hast: Vitrine, Sockel, Tuch.
 - **Phase 3 (Geheimnisse):** Wenn über Rademacher oder Falk gesprochen wird, überlege, ob jetzt der Moment für den Sitzplan ist.
-- **Phase 4 (Protokoll):** Du kannst drei Alibis bestätigen: Lindner an der Bar (21:13), {R01: Leonie / Leon} Sander auf der Terrasse (21:15) und Faber im Festsaal (ab 21:22).
 - **Wen du ansprechen solltest:** Falk (wie gut kennen Sie Dr. Rademacher?), Yilmaz (wo warst du während des Stromausfalls?), Marwitz (der Streit).
 - **Was du vermeiden solltest:** dich zu weit vorzuwagen, solange du nicht weißt, auf wessen Seite die Stiftung steht.
 - **Trumpf:** der Sitzplan mit „R. neben F.“ in Sanders Schrift.
+
+## Runde 3 · Die letzte Ermittlung
+
+- **Phase 4 (Protokoll):** Du kannst drei Alibis bestätigen: Lindner an der Bar (21:13), {R01: Leonie / Leon} Sander auf der Terrasse (21:15) und Faber im Festsaal (ab 21:22).

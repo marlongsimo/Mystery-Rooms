@@ -4,18 +4,18 @@
 
 ---
 
-## Seite 1 · Dein Charakter
+## Charakter · Wer du bist
 
 **[Clara / Carl] Lindner**, 39
 [freie Journalistin / freier Journalist], schreibt Reportagen für das Wochenmagazin „Der Bogen“
 
-**Beziehung zum Opfer:** Offiziell bist du hier, um eine Jubiläumsreportage über 125 Jahre Sternwarte zu schreiben. Sander hat dir dafür heute ein Interview gegeben, um 21:04 im Kartenraum. Er wusste nicht, dass du seit sechs Monaten an einer ganz anderen Geschichte arbeitest.
+**Beziehung zum Opfer:** Offiziell bist du hier, um eine Jubiläumsreportage über 125 Jahre Sternwarte zu schreiben. Sander hat dir dafür ein Interview zugesagt, gleich nach seiner Ansprache im Kartenraum. Er wusste nicht, dass du seit sechs Monaten an einer ganz anderen Geschichte arbeitest.
 
 **Eigenschaften:** neugierig · geduldig wie eine Katze vor dem Mauseloch · freundlich, solange es nützt · glaubt an die Wahrheit und an gute Schlagzeilen, nicht unbedingt in dieser Reihenfolge
 
 **Kurzbeschreibung:** [Sie / Er] stellt Fragen, die harmlos klingen, und merkt sich die Antworten wortwörtlich. Am Revers steckt offen ein kleines Mikrofon, „für die Zitate, das ist ja abgesprochen“. Was nicht abgesprochen ist, steckt woanders.
 
-## Seite 1 · Deine Vorgeschichte
+## Charakter · Deine Vorgeschichte
 
 Vor sechs Monaten lag ein Umschlag in deinem Briefkasten, ohne Absender. Darin eine Kopie der Sternkarte 41 aus dem Eichenfelser Atlas und ein Zettel mit einem einzigen Satz: „Fragen Sie, wer den Nordhimmel gezeichnet hat.“
 
@@ -31,7 +31,7 @@ Du bist nicht stolz auf alles, was du für Geschichten tust. Unter dem Kartentis
 
 Die anderen Gäste hast du alle gegoogelt. Marwitz erkennst du vom Foto, dreißig Jahre älter. Falk kennst du aus dem Wirtschaftsteil. Rademacher hast du heute beim Empfang gefragt, ob du das Archiv besichtigen darfst. Die Antwort war freundlich und ein klares Nein.
 
-## Seite 2 · Deine Kleidung
+## Kleidung · Deine Kleidung
 
 **Grundbild:** smart, praktisch, unauffällig genug, um überall dabei zu sein. Du sollst aussehen wie jemand, der dazugehört, aber jederzeit Notizen machen kann.
 
@@ -41,13 +41,27 @@ Die anderen Gäste hast du alle gegoogelt. Marwitz erkennst du vom Foto, dreißi
 | Details | ein kleines Ansteckmikrofon am Revers (oder eine Brosche, die eins sein soll) | dasselbe |
 | Schuhe | bequeme, schicke Schuhe | bequeme Lederschuhe |
 | **Requisit fürs Spiel** | **ein Notizbuch und ein Stift**, ständig in Gebrauch | dasselbe |
-| optional | ein Espressobecher von der Bar: dein Alibi (Bon 21:13) | dasselbe |
+| optional | ein Notizzettel mit Fragen für das Interview | dasselbe |
 
 *Niemand muss etwas kaufen. Ein Notizbuch reicht.*
 
-## Seite 3 · Was du weißt
+## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-**Dein Abend:**
+Du bist **unter falschem Vorwand** hier, und unter dem Kartentisch klebt **dein zweites Funkmikrofon**. Wer heimlich das nichtöffentlich gesprochene Wort aufnimmt, macht sich strafbar. Wenn das herauskommt, ist deine Karriere vorbei.
+
+## Vertraulich · Deine Ziele
+
+1. **Persönlich:** Die Geschichte bekommen, exklusiv: die wahre Urheberschaft des Atlas, und wenn möglich mehr.
+2. **Zu einer anderen Person:** Marwitz zum Reden bringen. {R02: Sie / Er} ist der Kern deiner Geschichte.
+3. **Zum Fall:** Wenn heute Abend etwas geschieht, willst du die Geschichte als [Erste / Erster] haben, und du willst sie aufklären. Dafür wirst du irgendwann zeigen müssen, was dein Mikrofon gehört hat.
+
+## Vertraulich · Beim Empfang
+
+- **Phase 1 (Empfang):** Stell harmlose Fragen. Merk dir, wer wem ausweicht.
+
+## Runde 1 · Nach dem Fund
+
+**Dein Abend ab 20:40:**
 - **21:03** Verbindungstür West (deine Gästekarte).
 - **21:04–21:08** Interview mit Sander im Kartenraum. Er war fahrig, sah immer wieder auf die Uhr und auf einen aufgeschlagenen Atlas.
 - **21:08** Der Strom fiel aus. Du bist hinaus. **Im dunklen Flur hörtest du ein leises metallisches Klirren und sahst am Ende des Flurs einen Schatten.** Erkannt hast du niemanden. Es klang nicht nach einem schweren Schlüsselbund, eher feiner. Sicher bist du nicht.
@@ -61,29 +75,24 @@ Die anderen Gäste hast du alle gegoogelt. Marwitz erkennst du vom Foto, dreißi
 > [Tür. Stille. Schritte, die näher kommen. 21:09:] SANDER: „Sie sind früh.“
 > [Rauschen. Verbindung abgebrochen.]
 
+**Was das jetzt bedeutet:** Du bist die letzte Person, die Sander offiziell lebend gesehen hat. Aber deine Aufnahme beweist, dass er nach dir noch jemanden empfangen hat.
+
+**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Dass du heimlich aufgenommen hast, darfst du verschweigen.
+
+- **Phase 2 (Mord):** Du warst als [Letzte / Letzter] offiziell bei Sander. Das kommt heraus, steh dazu. Erzähl vom Interview, nicht vom zweiten Mikrofon.
+
+## Runde 2 · Jetzt fällt dir ein
+
 **Was du über andere weißt:**
 - Marwitz hat mit Sander am Atlas gearbeitet. Du hast das Foto von 1995.
 - Falk kommt auffällig oft nach Eichenfels.
 - Rademacher wollte dich nicht ins Archiv lassen.
 
-**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Dass du heimlich aufgenommen hast, darfst du verschweigen.
-
-## Seite 4 · Dein Geheimnis — VERTRAULICH
-
-Du bist **unter falschem Vorwand** hier, und unter dem Kartentisch klebt **dein zweites Funkmikrofon**. Wer heimlich das nichtöffentlich gesprochene Wort aufnimmt, macht sich strafbar. Wenn das herauskommt, ist deine Karriere vorbei, und du bist die letzte Person, die Sander lebend gesehen hat. Aber: Deine Aufnahme beweist, dass Sander nach dir noch jemanden empfangen hat.
-
-## Seite 4 · Deine Ziele
-
-1. **Persönlich:** Die Geschichte bekommen, exklusiv: die wahre Urheberschaft des Atlas, und wenn möglich mehr.
-2. **Zu einer anderen Person:** Marwitz zum Reden bringen. {R02: Sie / Er} ist der Kern deiner Geschichte.
-3. **Zum Fall:** Den Fall lösen. [Eine Reporterin, die / Ein Reporter, der] den Mord aufklärt, schreibt die Geschichte des Jahres. Dafür musst du irgendwann deine Aufnahme zeigen.
-
-## Seite 4 · Deine Spielhinweise
-
-- **Phase 1 (Empfang):** Stell harmlose Fragen. Merk dir, wer wem ausweicht.
-- **Phase 2 (Mord):** Du warst als [Letzte / Letzter] offiziell bei Sander. Das kommt heraus, steh dazu. Erzähl vom Interview, nicht vom zweiten Mikrofon.
 - **Phase 3 (Funkmikrofon):** Die Spielleitung gibt bekannt, dass unter dem Kartentisch ein Mikrofon gefunden wurde (B7). Jetzt musst du entscheiden: Gibst du die Aufnahme preis und riskierst deinen Ruf, oder schweigst du und lässt die anderen raten? Ist deine Rolle nicht besetzt, kommt die Abschrift in Runde 3 ohnehin auf den Tisch.
-- **Phase 4 (Protokoll):** Vergleiche das Zutrittsprotokoll mit deiner Aufnahme. Wer war um 21:09 schon im Westflügel?
 - **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (warum kein Archiv?), Falk (warum so oft hier?).
 - **Was du vermeiden solltest:** zu früh zu verraten, wie viel du schon weißt.
 - **Trumpf:** das Klirren im Flur, um 21:08, im 1. OG, vor dem Kartenraum. Spiel es aus, wenn die Küche von dem Klirren um 21:22 erzählt. Die beiden Beobachtungen könnten dieselbe Person betreffen. Ob es tatsächlich dieselbe war, kannst du nicht sicher sagen.
+
+## Runde 3 · Die letzte Ermittlung
+
+- **Phase 4 (Protokoll):** Vergleiche das Zutrittsprotokoll mit deiner Aufnahme. Wer war um 21:09 schon im Westflügel?

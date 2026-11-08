@@ -4,7 +4,7 @@
 
 ---
 
-## Seite 1 · Dein Charakter
+## Charakter · Wer du bist
 
 **[Leonie / Leon] Sander**, 34
 [Unternehmensberaterin / Unternehmensberater] in Leipzig, Schwerpunkt Gastronomie und Freizeit
@@ -15,7 +15,7 @@
 
 **Kurzbeschreibung:** [Sie / Er] kommt in jeden Raum, als wäre er ein Meeting, das zu spät begonnen hat. Das Handy ist immer in der Hand, der Blick immer schon beim nächsten Gespräch. Wer genau hinsieht, merkt, dass [sie / er] in diesem Haus jede Stufe kennt und trotzdem wie ein Gast herumläuft.
 
-## Seite 1 · Deine Vorgeschichte
+## Charakter · Deine Vorgeschichte
 
 Du bist in der Sternwarte aufgewachsen, buchstäblich. Bis du zwölf warst, wohnte die Familie im Ostflügel, und dein Kinderzimmer lag dort, wo heute die Gästezimmer sind. Dein Vater nahm dich nachts mit in die Kuppel, zeigte dir den Andromedanebel und erklärte dir, dass das Licht zweieinhalb Millionen Jahre unterwegs war. Mit dreizehn hast du gemerkt, dass er dich nur dann wirklich ansah, wenn ein Teleskop dazwischen war.
 
@@ -29,7 +29,7 @@ Letzte Woche hat dein Vater dich angerufen, zum ersten Mal seit Monaten. Er sagt
 
 Die anderen Gäste kennst du kaum: Ritter von der Kanzlei, {R03: die / der} den Familiennachlass verwaltet. Rademacher aus dem Archiv, {R08: die / der} dir als Kind die alten Karten gezeigt hat und immer freundlich war. Dr. Seebach, {R07: die Ärztin / der Arzt} deines Vaters, {R07: die / der} dich heute auffällig lange angesehen hat.
 
-## Seite 2 · Deine Kleidung
+## Kleidung · Deine Kleidung
 
 **Grundbild:** erfolgreich, modern, ein bisschen zu urban für ein altes Haus im Wald. Du sollst aussehen wie jemand, der nicht zugeben will, dass er nach Hause gekommen ist.
 
@@ -43,39 +43,49 @@ Die anderen Gäste kennst du kaum: Ritter von der Kanzlei, {R03: die / der} den 
 
 *Niemand muss etwas kaufen. Ein Blazer und ein Handy reichen.*
 
-## Seite 3 · Was du weißt
+## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-**Dein Abend:**
+Vor zwei Jahren hast du **die Unterschrift deines Vaters unter eine Bürgschaft über 40 000 € gefälscht**. Das Restaurant ist gescheitert, die Bank fordert das Geld vom Bürgen. Seit drei Wochen. Wusste dein Vater es? Wenn ja, steht es vielleicht im neuen Testament. Wenn es herauskommt, ist es Urkundenfälschung, und du hast ein Motiv, das jeder versteht.
+
+## Vertraulich · Deine Ziele
+
+1. **Persönlich:** Die Fälschung soll nicht öffentlich werden – zumindest nicht, bevor du sie selbst erklären kannst.
+2. **Zu einer anderen Person:** Von Ritter erfahren, was im neuen Testament steht.
+3. **Zum Fall:** Wenn deinem Vater heute etwas zustößt, willst du wissen, wer es war. Du hast ihn nicht verstanden, aber du hast ihn geliebt.
+
+## Vertraulich · Bis zur Rede um 20:40
+
 - **20:40** Die Rede deines Vaters. „Eine Person, die sich seit Jahren in Sicherheit wiegt.“ Du hast gespürt, wie dir das Blut aus dem Gesicht wich. Meint er dich?
+
+## Vertraulich · Beim Empfang
+
+- **Phase 1 (Empfang):** Sei souverän, ein wenig kühl. Wenn jemand nach deinem Vater fragt: „Wir sehen uns selten. Er ist beschäftigt.“
+
+## Runde 1 · Nach dem Fund
+
+**Dein Abend ab 20:40:**
 - **20:55–21:10** Bibliothek, mit Ritter. Du hast direkt gefragt, ob es ein neues Testament gibt. Ritter wich aus: „Darüber spricht Ihr Vater selbst mit Ihnen.“ Um 21:06 ging Ritter, um „etwas zu holen“. Du bist noch vier Minuten geblieben.
 - **21:10–21:26** Terrasse. Du hast mit Kim telefoniert, 15 Minuten lang, über die Bank und darüber, was du deinem Vater sagen sollst. Das Anrufprotokoll in deinem Handy zeigt 21:11 bis 21:26.
 - **21:08** Der Strom fiel aus, während du noch drinnen warst. Draußen war es heller als drinnen.
 - **21:15** Hollerbach hat dich durch die Glastür des Festsaals gesehen und dir zugenickt.
 - **21:27** zurück in den Festsaal. **21:35** der Schrei.
 
+**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Die Bürgschaft darfst du verschweigen.
+
+- **Phase 2 (Mord):** Du darfst getroffen sein. Gib dein Alibi genau an, Bibliothek und Terrasse.
+
+## Runde 2 · Jetzt fällt dir ein
+
 **Was du über andere weißt:**
 - Ritter hatte heute einen dicken Umschlag dabei: „Testament – Abschrift“. Du hast es auf dem Etikett gelesen.
 - Dr. Seebach hat dich beim Dinner gefragt: „Wie geht es Ihnen mit Ihrem Vater?“ So fragt man nicht beim Dessert.
 - Rademacher kennt jedes Blatt im Archiv. Als Kind durftest du bei {R08: ihr / ihm} mit weißen Handschuhen eine Sternkarte halten.
 
-**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Die Bürgschaft darfst du verschweigen.
-
-## Seite 4 · Dein Geheimnis — VERTRAULICH
-
-Vor zwei Jahren hast du **die Unterschrift deines Vaters unter eine Bürgschaft über 40 000 € gefälscht**. Das Restaurant ist gescheitert, die Bank fordert das Geld vom Bürgen. Seit drei Wochen. Wusste dein Vater es? Wenn ja, steht es vielleicht im neuen Testament. Wenn es herauskommt, ist es Urkundenfälschung, und du hast ein Motiv, das jeder versteht.
-
-## Seite 4 · Deine Ziele
-
-1. **Persönlich:** Die Fälschung soll nicht öffentlich werden – zumindest nicht, bevor du sie selbst erklären kannst.
-2. **Zu einer anderen Person:** Von Ritter erfahren, was im neuen Testament steht.
-3. **Zum Fall:** Den Mörder deines Vaters finden. Du hast ihn nicht verstanden, aber du hast ihn geliebt.
-
-## Seite 4 · Deine Spielhinweise
-
-- **Phase 1 (Empfang):** Sei souverän, ein wenig kühl. Wenn jemand nach deinem Vater fragt: „Wir sehen uns selten. Er ist beschäftigt.“
-- **Phase 2 (Mord):** Du darfst getroffen sein. Gib dein Alibi genau an, Bibliothek und Terrasse.
 - **Phase 3 (Geheimnisse):** Sobald das Testament Thema wird, schauen alle auf dich, denn du bist [die Erbin / der Erbe]. Bleib ruhig: Du warst nachweislich draußen.
-- **Phase 4 (Protokoll):** Das Zutrittsprotokoll entlastet dich nicht direkt, du warst nie an einem Kartenleser. Hollerbach kann es. Sprich {R05: sie / ihn} an.
 - **Wen du ansprechen solltest:** Ritter (Ziel 2), Hollerbach (dein Alibi), Seebach (warum diese Frage beim Dinner?).
 - **Was du vermeiden solltest:** das Wort „Bank“. Und Ritter vor allen nach dem Testament zu fragen. Das macht dich verdächtig.
 - **Trumpf:** Hollerbach hat dich um 21:15 auf der Terrasse gesehen. Dazu dein Anrufprotokoll.
+
+## Runde 3 · Die letzte Ermittlung
+
+- **Phase 4 (Protokoll):** Das Zutrittsprotokoll entlastet dich nicht direkt, du warst nie an einem Kartenleser. Hollerbach kann es. Sprich {R05: sie / ihn} an.

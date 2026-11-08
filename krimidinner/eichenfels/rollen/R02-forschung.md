@@ -4,7 +4,7 @@
 
 ---
 
-## Seite 1 · Dein Charakter
+## Charakter · Wer du bist
 
 **Dr. [Irene / Ingo] Marwitz**, 61
 [Astrophysikerin / Astrophysiker], bis zum letzten Jahr am Observatorium Uppsala, Schweden, jetzt emeritiert
@@ -15,7 +15,7 @@
 
 **Kurzbeschreibung:** [Sie / Er] trägt dieselbe Art Kleidung wie vor dreißig Jahren, weil [sie / er] keinen Grund sieht, etwas zu ändern, das funktioniert. Wenn [sie / er] zur Decke schaut, sieht [sie / er] die Kuppel dahinter. Heute Abend sieht man [ihr / ihm] an, dass [sie / er] einen Satz seit Wochen übt.
 
-## Seite 1 · Deine Vorgeschichte
+## Charakter · Deine Vorgeschichte
 
 1994 kamst du als [junge Doktorandin / junger Doktorand] nach Eichenfels. Theodor Sander war Assistent, drei Jahre älter, ehrgeizig und brillant. Ihr hattet ein gemeinsames Ziel: einen neuen Himmelsatlas der Nordhalbkugel, gezeichnet nach eigenen Beobachtungen, so genau wie keiner zuvor.
 
@@ -29,7 +29,7 @@ Heute um 20:49 bist du ihm in den Kartenraum gefolgt. Du wolltest es von ihm hö
 
 Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachmittag stolz den restaurierten Refraktor gezeigt, deinen alten Refraktor. Rademacher aus dem Archiv hat dich beim Empfang höflich gefragt, ob du „noch Unterlagen aus der Atlas-Zeit“ hast.
 
-## Seite 2 · Deine Kleidung
+## Kleidung · Deine Kleidung
 
 **Grundbild:** Wissenschaft, die sich nichts beweisen muss. Schlicht, hochwertig, ein wenig aus der Zeit gefallen.
 
@@ -43,9 +43,23 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 
 *Niemand muss etwas kaufen. Ein Schal und ein Notizbuch reichen.*
 
-## Seite 3 · Was du weißt
+## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-**Dein Abend:**
+**Die Sternkarten 41–48 des berühmten Atlas sind dein Werk.** Sander hat dich aus der Geschichte gestrichen. Du hast dir vorgenommen, Sander heute unter vier Augen zur Rede zu stellen, noch vor seiner Rede um 22 Uhr.
+
+## Vertraulich · Deine Ziele
+
+1. **Persönlich:** Deine Urheberschaft am Atlas soll heute anerkannt werden, vor allen, so wie Sander es versprochen hatte.
+2. **Zu einer anderen Person:** Lindner von der Presse hat dir vor Monaten nach Uppsala geschrieben. Du hast nie geantwortet. Finde heraus, was {R04: sie / er} weiß.
+3. **Zum Fall:** Herausfinden, was Sander mit „wenn ich die Blätter dann noch habe“ meinte. Wer hatte Grund, ihm die Blätter wegzunehmen?
+
+## Vertraulich · Beim Empfang
+
+- **Phase 1 (Empfang):** Sei höflich, aber kurz angebunden. Auf Fragen nach dem Atlas: „Ein schönes Werk. Ich kenne es gut.“
+
+## Runde 1 · Nach dem Fund
+
+**Dein Abend ab 20:40:**
 - **20:49–21:02** Kartenraum, mit Sander. Streit. Du hast gerufen: „Dann sage ich es heute Abend selbst, vor allen!“
 - **21:03** Treppe hinauf in die Kuppel, zum alten Refraktor. Du wolltest allein sein.
 - **21:07** Faber kam und machte sich am Steuerpult zu schaffen, ohne dich zu bemerken. Erst als {R09: sie / er} dich sah, erschrak {R09: sie / er}.
@@ -53,29 +67,24 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 - **21:14** Faber ging hinaus. Du bist im Dunkeln geblieben, mit dem Gesicht am kalten Okular.
 - **21:20** Das Licht kam zurück. **21:26** Verbindungstür West, zurück in den Mittelbau. **21:35** der Schrei.
 
+**Was das jetzt bedeutet:** Wenn deine Urheberschaft herauskommt, hast du das stärkste Motiv im ganzen Haus: dreißig Jahre Kränkung, ein Streit eine halbe Stunde vor der Tat, und kein Zeuge, außer Faber. Und Faber hat eigene Gründe zu schweigen. **Neues Ziel:** Faber muss zugeben, dass {R09: sie / er} von 21:07 bis 21:14 bei dir in der Kuppel war. Das ist euer beider Alibi.
+
+**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Ja, das heißt: Du musst zugeben, dass du allein in der Kuppel warst, im Westflügel, zur Tatzeit.
+
+- **Phase 2 (Mord):** Alle haben den Streit gehört oder werden davon hören. Leugne ihn nicht, Regel 2. Sag, worum es ging, so viel du willst.
+
+## Runde 2 · Jetzt fällt dir ein
+
 **Was du über andere weißt:**
 - Sander sagte beim Streit: „Die Blätter beweisen es. Wenn ich sie dann noch habe.“ Du verstehst erst jetzt, dass er vielleicht wirklich etwas befürchtet hat.
 - Faber hat den Stromausfall selbst ausgelöst. Warum?
 - Rademacher wollte wissen, ob du „noch Unterlagen aus der Atlas-Zeit“ hast. Warum interessiert das das Archiv?
 
-**Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Ja, das heißt: Du musst zugeben, dass du allein in der Kuppel warst, im Westflügel, zur Tatzeit.
-
-## Seite 4 · Dein Geheimnis — VERTRAULICH
-
-**Die Sternkarten 41–48 des berühmten Atlas sind dein Werk.** Sander hat dich aus der Geschichte gestrichen. Wenn das herauskommt, hast du das stärkste Motiv im ganzen Haus: dreißig Jahre Kränkung, ein Streit eine halbe Stunde vor der Tat, und kein Zeuge, außer Faber, und Faber hat eigene Gründe zu schweigen.
-
-## Seite 4 · Deine Ziele
-
-1. **Persönlich:** Deine Urheberschaft am Atlas soll heute anerkannt werden, vor allen, so wie Sander es versprochen hatte.
-2. **Zu einer anderen Person:** Faber muss zugeben, dass {R09: sie / er} von 21:07 bis 21:14 bei dir in der Kuppel war. Das ist euer beider Alibi.
-3. **Zum Fall:** Herausfinden, was Sander mit „wenn ich die Blätter dann noch habe“ meinte. Wer hatte Grund, ihm die Blätter wegzunehmen?
-
-## Seite 4 · Deine Spielhinweise
-
-- **Phase 1 (Empfang):** Sei höflich, aber kurz angebunden. Auf Fragen nach dem Atlas: „Ein schönes Werk. Ich kenne es gut.“
-- **Phase 2 (Mord):** Alle haben den Streit gehört oder werden davon hören. Leugne ihn nicht, Regel 2. Sag, worum es ging, so viel du willst.
 - **Phase 3 (Geheimnisse):** Wenn die Archivliste (Karten 41–48) auf den Tisch kommt, ist das dein Moment. Das sind deine Karten. Überleg, ob du es jetzt sagst oder ob es dich verdächtiger macht.
-- **Phase 4 (Protokoll):** Das Protokoll zeigt, dass du um 21:26 aus dem Westflügel kamst. Das sieht schlecht aus. Fabers Technikprotokoll (B10) zeigt, dass Faber um 21:07 in der Kuppel war. Nutze das.
 - **Wen du ansprechen solltest:** Faber (Ziel 2), Rademacher (warum die Frage nach den Unterlagen?), Ritter (hat Sander etwas über dich verfügt?).
 - **Was du vermeiden solltest:** dich in Wut zu reden. Genau das erwartet man von der Person, die es getan hat.
 - **Trumpf:** Faber war von 21:07 bis 21:14 bei dir in der Kuppel und hat den Strom von Hand abgeschaltet.
+
+## Runde 3 · Die letzte Ermittlung
+
+- **Phase 4 (Protokoll):** Das Protokoll zeigt, dass du um 21:26 aus dem Westflügel kamst. Das sieht schlecht aus. Fabers Technikprotokoll (B10) zeigt, dass Faber um 21:07 in der Kuppel war. Nutze das.

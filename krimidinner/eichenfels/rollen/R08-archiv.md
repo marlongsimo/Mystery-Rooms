@@ -4,7 +4,7 @@
 
 ---
 
-## Seite 1 · Dein Charakter
+## Charakter · Wer du bist
 
 **Dr. [Judith / Julius] Rademacher**, 49
 [Leiterin / Leiter] von Archiv und Sammlung der Stiftung Sternwarte Eichenfels
@@ -15,7 +15,7 @@
 
 **Kurzbeschreibung:** Man übersieht [sie / ihn] leicht, und genau das ist [ihr / sein] Vorteil. [Sie / Er] weiß, wo jedes Blatt in diesem Haus liegt, kennt das Gewicht jeder Sphäre und das Datum jeder Restaurierung. Wenn [sie / er] etwas Wertvolles anfasst, zieht [sie / er] weiße Baumwollhandschuhe an, aus Gewohnheit, fast feierlich. Die Lesebrille hängt immer an einer feinen Kette um den Hals und klirrt leise, wenn [sie / er] geht.
 
-## Seite 1 · Deine Vorgeschichte
+## Charakter · Deine Vorgeschichte
 
 Du hast Kunstgeschichte und Wissenschaftsgeschichte studiert, über Himmelskarten des 19. Jahrhunderts promoviert und bist mit 34 nach Eichenfels gekommen, weil es die einzige Stelle war, an der man mit diesem Wissen etwas anfangen konnte. Die Stelle war schlecht bezahlt, aber sie war die richtige. Das hast du lange geglaubt.
 
@@ -29,7 +29,7 @@ Was du nicht wusstest: Auf genau diesen acht Blättern stehen am Rand Korrekture
 
 Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, hast du auf die Schublade mit den Karten 41 bis 48 gestarrt, als könnten sie dich verraten. Heute Nachmittag haben sie es getan.
 
-## Seite 2 · Deine Kleidung
+## Kleidung · Deine Kleidung
 
 **Grundbild:** gepflegt, gediegen, ein wenig altmodisch. Du sollst aussehen wie jemand, dem man die wertvollsten Dinge des Hauses anvertraut.
 
@@ -43,26 +43,7 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 
 *Die Brillenkette ist wichtig: Sie ist eine Spur. Trag sie trotzdem, wer die Täterrolle hat, darf sich nicht durch fehlende Requisiten verraten. Jede Kette tut es, auch eine selbst gebastelte.*
 
-## Seite 3 · Was du weißt
-
-**Dein Abend – was wirklich geschah:**
-- **Nachmittag:** Sander kam ins Archiv, legte dir einen Zettel hin und ging wieder: „Kommen Sie um Viertel nach neun in den Kartenraum. Bringen Sie die Archivliste mit.“ Du wusstest sofort, dass er es entdeckt hatte.
-- **Beim Dinner** saßt du neben Falk. Hollerbach hatte den Sitzplan geändert. Falk sprach dich beim Hauptgang mit dem Vornamen an. Du hast {R10: sie / ihn} unter dem Tisch angestoßen.
-- **20:40** Sanders Rede. „Eine Person, die sich seit Jahren in Sicherheit wiegt.“ Du hast gelächelt und applaudiert.
-- **21:03** Archiv verlassen (Karte). **21:04** Verbindungstür Ost in den Mittelbau. **21:05** Verbindungstür West.
-- **21:05–21:08** Du hast im Flur vor dem Kartenraum gewartet. Drinnen sprach jemand mit Sander, Lindner von der Presse. Um 21:08 ging das Licht aus, Lindner kam heraus und lief an dir vorbei. Ob {R04: sie / er} dich gesehen hat, weißt du nicht.
-- **21:09** Kartenraum. Sander: „Sie sind früh.“ Er hielt dir die Archivliste hin. „Um zehn erfahren es alle. Morgen die Polizei.“ Du hast die Handschuhe angezogen, als wolltest du die Blätter zeigen. Dann hast du den Messingsockel der Armillarsphäre genommen und zugeschlagen. Einmal.
-- Du hast den Sockel in das Samttuch der Vitrine gewickelt, die Archivliste eingesteckt und im Dunkeln beim Toten gewartet, bis der Strom zurück war. Archiv und Restaurierung bleiben bei Stromausfall verriegelt, auch für deine Karte.
-- **21:22** Mit dem Bündel die Treppe hinunter, am Ende des Servicegangs vorbei, zur Restaurierung. Deine Brillenkette klirrte bei jedem Schritt. Ob dich jemand gehört hat? **21:24** Restaurierung (Karte). Sockel, Tuch und Handschuhe in die Transportkiste, dazu die acht Originalblätter aus dem Planschrank, wo sie seit Februar liegen. Deckel zu. Die Archivliste hast du später im Archiv zerrissen und in den Papierkorb geworfen. Das war ein Fehler.
-- **21:27** Verbindungstür West in den Mittelbau. **21:29** SMS an Falk: „Keine Rede um 22 Uhr. Abholung morgen 8 Uhr wie vereinbart. – J.“ **21:30** Verbindungstür Ost, **21:31** Archiv.
-
-**Was du über andere weißt:**
-- Marwitz hat Sander heute angeschrien, alle haben es gehört. {R02: Sie / Er} war danach lange verschwunden.
-- Faber ist kurz vor dem Stromausfall in den Westflügel gegangen. Ein Sturmschaden genau zur richtigen Zeit?
-- Ritter heißt mit Nachnamen auf R., genau wie du. Und hat dieselben Initialen: J. R.
-- {R01: Leonie / Leon} Sander erbt, oder erbte.
-
-## Seite 4 · Dein Geheimnis — STRENG VERTRAULICH
+## Vertraulich · Dein Geheimnis — STRENG VERTRAULICH
 
 **Du hast Professor Theodor Sander getötet.**
 
@@ -81,20 +62,49 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 - Lenk auf Faber: Wer den Strom abschaltet, will im Dunkeln etwas tun.
 - Lenk auf Marwitz: allein in der Kuppel, bis 21:26 im Westflügel, und das stärkste Motiv im Haus.
 
-## Seite 4 · Deine Ziele
+## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Nicht überführt werden. Halte deine Geschichte so lange wie möglich, und ändere sie lieber einmal gut als dreimal schlecht.
 2. **Zu einer anderen Person:** Falk muss schweigen. Wenn Falk die SMS zeigt, bist du verloren. Sorg dafür, dass Falk Angst um den eigenen Ruf hat, nicht um deinen.
 3. **Zum Fall:** Den Verdacht auf Marwitz (Motiv, Streit, allein in der Kuppel) oder Faber (Stromausfall) lenken. Die Kiste in der Restaurierung darf vor 8 Uhr niemand öffnen.
 
-## Seite 4 · Deine Spielhinweise
+## Vertraulich · Was heute Abend geschieht
+
+*Du kennst die Tat von Anfang an, damit du dich vorbereiten kannst. Im Spiel geschieht sie erst nach Sanders Rede. Beim Empfang spielst du, als wäre nichts.*
+
+- **Nachmittag:** Sander kam ins Archiv, legte dir einen Zettel hin und ging wieder: „Kommen Sie um Viertel nach neun in den Kartenraum. Bringen Sie die Archivliste mit.“ Du wusstest sofort, dass er es entdeckt hatte.
+- **Beim Dinner** saßt du neben Falk. Hollerbach hatte den Sitzplan geändert. Falk sprach dich beim Hauptgang mit dem Vornamen an. Du hast {R10: sie / ihn} unter dem Tisch angestoßen.
+- **20:40** Sanders Rede. „Eine Person, die sich seit Jahren in Sicherheit wiegt.“ Du hast gelächelt und applaudiert.
+- **21:03** Archiv verlassen (Karte). **21:04** Verbindungstür Ost in den Mittelbau. **21:05** Verbindungstür West.
+- **21:05–21:08** Du hast im Flur vor dem Kartenraum gewartet. Drinnen sprach jemand mit Sander, Lindner von der Presse. Um 21:08 ging das Licht aus, Lindner kam heraus und lief an dir vorbei. Ob {R04: sie / er} dich gesehen hat, weißt du nicht.
+- **21:09** Kartenraum. Sander: „Sie sind früh.“ Er hielt dir die Archivliste hin. „Um zehn erfahren es alle. Morgen die Polizei.“ Du hast die Handschuhe angezogen, als wolltest du die Blätter zeigen. Dann hast du den Messingsockel der Armillarsphäre genommen und zugeschlagen. Einmal.
+- Du hast den Sockel in das Samttuch der Vitrine gewickelt, die Archivliste eingesteckt und im Dunkeln beim Toten gewartet, bis der Strom zurück war. Archiv und Restaurierung bleiben bei Stromausfall verriegelt, auch für deine Karte.
+- **21:22** Mit dem Bündel die Treppe hinunter, am Ende des Servicegangs vorbei, zur Restaurierung. Deine Brillenkette klirrte bei jedem Schritt. Ob dich jemand gehört hat? **21:24** Restaurierung (Karte). Sockel, Tuch und Handschuhe in die Transportkiste, dazu die acht Originalblätter aus dem Planschrank, wo sie seit Februar liegen. Deckel zu. Die Archivliste hast du später im Archiv zerrissen und in den Papierkorb geworfen. Das war ein Fehler.
+- **21:27** Verbindungstür West in den Mittelbau. **21:29** SMS an Falk: „Keine Rede um 22 Uhr. Abholung morgen 8 Uhr wie vereinbart. – J.“ **21:30** Verbindungstür Ost, **21:31** Archiv.
+
+## Vertraulich · Beim Empfang
 
 **Regeln für dich:** Du darfst lügen, auch über Aufenthaltsort und Handlungen. Erfinde aber keine Beweisstücke, und behaupte nichts, was einem ausgeteilten Beweis direkt widerspricht, ohne eine Erklärung zu haben. Ein gutes Spiel braucht eine gute Verteidigung, kein Schweigen.
 
 - **Phase 1 (Empfang):** Sei freundlich und hilfsbereit, erzähl gern vom Atlas. Wer viel über Sternkarten weiß, wirkt harmlos.
+
+## Runde 1 · Nach dem Fund
+
 - **Phase 2 (Mord):** Wirk erschüttert, nicht überrascht. Erzähl deine Geschichte von Anfang an so, wie sie oben steht, mit Westflügel und Restaurierung. Dann passt sie später zum Protokoll. Erwähne beiläufig den Streit zwischen Marwitz und Sander.
+
+## Runde 2 · Jetzt fällt dir ein
+
+**Was du über andere weißt:**
+- Marwitz hat Sander heute angeschrien, alle haben es gehört. {R02: Sie / Er} war danach lange verschwunden.
+- Faber ist kurz vor dem Stromausfall in den Westflügel gegangen. Ein Sturmschaden genau zur richtigen Zeit?
+- Ritter heißt mit Nachnamen auf R., genau wie du. Und hat dieselben Initialen: J. R.
+- {R01: Leonie / Leon} Sander erbt, oder erbte.
+
 - **Phase 3 (Kalender und Archivliste):** Gefährlich. Das „R.“ und das „J. R.“ passen auch auf Ritter, nutze das, aber greif Ritter nicht zu offen an. Zur Archivliste: „Die Inventarnummern habe ich auf Anweisung geändert, als die Originale zur Restaurierung gingen. Das ist ein normaler Vorgang.“
-- **Phase 4 (Protokoll, Küche):** Das Protokoll stützt deine Geschichte, bleib ruhig. Gefährlich ist die Küche: Jemand hat um 21:22 eine Person mit einem schweren Bündel gesehen, und es klirrte. Erinnere daran, dass mehrere Menschen hier klirren, und dass „im Dunkeln“ niemand genau hinsieht.
 - **Wen du ansprechen solltest:** Faber, um ihn wegen des Stromausfalls nervös zu machen. Marwitz, um {R02: sie / ihn} über den Streit reden zu lassen.
 - **Was du vermeiden solltest:** die Restaurierung zu erwähnen, bevor es jemand anderes tut. Mit Falk auffällig zu tuscheln.
+
+## Runde 3 · Die letzte Ermittlung
+
+- **Phase 4 (Protokoll, Küche):** Das Protokoll stützt deine Geschichte, bleib ruhig. Gefährlich ist die Küche: Jemand hat um 21:22 eine Person mit einem schweren Bündel gesehen, und es klirrte. Erinnere daran, dass mehrere Menschen hier klirren, und dass „im Dunkeln“ niemand genau hinsieht.
 - **Finale:** Bleib bei deiner Geschichte, bis die Anklagen abgegeben sind. Danach legst du dein Blatt offen.

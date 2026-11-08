@@ -4,7 +4,7 @@
 
 ---
 
-## Seite 1 · Dein Charakter
+## Charakter · Wer du bist
 
 **[Paula / Pascal] Faber**, 42
 [Leiterin / Leiter] der Haustechnik der Sternwarte Eichenfels: Strom, Heizung, Schließanlage, Kuppel und Teleskope
@@ -15,7 +15,7 @@
 
 **Kurzbeschreibung:** [Sie / Er] trägt die Arbeitsweste sogar zum Festessen, „falls was ist“. An [ihrem / seinem] Gürtel hängen eine Taschenlampe und ein Schlüsselbund, schwerer als bei allen anderen im Haus. Wer [sie / ihn] nach den Sternen fragt, bekommt zum ersten Mal an diesem Abend ein Lächeln.
 
-## Seite 1 · Deine Vorgeschichte
+## Charakter · Deine Vorgeschichte
 
 Du bist [Elektromeisterin / Elektromeister], hast in Suhl Anlagen für Krankenhäuser gebaut und bist vor zwölf Jahren nach Eichenfels gekommen, weil man dir eine Kuppel versprochen hat. Das Haus ist ein Flickenteppich aus 1901, 1965 und 2011, aber die Kuppel und das große Spiegelteleskop gehören zum Schönsten, was du je in den Händen hattest.
 
@@ -29,7 +29,7 @@ Nachts in der Kuppel, wenn das Haus schläft und das Teleskop leise surrt, hast 
 
 Die anderen kennst du aus dem Alltag: Rademacher aus dem Archiv, mit {R08: der / dem} du dir die Karten für Archiv und Restaurierung teilst, nur ihr beide und Sander haben welche. Marwitz, {R02: der / dem} du heute Nachmittag stolz den restaurierten Refraktor gezeigt hast. Hollerbach, {R05: die / der} dich seit Tagen wegen Steckdosen jagt.
 
-## Seite 2 · Deine Kleidung
+## Kleidung · Deine Kleidung
 
 **Grundbild:** die einzige Person, die heute Abend etwas reparieren kann, und das weiß. Ordentlich, aber nicht verkleidet.
 
@@ -43,9 +43,23 @@ Die anderen kennst du aus dem Alltag: Rademacher aus dem Archiv, mit {R08: der /
 
 *Niemand muss etwas kaufen. Eine Weste und eine Taschenlampe reichen, **aber der Schlüsselbund ist Pflicht**: Nimm einfach deinen eigenen, je mehr Schlüssel, desto besser. **Er muss beim Gehen hörbar klirren.** Trag ihn den ganzen Abend sichtbar am Gürtel oder in der Hand.*
 
-## Seite 3 · Was du weißt
+## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-**Dein Abend:**
+Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofotos**, die du verkaufst, obwohl Sander es verboten hat. Heute läuft seit 20 Uhr eine Aufnahme, und Sander will nach seiner Rede „die Kuppel prüfen“. **Du hast vor, kurz nach der Rede am Kuppelpult den Not-Aus zu drücken.** Der Strom ist dann ein paar Minuten weg, und das Nutzungsprotokoll des Teleskops ist gelöscht. Den Gästen sagst du: Sturmschaden.
+
+## Vertraulich · Deine Ziele
+
+1. **Persönlich:** Das Teleskop-Geschäft geheim halten. Den Stromausfall darfst du zugeben, den Grund nicht unbedingt.
+2. **Zu einer anderen Person:** Marwitz hast du heute Nachmittag stolz den alten Refraktor gezeigt. Jetzt hoffst du, dass {R02: sie / er} heute Abend nicht in der Kuppel herumsteht, wenn du dort zu tun hast.
+3. **Zum Fall:** Die Technik dieses Hauses kennst du als [Einzige / Einziger]. Wenn heute etwas passiert, wird man dich fragen.
+
+## Vertraulich · Beim Empfang
+
+- **Phase 1 (Empfang):** Sei wortkarg. Wenn jemand nach den Sternen fragt, darfst du schwärmen.
+
+## Runde 1 · Nach dem Fund
+
+**Dein Abend ab 20:40:**
 - **21:06** Verbindungstür West (deine Karte). **21:07** Anmeldung am Steuerpult der Kuppel (deine Karte). Im Halbdunkel am alten Refraktor saß Marwitz. Du hast {R02: sie / ihn} erst gesehen, als du schon am Pult standest.
 - **21:08** **Du hast mit dem Not-Aus am Pult den Strom unterbrochen.** Das Nutzungsprotokoll des Teleskops ist gelöscht. „So, das war’s“, hast du gemurmelt.
 - **21:14** aus der Kuppel, die Treppe hinunter und durch die (offene) Verbindungstür West in den Mittelbau.
@@ -61,24 +75,19 @@ Die anderen kennst du aus dem Alltag: Rademacher aus dem Archiv, mit {R08: der /
 - **Archiv und Restaurierung öffnen nur drei Karten: Sanders, Rademachers und deine.**
 - Der Servicegang von der Küche in den Westflügel hat keinen Kartenleser.
 
+**Was das jetzt bedeutet:** Der Zeitpunkt des Stromausfalls war Zufall. Aber wer wird dir das glauben, wenn der Mord genau in der Dunkelheit geschah, die du gemacht hast? **Neue Ziele:** Nicht verdächtigt werden, nur weil der Stromausfall zur Tatzeit kam. Und: Marwitz und du seid euer gegenseitiges Alibi für 21:07–21:14. Sorg dafür, dass das zählt, ohne dass du mehr preisgibst als nötig.
+
 **Was du sagen darfst:** Deinen Aufenthaltsort und deine Handlungen musst du wahrheitsgemäß angeben (Regel 2). Das heißt: Wenn man dich fragt, musst du zugeben, dass du in der Kuppel warst und den Not-Aus gedrückt hast. **Warum**, darfst du verschweigen.
 
-## Seite 4 · Dein Geheimnis — VERTRAULICH
-
-Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofotos**, die du verkaufst, obwohl Sander es verboten hat. Heute lief seit 20 Uhr eine Aufnahme. **Den Stromausfall um 21:08 hast du selbst ausgelöst**, damit das Nutzungsprotokoll gelöscht wird. Der Zeitpunkt war Zufall. Aber wer wird dir das glauben, wenn der Mord genau in der Dunkelheit geschah, die du gemacht hast?
-
-## Seite 4 · Deine Ziele
-
-1. **Persönlich:** Das Teleskop-Geschäft geheim halten. Den Stromausfall darfst du zugeben, den Grund nicht unbedingt.
-2. **Zu einer anderen Person:** Marwitz und du seid euer gegenseitiges Alibi für 21:07–21:14. Sorg dafür, dass das zählt, ohne dass du mehr preisgibst als nötig.
-3. **Zum Fall:** Nicht verdächtigt werden, nur weil der Stromausfall „zufällig“ zur Tatzeit kam. Die Technik kann den Fall lösen. Du kennst sie als [Einzige / Einziger].
-
-## Seite 4 · Deine Spielhinweise
-
-- **Phase 1 (Empfang):** Sei wortkarg. Wenn jemand nach den Sternen fragt, darfst du schwärmen.
 - **Phase 2 (Mord):** Erkläre den Stromausfall zuerst als Sturmschaden. Wenn jemand direkt fragt, wo du warst, gilt Regel 2: Kuppel, dann Keller.
+
+## Runde 2 · Jetzt fällt dir ein
+
 - **Phase 3 (Geheimnisse):** Erkläre der Gruppe die Schließanlage (siehe oben). Das ist Wissen, das alle brauchen, und es lenkt von dir ab.
-- **Phase 4 (Protokoll):** Du liest den Server aus. Dein Technikprotokoll (B10) zeigt „NOT-AUS Kuppelpult (manuell)“. Jetzt brauchst du eine Erklärung, und Marwitz.
 - **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (wer außer euch beiden hat eine Karte für die Restaurierung? Niemand.), Yilmaz (der Servicegang).
 - **Was du vermeiden solltest:** den Namen „Thüringer Nachthimmel“.
 - **Trumpf:** Dein Weg ist lückenlos: 21:07–21:14 Kuppel (Marwitz), 21:15 Küche (Yilmaz, Jo), 21:16–21:21 Hauptverteilung (B10), ab 21:22 Festsaal (Hollerbach). Und um 21:24 hat eine Karte die Restaurierung geöffnet, während du im Festsaal standest. Deine war es nicht.
+
+## Runde 3 · Die letzte Ermittlung
+
+- **Phase 4 (Protokoll):** Du liest den Server aus. Dein Technikprotokoll (B10) zeigt „NOT-AUS Kuppelpult (manuell)“. Jetzt brauchst du eine Erklärung, und Marwitz.

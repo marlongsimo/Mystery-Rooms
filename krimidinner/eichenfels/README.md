@@ -36,6 +36,8 @@ Krimidinner für 4–10 Personen am Tisch, mit einer Spielleitung, die mitspiele
   | FUNK | B12, falls Lindner die Aufnahme nicht vorlegt |
 
   B8 und B12 erscheinen je nach Besetzung automatisch.
+- **Rollenblätter nach Runden:** Charakter, Kleidung und Vertraulich (Geheimnis, Ziele, Empfang) sind sofort sichtbar. **Runde 1–3** öffnen sich mit denselben Losungswörtern wie die Beweise. Vor dem Fund weiß keine unschuldige Rolle etwas über die Mordnacht, nur R08 kennt die Tat von Anfang an.
+- **Geführte Spielleitung:** sieben Schritte (Vorbereitung, Start, Phase 1–4, Finale), je mit Vorlesetext, Zeitnahme, Losungswort, Karten, „Wenn es stockt“ und dem **Wissen der fehlenden Rollen** zum Vorlesen (Gastgeberheft A8, nur für die bei euch unbesetzten Rollen).
 - **Varianten:** `[w / m]` für die eigene Rolle, `{Rxx: w / m}` für andere Rollen, aufgelöst beim Anzeigen. Die Kleidungstabelle zeigt nur die eigene Spalte.
 - **Geheimes:** Rollenblätter, Karten und Teil B liegen nicht im Klartext im Quelltext. Das ist ein Schutz gegen zufälliges Mitlesen, kein Kopierschutz.
 - **Druck:**

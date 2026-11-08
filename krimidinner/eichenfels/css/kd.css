@@ -135,3 +135,19 @@ input.code { text-transform: uppercase; letter-spacing: .25em; font: 600 22px va
 .plan-hint { display: none; margin: 4px 0 0; font: 12px var(--mono); color: #7a6233; }
 @media (max-width: 560px) { .plan-hint { display: block; } }
 @media print { .plan-hint { display: none !important; } }
+
+/* Geführter Ablauf der Spielleitung */
+.steps { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 12px; }
+.steps button { min-width: 48px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: none; color: var(--muted); font: 600 12px var(--mono); cursor: pointer; }
+.steps button.done { color: #9fe0b0; border-color: #2e6a48; }
+.steps button.on { color: #16130c; background: var(--brass); border-color: var(--brass); }
+.step-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.step-head h2 { margin: 8px 0; }
+.timer { font: 600 15px var(--mono); color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.timer #tm { color: var(--text); font-size: 20px; } .timer #tm.over { color: #f0b4aa; }
+.npc { margin: 14px 0; padding: 12px 14px; border: 1px solid #5a4a33; border-radius: 14px; background: #1b1713; }
+.npc h3 { margin: 0 0 4px; } .npc blockquote { margin: 10px 0 0; padding: 10px 14px; border-left: 3px solid var(--brass); background: #ffffff08; font: 16px/1.5 Georgia, serif; color: #f1e9d6; }
+.npc blockquote b { font: 600 11px var(--mono); color: var(--brass); margin-right: 6px; }
+.step-doc { margin-top: 14px; }
+.imp { margin: 14px 0; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; } .imp summary { cursor: pointer; color: var(--brass); }
+.stepnav { position: sticky; bottom: 0; padding: 12px 0; background: linear-gradient(transparent, var(--bg) 30%); justify-content: space-between; margin-top: 16px; }

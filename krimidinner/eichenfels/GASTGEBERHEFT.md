@@ -59,7 +59,7 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 ## A5 · Vor dem Start vorlesen
 
-> „Bevor wir beginnen, die Regeln. Erstens: Ihr dürft eure Geheimnisse für euch behalten, ausweichen und schweigen. Zweitens: Wer unschuldig ist, sagt über den eigenen Aufenthaltsort und die eigenen Handlungen zur Tatzeit die Wahrheit. Nur eine Person am Tisch darf darüber lügen – und sie weiß, dass sie gemeint ist. Drittens: Was auf einer Beweiskarte steht, ist wahr. Viertens: Trumpfkarten spielt ihr, wann ihr wollt. Fünftens: Die vierte Seite eures Rollenblatts zeigt ihr niemandem. Und jetzt: Willkommen in Eichenfels.“
+> „Bevor wir beginnen, die Regeln. Erstens: Ihr dürft eure Geheimnisse für euch behalten, ausweichen und schweigen. Zweitens: Wer unschuldig ist, sagt über den eigenen Aufenthaltsort und die eigenen Handlungen zur Tatzeit die Wahrheit. Nur eine Person am Tisch darf darüber lügen – und sie weiß, dass sie gemeint ist. Drittens: Was auf einer Beweiskarte steht, ist wahr. Viertens: Trumpfkarten spielt ihr, wann ihr wollt. Fünftens: Den vertraulichen Teil und die Runden eures Rollenblatts zeigt ihr niemandem. Was eure Figur in der Mordnacht erlebt hat, erfahrt ihr erst im Lauf des Abends – mit den Losungswörtern, die ich vorlese. Und jetzt: Willkommen in Eichenfels.“
 
 ---
 
@@ -67,7 +67,7 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 > **Vorlesen:** „Willkommen in der Sternwarte Eichenfels. Heute vor 125 Jahren wurde hier zum ersten Mal die Kuppel geöffnet. Draußen wird der Wind stärker, drinnen glänzt das Silber. Professor Theodor Sander hat Sie eingeladen – zehn Menschen, die mit diesem Haus verbunden sind, manche enger, als ihnen lieb ist. Bitte stellen Sie sich einander vor: Wer sind Sie, und was verbindet Sie mit dem Professor?“
 
-**Deine Aufgabe:** Jede Person stellt sich mit Seite 1 ihres Rollenblatts vor (Name, Beruf, Verbindung zu Sander). Danach stellst du die **Nebenfiguren** mit je einem Satz vor:
+**Deine Aufgabe:** Jede Person stellt sich mit dem Abschnitt „Charakter“ ihres Rollenblatts vor (Name, Beruf, Verbindung zu Sander). Danach stellst du die **Nebenfiguren** mit je einem Satz vor:
 
 | Nebenfigur | Satz zum Vorlesen |
 |---|---|
@@ -92,7 +92,7 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 > **Vorlesen:** „Um 21:08 erlischt das Licht. Notlampen flackern, irgendwo schlägt eine Tür. Um 21:20 ist der Strom zurück. Das Dessert wird aufgetragen – aber der Platz des Professors bleibt leer. Um 21:35 hören Sie einen Schrei aus dem Westflügel. Professor Sander liegt tot im Kartenraum. Draußen tobt der Sturm, ein Baum blockiert die Zufahrt, das Netz ist schwach. Die Polizei kommt frühestens im Morgengrauen. Bis dahin sind Sie unter sich – und eine Person in diesem Raum hat es getan.“
 
-**Freigeben:** B1 Tatortbericht · B2 Ärztliche Einschätzung · B3 Grundriss und Schließanlage · B4 Ablaufplan
+**Losungswort: KUPPEL.** Es öffnet die Beweise B1 Tatortbericht · B2 Ärztliche Einschätzung · B3 Grundriss und Schließanlage · B4 Ablaufplan – und in jedem Rollenblatt den Abschnitt **Runde 1**: Was die eigene Figur zwischen 20:40 und 21:35 erlebt hat. Gib allen kurz Zeit zum Lesen.
 
 **Runde der Alibis:** Jede Person sagt der Reihe nach, wo sie zwischen 21:00 und 21:35 Uhr war. Erinnere an Regel 2. Für Nebenfiguren sagst du: „Das weiß im Moment niemand genau.“
 
@@ -102,7 +102,7 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 > **Vorlesen:** „Es ist gegen halb elf. Im Kartenraum finden sich Spuren, die nicht zu einem Unfall passen. Im Papierkorb des Archivs liegen Papierfetzen. Und unter dem Kartentisch klebt etwas, das dort nicht hingehört.“
 
-**Freigeben:** B5 Kalender · B6 Archivliste · B7 Funkmikrofon · **B8**, wenn R07 nicht besetzt ist
+**Losungswort: ORION.** Es öffnet B5 Kalender · B6 Archivliste · B7 Funkmikrofon · **B8**, wenn R07 nicht besetzt ist – und in jedem Rollenblatt **Runde 2**: „Jetzt fällt dir ein …“, mit Trumpfkarten.
 
 **Freies Gespräch:** Die Gäste befragen einander, gehen zu zweit beiseite, schließen Bündnisse, spielen Trumpfkarten.
 
@@ -112,7 +112,7 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 > **Vorlesen:** „Gegen halb zwölf gelingt es der Haustechnik, den Server im Keller auszulesen. Das Zutrittsprotokoll des Abends liegt auf dem Tisch. Und in der Küche erzählt die Aushilfe Jo, was ihr seltsam vorkam.“
 
-**Freigeben:** B9 Zutrittsprotokoll · B10 Technikprotokoll · B11 Aussage aus der Küche · **B12**, wenn R04 nicht besetzt ist oder die Aufnahme noch nicht auf dem Tisch liegt
+**Losungswort: NEBEL.** Es öffnet B9 Zutrittsprotokoll · B10 Technikprotokoll · B11 Aussage aus der Küche · **B12**, wenn R04 nicht besetzt ist (sonst bei Bedarf mit **FUNK**) – und in jedem Rollenblatt **Runde 3**.
 
 **Tipp:** Schlag vor, gemeinsam eine Zeitleiste von 21:00 bis 21:35 aufzuschreiben, zum Beispiel auf einer Serviette in der Tischmitte.
 
@@ -134,6 +134,26 @@ Ich klage an: ____________________
 Weil (Motiv): ____________________
 Der Beweis, der es zeigt: ____________________
 ```
+
+## A8 · Wissen der Nebenfiguren
+
+Fehlt eine Rolle, geht ihr Wissen nicht verloren. Lies die passenden Sätze in der genannten Phase vor (in der App erscheinen nur die Sätze der Rollen, die bei euch fehlen). Für die Lösung nötig ist nichts davon – es macht den Abend reicher.
+
+| Rolle | Phase | Zum Vorlesen |
+|---|---|---|
+| R01 | 2 | „{R01: Leonie / Leon} Sander war von 21:10 bis 21:26 auf der Terrasse und hat telefoniert. Das Anrufprotokoll im Handy bestätigt es.“ |
+| R01 | 3 | „{R01: Leonie / Leon} Sander erzählt: Ritter hatte heute einen dicken Umschlag dabei, beschriftet ‚Testament – Abschrift‘.“ |
+| R03 | 2 | „Ritter war ab 21:07 im Gästezimmer im Ostflügel und kam während des Stromausfalls nicht heraus.“ |
+| R03 | 3 | „Ritter stellt klar: Sander nannte die Kanzlei in seinem Kalender immer ‚Kanzlei‘. Der Termin mit ihr war um 22:30.“ |
+| R03 | 4 | „Ritter erinnert sich: Im Frühjahr bat Rademacher darum, die Versicherungsliste ‚ohne die Karten 41–48, die sind in der Restaurierung‘ zu unterschreiben.“ |
+| R04 | 2 | „Lindner hat Sander von 21:04 bis 21:08 interviewt. Beim Hinausgehen hörte {R04: sie / er} im dunklen Flur vor dem Kartenraum ein leises metallisches Klirren.“ |
+| R05 | 2 | „Hollerbach hörte um 20:55 im Westflügel Marwitz durch die Tür des Kartenraums rufen: ‚… dann sage ich es heute Abend selbst, vor allen!‘“ |
+| R05 | 2 | „Hollerbach sah um 21:13 Lindner an der Bar, um 21:15 {R01: Leonie / Leon} Sander auf der Terrasse und ab 21:22 Faber im Festsaal.“ |
+| R05 | 3 | „Hollerbach verrät: Sander ließ am Nachmittag den Sitzplan ändern, Rademacher sollte neben Falk sitzen. Am Rand stand in seiner Schrift ‚R. neben F.‘.“ |
+| R05 | 3 | „Hollerbach weiß außerdem: Rademacher trägt bei der Arbeit immer weiße Baumwollhandschuhe.“ |
+| R06 | 2 | „{R06: Mina / Emre} Yilmaz aus der Küche war ab 21:15 im Vorratskeller im Westflügel.“ |
+| R07 | 3 | „Seebach erzählt: Sander sagte letzten Sonntag beim Schach: ‚Im Archiv stimmt etwas nicht. Ich werde bestohlen, von jemandem, dem ich vertraut habe.‘“ |
+| R07 | 4 | „Seebach bricht die Schweigepflicht: Sander war schwer herzkrank. Er hatte nur noch Monate.“ |
 
 ## A7 · Wenn es stockt
 

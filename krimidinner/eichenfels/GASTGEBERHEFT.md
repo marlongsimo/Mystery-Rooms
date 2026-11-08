@@ -137,7 +137,7 @@ Der Beweis, der es zeigt: ____________________
 
 ## A8 · Wissen der Nebenfiguren
 
-Fehlt eine Rolle, geht ihr Wissen nicht verloren. Lies die passenden Sätze in der genannten Phase vor (in der App erscheinen nur die Sätze der Rollen, die bei euch fehlen). Für die Lösung nötig ist nichts davon – es macht den Abend reicher.
+Fehlt eine Rolle, geht ihr Wissen nicht verloren. **In der App erscheinen diese Sätze als Aussagekarten bei allen Gästen**, zusammen mit den Beweisen der Runde (Phase 2 mit KUPPEL, Phase 3 mit ORION, Phase 4 mit NEBEL) – und nur die Sätze der Rollen, die bei euch fehlen. Du musst nichts vorlesen. **Ohne Handys:** Die Aussagekarten werden mit den Beweiskarten gedruckt; leg sie mit der Runde auf den Tisch oder lies sie vor. Für die Lösung nötig ist nichts davon – es macht den Abend reicher.
 
 | Rolle | Phase | Zum Vorlesen |
 |---|---|---|

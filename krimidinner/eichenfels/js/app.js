@@ -82,6 +82,12 @@
     const c = cast(n);
     return Object.entries(C.cards).filter(([id, k]) => k.round === r && (id !== "B8" || !c.includes("R07")) && (id !== "B12" || !c.includes("R04") || extraOpen)).map(([id]) => id);
   }
+  /** Aussagen der Nebenfiguren: Wissen unbesetzter Rollen als Karte. Phase 2 → Runde 1, Phase 3 → Runde 2, Phase 4 → Runde 3. */
+  const npcFor = (r, n) => C.npc.map((x, i) => ({ ...x, i })).filter((x) => x.phase === r + 1 && !cast(n).includes(x.role));
+  function npcHtml(x, variants) {
+    const r = ROUNDS[x.phase - 2], who = NAMES[x.role][male(variants, x.role) ? 1 : 0];
+    return `<article class="ecard npc-card ${r.cls}"><header><span>STERNWARTE EICHENFELS</span><span>AUSSAGE ☏</span></header><h4>Aussage · ${esc(who)}</h4><div class="body"><p>${resolve(unveil(x.html), variants)}</p></div><footer>Nebenfigur · bei euch nicht besetzt · ${esc(r.name.split(" · ")[0])}</footer></article>`;
+  }
   function cardHtml(id, variants) {
     const k = C.cards[id], r = ROUNDS[k.round - 1];
     return `<article class="ecard ${r.cls}${["B3", "B9", "B11"].includes(id) ? " dense" : ""}"><header><span>STERNWARTE EICHENFELS</span><span>${id} ${esc(k.icon)}</span></header><h4>${esc(k.title)}</h4><div class="body">${resolve(unveil(k.html), variants)}</div><footer>${esc(k.foot)}</footer></article>`;
@@ -250,7 +256,7 @@
     const unlocked = ROUNDS.filter((r) => open[r.no]);
     pane.appendChild(unlockForm(me, () => viewRolle()));
     pane.insertAdjacentHTML("beforeend", `${unlocked.length ? "" : `<p class="muted">Noch keine Beweise freigegeben.</p>`}
-      <div class="cardlist">${unlocked.slice().reverse().map((r) => `<h3>${esc(r.name)}</h3>` + cardsFor(r.no, d.n, open.extra).map((id) => cardHtml(id, d.variants)).join("")).join("")}</div>`);
+      <div class="cardlist">${unlocked.slice().reverse().map((r) => `<h3>${esc(r.name)}</h3>` + cardsFor(r.no, d.n, open.extra).map((id) => cardHtml(id, d.variants)).join("") + npcFor(r.no, d.n).map((x) => npcHtml(x, d.variants)).join("")).join("")}</div>`);
   }
 
   /* Spielleitung: geführter Ablauf Schritt für Schritt */
@@ -285,10 +291,10 @@
       pane.innerHTML = `<div class="steps no-print">${STEPS.map((s, k) => `<button data-step="${k}" class="${k === i ? "on" : k < i ? "done" : ""}" title="${esc(s.title)}">${k === 0 ? "Vorb." : k === 1 ? "Start" : k === STEPS.length - 1 ? "Finale" : "P" + (k - 1)}</button>`).join("")}</div>
         <div class="step-head"><h2>${esc(st.title)}</h2>${st.mins ? `<div class="timer"><span id="tm">${timers[st.key] ? mmss(Date.now() - timers[st.key]) : "0:00"}</span> / ca. ${st.mins} Min. <button class="btn ghost small" id="tstart">${timers[st.key] ? "neu starten" : "Zeit starten"}</button></div>` : ""}</div>
         ${hostLiveBox(host)}
-        ${i === 0 ? `<p class="note">Bei euch besetzt: ${c.join(" · ")}. Nebenfiguren: ${missing.join(" · ") || "keine"}. Was die Nebenfiguren wissen, bietet dir der Ablauf in der passenden Phase zum Vorlesen an.</p>` : ""}
-        ${r ? `<div class="round ${r.cls}"><h3>Losungswort für die Gäste</h3>${roundOpen ? `<div class="word">${r.word}</div><p class="small muted">Öffnet: ${cardsFor(r.no, d.n, false).join(", ")}${r.no <= 3 ? ` und im Rollenblatt Runde ${r.no}` : ""}.</p><button class="btn small" data-cards="${r.no}">Karten zeigen</button>` : `<p class="small muted">${r.no === 4 ? "Erst, wenn alle ihre Anklage abgegeben haben." : "Zu Beginn dieser Phase öffnen und vorlesen."}</p><button class="btn small" data-round="${r.no}">${r.no === 4 ? "Finale-Karten öffnen" : "Losungswort anzeigen"}</button>`}
+        ${i === 0 ? `<p class="note">Bei euch besetzt: ${c.join(" · ")}. Nebenfiguren: ${missing.join(" · ") || "keine"}. Was die Nebenfiguren wissen, erscheint mit dem Losungswort bei allen Gästen als <b>Aussagekarte</b> – du musst dafür nichts vorlesen.</p>` : ""}
+        ${r ? `<div class="round ${r.cls}"><h3>Losungswort für die Gäste</h3>${roundOpen ? `<div class="word">${r.word}</div><p class="small muted">Öffnet: ${cardsFor(r.no, d.n, false).join(", ")}${npcFor(r.no, d.n).length ? ` · ${npcFor(r.no, d.n).length} ${npcFor(r.no, d.n).length === 1 ? "Aussage" : "Aussagen"} von Nebenfiguren` : ""}${r.no <= 3 ? ` · im Rollenblatt Runde ${r.no}` : ""}.</p><button class="btn small" data-cards="${r.no}">Karten zeigen</button>` : `<p class="small muted">${r.no === 4 ? "Erst, wenn alle ihre Anklage abgegeben haben." : "Zu Beginn dieser Phase öffnen und vorlesen."}</p><button class="btn small" data-round="${r.no}">${r.no === 4 ? "Finale-Karten öffnen" : "Losungswort anzeigen"}</button>`}
           ${st.round === 3 && c.includes("R04") ? `<p class="small" style="margin-top:12px">Hat Lindner die Aufnahme noch nicht vorgelegt? Dann zusätzlich: ${seen.extra ? `<b class="word" style="font-size:18px">${EXTRA.word}</b> <button class="btn ghost small" data-cards="extra">B12 zeigen</button>` : `<button class="btn ghost small" data-round="extra">Zusatzwort FUNK anzeigen</button>`}</p>` : ""}</div>` : ""}
-        ${npc.length ? `<div class="npc"><h3>Fehlende Rollen · zum Vorlesen</h3><p class="small muted">Diese Figuren spielt bei euch niemand. Lies vor, was sie wissen – am besten, sobald das Gespräch darauf kommt.</p>${npc.map((n) => `<blockquote><b>${n.role}</b> ${resolve(n.html, d.variants)}</blockquote>`).join("")}</div>` : ""}
+        ${npc.length ? `<div class="npc"><h3>Aussagen der Nebenfiguren · ${npc.length}</h3><p class="small muted">Diese Figuren spielt bei euch niemand. Ihre Aussagen erscheinen mit dem Losungswort bei allen Gästen als Karte (und unter „Karten zeigen“). <b>Du musst nichts vorlesen.</b> Nur ohne Handys: vorlesen oder die gedruckten Aussagekarten auf den Tisch legen.</p><details><summary>Aussagen ansehen</summary>${npc.map((n) => `<blockquote><b>${n.role}</b> ${resolve(unveil(n.html), d.variants)}</blockquote>`).join("")}</details></div>` : ""}
         <div class="hostdoc step-doc">${st.secs.map((k) => C.sections[k] ? (st.secs.length > 1 ? `<h2>${esc(C.sections[k].title)}</h2>` : "") + resolve(C.sections[k].html, d.variants) : "").join("")}</div>
         ${imp.length ? `<details class="imp"><summary>Wenn es stockt</summary><ul>${imp.map((x) => `<li>${x}</li>`).join("")}</ul></details>` : ""}
         ${st.key === "fin" ? hostAccusations(host, d) + `<p class="note red">Nach dem Vorlesen der Anklagen: Reiter <b>Lösung</b> öffnen.</p>` : ""}
@@ -304,7 +310,7 @@
         if (k === "4" && !confirm("Haben alle ihre Anklage abgegeben? Die Finale-Karten verraten die Lösung.")) return;
         seen[k] = true; save(); livePush(host); viewLeitung();
       });
-      $$("[data-cards]").forEach((b) => b.onclick = () => { const k = b.dataset.cards, ids = k === "extra" ? ["B12"] : cardsFor(+k, d.n, false); showOverlay(`<div class="cardlist">${ids.map((id) => cardHtml(id, d.variants)).join("")}</div>`); });
+      $$("[data-cards]").forEach((b) => b.onclick = () => { const k = b.dataset.cards, ids = k === "extra" ? ["B12"] : cardsFor(+k, d.n, false); showOverlay(`<div class="cardlist">${ids.map((id) => cardHtml(id, d.variants)).join("")}${k === "extra" ? "" : npcFor(+k, d.n).map((x) => npcHtml(x, d.variants)).join("")}</div>`); });
       return;
     }
     if (htab === "heft") {
@@ -339,9 +345,9 @@
     if (what === "hostB") add(`<div class="hostdoc">${resolve(unveil(C.hostB), d.variants)}</div>`);
     if (what === "guide") add(`<div class="guide"><h1>Der letzte Stern von Eichenfels – Spielanleitung</h1>${C.guide}</div>`);
     if (what === "cards") {
-      const ids = [1, 2, 3, 4].flatMap((r) => cardsFor(r, d.n, true)).filter((id) => id !== "B3");
+      const items = [1, 2, 3, 4].flatMap((r) => cardsFor(r, d.n, true).filter((id) => id !== "B3").map((id) => cardHtml(id, d.variants)).concat(npcFor(r, d.n).map((x) => npcHtml(x, d.variants))));
       add(cardHtml("B3", d.variants), "p-cards p-plan"); // Grundriss als eigenes Blatt
-      for (let i = 0; i < ids.length; i += 4) add(ids.slice(i, i + 4).map((id) => cardHtml(id, d.variants)).join(""), "p-cards");
+      for (let i = 0; i < items.length; i += 4) add(items.slice(i, i + 4).join(""), "p-cards");
     }
     if (what === "roles") {
       const ids = cast(d.n).slice().sort(() => Math.random() - 0.5);

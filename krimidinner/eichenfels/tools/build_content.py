@@ -170,7 +170,7 @@ for chunk in re.split(r"(?=^## )", a_src, flags=re.M):
 npc = []
 a8 = a_src.split("## A8", 1)[1].split("\n## ", 1)[0]
 for row in re.findall(r"^\| (R\d\d) \| (\d) \| (.+) \|$", a8, flags=re.M):
-    npc.append({"role": row[0], "phase": int(row[1]), "html": inline(row[2])})
+    npc.append({"role": row[0], "phase": int(row[1]), "html": veil(inline(row[2]))})
 impulses = {}
 a7 = a_src.split("## A7", 1)[1].split("\n## ", 1)[0]
 for m in re.finditer(r"^- \*\*(Phase \d|Immer):\*\* (.+)$", a7, flags=re.M):

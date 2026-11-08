@@ -77,14 +77,19 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
   check(/Du hast Professor Theodor Sander getötet/.test(await R8.textContent('.doc')) && /Was heute Abend geschieht/.test(await R8.textContent('.doc')), 'R08: Tat und Ablauf schon im Teil „Vertraulich“');
   // Beweise
   await A.click('[data-tab="bew"]');
-  check(JSON.stringify(await cardIds(A)) === JSON.stringify(['B1', 'B2', 'B3', 'B4']), 'Nach KUPPEL: Beweise B1–B4');
+  check(JSON.stringify((await cardIds(A)).filter((x) => /^B/.test(x))) === JSON.stringify(['B1', 'B2', 'B3', 'B4']), 'Nach KUPPEL: Beweise B1–B4');
+  const npcR1 = await A.$$eval('.npc-card h4', (h) => h.map((x) => x.textContent));
+  check(npcR1.length === 5 && npcR1.every((x) => /^Aussage · /.test(x)) && !(await A.textContent('.cardlist')).match(/\{R0|\[[^\]]* \/ /), 'Nach KUPPEL: 5 Aussagekarten der fehlenden Rollen (' + npcR1.map((x) => x.replace('Aussage · ', '')).join(', ') + ')');
+  check(!npcR1.some((x) => /Marwitz|Rademacher|Faber|Falk|Sander$/.test(x) && !/Leonie|Leon /.test(x)), 'Keine Aussagekarte einer besetzten Rolle');
   await unlock(A, 'ORION');
   let ids = await cardIds(A);
   check(ids.includes('B8') && ids.includes('B5') && !ids.includes('B9'), 'ORION → B5–B8 (B8, weil R07 fehlt)');
+  check((await A.$$('.npc-card')).length === 9, 'Nach ORION: 4 weitere Aussagekarten (zusammen 9)');
   await A.click('[data-tab="p4"]'); check(/Jetzt fällt dir ein/.test(await A.textContent('.doc')), 'ORION öffnet auch Runde 2 im Rollenblatt');
   await A.click('[data-tab="bew"]'); await unlock(A, 'NEBEL');
   ids = await cardIds(A);
   check(ids.includes('B11') && ids.includes('B12') && !ids.includes('B13'), 'NEBEL → B9–B12 (B12, weil R04 fehlt), Finale noch zu');
+  check((await A.$$('.npc-card')).length === 11, 'Nach NEBEL: 2 weitere Aussagekarten (zusammen 11 bei 5 Personen)');
   const b11 = await A.textContent('.ecard:has(header:has-text("B11"))');
   check(!/\{R0/.test(b11) && /(Mina|Emre)/.test(b11), 'B11: Name der Küchenfigur nach Variante aufgelöst');
 
@@ -122,7 +127,7 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
   // Druck
   await H.evaluate(() => { window.print = () => {}; });
   await H.click('[data-tab="druck"]'); await H.click('[data-p="cards"]');
-  check((await H.$$eval('#print .ecard', (c) => c.length)) === 14, 'Druck: alle 14 Beweiskarten (B3 als eigenes Blatt)');
+  check((await H.$$eval('#print .ecard:not(.npc-card)', (c) => c.length)) === 14 && (await H.$$eval('#print .npc-card', (c) => c.length)) === 11, 'Druck: 14 Beweiskarten (B3 als eigenes Blatt) und 11 Aussagekarten');
   await H.click('[data-p="roles"]');
   check((await H.$$eval('#print .p-doc', (c) => c.length)) === 30, 'Druck: 5 Rollen × 6 Teile');
   const pr = await H.textContent('#print');

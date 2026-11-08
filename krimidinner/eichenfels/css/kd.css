@@ -166,3 +166,9 @@ input.code { text-transform: uppercase; letter-spacing: .25em; font: 600 22px va
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 .doc .fld { display: block; margin: 12px 0; font: 600 13px var(--sans); color: #6b5528; }
 .doc .fld select, .doc .fld textarea { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid #c9bc9c; border-radius: 8px; background: #fbf6ea; color: #231e14; font: 16px var(--sans); }
+
+/* Aussagekarten der Nebenfiguren */
+.ecard.npc-card { background: #efe6d2; border-left: 5px solid var(--c); }
+.ecard.npc-card h4 { font-style: italic; text-transform: none; letter-spacing: 0; }
+.ecard.npc-card .body p { font: 16px/1.5 Georgia, serif; }
+.npc details { margin-top: 8px; } .npc summary { cursor: pointer; color: var(--brass); }

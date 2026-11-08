@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.8 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.9 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -367,6 +367,8 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 - *(R08)* Rademachers Motiv neben Geld: die Pflegekosten der Mutter, zweimal abgelehnte Gehaltserhöhung. Die Archivliste nahm {R08: sie / er} aus dem Kartenraum mit und zerriss sie um 21:31 im Archiv (deshalb B6 im Papierkorb).
 
 - *(Prüfung 0.3)* Faber geht um 21:15 durch die Küche zur Kellertreppe (Yilmaz und Jo sehen {R09: sie / ihn}), meldet sich um 21:21 an der Hauptverteilung ab und ist ab 21:22 im Festsaal. Die Originalblätter lagen seit Februar im Planschrank der Restaurierung. Yilmaz sah von 21:15 bis 21:22 niemanden im Gang oder vor der Restaurierung. R10 trägt ein Kettenarmband bzw. eine Taschenuhr an einer Kette.
+
+- *(0.9)* Das Wissen unbesetzter Rollen (Gastgeberheft A8) erscheint als **Aussagekarte** bei allen Gästen, mit dem Losungswort der passenden Runde. Die Spielleitung muss nichts mehr vorlesen.
 
 **Rollenblätter:** `rollen/R01-familie.md` bis `rollen/R10-sammler.md`, alle nach den Standards in Abschnitt 10. R10 heißt im Titel „Die private Sammlung“ (geschlechtsneutral).
 

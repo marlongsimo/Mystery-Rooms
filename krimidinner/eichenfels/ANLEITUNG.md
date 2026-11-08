@@ -53,7 +53,7 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
 | **4 · Die letzte Ermittlung** | Die letzten Beweise. Setzt die Teile zusammen. | ca. 25 Min. |
 | **Finale · Anklage und Auflösung** | Jede Person gibt verdeckt ab, wen sie anklagt. Dann wird aufgelöst. | 15–30 Min. |
 
-Die Spielleitung liest zu Beginn jeder Phase einen kurzen Text vor und nennt ein Losungswort. Damit öffnen sich auf euren Handys die neuen Beweise und der nächste Abschnitt eures Rollenblatts. Ohne Handys gibt es Karten und verschlossene Umschläge.
+Die Spielleitung liest zu Beginn jeder Phase einen kurzen Text vor und nennt ein Losungswort. Damit öffnen sich auf euren Handys die neuen Beweise und der nächste Abschnitt eures Rollenblatts. Spielt eine Figur bei euch niemand, erscheint ihr Wissen als **Aussagekarte** bei den Beweisen. Ohne Handys gibt es Karten und verschlossene Umschläge.
 
 ---
 

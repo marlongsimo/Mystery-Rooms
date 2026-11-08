@@ -1,6 +1,6 @@
 # Rollenblatt R06 · Die Küchenleitung
 
-*Varianten-Schreibweise: [weiblich / männlich]. In der fertigen Fassung steht nur die gewählte Variante.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 
@@ -27,7 +27,7 @@ Dir ist klar, dass das keine gute Idee ist. Aber zwei Flaschen von vierundzwanzi
 
 Den Weg kennst du: Von der Küche führt ein alter Servicegang ohne Kartenleser in den Westflügel, an dessen Ende der Vorratskeller liegt. Gleich daneben ist die Restaurierung, in die du nie hineingekommen bist, nur Archiv und Technik haben dafür Karten.
 
-Die anderen kennst du flüchtig: Hollerbach, mit [der / dem] du seit drei Jahren jedes Fest stemmst. Faber von der Technik, der [die] dir mal einen Herd repariert hat. Rademacher aus dem Archiv, [die / der] jedes Jahr einmal fragt, ob es „wieder diese Suppe“ gibt.
+Die anderen kennst du flüchtig: Hollerbach, mit {R05: der / dem} du seit drei Jahren jedes Fest stemmst. Faber von der Technik, {R09: die / der} dir mal einen Herd repariert hat. Rademacher aus dem Archiv, {R08: die / der} jedes Jahr einmal fragt, ob es „wieder diese Suppe“ gibt.
 
 ## Seite 2 · Deine Kleidung
 
@@ -47,10 +47,10 @@ Die anderen kennst du flüchtig: Hollerbach, mit [der / dem] du seit drei Jahren
 
 **Dein Abend:**
 - Bis **21:15** in der Küche. Um 21:08 der Stromausfall, die Gasherde laufen weiter, das Dessert nicht in Gefahr.
-- **21:15** Du sagst der Aushilfe Jo: „Ich hole Nachschub für den Kaffee“, und gehst durch den Servicegang in den Westflügel, zum Vorratskeller.
+- **21:15** Faber rennt mit der Taschenlampe durch die Küche zur Kellertreppe: „Gleich ist der Strom wieder da.“ Jo und du seht {R09: sie / ihn}. Gleich danach sagst du Jo: „Ich hole Nachschub für den Kaffee“, und gehst durch den Servicegang in den Westflügel, zum Vorratskeller. **Unten ist niemand**, weder im Gang noch vor der Restaurierung. Du hättest es gehört, es ist totenstill.
 - **21:20** Das Licht kommt zurück, während du im Keller zwischen den Weinregalen stehst.
-- **21:22** Du hast die zwei Flaschen und schreibst Deniz. In dem Moment siehst du am Ende des Servicegangs, wo er in den Westflügel mündet, **jemanden vorbeigehen, Richtung Restaurierung.** Im Arm etwas Schweres, in ein dunkles Tuch gewickelt, getragen wie ein Kind. Das Gesicht hast du nicht gesehen, die Person ging von dir weg. Aber **eine Lesebrille an einer Kette klirrte bei jedem Schritt.**
-- **21:28** zurück in der Küche, mit zwei Flaschen unter der Jacke. Jo hat dich gesehen.
+- **21:22** Du hast die zwei Flaschen und schreibst Deniz. In dem Moment siehst du am Ende des Servicegangs, wo er in den Westflügel mündet, **jemanden die Treppe aus dem Obergeschoss herunterkommen und zur Restaurierung gehen.** Im Arm etwas Schweres, in ein dunkles Tuch gewickelt, getragen wie ein Kind. Das Gesicht hast du nicht gesehen, die Person ging von dir weg. Aber **bei jedem Schritt klirrte etwas, fein und metallisch.** Was es war, weißt du nicht.
+- **21:28** zurück in der Küche, mit zwei Flaschen unter der Jacke. Jo hat dich gesehen. Jo erzählt, dass Faber kurz nach zwanzig nach wieder heraufkam und in den Festsaal ging.
 - **21:35** der Schrei.
 
 **Was du über andere weißt:**
@@ -67,14 +67,14 @@ Du hast **zwei Flaschen 1990er Riesling aus dem Vorratskeller der Stiftung genom
 
 1. **Persönlich:** Den Diebstahl geheim halten. Oder ihn selbst zugeben, bevor es jemand anderes tut. Das ist die bessere Variante, wenn es eng wird.
 2. **Zu einer anderen Person:** Hollerbach darf nicht schlecht über dich denken. Ihr seid seit drei Jahren ein Team.
-3. **Zum Fall:** Deine Beobachtung soll zählen, auch wenn du sie spät erzählst. Du hast vielleicht den Mörder [die Mörderin] gesehen.
+3. **Zum Fall:** Deine Beobachtung soll zählen, auch wenn du sie spät erzählst. Du hast vielleicht die Person gesehen, die es getan hat.
 
 ## Seite 4 · Deine Spielhinweise
 
 - **Phase 1 (Empfang):** Du bist meist „in der Küche“. Tritt auf, wenn ein Gang serviert wird, und verschwinde wieder.
 - **Phase 2 (Mord):** Wenn nach Alibis gefragt wird: „Ich war in der Küche und kurz im Vorratskeller.“ Das stimmt.
-- **Phase 3 (Geheimnisse):** Achte darauf, wer eine Brille an einer Kette trägt. Sag es noch nicht.
+- **Phase 3 (Geheimnisse):** Achte darauf, wer etwas trägt, das beim Gehen klirrt. Es sind mehrere. Sag es noch nicht.
 - **Phase 4 (Küche):** Spätestens wenn die Spielleitung die Aussage der Aushilfe Jo vorliest (B11), musst du dich entscheiden. Jo hat nur halb zugehört, du hast es selbst gesehen.
-- **Wen du ansprechen solltest:** Hollerbach (Ziel 2), Faber (wer hat sonst Karten für die Restaurierung?), jede Person mit Brillenkette.
+- **Wen du ansprechen solltest:** Hollerbach (Ziel 2), Faber (wer hat sonst Karten für die Restaurierung?), jede Person, die beim Gehen klirrt.
 - **Was du vermeiden solltest:** das Wort „Wein“.
-- **Trumpf:** die Nachricht an Deniz, 21:22, mit Zeitstempel. Sie beweist, wann du die Person gesehen hast.
+- **Trumpf:** die Nachricht an Deniz, 21:22, mit Zeitstempel. Sie beweist, wann du die Person gesehen hast. Und: Zwischen 21:15 und 21:22 war unten niemand. Wer behauptet, in dieser Zeit vor der Restaurierung gewartet zu haben, lügt.

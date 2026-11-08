@@ -1,6 +1,6 @@
 # Rollenblatt R03 · Die Kanzlei der Stiftung
 
-*Musterblatt zur Freigabe. Varianten-Schreibweise: weiblich / männlich in eckigen Klammern, z. B. [Johanna / Johannes]. In der fertigen Fassung (digital und PDF) steht nur die gewählte Variante.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 
@@ -13,7 +13,7 @@
 
 **Eigenschaften:** korrekt · verschwiegen · beherrscht · sagt lieber nichts als etwas Halbes · hasst Überraschungen
 
-**Kurzbeschreibung:** Man erkennt [sie / ihn] daran, dass [sie / er] als Einzige(r) im Raum nie die Stimme hebt. Wenn [sie / er] lächelt, hat [sie / er] vorher entschieden, dass es angebracht ist. Im Raum ist [sie / er] die Person, der man ansieht, dass sie den Inhalt jeder Mappe kennt, die sie trägt, und nichts davon verraten wird. Wer [ihr / ihm] eine Frage stellt, bekommt eine Antwort, die vollkommen korrekt ist und nichts enthält.
+**Kurzbeschreibung:** Man erkennt [sie / ihn] daran, dass [sie / er] als [Einzige / Einziger] im Raum nie die Stimme hebt. Wenn [sie / er] lächelt, hat [sie / er] vorher entschieden, dass es angebracht ist. Im Raum ist [sie / er] die Person, der man ansieht, dass sie den Inhalt jeder Mappe kennt, die sie trägt, und nichts davon verraten wird. Wer [ihr / ihm] eine Frage stellt, bekommt eine Antwort, die vollkommen korrekt ist und nichts enthält.
 
 ## Seite 1 · Deine Vorgeschichte
 
@@ -21,11 +21,11 @@ Du bist in Ilmenau aufgewachsen, keine zwanzig Kilometer von der Sternwarte entf
 
 Vor zehn Jahren übernahm deine Kanzlei das Mandat der Stiftung. Es war ein Prestigeauftrag, aber kein angenehmer. Sander behandelte Juristen wie Handwerker, die man ruft, wenn etwas tropft. Er unterschrieb, ohne zu lesen, und beschwerte sich dann über das, was er unterschrieben hatte. Trotzdem hast du gelernt, ihn zu lesen: Wenn er leise wurde, meinte er es ernst. Seit drei Wochen trägst du die Abschrift seines Testaments mit dir herum wie etwas, das zu warm ist, um es lange festzuhalten.
 
-Vor drei Wochen wurde er sehr leise. Er bestellte dich an einem Dienstag um zehn Uhr in sein Arbeitszimmer und diktierte dir ein neues Testament. Dabei sah er schlecht aus, grau im Gesicht, und er sagte einen Satz, den du seitdem nicht vergisst: „Ich habe nicht mehr viel Zeit für Ausreden, Frau [Herr] Ritter. Weder für meine noch für die anderer.“
+Vor drei Wochen wurde er sehr leise. Er bestellte dich an einem Dienstag um zehn Uhr in sein Arbeitszimmer und diktierte dir ein neues Testament. Dabei sah er schlecht aus, grau im Gesicht, und er sagte einen Satz, den du seitdem nicht vergisst: „Ich habe nicht mehr viel Zeit für Ausreden, [Frau / Herr] Ritter. Weder für meine noch für die anderer.“
 
 Das neue Testament ist der Grund, warum du heute hier bist. Offiziell bist du als Vertretung der Stiftung zum Jubiläum geladen. Tatsächlich hat Sander dich gebeten, nach seiner Rede um 22:30 mit ihm und seinem Kind zusammenzusitzen. Er wollte, dass du dabei bist, „damit hinterher niemand behauptet, er habe etwas falsch verstanden“.
 
-Die anderen Gäste kennst du aus Akten: Dr. Rademacher aus dem Archiv, mit der [dem] du jedes Jahr die Inventarliste für die Versicherung abzeichnest. Faber von der Haustechnik, dessen Stundenzettel du zweimal zurückgeschickt hast. Falk als großzügigste Förderung der Stiftung, über deren Verträge du wachst. Und Leonie [Leon] Sander, das Kind des Professors, das du heute zum ersten Mal persönlich triffst und dem du gleich nicht in die Augen sehen wirst.
+Die anderen Gäste kennst du aus Akten: Dr. Rademacher aus dem Archiv, mit {R08: der / dem} du jedes Jahr die Inventarliste für die Versicherung abzeichnest. Faber von der Haustechnik, dessen Stundenzettel du zweimal zurückgeschickt hast. Falk, {R10: die großzügigste Förderin / der großzügigste Förderer} der Stiftung, über deren Verträge du wachst. Und {R01: Leonie / Leon} Sander, das Kind des Professors, das du heute zum ersten Mal persönlich triffst und dem du gleich nicht in die Augen sehen wirst.
 
 ## Seite 2 · Deine Kleidung
 
@@ -44,7 +44,7 @@ Die anderen Gäste kennst du aus Akten: Dr. Rademacher aus dem Archiv, mit der [
 ## Seite 3 · Was du weißt
 
 **Dein Abend:**
-- **20:55–21:06** in der Bibliothek, mit Leonie [Leon] Sander. [Sie / Er] fragte direkt, ob es ein neues Testament gibt. Du bist ausgewichen: „Darüber spricht Ihr Vater selbst mit Ihnen.“
+- **20:55–21:06** in der Bibliothek, mit {R01: Leonie / Leon} Sander. {R01: Sie / Er} fragte direkt, ob es ein neues Testament gibt. Du bist ausgewichen: „Darüber spricht Ihr Vater selbst mit Ihnen.“
 - **21:07** durch die Verbindungstür Ost in dein Gästezimmer, um die Abschrift des Testaments zu holen.
 - **21:08** Stromausfall. Die Tür zum Mittelbau ging nicht mehr auf. Du saßt bis **21:20** im Ostflügel fest und hast im Dunkeln gewartet. Niemand kam vorbei.
 - **21:21** zurück in den Mittelbau, danach im Salon.
@@ -59,8 +59,8 @@ Die anderen Gäste kennst du aus Akten: Dr. Rademacher aus dem Archiv, mit der [
 ## Seite 4 · Dein Geheimnis — VERTRAULICH
 
 Das neue Testament, unterschrieben vor drei Wochen:
-- Leonie [Leon] Sander erhält **nur noch den Pflichtteil.**
-- Der Rest geht an die Stiftung, mit einer Auflage: Bei jeder künftigen Ausgabe des Himmelsatlas ist **Dr. [Irene / Ingo] Marwitz als Mitautor(in)** zu nennen.
+- {R01: Leonie / Leon} Sander erhält **nur noch den Pflichtteil.**
+- Der Rest geht an die Stiftung, mit einer Auflage: Bei jeder künftigen Ausgabe des Himmelsatlas ist **Dr. {R02: Irene / Ingo} Marwitz als {R02: Mitautorin / Mitautor}** zu nennen.
 - Der Grund für die Enterbung steht in einem versiegelten Begleitbrief, den du gelesen hast: Sander hatte erfahren, dass sein Kind vor zwei Jahren **seine Unterschrift unter eine Bürgschaft gefälscht** hat.
 
 Du bist an die Schweigepflicht gebunden. Wenn du das Testament jetzt, mitten in einer Mordermittlung, offenlegst, gibst du dem Kind ein Motiv, und dir selbst den Ruf, Mandantengeheimnisse auszuplaudern.
@@ -68,7 +68,7 @@ Du bist an die Schweigepflicht gebunden. Wenn du das Testament jetzt, mitten in 
 ## Seite 4 · Deine Ziele
 
 1. **Persönlich:** Das Testament erst eröffnen, wenn es rechtlich sauber ist. Bis zum Finale soll niemand den Inhalt kennen, es sei denn, du entscheidest dich bewusst dafür.
-2. **Zu einer anderen Person:** Herausfinden, ob Leonie [Leon] Sander von der Enterbung wusste. Wenn ja, ist [sie / er] verdächtig. Wenn nein, verdient [sie / er] es, die Wahrheit von dir zu hören und nicht aus einem Gerücht.
+2. **Zu einer anderen Person:** Herausfinden, ob {R01: Leonie / Leon} Sander von der Enterbung wusste. Wenn ja, ist {R01: sie / er} verdächtig. Wenn nein, verdient {R01: sie / er} es, die Wahrheit von dir zu hören und nicht aus einem Gerücht.
 3. **Zum Fall:** Nicht verdächtigt werden. Auf Sanders Kalender steht heute ein „R.“, und du heißt Ritter.
 
 ## Seite 4 · Deine Spielhinweise
@@ -76,6 +76,6 @@ Du bist an die Schweigepflicht gebunden. Wenn du das Testament jetzt, mitten in 
 - **Phase 1 (Empfang):** Sei höflich und distanziert. Wenn jemand nach dem Testament fragt: „Dazu kann ich nichts sagen.“
 - **Phase 2 (Mord):** Gib dein Alibi genau an. Das Zutrittsprotokoll kommt später und wird dich bestätigen.
 - **Phase 3 (Kalender):** Sobald der Kalender (B5) auf dem Tisch liegt, wirst du angesehen werden. Dein bestes Argument: „Er hat mich nie R. genannt. Schauen Sie auf Dienstag: ‚Kanzlei‘.“
-- **Wen du ansprechen solltest:** Rademacher, wegen der seltsamen Inventarliste aus dem Frühjahr. Und Leonie [Leon] Sander, wegen Ziel 2.
-- **Was du vermeiden solltest:** das Wort „Pflichtteil“ vor dem Finale. Und Marwitz zu früh zu verraten, dass [sie / er] im Testament steht. Das wäre ein Motiv für Marwitz, wenn [sie / er] es vorher wusste – wusste [sie / er] aber nicht.
+- **Wen du ansprechen solltest:** Rademacher, wegen der seltsamen Inventarliste aus dem Frühjahr. Und {R01: Leonie / Leon} Sander, wegen Ziel 2.
+- **Was du vermeiden solltest:** das Wort „Pflichtteil“ vor dem Finale. Und Marwitz zu früh zu verraten, dass {R02: sie / er} im Testament steht. Das wäre ein Motiv für Marwitz, wenn {R02: sie / er} es vorher wusste – wusste {R02: sie / er} aber nicht.
 - **Trumpf:** die Abschrift in deiner Mappe. Spiel sie aus, wenn das Gespräch über Marwitz’ Ansprüche festfährt. Sie beweist, dass Sander seine Schuld eingestehen wollte.

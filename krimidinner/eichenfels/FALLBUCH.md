@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.2 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.3 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach der systematischen Prüfung (Schließanlage, Beweiskette, Klirren, Zeitrahmen) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -29,7 +29,7 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 
 ## 2. Schauplatz
 
-**Sternwarte Eichenfels**, Thüringer Wald, gegründet 1901. Ein Herrenhaus mit Kuppel, heute Sitz einer Stiftung. Samstagabend im November, 125-jähriges Jubiläum. Gegen 21 Uhr zieht ein Unwetter auf, ein umgestürzter Baum blockiert die Zufahrt. Niemand kann das Anwesen verlassen, und die Polizei kommt frühestens im Morgengrauen.
+**Sternwarte Eichenfels**, Thüringer Wald, gegründet 1901. Ein Herrenhaus mit Kuppel, heute Sitz einer Stiftung. Samstagabend im November, 125-jähriges Jubiläum. Gegen 21 Uhr zieht ein Unwetter auf, ein umgestürzter Baum blockiert die Zufahrt. Niemand kann das Anwesen verlassen. Die Polizei meldet sich kurz nach Mitternacht über Funk: Sie kommt im Morgengrauen durch.
 
 ### Grundriss (wird als Beweis B3 ausgeteilt)
 
@@ -47,9 +47,17 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 ```
 
 **Die Schließanlage (wichtig für die Lösung):**
-- Kartenleser an: Verbindungstür West, Verbindungstür Ost, Archiv, Restaurierung. Jede Buchung wird mit Uhrzeit und Karte protokolliert.
-- Die Gäste haben Gästekarten für beide Verbindungstüren und die Gästezimmer. Archiv und Restaurierung öffnen nur die Karten von Sander, Rademacher und Faber.
-- **Bei Stromausfall:** Die Türen im **Westflügel** entriegeln (Brandschutz, offen). Die Türen im **Ostflügel** bleiben verriegelt (Archivschutz). Die Kartenleser protokollieren nichts.
+- Kartenleser an: Verbindungstür West, Verbindungstür Ost, Archiv, Restaurierung. Jede Buchung wird mit Uhrzeit und Karte protokolliert. Kartenraum, Kuppel, Vorratskeller und Servicegang haben **keinen** Kartenleser.
+- Die Gäste haben Gästekarten für beide Verbindungstüren und die Gästezimmer. **Archiv und Restaurierung öffnen nur die Karten von Sander, Rademacher und Faber.**
+- **Bei Stromausfall gibt es drei Zustände:**
+
+| Tür | bei Stromausfall | warum |
+|---|---|---|
+| Verbindungstür West und Flurtüren im Westflügel | **entriegelt**, man kommt frei durch | Fluchtweg (Brandschutz) |
+| Verbindungstür Ost | **verriegelt**, niemand kommt in den Ostflügel hinein oder heraus | Archivschutz |
+| Archiv und Restaurierung | **verriegelt**, auch die berechtigten Karten öffnen nicht | Sammlungsschutz |
+
+- Während des Stromausfalls protokolliert **kein** Kartenleser etwas. Die Hauptverteilung protokolliert ihre eigene Bedienung (B10).
 
 ---
 
@@ -69,18 +77,19 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 | 21:05 | Rademacher geht durch die Verbindungstür West und wartet im dunklen Flur vor dem Kartenraum. |
 | 21:06–21:07 | Faber geht in den Westflügel und meldet sich am Steuerpult der Kuppel an. Dort trifft er Marwitz. |
 | 21:07 | Ritter geht in den Ostflügel, um ihre Abschrift des neuen Testaments zu holen. |
-| **21:08** | **Faber löst am Kuppelpult von Hand eine Stromunterbrechung aus**, um das Protokoll seiner heimlichen Teleskopnutzung zu löschen. Notlicht. Westflügel offen, Ostflügel verriegelt, keine Protokolle. Lindner verlässt den Kartenraum. Im Flur hört sie (er) ein leises Klirren, wie von einer feinen Kette. |
+| **21:08** | **Faber löst am Kuppelpult von Hand eine Stromunterbrechung aus**, um das Protokoll seiner heimlichen Teleskopnutzung zu löschen. Notlicht. Westflügel-Flure offen, Ostflügel, Archiv und Restaurierung verriegelt, keine Protokolle. Lindner verlässt den Kartenraum. Im Flur des 1. OG hört Lindner ein leises metallisches Klirren und sieht am Flurende einen Schatten. |
 | 21:09 | Rademacher betritt den Kartenraum. Sander: „Sie sind früh.“ Das Funkmikrofon verliert die Verbindung, weil Lindner zur Bar geht. |
 | 21:10 | Leonie Sander geht auf die Terrasse und telefoniert (21:11–21:26). Seebach und Falk sitzen im Salon (21:05–21:25). |
 | **ca. 21:12–21:16** | **Sander konfrontiert Rademacher mit der Archivliste. Rademacher schlägt mit dem Messingsockel der Armillarsphäre zu.** Sie trägt ihre weißen Archivhandschuhe, wie immer, wenn sie Sammlungsstücke anfasst. Sie wickelt den Sockel in das Samttuch der Vitrine. |
 | 21:13 | Lindner bestellt an der Bar einen Espresso (Bon 21:13). Hollerbach bedient. |
-| 21:14 | Faber verlässt die Kuppel, um den Strom im Keller wieder einzuschalten. |
-| 21:15 | Hollerbach sieht Leonie Sander durch die Glastür auf der Terrasse telefonieren. Yilmaz geht durch den Servicegang zum Vorratskeller. |
+| 21:14 | Faber verlässt die Kuppel, die Treppe hinunter und durch die (offene) Verbindungstür West in den Mittelbau. |
+| 21:15 | Faber eilt mit Taschenlampe durch die Küche zur Kellertreppe („Gleich ist der Strom wieder da“). Yilmaz und die Aushilfe Jo sehen ihn. Yilmaz geht danach durch den Servicegang zum Vorratskeller. Hollerbach sieht Leonie Sander durch die Glastür auf der Terrasse telefonieren. |
 | 21:16–21:20 | Faber startet die Hauptverteilung neu. Der Schalter muss vier Minuten lang gehalten werden. |
 | **21:20** | **Der Strom ist wieder da. Die Protokolle laufen wieder.** |
-| 21:21 | Ritter kommt aus dem Ostflügel zurück. |
-| **21:22** | **Yilmaz sieht vom Vorratskeller aus jemanden mit einem eingewickelten, schweren Gegenstand am Ende des Servicegangs vorbeigehen, Richtung Restaurierung. Eine Lesebrille an einer Kette klirrt bei jedem Schritt.** Im selben Moment schreibt Yilmaz ihrem Bruder: „hab sie, zwei Flaschen“ (21:22). |
-| **21:24** | **Karte Rademacher: Restaurierung.** Sockel, Tuch, Handschuhe und die acht Originalblätter verschwinden in einer Transportkiste mit der Aufschrift „Leihgabe – Falk Collection“. |
+| 21:21 | Ritter kommt aus dem Ostflügel zurück. Faber meldet sich an der Hauptverteilung ab (B10) und kommt durch die Küche herauf. |
+| 21:22 | Faber im Festsaal: „Sturmschaden, alles wieder in Ordnung.“ Hollerbach und die Gäste im Festsaal sehen ihn. |
+| **21:22** | **Yilmaz sieht vom Vorratskeller aus jemanden mit einem eingewickelten, schweren Gegenstand am Ende des Servicegangs vorbeigehen, Richtung Restaurierung, die Treppe aus dem 1. OG herunter. Bei jedem Schritt ein feines metallisches Klirren.** Das Gesicht sieht Yilmaz nicht. Von 21:15 bis 21:22 war im Gang und vor der Restaurierung niemand. Im selben Moment schreibt Yilmaz dem Bruder: „hab sie, zwei Flaschen“ (21:22). |
+| **21:24** | **Karte Rademacher: Restaurierung.** Sockel, Tuch und Handschuhe verschwinden in einer Transportkiste mit der Aufschrift „Leihgabe – Falk Collection“. Dazu legt Rademacher die acht Originalblätter, die seit Februar im Planschrank der Restaurierung lagen. |
 | 21:26 | Marwitz kommt aus der Kuppel zurück (Verbindungstür West). |
 | 21:27 | Rademacher geht zurück in den Mittelbau. |
 | 21:28 | Yilmaz ist mit zwei Flaschen zurück in der Küche. |
@@ -89,263 +98,30 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 | 21:33 | Hollerbach geht in den Westflügel, um Sander zum Dessert zu holen. |
 | **21:35** | **Hollerbach findet Sander tot im Kartenraum.** |
 
-**Rademachers Lüge:** „Ich war von kurz vor neun bis halb zehn im Archiv. Als der Strom weg war, saß ich fest, der Ostflügel war ja verriegelt.“ Das Zutrittsprotokoll zeigt das Gegenteil: Sie hat das Archiv um 21:03 verlassen, war um 21:05 im Westflügel und um 21:24 in der Restaurierung, und erst um 21:31 ist sie wieder im Archiv.
+**Rademachers Geschichte (die Lüge):** „Wegen des Unwetters wollte ich nach den Leihgaben in der Restaurierung sehen, Feuchtigkeit ist Gift für Papier. Um 21:03 bin ich aus dem Archiv, um 21:05 in den Westflügel. Kurz bevor ich an der Restaurierung war, fiel der Strom aus, die Tür war verriegelt. Ich habe im Dunkeln davor gewartet, unten im Erdgeschoss. Als der Strom zurück war, habe ich die Temperatur geprüft und bin um halb zehn zurück ins Archiv.“
+
+Diese Geschichte **passt zum Zutrittsprotokoll**. Das Protokoll zeigt nur, dass Rademacher zur Tatzeit im Westflügel war, genau wie Marwitz, Faber und Lindner. Gelogen ist zweierlei: Rademacher stand nicht unten vor der Restaurierung, sondern oben im Kartenraum, und ging nicht mit leeren Händen in die Restaurierung. Widerlegt wird beides erst durch die Kombination aus Kalender, Aufnahme, Beobachtung der Küche und Kartenlogik (Abschnitt 6).
 
 ---
 
 ## 4. Die zehn Rollen
 
-Jede Rolle hat eine **Rollenvariante** weiblich oder männlich. Name, Pronomen und Anrede ändern sich, alles andere bleibt gleich. Die Texte der Rollenblätter sind in der Du-Form geschrieben. Andere Personen werden nur mit dem Nachnamen genannt, deshalb passen sie für jede Variante.
-
-Jedes Rollenblatt besteht aus:
-- **Öffentlich:** was alle über dich wissen dürfen, mit einem Kostümtipp
-- **Dein Abend:** wo du wann warst. Du darfst nicht darüber lügen, außer als Täterrolle.
-- **Dein Geheimnis:** darfst du verschweigen
-- **Deine Ziele:** zwei bis drei Ziele, für Punkte am Ende
-- **Was du weißt:** Wissen über andere
-- **Trumpf:** optional, ein Wissen, das du ausspielen kannst, wenn es dir nützt
-
----
-
-### Rolle 1 · Das Kind des Professors
-**Leonie Sander / Leon Sander**, 34, Unternehmensberatung in Leipzig
-
-**Öffentlich:** Das einzige Kind des Professors, nach dem Tod der Mutter vor zwölf Jahren zum Vater auf Abstand gegangen. Gilt als Erbe der Familienvilla und eines Teils des Stiftungsvermögens. *Kostüm: elegant, aber eilig, Handy immer in der Hand.*
-
-**Dein Abend:**
-- 20:55–21:10 in der Bibliothek mit Ritter. Du wolltest wissen, ob es ein neues Testament gibt. Ritter wich aus.
-- 21:10–21:26 auf der Terrasse. Du hast mit einer Freundin (einem Freund) telefoniert, 15 Minuten lang, das steht im Anrufprotokoll deines Handys.
-- 21:27 zurück in den Festsaal.
-
-**Dein Geheimnis:** Vor zwei Jahren hast du die Unterschrift deines Vaters unter eine Bürgschaft für einen Kredit über 40 000 € gesetzt. Das Geschäft ist gescheitert, die Bank will das Geld zurück. Wenn das herauskommt, ist es Urkundenfälschung.
-
-**Deine Ziele:**
-1. Herausfinden, was im neuen Testament steht.
-2. Verhindern, dass die gefälschte Bürgschaft öffentlich wird.
-3. Den Mörder deines Vaters finden – du hast ihn trotz allem geliebt.
-
-**Was du weißt:**
-- Ritter hatte heute einen dicken Umschlag dabei, „Testament – Abschrift“.
-- Dein Vater hat am Telefon letzte Woche gesagt: „Ich habe nicht mehr viel Zeit für Ausreden.“ Du hast das für Sarkasmus gehalten.
-
-**Trumpf:** Hollerbach hat dich um 21:15 auf der Terrasse gesehen. Die Person hat dir durch die Glastür zugenickt.
-
----
-
-### Rolle 2 · Die frühere Forschungspartnerschaft
-**Dr. Irene Marwitz / Dr. Ingo Marwitz**, 61, Astrophysik, emeritiert
-
-**Öffentlich:** Hat vor dreißig Jahren mit Sander an der Sternwarte gearbeitet. Dann der Bruch: Sander bekam die Professur, Marwitz ging nach Schweden. Seit 25 Jahren das erste Mal wieder in Eichenfels. *Kostüm: schlicht, ein alter Universitätsschal.*
-
-**Dein Abend:**
-- 20:49–21:02 im Kartenraum bei Sander. Ihr habt euch angeschrien. Du hast gesagt: „Dann sage ich es heute Abend selbst, vor allen!“
-- 21:03–21:26 in der Kuppel, am alten Refraktor. Um 21:07 kam Faber und hantierte am Steuerpult. Um 21:08 ging das Licht aus. Faber murmelte „So, das war’s“ und ging um 21:14 hinaus. Du bist im Dunkeln geblieben.
-- 21:26 durch die Verbindungstür West zurück in den Mittelbau.
-
-**Dein Geheimnis:** Die Hälfte des Himmelsatlas, die Sternkarten 41–48 der Nordhalbkugel, stammt von dir. Sander hat dich aus dem Vorwort gestrichen. Der Streit heute war die Fortsetzung eines dreißig Jahre alten Streits. Und er hat dir heute etwas Seltsames gesagt: „Die Blätter beweisen es. Wenn ich sie noch habe.“
-
-**Deine Ziele:**
-1. Deine Urheberschaft am Atlas anerkennen lassen, vor allen.
-2. Nicht als Mörderin (Mörder) dastehen, obwohl du allein in der Kuppel warst.
-
-**Was du weißt:**
-- Auf den Originalblättern hattest du damals jede Korrektur mit „I. M.“ abgezeichnet.
-- Faber war um 21:08 am Steuerpult in der Kuppel und hat etwas ausgeschaltet. Der Sturm war das nicht.
-
-**Trumpf:** Faber war von 21:07 bis 21:14 bei dir in der Kuppel. Das entlastet euch beide, aber nur, wenn Faber zugibt, dort am Pult gewesen zu sein.
-
----
-
-### Rolle 3 · Die Kanzlei der Stiftung
-**Johanna Ritter / Johannes Ritter**, 52, Rechtsanwältin (Rechtsanwalt), Notariat Ilmenau
-
-**Öffentlich:** Vertritt seit zehn Jahren die Stiftung und den Professor persönlich. Korrekt, verschwiegen, ein wenig steif. *Kostüm: dunkles Kostüm (dunkler Anzug), Aktentasche, Lesebrille ohne Kette.*
-
-**Dein Abend:**
-- 20:55–21:06 in der Bibliothek mit Leonie Sander. Sie hat nach dem Testament gefragt. Du bist ausgewichen.
-- 21:07 durch die Verbindungstür Ost in dein Gästezimmer, um die Abschrift des Testaments zu holen. Um 21:08 Stromausfall, die Tür zum Mittelbau ging nicht mehr auf. Du saßt bis 21:20 im Ostflügel fest.
-- 21:21 zurück in den Mittelbau, danach im Salon.
-
-**Dein Geheimnis:** Sander hat vor drei Wochen ein neues Testament unterschrieben. Das Kind erhält nur noch den Pflichtteil, der Rest geht an die Stiftung, mit der Auflage, „Dr. Marwitz als Mitautorin des Atlas zu nennen“. Grund für die Enterbung: Sander hatte von der gefälschten Bürgschaft erfahren. Er wollte beides nach der Rede um 22:30 mit dir und seinem Kind besprechen.
-
-**Deine Ziele:**
-1. Das Testament erst eröffnen, wenn es rechtlich sauber ist, nicht mitten in einer Mordermittlung.
-2. Nicht verdächtigt werden. Du heißt Ritter, und auf Sanders Kalender steht ein „R.“.
-
-**Was du weißt:**
-- Sander nannte dich in seinem Kalender **immer „Kanzlei“**, nie „R.“.
-- Der Termin mit dir war um **22:30**, nicht um 21:15.
-
-**Trumpf:** Die Abschrift des Testaments in deiner Tasche, mit dem Satz über Marwitz.
-
----
-
-### Rolle 4 · Die Presse
-**Clara Lindner / Carl Lindner**, 39, freie Journalistin (freier Journalist), recherchiert für ein Magazin
-
-**Öffentlich:** Offiziell „schreibt über das Jubiläum“. *Kostüm: Notizbuch, Blazer, Ansteckmikrofon am Revers (ganz offen).*
-
-**Dein Abend:**
-- 21:03 in den Westflügel. Von 21:04 bis 21:08 Interview mit Sander im Kartenraum.
-- 21:08 Stromausfall. Du gehst hinaus. Im dunklen Flur hörst du ein leises Klirren, wie eine feine Kette, und siehst jemanden am Ende des Flurs. Erkennen konntest du niemanden.
-- 21:10 im Festsaal an der Bar. Hollerbach bringt dir einen Espresso (Bon 21:13).
-
-**Dein Geheimnis:** Du bist unter falschem Vorwand hier. Du recherchierst seit Monaten über Gerüchte zum Atlas. Unter dem Kartentisch hast du ein **zweites Funkmikrofon** versteckt, das weiter aufzeichnet, nachdem du gegangen bist. Die Verbindung riss um 21:09 ab, als du zur Bar gingst.
-
-**Deine Ziele:**
-1. Die Geschichte bekommen, exklusiv.
-2. Verbergen, dass du heimlich aufgezeichnet hast. Das ist strafbar.
-3. Den Fall lösen, denn das wäre die beste Geschichte.
-
-**Was du weißt (deine Aufnahme, Ausschnitt):**
-> SANDER: „… Fragen Sie nach Seite 41. Nach den Inventarnummern. Jemand in diesem Haus hat mich bestohlen, und ich habe es zu spät gemerkt.“
-> SANDER: „Gehen Sie jetzt. Ich erwarte um Viertel nach noch jemanden.“
-> [Tür. Schritte. 21:09:] SANDER: „Sie sind früh.“ [Verbindung abgebrochen.]
-
-**Trumpf:** das Klirren im Flur.
-
----
-
-### Rolle 5 · Die Veranstaltungsleitung
-**Tessa Hollerbach / Tom Hollerbach**, 45, Eventagentur Hollerbach
-
-**Öffentlich:** Organisiert das Jubiläum, seit Wochen im Haus, kennt jeden Gang. *Kostüm: Headset, Klemmbrett, bequeme Schuhe.*
-
-**Dein Abend:**
-- 20:55 Im Westflügel-Flur hörst du Marwitz durch die Tür des Kartenraums: „… dann sage ich es heute Abend selbst, vor allen!“
-- 21:10–21:30 Festsaal, Dessert vorbereiten. 21:13 Espresso für Lindner an der Bar. 21:15 siehst du Leonie Sander durch die Glastür auf der Terrasse telefonieren.
-- 21:33 Westflügel, um Sander zum Dessert zu holen. **21:35 findest du ihn.**
-
-**Dein Geheimnis:** Sander hat dich am Nachmittag gebeten, den Sitzplan zu ändern: **Rademacher sollte neben Falk sitzen.** „Ich will sehen, ob sie sich kennen.“ Sie kannten sich. Falk hat Rademacher beim Hauptgang mit dem Vornamen angesprochen, und Rademacher hat ihn unter dem Tisch angestoßen.
-
-**Deine Ziele:**
-1. Herausfinden, warum Sander diese Begegnung wollte.
-2. Den Abend retten. Die Agentur braucht diesen Auftrag, also kein Skandal, der an dir hängen bleibt.
-
-**Was du weißt:**
-- Die Armillarsphäre stand in der Vitrine im Kartenraum, mit einem Samttuch bedeckt. Beides ist weg.
-- Rademacher trägt bei der Arbeit immer weiße Baumwollhandschuhe. Beim Dinner hatte sie (er) welche in der Jackentasche.
-
-**Trumpf:** der geänderte Sitzplan, mit Sanders Notiz am Rand: „R. neben F.“
-
----
-
-### Rolle 6 · Die Küchenleitung
-**Mina Yilmaz / Emre Yilmaz**, 37, Küchenchefin (Küchenchef) vom Landgasthof „Zum Kauz“
-
-**Öffentlich:** Kocht heute für 30 Personen. Seit drei Jahren für jedes Fest der Sternwarte gebucht. *Kostüm: Kochjacke, Geschirrtuch über der Schulter.*
-
-**Dein Abend:**
-- Bis 21:15 in der Küche.
-- 21:15–21:28 durch den Servicegang zum Vorratskeller im Westflügel.
-- **21:22** Vom Vorratskeller aus siehst du am Ende des Servicegangs jemanden vorbeigehen, Richtung Restaurierung. Im Arm etwas Schweres, in ein dunkles Tuch gewickelt. Das Gesicht hast du nicht gesehen. Aber eine **Lesebrille an einer Kette** klirrte bei jedem Schritt. Du weißt die Uhrzeit genau: Du hast deinem Bruder in dem Moment geschrieben.
-- 21:28 zurück in der Küche, mit zwei Flaschen.
-
-**Dein Geheimnis:** Du hast zwei Flaschen 1990er Riesling aus dem Vorratskeller der Stiftung genommen, für die Hochzeit deines Bruders. Die Nachricht um 21:22: „hab sie, zwei Flaschen“. Wenn das herauskommt, verlierst du den Auftrag.
-
-**Deine Ziele:**
-1. Den Diebstahl geheim halten – oder ihn selbst zugeben, bevor es jemand anderes tut.
-2. Dafür sorgen, dass deine Beobachtung zählt, auch wenn du sie erst spät erzählst.
-
-**Was du weißt:** Die Aushilfe Jo hat gesehen, dass du um 21:28 mit zwei Flaschen und sonst nichts zurückkamst.
-
-**Trumpf:** die Nachricht an deinen Bruder, mit Zeitstempel 21:22.
-
----
-
-### Rolle 7 · Die ärztliche Vertrauensperson
-**Dr. Nina Seebach / Dr. Nils Seebach**, 58, Internistin (Internist) in Ilmenau
-
-**Öffentlich:** Seit 20 Jahren Sanders Ärztin (Arzt) und Freundin (Freund) des Hauses. Hat nach dem Fund die erste Untersuchung gemacht. *Kostüm: Abendgarderobe, Arzttasche im Auto.*
-
-**Dein Abend:**
-- 21:05–21:25 im Salon mit Falk. Falk hat viel über alte Bücher geredet und auffällig oft auf das Handy geschaut.
-- 21:37 an den Tatort gerufen.
-
-**Dein Geheimnis:** Sander war schwer herzkrank, mit einer Prognose von Monaten. Er nahm einen starken Blutverdünner. Er hat dich gebeten, niemandem etwas zu sagen, auch nicht seinem Kind. Deshalb wollte er heute „aufräumen“.
-
-**Deine Ziele:**
-1. Die Schweigepflicht wahren, solange es geht.
-2. Trotzdem zur Aufklärung beitragen. Du weißt Dinge, die sonst niemand weiß.
-
-**Was du weißt (ärztlich):**
-- Todeszeit zwischen **21:10 und 21:25**. Ein einzelner, sehr heftiger Schlag von hinten mit einem schweren, kantigen Gegenstand.
-- Wegen des Blutverdünners hat die Wunde stark geblutet. **Wer zugeschlagen hat, muss Blut an den Händen oder Ärmeln gehabt haben.** Niemand im Haus hatte sichtbare Flecken, also hat die Person Handschuhe getragen oder sich umgezogen.
-
-**Trumpf:** Falks Alibi: Ihr wart von 21:05 bis 21:25 zusammen.
-
----
-
-### Rolle 8 · Die Archivleitung — TÄTERROLLE
-**Dr. Judith Rademacher / Dr. Julius Rademacher**, 49, Leiterin (Leiter) von Archiv und Sammlung
-
-**Öffentlich:** Hüterin (Hüter) des Himmelsatlas und der historischen Instrumente. Gründlich, freundlich, unauffällig. *Kostüm: dunkles Jackett, **Lesebrille an einer feinen Kette**, weiße Baumwollhandschuhe in der Brusttasche.*
-
-**Was du wirklich getan hast:**
-- Seit einem Jahr hast du die Sternkarten 41–48 aus dem Atlas gegen hochwertige Kopien getauscht und in der Archivliste die Inventarnummern angepasst („Abgleich: J. R.“). Falk will die Originale für 180 000 € kaufen. Abholung morgen 8 Uhr, in einer Transportkiste „Leihgabe – Falk Collection“.
-- Heute Nachmittag sagte Sander zu dir: „Kommen Sie um Viertel nach neun in den Kartenraum. Bringen Sie die Archivliste mit.“
-- 21:03 Archiv verlassen, 21:05 durch die Verbindungstür West. Du hast im Flur gewartet, bis Lindner rauskam.
-- 21:09 im Kartenraum. Sander hielt dir die Archivliste hin und sagte, um 22 Uhr erfahren es alle, und morgen die Polizei. Du hast die Handschuhe angezogen, als wolltest du die Blätter zeigen. Dann hast du den Sockel der Armillarsphäre genommen.
-- Du hast den Sockel in das Samttuch der Vitrine gewickelt und gewartet, bis der Strom wieder da war. Um 21:22 bist du am Servicegang vorbei in die Restaurierung gegangen (Karte 21:24). Kiste, Handschuhe hinein, Deckel zu.
-- 21:27 zurück in den Mittelbau, 21:29 SMS an Falk, 21:31 wieder im Archiv.
-
-**Deine Geschichte (die du erzählst):** „Ich war ab kurz vor neun im Archiv und habe die Leihgaben für morgen geprüft. Als der Strom ausfiel, saß ich fest, der Ostflügel verriegelt ja. Um halb zehn kam ich wieder raus.“
-
-**Deine Ziele:**
-1. Nicht überführt werden.
-2. Den Verdacht auf Marwitz (Motiv, Streit, allein in der Kuppel) oder Faber (Stromausfall) lenken.
-3. Die Kiste darf nicht geöffnet werden, bevor Falk sie morgen abholt.
-
-**Regeln für dich:** Du darfst lügen, auch über deinen Aufenthaltsort. Lege aber keine Beweisstücke vor, die es nicht gibt, und behaupte nichts, was einem ausgeteilten Beweis direkt widerspricht, ohne eine Erklärung parat zu haben. Wirst du mit dem Zutrittsprotokoll konfrontiert, darfst du improvisieren. Ein gutes Spiel braucht eine gute Verteidigung.
-
-**Was du über andere weißt:** Marwitz hat Sander heute angeschrien. Faber hat sich vor dem Stromausfall in den Westflügel geschlichen. Ritter hat ein „R.“ im Namen, genau wie du.
-
----
-
-### Rolle 9 · Die technische Leitung
-**Paula Faber / Pascal Faber**, 42, Haustechnik und Kuppel
-
-**Öffentlich:** Kümmert sich um Strom, Heizung, Kuppel und Teleskop. Hat den „Sturmschaden“ um 21:20 behoben. *Kostüm: Arbeitsweste über dem Hemd, Taschenlampe.*
-
-**Dein Abend:**
-- 21:06 Verbindungstür West, 21:07 am Steuerpult der Kuppel angemeldet. Marwitz saß dort im Halbdunkel am alten Refraktor.
-- **21:08 hast du die Stromunterbrechung selbst ausgelöst**, mit dem Not-Aus am Kuppelpult.
-- 21:14 aus der Kuppel. 21:16–21:20 im Keller an der Hauptverteilung. Den Neustart-Schalter muss man vier Minuten gedrückt halten. Um 21:20 war der Strom wieder da.
-
-**Dein Geheimnis:** Seit einem Jahr nutzt du das große Teleskop nachts heimlich für Astrofotos, die du unter eigenem Namen verkaufst. Sander hatte es verboten. Heute lief seit 20 Uhr eine automatische Aufnahme, und Sander wollte nach der Rede „die Kuppel prüfen“. Der Not-Aus löscht das Nutzungsprotokoll des Teleskops. Der Sturm war eine praktische Ausrede.
-
-**Deine Ziele:**
-1. Das Teleskop-Geheimnis bewahren.
-2. Nicht als Mörder (Mörderin) gelten, nur weil der Stromausfall „zufällig“ zur Tatzeit kam.
-
-**Was du weißt:**
-- Die Schließanlage: Bei Stromausfall ist der Westflügel offen und der Ostflügel verriegelt. **Wer im Ostflügel war, kam zwischen 21:08 und 21:20 nicht heraus.**
-- Archiv und Restaurierung öffnen nur drei Karten: Sanders, Rademachers und deine.
-
-**Trumpf:** Marwitz war von 21:07 bis 21:14 in der Kuppel. Das entlastet euch beide, aber dann musst du zugeben, dass du am Pult warst.
-
----
-
-### Rolle 10 · Der private Sammler
-**Eva Falk / Egon Falk**, 66, Unternehmerin (Unternehmer), Sammlung historischer Instrumente
-
-**Öffentlich:** Großzügige Förderin (großzügiger Förderer) der Sternwarte, hat die Restaurierung der Kuppel bezahlt. *Kostüm: teurer Schal, Siegelring.*
-
-**Dein Abend:**
-- Beim Dinner neben Rademacher. Du hast dich verplappert und ihn (sie) beim Vornamen genannt.
-- 21:05–21:25 im Salon mit Seebach.
-- **21:29 SMS von Rademacher:** „Keine Rede um 22 Uhr. Abholung morgen 8 Uhr wie vereinbart. – J.“
-
-**Dein Geheimnis:** Du hast mit Rademacher den Kauf von acht Originalblättern des Atlas für 180 000 € vereinbart. Dir war klar, dass das nicht ganz sauber ist. Aber vom Mord weißt du nichts. Die SMS macht dir seit 21:29 Angst.
-
-**Deine Ziele:**
-1. Deine Beteiligung am Handel vertuschen.
-2. Herausfinden, ob du einem Mörder (einer Mörderin) Geld geben wolltest.
-3. Wenn es eng wird: lieber als Zeuge (Zeugin) auftreten als als Mittäter (Mittäterin).
-
-**Was du weißt:** Die Transportkiste für die Abholung steht in der Restaurierung, beschriftet „Leihgabe – Falk Collection“.
-
-**Trumpf:** die SMS von 21:29.
+Jede Rolle hat eine **Rollen-ID** (R01–R10) und zwei **Rollenvarianten**, weiblich oder männlich. Nur Name, Anrede und Pronomen wechseln, Wissen, Geheimnisse und Lösung bleiben gleich. **Maßgeblich sind die Rollenblätter in `rollen/`.** Diese Übersicht wiederholt nur das Nötigste, damit Fallbuch und Rollenblätter nicht auseinanderlaufen.
+
+| ID | Rolle | weiblich / männlich | Geheimnis (Kurzform) | klirrt? | Datei |
+|---|---|---|---|---|---|
+| R01 | Das Kind des Professors | Leonie / Leon Sander | gefälschte Bürgschaft | – | `R01-familie.md` |
+| R02 | Die frühere Forschungspartnerschaft | Dr. Irene / Dr. Ingo Marwitz | Mitautorschaft am Atlas | – | `R02-forschung.md` |
+| R03 | Die Kanzlei der Stiftung | Johanna / Johannes Ritter | neues Testament | – | `R03-kanzlei.md` |
+| R04 | Die Presse | Clara / Carl Lindner | heimliche Aufnahme | – | `R04-presse.md` |
+| R05 | Die Veranstaltungsleitung | Tessa / Tom Hollerbach | geänderter Sitzplan | – | `R05-veranstaltung.md` |
+| R06 | Die Küchenleitung | Mina / Emre Yilmaz | Weindiebstahl | – | `R06-kueche.md` |
+| R07 | Die ärztliche Vertrauensperson | Dr. Nina / Dr. Nils Seebach | Sanders Krankheit | – | `R07-arzt.md` |
+| **R08** | **Die Archivleitung – Täterrolle** | **Dr. Judith / Dr. Julius Rademacher** | **Diebstahl der Blätter, Mord** | **Brillenkette** | `R08-archiv.md` |
+| R09 | Die technische Leitung | Paula / Pascal Faber | heimliche Teleskopnutzung, Not-Aus | Schlüsselbund | `R09-technik.md` |
+| R10 | Die private Sammlung | Eva / Egon Falk | Kauf der Blätter | Kettenarmband / Uhrkette | `R10-sammler.md` |
+
+**Schreibweise in den Rollenblättern:** `[weiblich / männlich]` bezieht sich auf die **eigene** Rolle. `{R03: die / der}` bezieht sich auf die Variante einer **anderen** Rolle (hier R03). Beim Erzeugen der Blätter wird jede Klammer nach der Variante der genannten Rolle aufgelöst.
 
 ---
 
@@ -385,7 +161,7 @@ Karten 41–48: Die Inventarnummern wurden im Februar von `HA-1901-041` usw. auf
 **B7 · Fund unter dem Kartentisch**
 Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner besetzt, entscheidet Lindner, ob und wann die Aufnahme auf den Tisch kommt. Ist Lindner nicht besetzt, gibt die Spielleitung in Runde 3 die Abschrift frei.)*
 
-**B8 · Seebachs Nachtrag** *(nur, falls Seebach nicht besetzt ist)*: Blutverdünner, starke Blutung, „Wer zuschlug, hatte Blut an Händen oder Ärmeln, oder trug Handschuhe.“
+**B8 · Seebachs Nachtrag** *(nur, falls Seebach nicht besetzt ist)*: Blutverdünner, starke Blutung, „Wer zuschlug, hatte Blut an Händen oder Ärmeln, oder trug Handschuhe.“ Und: „Ich saß von 21:05 bis 21:25 mit Falk im Salon.“
 
 ### Runde 3 · die letzte Ermittlung (Phase 4)
 
@@ -411,10 +187,10 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 | 21:33 | Hollerbach | Verbindungstür West |
 
 **B10 · Technikprotokoll der Hauptverteilung**
-„21:07 Anmeldung Kuppelpult: Karte Faber · **21:08 Unterbrechung ausgelöst: NOT-AUS Kuppelpult (manuell)** · 21:16 Neustart eingeleitet, Hauptverteilung Keller (Schalter halten, 4 Min.) · 21:20 Neustart abgeschlossen. Teleskop: Nutzungsprotokoll gelöscht (Not-Aus).“ *Kein Sturm: Der Stromausfall wurde von Hand ausgelöst.*
+„21:07 Anmeldung Kuppelpult: Karte Faber · **21:08 Unterbrechung ausgelöst: NOT-AUS Kuppelpult (manuell)** · 21:16 Neustart eingeleitet, Hauptverteilung Keller (Schalter halten, 4 Min.) · 21:20 Neustart abgeschlossen · 21:21 Abmeldung Hauptverteilung: Karte Faber. Teleskop: Nutzungsprotokoll gelöscht (Not-Aus).“ *Kein Sturm: Der Stromausfall wurde von Hand ausgelöst.*
 
 **B11 · Aussage aus der Küche** *(die Aushilfe Jo, falls Yilmaz nicht besetzt ist oder bis Runde 3 nichts gesagt hat)*
-„Mina (Emre) war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller, glaube ich. Hinterher hat sie (er) erzählt, da sei jemand mit einem Paket im Arm vorbeigegangen, so gegen zwanzig nach. Mit Brille an einer Kette. Mehr weiß ich nicht.“
+„Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Kurz nach zwanzig nach kam er wieder hoch und ging in den Festsaal. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, da unten sei die ganze Zeit keine Menschenseele gewesen, und dann, so gegen zwanzig nach, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
 
 **B12 · Lindners Aufnahme, Abschrift** *(falls nicht schon von Lindner vorgelegt)*: wie auf dem Rollenblatt von Lindner.
 
@@ -430,32 +206,50 @@ Darin: der Messingsockel, eingewickelt in das Samttuch, mit Blut. Ein Paar weiß
 
 ## 6. Die Lösung und warum sie eindeutig ist
 
-### Die Beweiskette gegen Rademacher (drei Glieder, jedes für sich harmlos)
+### Kein einzelner Beweis löst den Fall
 
-1. **Rademacher lügt über den Aufenthaltsort.** Das Zutrittsprotokoll (B9) zeigt: Archiv verlassen um 21:03, Westflügel um 21:05, zurück im Archiv erst um 21:31. Die Geschichte „Ich saß im Ostflügel fest“ ist unmöglich. Nach der Regel darf nur die Täterrolle über den Aufenthaltsort lügen.
-2. **Rademacher war die verabredete Person.** Der Kalender (B5) nennt „21:15 R. – Liste mitbringen!“. Die Kanzlei heißt bei Sander immer „Kanzlei“, und der Termin mit ihr war um 22:30. Die Liste ist die Archivliste (B6), abgezeichnet „J. R.“. Sander sagt in der Aufnahme (B12) „Ich erwarte um Viertel nach noch jemanden“ und um 21:09 „Sie sind früh“. Wer früh kam, war schon im Westflügel. Ritter war ab 21:07 im verriegelten Ostflügel eingeschlossen (B3, B9).
-3. **Rademacher hat die Tatwaffe weggebracht.** Um 21:22 trägt jemand mit Lesebrille an einer Kette etwas Schweres in Richtung Restaurierung (Yilmaz / B11). Um 21:24 öffnet Rademachers Karte die Restaurierung (B9). Nur drei Karten öffnen diese Tür (B3), und es war Rademachers.
+| Beweis | was er allein zeigt | warum das nicht reicht |
+|---|---|---|
+| B9 Zutrittsprotokoll | Rademacher war 21:05–21:27 im Westflügel | Marwitz, Faber und Lindner auch. Rademachers Geschichte passt zum Protokoll. |
+| B5 Kalender „21:15 R.“ | Sander erwartete jemanden mit R. | Ritter und Rademacher, beide „J. R.“ (B6) |
+| B12 „Sie sind früh“ | Der Besuch kam um 21:09, früher als verabredet | nennt keinen Namen |
+| B11 / Yilmaz | Jemand trug um 21:22 etwas Schweres zur Restaurierung, es klirrte | kein Gesicht. Drei Rollen klirren (R08, R09, R10). |
+| Seebach / B8 | Der Täter trug Handschuhe oder zog sich um | Handschuhe kann jeder anziehen |
 
-**Motiv:** Archivliste (B6) und Sitzplan (Hollerbach), dazu die SMS (Trumpf Falk): der Verkauf der Originalblätter an Falk.
-**Ergänzend:** Seebach (Blut und Handschuhe) und Hollerbach (Rademacher trägt immer weiße Handschuhe bei sich).
+### Die Beweiskette gegen Rademacher
+
+1. **Die verabredete Person war Rademacher.** Kalender (B5): „21:15 R. – Liste mitbringen!“. Die Kanzlei heißt bei Sander immer „Kanzlei“, ihr Termin war um 22:30. Ritter war außerdem ab 21:07 im verriegelten Ostflügel eingeschlossen (B3, B9). „Liste“ meint die Archivliste (B6). Um 21:09 kam der Besuch „früh“ (B12). Im Westflügel waren zu dieser Zeit nur Marwitz und Faber (zusammen in der Kuppel, B10 plus ihre Aussagen), Lindner (gerade gegangen) und Rademacher (seit 21:05, B9).
+2. **Rademacher hat die Tatwaffe in die Restaurierung gebracht.** Um 21:22 trägt jemand etwas Schweres, Klirrendes zur Restaurierung (B11 / Yilmaz). Um 21:24 öffnet sie eine Karte (B9). Die Tür öffnen nur drei Karten (B3): Sanders (tot), Fabers (Faber ist um 21:22 im Festsaal, B11) und Rademachers. Es war Rademachers Karte.
+3. **Rademachers Geschichte ist gelogen.** Rademacher sagt, sie (er) habe 21:08–21:20 unten vor der Restaurierung gewartet. Yilmaz war ab 21:15 genau dort und hat bis 21:22 niemanden gesehen (B11). Und Rademacher behauptet, mit leeren Händen in die Restaurierung gegangen zu sein. Nach Regel 2 darf nur die Täterrolle über Aufenthalt und Handlungen lügen.
+
+**Motiv:** Archivliste „J. R.“ (B6), die Bitte an Ritter, die Versicherungsliste ohne die Karten 41–48 zu unterschreiben (R03), der Sitzplan „R. neben F.“ (R05), die SMS an Falk (Trumpf R10).
+**Stützend:** Blut und Handschuhe (B8 / R07) und Rademachers weiße Archivhandschuhe (R05).
+
+Für die Lösung genügen die Glieder 1 und 2. Glied 3 überführt Rademacher endgültig, auch für Spielende, die Regel 2 nicht im Kopf haben.
 
 ### Warum es niemand anderes war
 
-| Rolle | Motiv | Gelegenheit | Was entlastet (auch ohne Trumpfkarten) |
-|---|---|---|---|
-| 1 Leonie (Leon) Sander | Testament, Bürgschaft | keine | Kein Weg in die Restaurierung (keine Karte), keine Kette. Mit Trumpf: Hollerbach sieht sie um 21:15 auf der Terrasse, Anrufprotokoll 21:11–21:26. |
-| 2 Marwitz | Urheberschaft, Streit | allein in der Kuppel, Westflügel | Keine Karte für die Restaurierung (B3), keine Brille an einer Kette. „Sie sind früh“ (B12) passt nicht auf jemanden, der eben erst im Streit gegangen ist. Mit Trumpf: Faber war 21:07–21:14 bei ihr in der Kuppel. |
-| 3 Ritter | „R.“ im Kalender, Testament | keine | 21:07–21:20 im verriegelten Ostflügel (B3, B9). „Kanzlei“ statt „R.“ (B5). |
-| 4 Lindner | letzte Person bei Sander | kurz | Sander lebte nach Lindners Weggang (B12). Bon an der Bar 21:13 (Hollerbach). Keine Karte für die Restaurierung. |
-| 5 Hollerbach | keines | keine | Festsaal 21:10–21:30, Zeugin für Lindner und Leonie. Findet die Leiche um 21:35 (B9: 21:33 West). |
-| 6 Yilmaz | keines | Servicegang 21:15–21:28 | Keine Karte für die Restaurierung. Kam mit zwei Flaschen und sonst nichts zurück (B11). |
-| 7 Seebach | keines | keine | Salon 21:05–21:25 mit Falk. |
-| 9 Faber | Teleskop | Stromausfall von Hand (B10) | 21:16–21:20 Schalter in der Hauptverteilung halten (B10), vorher mit Marwitz in der Kuppel. Ist um 21:24 nicht im Protokoll. |
-| 10 Falk | Handel | keine | Salon 21:05–21:25 mit Seebach. Mitwisser des Handels, nicht des Mordes. |
+| Rolle | Motiv | Gelegenheit | Was entlastet | Quelle |
+|---|---|---|---|---|
+| R01 Leonie / Leon Sander | Testament, Bürgschaft | keine im Westflügel belegt | keine Karte für die Restaurierung. Mit Trumpf: Hollerbach sieht {R01: sie / ihn} um 21:15 auf der Terrasse, Anrufprotokoll 21:11–21:26 | B3 · R05 |
+| R02 Marwitz | Urheberschaft, Streit | allein in der Kuppel 21:14–21:26 | **kein vollständiges Alibi** (bewusst). Keine Karte für die Restaurierung, hätte die Tatwaffe nicht um 21:24 dorthin bringen können. Kein „R.“. Bis 21:14 mit Faber (Aussage beider, Fabers Anwesenheit belegt B10) | B3 · B9 · B10 |
+| R03 Ritter | „R.“ im Kalender, Testament | keine | 21:07–21:20 im verriegelten Ostflügel. „Kanzlei“ statt „R.“ | B3 · B5 · B9 |
+| R04 Lindner | als Letzte(r) offiziell bei Sander | 21:04–21:08 | Sander lebte nach Lindners Weggang („Sie sind früh“). Keine Karte für die Restaurierung. Espresso 21:13 (R05) | B12 · B3 |
+| R05 Hollerbach | keines | keine | Festsaal 21:10–21:30, vor Zeugen | Rollen R01, R04 |
+| R06 Yilmaz | keines | Westflügel EG 21:15–21:28 | keine Karte für die Restaurierung. Kam mit zwei Flaschen und sonst nichts zurück | B11 |
+| R07 Seebach | keines | keine | Salon 21:05–21:25 mit Falk | B8 |
+| R09 Faber | Teleskop | Stromausfall von Hand | lückenlos: 21:07–21:14 Kuppel (mit Marwitz), 21:15 Küche (Jo), 21:16–21:21 Hauptverteilung, 21:22 Festsaal | B10 · B11 |
+| R10 Falk | Handel | keine | Salon 21:05–21:25 mit Seebach. Mitwisser des Handels, nicht des Mordes | B8 |
 
-**Probe:** Das Spiel wurde in Gedanken für 4 Personen (2, 8, 9, 10) durchgespielt. B5, B6, B9, B10, B11 und B12 kommen dann alle von der Spielleitung und reichen für alle drei Glieder der Kette. Die Entlastung von Marwitz und Faber steht in B10 und B12. **Diese Probe muss beim ersten echten Testabend wiederholt werden.**
+### Probe für 4 Personen (R02, R08, R09, R10, alle anderen sind Nebenfiguren)
 
----
+Die Spielleitung gibt frei: B1–B6, B7, B8 (Seebach fehlt), B9, B10, B11 (Yilmaz fehlt), B12 (Lindner fehlt).
+- Glied 1: B5 + B3 + B9 (Ritter im Ostflügel) + B12 + B9 (wer um 21:09 im Westflügel war). ✓
+- Glied 2: B11 + B9 + B3 + B11 (Faber um 21:22 oben). ✓
+- Glied 3: B11 („keine Menschenseele“) gegen Rademachers eigene Geschichte. ✓
+- Faber entlastet: B10 + B11. Falk entlastet: B8. Marwitz: nicht vollständig, aber ohne Karte. ✓
+
+**Diese Probe muss beim ersten echten Testabend wiederholt werden.**
 
 ## 7. Ablauf und Vorlesetexte der Spielleitung
 
@@ -477,23 +271,23 @@ Beweise B1–B4 freigeben. **Runde der Alibis:** Jede Person sagt, wo sie zwisch
 
 ### Phase 3 · Geheimnisse und Intrigen (ca. 30 Min.)
 
-> **Vorlesen:** „Im Kartenraum finden sich Spuren, die nicht zu einem Unfall passen. Im Papierkorb des Archivs liegen Papierfetzen. Und unter dem Kartentisch klebt etwas, das dort nicht hingehört.“
+> **Vorlesen:** „Es ist gegen halb elf. Im Kartenraum finden sich Spuren, die nicht zu einem Unfall passen. Im Papierkorb des Archivs liegen Papierfetzen. Und unter dem Kartentisch klebt etwas, das dort nicht hingehört.“
 
-Beweise B5–B7 (und B8, wenn Seebach nicht besetzt ist) freigeben. Freies Gespräch: befragen, Bündnisse schließen, Trumpfkarten ausspielen.
+Beweise B5–B7 (und B8, wenn Seebach nicht besetzt ist) freigeben. *Spielzeit im Fall: gegen halb elf.* Freies Gespräch: befragen, Bündnisse schließen, Trumpfkarten ausspielen.
 
 ### Phase 4 · Die letzte Ermittlung (ca. 25 Min.)
 
-> **Vorlesen:** „Kurz nach Mitternacht gelingt es Faber (oder: der Haustechnik), den Server im Keller auszulesen. Das Zutrittsprotokoll des Abends liegt auf dem Tisch. Und in der Küche erzählt die Aushilfe Jo, was ihr seltsam vorkam.“
+> **Vorlesen:** „Gegen halb zwölf gelingt es Faber (oder: der Haustechnik), den Server im Keller auszulesen. Das Zutrittsprotokoll des Abends liegt auf dem Tisch. Und in der Küche erzählt die Aushilfe Jo, was ihr seltsam vorkam.“
 
 Beweise B9–B11 (und B12, falls noch nicht vorgelegt) freigeben.
 
 ### Finale · Anklage und Auflösung (15–30 Min.)
 
-> **Vorlesen:** „Das Morgengrauen ist nah. Bevor die Polizei kommt, sagt jede und jeder von Ihnen, was er glaubt: Wer hat Theodor Sander getötet? Warum? Und welcher Beweis überführt die Person?“
+> **Vorlesen:** „Kurz nach Mitternacht meldet sich die Polizei über Funk: Im Morgengrauen ist die Zufahrt frei. Bevor sie kommt, sagt jede und jeder von Ihnen, was er glaubt: Wer hat Theodor Sander getötet? Warum? Und welcher Beweis überführt die Person?“
 
 Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danach legt die Täterrolle ihr Rollenblatt offen. Die Spielleitung gibt B13 und B14 frei und liest die Auflösung vor.
 
-> **Vorlesen (Auflösung):** „Dr. Rademacher hat das Archiv um 21:03 verlassen, nicht um halb zehn. Um 21:09 betrat sie (er) den Kartenraum – ‚Sie sind früh‘, sagte Sander. Er hielt ihr die Archivliste hin: acht Sternkarten, gegen Kopien getauscht, verkauft an Falk. Rademacher zog die weißen Handschuhe an, als wolle sie die Blätter zeigen – und griff nach dem Sockel der Armillarsphäre. Um 21:22 trug sie ihn, eingewickelt in das Samttuch, an der Küche vorbei. Um 21:24 öffnete ihre Karte die Restaurierung. – In der Kiste liegen nicht nur die Tatwaffe und die Handschuhe, sondern auch die acht Originalblätter. Am Rand jeder Karte stehen zwei Buchstaben: I. M. Sander wollte heute Abend zwei Wahrheiten erzählen. Die zweite betraf ihn selbst. Der Mord sollte eine Lüge verdecken – die auf einer anderen Lüge gebaut war.“
+> **Vorlesen (Auflösung):** „Dr. Rademacher hat das Archiv um 21:03 verlassen, um 21:05 den Westflügel betreten – und nicht, wie behauptet, unten vor der Restaurierung gewartet. Rademacher stand oben im dunklen Flur vor dem Kartenraum, bis Lindner herauskam. Um 21:09 trat {R08: sie / er} ein – ‚Sie sind früh‘, sagte Sander. Er hielt {R08: ihr / ihm} die Archivliste hin: acht Sternkarten, gegen Kopien getauscht, verkauft an Falk. Rademacher zog die weißen Handschuhe an, als wolle {R08: sie / er} die Blätter zeigen – und griff nach dem Sockel der Armillarsphäre. Bis der Strom zurückkam, blieb {R08: sie / er} im Dunkeln beim Toten. Um 21:22 trug {R08: sie / er} den Sockel, eingewickelt in das Samttuch, die Treppe hinunter, die Brillenkette klirrte bei jedem Schritt. Um 21:24 öffnete die Karte die Restaurierung. – In der Kiste liegen nicht nur die Tatwaffe und die Handschuhe, sondern auch die acht Originalblätter. Am Rand jeder Karte stehen zwei Buchstaben: I. M. Sander wollte heute Abend zwei Wahrheiten erzählen. Die zweite betraf ihn selbst. Der Mord sollte eine Lüge verdecken – die auf einer anderen Lüge gebaut war. Und den anonymen Brief an die Presse, vor sechs Monaten, hat Theodor Sander selbst geschrieben.“
 
 ### Punkte (optional)
 
@@ -501,7 +295,7 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 |---|---|
 | Täter richtig | 3 |
 | Motiv richtig | 1 |
-| Entscheidender Beweis genannt (B9, B5 mit „Kanzlei“, B11) | 1 |
+| Entscheidender Beweis genannt (Glied 1 oder 2 aus Abschnitt 6) | 1 |
 | Jedes erreichte eigene Ziel | 1 |
 | Täterrolle: niemand oder nur eine Minderheit klagt richtig an | 4 |
 
@@ -535,11 +329,11 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 | Bestandteil | Festlegung |
 |---|---|
 | Umfang | vier Seiten je Rolle: 1 Charakter und Vorgeschichte · 2 Kleidung · 3 Was du weißt · 4 vertraulich: Geheimnis, Ziele, Spielhinweise |
-| Varianten | weiblich und männlich, eine Rollen-ID (R01–R10), nur Name, Anrede und Pronomen wechseln |
+| Varianten | weiblich und männlich, eine Rollen-ID (R01–R10), nur Name, Anrede und Pronomen wechseln. `[w / m]` = eigene Rolle, `{Rxx: w / m}` = andere Rolle |
 | Charakterbeschreibung | ca. 100–150 Wörter: Name, Alter, Beruf, Beziehung zum Opfer, Eigenschaften, Kurzbeschreibung |
 | Vorgeschichte | ca. 300–400 Wörter, mit Verbindungen zu den anderen Gästen |
 | Kleidung | gemeinsames Grundbild für beide Varianten (gleicher Status, gleiche Persönlichkeit), konkrete Teile je Variante, Hinweis „niemand muss etwas kaufen“ |
-| Requisit | mindestens eines mit Spielrelevanz. **Nur R08 trägt eine Lesebrille an einer Kette.** |
+| Requisit | mindestens eines mit Spielrelevanz. **Drei Rollen tragen etwas, das beim Gehen klirrt:** R08 Brillenkette, R09 Schlüsselbund, R10 Kettenarmband bzw. Uhrkette. Alle anderen tragen nichts Klirrendes und keine Brille an einer Kette. |
 | Was du weißt | Abend minutengenau, Wissen über andere, was du sagen darfst |
 | Geheimnis | eigene vertrauliche Seite. Bei R08 zusätzlich Tat, Lüge und Verteidigungsstrategie |
 | Ziele | genau drei: persönlich · zu einer anderen Person · zum Fall |
@@ -555,7 +349,7 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 | Regel 2 | Ja, in der Fassung oben. |
 | Ton | Ernst, atmosphärisch, subtil ironisch. |
 | Hinweis Inventarliste (aus R03) | Freigegeben, siehe unten. Er reicht allein nie zur Überführung. |
-| Punkte am Ende | offen |
+| Punkte am Ende | Vorschlag in Abschnitt 7, Entscheidung offen |
 | Kategorie „Krimidinner“ auf der Startseite | offen |
 
 **Nachgetragene Tatsachen aus den Rollenblättern:**
@@ -566,8 +360,10 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 - *(R07)* Sander zu Seebach, letzten Sonntag beim Schach: „Im Archiv stimmt etwas nicht. Ich werde bestohlen, von jemandem, dem ich vertraut habe.“
 - *(R10)* Rademacher zu Falk vor einigen Wochen: „Sander ahnt etwas. Aber er hat keine Beweise.“ Seebach sah Falk um 21:29 eine Nachricht lesen und blass werden.
 - *(R09)* Fabers Nebengeschäft heißt „Thüringer Nachthimmel“. Das Teleskop belichtete seit 20 Uhr den Pferdekopfnebel.
-- *(R01, R06)* Nebenfiguren mit Namen: Kim (Leonies [Leons] Freund/in am Telefon), Deniz (Yilmaz’ Bruder), Jo (Küchenaushilfe), Marianne Sander (verstorbene Mutter).
+- *(R01, R06)* Nebenfiguren mit Namen: Kim (Studienfreundin von R01, am Telefon), Deniz (Yilmaz’ Bruder), Jo (Küchenaushilfe), Marianne Sander (verstorbene Mutter).
 - *(R08)* Rademachers Motiv neben Geld: die Pflegekosten der Mutter, zweimal abgelehnte Gehaltserhöhung. Die Archivliste nahm sie (er) aus dem Kartenraum mit und zerriss sie um 21:31 im Archiv (deshalb B6 im Papierkorb).
+
+- *(Prüfung 0.3)* Faber geht um 21:15 durch die Küche zur Kellertreppe (Yilmaz und Jo sehen {R09: sie / ihn}), meldet sich um 21:21 an der Hauptverteilung ab und ist ab 21:22 im Festsaal. Die Originalblätter lagen seit Februar im Planschrank der Restaurierung. Yilmaz sah von 21:15 bis 21:22 niemanden im Gang oder vor der Restaurierung. R10 trägt ein Kettenarmband bzw. eine Taschenuhr an einer Kette.
 
 **Rollenblätter:** `rollen/R01-familie.md` bis `rollen/R10-sammler.md`, alle nach den Standards in Abschnitt 10. R10 heißt im Titel „Die private Sammlung“ (geschlechtsneutral).
 

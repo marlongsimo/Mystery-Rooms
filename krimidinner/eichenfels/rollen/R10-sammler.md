@@ -1,6 +1,6 @@
 # Rollenblatt R10 · Die private Sammlung
 
-*Varianten-Schreibweise: [weiblich / männlich]. In der fertigen Fassung steht nur die gewählte Variante.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 
@@ -9,7 +9,7 @@
 **[Eva / Egon] Falk**, 66
 [Unternehmerin / Unternehmer] im Ruhestand, früher Falk Präzisionsoptik in Jena, heute [Sammlerin / Sammler] historischer astronomischer Instrumente
 
-**Beziehung zum Opfer:** Du bist die großzügigste Förderung der Stiftung. Die Restaurierung der Kuppel vor sechs Jahren hast du bezahlt, und dein Name steht auf einer Messingtafel neben der Treppe. Sander nannte dich „unsere Mäzenin [unser Mäzen]“ und meinte, er dulde dich. Ihr habt euch respektiert, gemocht habt ihr euch nicht.
+**Beziehung zum Opfer:** Du bist [die großzügigste Förderin / der großzügigste Förderer] der Stiftung. Die Restaurierung der Kuppel vor sechs Jahren hast du bezahlt, und dein Name steht auf einer Messingtafel neben der Treppe. Sander nannte dich „unsere Mäzenin [unser Mäzen]“ und meinte, er dulde dich. Ihr habt euch respektiert, gemocht habt ihr euch nicht.
 
 **Eigenschaften:** großzügig · gewohnt, zu bekommen, was [sie / er] will · charmant mit einem Rest Härte aus vierzig Jahren Geschäft · Sammelleidenschaft bis zur Gier · ehrlicher, als man denkt, sobald man [sie / ihn] in die Enge treibt
 
@@ -25,9 +25,9 @@ Vor zwei Jahren, bei einer Auktion in Leipzig, hast du Rademacher kennengelernt,
 
 Ein Jahr später kam das Angebot: acht Originalblätter, die Karten 41 bis 48, für 180 000 €. „Offiziell ein Tausch gegen Faksimiles, für die Restaurierung, die Stiftung braucht Geld.“ Du hast nicht nachgefragt. Du wolltest nicht. Die Blätter sollen morgen um 8 Uhr abgeholt werden, in einer Transportkiste, die in der Restaurierung steht. Beschriftet: „Leihgabe – Falk Collection“. Deine Kunsttransportfirma ist bestellt. Du bist es nicht gewohnt, Angst zu haben. Seit der Rede um 20:40 hast du welche.
 
-Heute beim Dinner saßt du neben Rademacher, so stand es auf der Tischkarte. Beim Hauptgang hast du [sie / ihn] beim Vornamen genannt, aus Gewohnheit. Rademacher hat dich unter dem Tisch angestoßen, und Hollerbach hat beim Nachschenken genau in diesem Moment aufgesehen.
+Heute beim Dinner saßt du neben Rademacher, so stand es auf der Tischkarte. Beim Hauptgang hast du {R08: sie / ihn} beim Vornamen genannt, aus Gewohnheit. Rademacher hat dich unter dem Tisch angestoßen, und Hollerbach hat beim Nachschenken genau in diesem Moment aufgesehen.
 
-Die anderen kennst du aus der Stiftung: Ritter von der Kanzlei, die [der] deine Förderverträge prüft. Seebach, mit [der / dem] du nach dem Essen im Salon gesessen hast. Lindner von der Presse, [die / der] dich heute auffällig lange angesehen hat.
+Die anderen kennst du aus der Stiftung: Ritter von der Kanzlei, {R03: die / der} deine Förderverträge prüft. Seebach, mit {R07: der / dem} du nach dem Essen im Salon gesessen hast. Lindner von der Presse, {R04: die / der} dich heute auffällig lange angesehen hat.
 
 ## Seite 2 · Deine Kleidung
 
@@ -36,7 +36,7 @@ Die anderen kennst du aus der Stiftung: Ritter von der Kanzlei, die [der] deine 
 | | weiblich | männlich |
 |---|---|---|
 | Kleidung | ein elegantes dunkles Kleid oder ein Hosenanzug aus gutem Stoff | ein dunkler, sehr gut sitzender Anzug, eventuell Dreiteiler |
-| Details | ein teurer Seidenschal, eine auffällige Brosche oder Kette (**keine Brillenkette**) | Einstecktuch, Seidenschal |
+| Details | ein teurer Seidenschal, **ein Kettenarmband, das beim Gehen leise klirrt** (keine Brillenkette) | Einstecktuch, Seidenschal, **eine Taschenuhr an einer Kette, die beim Gehen leise klirrt** |
 | Schuhe | elegante Schuhe | handgenähte Lederschuhe, poliert |
 | **Requisit fürs Spiel** | **ein Siegelring** und **dein Handy** mit der SMS von 21:29 | dasselbe |
 | optional | eine Lupe für alte Karten, in der Tasche | dasselbe |
@@ -61,13 +61,13 @@ Die anderen kennst du aus der Stiftung: Ritter von der Kanzlei, die [der] deine 
 
 ## Seite 4 · Dein Geheimnis — VERTRAULICH
 
-Du hast mit Rademacher **den Kauf von acht Originalblättern des Atlas für 180 000 € vereinbart.** Dir war klar, dass das nicht sauber ist. Hehlerei, wenn man es streng nimmt. Vom Mord wusstest du nichts. Aber die SMS um 21:29 hat dir klargemacht, dass du vielleicht einem Mörder [einer Mörderin] Geld geben wolltest, und dass die Tatwaffe vielleicht in deiner Kiste liegt.
+Du hast mit Rademacher **den Kauf von acht Originalblättern des Atlas für 180 000 € vereinbart.** Dir war klar, dass das nicht sauber ist. Hehlerei, wenn man es streng nimmt. Vom Mord wusstest du nichts. Aber die SMS um 21:29 hat dir klargemacht, dass du vielleicht {R08: einer Mörderin / einem Mörder} Geld geben wolltest, und dass die Tatwaffe vielleicht in deiner Kiste liegt.
 
 ## Seite 4 · Deine Ziele
 
 1. **Persönlich:** Deine Beteiligung am Handel vertuschen, so lange es geht.
 2. **Zu einer anderen Person:** Herausfinden, ob Rademacher es getan hat. Du willst nicht für einen Mord bezahlen.
-3. **Zum Fall:** Wenn es eng wird, lieber als Zeuge [Zeugin] auftreten als als Mittäter [Mittäterin]. Wer zuerst redet, steht besser da.
+3. **Zum Fall:** Wenn es eng wird, lieber als [Zeugin / Zeuge] auftreten denn als [Mittäterin / Mittäter]. Wer zuerst redet, steht besser da.
 
 ## Seite 4 · Deine Spielhinweise
 

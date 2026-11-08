@@ -1,6 +1,6 @@
 # Rollenblatt R02 · Die frühere Forschungspartnerschaft
 
-*Varianten-Schreibweise: [weiblich / männlich]. In der fertigen Fassung steht nur die gewählte Variante.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 
@@ -17,7 +17,7 @@
 
 ## Seite 1 · Deine Vorgeschichte
 
-1994 kamst du als junge Doktorandin [junger Doktorand] nach Eichenfels. Theodor Sander war Assistent, drei Jahre älter, ehrgeizig und brillant. Ihr hattet ein gemeinsames Ziel: einen neuen Himmelsatlas der Nordhalbkugel, gezeichnet nach eigenen Beobachtungen, so genau wie keiner zuvor.
+1994 kamst du als [junge Doktorandin / junger Doktorand] nach Eichenfels. Theodor Sander war Assistent, drei Jahre älter, ehrgeizig und brillant. Ihr hattet ein gemeinsames Ziel: einen neuen Himmelsatlas der Nordhalbkugel, gezeichnet nach eigenen Beobachtungen, so genau wie keiner zuvor.
 
 Zwei Winter lang habt ihr fast jede klare Nacht in der Kuppel verbracht. Er beobachtete den Süden, du den Norden. Die Sternkarten 41 bis 48 sind deine: Jede Position hast du gemessen, jede Korrektur am Rand mit „I. M.“ abgezeichnet, mit Bleistift, so wie man es dir beigebracht hatte.
 
@@ -48,7 +48,7 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 **Dein Abend:**
 - **20:49–21:02** Kartenraum, mit Sander. Streit. Du hast gerufen: „Dann sage ich es heute Abend selbst, vor allen!“
 - **21:03** Treppe hinauf in die Kuppel, zum alten Refraktor. Du wolltest allein sein.
-- **21:07** Faber kam und machte sich am Steuerpult zu schaffen, ohne dich zu bemerken. Erst als [sie / er] dich sah, erschrak [sie / er].
+- **21:07** Faber kam und machte sich am Steuerpult zu schaffen, ohne dich zu bemerken. Erst als {R09: sie / er} dich sah, erschrak {R09: sie / er}.
 - **21:08** Faber drückte etwas am Pult. Alles wurde dunkel, nur die Notlampen glommen. Faber murmelte: „So, das war’s.“ Kein Sturm, kein Blitz. Das war Absicht.
 - **21:14** Faber ging hinaus. Du bist im Dunkeln geblieben, mit dem Gesicht am kalten Okular.
 - **21:20** Das Licht kam zurück. **21:26** Verbindungstür West, zurück in den Mittelbau. **21:35** der Schrei.
@@ -67,7 +67,7 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 ## Seite 4 · Deine Ziele
 
 1. **Persönlich:** Deine Urheberschaft am Atlas soll heute anerkannt werden, vor allen, so wie Sander es versprochen hatte.
-2. **Zu einer anderen Person:** Faber muss zugeben, dass [sie / er] von 21:07 bis 21:14 bei dir in der Kuppel war. Das ist euer beider Alibi.
+2. **Zu einer anderen Person:** Faber muss zugeben, dass {R09: sie / er} von 21:07 bis 21:14 bei dir in der Kuppel war. Das ist euer beider Alibi.
 3. **Zum Fall:** Herausfinden, was Sander mit „wenn ich die Blätter dann noch habe“ meinte. Wer hatte Grund, ihm die Blätter wegzunehmen?
 
 ## Seite 4 · Deine Spielhinweise
@@ -77,5 +77,5 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 - **Phase 3 (Geheimnisse):** Wenn die Archivliste (Karten 41–48) auf den Tisch kommt, ist das dein Moment. Das sind deine Karten. Überleg, ob du es jetzt sagst oder ob es dich verdächtiger macht.
 - **Phase 4 (Protokoll):** Das Protokoll zeigt, dass du um 21:26 aus dem Westflügel kamst. Das sieht schlecht aus. Fabers Technikprotokoll (B10) zeigt, dass Faber um 21:07 in der Kuppel war. Nutze das.
 - **Wen du ansprechen solltest:** Faber (Ziel 2), Rademacher (warum die Frage nach den Unterlagen?), Ritter (hat Sander etwas über dich verfügt?).
-- **Was du vermeiden solltest:** dich in Wut zu reden. Genau das erwartet man vom Mörder [von der Mörderin].
+- **Was du vermeiden solltest:** dich in Wut zu reden. Genau das erwartet man von der Person, die es getan hat.
 - **Trumpf:** Faber war von 21:07 bis 21:14 bei dir in der Kuppel und hat den Strom von Hand abgeschaltet.

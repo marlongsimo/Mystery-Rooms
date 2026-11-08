@@ -1,6 +1,6 @@
 # Rollenblatt R01 · Das Kind des Professors
 
-*Varianten-Schreibweise: [weiblich / männlich]. In der fertigen Fassung steht nur die gewählte Variante.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 
@@ -21,13 +21,13 @@ Du bist in der Sternwarte aufgewachsen, buchstäblich. Bis du zwölf warst, wohn
 
 Deine Mutter, Marianne Sander, hielt die Familie zusammen. Als sie starb, warst du 22. Dein Vater hielt bei der Beerdigung eine Rede über ihre Geduld und ging am selben Abend in die Kuppel. Du bist nach Leipzig gezogen und hast seitdem Karriere gemacht, ziemlich gut sogar, wenn man den Visitenkarten glaubt.
 
-Vor zwei Jahren wolltest du dich selbständig machen: ein Restaurant mit Sternenhimmel, gemeinsam mit einer Freundin [einem Freund], Kim. Die Bank wollte eine Bürgschaft. Dein Vater hätte unterschrieben, vielleicht. Aber du hättest fragen müssen, und das konntest du nicht. Also hast du seine Unterschrift selbst unter die Bürgschaft gesetzt. Du kennst sie seit deiner Kindheit, von Zeugnissen und Entschuldigungszetteln.
+Vor zwei Jahren wolltest du dich selbständig machen: ein Restaurant mit Sternenhimmel, gemeinsam mit deiner Studienfreundin Kim. Die Bank wollte eine Bürgschaft. Dein Vater hätte unterschrieben, vielleicht. Aber du hättest fragen müssen, und das konntest du nicht. Also hast du seine Unterschrift selbst unter die Bürgschaft gesetzt. Du kennst sie seit deiner Kindheit, von Zeugnissen und Entschuldigungszetteln.
 
 Das Restaurant hat nach vierzehn Monaten geschlossen. Die Bank will 40 000 € zurück, und seit drei Wochen ruft sie nicht mehr dich an, sondern den Bürgen.
 
 Letzte Woche hat dein Vater dich angerufen, zum ersten Mal seit Monaten. Er sagte: „Ich habe nicht mehr viel Zeit für Ausreden.“ Du hast das für Sarkasmus gehalten und aufgelegt. Zwei Tage später kam der Brief: „Komm am Samstag. Es gibt Dinge, die ich dir sagen muss, bevor ich sie allen sage.“
 
-Die anderen Gäste kennst du kaum: Ritter von der Kanzlei, die [der] den Familiennachlass verwaltet. Rademacher aus dem Archiv, die [der] dir als Kind die alten Karten gezeigt hat und immer freundlich war. Dr. Seebach, die Ärztin [der Arzt] deines Vaters, die [der] dich heute auffällig lange angesehen hat.
+Die anderen Gäste kennst du kaum: Ritter von der Kanzlei, {R03: die / der} den Familiennachlass verwaltet. Rademacher aus dem Archiv, {R08: die / der} dir als Kind die alten Karten gezeigt hat und immer freundlich war. Dr. Seebach, {R07: die Ärztin / der Arzt} deines Vaters, {R07: die / der} dich heute auffällig lange angesehen hat.
 
 ## Seite 2 · Deine Kleidung
 
@@ -56,7 +56,7 @@ Die anderen Gäste kennst du kaum: Ritter von der Kanzlei, die [der] den Familie
 **Was du über andere weißt:**
 - Ritter hatte heute einen dicken Umschlag dabei: „Testament – Abschrift“. Du hast es auf dem Etikett gelesen.
 - Dr. Seebach hat dich beim Dinner gefragt: „Wie geht es Ihnen mit Ihrem Vater?“ So fragt man nicht beim Dessert.
-- Rademacher kennt jedes Blatt im Archiv. Als Kind durftest du bei [ihr / ihm] mit weißen Handschuhen eine Sternkarte halten.
+- Rademacher kennt jedes Blatt im Archiv. Als Kind durftest du bei {R08: ihr / ihm} mit weißen Handschuhen eine Sternkarte halten.
 
 **Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Die Bürgschaft darfst du verschweigen.
 
@@ -74,8 +74,8 @@ Vor zwei Jahren hast du **die Unterschrift deines Vaters unter eine Bürgschaft 
 
 - **Phase 1 (Empfang):** Sei souverän, ein wenig kühl. Wenn jemand nach deinem Vater fragt: „Wir sehen uns selten. Er ist beschäftigt.“
 - **Phase 2 (Mord):** Du darfst getroffen sein. Gib dein Alibi genau an, Bibliothek und Terrasse.
-- **Phase 3 (Geheimnisse):** Sobald das Testament Thema wird, schauen alle auf dich, denn du bist der Erbe [die Erbin]. Bleib ruhig: Du warst nachweislich draußen.
-- **Phase 4 (Protokoll):** Das Zutrittsprotokoll entlastet dich nicht direkt, du warst nie an einem Kartenleser. Hollerbach kann es. Sprich [sie / ihn] an.
+- **Phase 3 (Geheimnisse):** Sobald das Testament Thema wird, schauen alle auf dich, denn du bist [die Erbin / der Erbe]. Bleib ruhig: Du warst nachweislich draußen.
+- **Phase 4 (Protokoll):** Das Zutrittsprotokoll entlastet dich nicht direkt, du warst nie an einem Kartenleser. Hollerbach kann es. Sprich {R05: sie / ihn} an.
 - **Wen du ansprechen solltest:** Ritter (Ziel 2), Hollerbach (dein Alibi), Seebach (warum diese Frage beim Dinner?).
 - **Was du vermeiden solltest:** das Wort „Bank“. Und Ritter vor allen nach dem Testament zu fragen. Das macht dich verdächtig.
 - **Trumpf:** Hollerbach hat dich um 21:15 auf der Terrasse gesehen. Dazu dein Anrufprotokoll.

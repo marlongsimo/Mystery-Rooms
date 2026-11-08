@@ -1,6 +1,6 @@
 # Rollenblatt R05 · Die Veranstaltungsleitung
 
-*Varianten-Schreibweise: [weiblich / männlich]. In der fertigen Fassung steht nur die gewählte Variante.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 
@@ -27,7 +27,7 @@ Heute Nachmittag, um halb vier, rief Sander dich in sein Arbeitszimmer. Er wollt
 
 Die beiden kannten sich. Beim Hauptgang hat Falk Rademacher beim Vornamen angesprochen, laut genug, dass du es beim Nachschenken gehört hast. Rademacher hat Falk unter dem Tisch angestoßen. Du hast so getan, als hättest du nichts gesehen. Das ist dein Beruf.
 
-Die übrigen Gäste kennst du aus der Planung: Yilmaz aus der Küche, mit [der / dem] du seit drei Jahren zusammenarbeitest. Lindner von der Presse, die [den] du auf die Liste gesetzt hast. Faber von der Haustechnik, der [die] dir heute die Steckdosen für die Musik freigeschaltet hat.
+Die übrigen Gäste kennst du aus der Planung: Yilmaz aus der Küche, mit {R06: der / dem} du seit drei Jahren zusammenarbeitest. Lindner von der Presse, {R04: die / den} du auf die Liste gesetzt hast. Faber von der Haustechnik, {R09: die / der} dir heute die Steckdosen für die Musik freigeschaltet hat.
 
 ## Seite 2 · Deine Kleidung
 
@@ -51,12 +51,13 @@ Die übrigen Gäste kennst du aus der Planung: Yilmaz aus der Küche, mit [der /
 - **21:08** Stromausfall. Du beruhigst die Gäste im Festsaal, holst Kerzen.
 - **21:10–21:30** Festsaal, Dessert vorbereiten.
 - **21:13** Du bringst Lindner einen Espresso an die Bar (Bon 21:13).
-- **21:15** Durch die Glastür siehst du Leonie [Leon] Sander auf der Terrasse telefonieren. Ihr nickt euch zu.
+- **21:15** Durch die Glastür siehst du {R01: Leonie / Leon} Sander auf der Terrasse telefonieren. Ihr nickt euch zu.
+- **21:22** Faber kommt in den Festsaal, mit Taschenlampe: „Sturmschaden, alles wieder in Ordnung.“ Danach bleibt {R09: sie / er} bei den Gästen.
 - **21:33** Verbindungstür West. Du willst Sander zum Dessert holen.
 - **21:35** Du findest ihn. Er liegt neben dem Kartentisch. Die Vitrine steht offen, die Armillarsphäre liegt am Boden, **der Messingsockel fehlt, das Samttuch auch.** Du schreist.
 
 **Was du über andere weißt:**
-- Rademacher trägt bei der Arbeit immer weiße Baumwollhandschuhe. Beim Dinner steckten sie [ihr / ihm] in der Jackentasche.
+- Rademacher trägt bei der Arbeit immer weiße Baumwollhandschuhe. Beim Dinner steckten sie {R08: ihr / ihm} in der Jackentasche.
 - Rademacher und Falk kennen sich, besser, als sie zugeben.
 - Marwitz hat Sander um 20:55 angeschrien.
 
@@ -74,10 +75,10 @@ Du hast auf Sanders Anweisung den Sitzplan geändert, **damit Rademacher neben F
 
 ## Seite 4 · Deine Spielhinweise
 
-- **Phase 1 (Empfang):** Begrüße die Gäste, sei überall. Du darfst die Rolle der Gastgeberin [des Gastgebers] übernehmen, bis Sander „kommt“.
+- **Phase 1 (Empfang):** Begrüße die Gäste, sei überall. Du darfst die Rolle [der Gastgeberin / des Gastgebers] übernehmen, bis Sander „kommt“.
 - **Phase 2 (Mord):** Du hast die Leiche gefunden. Beschreib, was du gesehen hast: Vitrine, Sockel, Tuch.
 - **Phase 3 (Geheimnisse):** Wenn über Rademacher oder Falk gesprochen wird, überlege, ob jetzt der Moment für den Sitzplan ist.
-- **Phase 4 (Protokoll):** Du kannst zwei Alibis bestätigen: Lindner an der Bar (21:13) und Leonie [Leon] Sander auf der Terrasse (21:15).
+- **Phase 4 (Protokoll):** Du kannst drei Alibis bestätigen: Lindner an der Bar (21:13), {R01: Leonie / Leon} Sander auf der Terrasse (21:15) und Faber im Festsaal (ab 21:22).
 - **Wen du ansprechen solltest:** Falk (wie gut kennen Sie Dr. Rademacher?), Yilmaz (wo warst du während des Stromausfalls?), Marwitz (der Streit).
 - **Was du vermeiden solltest:** dich zu weit vorzuwagen, solange du nicht weißt, auf wessen Seite die Stiftung steht.
 - **Trumpf:** der Sitzplan mit „R. neben F.“ in Sanders Schrift.

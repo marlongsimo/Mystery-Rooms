@@ -1,6 +1,6 @@
 # Rollenblatt R04 · Die Presse
 
-*Varianten-Schreibweise: [weiblich / männlich]. In der fertigen Fassung steht nur die gewählte Variante.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 
@@ -25,7 +25,7 @@ Dann hast du gehört, dass das Archiv „Originale in die Restaurierung“ gegeb
 
 Dein Chefredakteur hat dir drei Monate gegeben. Die sind seit zwei Wochen um. Wenn du aus Eichenfels ohne Geschichte zurückkommst, schreibst du im Frühjahr wieder über Gartenschauen. Du hast dir geschworen, dass dir das nicht passiert, und du hast angefangen, Regeln zu dehnen, die du früher anderen vorgehalten hast.
 
-Für das Jubiläum hast du dich als Reporter [Reporterin] für eine harmlose Jubiläumsgeschichte angemeldet. Hollerbach hat dich auf die Gästeliste gesetzt. Sander hat einem Interview zugestimmt, „aber nur zehn Minuten, und nichts über Geld“.
+Für das Jubiläum hast du dich als [Reporterin / Reporter] für eine harmlose Jubiläumsgeschichte angemeldet. Hollerbach hat dich auf die Gästeliste gesetzt. Sander hat einem Interview zugestimmt, „aber nur zehn Minuten, und nichts über Geld“.
 
 Du bist nicht stolz auf alles, was du für Geschichten tust. Unter dem Kartentisch hast du heute ein zweites Funkmikrofon festgeklebt, das weiterläuft, wenn du den Raum verlässt. Der Empfänger steckt in deiner Tasche. Es ist illegal. Es war auch das erste Mal, dass du so etwas gemacht hast, sagst du dir.
 
@@ -50,12 +50,12 @@ Die anderen Gäste hast du alle gegoogelt. Marwitz erkennst du vom Foto, dreißi
 **Dein Abend:**
 - **21:03** Verbindungstür West (deine Gästekarte).
 - **21:04–21:08** Interview mit Sander im Kartenraum. Er war fahrig, sah immer wieder auf die Uhr und auf einen aufgeschlagenen Atlas.
-- **21:08** Der Strom fiel aus. Du bist hinaus. **Im dunklen Flur hörtest du ein leises Klirren, wie von einer feinen Kette, und sahst am Ende des Flurs einen Schatten.** Erkannt hast du niemanden.
+- **21:08** Der Strom fiel aus. Du bist hinaus. **Im dunklen Flur hörtest du ein leises metallisches Klirren und sahst am Ende des Flurs einen Schatten.** Erkannt hast du niemanden. Es klang nicht nach einem schweren Schlüsselbund, eher feiner. Sicher bist du nicht.
 - **21:09** Auf der Treppe verlor der Empfänger in deiner Tasche die Verbindung zum versteckten Mikrofon.
 - **21:10** Bar im Festsaal. **21:13** Hollerbach brachte dir einen Espresso (Bon 21:13).
 
 **Deine Aufnahme (vertraulich, auf dem Empfänger):**
-> SANDER: „Zehn Minuten, Frau [Herr] Lindner. Und nichts über Geld.“
+> SANDER: „Zehn Minuten, [Frau / Herr] Lindner. Und nichts über Geld.“
 > SANDER: „… Wenn Sie etwas Wahres schreiben wollen, fragen Sie nach Seite 41. Nach den Inventarnummern. Jemand in diesem Haus hat mich bestohlen, und ich habe es zu spät gemerkt.“
 > SANDER: „Gehen Sie jetzt. Ich erwarte um Viertel nach noch jemanden.“
 > [Tür. Stille. Schritte, die näher kommen. 21:09:] SANDER: „Sie sind früh.“
@@ -75,15 +75,15 @@ Du bist **unter falschem Vorwand** hier, und unter dem Kartentisch klebt **dein 
 ## Seite 4 · Deine Ziele
 
 1. **Persönlich:** Die Geschichte bekommen, exklusiv: die wahre Urheberschaft des Atlas, und wenn möglich mehr.
-2. **Zu einer anderen Person:** Marwitz zum Reden bringen. [Sie / Er] ist der Kern deiner Geschichte.
-3. **Zum Fall:** Den Fall lösen. Eine Reporterin [ein Reporter], die [der] den Mord aufklärt, schreibt die Geschichte des Jahres. Dafür musst du irgendwann deine Aufnahme zeigen.
+2. **Zu einer anderen Person:** Marwitz zum Reden bringen. {R02: Sie / Er} ist der Kern deiner Geschichte.
+3. **Zum Fall:** Den Fall lösen. [Eine Reporterin, die / Ein Reporter, der] den Mord aufklärt, schreibt die Geschichte des Jahres. Dafür musst du irgendwann deine Aufnahme zeigen.
 
 ## Seite 4 · Deine Spielhinweise
 
 - **Phase 1 (Empfang):** Stell harmlose Fragen. Merk dir, wer wem ausweicht.
-- **Phase 2 (Mord):** Du warst als Letzte(r) offiziell bei Sander. Das kommt heraus, steh dazu. Erzähl vom Interview, nicht vom zweiten Mikrofon.
+- **Phase 2 (Mord):** Du warst als [Letzte / Letzter] offiziell bei Sander. Das kommt heraus, steh dazu. Erzähl vom Interview, nicht vom zweiten Mikrofon.
 - **Phase 3 (Funkmikrofon):** Die Spielleitung gibt bekannt, dass unter dem Kartentisch ein Mikrofon gefunden wurde (B7). Jetzt musst du entscheiden: Gibst du die Aufnahme preis und riskierst deinen Ruf, oder schweigst du und lässt die anderen raten? Ist deine Rolle nicht besetzt, kommt die Abschrift in Runde 3 ohnehin auf den Tisch.
 - **Phase 4 (Protokoll):** Vergleiche das Zutrittsprotokoll mit deiner Aufnahme. Wer war um 21:09 schon im Westflügel?
 - **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (warum kein Archiv?), Falk (warum so oft hier?).
 - **Was du vermeiden solltest:** zu früh zu verraten, wie viel du schon weißt.
-- **Trumpf:** das Klirren im Flur, um 21:08. Spiel es aus, wenn jemand von einer Kette spricht.
+- **Trumpf:** das Klirren im Flur, um 21:08, im 1. OG, vor dem Kartenraum. Spiel es aus, wenn die Küche von dem Klirren um 21:22 erzählt. Wer um 21:08 oben war und um 21:22 unten, war dieselbe Person.

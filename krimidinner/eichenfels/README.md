@@ -45,9 +45,20 @@ Krimidinner für 4–10 Personen am Tisch, mit einer Spielleitung, die mitspiele
   - Gastgeberheft A und B getrennt, Anleitung.
   - Rollenblätter in zufälliger Reihenfolge ohne Namen. Jede Person kann ihr eigenes Blatt auch selbst drucken.
 
+## Live-Verbindung (optional)
+
+Über den Multiplayer-Baustein der Plattform (nur vorhandene Funktionen, Publishable Key):
+- Die Spielleitung eröffnet eine Live-Sitzung. Gäste verbinden sich im Rollenblatt mit dem Live-Code.
+- Öffnet die Spielleitung eine Runde, springen alle verbundenen Handys mit: Beweise und Abschnitt im Rollenblatt öffnen sich ohne Losungswort.
+- Im Finale gibt es die Anklage digital. Die Spielleitung sieht, wer abgegeben hat, liest vor und bekommt nach der Lösung die Auswertung.
+- Geteilt werden nur `runde` und `acc:<Nutzer-ID>`, **nie Rollen**.
+- Angefragt werden 11 Geräte. Erlaubt die Datenbank weniger (zurzeit 8), werden es automatisch 8. Wer nicht verbunden ist, nutzt die Losungswörter.
+- **Einrichtung in Supabase:** siehe [`SUPABASE.md`](SUPABASE.md) (Eintrag in `game_catalog`, Grenze 11, Aufbewahrung).
+
 ## Testen
 
 ```
 python3 -m http.server 8765 &      # im Repository-Wurzelordner
 node krimidinner/eichenfels/tests/krimidinner.test.js   # SHOTS=1 für Bildschirmfotos und PDF in /tmp
+node krimidinner/eichenfels/tests/live.test.js          # Live zu zweit gegen die echte Datenbank (LIVE_SLUG=krimidinner-eichenfels nach dem Katalogeintrag)
 ```

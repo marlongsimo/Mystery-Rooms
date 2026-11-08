@@ -7,7 +7,7 @@
   <meta name="description" content="Interaktives Krimidinner für 4–10 Personen: Rollen per Code, Beweise in Runden, Gastgeberheft und Druckversion.">
   <meta name="theme-color" content="#0d1018">
   <link rel="stylesheet" href="../../der-letzte-fall/css/fonts.css">
-  <link rel="stylesheet" href="css/kd.css?v=8">
+  <link rel="stylesheet" href="css/kd.css?v=9">
 </head>
 <body>
   <header class="top no-print">
@@ -17,7 +17,11 @@
   <main id="app" aria-live="polite"></main>
   <div id="print" class="print-only"></div>
   <div id="overlay" class="overlay no-print" hidden></div>
+  <!-- Live-Verbindung (optional): vorhandener Multiplayer-Baustein der Plattform, nur Publishable Key -->
+  <script src="../../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
+  <script src="../../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../../platform/multiplayer/mp-core.js?v=1"></script>
   <script src="js/content.js?v=7"></script>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/app.js?v=6"></script>
 </body>
 </html>

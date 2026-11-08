@@ -203,10 +203,12 @@
     const me = store.get("kd_eich_me", null), d = me && decode(me.code);
     if (!d || d.host) { go("code"); return; }
     const role = C.roles[d.role], isM = male(d.variants, d.role), name = NAMES[d.role][isM ? 1 : 0], open = me.open || {};
-    const tabs = PARTS.map(([, l], k) => [`p${k}`, k >= 3 && !open[k - 2] ? `🔒 ${l}` : l]).concat([["bew", "Beweise"], ["anl", "Regeln"]]);
-    app.innerHTML = `<p class="eyebrow">Dein Rollenblatt · ${d.role}</p><h1>${esc(name)}</h1><p class="muted">${esc(role.title.replace(/\s*—.*$/, ""))}</p>
+    const runde = liveOn() ? LIVE.client.states.runde : null, accOpen = Boolean(runde && runde.anklage);
+    const tabs = PARTS.map(([, l], k) => [`p${k}`, k >= 3 && !open[k - 2] ? `🔒 ${l}` : l]).concat([["bew", "Beweise"]], accOpen ? [["acc", "Anklage"]] : [], [["anl", "Regeln"]]);
+    app.innerHTML = `<p class="eyebrow">Dein Rollenblatt · ${d.role}</p><h1>${esc(name)}</h1><p class="muted">${esc(role.title.replace(/\s*—.*$/, ""))}</p>${playerLiveBox(me)}
       <nav class="tabs no-print">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${tab === k ? "on" : ""}${k === "p2" ? " secret" : ""}">${l}</button>`).join("")}</nav><section id="pane"></section>`;
     $$("[data-tab]").forEach((b) => b.onclick = () => { tab = b.dataset.tab; viewRolle(); });
+    bindPlayerLive(me);
     const pane = $("#pane");
     const printBtn = () => {
       pane.insertAdjacentHTML("beforeend", `<p class="row no-print" style="margin-top:18px"><button class="btn ghost small" id="prt">Mein Rollenblatt drucken</button><a class="btn ghost small" href="#start">Start</a></p>`);
@@ -229,6 +231,7 @@
       return;
     }
     if (tab === "anl") { pane.innerHTML = `<div class="guide">${C.guide}</div>`; return; }
+    if (tab === "acc") { pane.innerHTML = accOpen ? accusationForm(d, me) : `<p class="muted">Die Anklage ist noch nicht freigegeben.</p>`; bindAccusation(me); return; }
     // Beweise
     const unlocked = ROUNDS.filter((r) => open[r.no]);
     pane.appendChild(unlockForm(me, () => viewRolle()));
@@ -267,15 +270,16 @@
       const r = st.round ? ROUNDS[st.round - 1] : null, roundOpen = r && seen[r.no];
       pane.innerHTML = `<div class="steps no-print">${STEPS.map((s, k) => `<button data-step="${k}" class="${k === i ? "on" : k < i ? "done" : ""}" title="${esc(s.title)}">${k === 0 ? "Vorb." : k === 1 ? "Start" : k === STEPS.length - 1 ? "Finale" : "P" + (k - 1)}</button>`).join("")}</div>
         <div class="step-head"><h2>${esc(st.title)}</h2>${st.mins ? `<div class="timer"><span id="tm">${timers[st.key] ? mmss(Date.now() - timers[st.key]) : "0:00"}</span> / ca. ${st.mins} Min. <button class="btn ghost small" id="tstart">${timers[st.key] ? "neu starten" : "Zeit starten"}</button></div>` : ""}</div>
+        ${hostLiveBox(host)}
         ${i === 0 ? `<p class="note">Bei euch besetzt: ${c.join(" · ")}. Nebenfiguren: ${missing.join(" · ") || "keine"}. Was die Nebenfiguren wissen, bietet dir der Ablauf in der passenden Phase zum Vorlesen an.</p>` : ""}
         ${r ? `<div class="round ${r.cls}"><h3>Losungswort für die Gäste</h3>${roundOpen ? `<div class="word">${r.word}</div><p class="small muted">Öffnet: ${cardsFor(r.no, d.n, false).join(", ")}${r.no <= 3 ? ` und im Rollenblatt Runde ${r.no}` : ""}.</p><button class="btn small" data-cards="${r.no}">Karten zeigen</button>` : `<p class="small muted">${r.no === 4 ? "Erst, wenn alle ihre Anklage abgegeben haben." : "Zu Beginn dieser Phase öffnen und vorlesen."}</p><button class="btn small" data-round="${r.no}">${r.no === 4 ? "Finale-Karten öffnen" : "Losungswort anzeigen"}</button>`}
           ${st.round === 3 && c.includes("R04") ? `<p class="small" style="margin-top:12px">Hat Lindner die Aufnahme noch nicht vorgelegt? Dann zusätzlich: ${seen.extra ? `<b class="word" style="font-size:18px">${EXTRA.word}</b> <button class="btn ghost small" data-cards="extra">B12 zeigen</button>` : `<button class="btn ghost small" data-round="extra">Zusatzwort FUNK anzeigen</button>`}</p>` : ""}</div>` : ""}
         ${npc.length ? `<div class="npc"><h3>Fehlende Rollen · zum Vorlesen</h3><p class="small muted">Diese Figuren spielt bei euch niemand. Lies vor, was sie wissen – am besten, sobald das Gespräch darauf kommt.</p>${npc.map((n) => `<blockquote><b>${n.role}</b> ${resolve(n.html, d.variants)}</blockquote>`).join("")}</div>` : ""}
         <div class="hostdoc step-doc">${st.secs.map((k) => C.sections[k] ? (st.secs.length > 1 ? `<h2>${esc(C.sections[k].title)}</h2>` : "") + resolve(C.sections[k].html, d.variants) : "").join("")}</div>
         ${imp.length ? `<details class="imp"><summary>Wenn es stockt</summary><ul>${imp.map((x) => `<li>${x}</li>`).join("")}</ul></details>` : ""}
-        ${st.key === "fin" ? `<p class="note red">Nach dem Vorlesen der Anklagen: Reiter <b>Lösung</b> öffnen.</p>` : ""}
+        ${st.key === "fin" ? hostAccusations(host, d) + `<p class="note red">Nach dem Vorlesen der Anklagen: Reiter <b>Lösung</b> öffnen.</p>` : ""}
         <div class="row stepnav no-print"><button class="btn ghost" id="prev" ${i === 0 ? "disabled" : ""}>← Zurück</button><button class="btn" id="next" ${i === STEPS.length - 1 ? "disabled" : ""}>Weiter: ${i < STEPS.length - 1 ? esc(STEPS[i + 1].title.split(" · ")[0]) : ""} →</button></div>`;
-      filterNpcTable(pane, c);
+      filterNpcTable(pane, c); bindHostLive(host); bindHostAccusations(host);
       $$("[data-step]").forEach((b) => b.onclick = () => { host.step = +b.dataset.step; save(); viewLeitung(); });
       if ($("#prev")) $("#prev").onclick = () => { host.step = i - 1; save(); viewLeitung(); };
       if ($("#next")) $("#next").onclick = () => { host.step = i + 1; save(); viewLeitung(); };
@@ -284,7 +288,7 @@
       $$("[data-round]").forEach((b) => b.onclick = () => {
         const k = b.dataset.round;
         if (k === "4" && !confirm("Haben alle ihre Anklage abgegeben? Die Finale-Karten verraten die Lösung.")) return;
-        seen[k] = true; save(); viewLeitung();
+        seen[k] = true; save(); livePush(host); viewLeitung();
       });
       $$("[data-cards]").forEach((b) => b.onclick = () => { const k = b.dataset.cards, ids = k === "extra" ? ["B12"] : cardsFor(+k, d.n, false); showOverlay(`<div class="cardlist">${ids.map((id) => cardHtml(id, d.variants)).join("")}</div>`); });
       return;
@@ -310,7 +314,7 @@
       $("#sol").onclick = () => { if (!confirm("Wirklich öffnen? Danach kennst du die Lösung.")) return; seen.solution = true; save(); viewLeitung(); };
       return;
     }
-    pane.innerHTML = `<div class="hostdoc">${resolve(unveil(C.hostB), d.variants)}</div><p class="row" style="margin-top:14px"><button class="btn ghost small" data-p="hostB">Teil B drucken</button></p>`;
+    pane.innerHTML = `${liveOn() && host.anklage ? hostAccusations({ ...host, accShow: true }, d) : ""}<div class="hostdoc">${resolve(unveil(C.hostB), d.variants)}</div><p class="row" style="margin-top:14px"><button class="btn ghost small" data-p="hostB">Teil B drucken</button></p>`;
     $("[data-p]").onclick = () => printDocs("hostB", d);
   }
 
@@ -337,6 +341,138 @@
     $(".close", o).onclick = () => { o.hidden = true; o.innerHTML = ""; };
   }
 
+
+  /* ---------- Live-Verbindung (optional, über platform/multiplayer – nur vorhandene Funktionen, Publishable Key) ----------
+     Geteilt wird ausschließlich der Rundenstand („runde“, nur die Spielleitung schreibt) und auf Wunsch die Anklagen
+     („acc:<Nutzer-ID>“, jede Person ihre eigene). Rollen gehen nie an den Server – sie bleiben in den Codes.
+     Angefragt werden 11 Geräte (Spielleitung + 10 Gäste). Erlaubt die Datenbank weniger (zurzeit 2–8), wird es mit 8 versucht;
+     wer nicht verbunden ist, nutzt die Losungswörter. */
+  const LIVE_SLUG = new URLSearchParams(location.search).get("liveslug") || "krimidinner-eichenfels"; // ?liveslug= nur für Tests
+  const LIVE = { client: null, err: "", busy: false };
+  function liveClient() {
+    if (LIVE.client) return LIVE.client;
+    if (!window.MRMultiplayer) { LIVE.err = "Die Live-Verbindung ist gerade nicht verfügbar. Die Losungswörter funktionieren immer."; return null; }
+    try { LIVE.client = window.MRMultiplayer.connect({ gameSlug: LIVE_SLUG, maxPlayers: 11, storeKey: "kd_eich_live:" + LIVE_SLUG }); }
+    catch (e) { LIVE.err = e.message; return null; }
+    const c = LIVE.client;
+    c.on("state", (row) => onLiveState(row));
+    c.on("players", () => liveRefresh());
+    c.on("lost", (why) => { toast(why || "Live-Verbindung beendet."); liveRefresh(); });
+    return c;
+  }
+  const liveOn = () => Boolean(LIVE.client && LIVE.client.session);
+  const liveIsHost = () => liveOn() && LIVE.client.session.is_host;
+  function liveMsg(e) { const m = (e && e.message) || String(e || ""); return /nicht verfügbar|game_catalog|unbekannt|unknown|not.*found|kein.*Spiel/i.test(m) ? "Die Live-Verbindung ist für dieses Spiel noch nicht freigeschaltet. Die Losungswörter funktionieren trotzdem." : m; }
+  let toastTm = null;
+  function toast(text) { let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast no-print"; t.setAttribute("role", "status"); document.body.appendChild(t); } t.textContent = text; t.classList.add("show"); clearTimeout(toastTm); toastTm = setTimeout(() => t.classList.remove("show"), 5200); }
+  /** Neu zeichnen, aber nie mitten in eine Eingabe hinein. */
+  function liveRefresh() { const a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return; const h = location.hash.slice(1); if (h === "rolle") viewRolle(); else if (h === "leitung") viewLeitung(); }
+  function onLiveState(row) {
+    if (row.state_key === "runde") {
+      const me = store.get("kd_eich_me", null), st = row.state || {};
+      if (me && location.hash.slice(1) === "rolle") {
+        const open = me.open || {}; let fresh = 0;
+        for (let k = 1; k <= 4; k++) if (st.open && st.open[k] && !open[k]) { open[k] = true; fresh = k; }
+        if (st.extra && !open.extra) { open.extra = true; fresh = fresh || 3; }
+        me.open = open; store.set("kd_eich_me", me);
+        if (fresh) toast(fresh === 4 ? "Das Finale ist offen: Die letzten Beweise liegen auf dem Tisch." : `Runde ${fresh} ist offen – neue Beweise und ein neuer Abschnitt in deinem Rollenblatt.`);
+        if (fresh || st.anklage) liveRefresh();
+      }
+      return;
+    }
+    if (row.state_key.startsWith("acc:") && location.hash.slice(1) === "leitung") liveRefresh();
+  }
+  /** Spielleitung: Rundenstand an alle Geräte. */
+  function livePush(host) {
+    if (!liveIsHost()) return;
+    const seen = host.seen || {}, open = {}; [1, 2, 3, 4].forEach((k) => { if (seen[k]) open[k] = true; });
+    LIVE.client.writeOwn("runde", { open, extra: Boolean(seen.extra), anklage: Boolean(host.anklage), at: Date.now() }).catch((e) => toast("Live: " + liveMsg(e)));
+  }
+  const liveDevices = () => (liveOn() ? LIVE.client.players.length : 0);
+  function hostLiveBox(host) {
+    const c = LIVE.client;
+    if (liveOn()) return `<div class="live on"><span class="dot"></span><b>LIVE</b> · Code <b class="lcode">${esc(c.session.room_code)}</b> · ${liveDevices()} ${liveDevices() === 1 ? "Gerät" : "Geräte"} verbunden (max. ${c.session.max_players}) <button class="btn ghost small" id="liveEnd">beenden</button></div>`;
+    return `<div class="live"><b>Live-Verbindung (optional)</b><p class="small muted">Dann springen die Handys der verbundenen Gäste automatisch in die nächste Runde, und die Anklagen kommen digital bei dir an. Die Losungswörter funktionieren weiter – für alle, die nicht verbunden sind. Rollen werden dabei nie übertragen.</p>
+      <button class="btn small" id="liveStart" ${LIVE.busy ? "disabled" : ""}>Live-Sitzung eröffnen</button>${LIVE.err ? `<p class="fb">${esc(LIVE.err)}</p>` : ""}</div>`;
+  }
+  function bindHostLive(host) {
+    const st = $("#liveStart"), en = $("#liveEnd");
+    if (st) st.onclick = async () => {
+      const c = liveClient(); if (!c) { viewLeitung(); return; }
+      LIVE.busy = true; LIVE.err = ""; viewLeitung();
+      try { await c.create("Spielleitung"); livePush(host); }
+      catch (e) {
+        if (/Gruppengröße/i.test(e.message || "")) { // Datenbank erlaubt (noch) weniger Plätze: mit 8 versuchen
+          try { c.maxPlayers = 8; await c.create("Spielleitung"); livePush(host); LIVE.err = "Hinweis: Die Datenbank erlaubt zurzeit nur 8 Geräte. Alle weiteren Gäste nutzen die Losungswörter."; }
+          catch (e2) { LIVE.err = liveMsg(e2); }
+        } else LIVE.err = liveMsg(e);
+      }
+      LIVE.busy = false; viewLeitung();
+    };
+    if (en) en.onclick = async () => { if (!confirm("Live-Sitzung beenden? Die Gäste nutzen dann wieder die Losungswörter.")) return; try { await LIVE.client.leave(); } catch (e) { /* schon zu */ } viewLeitung(); };
+  }
+  function playerLiveBox(me) {
+    const c = LIVE.client;
+    if (liveOn()) return `<div class="live on small"><span class="dot"></span>Live mit der Spielleitung verbunden · ${esc(c.session.room_code)}</div>`;
+    return `<details class="live small"><summary>Live mit der Spielleitung verbinden (optional)</summary>
+      <p class="small muted">Dann öffnen sich die Runden von selbst. Den Live-Code zeigt dir die Spielleitung.</p>
+      <div class="unlock"><input type="text" id="liveCode" class="code" placeholder="LIVE-CODE" autocomplete="off" style="font-size:16px;letter-spacing:.1em"><input type="text" id="liveName" placeholder="Dein Name" maxlength="30" autocomplete="off" value="${esc(me.name || "")}"></div>
+      <button class="btn small" id="liveJoin" ${LIVE.busy ? "disabled" : ""}>Verbinden</button>${LIVE.err ? `<p class="fb">${esc(LIVE.err)}</p>` : ""}</details>`;
+  }
+  function bindPlayerLive(me) {
+    const j = $("#liveJoin"); if (!j) return;
+    j.onclick = async () => {
+      const code = $("#liveCode").value.trim(), nm = $("#liveName").value.trim();
+      if (!code || !nm) { LIVE.err = "Bitte Live-Code und Namen eingeben."; viewRolle(); return; }
+      const c = liveClient(); if (!c) { viewRolle(); return; }
+      me.name = nm; store.set("kd_eich_me", me);
+      LIVE.busy = true; LIVE.err = "";
+      try { await c.join(code, nm); const st = c.states.runde; if (st) onLiveState({ state_key: "runde", state: st }); toast("Verbunden. Die Runden öffnen sich jetzt von selbst."); }
+      catch (e) { LIVE.err = liveMsg(e); }
+      LIVE.busy = false; document.activeElement && document.activeElement.blur(); viewRolle();
+    };
+  }
+  /** Anklage digital (wenn die Spielleitung sie freigibt). */
+  function accusationForm(d, me) {
+    const c = LIVE.client, mine = c && c.user && c.states["acc:" + c.user.id];
+    const opts = IDS.map((id) => `<option value="${id}">${esc(NAMES[id][male(d.variants, id) ? 1 : 0])}</option>`).join("");
+    if (mine) return `<div class="seal"><span class="stamp">ABGEGEBEN</span><p>Deine Anklage liegt bei der Spielleitung: <b>${esc(NAMES[mine.who][male(d.variants, mine.who) ? 1 : 0])}</b>.</p></div>`;
+    return `<div class="doc"><p class="dossier-head">STERNWARTE EICHENFELS · ANKLAGE</p><h2>Wer hat Theodor Sander getötet?</h2>
+      <label class="fld">Ich klage an<select id="accWho"><option value="">– bitte wählen –</option>${opts}</select></label>
+      <label class="fld">Weil (Motiv)<textarea id="accWhy" rows="3" maxlength="400"></textarea></label>
+      <label class="fld">Der Beweis, der es zeigt<textarea id="accProof" rows="3" maxlength="400"></textarea></label>
+      <button class="btn" id="accSend">Verdeckt abgeben</button><p class="fb" id="accFb"></p><p class="small">Erst nach dem Abgeben sehen die anderen, dass du fertig bist – nicht, wen du anklagst.</p></div>`;
+  }
+  function bindAccusation(me) {
+    const b = $("#accSend"); if (!b) return;
+    b.onclick = async () => {
+      const who = $("#accWho").value, why = $("#accWhy").value.trim(), proof = $("#accProof").value.trim();
+      if (!who) { $("#accFb").textContent = "Bitte eine Person wählen."; return; }
+      if (!confirm("Anklage abgeben? Danach lässt sie sich nicht mehr ändern.")) return;
+      try { await LIVE.client.writeOwn("acc:" + LIVE.client.user.id, { who, why, proof, name: me.name || "", at: Date.now() }); toast("Anklage abgegeben."); }
+      catch (e) { $("#accFb").textContent = liveMsg(e); return; }
+      document.activeElement && document.activeElement.blur(); viewRolle();
+    };
+  }
+  function hostAccusations(host, d) {
+    const c = LIVE.client; if (!liveOn()) return "";
+    const accs = Object.entries(c.states).filter(([k]) => k.startsWith("acc:")).map(([k, v]) => ({ uid: k.slice(4), ...v }));
+    const guests = c.players.filter((p) => !p.is_host);
+    if (!host.anklage) return `<div class="live"><b>Anklagen digital einsammeln</b><p class="small muted">Die verbundenen Gäste bekommen ein Formular. Wer nicht verbunden ist, nutzt den Anklagezettel.</p><button class="btn small" id="accOpen">Formular an alle verbundenen Gäste</button></div>`;
+    const show = host.accShow, solved = (host.seen || {}).solution;
+    return `<div class="live on"><b>Anklagen: ${accs.length} von ${guests.length} verbundenen Gästen abgegeben</b>
+      <p class="small">${guests.map((p) => `${accs.some((a) => a.uid === p.user_id) ? "✓" : "…"} ${esc(p.player_name)}`).join(" · ")}</p>
+      ${show ? `<table class="acc"><thead><tr><th>Name</th><th>klagt an</th><th>Motiv</th><th>Beweis</th>${solved ? "<th></th>" : ""}</tr></thead><tbody>${accs.map((a) => `<tr><td>${esc(c.playerName(a.uid) || a.name)}</td><td><b>${esc(NAMES[a.who] ? NAMES[a.who][male(d.variants, a.who) ? 1 : 0] : "?")}</b></td><td>${esc(a.why)}</td><td>${esc(a.proof)}</td>${solved ? `<td>${a.who === "R08" ? "✓" : "✗"}</td>` : ""}</tr>`).join("")}</tbody></table>
+        ${solved ? `<p class="small">Richtig angeklagt: <b>${accs.filter((a) => a.who === "R08").length}</b> von ${accs.length}.</p>` : `<p class="small muted">Ob es stimmt, zeigt die Tabelle nach dem Öffnen der Lösung.</p>`}` : `<button class="btn small" id="accShow">Anklagen vorlesen</button>`}</div>`;
+  }
+  function bindHostAccusations(host) {
+    const save = () => store.set("kd_eich_host", host);
+    const o = $("#accOpen"); if (o) o.onclick = () => { host.anklage = true; save(); livePush(host); viewLeitung(); };
+    const s = $("#accShow"); if (s) s.onclick = () => { host.accShow = true; save(); viewLeitung(); };
+  }
+  // nach dem Neuladen: laufende Live-Sitzung wiederfinden
+  (() => { try { if (localStorage.getItem("kd_eich_live:" + LIVE_SLUG)) { const c = liveClient(); if (c) c.restore().then(() => { if (liveIsHost()) livePush(store.get("kd_eich_host", {})); liveRefresh(); }).catch(() => {}); } } catch (e) { /* privat */ } })();
+
   /* ---------- Router ---------- */
   function route() {
     const h = location.hash.slice(1);
@@ -346,5 +482,5 @@
   }
   window.addEventListener("hashchange", route);
   route();
-  window.KD = { encode, decode, cast, cardsFor }; // für Tests
+  window.KD = { encode, decode, cast, cardsFor, live: () => LIVE.client }; // für Tests
 })();

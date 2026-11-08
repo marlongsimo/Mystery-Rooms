@@ -178,7 +178,8 @@ for m in re.finditer(r"^- \*\*(Phase \d|Immer):\*\* (.+)$", a7, flags=re.M):
 host_b = veil(md("# Teil B" + b_part))
 guide = md(read("ANLEITUNG.md").split("\n", 1)[1])
 
-data = {"roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide, "sections": sections, "npc": npc, "impulses": impulses}
+plan = read("assets/grundriss.svg")  # Grundriss für alle (Orientierung, ohne Schließregeln – die stehen auf B3)
+data = {"plan": plan, "roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide, "sections": sections, "npc": npc, "impulses": impulses}
 out = "/* Erzeugt von tools/build_content.py aus den .md-Dateien – nicht von Hand bearbeiten. */\nwindow.KD_CONTENT = " + json.dumps(data, ensure_ascii=False) + ";\n"
 os.makedirs(os.path.join(ROOT, "js"), exist_ok=True)
 with open(os.path.join(ROOT, "js", "content.js"), "w", encoding="utf-8") as f:

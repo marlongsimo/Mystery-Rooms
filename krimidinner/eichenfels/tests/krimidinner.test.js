@@ -56,6 +56,13 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
   await A.click('[data-tab="p1"]');
   const heads = await A.$$eval('.doc thead th', (t) => t.map((x) => x.textContent.trim()));
   check(heads.length === 2 && heads[1] === 'Deine Variante', 'Kleidungstabelle zeigt nur die eigene Variante');
+  // Regeln und Grundriss für alle, sofort
+  const tabOrder = await A.$$eval('.tabs button', (b) => b.map((x) => x.dataset.tab));
+  check(tabOrder.indexOf('anl') === 3 && tabOrder.indexOf('haus') === 4, 'Reiter „Regeln“ und „Haus“ direkt nach „Vertraulich“, vor den Runden');
+  await A.click('[data-tab="haus"]');
+  check(Boolean(await A.$('.plan-wrap svg')) && !/Sammlungsschutz|verriegelt, auch/.test(await A.textContent('#pane')), 'Haus: Grundriss sofort sichtbar, Schließregeln erst auf B3');
+  await A.click('[data-tab="anl"]');
+  check(/Regel 2/.test(await A.textContent('#pane')), 'Regeln: die fünf Regeln sofort sichtbar');
   // Runden des Rollenblatts
   await A.click('[data-tab="p3"]');
   check(await A.isVisible('.seal') && !(await A.$('.doc')), 'Runde 1 ist vor dem Losungswort gesperrt');

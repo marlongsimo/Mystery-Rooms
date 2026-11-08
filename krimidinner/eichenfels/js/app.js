@@ -198,13 +198,21 @@
     $("#unl", box).onclick = tryWord; $("#word", box).addEventListener("keydown", (e) => { if (e.key === "Enter") tryWord(); });
     return box;
   }
+  /** Grundriss für alle: Orientierung im Haus. Die Schließregeln stehen erst auf Beweis B3. */
+  function houseHtml() {
+    return `<div class="doc"><p class="dossier-head">STERNWARTE EICHENFELS · DAS HAUS</p><h2>Die Sternwarte Eichenfels</h2>
+      <p>Ein Herrenhaus von 1901 mit Kuppel, heute Sitz der Stiftung. Drei Flügel: im Westen Kartenraum, Restaurierung und die Treppe zur Kuppel, in der Mitte Festsaal, Salon, Küche und Bibliothek, im Osten Archiv und Gästezimmer. Die roten Quadrate sind Türen mit Kartenleser.</p>
+      <p class="plan-hint">↔ Plan zum Verschieben wischen</p><div class="plan-wrap">${C.plan}</div>
+      <p class="small"><i>Wer welche Tür öffnen kann und was bei einem Stromausfall geschieht, erfahrt ihr im Lauf des Abends.</i></p></div>`;
+  }
   let tab = "p0";
   function viewRolle() {
     const me = store.get("kd_eich_me", null), d = me && decode(me.code);
     if (!d || d.host) { go("code"); return; }
     const role = C.roles[d.role], isM = male(d.variants, d.role), name = NAMES[d.role][isM ? 1 : 0], open = me.open || {};
     const runde = liveOn() ? LIVE.client.states.runde : null, accOpen = Boolean(runde && runde.anklage);
-    const tabs = PARTS.map(([, l], k) => [`p${k}`, k >= 3 && !open[k - 2] ? `🔒 ${l}` : l]).concat([["bew", "Beweise"]], accOpen ? [["acc", "Anklage"]] : [], [["anl", "Regeln"]]);
+    const parts = PARTS.map(([, l], k) => [`p${k}`, k >= 3 && !open[k - 2] ? `🔒 ${l}` : l]);
+    const tabs = parts.slice(0, 3).concat([["anl", "Regeln"], ["haus", "Haus"]], parts.slice(3), [["bew", "Beweise"]], accOpen ? [["acc", "Anklage"]] : []);
     app.innerHTML = `<p class="eyebrow">Dein Rollenblatt · ${d.role}</p><h1>${esc(name)}</h1><p class="muted">${esc(role.title.replace(/\s*—.*$/, ""))}</p>${playerLiveBox(me)}
       <nav class="tabs no-print">${tabs.map(([k, l]) => `<button data-tab="${k}" class="${tab === k ? "on" : ""}${k === "p2" ? " secret" : ""}">${l}</button>`).join("")}</nav><section id="pane"></section>`;
     $$("[data-tab]").forEach((b) => b.onclick = () => { tab = b.dataset.tab; viewRolle(); });
@@ -212,7 +220,12 @@
     const pane = $("#pane");
     const printBtn = () => {
       pane.insertAdjacentHTML("beforeend", `<p class="row no-print" style="margin-top:18px"><button class="btn ghost small" id="prt">Mein Rollenblatt drucken</button><a class="btn ghost small" href="#start">Start</a></p>`);
-      $("#prt").onclick = () => { $("#print").innerHTML = ""; PARTS.forEach((_, k) => { const w = document.createElement("div"); w.className = "p-doc"; w.appendChild(rolePart(d, k, true)); $("#print").appendChild(w); }); window.print(); };
+      $("#prt").onclick = () => {
+        const P = $("#print"); P.innerHTML = "";
+        PARTS.forEach((_, k) => { const w = document.createElement("div"); w.className = "p-doc"; w.appendChild(rolePart(d, k, true)); P.appendChild(w); });
+        P.insertAdjacentHTML("beforeend", `<div class="p-doc">${houseHtml()}</div><div class="p-doc"><div class="guide"><h1>Spielanleitung</h1>${C.guide}</div></div>`);
+        window.print();
+      };
     };
     if (tab.startsWith("p")) {
       const k = +tab.slice(1);
@@ -231,6 +244,7 @@
       return;
     }
     if (tab === "anl") { pane.innerHTML = `<div class="guide">${C.guide}</div>`; return; }
+    if (tab === "haus") { pane.innerHTML = houseHtml(); return; }
     if (tab === "acc") { pane.innerHTML = accOpen ? accusationForm(d, me) : `<p class="muted">Die Anklage ist noch nicht freigegeben.</p>`; bindAccusation(me); return; }
     // Beweise
     const unlocked = ROUNDS.filter((r) => open[r.no]);

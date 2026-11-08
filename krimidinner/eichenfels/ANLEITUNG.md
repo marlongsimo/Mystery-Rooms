@@ -22,6 +22,7 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
    - **Charakter:** wer du bist, deine Vorgeschichte, woher du die anderen kennst.
    - **Kleidung:** ein Vorschlag fürs Kostüm und dein **Requisit**.
    - **Vertraulich:** dein Geheimnis, deine Ziele und wie du dich beim Empfang verhältst.
+   - Dazu für alle sofort: die **Regeln** und das **Haus**, also den Grundriss der Sternwarte zur Orientierung.
 
    Was deine Figur in der Mordnacht erlebt hat, steht noch nicht darin. Das öffnet sich erst während des Spiels: **Runde 1, 2 und 3** gehen mit den Losungswörtern auf, die die Spielleitung vorliest – genau wie die Beweise.
 4. **Kostüm:** Niemand muss etwas kaufen. Was du im Schrank hast, reicht. **Steht bei deinem Requisit „Pflicht“, bring es bitte mit.** Es gehört zum Spiel.

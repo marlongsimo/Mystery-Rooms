@@ -54,7 +54,7 @@ Die übrigen Gäste kennst du aus der Planung: Yilmaz aus der Küche, mit {R06: 
 - **21:15** Durch die Glastür siehst du {R01: Leonie / Leon} Sander auf der Terrasse telefonieren. Ihr nickt euch zu.
 - **21:22** Faber kommt in den Festsaal, mit Taschenlampe: „Sturmschaden, alles wieder in Ordnung.“ Danach bleibt {R09: sie / er} bei den Gästen.
 - **21:33** Verbindungstür West. Du willst Sander zum Dessert holen.
-- **21:35** Du findest ihn. Er liegt neben dem Kartentisch. Die Vitrine steht offen, die Armillarsphäre liegt am Boden, **der Messingsockel fehlt, das Samttuch auch.** Du schreist.
+- **21:35** Du findest ihn. Später, als Seebach ihn untersucht, siehst du seine Zugangskarte in der Innentasche des Jacketts. Er liegt neben dem Kartentisch. Die Vitrine steht offen, die Armillarsphäre liegt am Boden, **der Messingsockel fehlt, das Samttuch auch.** Du schreist.
 
 **Was du über andere weißt:**
 - Rademacher trägt bei der Arbeit immer weiße Baumwollhandschuhe. Beim Dinner steckten sie {R08: ihr / ihm} in der Jackentasche.

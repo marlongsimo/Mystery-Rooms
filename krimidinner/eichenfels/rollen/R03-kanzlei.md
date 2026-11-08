@@ -1,6 +1,6 @@
 # Rollenblatt R03 · Die Kanzlei der Stiftung
 
-*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R03: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R03). In der fertigen Fassung steht nur das jeweils Passende.*
+*Schreibweise: `[weiblich / männlich]` gilt für deine eigene Rolle. `{R08: die / der}` richtet sich nach der Variante einer anderen Rolle (hier R08). In der fertigen Fassung steht nur das jeweils Passende.*
 
 ---
 

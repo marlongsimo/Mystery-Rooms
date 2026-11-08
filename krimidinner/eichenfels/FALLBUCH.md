@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: Entwurf 0.1 zur Freigabe · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.2 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -16,7 +16,7 @@ Stand: Entwurf 0.1 zur Freigabe · Grundlage: Konzept „Der letzte Stern von Ei
 | 3 | **Der Fall ist schwerer:** Die Notiz nennt nur „R.“ (passt auch auf die Kanzlei Ritter), die Archivliste ist mit „J. R.“ abgezeichnet (passt auf beide), das Zutrittsprotokoll hat eine Lücke von zwölf Minuten. | Im Konzept war der Fall nach Notiz und Zutrittsprotokoll praktisch gelöst. |
 | 4 | **Überführen statt raten:** Die Lösung ergibt sich aus einer Kette von drei Beweisen, die jeder für sich harmlos wirken (Abschnitt 6). | Plausibilitätsforderung aus dem Konzept |
 | 5 | **4–10 Personen**, kein Kurzmodus für 2–3. | Ohne Verhör und Bluff trägt ein Krimidinner nicht. |
-| 6 | **Eine Regel gegen Willkür:** Alle dürfen ihr Geheimnis verschweigen. Über den eigenen Aufenthaltsort lügen darf nur die Täterrolle. | Sonst ist kein Alibi etwas wert, und die Gruppe kann nichts beweisen. |
+| 6 | **Eine Regel gegen Willkür (Regel 2, freigegeben):** Alle dürfen ihr Geheimnis verschweigen. Über Aufenthaltsort und Handlungen zur Tatzeit lügen darf nur die Täterrolle. | Sonst ist kein Alibi etwas wert, und die Gruppe kann nichts beweisen. |
 | 7 | **Trumpfkarten:** Einige Rollen halten Wissen, das die Lösung beschleunigt, aber nicht nötig ist. Alles, was für die Lösung **nötig** ist, gibt die Spielleitung ohnehin frei. | So funktioniert der Fall mit 4 wie mit 10 Personen. |
 
 ---
@@ -61,7 +61,7 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 | 19:30 | Dinner im Festsaal. Rademacher sitzt neben Falk – auf Sanders ausdrücklichen Wunsch (Hollerbach hat den Sitzplan am Nachmittag geändert). |
 | 20:40 | Sanders Ansprache: „Um 22 Uhr werde ich Ihnen allen die Wahrheit erzählen …“ |
 | 20:44 | Sander geht in den Kartenraum (Westflügel). |
-| 20:49 | Marwitz folgt ihm. Heftiger Streit über den Atlas. Hollerbach hört um 20:55 im Flur: „… dann sage ich es heute Abend selbst, vor allen!“ |
+| 20:49 | Marwitz folgt ihm. Heftiger Streit über den Atlas. Hollerbach, über den Servicegang (ohne Kartenleser) im Westflügel unterwegs, hört um 20:55 im Flur: „… dann sage ich es heute Abend selbst, vor allen!“ |
 | 20:55 | Leonie Sander und Ritter reden in der Bibliothek über das Testament. |
 | 21:02 | Marwitz verlässt den Kartenraum und steigt zur Kuppel hinauf, wo sie vor dreißig Jahren mit Sander gearbeitet hat. |
 | 21:03 | Lindner (Presse) geht in den Westflügel. Rademacher verlässt das Archiv. |
@@ -517,18 +517,58 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 
 ## 9. Spielregeln für alle (steht in der Anleitung)
 
-1. Du darfst dein Geheimnis verschweigen, ausweichen und schweigen.
-2. **Über deinen Aufenthaltsort darfst du nicht lügen.** Nur die Täterrolle darf das.
-3. Beweise sind wahr. Was auf einer Beweiskarte steht, gilt.
-4. Trumpfkarten spielst du aus, wann du willst, oder gar nicht.
-5. Niemand zeigt sein Rollenblatt vor dem Finale.
+**Regel 1 – Geheimnisse:** Du darfst dein Geheimnis verschweigen, Gesprächen ausweichen, Motive herunterspielen und persönliche Informationen zurückhalten. Niemand muss freiwillig sein ganzes Wissen offenlegen.
 
-## 10. Offene Fragen zur Freigabe
+**Regel 2 – Wahrheit und Lüge (freigegeben):**
+- Alle unschuldigen Rollen geben ihren **tatsächlichen Aufenthaltsort und ihre Handlungen zur Tatzeit** wahrheitsgemäß wieder.
+- Nur die Täterrolle darf über Aufenthaltsort und Handlungen lügen.
+- Die Regel kennen alle vor Spielbeginn. Wer die Täterrolle hat, erfährt nur die Person selbst.
 
-1. **Namen:** Sind die neuen Namen in Ordnung, vor allem Sander (Opfer) und Rademacher (Täterrolle)?
-2. **Die Regel „nur die Täterrolle darf über den Aufenthaltsort lügen“:** Sie macht den Fall lösbar, ist aber streng. Alternative: Alle dürfen lügen, und das Zutrittsprotokoll ist dann das einzige harte Alibi.
-3. **Ton:** Der Fall ist ernst, mit leiser Ironie (Wein-Diebstahl, Teleskop-Fotos). Soll er heiterer werden, mit mehr komischen Figuren?
-4. **Punkte am Ende:** ja oder nein?
-5. **Name der Reihe auf der Startseite:** „Krimidinner“ als eigene Kategorie?
+**Regel 3:** Beweise sind wahr. Was auf einer Beweiskarte steht, gilt.
 
-Nach der Freigabe folgen die ausformulierten Rollenblätter (beide Varianten), die Beweiskarten im Layout, das Gastgeberheft und die Anleitung, danach die Technik (Codes, Spieleransicht, Freigabe der Runden, Druckversion).
+**Regel 4:** Trumpfkarten spielst du aus, wann du willst, oder gar nicht.
+
+**Regel 5:** Niemand zeigt die vertraulichen Seiten seines Rollenblatts vor dem Finale.
+
+## 10. Standards für die Rollenblätter (freigegeben am Musterblatt R03)
+
+| Bestandteil | Festlegung |
+|---|---|
+| Umfang | vier Seiten je Rolle: 1 Charakter und Vorgeschichte · 2 Kleidung · 3 Was du weißt · 4 vertraulich: Geheimnis, Ziele, Spielhinweise |
+| Varianten | weiblich und männlich, eine Rollen-ID (R01–R10), nur Name, Anrede und Pronomen wechseln |
+| Charakterbeschreibung | ca. 100–150 Wörter: Name, Alter, Beruf, Beziehung zum Opfer, Eigenschaften, Kurzbeschreibung |
+| Vorgeschichte | ca. 300–400 Wörter, mit Verbindungen zu den anderen Gästen |
+| Kleidung | gemeinsames Grundbild für beide Varianten (gleicher Status, gleiche Persönlichkeit), konkrete Teile je Variante, Hinweis „niemand muss etwas kaufen“ |
+| Requisit | mindestens eines mit Spielrelevanz. **Nur R08 trägt eine Lesebrille an einer Kette.** |
+| Was du weißt | Abend minutengenau, Wissen über andere, was du sagen darfst |
+| Geheimnis | eigene vertrauliche Seite. Bei R08 zusätzlich Tat, Lüge und Verteidigungsstrategie |
+| Ziele | genau drei: persönlich · zu einer anderen Person · zum Fall |
+| Spielhinweise | für jede Phase, dazu: wen ansprechen, was vermeiden, Trumpf |
+| Ton | ernst und atmosphärisch, gehobene Sprache, subtile Ironie, nicht blutrünstig |
+| Quelle | ausschließlich dieses Fallbuch. Neue Tatsachen in Rollenblättern werden hier nachgetragen. |
+
+## 11. Entscheidungen
+
+| Frage | Entscheidung |
+|---|---|
+| Namen | Die neuen Namen dieses Fallbuchs gelten. Das ursprüngliche Konzept (Ahrens, Voss, Reuter …) ist verworfen. |
+| Regel 2 | Ja, in der Fassung oben. |
+| Ton | Ernst, atmosphärisch, subtil ironisch. |
+| Hinweis Inventarliste (aus R03) | Freigegeben, siehe unten. Er reicht allein nie zur Überführung. |
+| Punkte am Ende | offen |
+| Kategorie „Krimidinner“ auf der Startseite | offen |
+
+**Nachgetragene Tatsachen aus den Rollenblättern:**
+- *(R03, freigegeben)* Im Frühjahr bat Rademacher Ritter, die jährliche Inventarliste für die Versicherung „ohne die Karten 41–48, die sind in der Restaurierung“ zu unterschreiben. Ritter dachte sich nichts dabei. Das stützt B6, beweist aber allein nichts.
+- *(R04)* Lindner bekam vor sechs Monaten anonym eine Kopie der Karte 41 und den Satz „Fragen Sie, wer den Nordhimmel gezeichnet hat.“ **Absender war Sander selbst** (nur Gastgeberheft, Auflösung). Er wollte, dass die Wahrheit auch dann herauskommt, wenn er sie nicht mehr selbst sagen kann.
+- *(R02)* Rademacher fragte Marwitz beim Empfang, ob [sie / er] „noch Unterlagen aus der Atlas-Zeit“ habe – sie (er) wollte wissen, ob es Kopien der Originale mit „I. M.“ gibt.
+- *(R05)* Hollerbach war um 20:55 über den Servicegang im Westflügel (deshalb nicht im Protokoll).
+- *(R07)* Sander zu Seebach, letzten Sonntag beim Schach: „Im Archiv stimmt etwas nicht. Ich werde bestohlen, von jemandem, dem ich vertraut habe.“
+- *(R10)* Rademacher zu Falk vor einigen Wochen: „Sander ahnt etwas. Aber er hat keine Beweise.“ Seebach sah Falk um 21:29 eine Nachricht lesen und blass werden.
+- *(R09)* Fabers Nebengeschäft heißt „Thüringer Nachthimmel“. Das Teleskop belichtete seit 20 Uhr den Pferdekopfnebel.
+- *(R01, R06)* Nebenfiguren mit Namen: Kim (Leonies [Leons] Freund/in am Telefon), Deniz (Yilmaz’ Bruder), Jo (Küchenaushilfe), Marianne Sander (verstorbene Mutter).
+- *(R08)* Rademachers Motiv neben Geld: die Pflegekosten der Mutter, zweimal abgelehnte Gehaltserhöhung. Die Archivliste nahm sie (er) aus dem Kartenraum mit und zerriss sie um 21:31 im Archiv (deshalb B6 im Papierkorb).
+
+**Rollenblätter:** `rollen/R01-familie.md` bis `rollen/R10-sammler.md`, alle nach den Standards in Abschnitt 10. R10 heißt im Titel „Die private Sammlung“ (geschlechtsneutral).
+
+Als Nächstes folgen die Beweiskarten im Layout, das Gastgeberheft und die Anleitung, danach die Technik (Codes, Spieleransicht, Freigabe der Runden, Druckversion).

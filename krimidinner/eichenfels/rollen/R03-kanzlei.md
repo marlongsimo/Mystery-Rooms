@@ -13,13 +13,13 @@
 
 **Eigenschaften:** korrekt · verschwiegen · beherrscht · sagt lieber nichts als etwas Halbes · hasst Überraschungen
 
-**Kurzbeschreibung:** Man erkennt [sie / ihn] daran, dass [sie / er] als Einzige(r) im Raum nie die Stimme hebt. Wenn [sie / er] lächelt, hat [sie / er] vorher entschieden, dass es angebracht ist.
+**Kurzbeschreibung:** Man erkennt [sie / ihn] daran, dass [sie / er] als Einzige(r) im Raum nie die Stimme hebt. Wenn [sie / er] lächelt, hat [sie / er] vorher entschieden, dass es angebracht ist. Im Raum ist [sie / er] die Person, der man ansieht, dass sie den Inhalt jeder Mappe kennt, die sie trägt, und nichts davon verraten wird. Wer [ihr / ihm] eine Frage stellt, bekommt eine Antwort, die vollkommen korrekt ist und nichts enthält.
 
 ## Seite 1 · Deine Vorgeschichte
 
 Du bist in Ilmenau aufgewachsen, keine zwanzig Kilometer von der Sternwarte entfernt. Als Kind warst du mit der Schulklasse einmal oben in der Kuppel, und der Mann, der euch damals den Saturn zeigte, war ein junger, ungeduldiger Assistent namens Theodor Sander. Du hast ihn daran nie erinnert.
 
-Vor zehn Jahren übernahm deine Kanzlei das Mandat der Stiftung. Es war ein Prestigeauftrag, aber kein angenehmer. Sander behandelte Juristen wie Handwerker, die man ruft, wenn etwas tropft. Er unterschrieb, ohne zu lesen, und beschwerte sich dann über das, was er unterschrieben hatte. Trotzdem hast du gelernt, ihn zu lesen: Wenn er leise wurde, meinte er es ernst.
+Vor zehn Jahren übernahm deine Kanzlei das Mandat der Stiftung. Es war ein Prestigeauftrag, aber kein angenehmer. Sander behandelte Juristen wie Handwerker, die man ruft, wenn etwas tropft. Er unterschrieb, ohne zu lesen, und beschwerte sich dann über das, was er unterschrieben hatte. Trotzdem hast du gelernt, ihn zu lesen: Wenn er leise wurde, meinte er es ernst. Seit drei Wochen trägst du die Abschrift seines Testaments mit dir herum wie etwas, das zu warm ist, um es lange festzuhalten.
 
 Vor drei Wochen wurde er sehr leise. Er bestellte dich an einem Dienstag um zehn Uhr in sein Arbeitszimmer und diktierte dir ein neues Testament. Dabei sah er schlecht aus, grau im Gesicht, und er sagte einen Satz, den du seitdem nicht vergisst: „Ich habe nicht mehr viel Zeit für Ausreden, Frau [Herr] Ritter. Weder für meine noch für die anderer.“
 

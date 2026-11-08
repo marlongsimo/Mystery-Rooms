@@ -92,7 +92,7 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 **Regeln für dich:** Du darfst lügen, auch über Aufenthaltsort und Handlungen. Erfinde aber keine Beweisstücke, und behaupte nichts, was einem ausgeteilten Beweis direkt widerspricht, ohne eine Erklärung zu haben. Ein gutes Spiel braucht eine gute Verteidigung, kein Schweigen.
 
 - **Phase 1 (Empfang):** Sei freundlich und hilfsbereit, erzähl gern vom Atlas. Wer viel über Sternkarten weiß, wirkt harmlos.
-- **Phase 2 (Mord):** Wirk erschüttert, nicht überrascht. Gib deine Archiv-Geschichte. Erwähne beiläufig den Streit zwischen Marwitz und Sander.
+- **Phase 2 (Mord):** Wirk erschüttert, nicht überrascht. Erzähl deine Geschichte von Anfang an so, wie sie oben steht, mit Westflügel und Restaurierung. Dann passt sie später zum Protokoll. Erwähne beiläufig den Streit zwischen Marwitz und Sander.
 - **Phase 3 (Kalender und Archivliste):** Gefährlich. Das „R.“ und das „J. R.“ passen auch auf Ritter, nutze das, aber greif Ritter nicht zu offen an. Zur Archivliste: „Die Inventarnummern habe ich auf Anweisung geändert, als die Originale zur Restaurierung gingen. Das ist ein normaler Vorgang.“
 - **Phase 4 (Protokoll, Küche):** Das Protokoll stützt deine Geschichte, bleib ruhig. Gefährlich ist die Küche: Jemand hat um 21:22 eine Person mit einem schweren Bündel gesehen, und es klirrte. Erinnere daran, dass mehrere Menschen hier klirren, und dass „im Dunkeln“ niemand genau hinsieht.
 - **Wen du ansprechen solltest:** Faber, um ihn wegen des Stromausfalls nervös zu machen. Marwitz, um {R02: sie / ihn} über den Streit reden zu lassen.

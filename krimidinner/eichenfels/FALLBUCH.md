@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.5 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.6 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -132,7 +132,7 @@ Die Spielleitung gibt sie rundenweise frei, digital auf allen Handys oder als Ka
 ### Runde 1 · nach dem Fund (Phase 2)
 
 **B1 · Tatortbericht (Kartenraum, 21:40, aufgenommen von Hollerbach und Seebach)**
-Sander liegt neben dem Kartentisch, Schlag auf den Hinterkopf. Der Kartentisch ist aufgeräumt, die Archivliste fehlt. Das Fenster ist geschlossen und von innen verriegelt, die Tür war nur angelehnt. Die Vitrine der **Armillarsphäre** steht offen: Die Sphäre liegt am Boden, ihr **schwerer Messingsockel fehlt**, das **Samttuch** der Vitrine ebenfalls. In der Innentasche seines Jacketts steckt **seine eigene Zugangskarte**. Auf dem Tisch liegt der Himmelsatlas, aufgeschlagen bei Karte 41, daneben eine Lupe.
+Sander liegt neben dem Kartentisch, Schlag auf den Hinterkopf. Der Kartentisch ist aufgeräumt. Darauf liegt eine leere Klarsichthülle mit der Aufschrift „Archivliste Atlas“. Das Fenster ist geschlossen und von innen verriegelt, die Tür war nur angelehnt. Die Vitrine der **Armillarsphäre** steht offen: Die Sphäre liegt am Boden, ihr **schwerer Messingsockel fehlt**, das **Samttuch** der Vitrine ebenfalls. In der Innentasche seines Jacketts steckt **seine eigene Zugangskarte**. Auf dem Tisch liegt der Himmelsatlas, aufgeschlagen bei Karte 41, daneben eine Lupe.
 
 **B2 · Erste ärztliche Einschätzung (Seebach)**
 Todeszeit 21:10–21:25. Ein Schlag von hinten mit schwerem, kantigem Gegenstand. Starke Blutung. *(Der Satz über den Blutverdünner steht nur auf Seebachs Rollenblatt. Ist Seebach nicht besetzt, liest die Spielleitung ihn in Runde 2 vor.)*
@@ -192,7 +192,7 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 **B10 · Technikprotokoll der Hauptverteilung**
 „21:07 Anmeldung Kuppelpult: Karte Faber · **21:08 Unterbrechung ausgelöst: NOT-AUS Kuppelpult (manuell)** · 21:16 Neustart eingeleitet, Hauptverteilung Keller (Schalter halten, 4 Min.) · 21:20 Neustart abgeschlossen · 21:21 Abmeldung Hauptverteilung: Karte Faber. Teleskop: Nutzungsprotokoll gelöscht (Not-Aus).“ *Kein Sturm: Der Stromausfall wurde von Hand ausgelöst.*
 
-**B11 · Aussage aus der Küche** *(die Aushilfe Jo, falls Yilmaz nicht besetzt ist oder bis Runde 3 nichts gesagt hat)*
+**B11 · Aussage aus der Küche** *(die Aushilfe Jo, kommt in Runde 3 immer, weil sie auch Fabers Weg belegt. Hat Yilmaz die Beobachtung schon erzählt, bestätigt B11 sie nur.)*
 „Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Um 21:21 kam er wieder hoch, ich hab auf die Küchenuhr geschaut, weil das Licht gerade wieder da war, und ging direkt in den Festsaal. Danach stand er die ganze Zeit dort bei den Gästen, ich hab ihn durch die Durchreiche gesehen. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen, und dann, so gegen zwanzig nach, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
 
 **B12 · Lindners Aufnahme, Abschrift** *(falls nicht schon von Lindner vorgelegt)*: wie auf dem Rollenblatt von Lindner.
@@ -202,7 +202,7 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 **B13 · Die Transportkiste („Leihgabe – Falk Collection“, Restaurierung)**
 Darin: der Messingsockel, eingewickelt in das Samttuch, mit Blut. Ein Paar weiße Baumwollhandschuhe mit dem Stempel „ARCHIV EICHENFELS“, die Fingerspitzen dunkelrot. Eine Mappe mit acht Sternkarten, Karten 41–48, **Originale**, mit Korrekturen am Rand, jede abgezeichnet „**I. M.**“.
 
-**B14 · Sanders Redemanuskript (Innentasche seines Jacketts)**
+**B14 · Sanders Redemanuskript (versiegelter Umschlag im Rednerpult des Festsaals, Aufschrift „Erst um 22 Uhr öffnen“)**
 > „Ich habe nicht mehr viel Zeit, und ich will sie nicht mit Lügen verbringen. Der Himmelsatlas, für den man mich seit dreißig Jahren ehrt, ist zur Hälfte das Werk von {R02: Irene / Ingo} Marwitz. Ich habe das verschwiegen, weil ich die Professur wollte. – Und jemand in diesem Haus hat die Blätter, die das beweisen, verkauft. Ich werde heute Abend sagen, wer.“
 
 ---
@@ -246,7 +246,7 @@ Für die Lösung genügen die Glieder 1 und 2. Glied 3 überführt Rademacher en
 
 ### Probe für 4 Personen (R02, R08, R09, R10, alle anderen sind Nebenfiguren)
 
-Die Spielleitung gibt frei: B1–B6, B7, B8 (Seebach fehlt), B9, B10, B11 (Yilmaz fehlt), B12 (Lindner fehlt).
+Die Spielleitung gibt frei: B1–B6, B7, B8 (Seebach fehlt), B9, B10, B11 (immer), B12 (Lindner fehlt).
 - Glied 1: B5 + B3 + B9 (Ritter im Ostflügel) + B12 + B9 (wer um 21:09 im Westflügel war). ✓
 - Glied 2: B11 + B9 + B3 + B1 (Sanders Karte beim Toten) + B11 (Faber ab 21:21 im Festsaal). ✓
 - Glied 3: B11 („keine Menschenseele“) gegen Rademachers eigene Geschichte. ✓
@@ -268,7 +268,7 @@ Jede Person stellt sich mit dem Teil „Öffentlich“ vor. Nicht besetzte Rolle
 
 ### Phase 2 · Der Mord (ca. 20 Min.)
 
-> **Vorlesen:** „Um 21:08 erlischt das Licht. Notlampen flackern, irgendwo schlägt eine Tür. Um 21:20 ist der Strom zurück. Das Dessert wird aufgetragen – aber der Platz des Professors bleibt leer. Um 21:35 hören Sie einen Schrei aus dem Westflügel. Professor Sander liegt tot im Kartenraum. Draußen tobt der Sturm, ein Baum blockiert die Zufahrt, das Netz ist schwach. Die Polizei kommt frühestens im Morgengrauen. Bis dahin sind Sie unter sich – und einer von Ihnen hat es getan.“
+> **Vorlesen:** „Um 21:08 erlischt das Licht. Notlampen flackern, irgendwo schlägt eine Tür. Um 21:20 ist der Strom zurück. Das Dessert wird aufgetragen – aber der Platz des Professors bleibt leer. Um 21:35 hören Sie einen Schrei aus dem Westflügel. Professor Sander liegt tot im Kartenraum. Draußen tobt der Sturm, ein Baum blockiert die Zufahrt, das Netz ist schwach. Die Polizei kommt frühestens im Morgengrauen. Bis dahin sind Sie unter sich – und eine Person in diesem Raum hat es getan.“
 
 Beweise B1–B4 freigeben. **Runde der Alibis:** Jede Person sagt, wo sie zwischen 21:00 und 21:35 war. (Erinnerung an die Regel: Nur die Täterrolle darf darüber lügen.)
 
@@ -282,7 +282,7 @@ Beweise B5–B7 (und B8, wenn Seebach nicht besetzt ist) freigeben. *Spielzeit i
 
 > **Vorlesen:** „Gegen halb zwölf gelingt es Faber (oder: der Haustechnik), den Server im Keller auszulesen. Das Zutrittsprotokoll des Abends liegt auf dem Tisch. Und in der Küche erzählt die Aushilfe Jo, was ihr seltsam vorkam.“
 
-Beweise B9–B11 (und B12, falls noch nicht vorgelegt) freigeben.
+Beweise B9, B10 und B11 freigeben (immer), dazu B12, falls Lindners Aufnahme noch nicht auf dem Tisch liegt.
 
 ### Finale · Anklage und Auflösung (15–30 Min.)
 
@@ -370,4 +370,6 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 
 **Rollenblätter:** `rollen/R01-familie.md` bis `rollen/R10-sammler.md`, alle nach den Standards in Abschnitt 10. R10 heißt im Titel „Die private Sammlung“ (geschlechtsneutral).
 
-Als Nächstes folgen die Beweiskarten im Layout, das Gastgeberheft und die Anleitung, danach die Technik (Codes, Spieleransicht, Freigabe der Runden, Druckversion).
+**Weitere Unterlagen (Stand 0.6):** `BEWEISKARTEN.md` (B1–B14 mit Gestaltung), `GASTGEBERHEFT.md` (Teil A offen, Teil B versiegelt), `ANLEITUNG.md` (für alle, ohne Lösung). Bei Abweichungen gilt dieses Fallbuch.
+
+Als Nächstes folgt die Technik (Codes, Spieleransicht, Freigabe der Runden, Druckversion).

@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.3 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach der systematischen Prüfung (Schließanlage, Beweiskette, Klirren, Zeitrahmen) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.4 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -100,7 +100,7 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 
 **Rademachers Geschichte (die Lüge):** „Wegen des Unwetters wollte ich nach den Leihgaben in der Restaurierung sehen, Feuchtigkeit ist Gift für Papier. Um 21:03 bin ich aus dem Archiv, um 21:05 in den Westflügel. Kurz bevor ich an der Restaurierung war, fiel der Strom aus, die Tür war verriegelt. Ich habe im Dunkeln davor gewartet, unten im Erdgeschoss. Als der Strom zurück war, habe ich die Temperatur geprüft und bin um halb zehn zurück ins Archiv.“
 
-Diese Geschichte **passt zum Zutrittsprotokoll**. Das Protokoll zeigt nur, dass Rademacher zur Tatzeit im Westflügel war, genau wie Marwitz, Faber und Lindner. Gelogen ist zweierlei: Rademacher stand nicht unten vor der Restaurierung, sondern oben im Kartenraum, und ging nicht mit leeren Händen in die Restaurierung. Widerlegt wird beides erst durch die Kombination aus Kalender, Aufnahme, Beobachtung der Küche und Kartenlogik (Abschnitt 6).
+Diese Geschichte **passt zum Zutrittsprotokoll**. Das Protokoll zeigt nur, dass Rademacher zur Tatzeit im Westflügel war, genau wie Marwitz, Faber und Lindner. **Gelogen ist der Ort:** Rademacher stand nicht unten vor der Restaurierung, sondern oben im Kartenraum. **Verschwiegen ist das Bündel:** Dass {R08: sie / er} um 21:22 etwas getragen hat, erwähnt {R08: sie / er} nicht. Das ist nach Regel 1 noch keine Lüge. Wird {R08: sie / er} direkt danach gefragt, muss {R08: sie / er} lügen. Widerlegt wird die Geschichte erst durch die Kombination aus Kalender, Aufnahme, Beobachtung der Küche und Kartenlogik (Abschnitt 6).
 
 ---
 
@@ -138,7 +138,10 @@ Sander liegt neben dem Kartentisch, Schlag auf den Hinterkopf. Der Kartentisch i
 Todeszeit 21:10–21:25. Ein Schlag von hinten mit schwerem, kantigem Gegenstand. Starke Blutung. *(Der Satz über den Blutverdünner steht nur auf Seebachs Rollenblatt. Ist Seebach nicht besetzt, liest die Spielleitung ihn in Runde 2 vor.)*
 
 **B3 · Grundriss und Schließanlage**
-Der Plan aus Abschnitt 2, mit dem Satz: „Bei Stromausfall: Westflügel entriegelt, Ostflügel verriegelt.“
+Der Plan aus Abschnitt 2 und die **vollständige Schließanlage**, so wie sie die Gruppe braucht:
+- Kartenleser an: Verbindungstür West, Verbindungstür Ost, Archiv, Restaurierung. Kartenraum, Kuppel, Vorratskeller und Servicegang haben keinen.
+- **Archiv und Restaurierung öffnen nur drei Karten: die von Sander, Rademacher und Faber.**
+- Bei Stromausfall: Flure und Verbindungstür West **entriegelt** · Verbindungstür Ost **verriegelt** · **Archiv und Restaurierung verriegelt, auch für berechtigte Karten** · kein Kartenleser protokolliert.
 
 **B4 · Ablaufplan des Abends (Hollerbach)**
 18:30 Empfang · 19:30 Dinner · 20:40 Ansprache Prof. Sander · 21:30 Dessert · **22:00 „Die Wahrheit über Eichenfels“ – Rede Prof. Sander, Festsaal** · 23:00 Kuppelführung (abgesagt wegen Unwetter)
@@ -190,7 +193,7 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 „21:07 Anmeldung Kuppelpult: Karte Faber · **21:08 Unterbrechung ausgelöst: NOT-AUS Kuppelpult (manuell)** · 21:16 Neustart eingeleitet, Hauptverteilung Keller (Schalter halten, 4 Min.) · 21:20 Neustart abgeschlossen · 21:21 Abmeldung Hauptverteilung: Karte Faber. Teleskop: Nutzungsprotokoll gelöscht (Not-Aus).“ *Kein Sturm: Der Stromausfall wurde von Hand ausgelöst.*
 
 **B11 · Aussage aus der Küche** *(die Aushilfe Jo, falls Yilmaz nicht besetzt ist oder bis Runde 3 nichts gesagt hat)*
-„Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Kurz nach zwanzig nach kam er wieder hoch und ging in den Festsaal. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, da unten sei die ganze Zeit keine Menschenseele gewesen, und dann, so gegen zwanzig nach, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
+„Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Kurz nach zwanzig nach kam er wieder hoch und ging in den Festsaal. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen, und dann, so gegen zwanzig nach, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
 
 **B12 · Lindners Aufnahme, Abschrift** *(falls nicht schon von Lindner vorgelegt)*: wie auf dem Rollenblatt von Lindner.
 
@@ -200,7 +203,7 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 Darin: der Messingsockel, eingewickelt in das Samttuch, mit Blut. Ein Paar weiße Baumwollhandschuhe mit dem Stempel „ARCHIV EICHENFELS“, die Fingerspitzen dunkelrot. Eine Mappe mit acht Sternkarten, Karten 41–48, **Originale**, mit Korrekturen am Rand, jede abgezeichnet „**I. M.**“.
 
 **B14 · Sanders Redemanuskript (Innentasche seines Jacketts)**
-> „Ich habe nicht mehr viel Zeit, und ich will sie nicht mit Lügen verbringen. Der Himmelsatlas, für den man mich seit dreißig Jahren ehrt, ist zur Hälfte das Werk von Irene (Ingo) Marwitz. Ich habe das verschwiegen, weil ich die Professur wollte. – Und jemand in diesem Haus hat die Blätter, die das beweisen, verkauft. Ich werde heute Abend sagen, wer.“
+> „Ich habe nicht mehr viel Zeit, und ich will sie nicht mit Lügen verbringen. Der Himmelsatlas, für den man mich seit dreißig Jahren ehrt, ist zur Hälfte das Werk von {R02: Irene / Ingo} Marwitz. Ich habe das verschwiegen, weil ich die Professur wollte. – Und jemand in diesem Haus hat die Blätter, die das beweisen, verkauft. Ich werde heute Abend sagen, wer.“
 
 ---
 
@@ -220,7 +223,7 @@ Darin: der Messingsockel, eingewickelt in das Samttuch, mit Blut. Ein Paar weiß
 
 1. **Die verabredete Person war Rademacher.** Kalender (B5): „21:15 R. – Liste mitbringen!“. Die Kanzlei heißt bei Sander immer „Kanzlei“, ihr Termin war um 22:30. Ritter war außerdem ab 21:07 im verriegelten Ostflügel eingeschlossen (B3, B9). „Liste“ meint die Archivliste (B6). Um 21:09 kam der Besuch „früh“ (B12). Im Westflügel waren zu dieser Zeit nur Marwitz und Faber (zusammen in der Kuppel, B10 plus ihre Aussagen), Lindner (gerade gegangen) und Rademacher (seit 21:05, B9).
 2. **Rademacher hat die Tatwaffe in die Restaurierung gebracht.** Um 21:22 trägt jemand etwas Schweres, Klirrendes zur Restaurierung (B11 / Yilmaz). Um 21:24 öffnet sie eine Karte (B9). Die Tür öffnen nur drei Karten (B3): Sanders (tot), Fabers (Faber ist um 21:22 im Festsaal, B11) und Rademachers. Es war Rademachers Karte.
-3. **Rademachers Geschichte ist gelogen.** Rademacher sagt, sie (er) habe 21:08–21:20 unten vor der Restaurierung gewartet. Yilmaz war ab 21:15 genau dort und hat bis 21:22 niemanden gesehen (B11). Und Rademacher behauptet, mit leeren Händen in die Restaurierung gegangen zu sein. Nach Regel 2 darf nur die Täterrolle über Aufenthalt und Handlungen lügen.
+3. **Rademachers Geschichte ist gelogen.** Rademacher sagt, {R08: sie / er} habe 21:08–21:20 unten vor der Restaurierung gewartet. Yilmaz war ab 21:15 genau dort, mit offener Tür und freiem Blick auf Gang und Restaurierungstür, und hat bis 21:22 niemanden gesehen oder gehört (B11). Nach Regel 2 darf nur die Täterrolle über Aufenthalt und Handlungen lügen.
 
 **Motiv:** Archivliste „J. R.“ (B6), die Bitte an Ritter, die Versicherungsliste ohne die Karten 41–48 zu unterschreiben (R03), der Sitzplan „R. neben F.“ (R05), die SMS an Falk (Trumpf R10).
 **Stützend:** Blut und Handschuhe (B8 / R07) und Rademachers weiße Archivhandschuhe (R05).
@@ -333,7 +336,7 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 | Charakterbeschreibung | ca. 100–150 Wörter: Name, Alter, Beruf, Beziehung zum Opfer, Eigenschaften, Kurzbeschreibung |
 | Vorgeschichte | ca. 300–400 Wörter, mit Verbindungen zu den anderen Gästen |
 | Kleidung | gemeinsames Grundbild für beide Varianten (gleicher Status, gleiche Persönlichkeit), konkrete Teile je Variante, Hinweis „niemand muss etwas kaufen“ |
-| Requisit | mindestens eines mit Spielrelevanz. **Drei Rollen tragen etwas, das beim Gehen klirrt:** R08 Brillenkette, R09 Schlüsselbund, R10 Kettenarmband bzw. Uhrkette. Alle anderen tragen nichts Klirrendes und keine Brille an einer Kette. |
+| Requisit | mindestens eines mit Spielrelevanz. **Pflicht und ohne Kauf: Drei Rollen tragen etwas, das beim Gehen hörbar klirrt:** R08 Brillenkette, R09 Schlüsselbund, R10 Kettenarmband bzw. Uhrkette. Alle anderen tragen nichts Klirrendes und keine Brille an einer Kette. |
 | Was du weißt | Abend minutengenau, Wissen über andere, was du sagen darfst |
 | Geheimnis | eigene vertrauliche Seite. Bei R08 zusätzlich Tat, Lüge und Verteidigungsstrategie |
 | Ziele | genau drei: persönlich · zu einer anderen Person · zum Fall |
@@ -355,13 +358,13 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 **Nachgetragene Tatsachen aus den Rollenblättern:**
 - *(R03, freigegeben)* Im Frühjahr bat Rademacher Ritter, die jährliche Inventarliste für die Versicherung „ohne die Karten 41–48, die sind in der Restaurierung“ zu unterschreiben. Ritter dachte sich nichts dabei. Das stützt B6, beweist aber allein nichts.
 - *(R04)* Lindner bekam vor sechs Monaten anonym eine Kopie der Karte 41 und den Satz „Fragen Sie, wer den Nordhimmel gezeichnet hat.“ **Absender war Sander selbst** (nur Gastgeberheft, Auflösung). Er wollte, dass die Wahrheit auch dann herauskommt, wenn er sie nicht mehr selbst sagen kann.
-- *(R02)* Rademacher fragte Marwitz beim Empfang, ob [sie / er] „noch Unterlagen aus der Atlas-Zeit“ habe – sie (er) wollte wissen, ob es Kopien der Originale mit „I. M.“ gibt.
+- *(R02)* Rademacher fragte Marwitz beim Empfang, ob {R02: sie / er} „noch Unterlagen aus der Atlas-Zeit“ habe – {R08: sie / er} wollte wissen, ob es Kopien der Originale mit „I. M.“ gibt.
 - *(R05)* Hollerbach war um 20:55 über den Servicegang im Westflügel (deshalb nicht im Protokoll).
 - *(R07)* Sander zu Seebach, letzten Sonntag beim Schach: „Im Archiv stimmt etwas nicht. Ich werde bestohlen, von jemandem, dem ich vertraut habe.“
 - *(R10)* Rademacher zu Falk vor einigen Wochen: „Sander ahnt etwas. Aber er hat keine Beweise.“ Seebach sah Falk um 21:29 eine Nachricht lesen und blass werden.
 - *(R09)* Fabers Nebengeschäft heißt „Thüringer Nachthimmel“. Das Teleskop belichtete seit 20 Uhr den Pferdekopfnebel.
 - *(R01, R06)* Nebenfiguren mit Namen: Kim (Studienfreundin von R01, am Telefon), Deniz (Yilmaz’ Bruder), Jo (Küchenaushilfe), Marianne Sander (verstorbene Mutter).
-- *(R08)* Rademachers Motiv neben Geld: die Pflegekosten der Mutter, zweimal abgelehnte Gehaltserhöhung. Die Archivliste nahm sie (er) aus dem Kartenraum mit und zerriss sie um 21:31 im Archiv (deshalb B6 im Papierkorb).
+- *(R08)* Rademachers Motiv neben Geld: die Pflegekosten der Mutter, zweimal abgelehnte Gehaltserhöhung. Die Archivliste nahm {R08: sie / er} aus dem Kartenraum mit und zerriss sie um 21:31 im Archiv (deshalb B6 im Papierkorb).
 
 - *(Prüfung 0.3)* Faber geht um 21:15 durch die Küche zur Kellertreppe (Yilmaz und Jo sehen {R09: sie / ihn}), meldet sich um 21:21 an der Hauptverteilung ab und ist ab 21:22 im Festsaal. Die Originalblätter lagen seit Februar im Planschrank der Restaurierung. Yilmaz sah von 21:15 bis 21:22 niemanden im Gang oder vor der Restaurierung. R10 trägt ein Kettenarmband bzw. eine Taschenuhr an einer Kette.
 

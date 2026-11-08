@@ -72,7 +72,7 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 
 **Wo sie verwundbar ist:**
 - Du sagst, du hättest unten vor der Restaurierung gewartet. Wer zwischen 21:15 und 21:22 dort unten war, weiß, dass das nicht stimmt.
-- Du sagst, du seist mit leeren Händen in die Restaurierung gegangen. Wer dich um 21:22 mit dem Bündel gesehen oder gehört hat, weiß es besser.
+- Das Bündel erwähnst du nicht. Fragt dich jemand direkt, ob du etwas getragen hast, musst du lügen. Wer dich um 21:22 gesehen oder gehört hat, weiß es besser.
 - Der Kalender sagt „R.“ und „Liste mitbringen!“.
 
 **Wenn es eng wird**, Ideen, keine Pflicht:

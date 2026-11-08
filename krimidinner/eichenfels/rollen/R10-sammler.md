@@ -41,7 +41,7 @@ Die anderen kennst du aus der Stiftung: Ritter von der Kanzlei, {R03: die / der}
 | **Requisit fürs Spiel** | **ein Siegelring** und **dein Handy** mit der SMS von 21:29 | dasselbe |
 | optional | eine Lupe für alte Karten, in der Tasche | dasselbe |
 
-*Niemand muss etwas kaufen. Ein Schal und ein auffälliger Ring reichen.*
+*Niemand muss etwas kaufen. Ein Schal und ein auffälliger Ring reichen, **aber das Klirrende ist Pflicht**: ein Kettenarmband, mehrere Armreifen, eine Taschenuhr an einer Kette, notfalls eine Halskette, die du locker trägst. Nimm, was du hast. **Es muss beim Gehen hörbar klirren**, den ganzen Abend.*
 
 ## Seite 3 · Was du weißt
 

@@ -41,7 +41,7 @@ Die anderen kennst du aus dem Alltag: Rademacher aus dem Archiv, mit {R08: der /
 | **Requisit fürs Spiel** | **ein schwerer Schlüsselbund mit einer Zugangskarte** (Archiv, Restaurierung, Kuppel). Er klirrt bei jedem Schritt, das gehört dazu. | dasselbe |
 | optional | eine Brille **ohne** Kette, auf die Stirn geschoben | dasselbe |
 
-*Niemand muss etwas kaufen. Eine Weste und eine Taschenlampe reichen.*
+*Niemand muss etwas kaufen. Eine Weste und eine Taschenlampe reichen, **aber der Schlüsselbund ist Pflicht**: Nimm einfach deinen eigenen, je mehr Schlüssel, desto besser. **Er muss beim Gehen hörbar klirren.** Trag ihn den ganzen Abend sichtbar am Gürtel oder in der Hand.*
 
 ## Seite 3 · Was du weißt
 

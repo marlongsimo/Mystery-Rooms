@@ -86,4 +86,4 @@ Du bist **unter falschem Vorwand** hier, und unter dem Kartentisch klebt **dein 
 - **Phase 4 (Protokoll):** Vergleiche das Zutrittsprotokoll mit deiner Aufnahme. Wer war um 21:09 schon im Westflügel?
 - **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (warum kein Archiv?), Falk (warum so oft hier?).
 - **Was du vermeiden solltest:** zu früh zu verraten, wie viel du schon weißt.
-- **Trumpf:** das Klirren im Flur, um 21:08, im 1. OG, vor dem Kartenraum. Spiel es aus, wenn die Küche von dem Klirren um 21:22 erzählt. Wer um 21:08 oben war und um 21:22 unten, war dieselbe Person.
+- **Trumpf:** das Klirren im Flur, um 21:08, im 1. OG, vor dem Kartenraum. Spiel es aus, wenn die Küche von dem Klirren um 21:22 erzählt. Die beiden Beobachtungen könnten dieselbe Person betreffen. Ob es tatsächlich dieselbe war, kannst du nicht sicher sagen.

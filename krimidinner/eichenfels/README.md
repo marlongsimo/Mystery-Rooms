@@ -16,6 +16,7 @@ Krimidinner für 4–10 Personen am Tisch, mit einer Spielleitung, die mitspiele
 | `index.html`, `css/kd.css`, `js/app.js` | die Anwendung |
 | `js/content.js` | **erzeugt** aus den .md-Dateien: `python3 tools/build_content.py` (nach jeder Textänderung ausführen) |
 | `tests/krimidinner.test.js` | Ablauf im Browser |
+| `assets/grundriss.svg` | Grundriss für B3 (wird beim Erzeugen in die Karte eingesetzt, im Druck als eigenes Blatt) |
 
 ## So funktioniert die Technik
 
@@ -38,7 +39,7 @@ Krimidinner für 4–10 Personen am Tisch, mit einer Spielleitung, die mitspiele
 - **Varianten:** `[w / m]` für die eigene Rolle, `{Rxx: w / m}` für andere Rollen, aufgelöst beim Anzeigen. Die Kleidungstabelle zeigt nur die eigene Spalte.
 - **Geheimes:** Rollenblätter, Karten und Teil B liegen nicht im Klartext im Quelltext. Das ist ein Schutz gegen zufälliges Mitlesen, kein Kopierschutz.
 - **Druck:**
-  - Beweiskarten, vier pro A4, in den Rundenfarben.
+  - Beweiskarten, vier pro A4, in den Rundenfarben. Der Grundriss (B3) als eigenes Blatt.
   - Gastgeberheft A und B getrennt, Anleitung.
   - Rollenblätter in zufälliger Reihenfolge ohne Namen. Jede Person kann ihr eigenes Blatt auch selbst drucken.
 

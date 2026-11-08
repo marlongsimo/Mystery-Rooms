@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 412" class="plan-svg" role="img" aria-label="Grundriss der Sternwarte Eichenfels: Westflügel, Mittelbau, Ostflügel, Kuppel und Keller, mit Kartenlesern">
+  <style>
+    .wall { fill: #fbf6ea; stroke: #3b3122; stroke-width: 2.2; }
+    .room { fill: #f3ead6; stroke: #6b5a3e; stroke-width: 1.2; }
+    .hall { fill: #e7dcc2; stroke: #6b5a3e; stroke-width: 1; }
+    .t { font: 600 13px "DM Sans", Arial, sans-serif; fill: #231e14; }
+    .s { font: 11px "DM Sans", Arial, sans-serif; fill: #4a3f2c; }
+    .wing { font: 700 12px "DM Mono", monospace; letter-spacing: .14em; fill: #7a6233; }
+    .floor { font: 11px "DM Mono", monospace; fill: #7a6233; }
+    .reader { fill: #9e2b25; stroke: #fff; stroke-width: 1; }
+    .stair { stroke: #6b5a3e; stroke-width: 1; }
+    .svc { fill: none; stroke: #6b5a3e; stroke-width: 2; stroke-dasharray: 6 4; }
+  </style>
+  <!-- Flügelbeschriftung -->
+  <text class="wing" x="115" y="22" text-anchor="middle">WESTFLÜGEL</text>
+  <text class="wing" x="320" y="22" text-anchor="middle">MITTELBAU</text>
+  <text class="wing" x="525" y="22" text-anchor="middle">OSTFLÜGEL</text>
+
+  <!-- Kuppel über dem Westflügel -->
+  <path class="wall" d="M60 112 A55 55 0 0 1 170 112 Z"/>
+  <line x1="128" y1="112" x2="156" y2="72" stroke="#3b3122" stroke-width="5"/>
+  <text class="t" x="94" y="106" text-anchor="middle">Kuppel</text>
+  <text class="s" x="190" y="78">2. OG · Steuerpult</text>
+
+  <!-- Gebäudehülle -->
+  <rect class="wall" x="20" y="112" width="190" height="186"/>
+  <rect class="wall" x="215" y="112" width="210" height="186"/>
+  <rect class="wall" x="430" y="112" width="190" height="186"/>
+  <text class="floor" x="8" y="160" transform="rotate(-90 8 160)" text-anchor="middle">1. OG</text>
+  <text class="floor" x="8" y="250" transform="rotate(-90 8 250)" text-anchor="middle">EG</text>
+
+  <!-- Westflügel -->
+  <rect class="room" x="26" y="118" width="128" height="80"/>
+  <text class="t" x="90" y="150" text-anchor="middle">Kartenraum</text>
+  <text class="s" x="90" y="167" text-anchor="middle">mit Armillarsphäre</text>
+  <rect class="room" x="26" y="206" width="78" height="70"/>
+  <text class="t" x="65" y="236" text-anchor="middle">Restau-</text>
+  <text class="t" x="65" y="252" text-anchor="middle">rierung</text>
+  <rect class="room" x="108" y="206" width="46" height="70"/>
+  <text class="s" x="131" y="236" text-anchor="middle">Vorrats-</text>
+  <text class="s" x="131" y="250" text-anchor="middle">keller</text>
+  <!-- Treppe West: EG ↔ 1. OG ↔ Kuppel -->
+  <rect class="hall" x="158" y="118" width="46" height="158"/>
+  <path d="M164 270 h34 M164 258 h34 M164 246 h34 M164 234 h34 M164 222 h34 M164 210 h34 M164 192 h34 M164 180 h34 M164 168 h34 M164 156 h34 M164 144 h34 M164 132 h34" stroke="#6b5a3e" stroke-width="1"/>
+  <text class="s" x="181" y="128" text-anchor="middle">Treppe</text>
+  <path d="M181 118 L181 96" stroke="#6b5a3e" stroke-width="1.4" stroke-dasharray="3 3"/>
+  <!-- Flur EG West -->
+  <rect class="hall" x="26" y="278" width="178" height="16"/>
+  <text class="s" x="62" y="290" text-anchor="middle">Flur</text>
+
+  <!-- Mittelbau -->
+  <rect class="room" x="221" y="118" width="198" height="80"/>
+  <text class="t" x="320" y="162" text-anchor="middle">Bibliothek</text>
+  <rect class="room" x="221" y="206" width="104" height="70"/>
+  <text class="t" x="273" y="236" text-anchor="middle">Festsaal</text>
+  <text class="s" x="273" y="252" text-anchor="middle">mit Bar · Rednerpult</text>
+  <text class="s" x="273" y="268" text-anchor="middle" font-style="italic">Glastür → Terrasse</text>
+  <rect class="room" x="329" y="206" width="44" height="34"/>
+  <text class="s" x="351" y="227" text-anchor="middle">Salon</text>
+  <rect class="room" x="329" y="242" width="44" height="34"/>
+  <text class="s" x="351" y="263" text-anchor="middle">Küche</text>
+  <rect class="room" x="377" y="206" width="42" height="70"/>
+  <text class="s" x="398" y="245" text-anchor="middle">Foyer</text>
+  <rect class="hall" x="221" y="278" width="198" height="16"/>
+  <text class="s" x="320" y="290" text-anchor="middle">Flur</text>
+
+  <!-- Ostflügel -->
+  <rect class="room" x="436" y="118" width="178" height="80"/>
+  <text class="t" x="525" y="162" text-anchor="middle">Gästezimmer</text>
+  <rect class="room" x="436" y="206" width="110" height="70"/>
+  <text class="t" x="491" y="245" text-anchor="middle">Archiv</text>
+  <rect class="hall" x="550" y="206" width="64" height="70"/>
+  <text class="s" x="582" y="245" text-anchor="middle">Treppe</text>
+  <rect class="hall" x="436" y="278" width="178" height="16"/>
+  <text class="s" x="525" y="290" text-anchor="middle">Flur</text>
+
+  <!-- Verbindungstüren und Kartenleser -->
+  <rect x="207" y="279" width="11" height="14" fill="#fbf6ea" stroke="#3b3122"/>
+  <rect x="422" y="279" width="11" height="14" fill="#fbf6ea" stroke="#3b3122"/>
+  <rect class="reader" x="207" y="270" width="9" height="9"/>
+  <rect class="reader" x="424" y="270" width="9" height="9"/>
+  <text class="s" x="212" y="312" text-anchor="middle">Verbindungstür West</text>
+  <text class="s" x="428" y="312" text-anchor="middle">Verbindungstür Ost</text>
+  <rect class="reader" x="60" y="272" width="9" height="9"/>
+  <rect class="reader" x="486" y="272" width="9" height="9"/>
+
+  <!-- Servicegang (Untergeschoss, ohne Kartenleser) -->
+  <path class="svc" d="M351 276 L351 330 L131 330 L131 276"/>
+  <text class="s" x="200" y="348" text-anchor="middle">Servicegang Küche ↔ Westflügel (ohne Kartenleser)</text>
+
+  <!-- Keller -->
+  <rect class="wall" x="352" y="352" width="190" height="34"/>
+  <text class="s" x="447" y="373" text-anchor="middle">Keller · Hauptverteilung (Strom)</text>
+  <path d="M362 276 L362 352" stroke="#6b5a3e" stroke-width="1.4" stroke-dasharray="3 3"/>
+
+
+  <!-- Legende -->
+  <rect class="reader" x="26" y="395" width="10" height="10"/>
+  <text class="s" x="42" y="404">Tür mit Kartenleser</text>
+  <path class="svc" d="M168 400 h22"/>
+  <text class="s" x="196" y="404">Servicegang</text>
+  <text class="s" x="614" y="404" text-anchor="end">Schnitt, nicht maßstäblich</text>
+</svg>

@@ -11,7 +11,7 @@ Stand: 1.0 · Grundlage: Fallbuch 0.6 (Abschnitt 5). **Die Karten B13 und B14 ve
 | Format | A6 quer (148 × 105 mm), vier Karten pro A4-Bogen, Schnittmarken. Am Bildschirm als Karte im gleichen Seitenverhältnis. |
 | Kopfzeile | links „STERNWARTE EICHENFELS“, rechts die Nummer (z. B. „B5“). Darunter der Titel in Versalien. |
 | Kennfarbe je Runde | Runde 1 **Nachtblau** · Runde 2 **Messing** · Runde 3 **Siegelrot** · Finale **Schwarz mit Gold**, versiegelt |
-| Grundriss (B3) | in der fertigen Gestaltung als Zeichnung: drei Flügel, Kuppel, Keller, Kartenleser als kleine Quadrate. Bis dahin der Textplan. |
+| Grundriss (B3) | als Zeichnung `assets/grundriss.svg` (Schnitt: drei Flügel, Kuppel, Keller, Servicegang, Kartenleser als rote Quadrate). Der Textplan unten ist die lesbare Quelle. |
 | Art des Beweisstücks | kleines Symbol oben rechts: ✦ Fund · ✎ Schriftstück · ☰ Liste/Protokoll · ☏ Aussage · ◉ Aufnahme |
 | Schrift | Titel in einer klassischen Antiqua (Sternwarten-Stil), Protokolle in Schreibmaschinenschrift, Handschrift (Kalender, Randnotizen) in einer ruhigen Schreibschrift |
 | Fußzeile | „Freigabe: Runde X“ und, falls nötig, die Bedingung (z. B. „nur wenn R07 nicht besetzt ist“) |

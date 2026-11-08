@@ -146,7 +146,11 @@ for chunk in re.split(r"(?=^## |^### B\d)", src, flags=re.M):
     body = re.sub(r"\n---\s*$", "", body).strip()
     foot = re.findall(r"^\*Freigabe:.*\*$", body, flags=re.M)
     body = re.sub(r"^\*Freigabe:.*\*$", "", body, flags=re.M).strip()
-    cards[cid] = {"round": rnd, "icon": m.group(2), "title": m.group(3).strip(), "html": veil(md(body)), "foot": foot[0].strip("*") if foot else ""}
+    html_body = md(body)
+    if cid == "B3":  # Grundriss als Zeichnung statt Textplan
+        svg = read("assets/grundriss.svg")
+        html_body = re.sub(r'<pre class="plan">.*?</pre>', '<p class="plan-hint">↔ Plan zum Verschieben wischen</p><div class="plan-wrap">' + svg + '</div>', html_body, count=1, flags=re.S)
+    cards[cid] = {"round": rnd, "icon": m.group(2), "title": m.group(3).strip(), "html": veil(html_body), "foot": foot[0].strip("*") if foot else ""}
 assert len(cards) == 14, sorted(cards)
 
 # ---------- Gastgeberheft, Anleitung ----------

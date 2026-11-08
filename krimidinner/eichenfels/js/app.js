@@ -274,7 +274,8 @@
     if (what === "hostB") add(`<div class="hostdoc">${resolve(unveil(C.hostB), d.variants)}</div>`);
     if (what === "guide") add(`<div class="guide"><h1>Der letzte Stern von Eichenfels – Spielanleitung</h1>${C.guide}</div>`);
     if (what === "cards") {
-      const ids = [1, 2, 3, 4].flatMap((r) => cardsFor(r, d.n, true));
+      const ids = [1, 2, 3, 4].flatMap((r) => cardsFor(r, d.n, true)).filter((id) => id !== "B3");
+      add(cardHtml("B3", d.variants), "p-cards p-plan"); // Grundriss als eigenes Blatt
       for (let i = 0; i < ids.length; i += 4) add(ids.slice(i, i + 4).map((id) => cardHtml(id, d.variants)).join(""), "p-cards");
     }
     if (what === "roles") {

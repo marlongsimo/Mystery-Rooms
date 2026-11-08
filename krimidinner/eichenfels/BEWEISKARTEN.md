@@ -11,6 +11,7 @@ Stand: 1.0 · Grundlage: Fallbuch 0.6 (Abschnitt 5). **Die Karten B13 und B14 ve
 | Format | A6 quer (148 × 105 mm), vier Karten pro A4-Bogen, Schnittmarken. Am Bildschirm als Karte im gleichen Seitenverhältnis. |
 | Kopfzeile | links „STERNWARTE EICHENFELS“, rechts die Nummer (z. B. „B5“). Darunter der Titel in Versalien. |
 | Kennfarbe je Runde | Runde 1 **Nachtblau** · Runde 2 **Messing** · Runde 3 **Siegelrot** · Finale **Schwarz mit Gold**, versiegelt |
+| Grundriss (B3) | in der fertigen Gestaltung als Zeichnung: drei Flügel, Kuppel, Keller, Kartenleser als kleine Quadrate. Bis dahin der Textplan. |
 | Art des Beweisstücks | kleines Symbol oben rechts: ✦ Fund · ✎ Schriftstück · ☰ Liste/Protokoll · ☏ Aussage · ◉ Aufnahme |
 | Schrift | Titel in einer klassischen Antiqua (Sternwarten-Stil), Protokolle in Schreibmaschinenschrift, Handschrift (Kalender, Randnotizen) in einer ruhigen Schreibschrift |
 | Fußzeile | „Freigabe: Runde X“ und, falls nötig, die Bedingung (z. B. „nur wenn R07 nicht besetzt ist“) |
@@ -51,7 +52,7 @@ Professor Sander liegt neben dem Kartentisch. Schlag auf den Hinterkopf.
 ### B3 · ☰ Grundriss und Schließanlage
 *aus dem Notfallordner der Haustechnik*
 
-**Grundriss** (als Zeichnung: drei Flügel, Kuppel, Keller; die Kartenleser als kleine Quadrate markiert)
+**Grundriss**
 
 ```
                     [ KUPPEL ]  (2. OG, Treppe aus dem Westflügel, Steuerpult)
@@ -71,15 +72,13 @@ Professor Sander liegt neben dem Kartentisch. Schlag auf den Hinterkopf.
 - Kartenraum, Kuppel, Vorratskeller und Servicegang haben **keinen** Kartenleser.
 - **Archiv und Restaurierung öffnen nur drei Karten: die von Prof. Sander, Dr. Rademacher und Faber.**
 
-**Bei Stromausfall**
+**Bei Stromausfall** (kein Kartenleser speichert etwas)
 
 | Tür | Zustand |
 |---|---|
 | Flure und Verbindungstür West | **entriegelt** (Fluchtweg) |
 | Verbindungstür Ost | **verriegelt** (Archivschutz) |
 | Archiv und Restaurierung | **verriegelt, auch für berechtigte Karten** (Sammlungsschutz) |
-
-Während eines Stromausfalls speichert **kein** Kartenleser etwas.
 
 *Freigabe: Runde 1*
 

@@ -48,19 +48,21 @@ Das neue Testament, unterschrieben vor drei Wochen:
 - Der Rest geht an die Stiftung, mit einer Auflage: Bei jeder künftigen Ausgabe des Himmelsatlas ist **Dr. {R02: Irene / Ingo} Marwitz als {R02: Mitautorin / Mitautor}** zu nennen.
 - Der Grund für die Enterbung steht in einem versiegelten Begleitbrief, den du gelesen hast: Sander hatte erfahren, dass sein Kind vor zwei Jahren **seine Unterschrift unter eine Bürgschaft gefälscht** hat.
 
-Du bist an die Schweigepflicht gebunden. Wenn du das Testament jetzt, mitten in einer Mordermittlung, offenlegst, gibst du dem Kind ein Motiv, und dir selbst den Ruf, Mandantengeheimnisse auszuplaudern.
+Du bist an die Schweigepflicht gebunden. Wenn du das Testament vor der Zeit offenlegst, gibst du dir selbst den Ruf, Mandantengeheimnisse auszuplaudern.
 
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Das Testament erst eröffnen, wenn es rechtlich sauber ist. Bis zum Finale soll niemand den Inhalt kennen, es sei denn, du entscheidest dich bewusst dafür.
-2. **Zu einer anderen Person:** Herausfinden, ob {R01: Leonie / Leon} Sander von der Enterbung wusste. Wenn ja, ist {R01: sie / er} verdächtig. Wenn nein, verdient {R01: sie / er} es, die Wahrheit von dir zu hören und nicht aus einem Gerücht.
-3. **Zum Fall:** Nicht verdächtigt werden. Auf Sanders Kalender steht heute ein „R.“, und du heißt Ritter.
+2. **Zu einer anderen Person:** Herausfinden, ob {R01: Leonie / Leon} Sander von der Enterbung wusste. Wenn ja, hat {R01: sie / er} mehr zu verbergen, als {R01: sie / er} zugibt. Wenn nein, verdient {R01: sie / er} es, die Wahrheit von dir zu hören und nicht aus einem Gerücht.
+3. **Zum Fall:** Bleib unangreifbar. Wer Testamente verwaltet, gerät schnell zwischen alle Fronten, und heute Abend sitzen alle Erben und Bittsteller an einem Tisch.
 
 ## Vertraulich · Beim Empfang
 
 - **Phase 1 (Empfang):** Sei höflich und distanziert. Wenn jemand nach dem Testament fragt: „Dazu kann ich nichts sagen.“
 
 ## Runde 1 · Nach dem Fund
+
+**Was das jetzt bedeutet:** Wenn du das Testament jetzt, mitten in einer Mordermittlung, offenlegst, gibst du dem Kind ein Motiv, und dir selbst den Ruf, Mandantengeheimnisse auszuplaudern.
 
 **Dein Abend ab 20:40:**
 - **20:55–21:06** in der Bibliothek, mit {R01: Leonie / Leon} Sander. {R01: Sie / Er} fragte direkt, ob es ein neues Testament gibt. Du bist ausgewichen: „Darüber spricht Ihr Vater selbst mit Ihnen.“
@@ -73,6 +75,8 @@ Du bist an die Schweigepflicht gebunden. Wenn du das Testament jetzt, mitten in 
 - **Phase 2 (Mord):** Gib dein Alibi genau an. Das Zutrittsprotokoll kommt später und wird dich bestätigen.
 
 ## Runde 2 · Jetzt fällt dir ein
+
+**Neues Ziel:** Nicht verdächtigt werden. Auf Sanders Kalender steht ein „R.“, und du heißt Ritter.
 
 **Was du über andere weißt:**
 - Sander nannte dich in seinem Kalender **immer „Kanzlei“**, nie mit deinem Namen. So steht es auf jeder Terminbestätigung, die du von ihm hast.

@@ -49,7 +49,7 @@ Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofot
 
 ## Vertraulich · Deine Ziele
 
-1. **Persönlich:** Das Teleskop-Geschäft geheim halten. Den Stromausfall darfst du zugeben, den Grund nicht unbedingt.
+1. **Persönlich:** Das Teleskop-Geschäft geheim halten. Fragt jemand nach dem Strom: Sturmschaden.
 2. **Zu einer anderen Person:** Marwitz hast du heute Nachmittag stolz den alten Refraktor gezeigt. Jetzt hoffst du, dass {R02: sie / er} heute Abend nicht in der Kuppel herumsteht, wenn du dort zu tun hast.
 3. **Zum Fall:** Die Technik dieses Hauses kennst du als [Einzige / Einziger]. Wenn heute etwas passiert, wird man dich fragen.
 
@@ -82,6 +82,8 @@ Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofot
 - **Phase 2 (Mord):** Erkläre den Stromausfall zuerst als Sturmschaden. Wenn jemand direkt fragt, wo du warst, gilt Regel 2: Kuppel, dann Keller.
 
 ## Runde 2 · Jetzt fällt dir ein
+
+**Neues Ziel:** Den Stromausfall darfst du zugeben, wenn es nicht anders geht. Den Grund nicht unbedingt.
 
 - **Phase 3 (Geheimnisse):** Erkläre der Gruppe die Schließanlage (siehe oben). Das ist Wissen, das alle brauchen, und es lenkt von dir ab.
 - **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (wer außer euch beiden hat eine Karte für die Restaurierung? Niemand.), Yilmaz (der Servicegang).

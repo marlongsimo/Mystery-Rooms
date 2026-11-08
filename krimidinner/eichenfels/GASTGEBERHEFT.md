@@ -144,7 +144,7 @@ Fehlt eine Rolle, geht ihr Wissen nicht verloren. Lies die passenden Sätze in d
 | R01 | 2 | „{R01: Leonie / Leon} Sander war von 21:10 bis 21:26 auf der Terrasse und hat telefoniert. Das Anrufprotokoll im Handy bestätigt es.“ |
 | R01 | 3 | „{R01: Leonie / Leon} Sander erzählt: Ritter hatte heute einen dicken Umschlag dabei, beschriftet ‚Testament – Abschrift‘.“ |
 | R03 | 2 | „Ritter war ab 21:07 im Gästezimmer im Ostflügel und kam während des Stromausfalls nicht heraus.“ |
-| R03 | 3 | „Ritter stellt klar: Sander nannte die Kanzlei in seinem Kalender immer ‚Kanzlei‘. Der Termin mit ihr war um 22:30.“ |
+| R03 | 3 | „Ritter stellt klar: Sander nannte die Kanzlei in seinem Kalender immer ‚Kanzlei‘. Der Termin mit {R03: ihr / ihm} war um 22:30.“ |
 | R03 | 4 | „Ritter erinnert sich: Im Frühjahr bat Rademacher darum, die Versicherungsliste ‚ohne die Karten 41–48, die sind in der Restaurierung‘ zu unterschreiben.“ |
 | R04 | 2 | „Lindner hat Sander von 21:04 bis 21:08 interviewt. Beim Hinausgehen hörte {R04: sie / er} im dunklen Flur vor dem Kartenraum ein leises metallisches Klirren.“ |
 | R05 | 2 | „Hollerbach hörte um 20:55 im Westflügel Marwitz durch die Tür des Kartenraums rufen: ‚… dann sage ich es heute Abend selbst, vor allen!‘“ |
@@ -188,7 +188,7 @@ Diese Impulse helfen weiter, ohne etwas zu verraten. Nimm höchstens einen pro P
 
 ## B-3 · Wie man es herausfinden konnte
 
-Für die Nachbesprechung. Zwei Schritte genügen, der dritte macht es endgültig.
+Für die Nachbesprechung. Zwei Schritte genügen, der dritte macht es endgültig. Niemand hat Rademacher bei der Tat gesehen: Die Lösung ist eine **Schlussfolgerung** aus mehreren Indizien, die zusammen nur auf eine Person passen – so, wie echte Ermittlungen meist funktionieren.
 
 1. **Wer war verabredet?** Der Kalender (B5) sagt „21:15 R. – Liste mitbringen!“. Die Kanzlei heißt bei Sander immer „Kanzlei“, ihr Termin war um 22:30, und Ritter war ab 21:07 im verriegelten Ostflügel (B3, B9). Die „Liste“ ist die Archivliste (B6, „J. R.“). Um 21:09 kam der Besuch „früh“ (Aufnahme, B12) – und im Westflügel war um diese Zeit außer Marwitz und Faber (zusammen in der Kuppel) nur noch Rademacher (seit 21:05, B9).
 2. **Wer brachte die Tatwaffe weg?** Um 21:22 trug jemand etwas Schweres, Klirrendes zur Restaurierung (B11). Um 21:24 öffnete eine Karte diese Tür (B9). Nur drei Karten können das (B3): Sanders steckte beim Toten (B1), Faber war ab 21:21 im Festsaal (B11). Es war Rademachers Karte.

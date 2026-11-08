@@ -38,7 +38,7 @@ Die anderen Gäste kennst du kaum: Ritter von der Kanzlei, {R03: die / der} den 
 | Kleidung | moderner Hosenanzug oder schlichtes Etuikleid mit Blazer | schmal geschnittener Anzug, Hemd ohne Krawatte |
 | Details | eine teure Uhr, wenig Schmuck | eine teure Uhr |
 | Schuhe | moderne Schuhe, eher zu schick fürs Gelände | moderne Lederschuhe oder edle Sneaker |
-| **Requisit fürs Spiel** | **dein Handy, immer in der Hand** (dein Anrufprotokoll ist dein Alibi) | dasselbe |
+| **Requisit fürs Spiel** | **dein Handy, immer in der Hand** (du wirst heute Abend noch lange telefonieren) | dasselbe |
 | optional | ein Schal, den du nie ablegst. Er gehörte deiner Mutter. | dasselbe |
 
 *Niemand muss etwas kaufen. Ein Blazer und ein Handy reichen.*

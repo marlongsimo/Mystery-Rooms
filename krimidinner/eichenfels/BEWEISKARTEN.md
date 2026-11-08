@@ -201,7 +201,7 @@ Ein kleines **Funkmikrofon**, eingeschaltet, mit Klebeband unter der Tischplatte
 
 „Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller: ‚Gleich ist der Strom wieder da.‘ Um 21:21 kam {R09: sie / er} wieder hoch – ich hab auf die Küchenuhr geschaut, weil das Licht gerade wieder da war – und ging direkt in den Festsaal. Danach stand {R09: sie / er} die ganze Zeit dort bei den Gästen, ich hab {R09: sie / ihn} durch die Durchreiche gesehen.
 
-{R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen. Und dann, so gegen zwanzig nach, sei jemand mit einem schweren Paket im Arm die Treppe heruntergekommen und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
+{R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen. Und dann, um 21:22 – {R06: sie / er} hat genau in dem Moment {R06: ihrem / seinem} Bruder eine Nachricht geschrieben und mir hinterher die Uhrzeit auf dem Handy gezeigt –, sei jemand mit einem schweren Paket im Arm die Treppe heruntergekommen und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
 
 *Freigabe: Runde 3 · immer*
 

@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.7 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.8 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -193,7 +193,7 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 „21:07 Anmeldung Kuppelpult: Karte Faber · **21:08 Unterbrechung ausgelöst: NOT-AUS Kuppelpult (manuell)** · 21:16 Neustart eingeleitet, Hauptverteilung Keller (Schalter halten, 4 Min.) · 21:20 Neustart abgeschlossen · 21:21 Abmeldung Hauptverteilung: Karte Faber. Teleskop: Nutzungsprotokoll gelöscht (Not-Aus).“ *Kein Sturm: Der Stromausfall wurde von Hand ausgelöst.*
 
 **B11 · Aussage aus der Küche** *(die Aushilfe Jo, kommt in Runde 3 immer, weil sie auch Fabers Weg belegt. Hat Yilmaz die Beobachtung schon erzählt, bestätigt B11 sie nur.)*
-„Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Um 21:21 kam er wieder hoch, ich hab auf die Küchenuhr geschaut, weil das Licht gerade wieder da war, und ging direkt in den Festsaal. Danach stand er die ganze Zeit dort bei den Gästen, ich hab ihn durch die Durchreiche gesehen. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen, und dann, so gegen zwanzig nach, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
+„Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Um 21:21 kam er wieder hoch, ich hab auf die Küchenuhr geschaut, weil das Licht gerade wieder da war, und ging direkt in den Festsaal. Danach stand er die ganze Zeit dort bei den Gästen, ich hab ihn durch die Durchreiche gesehen. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen, und dann, um 21:22 – {R06: sie / er} hat genau in dem Moment {R06: ihrem / seinem} Bruder eine Nachricht geschrieben und mir hinterher die Uhrzeit auf dem Handy gezeigt –, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
 
 **B12 · Lindners Aufnahme, Abschrift** *(falls nicht schon von Lindner vorgelegt)*: wie auf dem Rollenblatt von Lindner.
 

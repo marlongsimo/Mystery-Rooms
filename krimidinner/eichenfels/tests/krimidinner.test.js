@@ -49,7 +49,7 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
     await P.click('[data-tab="p1"]'); txt += await P.textContent('.doc');
     await P.click('[data-tab="p2"]'); await P.click('#s4'); txt += await P.textContent('.doc');
     check(!OPEN.test(txt), `${names[i]} → ${d.role} „${await P.textContent('h1')}“: keine offenen Variantenklammern`);
-    if (d.role !== 'R08') check(!/21:(0[3-9]|[1-3]\d)/.test(txt), `${d.role}: Charakter, Kleidung und Vertraulich verraten nichts aus der Mordnacht`);
+    if (d.role !== 'R08') check(!/21:(0[3-9]|[1-3]\d)/.test(txt) && !/Mord|Ermittlung|Kalender steht|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig\b/i.test(txt.replace(/verdächtig\./g, '')), `${d.role}: Charakter, Kleidung und Vertraulich verraten nichts aus der Mordnacht`);
     if (names[i] === 'Ben' || names[i] === 'Dora') check(male, `${names[i]} hat die männliche Variante`);
   }
   const A = by.R02.P;
@@ -128,6 +128,21 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
   ids = await cardIds(Q);
   check(!ids.includes('B12') && ids.includes('B8'), '8 Personen (R04 besetzt, R07 nicht): B12 fehlt ohne FUNK, B8 ist dabei');
   await unlock(Q, 'FUNK'); check((await cardIds(Q)).includes('B12'), 'FUNK → B12');
+
+  // Alle Besetzungen 4–10: Zusatzkarten und Wissen der Nebenfiguren
+  const table = await Q.evaluate(() => [4, 5, 6, 7, 8, 9, 10].map((n) => { const c = KD.cast(n), miss = ['R01','R02','R03','R04','R05','R06','R07','R08','R09','R10'].filter((r) => !c.includes(r));
+    return { n, b8: KD.cardsFor(2, n, false).includes('B8'), b12: KD.cardsFor(3, n, false).includes('B12'), npc: window.KD_CONTENT.npc.filter((x) => miss.includes(x.role)).length, core: ['R02','R08','R09','R10'].every((r) => c.includes(r)) }; }));
+  console.log('    ' + table.map((t) => `${t.n}P: B8 ${t.b8 ? 'ja' : '–'} · B12 ${t.b12 ? 'ja' : '–'} · Nebenfiguren-Sätze ${t.npc}`).join('\n    '));
+  check(table.every((t) => t.core), 'Alle Besetzungen enthalten R02, R08, R09, R10 (Täterrolle immer dabei)');
+  check(table.find((t) => t.n === 4).npc === 13 && table.find((t) => t.n === 10).npc === 0, '4 Personen: alle 13 Nebenfiguren-Sätze · 10 Personen: keiner');
+  check(table.every((t) => t.b8 === (t.n < 10) && t.b12 === (t.n < 8)), 'B8 nur ohne R07 (unter 10), B12 automatisch nur ohne R04 (unter 8)');
+  // Männliche Variante von R03 in den Nebenfiguren-Sätzen
+  const hm = await H.evaluate(() => KD.encode({ host: true, n: 4, variants: 1 << 2 }));
+  await H.evaluate((c) => localStorage.setItem('kd_eich_host', JSON.stringify({ code: c, people: [], seen: {}, step: 4 })), hm);
+  await H.goto(URL + '#leitung'); await H.reload(); await H.waitForSelector('.npc');
+  const t3 = await H.textContent('.npc');
+  check(/Der Termin mit ihm war um 22:30/.test(t3) && !OPEN.test(t3), '4 Personen, Ritter männlich: „Der Termin mit ihm“');
+  check((await H.$$('.npc blockquote')).length === 5, '4 Personen, Phase 3: fünf Sätze fehlender Rollen (R01, R03, R05 ×2, R07)');
 
   // Ein Gerät für Spielleitung und eigene Rolle
   await H.goto(URL + '#c=' + host.people[0].code.replace('-', '')); await H.waitForSelector('.doc');

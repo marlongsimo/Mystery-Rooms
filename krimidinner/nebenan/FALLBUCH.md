@@ -1,4 +1,4 @@
-# Nebenan – Der stille Kreis · Fallbuch 0.3.3
+# Nebenan – Der stille Kreis · Fallbuch 0.3.4
 
 **Fall 04 der Krimidinner-Reihe**
 
@@ -12,7 +12,9 @@
 | Opfer | Hanno Rabe (61), Gründer und Vorsitzender des Vereins |
 | Täterrolle | R03 Merle/Mattis Linde |
 
-> **Enthält die vollständige Lösung.** 0.3.3 ist eine überarbeitete Arbeitsfassung. Sie übernimmt die neue Raumgeometrie, die aktualisierte Bewegungsfolge von 20:38 bis 22:50 Uhr, die überarbeiteten Aussagenregeln und vier zusätzliche Produktionsbrücken: Kameraverwahrung, Seiferts Fundimpuls für B12, physische Handhabung von Kranz’ Notizen und die präzise Ortsangabe des Rückgabekartons in B21. Physische Tatmechanik und Raummaße sind als Konstruktionsstand festgelegt, aber noch nicht durch einen maßstäblichen Aufbau am Tisch validiert. Vorhandene Rollenbiografien aus 0.3 bleiben gültig, soweit sie dieser Fassung nicht widersprechen.
+> **Enthält die vollständige Lösung.** 0.3.4 ist die letzte inhaltliche Bereinigungsfassung vor der Rollenproduktion. Sie übernimmt 0.3.3 vollständig und korrigiert neun Widersprüche sowie zwei Abhängigkeiten im Schlüsselsystem (Abschnitt 0.2). Danach wird die Grundmechanik nicht mehr verändert; die zehn Rollenhefte werden gegen diese Masterfassung geprüft.
+>
+> Aus 0.3.3 übernommen: die neue Raumgeometrie, die aktualisierte Bewegungsfolge von 20:38 bis 22:50 Uhr, die überarbeiteten Aussagenregeln und vier zusätzliche Produktionsbrücken: Kameraverwahrung, Seiferts Fundimpuls für B12, physische Handhabung von Kranz’ Notizen und die präzise Ortsangabe des Rückgabekartons in B21. Physische Tatmechanik und Raummaße sind als Konstruktionsstand festgelegt, aber noch nicht durch einen maßstäblichen Aufbau am Tisch validiert. Vorhandene Rollenbiografien aus 0.3 bleiben gültig, soweit sie dieser Fassung nicht widersprechen.
 
 ---
 
@@ -35,6 +37,25 @@
 | 13 | Kranz’ Rückseite B17 war dramaturgisch nicht physisch verborgen. | Kranz faltet B2 nach der Vorstellung der Vorderseite mit der Rückseite nach innen und dreht das Blatt erst in Runde 4 um. |
 | 14 | B21 benannte den Rückgabekarton nicht präzise genug. | Hannos Brief nennt den Karton oben auf dem Schrank in seinem Büro und sagt, dass Seiferts Original von 1999 ganz obenauf liegt. |
 
+### 0.2 · Was 0.3.4 bereinigt
+
+| Nr. | Widerspruch in 0.3.3 | Verbindliche Fassung 0.3.4 |
+|---|---|---|
+| 1 | Der Beratungsraum war um 21:00 abgeschlossen, aber niemand schloss ab. | Linde schließt um 20:53 beim Hinausgehen mit dem **eigenen Schlüssel** ab. |
+| 2 | Kranz öffnete den Raum mit einem Schlüssel, den B6 nicht kannte; der kleine Schlüssel öffnete einmal den Schrank, einmal die Schublade. | Der **Ersatzring „Vorstand – Notfall“** trägt drei Schlüssel: Beratungsraum, Archivschrank, Schublade. B6 führt ihn seit 1998. |
+| 3 | Das Logik-Audit erlaubte Linde die Lüge „Hanno hat die Akte gemacht“. | Linde darf die eigene Fälschung **verschweigen**, aber nicht über fremde Handlungen lügen. Lügen darf Linde nur über die eigenen Bewegungen im Tatzeitfenster. |
+| 4 | B4 stammte aus Wielands Kamera, die bis Runde 4 verwahrt bleibt. | B4 ist ein **Vereins-Sofortbild** am Aushang im Saal, unabhängig von Wielands Kamera. |
+| 5 | Özdemir kannte den Kreis nicht, erzählte aber von der „Gastzeit 2001“. | Die Gastzeit entfällt. Özdemir bleibt Nicht-Mitglied. Ersatz ist eine unabhängige Beobachtung (Abschnitt 8). |
+| 6 | Linde ging vom WC über den Saal zur Küche. | Linde geht vom WC **direkt über den Flur** zur Küche. |
+| 7 | Überschrift „19 je Partie, 21 definiert“ | **20–22 Karten je Partie, 22 definiert** |
+| 8 | „weil sie friert“ bei Seifert, „sieht sie“ bei Linde | geschlechtsneutral mit Namen |
+| 9 | Kranz' Telefonat stand teils mit 20:47, teils mit 20:51 als Ende | einheitlich **20:41–20:51**, auch auf der Anrufliste |
+
+**Zwei Abhängigkeiten im Schlüsselsystem:**
+
+- **Wer weiß, dass Linde einen eigenen Schlüssel hat?** Das ist kein neuer Fakt aus B6. Linde schließt seit 1998 jeden Donnerstag den Beratungsraum auf und zu. Das wissen Wiesner (führt das Schlüsselbuch und hat den Schlüssel 1998 ausgegeben), Klose und die Mitglieder Fuchs und Seifert. B6 bestätigt es schriftlich mit dem Eintrag „Linde – seit 03/1998“. Für die Nicht-Mitglieder ist der Eintrag neu, für die Mitglieder nicht.
+- **Woher kommt der Ersatzring, und warum darf Kranz ihn benutzen?** Der Schlüsselkasten hängt im westlichen Flur neben der Küche, außerhalb des versiegelten Büros. Den Kastenschlüssel tragen laut Vereinsordnung nur Vorsitz und stellvertretender Vorsitz (Hanno und Kranz) sowie die Hausmeisterei (Wiesner). Der Ring ist beschriftet „Vorstand – Notfall“. Mit Hannos Tod ist Kranz amtierender Vorsitz, die Polizei hat Kranz außerdem das Abschließen des Hauses übertragen. In Runde 2 hat Kranz einen konkreten Anlass: Im schwarzen Buch steht „21:00 K. S.“ und „Mo: Rückgabe beginnt“, Seiferts Einladung nennt den Beratungsraum, und Kranz will vor der Aussage um 9 Uhr wissen, was Hanno dort vorbereitet hat. Kranz sagt das laut, bevor aufgeschlossen wird. Wiesner (falls besetzt) bestätigt: „Der Ring ist für genau so etwas da.“
+
 **Unveränderte Eckdaten**
 
 Herbstfest zum zwölfjährigen Bestehen des Vereins, Samstag, 16. Oktober 2004; Birkenhöhe; fünf bis zehn Spielende; vier Runden plus Finale; Hanno Rabe als Opfer; R03 Merle/Mattis Linde als Täterrolle. Die drei Außenfälle, die Doppelmanipulation des Archivs und das Finale mit einer zweiten moralischen Entscheidung bleiben erhalten. Die Fotos aus Wielands Digitalkamera sind ab jetzt auch bei fünf Personen als B22 verfügbar.
@@ -49,7 +70,7 @@ Diese Regeln gelten für alle Rollenhefte und die Spielleitung.
 4. **Erinnerungen:** Wenn dein Rollenheft sagt „Jetzt fällt dir ein …“, entscheidest du, wann du es erzählst. Steht dort, dass du es in einer bestimmten Runde offenlegen sollst, tust du es spätestens in dieser Runde.
 5. **Vertrauliches bleibt vertraulich:** Den Teil „Vertraulich“ und die Rundenabschnitte deines Rollenhefts zeigst du niemandem. Du darfst daraus erzählen, soweit die übrigen Regeln gelten.
 
-**Konsequenz für die Rollen:** Nicht-Täterrollen dürfen eine unangenehme Frage mit „Dazu möchte ich nichts sagen“ beantworten. Sie dürfen nicht eine falsche Uhrzeit oder einen erfundenen Aufenthaltsort nennen. Linde darf als Täterrolle über ihre eigenen Bewegungen im Tatzeitfenster lügen. Auch Linde darf nicht den Inhalt einer bereits ausgegebenen Beweiskarte verändern.
+**Konsequenz für die Rollen:** Nicht-Täterrollen dürfen eine unangenehme Frage mit „Dazu möchte ich nichts sagen“ beantworten. Sie dürfen nicht eine falsche Uhrzeit oder einen erfundenen Aufenthaltsort nennen. Linde darf als Täterrolle über die eigenen Bewegungen im Tatzeitfenster lügen; die Fälschung darf Linde nur verschweigen. Auch Linde darf nicht den Inhalt einer bereits ausgegebenen Beweiskarte verändern.
 
 ---
 
@@ -214,12 +235,12 @@ Um 23:00 sagt Kranz: „Morgen erzählen zehn Leute zehn verschiedene Geschichte
 | Zeit | Handlung |
 |---|---|
 | 20:46–20:47 | Linde sieht, dass Hanno nicht reagiert. Sie nimmt Hannos Prüfnotiz und die Kopien der Seifert-Akte vom Schreibtisch, verlässt das Büro durch die Bürotür und geht über den nun leeren Flur in den Beratungsraum. |
-| 20:48–20:52 | Linde schaltet den Aktenvernichter ein und vernichtet die Prüfnotiz sowie die Kopien. Um 20:51 hört sie das Klopfen von R06 an der Tür des Beratungsraums und hält inne. Sie schaltet das Gerät spätestens um 20:52 aus, als R06 wieder Richtung Saal geht. |
-| 20:53 | Linde verlässt den Beratungsraum und geht in Richtung WC. Seifert sieht sie von hinten in der langen dunklen Strickjacke verschwinden. |
-| 20:55–20:56 | Linde verlässt das WC, durchquert den Saal und geht weiter in Richtung Küche. |
-| 20:57 | Linde betritt die Küche. Özdemir bemerkt ihre Blässe und dass sie den linken Ärmel festhält. |
+| 20:48–20:52 | Linde schaltet den Aktenvernichter ein und vernichtet die Prüfnotiz sowie die Kopien. Um 20:51 hört Linde das Klopfen von R06 an der Tür des Beratungsraums und hält inne. Sie schaltet das Gerät spätestens um 20:52 aus, als R06 wieder Richtung Saal geht. |
+| 20:53 | Linde verlässt den Beratungsraum, schließt die Tür mit dem eigenen Schlüssel ab und geht in Richtung WC. Seifert sieht Linde von hinten in der langen dunklen Strickjacke verschwinden. |
+| 20:55–20:56 | Linde verlässt das WC und geht direkt über den Flur nach Westen zur Küche. |
+| 20:57 | Linde betritt die Küche. Özdemir bemerkt Lindes Blässe und den festgehaltenen linken Ärmel. |
 
-Linde bewegt den Toten nicht, nimmt keine Gegenstände vom Körper und verlässt das Haus nicht. Sie behält die Strickjacke an, weil ein Kleidungswechsel stärker auffallen würde. Die fehlende Manschettenschlaufe versucht sie mit der Hand zu verdecken.
+Linde bewegt den Toten nicht, nimmt keine Gegenstände vom Körper und verlässt das Haus nicht. Linde behält die Strickjacke an, weil ein Kleidungswechsel stärker auffallen würde, und versucht, die fehlende Manschettenschlaufe mit der Hand zu verdecken.
 
 ---
 
@@ -263,13 +284,13 @@ Jedes Dokument hat eine Herkunft, einen Ort in dieser Nacht und einen Zeitpunkt,
 | Kranz’ Notizen zur Notärztin, Vorderseite | Kranz’ Jackentasche | Kranz | 1 | B2 |
 | Kranz’ Notizen, Rückseite (Druckstellen) | ebenda | Kranz | 4 | B17 |
 | Mängelbuch und Reparaturquittung | Hausmeisterkammer | Wiesner oder schriftlicher Ersatz B19 | 1/4 | B3/B19 |
-| Festprogramm und Gruppenfoto 19:15 | Aushang im Saal und Wielands Kamera | alle | 1 | B4 |
+| Festprogramm und Gruppenfoto 19:15 (Vereins-Sofortbild) | Aushang im Saal | alle | 1 | B4 |
 | Wielands Digitalkamera mit drei zeitgestempelten Aufnahmen (20:41, 20:42, 20:51) | nach dem Polizeieinsatz auf einem Tisch im Saal; anschließend bei Kranz | Wieland, bei fehlender R08-Rolle Kranz | 4 | B22 |
 | **Schwarzes Buch** | **Sakko** über Hannos Stuhl im Saal | Kranz (ordnet persönliche Dinge) | 2 | B5 |
 | **Weißer Umschlag „K. – persönlich“** mit Hannos Brief | **Sakko**, Innentasche | Kranz übergibt ihn an Seifert; Seifert öffnet ihn erst im Finale | 2 (zu), Finale (auf) | B21 |
 | **Braune Rückgabeumschläge** (23 Stück, darunter Seiferts echte Wahrheit von 1999) | **Karton „ZURÜCK“ oben auf dem Aktenschrank im versiegelten Büro** | bleibt im versiegelten Büro | Skizze Runde 1, Erklärung im Finale | — |
 | Schlüsselbuch | Hausmeisterkammer | Wiesner oder Kranz | 2 | B6 |
-| Schlüssel zum Archivschrank und Ersatzschlüssel | Schlüsselkasten; Schlüsselinhaber gemäß B6 | Kranz | 2 | — |
+| Ersatzring „Vorstand – Notfall“ (Beratungsraum, Archivschrank, Schublade) | Schlüsselkasten im westlichen Flur; Kastenschlüssel bei Kranz, Wiesner (und Hanno) | Kranz, als amtierender Vorsitz | 2 | — |
 | Inhalt des Beratungsschranks | Beratungsraum | die Gruppe, nach Runde 2 | 2 | B7 |
 | Archivfassung Fuchs | Beratungsschrank | die Gruppe | 2 | B8 |
 | Gelber Durchschlag Fuchs | Fuchs’ Tasche | Fuchs, freiwillig | 2–4 | Beilage R01 |
@@ -329,9 +350,9 @@ Die vollständigen Vorgeschichten aus 0.3 bleiben gültig, soweit sie dieser Fas
 | Runde | Gibt preis |
 |---|---|
 | 1 | Legt Fundskizze (B1) und Notizen der Notärztin (B2, Vorderseite) vor. **Physische Anweisung:** Zeige nur die Vorderseite. Falte das Blatt anschließend einmal genau in der Mitte, sodass B17 innen liegt. Gib niemandem Gelegenheit, die Rückseite zu lesen. Sagt wahrheitsgemäß: „Ich war ab 20:38 draußen; telefoniert habe ich von 20:41 bis 20:51.“ |
-| 2 | Holt den Ersatzschlüssel aus dem Schlüsselkasten, öffnet den Beratungsraum für die Gruppe und lässt die Tür anschließend während der Spielrunden geöffnet. Mit dem kleinen Schlüssel am Ersatzring öffnet Kranz den Archivschrank. Ist vom Archiv erschüttert. Bewahre das gefaltete Blatt weiterhin bei dir. |
+| 2 | Sagt laut, warum: „21:00 K. S., Rückgabe am Montag, Seiferts Einladung in den Beratungsraum. Bevor wir um neun bei der Polizei sitzen, will ich wissen, was Hanno da vorbereitet hat.“ Holt als amtierender Vorsitz mit dem eigenen Kastenschlüssel den Ersatzring „Vorstand – Notfall“ aus dem Schlüsselkasten im westlichen Flur, schließt den Beratungsraum auf und lässt die Tür während der Spielrunden offen. Mit dem zweiten Schlüssel am Ring öffnet Kranz den Archivschrank; den kleinsten (Schublade) braucht die Gruppe erst in Runde 3. Ist vom Archiv erschüttert. Bewahre das gefaltete Blatt weiterhin bei dir. |
 | 3 | Muss sich zu B14 erklären (Brodersen); Lindes Aussage über den Streit um 20:24 fällt. Bewahre das gefaltete Blatt weiterhin bei dir. |
-| 4 | Wenn du den Griff an Hannos linkem Arm zugibst, entfalte das Blatt, drehe es sichtbar um und lege die Rückseite (B17) vor. Lege außerdem die Anrufliste vor und sage: „Ich habe Hanno um 20:25 am linken Arm gepackt.“ |
+| 4 | Wenn du den Griff an Hannos linkem Arm zugibst, entfalte das Blatt, drehe es sichtbar um und lege die Rückseite (B17) vor. Lege außerdem die Anrufliste des Handys vor (Brodersen, 20:41, Dauer 10 Minuten) und sage: „Ich habe Hanno um 20:25 am linken Arm gepackt.“ |
 
 **Kranz’ Geheimnis:** Im Streit um 20:25 packte Kranz Hanno am linken Oberarm: „Hör mir zu!“ Als die Notärztin von Prellungen sprach, bekam Kranz Angst, die eigenen Finger könnten Spuren hinterlassen haben. Die später beschriebenen Flecken liegen jedoch am rechten Arm.
 
@@ -342,9 +363,9 @@ Die vollständigen Vorgeschichten aus 0.3 bleiben gültig, soweit sie dieser Fas
 | 1 | Linde behauptet, seit 20:40 in der Küche gewesen zu sein. Diese falsche Aussage über die eigene Bewegung im Tatzeitfenster ist der Täterrolle erlaubt. Linde verweist auf den Warnzettel an der Leiter. |
 | 2 | „Der Kreis hat Menschen gerettet.“ Lenkt auf B8: „Hanno hat Texte verändert.“ |
 | 3 | „Da steht es doch: geführt von H. Rabe. Die Unterschrift ist die von Seifert. Und ich habe um 20:24 gehört, wie Kranz zu ihm sagte: ‚Dann bist du raus, Hanno. So oder so.‘“ Linde verweist auf echte Inhalte der Karte und verschweigt die eigene Fälschung; der letzte Teil ist wahr. |
-| 4 | Behauptet, sie/er habe die Spendendose aus dem Beratungsraum geholt. Wenn das widerlegt wird, weicht Linde aus: „Ich war für die Archivpflege zuständig. Hanno hat die Akte geprüft und unterschrieben. Mehr sage ich dazu nicht.“ Beide Sätze sind mit den Dokumenten vereinbar; Linde gesteht die Fälschung nicht ein. Nach dem Faden schweigt Linde. |
+| 4 | Behauptet, die Spendendose aus dem Beratungsraum geholt. Wenn das widerlegt wird, weicht Linde aus: „Ich war für die Archivpflege zuständig. Hanno hat die Akte geprüft und unterschrieben. Mehr sage ich dazu nicht.“ Beide Sätze sind mit den Dokumenten vereinbar; Linde gesteht die Fälschung nicht ein. Nach dem Faden schweigt Linde. |
 
-Linde darf über die eigenen Aufenthaltsorte und Handlungen im Tatzeitfenster lügen. Linde darf keine Beweiskarte umdeuten oder deren Inhalt bestreiten.
+Linde darf über die eigenen Aufenthaltsorte und Handlungen im Tatzeitfenster lügen. Die eigene Fälschung darf Linde verschweigen, aber Linde darf nicht über fremde Handlungen lügen (also nie behaupten, Hanno oder jemand anderes habe die Akte gemacht). Linde darf keine Beweiskarte umdeuten oder deren Inhalt bestreiten.
 
 ### R04 · Seifert – Zweifel
 
@@ -373,7 +394,7 @@ Linde darf über die eigenen Aufenthaltsorte und Handlungen im Tatzeitfenster l�
 | Rolle | Runde 1 | Später |
 |---|---|---|
 | R06 Rabe | Sagt bei Nachfrage wahrheitsgemäß „Kurz vor neun“ oder verweigert die genaue Zeit. Behauptet nicht, erst gegen 21 Uhr gekommen zu sein. | Runde 4: kam um 20:47, sah Kranz um 20:44 am Auto telefonieren, klopfte um 20:50 an der Bürotür und um 20:51 am Beratungsraum, hörte den Aktenvernichter. Finale: „Hanno sagte mir, er gebe alles zurück.“ |
-| R07 Özdemir | „Ich war in der Küche.“ | Runde 3: Einsichtsbrief, eigene Gastzeit 2001. Runde 4: Linde ging um 20:38 in der grünen Strickjacke aus der Küche und kam um 20:57 zurück, blass und mit festgehaltenem linken Ärmel. Hollmann kam um 21:05 in die Küche. |
+| R07 Özdemir | „Ich war in der Küche.“ | Runde 3: erkennt im Einsichtsbrief (B13) die eigene Formulierungshilfe für Seifert von 2003 wieder, ohne damals den Inhalt der Akte gekannt zu haben. Dazu eine unabhängige Beobachtung aus dem Viertel: Seit 2002 wurde Seifert von früheren Bekannten aus dem Verein auf der Straße nicht mehr gegrüßt, und Özdemir hat bei mehreren Ratsuchenden erlebt, dass sie nach Gesprächen „im Hinterzimmer“ plötzlich niemandem mehr etwas erzählen wollten. Den Namen oder die Regeln des Kreises kennt Özdemir nicht. Runde 4: Linde ging um 20:38 in der grünen Strickjacke aus der Küche und kam um 20:57 zurück, blass und mit festgehaltenem linken Ärmel. Hollmann kam um 21:05 in die Küche. |
 | R08 Wieland | „Jubiläumsartikel.“ | Runde 3: Der Artikel von 2002 wurde gestoppt. Runde 4: Fordert die eigene Digitalkamera bei Kranz zurück oder lässt Kranz die Kamera als verwahrtes Fundstück auf den Tisch legen. Präsentiert B22: Fotos 20:41 (Küche nur Özdemir), 20:42 (Fuchs am Basteltisch), 20:51 (Seifert im Hof). |
 | R09 Wiesner | Weist auf den Warnzettel hin, ohne zu behaupten, die Leiter sei noch defekt. Erklärt: „Ich wollte Hanno die Reparatur am Montag offiziell abnehmen lassen; bis dahin ließ ich den Zettel hängen.“ | Runde 4: Leiter am Freitag neu vernietet und geprüft (Quittung vom 15.10.), Aktenvernichter am Freitag geleert, Poltern um 20:46, Surren des Aktenvernichters 20:48–20:52. |
 | R10 Klose | Verteidigt Hanno und den Verein. | Runde 3: B14 trifft Klose ins Mark. Runde 4: „112a gab es nie“ und Lindes Wahrheit von 1997 (rückdatierter Antrag). |
@@ -388,7 +409,7 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 |---|---|---|
 | 18:30 | Hanno, Linde und Wiesner schließen das Haus auf und bereiten das Herbstfest vor. | Wiesner kennt die Räume und Schlüssel, aber nicht den Kreis. |
 | 19:00 | Das Fest beginnt; etwa 60 Nachbarn sind anwesend. | Öffentliches Vereinsfest, kein Kreisabend. |
-| 19:15 | Begrüßung und Gruppenfoto (B4). Die Spendendose steht zunächst auf dem Büfett. | Foto hält die Kleidung fest; Linde trägt die dunkelgrüne Strickjacke. |
+| 19:15 | Begrüßung und Gruppenfoto als Vereins-Sofortbild (B4), danach an den Aushang gepinnt. Die Spendendose steht zunächst auf dem Büfett. | Foto hält die Kleidung fest; Linde trägt die dunkelgrüne Strickjacke. |
 | 19:30 | Seifert kommt. Hanno hängt sein Sakko über einen Stuhl im Saal. | Weißer Umschlag „K. – persönlich“ bleibt in der Innentasche. |
 | 20:05 | Seifert fragt Hanno: „Wann?“ Hanno antwortet: „Um neun.“ | Seifert weiß, dass eine Rückgabe/Unterredung bevorsteht, aber nicht, was Hanno entdeckt hat. |
 | 20:10 | Hanno bittet Linde: „Um 20:40 im Büro. Allein.“ | Linde ahnt, dass Hanno die Fälschung erkannt hat. |
@@ -415,12 +436,12 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 | 20:50 | R06 betritt den Flur, klopft an der Bürotür und erhält keine Antwort. Klose geht zur Kassenecke, um Lose zu holen; Hollmann ist dort. | Hollmann sieht Klose. Der Flur ist jetzt belebt. |
 | 20:51 | R06 klopft an der Tür des Beratungsraums. Linde hört es und hält inne. R06 hört hinter der geschlossenen Tür das Surren, deutet es als gewöhnliche Büroarbeit und geht zurück Richtung Saal. Kranz beendet sein Telefonat und kehrt ins Haus zurück. Wieland fotografiert Seifert im Hof. | Zweite unabhängige Wahrnehmung des Aktenvernichters; Foto 20:51 zeigt Seifert im Hof. |
 | 20:52 | R06 erreicht den Saal. Linde schaltet den Aktenvernichter spätestens jetzt aus. | Das Gerät läuft nicht wegen eines behaupteten Defekts aus; Linde beendet den Vorgang aus Angst, entdeckt zu werden. |
-| 20:53 | Linde verlässt den Beratungsraum und geht durch den östlichen Flur ins WC. Seifert kommt vom Hof kurz in den Windfang zurück, weil sie friert und das WC aufsuchen will. Seifert sieht die lange dunkle Strickjacke von hinten im WC verschwinden, dreht um und geht zurück in den Hof. | Seifert erkennt das Gesicht nicht, aber Länge und Farbe der Jacke. |
+| 20:53 | Linde verlässt den Beratungsraum, schließt ihn mit dem eigenen Schlüssel ab und geht durch den östlichen Flur ins WC. Seifert kommt vom Hof kurz in den Windfang zurück, weil Seifert friert und das WC aufsuchen will. Seifert sieht die lange dunkle Strickjacke von hinten im WC verschwinden, dreht um und geht zurück in den Hof. | Seifert erkennt das Gesicht nicht, aber Länge und Farbe der Jacke. |
 | 20:55 | Linde verlässt das WC. Seifert befindet sich wieder im Hof. | Keine Begegnung. |
-| 20:56 | Linde durchquert den Saal und geht über den westlichen Flur in Richtung Küche. | Linde muss nicht durch den Beratungsraum zurück. |
+| 20:56 | Linde geht vom WC direkt über den Flur nach Westen zur Küchentür. | Der Saal liegt nicht auf dem Weg; niemand im Saal sieht Linde. |
 | 20:57 | Linde betritt die Küche. Özdemir bemerkt die Blässe und den festgehaltenen linken Ärmel. | B20, falls Özdemir nicht besetzt ist. |
 | 20:58 | Wiesner verlässt die Hausmeisterkammer und kommt in den Saal. Er fragt nicht nach Hanno, weil er weiter von einem vertraulichen Gespräch ausgeht und das Poltern als umgefallenen Aktenkarton deutet. | Wiesner verschweigt zunächst, dass er das Poltern und den Aktenvernichter gehört hat. |
-| 21:00 | Seifert geht zum Beratungsraum, weil Hanno den Termin „21 Uhr“ angekündigt hatte. Die Tür ist geschlossen; Seifert klopft, bekommt keine Antwort und betritt den Raum nicht. | Der Termin steht im schwarzen Buch. Seifert geht enttäuscht zurück. |
+| 21:00 | Seifert geht zum Beratungsraum, weil Hanno den Termin „21 Uhr“ angekündigt hatte. Die Tür ist abgeschlossen; Seifert klopft, bekommt keine Antwort und betritt den Raum nicht. | Der Termin steht im schwarzen Buch. Seifert geht enttäuscht zurück. |
 | 21:03 | Seifert kommt wieder in den Saal. | Keine weitere Sichtung Lindes im Flur. |
 | 21:05 | Hollmann geht von der Kassenecke in die Küche. | Özdemir kann den Zeitpunkt bestätigen. |
 | 21:07 | Hollmann schaltet die Kaffeemaschine ein und trägt „21:07 an – S. H.“ in den Küchendienstplan ein. Der Eintrag „20:45 Kaffee ansetzen – Linde“ ist durchgestrichen. | B16 widerlegt Lindes behauptetes Kaffee-Alibi. |
@@ -456,7 +477,7 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 |---|---|---|---|---|---|---|
 | R01 Fuchs | WC, Rückweg | geht 20:40 durch Flur; sieht dunkle Strickjacke | ab 20:42 Basteltisch | Basteltisch | bleibt in Saalnähe | Eltern, Foto 20:42 |
 | R02 Kranz | ab 20:38 draußen | Telefon 20:41–20:51 | bis 20:51 draußen, dann Saal | Saal; ab 21:12 sucht Hanno | findet Hanno mit Seifert; Polizei/Kassenabschluss | Anrufliste, R06 sieht Kranz am Auto |
-| R03 Linde | 20:38 Küche, danach Flur | 20:40 Büro; 20:46 Stoß | 20:47–20:52 Beratungsraum | 20:53–20:55 WC; 20:56 Saal; 20:57 Küche | bei Fund 21:17 an Bürotür; bleibt | Özdemir, Fuchs, Seifert, Kranz |
+| R03 Linde | 20:38 Küche, danach Flur | 20:40 Büro; 20:46 Stoß | 20:47–20:52 Beratungsraum | 20:53–20:55 WC; 20:56 Flur; 20:57 Küche | bei Fund 21:17 an Bürotür; bleibt | Özdemir, Fuchs, Seifert, Kranz |
 | R04 Seifert | Saal | Saal bis 20:49 | 20:49 Flur, danach Hof | 20:53 kurz Windfang, zurück Hof; 21:00 Beratungsraum; 21:03 Saal | sucht Hanno mit Kranz; nimmt um 21:32 Faden | Foto 20:51, eigene Aussage, Kranz |
 | R05 Hollmann | Kassenecke/Spendendose | 20:44 kurz an Bürotür | zurück Kassenecke | bis 21:05 Kassenecke, dann Küche; 21:07 Kaffee | Kassenabschluss mit Kranz | Klose (20:50), Dienstplan B16 |
 | R06 Rabe | Anfahrt/Auto | 20:44 Parkplatz; sieht Kranz | 20:47 Saal, 20:50–20:52 Flur | Saal | bleibt, sucht persönliche Dinge | eigene Aussage, Anrufliste Kranz |
@@ -499,7 +520,7 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 
 ---
 
-## 12 · Beweiskarten (19 je Partie, 21 definiert)
+## 12 · Beweiskarten (20–22 je Partie, 22 definiert)
 
 ### Runde 1 · Der Sturz (LEITER)
 
@@ -508,7 +529,7 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 | **B1** Fundskizze | Die Leiter liegt nach links (Westen) umgekippt vor dem Schrank. Hanno liegt links daneben auf der linken Körperseite; der Kopf liegt am Fuß der offenen linken Schranktür. Die rechte Hand liegt halb geöffnet vor dem Oberkörper, ein Fadenende ist zwischen den Fingern sichtbar. Der Karton „ZURÜCK“ steht leicht über der vorderen Schrankkante; aus dem braunen Umschlag schaut ein kleines Stück heraus. Die Bürotür zum Flur ist geschlossen. Es gibt keine Verbindungstür zum Beratungsraum. |
 | **B2** Kranz’ Notizen, Vorderseite | „21:32 Dr. Lehnert: Kopfverletzung links, passt zum Sturz gegen die Schranktür. Prellung am rechten Oberarm. Tod vor weniger als einer Stunde. Obduktion.“ Die Karte belegt, was Kranz notiert hat, nicht die endgültige Todesursache. |
 | **B3** Mängelbuch Hausmeisterei | „01.10. Büro, Trittleiter: oberste Stufe wackelt. Zettel drangeklebt.“ Darunter steht kein „erledigt“. Wiesner hat am 15.10. repariert, aber den Zettel bis zur formellen Abnahme am Montag hängen lassen. |
-| **B4** Festprogramm und Gruppenfoto 19:15 | „…21:15 Ansprache Hanno Rabe“. Grußwort: „Meine Tür steht immer offen. Hanno“. Auf dem Foto: Kleidung (Abschnitt 7), Spendendose auf dem Büfett. |
+| **B4** Festprogramm und Gruppenfoto 19:15 | Das Gruppenfoto ist ein **Sofortbild des Vereins** (Vereinskamera, aufgenommen von einer Nachbarin), das gleich nach der Begrüßung neben das Festprogramm an den Aushang gepinnt wurde. Es stammt nicht aus Wielands Kamera. Festprogramm: „…21:15 Ansprache Hanno Rabe“. Grußwort: „Meine Tür steht immer offen. Hanno“. Auf dem Foto: Kleidung (Abschnitt 7), Spendendose auf dem Büfett. |
 
 **Kleine Unstimmigkeiten in Runde 1:**
 
@@ -521,8 +542,8 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 | Karte | Inhalt |
 |---|---|
 | **B5** Das schwarze Buch | Kranz findet es im Sakko, als er Hannos persönliche Dinge zusammenlegt. Darin stehen die sieben Sätze, 23 Vornamen ohne Patenangaben und die Kalenderseite „Sa 16.10.: 20:40 – unter vier Augen · 21:00 K. S. (Karte 2001!) · S. H. – 1.800 – Do?“ sowie „Mo: Rückgabe beginnt.“ Außerdem steckt im Sakko der weiße Umschlag „K. – persönlich“. |
-| **B6** Schlüsselbuch | Büro: Rabe, Kranz, Wiesner (General). Beratungsraum: Rabe, Linde, Klose, Wiesner (General). Schrank: Rabe, Linde, Klose (alter Schlüssel, nie zurückgegeben), Ersatzschlüssel im Schlüsselkasten (Kranz, Wiesner). |
-| **B7** Der Beratungsschrank | 23 Hängemappen mit Vornamen, Mitgliederkarten, Eingangsbuch, Patenblätter, Hilfebuch und leere Formulare G. Eine Schublade ist verschlossen; der kleine Schlüssel hängt am Ersatzring. Sie wird in Runde 3 geöffnet. |
+| **B6** Schlüsselbuch | Wiesners Buch, geführt seit 1993. Büro: Rabe, Kranz, Wiesner (General). Beratungsraum: Rabe, **Linde – seit 03/1998**, Klose, Wiesner (General). Archivschrank: Rabe, Linde, Klose (alter Schlüssel, nie zurückgegeben). **Ersatzring „Vorstand – Notfall“** (seit 1998) mit drei Schlüsseln: Beratungsraum, Archivschrank, Schublade. Er hängt im Schlüsselkasten im westlichen Flur; den Kastenschlüssel haben Vorsitz, stellvertretender Vorsitz und Hausmeisterei (Rabe, Kranz, Wiesner). |
+| **B7** Der Beratungsschrank | 23 Hängemappen mit Vornamen, Mitgliederkarten, Eingangsbuch, Patenblätter, Hilfebuch und leere Formulare G. Eine Schublade ist verschlossen; der kleinste Schlüssel am Ersatzring passt. Sie wird in Runde 3 geöffnet. |
 | **B8** Archivfassung Fuchs | Formular G vom 08.07.2004, abgeschwächter Satz, am Rand „HR 08/04“. |
 
 ### Runde 3 · Die Akten (VORDRUCK)
@@ -638,8 +659,8 @@ Keine Karte allein überführt Linde. Die Täterthese wird zwingend, wenn Dokume
 | 1 | Linde | „Seit 20:40 in der Küche, Kaffee.“ (1) | 20:40–20:47 Büro; 20:47–20:52 Beratungsraum; 20:53–20:55 WC; ab 20:57 Küche | erlaubte Täterlüge über eigenen Aufenthaltsort | B16, Özdemir/B20, Sichtungen |
 | 2 | Linde | „Ich habe die Spendendose aus dem Beratungsraum geholt.“ (4) | Die Dose war bei Hollmann an der Kassenecke. | Ausrede; tatsächliche Aussage muss als Täterlüge kenntlich sein | B4, Hollmann, R07/B20 |
 | 3 | Linde | „Kranz sagte: ‚So oder so‘.“ (3) | stimmt, 20:24 | wahr | Kranz gibt den Streit in Runde 4 zu |
-| 4 | Linde | „Hanno hat die Akte gemacht.“ (3) | Linde hat sie gefälscht | erlaubte Täterlüge über eigene Beteiligung | B12, B15, Seiferts Erinnerung |
-| 5 | Kranz | „Ab 20:38 draußen; telefoniert ab 20:41.“ (1) | stimmt | wahr | Anrufliste, R06 sieht Kranz am Auto |
+| 4 | Linde | verweist auf „geführt von H. Rabe“ und verschweigt die eigene Fälschung (3) | Linde hat die Akte gefälscht | Auslassung. Linde sagt **nicht** „Hanno hat die Akte gemacht“: Das wäre eine Lüge über eine fremde Handlung außerhalb des Tatzeitfensters und ist nicht erlaubt. | B12, B15, Seiferts Erinnerung |
+| 5 | Kranz | „Ab 20:38 draußen; telefoniert von 20:41 bis 20:51.“ (1) | stimmt | wahr | Anrufliste (Gespräch mit Brodersen 20:41–20:51, 10 Min.), R06 sieht Kranz um 20:44 am Auto |
 | 6 | Kranz | verschweigt den Griff um 20:25 (1–3) | linker Arm | Auslassung, keine Falschaussage | eigenes Geständnis in Runde 4 |
 | 7 | Hollmann | sagt zunächst nur, meistens an der Kassenecke gewesen zu sein | war um 20:44 kurz an der Bürotür | Auslassung | eigenes Geständnis in Runde 4 |
 | 8 | Hollmann | gibt den Satz von 20:44 wieder (4) | stimmt | wahr | B5 (21:00 K. S.), B12 („unter vier Augen“) |
@@ -668,7 +689,7 @@ Keine Karte allein überführt Linde. Die Täterthese wird zwingend, wenn Dokume
 | Warum bestätigt Hanno 2003 ein Blatt, auf dem sein eigener Name steht? | Er prüft am 22.04.2003 Datum und Unterschrift, liest das kleine Feld „geführt von“ nicht und akzeptiert die Akte aus Bequemlichkeit bzw. weil es ihm damals gelegen kommt. In der Prüfnotiz von 2004 erkennt er die Unstimmigkeit. |
 | Woher wissen wir, dass das Blatt am 22.04.2003 schon existierte? | Hannos Antwort vom 22.04.2003 sagt, dass er die Akte eingesehen hat. Sie setzt damit eine Obergrenze für die Entstehung der Fälschung. |
 | Hätte die Polizei den Beratungsraum durchsuchen müssen? | Sie sichert zunächst den bekannten Fundort eines mutmaßlichen Leitersturzes. Niemand berichtet ihr von einem Zusammenhang zwischen Beratungsraum, Archiv und Tod. Der Raum bleibt unversiegelt; die Polizei durchsucht nicht systematisch das ganze Vereinsgebäude. Das ist eine dramaturgische Annahme, die im Gastgeberheft knapp erklärt werden muss. |
-| Warum öffnet Seifert die Tür zum Beratungsraum um 21:00 nicht? | Die Tür ist zu diesem Zeitpunkt abgeschlossen. Seifert ist ausgeschlossen und hat keinen Schlüssel. Sie klopft wie angekündigt, erhält keine Antwort und respektiert die verschlossene Tür. Erst in Runde 2 öffnet Kranz den Raum mit dem Ersatzschlüssel; danach bleibt er für die Spielrunden zugänglich. |
+| Warum öffnet Seifert die Tür zum Beratungsraum um 21:00 nicht? | Linde hat die Tür um 20:53 mit dem eigenen Schlüssel abgeschlossen. Seifert ist ausgeschlossen und hat keinen Schlüssel. Seifert klopft wie angekündigt, erhält keine Antwort und rüttelt nicht an der verschlossenen Tür. Erst in Runde 2 öffnet Kranz den Raum mit dem Ersatzring; danach bleibt er für die Spielrunden zugänglich. |
 | Warum öffnet R06 die Tür zum Beratungsraum um 20:51 nicht? | R06 kennt den Raum nicht als möglichen Tatort, hört nur eine Maschine und will den privaten Raum nicht ohne Erlaubnis betreten. |
 | Warum hört Wiesner den Aktenvernichter? | Seine Kammer teilt eine Wand mit dem Beratungsraum. Er kann das Surren lokalisieren, erkennt aber zunächst nur ein Arbeitsgerät. |
 | Hatte Klose mit dem alten Schlüssel Gelegenheit zur Fälschung? | Theoretisch ja. Klose wusste aber nichts von Seiferts Einsichtsbrief und hatte die neuen Vordrucke nicht abgeholt. Das bleibt eine Gegenhypothese bis Runde 4. |
@@ -724,7 +745,7 @@ Mit 5 Personen fehlen R06–R10. Die drei Eingeweihten (R01, R03, R04) stehen zw
 
 | Test | Stand |
 |---|---|
-| Logikprüfung | **0.3.3 auf dem Papier überarbeitet** (Raumlogik, Bewegungen bis 22:50, Aussagenregeln und Beweisverteilung). Maßstäbliche Tatansicht und Blindtest stehen noch aus; danach zweite Prüfung mit Rollenheften und `check_case.py`. |
+| Logikprüfung | **0.3.4 auf dem Papier bereinigt** (Raumlogik, Bewegungen bis 22:50, Aussagenregeln und Beweisverteilung). Maßstäbliche Tatansicht und Blindtest stehen noch aus; danach zweite Prüfung mit Rollenheften und `check_case.py`. |
 | 5-Personen-Test | auf dem Papier |
 | 10-Personen-Test | auf dem Papier |
 | Blindtest | offen. Messpunkte: Nach Runde 3 soll Linde **nicht** Hauptverdacht sein. Nach Runde 4 finden mindestens drei von fünf Gruppen Linde. |
@@ -741,7 +762,7 @@ Mit 5 Personen fehlen R06–R10. Die drei Eingeweihten (R01, R03, R04) stehen zw
 4. Linde wechselt 20:47 ungesehen vom Büro in den Beratungsraum; Seifert, R06 und Wiesner hören den Aktenvernichter aus unterschiedlichen Positionen.
 5. Nach dem Stoß liegt Hanno auf der linken Körperseite; die halb geöffnete rechte Hand mit sichtbarem Faden liegt vor dem Oberkörper.
 6. Doppelte Wiederholung von Hannos Satz entfernt: Der Satz „Um neun erfährt sie es. Von mir!“ fällt nur um 20:44.
-7. Seiferts Sichtung um 20:53 ist eine Rückkehr vom Hof: sie sieht Linde von hinten in Richtung WC verschwinden und geht wieder hinaus.
+7. Seiferts Sichtung um 20:53 ist eine Rückkehr vom Hof: Seifert sieht Linde von hinten in Richtung WC verschwinden und geht wieder hinaus.
 8. R06 klopft 20:50 an Büro und 20:51 am Beratungsraum; die Schwingtür verhindert eine Sichtbegegnung mit Linde um 20:47.
 9. Wiesner lässt den Mängelzettel bis zur formellen Reparaturabnahme am Montag hängen.
 10. Seifert entwendet den Faden mit einem Pinzettengriff; die Handlung ist schnell, aber potenziell beobachtbar.
@@ -754,6 +775,15 @@ Mit 5 Personen fehlen R06–R10. Die drei Eingeweihten (R01, R03, R04) stehen zw
 17. Seifert löst in Runde 3 den Fund von B12 durch die Erinnerung an das Surren um 20:49 selbst aus.
 18. Kranz hält die Rückseite B17 bis Runde 4 physisch verdeckt.
 19. B21 benennt ausdrücklich den Karton oben auf dem Schrank im Büro und Seiferts Original von 1999 ganz obenauf.
+
+**Ergänzt in 0.3.4:**
+
+20. Linde schließt den Beratungsraum um 20:53 mit dem eigenen Schlüssel (seit 03/1998) ab.
+21. Ersatzring „Vorstand – Notfall“ mit Schlüsseln für Beratungsraum, Archivschrank und Schublade; Schlüsselkasten im westlichen Flur; Kastenschlüssel bei Rabe, Kranz, Wiesner.
+22. B4 ist ein Vereins-Sofortbild am Aushang.
+23. Özdemir war nie Gast im Kreis; Ersatz: Formulierungshilfe 2003 und Beobachtungen aus dem Viertel.
+24. Linde geht um 20:56 direkt über den Flur zur Küche.
+25. Kranz' Anrufliste: Brodersen, 20:41, 10 Minuten.
 
 ---
 

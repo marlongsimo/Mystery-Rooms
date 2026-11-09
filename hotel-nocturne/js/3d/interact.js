@@ -4,7 +4,7 @@
  *   Ein Griff/Bügel prüft über die Engine (engine.tryLock) – Fehlertexte, Erfolg und Folgen kommen von dort, wie beim Dialog.
  * Rückgabe: { group, parts(), value(), shake() } – group an das Möbelstück hängen, parts/value in die focus-Angabe von hs() übernehmen.
  */
-import { THREE, canvasTex } from "./core.js?v=3";
+import { THREE, canvasTex } from "./core.js?v=4";
 
 const N = window.NOCTURNE;
 const snd = (n) => N.audio && N.audio.play && N.audio.play(n);

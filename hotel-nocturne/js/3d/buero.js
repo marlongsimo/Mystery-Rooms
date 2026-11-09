@@ -6,11 +6,11 @@
  * Zustände: Taschenlampe (Riegel unter der Platte) · tresor_offen (Tür offen, Schalter „TUNNEL W – ENTRIEGELT“) ·
  * tunnel_offen (Stahltür offen, dahinter die Rampe mit grünem Schimmer).
  */
-import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
-import { textTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=2";
-import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame } from "./hd.js?v=2";
-import { tag } from "./gfx.js?v=1";
-import { lift } from "./interact.js?v=3";
+import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=4";
+import { textTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=3";
+import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame } from "./hd.js?v=3";
+import { tag } from "./gfx.js?v=2";
+import { lift } from "./interact.js?v=4";
 
 const R = 2.6, H = 3.0;
 const MONO = "DM Mono, monospace";

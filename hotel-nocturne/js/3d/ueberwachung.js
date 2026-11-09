@@ -7,11 +7,11 @@
  * zeitleiste_ok · datei5_offen (Tür „Technik“ offen, Taste TECHNIK leuchtet) · taken_sicherung · Taschenlampe (unter dem Pult).
  * Bildhinweise: Uhr 23:17 · „CAM 3“-Hülle (rot) · „NUR ÜBER REKORDER“ · Terminaltexte wie in 2D · „ERSATZTEILE T.“.
  */
-import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
-import { textTex, plaqueTex, shell } from "./kit.js?v=2";
-import { brassMat, std, rbox, panel } from "./hd.js?v=2";
-import { tag } from "./gfx.js?v=1";
-import { lift } from "./interact.js?v=3";
+import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=4";
+import { textTex, plaqueTex, shell } from "./kit.js?v=3";
+import { brassMat, std, rbox, panel } from "./hd.js?v=3";
+import { tag } from "./gfx.js?v=2";
+import { lift } from "./interact.js?v=4";
 
 const R = 2.6, H = 2.8;
 const MONO = "DM Mono, monospace";

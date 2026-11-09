@@ -10,7 +10,7 @@
  * dieselbe Szene, die das Spiel benutzt (core.cinemaHost). Überspringen jederzeit; bei „Bewegung reduzieren“ oder ohne WebGL
  * läuft die bisherige Bildfolge.
  */
-import { THREE, canvasTex, cinemaHost } from "./core.js?v=3";
+import { THREE, canvasTex, cinemaHost } from "./core.js?v=4";
 
 const N = window.NOCTURNE;
 const A = () => N.audio;

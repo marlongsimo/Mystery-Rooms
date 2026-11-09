@@ -11,7 +11,7 @@
  * Kamerawege sind Kurven (Catmull-Rom) durch Stützpunkte; Brennweite je Einstellung. Ohne WebGL oder bei „Bewegung reduzieren“
  * bleibt die bisherige Bildfolge.
  */
-import { THREE, defineRoom, canvasTex, cinemaHost } from "./core.js?v=3";
+import { THREE, defineRoom, canvasTex, cinemaHost } from "./core.js?v=4";
 
 const N = window.NOCTURNE;
 const A = () => N.audio;

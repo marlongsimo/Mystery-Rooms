@@ -3,8 +3,8 @@
  * Texturen (Damast, Marmor, Perserteppich, Holz mit Maserung) und Formen (abgerundete Kanten, gedrechselte Beine,
  * Kassettenfüllungen, Zierrahmen) – alles aus Code, mit PBR-Einstellungen über tag() (siehe gfx.js).
  */
-import { THREE, canvasTex } from "./core.js?v=3";
-import { RoundedBoxGeometry, tag } from "./gfx.js?v=1";
+import { THREE, canvasTex } from "./core.js?v=4";
+import { RoundedBoxGeometry, tag } from "./gfx.js?v=2";
 
 /* ---------- Materialien ---------- */
 export const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.7, metalness: 0, ...o });

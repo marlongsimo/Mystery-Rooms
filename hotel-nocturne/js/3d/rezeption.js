@@ -6,9 +6,9 @@
  * nur das Porträt hängt gerade · lose Seite im Gästeregister · stockdunkle Ecke unter der Treppe (Taschenlampe).
  */
 // Version im Import = Cache-Steuerung; core.js darf nur einmal (mit derselben URL) geladen werden
-import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group, wallMesh, walls } from "./core.js?v=3";
-import { woodMat, brassMat, velvetMat, leatherMat, damask, marble, persian, rbox, panel, turnedLeg, ornateFrame, std, tableLamp } from "./hd.js?v=2";
-import { tag } from "./gfx.js?v=1";
+import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group, wallMesh, walls } from "./core.js?v=4";
+import { woodMat, brassMat, velvetMat, leatherMat, damask, marble, persian, rbox, panel, turnedLeg, ornateFrame, std, tableLamp } from "./hd.js?v=3";
+import { tag } from "./gfx.js?v=2";
 
 const R = 3.2, H = 3.4;
 

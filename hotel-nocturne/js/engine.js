@@ -1497,6 +1497,8 @@
     refresh() { if (inGame() && !dlg.open) renderStage(); },
     blocked: () => Boolean(overlay || dlg.open),
     roomName: (id) => (ROOM[id] ? ROOM[id].name : id),
+    /** Für Tests und den Hotelplan: in einen freigeschalteten Raum wechseln. */
+    goRoom: (id, via) => goRoom(id, via),
   };
 
   /* ---------- Los geht’s ---------- */

@@ -8,11 +8,11 @@
  * Schublade W mit Kratzspuren · Karton „PERSONAL 2009“ · Akte „VOSS, E.“ · Protokolle „A · 117“ / „B · 118“ ·
  * „SICHERHEITSBEREICH UG – ZUTRITT NUR PERSONAL“ · Zahlenfeld mit rotem/grünem Lämpchen.
  */
-import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
-import { textTex, plankTex, plaqueTex, shell } from "./kit.js?v=2";
-import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame } from "./hd.js?v=2";
-import { tag } from "./gfx.js?v=1";
-import { combinationLock, twister, lift } from "./interact.js?v=3";
+import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=4";
+import { textTex, plankTex, plaqueTex, shell } from "./kit.js?v=3";
+import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame } from "./hd.js?v=3";
+import { tag } from "./gfx.js?v=2";
+import { combinationLock, twister, lift } from "./interact.js?v=4";
 
 const R = 2.8, H = 3.2;
 const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

@@ -7,11 +7,11 @@
  * Zustände: f3_drin · gen_laeuft (Motor vibriert, Zeiger, Kontrollleuchte grün) · strom (Käfiglampen, Hebel unten, W2 230 V,
  * Magnetschloss grün) · schrank_weg (Schrank rutscht zur Seite) · tuer_offen.
  */
-import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
-import { textTex, plaqueTex, shell } from "./kit.js?v=2";
-import { woodMat, brassMat, std, rbox, panel } from "./hd.js?v=2";
-import { tag } from "./gfx.js?v=1";
-import { lift, twister } from "./interact.js?v=3";
+import { THREE, defineRoom, ready, canvasTex, lambert, basic, ZONE, box, cyl, plane, group } from "./core.js?v=4";
+import { textTex, plaqueTex, shell } from "./kit.js?v=3";
+import { woodMat, brassMat, std, rbox, panel } from "./hd.js?v=3";
+import { tag } from "./gfx.js?v=2";
+import { lift, twister } from "./interact.js?v=4";
 
 const R = 2.8, H = 3.6, WATER = 0.12, LAND = 1.33;
 const MONO = "DM Mono, monospace";
@@ -105,22 +105,27 @@ defineRoom("keller", (ctx) => {
   });
 
   /* ================= NORD · Metalltreppe hinauf, Wasserstandsmarken, Rohr mit Ritzung ================= */
-  const stair = new THREE.Group(), nSteps = 7, sx0 = -1.75, run = 1.6;
-  for (let i = 0; i < nSteps; i++) { const y = (i + 1) * (LAND / nSteps); stair.add(box(run / nSteps + 0.02, 0.04, 0.9, std(0x4a4c46, { metalness: 0.7, roughness: 0.6 }), sx0 + (i + 0.5) * (run / nSteps), y - 0.02, 0.45)); }
-  stair.add(box(1.25, 0.05, 0.95, std(0x4a4c46, { metalness: 0.7, roughness: 0.6 }), sx0 + run + 0.62, LAND - 0.025, 0.475)); // Podest vor der Tür
-  const stringer = box(Math.hypot(run, LAND) + 0.1, 0.18, 0.04, M.steelDark, sx0 + run / 2, LAND / 2 - 0.08, 0.92); stringer.rotation.z = Math.atan2(LAND, run); stair.add(stringer);
-  const rail = cyl(0.018, 0.018, Math.hypot(run, LAND) + 0.1, M.steelDark, sx0 + run / 2, LAND / 2 + 0.95, 0.9); rail.rotation.z = -Math.PI / 2 + Math.atan2(LAND, run); stair.add(rail);
-  stair.add(cyl(0.018, 0.018, 1.25, M.steelDark, sx0 + run + 0.62, LAND + 0.95, 0.9).rotateZ(Math.PI / 2));
-  for (let i = 0; i <= 4; i++) { const x = sx0 + i * (run / 4); stair.add(cyl(0.012, 0.012, 0.95, M.steelDark, x, (i / 4) * LAND + 0.47, 0.9)); }
-  [sx0 + run + 0.05, sx0 + run + 1.2].forEach((x) => { stair.add(cyl(0.014, 0.014, 0.95, M.steelDark, x, LAND + 0.47, 0.9)); stair.add(cyl(0.03, 0.03, LAND, M.steelDark, x, LAND / 2, 0.9)); });
-  add(place(stair, "n", 0.5, 0, 0));
+  // Die Treppe führt gerade auf die Tür zu (nichts steht zwischen Podest und Tür); Geländer nur an den Seiten
+  const stair = new THREE.Group(), nSteps = 7, run = 1.3, LD = 0.8, SW = 0.9, U = 0.53;
+  const stepM = std(0x4a4c46, { metalness: 0.7, roughness: 0.6 }), slope = Math.atan2(LAND, run), len = Math.hypot(run, LAND);
+  for (let i = 0; i < nSteps; i++) stair.add(box(SW, 0.04, run / nSteps + 0.02, stepM, 0, (i + 1) * (LAND / nSteps) - 0.02, LD + run - (i + 0.5) * (run / nSteps)));
+  stair.add(box(SW + 0.2, 0.05, LD, stepM, 0, LAND - 0.025, LD / 2)); // Podest vor der Tür
+  [-1, 1].forEach((sd) => {
+    const x = sd * (SW / 2 + 0.03);
+    const st = box(0.04, 0.18, len + 0.1, M.steelDark, x, LAND / 2 - 0.08, LD + run / 2); st.rotation.x = slope; stair.add(st); // Wange
+    const hr = cyl(0.018, 0.018, len + 0.1, M.steelDark, x + sd * 0.03, LAND / 2 + 0.95, LD + run / 2); hr.rotation.x = -Math.atan2(run, LAND); stair.add(hr); // Handlauf
+    stair.add(cyl(0.018, 0.018, LD, M.steelDark, x + sd * 0.07, LAND + 0.95, LD / 2).rotateX(Math.PI / 2)); // Geländer am Podest
+    [[LD + run, 0], [LD, LAND], [0.05, LAND]].forEach(([z, y0]) => stair.add(cyl(0.012, 0.012, 0.95, M.steelDark, x + sd * (z === LD + run ? 0.03 : 0.07), y0 + 0.47, z)));
+    stair.add(cyl(0.03, 0.03, LAND, M.steelDark, sd * (SW / 2 + 0.07), LAND / 2, LD - 0.05)); // Stütze unter dem Podest
+  });
+  add(place(stair, "n", U, 0, 0));
   // Tür oben auf dem Podest (zum Sicherheitsbereich), Schild
   const uDoor = group(rbox(0.86, 2.0, 0.06, std(0x3d3f3a, { metalness: 0.6, roughness: 0.5 }), 0, 1.0, -0.02, 0.01), plane(0.5, 0.12, lambert(0xffffff, { map: plaqueTex("SICHERHEITSBEREICH", 384, 90, "#2a2119", "#e6c48a", `600 30px ${MONO}`, 2) }), 0, 1.7, 0.012), rbox(0.05, 0.25, 0.06, M.steelDark, 0.32, 0.95, 0.03, 0.01));
   uDoor.add(box(0.06, 2.1, 0.08, M.steelDark, -0.46, 1.05, 0), box(0.06, 2.1, 0.08, M.steelDark, 0.46, 1.05, 0), box(0.98, 0.06, 0.08, M.steelDark, 0, 2.08, 0));
-  add(place(uDoor, "n", 0.6, LAND, 0));
-  // Klickflächen der Treppe: schräg direkt über den Stufen (verdeckt die Pegellatte links nicht) + Podest mit Tür
-  const sZone = box(Math.hypot(run, LAND) + 0.15, 0.5, 0.9, ZONE, sx0 + run / 2, LAND / 2 + 0.2, 0.45); sZone.rotation.z = Math.atan2(LAND, run);
-  add(place(hs("k_treppe", group(sZone, box(1.25, 2.3, 0.95, ZONE, sx0 + run + 0.62, LAND + 1.0, 0.475)), { aimLocal: [sx0 + run + 0.62, LAND + 1.0, 0.6] }), "n", 0.5, 0, 0));
+  add(place(uDoor, "n", U, LAND, 0));
+  // Klickflächen: schräg über den Stufen + Podest mit Tür
+  const sZone = box(SW, 0.5, len + 0.15, ZONE, 0, LAND / 2 + 0.2, LD + run / 2); sZone.rotation.x = slope;
+  add(place(hs("k_treppe", group(sZone, box(SW + 0.2, 2.3, LD, ZONE, 0, LAND + 1.0, LD / 2)), { aimLocal: [0, LAND + 1.0, LD / 2] }), "n", U, 0, 0));
   // Wasserstandsmarken (Pegellatte)
   const marks = group(plane(0.3, 1.4, lambert(0xffffff, { map: marksTex() }), 0, 0.7, 0), box(0.34, 1.44, 0.02, ZONE, 0, 0.7, 0.01));
   add(place(hs("wassermarken", marks), "n", 0.075, 0, 0.012));
@@ -130,7 +135,7 @@ defineRoom("keller", (ctx) => {
   pipeG.add(box(2.0, 0.34, 0.34, ZONE, 0, 0, 0));
   add(place(hs("rohr", pipeG), "n", 0.82, H - 0.75, 0.25));
   // Wasser (Klickfläche rechts vorn)
-  add(place(hs("k_wasser", group(box(1.4, 0.2, 1.2, ZONE, 0, WATER, 0))), "n", 0.7, 0, 1.6));
+  add(place(hs("k_wasser", group(box(1.0, 0.2, 1.2, ZONE, 0, WATER, 0))), "n", 0.72, 0, 1.6)); // rechts neben der Treppe
   // Tropfen
   const drop = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), std(0x9ab4c8, { roughness: 0.1 })); add(place(drop, "n", 0.9, H - 0.6, 0.6));
   anim((dt) => { drop.position.y -= dt * 3.4; if (drop.position.y < WATER) drop.position.y = H - 0.6; });

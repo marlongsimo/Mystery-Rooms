@@ -95,6 +95,8 @@ export function prepareScene(scene) {
 
 /* ---------- Umgebung (HDRI) ---------- */
 let envTex = null, envPromise = null;
+/** Nach einem Kontextverlust ist die vorberechnete Umgebung ungültig. */
+export function resetEnvironment() { envTex = null; envPromise = null; }
 export function environment(renderer) {
   if (envPromise) return envPromise;
   envPromise = new Promise((res) => {

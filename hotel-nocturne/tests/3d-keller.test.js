@@ -29,7 +29,7 @@ const light = async (p) => { await p.click('#phoneButton'); await p.waitForTimeo
 (async () => {
   const b = await chromium.launch(ARGS); const errs = [];
   const p2 = await b.newPage({ viewport: { width: 1280, height: 860 } }); p2.on('pageerror', (e) => errs.push('2D ' + e.message));
-  await enter(p2, BASE + '/hotel-nocturne/index.html', 'nocturne_save_v2');
+  await enter(p2, BASE + '/hotel-nocturne/index.html?2d', 'nocturne_save_v2');
   console.log('2D ohne Licht, sichtbare Hotspots:', (await p2.$$eval('#stage [data-hs]', (x) => x.map((y) => y.dataset.hs))).join(','));
   await light(p2);
   const ref = {};

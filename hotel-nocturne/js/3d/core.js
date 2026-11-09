@@ -10,7 +10,7 @@
  * Die Pfeile ‹ › drehen um 90° (= die vier Blickrichtungen der Raumdatei).
  */
 import * as THREE from "../../../platform/vendor/three-0.170.0/three.module.min.js";
-import * as GFX from "./gfx.js?v=1";
+import * as GFX from "./gfx.js?v=2";
 
 const N = window.NOCTURNE;
 const E = () => N.engine;
@@ -101,6 +101,9 @@ function init() {
   focusUI.addEventListener("click", (ev) => { const b = ev.target.closest("[data-f]"); if (!b || !focus) return; const id = focus.id; exitFocus(); if (b.dataset.f === "classic") E().hotspot(id); });
   wrap.appendChild(focusUI);
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && focus && !E().blocked()) exitFocus(); });
+  // Verliert der Browser den Grafikkontext (Speicher, Treiber), den Raum nach der Wiederherstellung neu aufbauen statt schwarz zu bleiben
+  canvas.addEventListener("webglcontextlost", (ev) => { ev.preventDefault(); running = false; console.warn("[Hotel Nocturne 3D] Grafikkontext verloren"); });
+  canvas.addEventListener("webglcontextrestored", () => { GFX.resetEnvironment(); fx = null; scene = null; roomId = null; if (N.engine && N.engine.refresh) N.engine.refresh(); });
   bindInput();
   new ResizeObserver(resize).observe(wrap);
   // Blitz der Engine (body.flash) auch im 3D-Raum
@@ -115,8 +118,27 @@ function resize() {
 }
 
 /* ---------- Raum aufbauen ---------- */
+/** Alten Raum vollständig freigeben: Geometrien, alle Texturen der Materialien, Schattenkarten der Lichter und die
+ *  Nachbearbeitung. Ohne das wächst der Grafikspeicher bei jedem Raumwechsel, bis der Browser den Grafikkontext
+ *  verwirft (schwarzes Bild). Die gemeinsame Umgebung (HDRI) bleibt erhalten. */
+function disposeRoom() {
+  if (scene) scene.traverse((o) => {
+    if (o.geometry) o.geometry.dispose();
+    [].concat(o.material || []).forEach((m) => {
+      Object.keys(m).forEach((k) => { const v = m[k]; if (v && v.isTexture && v !== scene.environment) v.dispose(); });
+      if (m.dispose) m.dispose();
+    });
+    if (o.isLight && o.shadow && o.shadow.map) { o.shadow.map.dispose(); o.shadow.map = null; }
+    if (o.isLight && o.map && o.map.isTexture) o.map.dispose(); // Lichtkegel der Taschenlampe
+  });
+  if (fx) { (fx.comp.passes || []).forEach((p) => p.dispose && p.dispose()); if (fx.comp.dispose) fx.comp.dispose(); fx = null; }
+  if (renderer && renderer.renderLists) renderer.renderLists.dispose();
+  // Taschenlampe hängt an der Kamera, die über alle Räume bleibt: alte Lampe abnehmen, sonst sammeln sich mit jedem
+  // Raumwechsel Lichter an, bis die Shader zu viele Texturen brauchen und nicht mehr laufen (schwarzes Bild)
+  if (camera) { if (flash) camera.remove(flash); if (flashTarget) camera.remove(flashTarget); }
+}
 function buildRoom(r) {
-  if (scene) scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); const m = o.material; [].concat(m || []).forEach((x) => { if (x.map) x.map.dispose(); x.dispose && x.dispose(); }); });
+  disposeRoom();
   scene = new THREE.Scene();
   scene.add(camera);
   const pick = [], states = [], anims = [];
@@ -383,7 +405,8 @@ function render(stage, r, i) {
   resize();
   startLoop();
 }
-function supports(r) { return Boolean(BUILDERS[r.id]) && webgl && (renderer || init()); }
+const FORCE_2D = new URLSearchParams(location.search).has("2d"); // ?2d: klassische 2D-Räume (Tests, schwache Geräte)
+function supports(r) { return !FORCE_2D && Boolean(BUILDERS[r.id]) && webgl && (renderer || init()); }
 
 /** Für automatische Tests: Kamera auf das Objekt eines Hotspots richten, Bildschirmpunkt zurückgeben. */
 function aimAt(id) {
@@ -419,7 +442,7 @@ function focusInfo() {
   if (!focus) return null; const rc = canvas.getBoundingClientRect();
   return { id: focus.id, leaving: focus.leaving, arrived: camera.position.distanceTo(focus.camPos) < 0.01, value: focus.sp.value ? focus.sp.value() : null, parts: focus.parts.map((p) => { const c = new THREE.Box3().setFromObject(p.obj).getCenter(new THREE.Vector3()).project(camera); return { name: p.name || "", x: rc.left + (c.x + 1) / 2 * rc.width, y: rc.top + (1 - c.y) / 2 * rc.height }; }) };
 }
-N.view3d = { supports, render, pickAt, aimAt, debugHits, focusInfo, focusExit: () => exitFocus(), pause: setPaused, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, triangles: renderer ? renderer.info.render.triangles : 0, ...sceneStats() }) };
+N.view3d = { supports, render, pickAt, aimAt, debugHits, focusInfo, focusExit: () => exitFocus(), pause: setPaused, sync: () => syncView(), quality: () => GFX.Q.level, modelsReady: GFX.modelsReady, info: () => ({ hd: Boolean(built && built.hd), bloom: Boolean(fx && fx.bloom && fx.bloom.enabled), shadows: Boolean(flash && flash.castShadow), env: Boolean(scene && scene.environment), calls: renderer ? renderer.info.render.calls : 0, gpuTextures: renderer ? renderer.info.memory.textures : 0, gpuGeometries: renderer ? renderer.info.memory.geometries : 0, contextLost: Boolean(renderer && renderer.getContext().isContextLost()), triangles: renderer ? renderer.info.render.triangles : 0, ...sceneStats() }) };
 // Falls das Spiel schon läuft, als die Module fertig geladen waren: jetzt auf 3D umschalten
 /* ---------- Kinomodus für das Intro (js/3d/intro.js) ----------
    Leiht sich Renderer, Kamera und den fertig gebauten Raum: Das Intro fährt durch dieselbe Szene,

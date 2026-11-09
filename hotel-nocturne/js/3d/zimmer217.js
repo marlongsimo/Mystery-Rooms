@@ -7,11 +7,11 @@
  * Bildhinweise: Zimmernummer 217 · Ziffernschloss der Kommode (vier Stellen, 0000) · „Wer nachts wacht“ über dem Schrank ·
  * „für E.“ am Landschaftsbild · Kerze brennt · Gepäckschein „6“ unter dem Bett (nur im Lichtkegel) · Tor im Hof nur beim Blitz.
  */
-import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=3";
-import { textTex, wallpaper, woodTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=2";
-import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame, tableLamp } from "./hd.js?v=2";
-import { tag } from "./gfx.js?v=1";
-import { combinationLock } from "./interact.js?v=3";
+import { THREE, defineRoom, ready, canvasTex, lambert, phong, basic, ZONE, box, cyl, plane, group } from "./core.js?v=4";
+import { textTex, wallpaper, woodTex, plankTex, plaqueTex, rainTex, shell } from "./kit.js?v=3";
+import { woodMat, brassMat, velvetMat, std, damask, persian, rbox, panel, turnedLeg, ornateFrame, tableLamp } from "./hd.js?v=3";
+import { tag } from "./gfx.js?v=2";
+import { combinationLock } from "./interact.js?v=4";
 
 const R = 2.6, H = 3.0;
 

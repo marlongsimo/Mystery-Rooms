@@ -28,7 +28,7 @@ const closeDlg = async (p) => { if (await p.evaluate(() => document.querySelecto
 (async () => {
   const b = await chromium.launch(ARGS); const errs = [];
   const p2 = await b.newPage({ viewport: { width: 1280, height: 860 } }); p2.on('pageerror', (e) => errs.push('2D ' + e.message));
-  await enter(p2, BASE + '/hotel-nocturne/index.html', 'nocturne_save_v2');
+  await enter(p2, BASE + '/hotel-nocturne/index.html?2d', 'nocturne_save_v2');
   const ref = {};
   for (let v = 0; v < 4; v++) {
     const ids = await p2.$$eval('#stage [data-hs]', (x) => x.map((y) => y.dataset.hs));

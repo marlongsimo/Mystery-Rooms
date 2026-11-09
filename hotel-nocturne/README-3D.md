@@ -1,6 +1,8 @@
 # Hotel Nocturne – 3D-Testmodus
 
-**Seite:** `hotel-nocturne/3d.html` – auf der Startseite des Spiels als „Einchecken (Testmodus 3D)“ verlinkt, nicht im Katalog.
+**Seite:** Seit November 2026 ist die 3D-Ansicht Standard in `hotel-nocturne/index.html` (normaler Spielstand `nocturne_save_v2`). `?2d` erzwingt die klassischen 2D-Räume (Tests, schwache Geräte); ohne WebGL fällt die Engine von selbst auf 2D zurück. `3d.html` bleibt als Testseite mit eigenem Spielstand (`nocturne_save_3d_v2`) für die automatischen Tests.
+
+**Speicher beim Raumwechsel:** `core.js` (`disposeRoom`) gibt Geometrien, alle Materialtexturen, Schattenkarten und die Nachbearbeitung frei und nimmt die alte Taschenlampe von der Kamera. Vorher sammelten sich mit jedem Wechsel Lichter an, bis die Shader zu viele Texturen brauchten (schwarzes Bild).
 
 Stand: **Rezeption**, **Zimmer 217** und **Gepäcklager** als 360°-Räume. Alle anderen Räume laufen auf derselben Seite in der gewohnten 2D-Ansicht weiter – das Spiel bleibt komplett durchspielbar.
 

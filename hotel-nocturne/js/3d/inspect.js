@@ -4,7 +4,7 @@
  * Eigenes kleines Bild (eigener Renderer, wird beim Schließen freigegeben). Inhalte nur aus den vorhandenen Gegenstandstexten.
  * Modelle: key217 (Anhänger vorn „217“, hinten „gilt auch für den Aufzug“), schraubendreher.
  */
-import { THREE, canvasTex } from "./core.js?v=3";
+import { THREE, canvasTex } from "./core.js?v=4";
 
 const N = window.NOCTURNE;
 const brass = () => new THREE.MeshStandardMaterial({ color: 0xc09a58, metalness: 1, roughness: 0.28 });

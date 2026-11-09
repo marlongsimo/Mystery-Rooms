@@ -136,7 +136,7 @@ const closeDlg = async (p) => { if (await dlgOpen(p)) { await p.click('#closeDia
   await p.close();
   // Gegenprobe normale Version: Zahlenschloss im Dialog
   const q = await b.newPage({ viewport: { width: 1280, height: 860 } }); const e2 = []; q.on('pageerror', (e) => e2.push(e.message));
-  await enter(q, BASE + '/hotel-nocturne/index.html');
+  await enter(q, BASE + '/hotel-nocturne/index.html?2d');
   await q.click('#stage [data-hs="schluesselkasten"]', { force: true }); await q.waitForTimeout(400);
   for (const k of '2317') await q.click(`[data-key="${k}"]`); await q.waitForTimeout(600);
   const fb = await q.evaluate(() => (document.querySelector('.lock-feedback') || {}).textContent || '');

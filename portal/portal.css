@@ -416,3 +416,8 @@ dialog[open] { animation: rise .25s ease-out; }
 .footer-claim { font: 500 12px var(--sans); letter-spacing: .28em; text-transform: uppercase; color: var(--gold-2); }
 .brand-image { width: 100%; height: auto; margin: 0 0 30px; border: 1px solid #d5ad6233; box-shadow: 0 30px 80px #0009; }
 @media (max-width: 680px) { .logo .wordmark { font-size: 15px; letter-spacing: .06em; } }
+
+/* Überschrift für Suchmaschinen (sichtbar, klein) und Slogan im Großformat */
+.hero .hero-h1 { font: 500 12px/1.5 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--teal); margin: 0 0 14px; text-shadow: none; max-width: 640px; }
+.hero .hero-title { font-family: var(--serif); font-weight: 500; font-size: clamp(38px, 6vw, 78px); line-height: 1.04; margin: 0 0 26px; letter-spacing: .01em; text-shadow: 0 4px 30px #000a; }
+.hero .hero-title em { font-style: normal; color: var(--gold); display: block; }

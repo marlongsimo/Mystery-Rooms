@@ -9,7 +9,7 @@
   const isTable = (g) => g.kind === "tisch";
   const ART = window.MR_ART || {};
   const art = (g) => g.poster
-    ? `<img src="${esc(g.poster)}" alt="" loading="lazy">`
+    ? `<img src="${esc(g.poster)}" alt="${esc(g.title)} – ${esc(g.subtitle)}" loading="lazy">`
     : `<svg viewBox="0 0 400 240" aria-hidden="true" preserveAspectRatio="xMidYMid slice">${ART[g.art] || ""}</svg>`;
   const dots = (n) => `<span class="dots" aria-label="Schwierigkeit: ${DIFF[n]}">${[1, 2, 3, 4].map((i) => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</span>`;
   const page = (g) => `spiele/${g.id}.html`;

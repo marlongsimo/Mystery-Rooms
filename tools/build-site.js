@@ -35,7 +35,8 @@ const artHtml = (g, pre = "") => (g.poster ? `<img src="${pre}${esc(g.poster)}" 
 const short = (s, n = 155) => { s = String(s).replace(/\s+/g, " ").trim(); if (s.length <= n) return s; const cut = s.slice(0, n - 1); return cut.slice(0, cut.lastIndexOf(" ")) + "…"; };
 const kindLabel = (g) => (isTable(g) ? "Krimidinner" : "Online Escape Room");
 const pageTitle = (g) => `${g.title} – ${isTable(g) ? "Krimidinner für zu Hause" : g.subtitle + " · Online Escape Room"} | Case Unlocked`;
-const description = (g) => short(`${isTable(g) ? "Kostenloses Krimidinner für " + g.players + ", " + g.duration + ". " : "Kostenloser Online Escape Room, " + g.players + ", " + g.duration + ". "}${g.teaser}`);
+const dur = (g) => g.duration.replace(/\.$/, "");
+const description = (g) => short(`${isTable(g) ? "Kostenloses Krimidinner für " + g.players + ", " + dur(g) + ". " : "Kostenloser Online Escape Room, " + g.players + ", " + dur(g) + ". "}${g.teaser}`);
 
 const LOGO = `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 15h9.5v-3.5a6.5 6.5 0 0 1 13 0V15H36v21H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="20" cy="11.2" r="2.4" fill="currentColor"/><path d="M18.9 12.6h2.2l1 5.2h-4.2z" fill="currentColor"/><path d="M10 24h20M10 29h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".55"/></svg>`;
 const CSS_V = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/portal\.css\?v=(\d+)/) || [, "1"])[1];
@@ -154,6 +155,65 @@ ${seoHead({ title, desc, url, image, type: "article", jsonld })}
 `;
 }
 
+
+/* ---------- Startseite: Kacheln und Fälle fertig ins HTML (portal.js ersetzt sie im Browser durch dieselben, plus Spielstand und Bewertungen) ---------- */
+const CAT_ORDER = ["klassisch", "crime", "digital"];
+const together = (g) => /–[2-9]/.test(g.players);
+const cardArt = (g) => (g.poster ? `<img src="${esc(g.poster)}" alt="${esc(g.title)} – ${esc(g.subtitle)}" loading="lazy">` : `<svg viewBox="0 0 400 240" aria-hidden="true" preserveAspectRatio="xMidYMid slice">${ART[g.art] || ""}</svg>`);
+function staticCards() {
+  return GAMES.filter((g) => !isTable(g)).sort((a, b) => CAT_ORDER.indexOf(a.category) - CAT_ORDER.indexOf(b.category)).map((g) => `      <article class="card" id="spiel-${esc(g.id)}">
+        <a class="card-art" href="spiele/${g.id}.html" tabindex="-1" aria-hidden="true">${cardArt(g)}<span class="card-badges">${g.isNew ? `<span class="badge new">Neu</span>` : ""}${together(g) ? `<span class="badge team">Gemeinsam</span>` : `<span class="badge solo">Allein</span>`}</span></a>
+        <div class="card-body">
+          <p class="card-cat">${esc(g.categoryLabel)}</p>
+          <h3><a href="spiele/${g.id}.html">${esc(g.title)}</a></h3>
+          <p class="card-sub">${esc(g.subtitle)}</p>
+          <p class="card-teaser">${esc(g.teaser)}</p>
+          <dl class="card-meta"><div><dt>Spielzeit</dt><dd>${esc(g.duration)}</dd></div><div><dt>Schwierigkeit</dt><dd>${dots(g.difficulty)}</dd></div><div><dt>Spieler</dt><dd>${esc(g.players)}</dd></div></dl>
+          <div class="card-actions"><a class="btn gold" href="${esc(g.url)}">Jetzt spielen <span aria-hidden="true">→</span></a><a class="btn ghost" href="spiele/${g.id}.html">Details</a></div>
+        </div></article>`).join("\n");
+}
+function staticCases() {
+  return GAMES.filter(isTable).map((g) => `      <article class="case" id="spiel-${esc(g.id)}">
+        <a class="case-art" href="spiele/${g.id}.html" tabindex="-1" aria-hidden="true">${cardArt(g)}</a>
+        <div class="case-body">
+          <p class="card-cat">${esc(g.subtitle)}</p>
+          <h3><a href="spiele/${g.id}.html">${esc(g.title)}</a></h3>
+          <p class="card-teaser">${esc(g.teaser)}</p>
+          <dl class="card-meta"><div><dt>Personen</dt><dd>${esc(g.players)}</dd></div><div><dt>Dauer</dt><dd>${esc(g.duration)}</dd></div><div><dt>Schwierigkeit</dt><dd>${dots(g.difficulty)}</dd></div></dl>
+          <div class="card-actions"><a class="btn gold" href="${esc(g.url)}">Abend anlegen <span aria-hidden="true">→</span></a><a class="btn ghost" href="${esc(g.url)}#code">Mein Rollenblatt öffnen</a><a class="btn ghost" href="spiele/${g.id}.html">Details</a></div>
+        </div></article>`).join("\n");
+}
+const playerRange = (list) => { const n = list.flatMap((g) => (g.players.match(/\d+/g) || []).map(Number)); return `${Math.min(...n)}–${Math.max(...n)} Personen`; };
+const stripTags = (s) => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+function faqLd(html) {
+  const items = [...html.matchAll(/<details><summary>([\s\S]*?)<\/summary><p>([\s\S]*?)<\/p><\/details>/g)];
+  return { "@type": "FAQPage", mainEntity: items.map((m) => ({ "@type": "Question", name: stripTags(m[1]), acceptedAnswer: { "@type": "Answer", text: stripTags(m[2]) } })) };
+}
+
+/* ---------- Kopf der Spielseiten selbst (Titel, Beschreibung, Vorschaubild). Hotel Nocturne bleibt unverändert. ---------- */
+const KEEP_HEAD = ["hotel-nocturne"];
+function gameHead(g) {
+  const file = path.join(ROOT, g.url);
+  if (KEEP_HEAD.includes(g.id) || !fs.existsSync(file)) return false;
+  let h = fs.readFileSync(file, "utf8");
+  const title = isTable(g) ? `${g.title} – Krimidinner für zu Hause | Case Unlocked` : `${g.title} – Online Escape Room kostenlos | Case Unlocked`;
+  const desc = description(g);
+  h = h.replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`);
+  h = h.replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(desc)}">`);
+  const url = SITE_URL + g.url.replace(/index\.html$/, "");
+  const block = [
+    `<link rel="canonical" href="${url}">`,
+    `<meta property="og:type" content="website">`, `<meta property="og:site_name" content="Case Unlocked">`, `<meta property="og:locale" content="de_DE">`,
+    `<meta property="og:title" content="${esc(title)}">`, `<meta property="og:description" content="${esc(desc)}">`,
+    `<meta property="og:url" content="${url}">`, `<meta property="og:image" content="${SITE_URL}portal/og/${g.id}.png">`, `<meta name="twitter:card" content="summary_large_image">`,
+  ].map((l) => "  " + l).join("\n");
+  const S = "<!-- SEO:START (erzeugt von tools/build-site.js) -->", E = "<!-- SEO:END -->";
+  if (h.includes(S)) h = between(h, S, E, block);
+  else h = h.replace(/(<meta name="description" content="[^"]*">)/, `$1\n  ${S}\n${block}\n  ${E}`);
+  fs.writeFileSync(file, h);
+  return true;
+}
+
 function between(text, start, end, inner) {
   const a = text.indexOf(start), b = text.indexOf(end);
   if (a < 0 || b < a) throw new Error("Marke fehlt: " + start);
@@ -208,10 +268,17 @@ async function ogImages() {
   const desc = (idx.match(/<meta name="description" content="([^"]*)"/) || [, ""])[1];
   const jsonld = { "@context": "https://schema.org", "@graph": [
     { "@type": "WebSite", name: "Case Unlocked", url: SITE_URL, inLanguage: "de", description: desc },
+    faqLd(idx),
     { "@type": "ItemList", name: "Escape Rooms und Krimidinner", itemListElement: GAMES.map((g, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE_URL}spiele/${g.id}.html`, name: g.title })) },
   ] };
   idx = between(idx, "<!-- SEO:START (erzeugt von tools/build-site.js) -->", "<!-- SEO:END -->", seoHead({ title, desc, url: SITE_URL, image: SITE_URL + "portal/og/start.png", jsonld }));
   idx = between(idx, "<!-- SPIELE:START (erzeugt von tools/build-site.js) -->", "<!-- SPIELE:END -->", "      " + footerGames(""));
+  idx = between(idx, "<!-- KARTEN:START (erzeugt von tools/build-site.js) -->", "<!-- KARTEN:END -->", staticCards());
+  idx = between(idx, "<!-- FAELLE:START (erzeugt von tools/build-site.js) -->", "<!-- FAELLE:END -->", staticCases());
+  idx = idx.replace(/<!-- TUER1 -->[\s\S]*?<!-- \/TUER1 -->/, `<!-- TUER1 -->${GAMES.filter((g) => !isTable(g)).length} Abenteuer · ${playerRange(GAMES.filter((g) => !isTable(g)))}<!-- /TUER1 -->`);
+  idx = idx.replace(/<!-- TUER2 -->[\s\S]*?<!-- \/TUER2 -->/, `<!-- TUER2 -->${GAMES.filter(isTable).length} Fälle · ${playerRange(GAMES.filter(isTable))}<!-- /TUER2 -->`);
+  const heads = GAMES.filter(gameHead).length;
+  console.log("Seitenköpfe der Spiele:", heads, "(Hotel Nocturne unverändert)");
   fs.writeFileSync(path.join(ROOT, "index.html"), idx);
 
   // Sitemap und robots.txt

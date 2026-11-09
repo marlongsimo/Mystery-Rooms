@@ -31,15 +31,19 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
 
 ## Die fünf Regeln
 
-**Regel 1: Geheimnisse.** Du darfst dein Geheimnis verschweigen, ausweichen und Wissen für dich behalten.
+**Regel 1: Geheimnisse.** Du darfst dein Geheimnis verschweigen, ausweichen und Wissen für dich behalten. Du musst nicht jede Frage beantworten.
 
-**Regel 2: Wahrheit und Lüge.** Wer **unschuldig** ist, sagt über den eigenen **Aufenthaltsort und die eigenen Handlungen zur Tatzeit** die Wahrheit. Nur die Täterrolle darf darüber lügen.
+**Regel 2: Wahrheit und Lüge.** Über deinen eigenen **Aufenthaltsort** und deine eigenen **Handlungen zur Tatzeit** darfst du nicht lügen. Du darfst aber schweigen oder eine Frage unbeantwortet lassen.
 
-**Regel 3: Beweise sind wahr.** Was auf einer Beweiskarte steht, gilt.
+Nur die **Täterrolle** darf über ihre eigenen Handlungen zur Tatzeit bewusst falsche Angaben machen. Ob du die Täterrolle hast, steht auf deinem Rollenblatt und nur dort.
+
+Über andere Geheimnisse, Motive und frühere Ereignisse darfst du schweigen oder ausweichend antworten. Du darfst jedoch keine Tatsachen erfinden, die deinem Rollenblatt widersprechen.
+
+**Regel 3: Beweise sind wahr.** Was auf einer Beweiskarte steht, gilt als Tatsache innerhalb des Spiels. Du darfst die Bedeutung eines Beweises bestreiten, aber nicht seine Existenz oder seinen Inhalt verändern.
 
 **Regel 4: Erinnerungen.** In deinen Runden steht oft „Jetzt fällt dir ein …“. Wann du es erzählst, entscheidest du. Steht dort, dass du etwas in dieser Runde offenlegen sollst, tu es.
 
-**Regel 5: Vertrauliches bleibt vertraulich.** Den Teil „Vertraulich“ und die Runden deines Rollenblatts zeigst du niemandem. Erzählen darfst du daraus, so viel du willst.
+**Regel 5: Vertrauliches bleibt vertraulich.** Den Teil „Vertraulich“ und die Runden deines Rollenblatts zeigst du niemandem. Erzählen darfst du daraus, so viel du willst – soweit die übrigen Regeln gelten.
 
 ---
 

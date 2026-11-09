@@ -76,9 +76,9 @@ In jeder Besetzung liegen 17 Karten auf dem Tisch.
 >
 > Erstens: Ihr dürft eure Geheimnisse für euch behalten, ausweichen und schweigen.
 >
-> Zweitens: Wer unschuldig ist, sagt über den eigenen Aufenthaltsort und die eigenen Handlungen zur Tatzeit die Wahrheit. Nur eine Person am Tisch darf darüber lügen, und sie weiß, dass sie gemeint ist.
+> Zweitens: Über euren eigenen Aufenthaltsort und eure Handlungen zur Tatzeit dürft ihr nicht lügen, aber schweigen. Nur eine Person am Tisch darf darüber falsche Angaben machen, und sie weiß, dass sie gemeint ist. Und niemand erfindet etwas, das dem eigenen Rollenblatt widerspricht.
 >
-> Drittens: Was auf einer Beweiskarte steht, ist wahr.
+> Drittens: Was auf einer Beweiskarte steht, ist wahr. Ihr dürft bestreiten, was es bedeutet, aber nicht, was dort steht.
 >
 > Viertens: Was euch einfällt, erzählt ihr, wann ihr wollt.
 >

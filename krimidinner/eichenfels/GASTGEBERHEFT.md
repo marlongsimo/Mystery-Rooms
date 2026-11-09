@@ -59,7 +59,7 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 ## A5 · Vor dem Start vorlesen
 
-> „Bevor wir beginnen, die Regeln. Erstens: Ihr dürft eure Geheimnisse für euch behalten, ausweichen und schweigen. Zweitens: Wer unschuldig ist, sagt über den eigenen Aufenthaltsort und die eigenen Handlungen zur Tatzeit die Wahrheit. Nur eine Person am Tisch darf darüber lügen – und sie weiß, dass sie gemeint ist. Drittens: Was auf einer Beweiskarte steht, ist wahr. Viertens: Trumpfkarten spielt ihr, wann ihr wollt. Fünftens: Den vertraulichen Teil und die Runden eures Rollenblatts zeigt ihr niemandem. Was eure Figur in der Mordnacht erlebt hat, erfahrt ihr erst im Lauf des Abends – mit den Losungswörtern, die ich vorlese. Und jetzt: Willkommen in Eichenfels.“
+> „Bevor wir beginnen, die Regeln. Erstens: Ihr dürft eure Geheimnisse für euch behalten, ausweichen und schweigen. Zweitens: Über euren eigenen Aufenthaltsort und eure Handlungen zur Tatzeit dürft ihr nicht lügen, aber schweigen. Nur eine Person am Tisch darf darüber falsche Angaben machen, und sie weiß, dass sie gemeint ist. Und niemand erfindet etwas, das dem eigenen Rollenblatt widerspricht. Drittens: Was auf einer Beweiskarte steht, ist wahr. Ihr dürft bestreiten, was es bedeutet, aber nicht, was dort steht. Viertens: Trumpfkarten spielt ihr, wann ihr wollt. Fünftens: Den vertraulichen Teil und die Runden eures Rollenblatts zeigt ihr niemandem. Was eure Figur in der Mordnacht erlebt hat, erfahrt ihr erst im Lauf des Abends – mit den Losungswörtern, die ich vorlese. Und jetzt: Willkommen in Eichenfels.“
 
 ---
 

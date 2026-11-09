@@ -595,3 +595,29 @@ Ein echter Probetisch steht noch aus.
 2. BEWEISKARTEN.md und GASTGEBERHEFT.md aus den Abschnitten 9 und 12 erzeugen.
 3. `fall.json` nach ENGINE.md anlegen und `assets/wagenplan.svg` zeichnen.
 4. Die Engine-Migration erst danach. Fall 02 dient als Prüfstein dafür.
+
+---
+
+## 18 · Nachtrag: Rollenhefte (Stand 0.3)
+
+Die Rollenhefte R01–R08 liegen unter `rollen/`, aufgebaut nach dem Eichenfels-Standard: Charakter, Kleidung, Vertraulich, Runde 1–4. Wie bei Eichenfels steht in Charakter, Kleidung und Vertraulich nichts über die Tatnacht, außer bei R07. Die Nacht ab 22 Uhr steht jeweils in Runde 1. Die Variantenschreibweise ist geprüft: Jede Rolle verwendet für sich selbst `[w / m]` und für andere `{Rxx: …}`.
+
+**Neue kleine Fakten aus den Rollenheften, zur Freigabe:**
+
+| Rolle | Fakt | Zweck |
+|---|---|---|
+| R01 | Auen zahlte 1921 2.000 Kronen für das Gutachten; Hagen trinkt seitdem keinen Alkohol. Hagen stößt beim Dinner das Glas um, als Auen „1921“ sagt (weiß R06). | Motiv, Ablenkung |
+| R02 | Auen sagt beim Einsteigen: „Den Pass hole ich mir nicht nach, Sie kommen vorbei.“ | Strang A: Das Klopfen um 22:20 ohne Antwort wird bedeutsam |
+| R02 | Sattler gibt Hartmann um 21:35 zwei Schilling fürs „Vergessen“. Steinach fragt am Bahnsteig nach Auens Abteil. | Ablenkung |
+| R02 | Brandl sagt bei der Tunnelrunde: „Das habe ich um zehn schon zugemacht.“ | Strang B, kleiner Zusatz |
+| R03 | Steinach tröstet Bell um 20:40: „Er wird für alles bezahlen.“ Brandl um 20:45: „Der Herr in Salon 6 hat das nicht zum ersten Mal gemacht.“ | Ablenkung, Charakter |
+| R03 | Die zweite Stimme um 22:14 war ruhig, „jemand, der gewohnt ist, leise zu sprechen“ (Runde 4). | Strang B |
+| R04 | Sattler kam 1913 ins Werk und wartete 1921 bei der Untersuchung mit Wendt auf dem Gang. Sattler bot Reiter im Januar „Beweise“ an. | Lücke 2, Ablenkung |
+| R04, R05 | Beide bestätigen in Runde 4, dass „elf von vierzig“ in keiner öffentlichen Quelle steht. | Strang C absichern |
+| R06 | Auen sagt um 20:50: „Ihr Mann ist mit dem Zug gefahren. Das tun Leute auf eigene Gefahr.“ Die Forderung beträgt 80.000 Schilling. | Motiv |
+| R06 | Brandl spricht Steinach beim Dinner ungefragt sein Beileid aus. Woher wusste {R07: sie / er} davon? | leiser Hinweis auf Strang C |
+| R06 | Steinach wartet von kurz nach zehn bis 22:33 vergeblich auf Bedienung. | Strang B, zweite Stimme neben Reiter |
+| R07 | Auen sagt um 22:14: „Ihr Vater war ein Säufer. Das hat sogar die Ärztin beschworen.“ Das Streichholzbriefchen aus dem Speisewagen blockiert die Unruh (B9). | Tathergang |
+| R08 | Reiter sieht Brandl um 22:33 „blass, mit frisch gestärkten Manschetten“. Die Provision beträgt 3 %, das Bestechungsgeld wurde im Dezember gezahlt. | Strang B |
+
+**Unverändert offen:** Probetisch; Gastgeberheft, Beweiskarten-Datei, `fall.json`, Wagenplan-SVG.

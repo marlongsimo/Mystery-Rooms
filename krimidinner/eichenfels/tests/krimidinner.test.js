@@ -62,7 +62,9 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
   await A.click('[data-tab="haus"]');
   check(Boolean(await A.$('.plan-wrap svg')) && !/Sammlungsschutz|verriegelt, auch/.test(await A.textContent('#pane')), 'Haus: Grundriss sofort sichtbar, Schließregeln erst auf B3');
   await A.click('[data-tab="anl"]');
-  check(/Regel 2/.test(await A.textContent('#pane')), 'Regeln: die fünf Regeln sofort sichtbar');
+  const rl = await A.textContent('#pane');
+  check(/Regel 2/.test(rl) && /Losungswort/.test(rl) && /Anklage/.test(rl), 'Regeln: fünf Regeln, Ablauf und Anklage sofort sichtbar');
+  check(!/Worum es geht|Die Spielleitung trägt alle Namen ein/.test(rl), 'Regeln im Rollenblatt ohne Klappentext und Vorbereitung');
   // Runden des Rollenblatts
   await A.click('[data-tab="p3"]');
   check(await A.isVisible('.seal') && !(await A.$('.doc')), 'Runde 1 ist vor dem Losungswort gesperrt');

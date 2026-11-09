@@ -176,10 +176,14 @@ a7 = a_src.split("## A7", 1)[1].split("\n## ", 1)[0]
 for m in re.finditer(r"^- \*\*(Phase \d|Immer):\*\* (.+)$", a7, flags=re.M):
     impulses[m.group(1)] = inline(m.group(2))
 host_b = veil(md("# Teil B" + b_part))
-guide = md(read("ANLEITUNG.md").split("\n", 1)[1])
+guide_src = read("ANLEITUNG.md").split("\n", 1)[1]
+guide = md(guide_src)
+# Für das Rollenblatt nur, was am Abend gilt: Regeln, Ablauf, Anklage, Tipps (ohne Klappentext und Vorbereitung)
+RULE_PARTS = ("Die fünf Regeln", "Der Ablauf", "Die Anklage", "Tipps für einen guten Abend")
+rules = md("\n".join(c for c in re.split(r"(?=^## )", guide_src, flags=re.M) if c[3:].startswith(RULE_PARTS)))
 
 plan = read("assets/grundriss.svg")  # Grundriss für alle (Orientierung, ohne Schließregeln – die stehen auf B3)
-data = {"plan": plan, "roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide, "sections": sections, "npc": npc, "impulses": impulses}
+data = {"plan": plan, "roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide, "rules": rules, "sections": sections, "npc": npc, "impulses": impulses}
 out = "/* Erzeugt von tools/build_content.py aus den .md-Dateien – nicht von Hand bearbeiten. */\nwindow.KD_CONTENT = " + json.dumps(data, ensure_ascii=False) + ";\n"
 os.makedirs(os.path.join(ROOT, "js"), exist_ok=True)
 with open(os.path.join(ROOT, "js", "content.js"), "w", encoding="utf-8") as f:

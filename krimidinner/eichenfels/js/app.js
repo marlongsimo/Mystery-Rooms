@@ -229,7 +229,7 @@
       $("#prt").onclick = () => {
         const P = $("#print"); P.innerHTML = "";
         PARTS.forEach((_, k) => { const w = document.createElement("div"); w.className = "p-doc"; w.appendChild(rolePart(d, k, true)); P.appendChild(w); });
-        P.insertAdjacentHTML("beforeend", `<div class="p-doc">${houseHtml()}</div><div class="p-doc"><div class="guide"><h1>Spielanleitung</h1>${C.guide}</div></div>`);
+        P.insertAdjacentHTML("beforeend", `<div class="p-doc">${houseHtml()}</div><div class="p-doc"><div class="guide"><h1>Regeln und Ablauf</h1>${C.rules}</div></div>`);
         window.print();
       };
     };
@@ -249,7 +249,7 @@
       printBtn();
       return;
     }
-    if (tab === "anl") { pane.innerHTML = `<div class="guide">${C.guide}</div>`; return; }
+    if (tab === "anl") { pane.innerHTML = `<div class="guide">${C.rules}</div>`; return; }
     if (tab === "haus") { pane.innerHTML = houseHtml(); return; }
     if (tab === "acc") { pane.innerHTML = accOpen ? accusationForm(d, me) : `<p class="muted">Die Anklage ist noch nicht freigegeben.</p>`; bindAccusation(me); return; }
     // Beweise

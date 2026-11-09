@@ -26,6 +26,8 @@ select slug, title, code_prefix, enabled from public.game_catalog where slug lik
 
 Erwartet: zwei Zeilen, `krimidinner` und `krimidinner-eichenfels`.
 
+**Stand:** eingetragen und geprüft (`tests/live-krimidinner.test.js`): Beide Fälle eröffnen Sitzungen mit `KRIM-`-Codes, Eichenfels mit 11, Der letzte Halt mit 9 Geräten.
+
 ---
 
 ## Was die Website tut

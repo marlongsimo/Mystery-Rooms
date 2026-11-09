@@ -453,7 +453,7 @@
     catch (e) { LIVE.err = e.message; return null; }
     const c = LIVE.client;
     c.on("state", (row) => onLiveState(row));
-    c.on("players", () => liveRefresh());
+    c.on("players", () => { if (liveIsHost()) livePush(store.get(SK("host"), {})); liveRefresh(); }); // Neue Geräte bekommen Fall und Rundenstand sofort, auch wenn sie ältere Einträge nicht lesen können
     c.on("lost", (why) => { toast(why || "Live-Verbindung beendet."); liveRefresh(); });
     return c;
   }
@@ -468,11 +468,15 @@
   function onLiveState(row) {
     if (row.state_key === "fall") {
       const st = row.state || {};
-      if (st.id && st.id !== F.id && !liveIsHost()) { toast("Diese Live-Sitzung gehört zu einem anderen Krimidinner."); LIVE.client.leave().catch(() => {}); liveRefresh(); }
+      if (st.id && st.id !== F.id && !liveIsHost()) {
+        LIVE.wrongCase = true; LIVE.err = "Diese Live-Sitzung gehört zu einem anderen Krimidinner.";
+        if (!LIVE.joining) { toast(LIVE.err); LIVE.client.leave().catch(() => {}).then(liveRefresh); } // beim Beitreten erledigt das bindPlayerLive
+      }
       return;
     }
     if (row.state_key === "runde") {
       const me = store.get(SK("me"), null), st = row.state || {};
+      if (st.fall && st.fall !== F.id && !liveIsHost()) { onLiveState({ state_key: "fall", state: { id: st.fall } }); return; }
       if (me && location.hash.slice(1) === "rolle") {
         const open = me.open || {}; let fresh = 0;
         ROUNDS.forEach((r) => { if (st.open && st.open[r.no] && !open[r.no]) { open[r.no] = true; fresh = r.no; } });
@@ -491,8 +495,11 @@
     if (!liveIsHost()) return;
     const seen = host.seen || {}, open = {}; ROUNDS.forEach((r) => { if (seen[r.no]) open[r.no] = true; });
     const extra = EXTRA.filter((x) => seen["x:" + x.id] || (seen.extra && EXTRA[0].id === x.id)).map((x) => x.id);
-    LIVE.client.writeOwn("fall", { id: F.id, nr: F.nr, codeVersion: 2 }).catch(() => {});
-    LIVE.client.writeOwn("runde", { open, extra, anklage: Boolean(host.anklage), at: Date.now() }).catch((e) => toast("Live: " + liveMsg(e)));
+    const c = LIVE.client;
+    // nacheinander schreiben; der Fall steht zusätzlich im Rundenstand, damit Gäste ihn sicher sehen
+    c.writeOwn("fall", { id: F.id, nr: F.nr, codeVersion: 2 }).catch(() => {})
+      .then(() => c.writeOwn("runde", { fall: F.id, open, extra, anklage: Boolean(host.anklage), at: Date.now() }))
+      .catch((e) => toast("Live: " + liveMsg(e)));
   }
   const liveDevices = () => (liveOn() ? LIVE.client.players.length : 0);
   function hostLiveBox(host) {
@@ -549,15 +556,16 @@
       if (!code || !nm) { LIVE.err = "Bitte Live-Code und Namen eingeben."; viewRolle(); return; }
       if (!window.MRMultiplayer) { LIVE.err = "Die Live-Verbindung ist gerade nicht verfügbar. Die Losungswörter funktionieren immer."; viewRolle(); return; }
       me.name = nm; store.set(SK("me"), me);
-      LIVE.busy = true; LIVE.err = "";
+      LIVE.busy = true; LIVE.err = ""; LIVE.wrongCase = false; LIVE.joining = true;
       try {
         const c = await joinSession(code, nm);
-        const fall = c.states.fall;
-        if (fall && fall.id && fall.id !== F.id) { await c.leave().catch(() => {}); throw new Error("Diese Live-Sitzung gehört zu einem anderen Krimidinner."); }
+        LIVE.joining = false;
+        const fall = c.states.fall, rd = c.states.runde;
+        if (LIVE.wrongCase || (fall && fall.id && fall.id !== F.id) || (rd && rd.fall && rd.fall !== F.id)) { await c.leave().catch(() => c._drop()); throw new Error("Diese Live-Sitzung gehört zu einem anderen Krimidinner."); }
         const st = c.states.runde; if (st) onLiveState({ state_key: "runde", state: st }); toast("Verbunden. Die Runden öffnen sich jetzt von selbst.");
       }
       catch (e) { LIVE.err = liveMsg(e); }
-      LIVE.busy = false; document.activeElement && document.activeElement.blur(); viewRolle();
+      LIVE.joining = false; LIVE.busy = false; document.activeElement && document.activeElement.blur(); viewRolle();
     };
   }
   /** Anklage digital (wenn die Spielleitung sie freigibt). */

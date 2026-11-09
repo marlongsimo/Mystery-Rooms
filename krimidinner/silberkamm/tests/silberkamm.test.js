@@ -1,5 +1,5 @@
 /*
- * Krimidinner Fall 02 „Der letzte Halt“ auf der gemeinsamen Engine – Ablauf im Browser
+ * Krimidinner Fall 02 „Abfahrt ins Dunkel“ auf der gemeinsamen Engine – Ablauf im Browser
  * Abend für 6 Personen (Spielleitung kann jede Rolle bekommen) → Codes v2 → jede Rolle öffnen (Varianten, Vorwissen, alle vier Runden) →
  * Zug-Plan → Losungswörter (auch LAEUTWERK) → bedingte Karten B8 (present R03) und B13 (missing R05) → Aussagekarten →
  * geführter Ablauf mit 8 Schritten → Finale B16 → Druck → Codes eines anderen Falls → Live (sektor-9).
@@ -23,7 +23,7 @@ const LEAK = /Mord|Ermittlung|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig|Polizei|
   // Spielleitung legt 6 Personen an und markiert sich selbst
   const H = await page();
   await H.goto(URL);
-  check(/Der letzte Halt/.test(await H.textContent('h1')) && /6–8 Personen/.test(await H.textContent('.lead')), 'Startseite: Titel und 6–8 Personen aus fall.json');
+  check(/Abfahrt ins Dunkel/.test(await H.textContent('h1')) && /6–8 Personen/.test(await H.textContent('.lead')), 'Startseite: Titel und 6–8 Personen aus fall.json');
   await H.click('a[href="#anlegen"]'); await H.waitForSelector('[data-name]');
   check((await H.$$('[data-name]')).length === 6, 'Anlegen beginnt mit 6 Personen (players.min)');
   const names = ['Anna', 'Ben', 'Cem', 'Dora', 'Emil', 'Fritzi'];
@@ -42,9 +42,9 @@ const LEAK = /Mord|Ermittlung|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig|Polizei|
   // Codes über Fallgrenzen
   const eCode = await (async () => { const E = await page(); await E.goto(EURL); const c = await E.evaluate(() => KD.encode({ host: false, role: 1, n: 5, variants: 0 })); return c; })();
   await H.goto(URL + '#code'); await H.fill('#codeIn', eCode); await H.click('#open');
-  check(/gehört zu „Der letzte Stern von Eichenfels“/.test(await H.textContent('#fb')) && Boolean(await H.$('#fb a[href*="eichenfels/index.html#c="]')), 'Eichenfels-Code auf der Silberkamm-Seite: Hinweis mit Link zum richtigen Fall');
+  check(/gehört zu „Der letzte Gast“/.test(await H.textContent('#fb')) && Boolean(await H.$('#fb a[href*="eichenfels/index.html#c="]')), 'Eichenfels-Code auf der Silberkamm-Seite: Hinweis mit Link zum richtigen Fall');
   const E2 = await page(); await E2.goto(EURL + '#code'); await E2.fill('#codeIn', host.people[1].code); await E2.click('#open');
-  check(/gehört zu „Der letzte Halt“/.test(await E2.textContent('#fb')), 'Silberkamm-Code auf der Eichenfels-Seite: Hinweis auf „Der letzte Halt“');
+  check(/gehört zu „Abfahrt ins Dunkel“/.test(await E2.textContent('#fb')), 'Silberkamm-Code auf der Eichenfels-Seite: Hinweis auf „Abfahrt ins Dunkel“');
 
   // Jede Person öffnet ihr Rollenblatt
   const by = {};
@@ -135,5 +135,5 @@ const LEAK = /Mord|Ermittlung|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig|Polizei|
   }
 
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
-  await b.close(); console.log(ok ? '\nDer letzte Halt in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);
+  await b.close(); console.log(ok ? '\nAbfahrt ins Dunkel in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);
 })();

@@ -7,7 +7,7 @@ Alle Befehle im Supabase-Dashboard unter **SQL Editor** ausführen. Nichts davon
 
 ## Einmalig: Kennung `krimidinner` eintragen
 
-Alle Fälle (Eichenfels, Der letzte Halt und alle weiteren) nutzen ab jetzt **eine** Live-Kennung. Neue Fälle brauchen keinen eigenen Eintrag mehr.
+Alle Fälle (Eichenfels, Abfahrt ins Dunkel und alle weiteren) nutzen ab jetzt **eine** Live-Kennung. Neue Fälle brauchen keinen eigenen Eintrag mehr.
 
 ```sql
 insert into public.game_catalog (slug, title, code_prefix, enabled)
@@ -26,7 +26,7 @@ select slug, title, code_prefix, enabled from public.game_catalog where slug lik
 
 Erwartet: zwei Zeilen, `krimidinner` und `krimidinner-eichenfels`.
 
-**Stand:** eingetragen und geprüft (`tests/live-krimidinner.test.js`): Beide Fälle eröffnen Sitzungen mit `KRIM-`-Codes, Eichenfels mit 11, Der letzte Halt mit 9 Geräten.
+**Stand:** eingetragen und geprüft (`tests/live-krimidinner.test.js`): Beide Fälle eröffnen Sitzungen mit `KRIM-`-Codes, Eichenfels mit 11, Abfahrt ins Dunkel mit 9 Geräten.
 
 ---
 
@@ -35,7 +35,7 @@ Erwartet: zwei Zeilen, `krimidinner` und `krimidinner-eichenfels`.
 | Situation | Verhalten |
 |---|---|
 | `krimidinner` ist eingetragen | Alle Fälle eröffnen Live-Sitzungen unter dieser Kennung. Im Sitzungsstand steht zusätzlich der Fall (`fall`: id, Nummer). Gäste eines anderen Falls werden abgewiesen. |
-| `krimidinner` fehlt noch | Eichenfels weicht auf die alte Kennung `krimidinner-eichenfels` aus. „Der letzte Halt“ meldet, dass Live noch nicht freigeschaltet ist; Losungswörter funktionieren trotzdem. |
+| `krimidinner` fehlt noch | Eichenfels weicht auf die alte Kennung `krimidinner-eichenfels` aus. „Abfahrt ins Dunkel“ meldet, dass Live noch nicht freigeschaltet ist; Losungswörter funktionieren trotzdem. |
 | Gäste treten bei | Sie probieren erst `krimidinner`, dann die alte Kennung ihres Falls. Laufende Eichenfels-Sitzungen bleiben dadurch erreichbar. |
 
 **Der alte Eintrag `krimidinner-eichenfels`** bleibt bestehen, nicht löschen. Er wird nur noch als Rückfall benutzt.

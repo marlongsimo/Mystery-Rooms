@@ -119,7 +119,7 @@ window.MR_GAMES = [
   {
     id: "krimidinner-eichenfels",
     kind: "tisch",
-    title: "Der letzte Stern von Eichenfels",
+    title: "Der letzte Gast",
     subtitle: "Krimidinner · Fall 01",
     category: "crime",
     categoryLabel: "Crime & Mystery · Krimidinner",
@@ -136,7 +136,7 @@ window.MR_GAMES = [
   {
     id: "krimidinner-silberkamm",
     kind: "tisch",
-    title: "Der letzte Halt",
+    title: "Abfahrt ins Dunkel",
     subtitle: "Krimidinner · Fall 02",
     category: "crime",
     categoryLabel: "Crime & Mystery · Krimidinner",
@@ -153,7 +153,7 @@ window.MR_GAMES = [
   {
     id: "krimidinner-mirage",
     kind: "tisch",
-    title: "Die letzte Illusion",
+    title: "Vorhang aus Lügen",
     subtitle: "Krimidinner · Fall 03",
     category: "crime",
     categoryLabel: "Crime & Mystery · Krimidinner",

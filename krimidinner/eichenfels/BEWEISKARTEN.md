@@ -1,4 +1,4 @@
-# Der letzte Stern von Eichenfels – Beweiskarten B1–B14
+# Der letzte Gast – Beweiskarten B1–B14
 
 Stand: 1.0 · Grundlage: Fallbuch 0.6 (Abschnitt 5). **Die Karten B13 und B14 verraten die Lösung.**
 

@@ -1,4 +1,4 @@
-# Der letzte Stern von Eichenfels – Spielanleitung
+# Der letzte Gast – Spielanleitung
 
 *Für alle, die mitspielen. Diese Anleitung verrät nichts über die Lösung.*
 

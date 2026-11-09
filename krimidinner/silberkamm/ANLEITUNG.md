@@ -1,4 +1,4 @@
-# Der letzte Halt – Spielanleitung
+# Abfahrt ins Dunkel – Spielanleitung
 
 *Für alle, die mitspielen. Diese Anleitung verrät nichts über die Lösung.*
 

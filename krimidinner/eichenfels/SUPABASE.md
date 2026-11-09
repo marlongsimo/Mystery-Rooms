@@ -10,7 +10,7 @@ Alle Befehle im Supabase-Dashboard unter **SQL Editor** ausführen. Nichts davon
 
 ```sql
 insert into public.game_catalog (slug, title, code_prefix, enabled)
-values ('krimidinner-eichenfels', 'Der letzte Stern von Eichenfels', 'EICH', true);
+values ('krimidinner-eichenfels', 'Der letzte Gast', 'EICH', true);
 ```
 
 Danach erhalten Live-Sitzungen Codes wie `EICH-3F9A2C`.

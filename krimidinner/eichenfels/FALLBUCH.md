@@ -1,8 +1,8 @@
-# Der letzte Stern von Eichenfels – Fallbuch
+# Der letzte Gast – Fallbuch
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.10 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.10 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Gast“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---

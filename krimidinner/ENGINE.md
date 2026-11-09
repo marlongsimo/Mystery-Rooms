@@ -80,7 +80,7 @@ Eine Datei je Fall. Alles, was nicht Text ist, steht hier. Beispiel Eichenfels, 
 {
   "id": "eichenfels",
   "nr": 1,
-  "title": "Der letzte Stern von Eichenfels",
+  "title": "Der letzte Gast",
   "players": { "min": 4, "max": 10 },
   "roles": [
     { "id": "R01", "file": "rollen/R01-familie.md",    "names": ["Leonie Sander", "Leon Sander"] },

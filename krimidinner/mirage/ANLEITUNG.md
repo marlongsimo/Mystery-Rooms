@@ -1,4 +1,4 @@
-# Die letzte Illusion – Spielanleitung
+# Vorhang aus Lügen – Spielanleitung
 
 *Für alle, die mitspielen. Diese Anleitung verrät nichts über die Lösung.*
 

@@ -1,5 +1,5 @@
 /*
- * Krimidinner Fall 03 „Die letzte Illusion“ auf der gemeinsamen Engine – Ablauf im Browser
+ * Krimidinner Fall 03 „Vorhang aus Lügen“ auf der gemeinsamen Engine – Ablauf im Browser
  * 6 Personen anlegen → Codes v2 → alle Rollen öffnen (Varianten, Vorwissen) → Reiter „Theater“ →
  * VORHANG, KULISSE (gestaffelt, ohne Rollenteil), KLAPPE, TONBAND, VEILCHEN, APPLAUS → bedingte Karten B9/B10, B17/B18 →
  * Aussagekarten R07–R10 → geführter Ablauf (9 Schritte, „P2b“) → Druck → 10 Personen → Codes anderer Fälle.
@@ -21,7 +21,7 @@ const LEAK = /Mord|Ermittlung|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig|Polizei|
 
   const H = await page();
   await H.goto(URL);
-  check(/Die letzte Illusion/.test(await H.textContent('h1')) && /6–10 Personen/.test(await H.textContent('.lead')), 'Startseite: Titel und 6–10 Personen');
+  check(/Vorhang aus Lügen/.test(await H.textContent('h1')) && /6–10 Personen/.test(await H.textContent('.lead')), 'Startseite: Titel und 6–10 Personen');
   await H.click('a[href="#anlegen"]'); await H.waitForSelector('[data-name]');
   check((await H.$$('[data-name]')).length === 6, 'Anlegen beginnt mit 6 Personen');
   const names = ['Anna', 'Ben', 'Cem', 'Dora', 'Emil', 'Fritzi'];
@@ -111,8 +111,8 @@ const LEAK = /Mord|Ermittlung|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig|Polizei|
 
   // Codes über Fallgrenzen
   const S = await page(); await S.goto(BASE + '/krimidinner/silberkamm/index.html#code'); await S.fill('#codeIn', host.people[0].code); await S.click('#open');
-  check(/gehört zu „Die letzte Illusion“/.test(await S.textContent('#fb')), 'Mirage-Code auf der Silberkamm-Seite: Hinweis auf „Die letzte Illusion“');
+  check(/gehört zu „Vorhang aus Lügen“/.test(await S.textContent('#fb')), 'Mirage-Code auf der Silberkamm-Seite: Hinweis auf „Vorhang aus Lügen“');
 
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
-  await b.close(); console.log(ok ? '\nDie letzte Illusion in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);
+  await b.close(); console.log(ok ? '\nVorhang aus Lügen in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);
 })();

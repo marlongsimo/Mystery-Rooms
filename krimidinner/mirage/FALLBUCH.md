@@ -1,4 +1,4 @@
-# Die letzte Illusion · Fallbuch 0.3
+# Vorhang aus Lügen · Fallbuch 0.3
 
 **Fall 03 der Krimidinner-Reihe**
 
@@ -254,7 +254,7 @@ Die Tabelle steht so in den Rollenheften. **Fett** ist, was die Rolle verschweig
 | **B16a · Kassenbuch** (nur wenn R09 besetzt) | Thier legt das Kassenbuch vor: seit 1949 monatlich „Lehrlingsprämie R. Dorne, 40 DM“, heute 20:15 „5.000 DM bar an A.V. – für V. (diktiert)“. Thier: „Ich habe sie selbst in den Umschlag gezählt und die Banderole geklebt.“ | C, Ablenkung Dorne |
 | **B16b · Kassenbuch** (nur wenn R09 fehlt) | dasselbe, gefunden in Varns Büro | C |
 
-### Finale · Die letzte Illusion
+### Finale · Vorhang aus Lügen
 
 | Karte | Inhalt |
 |---|---|

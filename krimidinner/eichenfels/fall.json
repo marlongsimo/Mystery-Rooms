@@ -1,7 +1,7 @@
 {
   "id": "eichenfels",
   "nr": 1,
-  "title": "Der letzte Stern von Eichenfels",
+  "title": "Der letzte Gast",
   "players": { "min": 4, "max": 10 },
   "store": "kd_eich_",
   "codeV1": true,

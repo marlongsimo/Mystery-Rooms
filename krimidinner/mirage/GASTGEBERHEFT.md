@@ -1,4 +1,4 @@
-# Die letzte Illusion – Gastgeberheft
+# Vorhang aus Lügen – Gastgeberheft
 
 *Für die Spielleitung. Teil A darfst du jederzeit lesen, auch wenn du selbst mitspielst. **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
@@ -171,7 +171,7 @@ In jeder Besetzung liegen 17 Karten auf dem Tisch.
 
 **Anklagezettel (Vorlage, A6):**
 ```
-DIE LETZTE ILLUSION · ANKLAGE
+VORHANG AUS LÜGEN · ANKLAGE
 Mein Name: ____________________
 Ich klage an: ____________________
 Wie kam Varn hinter den Spiegel: ____________________

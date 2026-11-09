@@ -1,4 +1,4 @@
-# Der letzte Halt – Gastgeberheft
+# Abfahrt ins Dunkel – Gastgeberheft
 
 *Für die Spielleitung. Teil A darfst du jederzeit lesen, auch wenn du selbst mitspielst. **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
@@ -168,7 +168,7 @@ Gib allen kurz Zeit zum Lesen.
 
 **Anklagezettel (Vorlage, A6):**
 ```
-DER LETZTE HALT · ANKLAGE
+ABFAHRT INS DUNKEL · ANKLAGE
 Mein Name: ____________________
 Ich klage an: ____________________
 Weil (Motiv): ____________________

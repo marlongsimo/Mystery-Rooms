@@ -15,7 +15,7 @@ Jedes Spiel hat ein eigenes Spielprinzip.
 | **DEADLINE.exe** – Der letzte Zugriff | Ermitteln auf einem simulierten Computer: vier parallele Stränge, Terminal, sechs Enden | Vorschau, allein vollständig spielbar | [`deadline/`](deadline/) |
 | **Das ARCHON-Protokoll** – 120 Minuten. Eine Chance. | Schwerer Desktop-Thriller: Finanzermittlung, Register, Audio, Terminal; Wissensdatenbank im Spiel | Vorschau, allein, am besten Computer/Tablet (Handy geht mit Hinweis) | [`archon/`](archon/) |
 | **SEKTOR 9** – Das letzte Protokoll | Kooperative Ermittlung in 3D: fünf Hallen mit Standpunkten, ECHO als Gegenspieler, Abschaltung zu zweit, Abstimmung, drei Enden | spielbar, allein oder bis zu viert | [`sektor-9/`](sektor-9/) |
-| **Der letzte Stern von Eichenfels** (Krimidinner) | Rollenspiel am Tisch für 4–10 Personen mit Spielleitung, Beweisrunden, Anklage | Vorschau: im Katalog, Rollen per Code, Runden per Losungswort, Druckversion · noch nicht am Tisch getestet | [`krimidinner/eichenfels/`](krimidinner/eichenfels/) |
+| **Der letzte Gast** (Krimidinner) | Rollenspiel am Tisch für 4–10 Personen mit Spielleitung, Beweisrunden, Anklage | Vorschau: im Katalog, Rollen per Code, Runden per Losungswort, Druckversion · noch nicht am Tisch getestet | [`krimidinner/eichenfels/`](krimidinner/eichenfels/) |
 | Das Geheimnis der Pyramide | – | geplant | – |
 | Projekt Schattenlabor | – | geplant | – |
 

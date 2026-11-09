@@ -1,4 +1,4 @@
-# Der letzte Halt · Fallbuch 0.2
+# Abfahrt ins Dunkel · Fallbuch 0.2
 
 **Fall 02 der Krimidinner-Reihe** · Silberkamm-Express Wien → Zürich · Donnerstag, 14. Februar 1929
 **Spielerzahl:** 6–8 · **Runden:** 4 + Finale · **Dauer:** ca. 3½ Stunden

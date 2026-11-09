@@ -1,5 +1,5 @@
 /*
- * Krimidinner „Der letzte Stern von Eichenfels“ – Ablauf im Browser
+ * Krimidinner „Der letzte Gast“ – Ablauf im Browser
  * Abend für 5 Personen anlegen → Codes → jede Rolle öffnen (Varianten, Kleidungstabelle, Querverweise) →
  * kein Vorwissen über die Mordnacht in den offenen Teilen → Runden des Rollenblatts und Beweise mit Losungswörtern →
  * bedingte Karten → geführter Ablauf der Spielleitung (Schritte, Nebenfiguren, Losungswörter, Siegel) → Druck.

@@ -1,4 +1,4 @@
-# Der letzte Stern von Eichenfels – Krimidinner, Fall 01
+# Der letzte Gast – Krimidinner, Fall 01
 
 Krimidinner für 4–10 Personen am Tisch, mit einer Spielleitung, die mitspielen darf. Spielbar am Handy oder komplett ausgedruckt.
 

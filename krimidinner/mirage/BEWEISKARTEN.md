@@ -1,4 +1,4 @@
-# Die letzte Illusion – Beweiskarten B1–B19
+# Vorhang aus Lügen – Beweiskarten B1–B19
 
 Stand 1.0 nach Fallbuch 0.4. **Die Karte B19 verrät die Lösung.**
 

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 424" class="plan-svg" role="img" aria-label="Grundriss Haus am Anger: Saal, Flur, Büro, Beratungsraum, Hausmeisterkammer, Küche, WC, Windfang">
+  <style>
+    .wall { fill: #fbf6ea; stroke: #3b3122; stroke-width: 2.4; }
+    .room { fill: #f3ead6; stroke: #6b5a3e; stroke-width: 1.3; }
+    .hall { fill: #e7dcc2; stroke: #6b5a3e; stroke-width: 1; }
+    .yard { fill: #e2e6d6; stroke: #8a9070; stroke-width: 1; stroke-dasharray: 4 3; }
+    .door { stroke: #fbf6ea; stroke-width: 5; }
+    .swing { fill: none; stroke: #6b5a3e; stroke-width: 1; }
+    .t { font: 600 13px "DM Sans", Arial, sans-serif; fill: #231e14; }
+    .s { font: 11px "DM Sans", Arial, sans-serif; fill: #4a3f2c; }
+    .m { font: 700 11px "DM Mono", monospace; letter-spacing: .12em; fill: #7a6233; }
+    .obj { fill: #d9c9a3; stroke: #6b5a3e; stroke-width: 1; }
+  </style>
+  <rect class="yard" x="20" y="14" width="600" height="40"/><text class="m" x="320" y="38" text-anchor="middle">HOF · FEUERKORB · LICHTERKETTE</text>
+  <rect class="wall" x="20" y="60" width="600" height="340"/>
+  <rect class="room" x="20" y="60" width="230" height="340"/><text class="t" x="135" y="180" text-anchor="middle">Saal</text>
+  <text class="s" x="135" y="198" text-anchor="middle">Büfett · Tombola · Bühne</text><text class="s" x="135" y="214" text-anchor="middle">Basteltisch</text>
+  <rect class="obj" x="30" y="350" width="70" height="38"/><text class="s" x="65" y="373" text-anchor="middle">Garderobe</text>
+  <text class="s" x="65" y="342" text-anchor="middle">Kassenecke</text>
+  <line class="door" x1="60" y1="60" x2="110" y2="60"/><text class="s" x="85" y="76" text-anchor="middle">Terrassentür</text>
+  <line class="door" x1="150" y1="400" x2="200" y2="400"/><text class="m" x="175" y="416" text-anchor="middle">HAUPTEINGANG</text>
+  <rect class="hall" x="250" y="190" width="310" height="60"/><text class="m" x="300" y="226" text-anchor="middle">FLUR (W)</text><text class="m" x="480" y="226" text-anchor="middle">FLUR (O)</text>
+  <line class="door" x1="250" y1="200" x2="250" y2="240"/><text class="s" x="244" y="186" text-anchor="end">Schwingtür</text>
+  <rect class="room" x="250" y="60" width="130" height="130"/><text class="t" x="315" y="140" text-anchor="middle">Büro</text><rect class="obj" x="262" y="66" width="90" height="16"/><text class="s" x="307" y="98" text-anchor="middle">Aktenschrank</text>
+  <rect class="room" x="380" y="60" width="130" height="130"/><text class="t" x="445" y="140" text-anchor="middle">Beratungsraum</text><rect class="obj" x="392" y="66" width="70" height="16"/><text class="s" x="427" y="98" text-anchor="middle">Schrank (verschlossen)</text>
+  <rect class="room" x="510" y="60" width="110" height="130"/><text class="t" x="565" y="110" text-anchor="middle">Hausmeister-</text><text class="t" x="565" y="126" text-anchor="middle">kammer</text>
+  <line class="door" x1="330" y1="190" x2="360" y2="190"/><line class="door" x1="420" y1="190" x2="450" y2="190"/><line class="door" x1="540" y1="190" x2="570" y2="190"/>
+  <rect class="room" x="250" y="250" width="180" height="150"/><text class="t" x="340" y="330" text-anchor="middle">Küche</text>
+  <rect class="room" x="430" y="250" width="130" height="150"/><text class="t" x="495" y="330" text-anchor="middle">WC</text><rect class="room" x="560" y="300" width="60" height="100"/><text class="s" x="590" y="356" text-anchor="middle">Lager</text>
+  <rect class="room" x="560" y="190" width="60" height="110"/><text class="s" x="590" y="236" text-anchor="middle">Wind-</text><text class="s" x="590" y="250" text-anchor="middle">fang</text>
+  <line class="door" x1="290" y1="250" x2="320" y2="250"/><line class="door" x1="470" y1="250" x2="500" y2="250"/><line class="door" x1="560" y1="205" x2="560" y2="235"/><line class="door" x1="620" y1="220" x2="620" y2="250"/>
+  <text class="s" x="590" y="270" text-anchor="middle">Hinter-</text><text class="s" x="590" y="284" text-anchor="middle">ausgang →</text>
+  <rect class="obj" x="262" y="252" width="16" height="10"/><text class="s" x="262" y="276">Schlüsselkasten</text>
+  <text class="m" x="320" y="414" text-anchor="middle">N ↑</text>
+</svg>

@@ -8,7 +8,8 @@
 create table if not exists public.game_ratings (
   id          bigint generated always as identity primary key,
   game_slug   text        not null check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline', 'archon', 'sektor-9',
-                                                        'krimidinner-eichenfels', 'krimidinner-silberkamm', 'krimidinner-mirage')),
+                                                        'krimidinner-eichenfels', 'krimidinner-silberkamm', 'krimidinner-mirage',
+                                                        'krimidinner-nebenan')),
   stars       smallint    not null check (stars between 1 and 5),
   comment     text                 check (comment is null or char_length(comment) <= 500),
   ending      text                 check (ending  is null or char_length(ending)  <= 40),
@@ -88,3 +89,9 @@ alter table public.game_ratings add constraint game_ratings_game_slug_check
 --   alter table public.game_ratings add constraint game_ratings_game_slug_check
 --     check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline', 'archon', 'sektor-9',
 --                          'krimidinner-eichenfels', 'krimidinner-silberkamm', 'krimidinner-mirage'));
+
+-- Nachtrag 11/2026 (Fall 04 „Nebenan – Der stille Kreis“): für die bestehende Tabelle ausführen.
+--   alter table public.game_ratings drop constraint if exists game_ratings_game_slug_check;
+--   alter table public.game_ratings add constraint game_ratings_game_slug_check
+--     check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline', 'archon', 'sektor-9',
+--                          'krimidinner-eichenfels', 'krimidinner-silberkamm', 'krimidinner-mirage', 'krimidinner-nebenan'));

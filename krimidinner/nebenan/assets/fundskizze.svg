@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 356" class="plan-svg" role="img" aria-label="Fundskizze Büro: umgekippte Leiter, offene Schranktür, Karton ZURÜCK, Lage Hannos">
+  <style>
+    .wall { fill: #fbf6ea; stroke: #3b3122; stroke-width: 2.4; }
+    .room { fill: #f3ead6; stroke: #6b5a3e; stroke-width: 1.3; }
+    .hall { fill: #e7dcc2; stroke: #6b5a3e; stroke-width: 1; }
+    .yard { fill: #e2e6d6; stroke: #8a9070; stroke-width: 1; stroke-dasharray: 4 3; }
+    .door { stroke: #fbf6ea; stroke-width: 5; }
+    .swing { fill: none; stroke: #6b5a3e; stroke-width: 1; }
+    .t { font: 600 13px "DM Sans", Arial, sans-serif; fill: #231e14; }
+    .s { font: 11px "DM Sans", Arial, sans-serif; fill: #4a3f2c; }
+    .m { font: 700 11px "DM Mono", monospace; letter-spacing: .12em; fill: #7a6233; }
+    .obj { fill: #d9c9a3; stroke: #6b5a3e; stroke-width: 1; }
+  </style>
+  <rect class="wall" x="40" y="30" width="400" height="300"/><text class="m" x="240" y="22" text-anchor="middle">BÜRO · NORDWAND</text>
+  <rect class="obj" x="170" y="34" width="200" height="40"/><text class="s" x="300" y="58" text-anchor="middle">Stahlaktenschrank</text>
+  <line x1="170" y1="74" x2="170" y2="150" stroke="#3b3122" stroke-width="4"/><text class="s" x="160" y="120" text-anchor="end">linke Tür offen</text>
+  <rect x="190" y="26" width="70" height="20" fill="#ead9b4" stroke="#6b5a3e"/><text class="s" x="225" y="40" text-anchor="middle">ZURÜCK</text><rect x="240" y="20" width="14" height="8" fill="#b58b55"/>
+  <g transform="translate(205 150) rotate(-12)"><rect x="0" y="0" width="110" height="26" fill="none" stroke="#3b3122" stroke-width="2"/><line x1="28" y1="0" x2="28" y2="26" stroke="#3b3122"/><line x1="55" y1="0" x2="55" y2="26" stroke="#3b3122"/><line x1="82" y1="0" x2="82" y2="26" stroke="#3b3122"/></g><text class="s" x="300" y="200">Trittleiter, umgekippt</text>
+  <path d="M176 156 q18 -6 30 8 l60 40 q10 8 2 18 l-70 60 q-14 8 -22 -4 l-8 -40 z" fill="none" stroke="#9e2b25" stroke-width="1.6" stroke-dasharray="5 3"/>
+  <circle cx="180" cy="160" r="12" fill="none" stroke="#9e2b25" stroke-width="1.6" stroke-dasharray="5 3"/><text class="s" x="150" y="230" text-anchor="end">Kopf an der</text><text class="s" x="150" y="244" text-anchor="end">Schranktür</text>
+  <circle cx="236" cy="236" r="5" fill="#2f5a3e"/><text class="s" x="220" y="300" text-anchor="end">rechte Hand,</text><text class="s" x="220" y="314" text-anchor="end">Fadenende</text>
+  <rect class="obj" x="330" y="230" width="100" height="60"/><text class="s" x="380" y="264" text-anchor="middle">Schreibtisch</text><text class="s" x="380" y="278" text-anchor="middle">(Redemanuskript)</text>
+  <line class="door" x1="80" y1="330" x2="120" y2="330"/><text class="s" x="100" y="346" text-anchor="middle">Bürotür zum Flur (zu)</text>
+  <text class="s" x="440" y="346" text-anchor="end">keine Tür zum Nachbarraum</text>
+</svg>

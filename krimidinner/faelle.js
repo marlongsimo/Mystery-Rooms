@@ -4,4 +4,5 @@ window.KD_FAELLE = [
   { id: "eichenfels", nr: 1, title: "Der letzte Gast", path: "eichenfels/index.html" },
   { id: "silberkamm", nr: 2, title: "Abfahrt ins Dunkel", path: "silberkamm/index.html" },
   { id: "mirage", nr: 3, title: "Vorhang aus Lügen", path: "mirage/index.html" },
+  { id: "nebenan", nr: 4, title: "Nebenan – Der stille Kreis", path: "nebenan/index.html" },
 ];

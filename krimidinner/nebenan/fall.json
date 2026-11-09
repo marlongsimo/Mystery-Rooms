@@ -1,0 +1,301 @@
+{
+  "id": "nebenan",
+  "nr": 4,
+  "title": "Nebenan – Der stille Kreis",
+  "players": {
+    "min": 5,
+    "max": 10
+  },
+  "store": "kd_neb_",
+  "roles": [
+    {
+      "id": "R01",
+      "file": "rollen/R01-fuchs.md",
+      "names": [
+        "Janne Fuchs",
+        "Lasse Fuchs"
+      ]
+    },
+    {
+      "id": "R02",
+      "file": "rollen/R02-kranz.md",
+      "names": [
+        "Beate Kranz",
+        "Benedikt Kranz"
+      ]
+    },
+    {
+      "id": "R03",
+      "file": "rollen/R03-linde.md",
+      "names": [
+        "Merle Linde",
+        "Mattis Linde"
+      ]
+    },
+    {
+      "id": "R04",
+      "file": "rollen/R04-seifert.md",
+      "names": [
+        "Karla Seifert",
+        "Karl Seifert"
+      ]
+    },
+    {
+      "id": "R05",
+      "file": "rollen/R05-hollmann.md",
+      "names": [
+        "Svenja Hollmann",
+        "Sören Hollmann"
+      ]
+    },
+    {
+      "id": "R06",
+      "file": "rollen/R06-rabe.md",
+      "names": [
+        "Fenja Rabe",
+        "Hauke Rabe"
+      ]
+    },
+    {
+      "id": "R07",
+      "file": "rollen/R07-oezdemir.md",
+      "names": [
+        "Tamara Özdemir",
+        "Tilo Özdemir"
+      ]
+    },
+    {
+      "id": "R08",
+      "file": "rollen/R08-wieland.md",
+      "names": [
+        "Viola Wieland",
+        "Vincent Wieland"
+      ]
+    },
+    {
+      "id": "R09",
+      "file": "rollen/R09-wiesner.md",
+      "names": [
+        "Edda Wiesner",
+        "Enno Wiesner"
+      ]
+    },
+    {
+      "id": "R10",
+      "file": "rollen/R10-klose.md",
+      "names": [
+        "Bärbel Klose",
+        "Bernd Klose"
+      ]
+    }
+  ],
+  "cast": {
+    "order": [
+      "R01",
+      "R02",
+      "R03",
+      "R04",
+      "R05",
+      "R06",
+      "R07",
+      "R08",
+      "R09",
+      "R10"
+    ]
+  },
+  "culprits": [
+    "R03"
+  ],
+  "host": {
+    "mayPlay": true,
+    "neverCulprit": false
+  },
+  "rounds": [
+    {
+      "no": 1,
+      "name": "Runde 1 · Der Sturz",
+      "word": "LEITER",
+      "color": "#7a5a2e",
+      "rolePart": "Runde 1"
+    },
+    {
+      "no": 2,
+      "name": "Runde 2 · Das Hinterzimmer",
+      "word": "STILLE",
+      "color": "#3d4a5c",
+      "rolePart": "Runde 2"
+    },
+    {
+      "no": 3,
+      "name": "Runde 3 · Die Akten",
+      "word": "VORDRUCK",
+      "color": "#6b3f2a",
+      "rolePart": "Runde 3"
+    },
+    {
+      "no": 4,
+      "name": "Runde 4 · Der Stoß",
+      "word": "FADEN",
+      "color": "#2f5a3e",
+      "rolePart": "Runde 4"
+    },
+    {
+      "no": 5,
+      "name": "Finale · nach der Anklage",
+      "word": "ZURÜCK",
+      "alt": "ZURUECK",
+      "color": "#b98a3c",
+      "final": true
+    }
+  ],
+  "cards": {
+    "B1": {
+      "svg": "assets/fundskizze.svg"
+    },
+    "B9": {
+      "print": "dense"
+    },
+    "B11": {
+      "print": "dense"
+    },
+    "B14": {
+      "print": "dense"
+    },
+    "B19": {
+      "when": {
+        "missing": [
+          "R09"
+        ]
+      }
+    },
+    "B20": {
+      "when": {
+        "missing": [
+          "R07"
+        ]
+      }
+    }
+  },
+  "steps": [
+    {
+      "key": "vorb",
+      "title": "Vorbereitung",
+      "sections": [
+        "A1",
+        "A2",
+        "A3",
+        "A4"
+      ]
+    },
+    {
+      "key": "start",
+      "title": "Start · Regeln vorlesen",
+      "sections": [
+        "A5"
+      ],
+      "mins": 5
+    },
+    {
+      "key": "p1",
+      "title": "Phase 1 · Nach dem Fest",
+      "sections": [
+        "Phase 1"
+      ],
+      "phase": 1,
+      "mins": 15
+    },
+    {
+      "key": "p2",
+      "title": "Phase 2 · Der Sturz",
+      "sections": [
+        "Phase 2"
+      ],
+      "phase": 2,
+      "round": 1,
+      "mins": 30
+    },
+    {
+      "key": "p3",
+      "title": "Phase 3 · Das Hinterzimmer",
+      "sections": [
+        "Phase 3"
+      ],
+      "phase": 3,
+      "round": 2,
+      "mins": 35
+    },
+    {
+      "key": "p4",
+      "title": "Phase 4 · Die Akten",
+      "sections": [
+        "Phase 4"
+      ],
+      "phase": 4,
+      "round": 3,
+      "mins": 40
+    },
+    {
+      "key": "p5",
+      "title": "Phase 5 · Der Stoß",
+      "sections": [
+        "Phase 5"
+      ],
+      "phase": 5,
+      "round": 4,
+      "mins": 35
+    },
+    {
+      "key": "fin",
+      "title": "Finale · Anklage, Brief und Entscheidung",
+      "sections": [
+        "Finale"
+      ],
+      "phase": 6,
+      "round": 5,
+      "mins": 30,
+      "accusation": true
+    }
+  ],
+  "npc": {
+    "phaseToRound": {
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "5": 4
+    }
+  },
+  "house": {
+    "tab": "Haus",
+    "head": "DAS HAUS",
+    "title": "Das Haus am Anger",
+    "svg": "assets/hausplan.svg",
+    "intro": "Grundriss des Nachbarschaftshauses „Haus am Anger“ im Erdgeschoss: Saal, Flur, Küche, Büro, Beratungsraum, Hausmeisterkammer, WC und Windfang. Der Haupteingang führt in den Saal, eine Schwingtür in den Flur.",
+    "note": "Wer heute Nacht welche Wege gegangen ist, erfahrt ihr im Lauf der Ermittlung."
+  },
+  "texts": {
+    "brand": "NEBENAN",
+    "cardHeader": "HAUS AM ANGER",
+    "eyebrow": "Krimidinner · Fall 04",
+    "teaser": "Oktober 2004, Herbstfest eines Nachbarschaftsvereins. Der Gründer stürzt im Büro von der Leiter, ein tragischer Unfall. Bis jemand die Tür neben seinem Büro öffnet.",
+    "accusation": "Wer hat Hanno Rabe getötet?",
+    "inviteText": "{name}, hier ist dein Rollenblatt für „{title}“. Bitte nur selbst öffnen: {link} (Code {code})"
+  },
+  "rulesSections": [
+    "Die fünf Regeln",
+    "Der Ablauf",
+    "Die Anklage",
+    "Tipps für einen guten Abend"
+  ],
+  "theme": {
+    "bg": "#10120f",
+    "accent": "#b98a3c"
+  },
+  "live": {
+    "slug": "krimidinner",
+    "maxDevices": 11
+  },
+  "leakCheck": [
+    "TÄTERROLLE",
+    "Du hast Hanno"
+  ]
+}

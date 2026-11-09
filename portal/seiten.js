@@ -55,6 +55,13 @@ window.MR_SEITEN = {
       tipp: "Mode der späten Zwanziger: Weste, Hut, Perlenkette.",
       mehr: "Acht Figuren, ein Wagenplan, vier Runden und ein Finale. Rollen per Handy oder ausgedruckt, Gastgeberheft mit Ablauf und Vorlesetexten.",
     },
+    "krimidinner-nebenan": {
+      intro: "Oktober 2004: das Herbstfest eines Nachbarschaftsvereins. Der Gründer stürzt im Büro von der Leiter. Was wie ein Unfall aussieht, führt in einen Raum, den nicht alle am Tisch kennen.",
+      wen: "Für Runden, die Geheimnisse, Papierspuren und eine Entscheidung am Ende mögen.",
+      team: "5–10 Personen am Tisch, die Spielleitung spielt mit.",
+      tipp: "Strickjacke, Cordhose oder Fleecepulli, und ein Notizblock für die Zeitleiste.",
+      mehr: "Zehn Figuren, ein Hausplan, Dokumente zum Vergleichen und Zusammensetzen, vier Runden und ein Finale mit zwei Entscheidungen. Rollen per Handy oder ausgedruckt, Gastgeberheft mit Ablauf und Vorlesetexten.",
+    },
     "krimidinner-mirage": {
       intro: "November 1958: die letzte Vorstellung im Varieté Palais Mirage. Der Impresario liegt hinter dem Spiegelkabinett, obwohl er um 21:58 noch aus der Loge gegrüßt hat.",
       wen: "Für Runden, die Bühnenzauber und eine gute Täuschung mögen.",

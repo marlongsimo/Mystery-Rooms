@@ -3,6 +3,7 @@
 
 @font-face{font-family:"Cinzel";font-weight:500;font-display:swap;src:url(fonts/cinzel-latin-500-normal.woff2) format("woff2")}
 @font-face{font-family:"Cinzel";font-weight:600;font-display:swap;src:url(fonts/cinzel-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Roboto Slab";font-weight:800;font-display:swap;src:url(fonts/roboto-slab-latin-800-normal.woff2) format("woff2")}
 @font-face{font-family:"Inter";font-weight:400;font-display:swap;src:url(fonts/inter-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Inter";font-weight:500;font-display:swap;src:url(fonts/inter-latin-500-normal.woff2) format("woff2")}
 @font-face{font-family:"Inter";font-weight:600;font-display:swap;src:url(fonts/inter-latin-600-normal.woff2) format("woff2")}
@@ -407,3 +408,11 @@ dialog[open] { animation: rise .25s ease-out; }
   .game-shots { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 680px) { .hero-moon { display: none; } }
+
+/* ---------- Marke „Case Unlocked“ ---------- */
+.logo .wordmark, .logo-text { font: 800 17px/1 "Roboto Slab", Georgia, serif; letter-spacing: .08em; color: #efe6d2; }
+.logo .wordmark b, .logo-text b { color: var(--gold); font-weight: 800; }
+.footer .logo-text { font-size: 20px; }
+.footer-claim { font: 500 12px var(--sans); letter-spacing: .28em; text-transform: uppercase; color: var(--gold-2); }
+.brand-image { width: 100%; height: auto; margin: 0 0 30px; border: 1px solid #d5ad6233; box-shadow: 0 30px 80px #0009; }
+@media (max-width: 680px) { .logo .wordmark { font-size: 15px; letter-spacing: .06em; } }

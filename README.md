@@ -1,4 +1,4 @@
-# Mystery Rooms
+# Case Unlocked
 
 Digitale Escape Rooms für den Browser – kostenlos, ohne Anmeldung, direkt spielbar. Rein statisch (GitHub Pages); gemeinsames Spielen läuft über Supabase.
 

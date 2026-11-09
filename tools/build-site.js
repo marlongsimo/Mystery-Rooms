@@ -17,7 +17,7 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-const SITE_URL = (process.env.SITE_URL || "https://marlongsimo.github.io/Mystery-Rooms/").replace(/\/?$/, "/");
+const SITE_URL = (process.env.SITE_URL || "https://case-unlocked.de/").replace(/\/?$/, "/");
 const ROOT = path.resolve(__dirname, "..");
 const TODAY = new Date().toISOString().slice(0, 10);
 

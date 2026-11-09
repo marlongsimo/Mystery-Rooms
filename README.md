@@ -2,7 +2,7 @@
 
 Digitale Escape Rooms für den Browser – kostenlos, ohne Anmeldung, direkt spielbar. Rein statisch (GitHub Pages); gemeinsames Spielen läuft über Supabase.
 
-**Live:** https://marlongsimo.github.io/Mystery-Rooms/
+**Live:** https://case-unlocked.de/ (GitHub Pages, eigene Domain über die Datei `CNAME`)
 
 ## Spiele
 

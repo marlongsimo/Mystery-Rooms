@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://marlongsimo.github.io/Mystery-Rooms/sitemap.xml
+Sitemap: https://case-unlocked.de/sitemap.xml

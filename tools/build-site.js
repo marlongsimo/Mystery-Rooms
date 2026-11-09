@@ -23,9 +23,10 @@ const TODAY = new Date().toISOString().slice(0, 10);
 
 const ctx = { window: {} };
 vm.createContext(ctx);
-for (const f of ["portal/games.js", "portal/art.js"]) vm.runInContext(fs.readFileSync(path.join(ROOT, f), "utf8"), ctx, { filename: f });
+for (const f of ["portal/games.js", "portal/art.js", "portal/seiten.js"]) vm.runInContext(fs.readFileSync(path.join(ROOT, f), "utf8"), ctx, { filename: f });
 const GAMES = ctx.window.MR_GAMES.filter((g) => g.status !== "geplant");
 const ART = ctx.window.MR_ART;
+const SEITEN = ctx.window.MR_SEITEN || { spiele: {}, themen: [] };
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const DIFF = ["", "Leicht", "Mittel", "Anspruchsvoll", "Schwer"];
@@ -43,7 +44,7 @@ const CSS_V = (fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/por
 
 function footerGames(pre) {
   const group = (label, list) => `<b>${label}</b>` + list.map((g) => `<a href="${pre}spiele/${g.id}.html">${esc(g.title)}</a>`).join("");
-  return group("ESCAPE ROOMS", GAMES.filter((g) => !isTable(g))) + group("KRIMIDINNER", GAMES.filter(isTable));
+  return group("ESCAPE ROOMS", GAMES.filter((g) => !isTable(g))) + group("KRIMIDINNER", GAMES.filter(isTable)) + `<b>THEMEN</b>` + SEITEN.themen.map((s) => `<a href="${pre}${s.slug}.html">${esc(s.menu)}</a>`).join("");
 }
 function seoHead({ title, desc, url, image, type = "website", jsonld }) {
   return [
@@ -131,7 +132,8 @@ ${seoHead({ title, desc, url, image, type: "article", jsonld })}
       </div>
     </div>
     ${g.shots ? `<ul class="game-shots">${g.shots.map((s) => `<li><img src="../${esc(s.src)}" alt="${esc(g.title)}: ${esc(s.label)}" loading="lazy"><span>${esc(s.label)}</span></li>`).join("")}</ul>` : ""}
-    <section class="game-more">${how}</section>
+    ${quick(g)}
+    <section class="game-more faq"><details><summary>${isTable(g) ? "So läuft der Abend" : "So spielst du"}</summary>${how.replace(/<h2>[^<]*<\/h2>/, "")}</details></section>
     <section class="game-next"><h2>Weitere Abenteuer</h2><div class="cards">${others.map((o) => `<a class="mini" href="${o.id}.html">${artHtml(o, "../")}<span><b>${esc(o.title)}</b><small>${kindLabel(o)} · ${esc(o.players)}</small></span></a>`).join("")}</div></section>
   </main>
   <footer class="footer">
@@ -214,6 +216,82 @@ function gameHead(g) {
   return true;
 }
 
+
+/* ---------- Kompakter Textblock je Spiel (portal/seiten.js) ---------- */
+function quick(g) {
+  const s = SEITEN.spiele[g.id];
+  if (!s) return "";
+  return `<section class="game-quick">
+      <p class="game-intro">${esc(s.intro)}</p>
+      <dl class="quick-grid"><div><dt>Für wen</dt><dd>${esc(s.wen)}</dd></div><div><dt>${isTable(g) ? "Am Tisch" : "Allein oder gemeinsam"}</dt><dd>${esc(s.team)}</dd></div><div><dt>Tipp</dt><dd>${esc(s.tipp)}</dd></div></dl>
+      ${s.mehr ? `<div class="faq"><details><summary>Mehr über ${esc(g.title)}</summary><p>${esc(s.mehr)}</p></details></div>` : ""}
+    </section>`;
+}
+
+/* ---------- Themenseiten (kompakt) ---------- */
+function topicPage(s) {
+  const url = `${SITE_URL}${s.slug}.html`;
+  const list = GAMES.filter((g) => (s.filter === "tisch" ? isTable(g) : s.filter === "team" ? !isTable(g) && together(g) : !isTable(g)));
+  const jsonld = { "@context": "https://schema.org", "@graph": [
+    { "@type": "WebPage", name: s.h1, description: s.desc, url, inLanguage: "de" },
+    { "@type": "FAQPage", mainEntity: s.faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
+    { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Case Unlocked", item: SITE_URL }, { "@type": "ListItem", position: 2, name: s.h1, item: url }] },
+  ] };
+  const cards = list.map((g) => `<a class="mini" href="spiele/${g.id}.html">${artHtml(g)}<span><b>${esc(g.title)}</b><small>${esc(g.players)} · ${esc(g.duration)}</small></span></a>`).join("");
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b111c">
+  <title>${esc(s.title)}</title>
+  <meta name="description" content="${esc(s.desc)}">
+${seoHead({ title: s.title, desc: s.desc, url, image: SITE_URL + "portal/og/start.png", jsonld })}
+  <link rel="icon" href="portal/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="portal/portal.css?v=${CSS_V}">
+</head>
+<body>
+  <!-- Erzeugt von tools/build-site.js aus portal/seiten.js – nicht von Hand bearbeiten. -->
+  <header class="header scrolled solid" id="header">
+    <a href="index.html" class="logo" aria-label="Case Unlocked – zur Startseite">${LOGO}<span class="wordmark">CASE <b>UNLOCKED</b></span></a>
+    <nav class="nav" id="nav" aria-label="Hauptnavigation">
+      <a href="index.html#escape-rooms">Escape Rooms</a>
+      <a href="index.html#krimidinner">Krimidinner</a>
+      <a href="index.html#so-gehts">So geht’s</a>
+      <a href="ueber-uns.html">Über uns</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
+  </header>
+  <main class="game topic">
+    <p class="crumbs"><a href="index.html">Case Unlocked</a> › ${esc(s.h1)}</p>
+    <p class="kicker">${esc(s.kicker)}</p>
+    <h1>${esc(s.h1)}</h1>
+    <p class="game-teaser">${esc(s.lead)}</p>
+    <div class="topic-games">${cards}</div>
+    <ol class="topic-steps">${s.steps.map(([h, x]) => `<li><b>${esc(h)}</b><span>${esc(x)}</span></li>`).join("")}</ol>
+    <section class="faq topic-faq">${s.faq.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</section>
+    <p class="topic-cross"><a href="${s.cross[0]}.html">${esc(s.cross[1])} →</a></p>
+  </main>
+  <footer class="footer">
+    <a href="index.html" class="logo-text">CASE <b>UNLOCKED</b></a>
+    <p class="footer-claim">Find the clues. Crack the case.</p>
+    <nav class="footer-games" aria-label="Alle Spiele">${footerGames("")}</nav>
+    <nav class="footer-nav" aria-label="Fußzeile"><a href="ueber-uns.html">Über uns</a><a href="impressum.html#kontakt">Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
+    <p class="footer-small">Keine Cookies, kein Tracking, keine Werbung.</p>
+  </footer>
+  <script>
+    (() => {
+      const b = document.getElementById("menuToggle");
+      const set = (o) => { document.body.classList.toggle("nav-open", o); b.setAttribute("aria-expanded", String(o)); };
+      b.addEventListener("click", () => set(!document.body.classList.contains("nav-open")));
+      document.querySelectorAll("#nav a").forEach((a) => a.addEventListener("click", () => set(false)));
+    })();
+  </script>
+</body>
+</html>
+`;
+}
+
 function between(text, start, end, inner) {
   const a = text.indexOf(start), b = text.indexOf(end);
   if (a < 0 || b < a) throw new Error("Marke fehlt: " + start);
@@ -261,6 +339,8 @@ async function ogImages() {
   for (const f of fs.readdirSync(path.join(ROOT, "spiele"))) if (f.endsWith(".html") && !GAMES.some((g) => g.id + ".html" === f)) fs.unlinkSync(path.join(ROOT, "spiele", f));
   for (const g of GAMES) fs.writeFileSync(path.join(ROOT, "spiele", g.id + ".html"), gamePage(g));
   console.log("Spielseiten:", GAMES.length);
+  for (const s of SEITEN.themen) fs.writeFileSync(path.join(ROOT, s.slug + ".html"), topicPage(s));
+  console.log("Themenseiten:", SEITEN.themen.length);
 
   // Startseite: Kopf (kanonische Adresse, Vorschaubild, strukturierte Daten) und Spiele-Links in der Fußzeile
   let idx = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
@@ -282,7 +362,7 @@ async function ogImages() {
   fs.writeFileSync(path.join(ROOT, "index.html"), idx);
 
   // Sitemap und robots.txt
-  const urls = [["", "1.0", "weekly"]].concat(GAMES.map((g) => [`spiele/${g.id}.html`, "0.8", "monthly"]), [["ueber-uns.html", "0.4", "yearly"], ["impressum.html", "0.1", "yearly"], ["datenschutz.html", "0.1", "yearly"]]);
+  const urls = [["", "1.0", "weekly"]].concat(SEITEN.themen.map((s) => [`${s.slug}.html`, "0.9", "monthly"]), GAMES.map((g) => [`spiele/${g.id}.html`, "0.8", "monthly"]), [["ueber-uns.html", "0.4", "yearly"], ["impressum.html", "0.1", "yearly"], ["datenschutz.html", "0.1", "yearly"]]);
   fs.writeFileSync(path.join(ROOT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(([u, pr, ch]) => `  <url><loc>${SITE_URL}${u}</loc><lastmod>${TODAY}</lastmod><changefreq>${ch}</changefreq><priority>${pr}</priority></url>`).join("\n")}\n</urlset>\n`);
   fs.writeFileSync(path.join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
   console.log("sitemap.xml:", urls.length, "Adressen ·", SITE_URL);

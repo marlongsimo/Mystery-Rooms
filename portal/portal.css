@@ -421,3 +421,28 @@ dialog[open] { animation: rise .25s ease-out; }
 .hero .hero-h1 { font: 500 12px/1.5 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--teal); margin: 0 0 14px; text-shadow: none; max-width: 640px; }
 .hero .hero-title { font-family: var(--serif); font-weight: 500; font-size: clamp(38px, 6vw, 78px); line-height: 1.04; margin: 0 0 26px; letter-spacing: .01em; text-shadow: 0 4px 30px #000a; }
 .hero .hero-title em { font-style: normal; color: var(--gold); display: block; }
+
+/* ---------- Kompakte Texte: Spielseiten und Themenseiten ---------- */
+.more-links { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 0; font-size: 14px; }
+.more-links a { color: var(--gold-2); text-decoration: none; }
+.more-links a::after { content: " →"; }
+.more-links a:hover { text-decoration: underline; }
+.game-quick { margin-top: 36px; }
+.game-intro { font-size: 16px; color: #d0d3db; max-width: 820px; margin: 0 0 18px; }
+.quick-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 6px; }
+.quick-grid div { padding: 14px 16px; border: 1px solid var(--line); background: var(--card); }
+.quick-grid dt { font: 500 10px var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--teal); margin-bottom: 4px; }
+.quick-grid dd { margin: 0; font-size: 14px; color: #d0d3db; }
+.game .faq details, .topic-faq details { max-width: none; }
+.game-more.faq { margin-top: 0; padding-top: 0; border-top: 0; }
+.game-more.faq ol { margin: 0 0 16px; }
+.topic h1 { margin: 0 0 12px; }
+.topic-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin: 26px 0 30px; }
+.topic-steps { list-style: none; counter-reset: s; padding: 0; margin: 0 0 26px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.topic-steps li { counter-increment: s; padding: 16px; border: 1px solid var(--line); background: var(--card); }
+.topic-steps li::before { content: "0" counter(s); display: block; font: 500 20px var(--serif); color: var(--gold); margin-bottom: 6px; }
+.topic-steps b { display: block; font: 600 15px var(--serif); letter-spacing: .04em; margin-bottom: 4px; }
+.topic-steps span { font-size: 14px; color: var(--muted); }
+.topic-cross { margin: 26px 0 0; }
+.topic-cross a { color: var(--gold-2); }
+@media (max-width: 760px) { .quick-grid, .topic-steps { grid-template-columns: 1fr; } }

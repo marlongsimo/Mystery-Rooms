@@ -121,7 +121,7 @@ Für alle Spieler gibt es `assets/theaterplan.svg` im Reiter „Theater“. Dara
 |---|---|
 | 19:20 | Velten kommt an, Garderobenmarke 17. Zum ersten Mal seit neun Jahren im Haus. |
 | 19:40 | Zorn streitet im Salon mit Varn um Geld und um Lukas: „Sie haben ihn auf dem Gewissen, nicht nur Velten.“ |
-| 20:00 | Malven startet im Büro Varns ein verstecktes **Minifon** (Drahttongerät, läuft 30 Minuten). **[NEU]** |
+| 19:58 | Malven startet im Büro Varns ein verstecktes **Minifon** (Drahttongerät, läuft 30 Minuten bis 20:28). Malven hatte es um 18:30 hinter die Akten im Regal geschoben. |
 | 20:03–20:15 | Velten in Varns Büro, Malvens Minifon läuft. Velten: „Das Original ist hier im Haus. Nach dem letzten Vorhang sagen Sie, wer die Klappe öffnen ließ, oder die Presse bekommt es.“ Varn: „Dann zeigen Sie es mir. Um neun. Unten. Wo alles angefangen hat.“ **[0.3]** |
 | 20:15 | Varn lässt sich von Thier **5.000 DM** bar geben. Thier zählt sie in einen Lohnumschlag mit Banderole, Varn diktiert für das Kassenbuch: „für V.“ Varn steckt den Umschlag in die Innentasche seines Fracks und trägt in seinen Tischkalender ein: „21:00 V. unten. Zettel. 5.000 bar (Thier).“ **[0.3]** |
 | 20:20 | Ansprache im Foyer. Varn kündigt „die Wahrheit nach dem letzten Vorhang“ an. Er meint seine eigene Version von 1949: „Velten war betrunken.“ |
@@ -406,14 +406,14 @@ Alle neuen Namen sind gegen die anderen Spiele geprüft.
 
 | Punkt | Lösung |
 |---|---|
-| Zettel | **Er liegt seit 1949 im Haus**, in Dornes Versteck im Werkzeugkasten neben Klappe 3. Velten bekam im Oktober nur ein Foto mit dem Hinweis auf das Versteck und bringt nichts mit. Um 20:56 nimmt Varn den Zettel selbst heraus. Erst nach der Tat steckt Velten die verbrannten Reste ein. |
+| Zettel | **Er liegt seit 1949 im Haus**, in Dornes Versteck im Werkzeugkasten neben Klappe 3. Velten bekam im Oktober nur ein Foto mit dem Hinweis auf das Versteck und bringt nichts mit. Um 20:56 nimmt Varn den Zettel selbst heraus. Velten nimmt den Zettel erst nach dem Schlag und nach dem Austreten der Flamme an sich (21:02–21:03) und steckt die verbrannten Reste ein. |
 | 5.000 DM | **20:15:** Thier zählt das Geld in einen Lohnumschlag mit Banderole, Varn diktiert „für V.“ ins Kassenbuch. **Danach:** Varn steckt den Umschlag in den Frack und schreibt den Kalendereintrag. **20:56:** Er bietet das Geld an, Velten lehnt ab. **Nach der Tat:** Velten durchsucht Varn nicht, deshalb liegt der Umschlag mit unversehrter Banderole bei der Leiche. |
 | Minutenablauf | 21:02 Schlag · 21:03–21:05 Versenkung in die Rückkammer · 21:05 Gegengewicht in den Schacht · 21:06 im Dunkeln die Treppe hinauf · 21:07 von Malven gesehen · 21:08–21:10 warten · 21:11 Tonkabine · 21:18 Band · 21:19–21:22 zurück. **Ohne Überschneidung.** Dass ein Körper in die Kammer kommt, erklärt die alte Versenkung. |
 | Motiv der Vertuschung | drei Ziele: Zeit gewinnen, Tatzeit in die Vorstellung legen, Verdacht aufs Haus lenken. Velten handelt kühl berechnend, nicht aus Panik, und nimmt dabei in Kauf, Dorne zu belasten. Das ist eine zweite Schuld, Velten wird dadurch nicht zum Opfer. |
 | Runde 1 | **gestaffelt:** VORHANG öffnet B1, B2, B5, später KULISSE B3, B4. Für die Engine ist das eine zusätzliche Runde ohne Rollenteil. In `fall.json`: Runde 1 (VORHANG, `rolePart` Runde 1), Runde 2 (KULISSE, ohne `rolePart`), danach Runden 3–5 mit den Rollenteilen Runde 2–4 und das Finale. Die Spielleitung bekommt dafür einen eigenen Schritt „Phase 2b“. |
 | neues Losungswort | **KULISSE** (zur Freigabe) |
 
-**Stand:** Alle in 0.2 offenen Logikpunkte sind geschlossen. Auf dem Papier ist der Fall rollenheftreif. Ein Probetisch steht weiterhin aus.
+**Stand:** Fallbuch 0.3 und Losungswort KULISSE sind freigegeben. Alle in 0.2 offenen Logikpunkte sind geschlossen. Auf dem Papier ist der Fall rollenheftreif. Ein Probetisch steht weiterhin aus.
 
 ---
 
@@ -423,3 +423,43 @@ Alle neuen Namen sind gegen die anderen Spiele geprüft.
 2. Beweiskarten-Datei, Gastgeberheft mit Teil A und versiegeltem Teil B, Anleitung.
 3. `fall.json` mit den vier bedingten Karten und `theaterplan.svg`.
 4. Erzeugen mit der Engine, Test für 6 bis 10 Personen, Eintrag auf der Startseite.
+
+---
+
+## 18 · Nachtrag: Rollenhefte (Stand 0.4)
+
+Die Rollenhefte R01–R10 liegen unter `rollen/`, aufgebaut wie bei Eichenfels und Silberkamm: Charakter, Kleidung, Vertraulich, Runde 1–4.
+
+**Wo die Runden stehen:**
+- **Runde 1** umfasst VORHANG und KULISSE.
+- **Runde 2–4** öffnen KLAPPE, TONBAND und VEILCHEN.
+- **Charakter, Kleidung und Vertraulich** enden um 20:50. Die Nacht ab 20:50 steht erst in Runde 1. Die Ausnahme ist R06 Velten: Wie bei jeder Täterrolle kennt Velten die Tat von Anfang an.
+
+**Was geprüft ist:**
+- **Varianten:** Jede Rolle verwendet für sich selbst `[w / m]` und für andere `{Rxx: …}`.
+- **Keine Lecks vor Runde 1:** In Charakter, Kleidung und Vertraulich der unschuldigen Rollen kommen weder Mord, Leiche, Tatzeit, Alibi, Polizei noch „tot“ vor.
+- **Minifon-Wortlaut:** Der Gesprächsausschnitt in Malvens und Veltens Heft ist wörtlich gleich mit B9a.
+
+**Kleine neue Fakten aus den Rollenheften, zur Freigabe:**
+
+| Rolle | Fakt | Zweck |
+|---|---|---|
+| R06 Velten | lebt seit 1950 in **Lübeck**, tritt in Kurhäusern auf. Ist **Linkshänder(in)** und grüßte um 21:58 mit der linken Hand. Schrieb Ende Oktober an die *Nordhafener Rundschau*: „Ich besitze einen Beweis zum Unglück von 1949. Nach dem letzten Vorhang wird er öffentlich. V.“ | Strang A (Gruß), Strang C (Brief, Lübeck) |
+| R03 Zorn | erinnert sich in Runde 3: Varn grüßte immer mit der **rechten** Hand. Ein alter Bühnenarbeiter hatte vor einem Monat gesagt: „Fragen Sie Varn mal, wer die Sicherung abgenommen hat.“ Schuldet Varn 3.000 Mark und hat einen Brief über eine versprochene Beteiligung. | Strang A, Motiv Zorn |
+| R07 Malven | legt in Runde 4 den Brief „V.“ mit Poststempel Lübeck vor und hat Varn am 15.11. danach gefragt | Strang C |
+| R02 Rohn | sah um 22:05 aus der vorderen Unterbühne: Nur der alte Riegelhebel hinten ist staubfrei. Hat am 19.11. bei der Probe die Sicherung von Klappe A selbst gelöst, um Varn zu warnen. | Strang B, Ablenkung |
+| R04 Senn | erkennt in Runde 4 den Wischer an Veltens Schulter als **Kalk, nicht Puder**. Die Frack-Kopie ist für die „Sammlung Hübner“ (600 Mark) bestimmt. | Strang B |
+| R08 Kest | Velten kam um 21:22 mit **trockenem Haar** zurück („unter dem Vordach geraucht“). Das Kabinett soll an einen amerikanischen Showproduzenten gehen, im Frühjahr wird abgerissen. | Strang B, Motiv |
+| R01 Vey | Vertrag mit dem fiktiven **Varieté Atlantik** in Hamburg. Varns Drohbrief liegt zerrissen im Papierkorb. Roch um 22:16 in der vorderen Unterbühne schwach verbranntes Papier. | Ablenkung, leiser Hinweis |
+| R09 Thier | leiht sich monatlich 150 Mark aus der Kasse (900 Mark Rückstand) und ruft um 22:40 die Polizei an | Ablenkung, Rahmen |
+| R10 Quell | Parodie-Schallplatte „Der Direktor lässt bitten“, Gage halbiert. Hat Band 3 um 18:40 geprüft. | Ablenkung |
+| R05 Dorne | Seine Moral entwickelt sich über die Runden: In Runde 2 zögert er, in Runde 3 hat er Wissen über die Versenkung, das ihn selbst belastet, und **in Runde 4 legt er verbindlich offen**: Zettel, Versteck, Foto an Velten, Schweigegeld. Ob er auch die Warnung an Velten von 1949 preisgibt, entscheidet die Person, die Dorne spielt. | Strang C, eigene Konfliktlinie |
+
+**Veltens Verlauf über die Runden:**
+- **Runde 1:** sagt kaum etwas, zeigt auf niemanden.
+- **Runde 2:** räumt 1949 ein und stellt sich als Opfer dar.
+- **Runde 3:** zweite Linie, die Jacke.
+- **Runde 4:** dritte Linie, das Treffen.
+- **Finale:** Das Geständnis enthält auch die eigene Schuld von 1949.
+
+**Was als Nächstes fehlt:** BEWEISKARTEN.md, GASTGEBERHEFT.md (mit den Aussagekarten für R07–R10), ANLEITUNG.md, `fall.json`, `theaterplan.svg`. Ein Probetisch steht aus.

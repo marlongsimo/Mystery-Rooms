@@ -106,6 +106,9 @@ def main(folder):
     for s in fall.get("rulesSections", []):
         if f"## {s}" not in an:
             errs.append(f"Anleitung: Abschnitt „{s}“ fehlt")
+    for cid, spec in fall.get("cards", {}).items():
+        if spec.get("svg") and not os.path.exists(os.path.join(folder, spec["svg"])):
+            errs.append(f"{cid}: Zeichnung fehlt ({spec['svg']})")
     svg = fall.get("house", {}).get("svg")
     if svg and not os.path.exists(os.path.join(folder, svg)):
         errs.append(f"Asset fehlt: {svg}")

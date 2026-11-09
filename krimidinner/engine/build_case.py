@@ -160,8 +160,10 @@ for chunk in re.split(r"(?=^## |^### B\d)", src, flags=re.M):
     foot = re.findall(r"^\*Freigabe:.*\*$", body, flags=re.M)
     body = re.sub(r"^\*Freigabe:.*\*$", "", body, flags=re.M).strip()
     html_body = md(body)
-    if FALL.get("cards", {}).get(cid, {}).get("print") == "sheet" and house_svg:  # Plan als Zeichnung statt Textplan
-        html_body = re.sub(r'<pre class="plan">.*?</pre>', '<p class="plan-hint">↔ Plan zum Verschieben wischen</p><div class="plan-wrap">' + house_svg + '</div>', html_body, count=1, flags=re.S)
+    ccfg = FALL.get("cards", {}).get(cid, {})
+    card_svg = read(ccfg["svg"]) if ccfg.get("svg") else (house_svg if ccfg.get("print") == "sheet" else "")
+    if card_svg:  # Plan als Zeichnung statt Textplan (eigene Zeichnung der Karte oder der Hausplan)
+        html_body = re.sub(r'<pre class="plan">.*?</pre>', '<p class="plan-hint">↔ Plan zum Verschieben wischen</p><div class="plan-wrap">' + card_svg + '</div>', html_body, count=1, flags=re.S)
     cards[cid] = {"round": rnd, "icon": m.group(2), "title": m.group(3).strip(), "html": veil(html_body), "foot": foot[0].strip("*") if foot else ""}
 
 # ---------- Gastgeberheft, Anleitung ----------

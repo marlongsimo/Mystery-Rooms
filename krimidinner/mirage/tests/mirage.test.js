@@ -66,6 +66,7 @@ const LEAK = /Mord|Ermittlung|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig|Polizei|
   await unlock(A, 'VEILCHEN'); ids = await cardIds(A);
   check(ids.includes('B15') && ids.includes('B16') && ids.includes('B18') && !ids.includes('B17') && !ids.includes('B19'), 'VEILCHEN → B15, B16, B18 (Thier fehlt), Finale zu');
   check((await npcCount(A)) === 11, 'Alle 11 Aussagekarten von R07–R10');
+  check(await A.$eval('.ecard:has(header:has-text("B15")) .plan-wrap svg', (s) => /KÜNSTLERGANG/.test(s.textContent)).catch(() => false) && await A.$eval('.ecard:has(header:has-text("B4")) .plan-wrap svg', (s) => /LÄNGSSCHNITT/.test(s.textContent) && /ÄNDERUNGEN/.test(s.textContent) && !/KÜNSTLERGANG/.test(s.textContent)).catch(() => false), 'B4 Bauamtsplan mit Schnitt und Änderungsfeld, ohne Gang · B15 mit dem Plan von 1938, mit Gang');
   check(!OPEN.test(await A.textContent('.cardlist')), 'Karten und Aussagen ohne offene Klammern');
   const b10 = await A.textContent('.ecard:has(header:has-text("B10"))');
   check(/Das Original ist hier im Haus\. Nach dem letzten Vorhang sagen Sie, wer die Klappe öffnen ließ, oder die Presse bekommt es\./.test(b10) && /Dann zeigen Sie es mir\. Um neun\. Unten\. Wo alles angefangen hat\./.test(b10), 'B10: Wortlaut der Minifon-Aufnahme wie im Fallbuch');

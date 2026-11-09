@@ -468,3 +468,18 @@ Die Rollenhefte R01–R10 liegen unter `rollen/`, aufgebaut wie bei Eichenfels u
 - `tests/mirage.test.js` mit 51 Prüfungen.
 
 Ein Probetisch steht aus.
+
+---
+
+## 19 · Nachtrag: Pläne (Stand 1.1)
+
+- **B4 / Reiter „Theater“** ist jetzt ein Bauamtsplan, Stand Umbau 1950:
+  - Grundriss Erdgeschoss mit allen Türen. Dazu gehören die Bühnentür vom Salon in den Personalgang und die Logentür vom Personalgang in Loge 2. So sieht man, wie Velten um 21:58 aus dem Requisitenraum in die Loge kam.
+  - Längsschnitt A–A durch Kabinett, Klappe A und 3, Versenkung und Schacht.
+  - Änderungsfeld:
+    - a: 04/1949, Rückkammer stillgelegt
+    - b: 06/1950, Garderobe: Rückwand neu verputzt
+    - c: 10/1955, Tonkabine eingebaut
+  - Bleistiftnotizen der Technik („Kl. A – Rohn prüft!“, „Lichttest 21:06 – nur hinten“, „4. Stufe knarrt“, „max. 2 Pers.! – R.D.“), Prüfstempel 12.6.1950.
+- **B15** enthält zusätzlich den **Bauplan von 1938 (Kellergeschoss)** aus dem untersten Fach des Planschranks. Er zeigt den Künstlergang von der Garderobe zur hinteren Unterbühne. Erst beide Pläne zusammen erklären „Rückwand neu verputzt“.
+- **Quelle:** `assets/plaene.py` zeichnet beide Pläne. Die Engine kann jetzt jeder Karte eine eigene Zeichnung geben (`cards.*.svg`).

@@ -24,7 +24,7 @@ Für die Gäste heißen die Stufen „Runde 1“ (VORHANG und KULISSE), „Runde
 | Format | A6 quer (148 × 105 mm), vier Karten pro A4-Bogen, mit Schnittmarken |
 | Kopfzeile | links „PALAIS MIRAGE“, rechts die Nummer, darunter der Titel in Versalien |
 | Kennfarbe | VORHANG **Samtrot** · KULISSE **Messing** · KLAPPE **Bühnengrün** · TONBAND **Nachtblau** · VEILCHEN **Violett** · Finale **Schwarz mit Gold**, versiegelt |
-| Theaterplan | B4 als eigenes Blatt mit `assets/theaterplan.svg`. Den Plan sehen alle Gäste auch sofort im Reiter „Theater“. Der alte Künstlergang ist darauf nicht eingezeichnet. |
+| Pläne | B4 als eigenes Blatt mit `assets/theaterplan.svg` (Bauamtsplan 1950: Grundriss, Schnitt, Änderungsfeld, Bleistiftnotizen). Den Plan sehen alle Gäste auch sofort im Reiter „Theater“, ohne den alten Künstlergang. B15 als eigenes Blatt mit `assets/plan1938.svg`, das den Gang zeigt. Beide Pläne werden aus `assets/plaene.py` erzeugt. |
 | Symbol | ✦ Fund · ✎ Schriftstück · ☰ Liste/Protokoll · ☏ Aussage · ◉ Aufnahme |
 | Rückseite | roter Vorhang, Spiegel, „Beweisstück“ |
 | Finale-Karte | Rückseite zusätzlich „Erst nach der Anklage öffnen“, im Druck in einem Umschlag |
@@ -79,24 +79,23 @@ Beim Abschrauben der Spiegelplatten für den Transport saß eine Rückplatte sch
 
 ## Runde 2 · Messing · KULISSE · Das Haus und der Abend
 
-### B4 · ☰ Theaterplan 1958
-*aus dem Büro der technischen Leitung*
+### B4 · ☰ Theaterplan (Bauamt 1950)
+*Blatt 3/7 aus dem Planschrank der Technik, mit Bleistiftnotizen*
 
 ```
-                      [ BELEUCHTERBRÜCKE ] (über der Bühne)
-  SEITENBÜHNE LINKS   |        BÜHNE           |  SEITENBÜHNE RECHTS
-  Tonkabine           |  Spiegelkabinett:      |  Bühnentreppe ↓ Unterbühne
-                      |  Vorderraum (Klappe A) |  Requisitenraum
-                      |  Rückkammer (Klappe 3) |  Garderoben 1, 2 · Büro Varn
-  --------------------+------------------------+---------------------------
-  ZUSCHAUERRAUM: Reihe 1 (Plätze 1–12), Loge 1 links, Loge 2 rechts
-  FOYER: Garderobe · Salon mit Bar · Seiteneingang mit Vordach
-
-  UNTERBÜHNE:  vorn (unter Klappe A)  |  Gegengewichtsschacht  |  hinten (unter Klappe 3)
+Grundriss Erdgeschoss und Längsschnitt A–A durch Bühne und Unterbühne (Zeichnung)
 ```
 
-- Die **Rückkammer** ist vermerkt: „stillgelegt seit 1949. Zugang nur von unten über Klappe 3 (Versenkung, Riegelhebel).“
-- Die **Illusion „Das leere Kabinett“** läuft nur über Klappe A und die vordere Unterbühne.
+- Im **Schnitt** sieht man: Die Rückkammer liegt über **Klappe 3** und der alten **Versenkung**, der Vorderraum über **Klappe A**. Dazwischen liegt der Gegengewichtsschacht.
+- **Änderungsfeld:**
+
+| | Datum | Änderung |
+|---|---|---|
+| a | 04/1949 | Rückkammer stillgelegt, Klappe 3 und Versenkung außer Betrieb |
+| b | 06/1950 | Garderobe: Rückwand neu verputzt |
+| c | 10/1955 | Tonkabine eingebaut |
+
+- **Bleistift:** „Kl. A – Rohn prüft!“ · „Lichttest 21:06 – nur hinten“ · „Treppe: 4. Stufe knarrt“ · „Brücke max. 2 Pers.! – R.D.“
 
 *Freigabe: Runde 1 (KULISSE)*
 
@@ -227,9 +226,17 @@ Platz 9  Thier
 ## Runde 5 · Violett · VEILCHEN · Der alte Weg
 
 ### B15 · ✦ Der alte Künstlergang
-*hinter der Garderobe*
+*hinter der Garderobe, dazu ein Plan aus dem untersten Fach des Planschranks*
 
-Hinter dem Garderobenständer eine **Tapetentür**, dahinter ein schmaler alter Gang, der zur **hinteren Unterbühne** führt. Er fehlt auf jedem heutigen Plan. Im Staub **ein Paar Schuhspuren, hin und zurück**. Am Bogen in der Mitte, frisch gekalkt im Oktober, ein **Wischer in Schulterhöhe**, rechts.
+Hinter dem Garderobenständer ist eine **Tapetentür**, dahinter eine Treppe nach unten und ein schmaler alter Gang. Im Staub **ein Paar Schuhspuren, hin und zurück**. Am Bogen in der Mitte, frisch gekalkt im Oktober, ein **Wischer in Schulterhöhe**, rechts.
+
+Im Planschrank der Technik liegt ganz unten ein vergilbtes Blatt von 1938:
+
+```
+Bauplan 1938, Kellergeschoss (Zeichnung)
+```
+
+Auf dem Plan von 1950 (B4) ist an dieser Stelle nur Wand, Änderung b: „Garderobe: Rückwand neu verputzt“.
 
 *Freigabe: Runde 4 (VEILCHEN)*
 

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 640" class="plan-svg" role="img" aria-label="Bauplan von 1938, Kellergeschoss des Palais Mirage, mit dem Künstlergang von der Garderobe zur hinteren Unterbühne">
+  <style>
+    .paper { fill: #e6d5ae; }
+    .frame { fill: none; stroke: #3a2a14; stroke-width: 1.6; }
+    .w { fill: none; stroke: #3a2a14; stroke-width: 4; stroke-linejoin: miter; }
+    .w2 { fill: none; stroke: #3a2a14; stroke-width: 1.4; }
+    .thin { fill: none; stroke: #3a2a14; stroke-width: .8; }
+    .hatch { fill: url(#hatch); stroke: #3a2a14; stroke-width: 1.2; }
+    .mirror { fill: #c9d6df; fill-opacity: .55; stroke: #3a2a14; stroke-width: 1.4; }
+    .dash { fill: none; stroke: #3a2a14; stroke-width: 1; stroke-dasharray: 6 4; }
+    .door { fill: none; stroke: #3a2a14; stroke-width: .9; }
+    .gap { stroke: #e6d5ae; stroke-width: 5; }
+    .lbl { font: 600 12px "DM Mono", "Courier New", monospace; letter-spacing: .06em; fill: #3a2a14; }
+    .sm { font: 10px "DM Mono", "Courier New", monospace; fill: #3a2a14; }
+    .hd { font: 700 13px "DM Mono", "Courier New", monospace; letter-spacing: .16em; fill: #3a2a14; }
+    .ttl { font: 700 15px "DM Mono", "Courier New", monospace; letter-spacing: .12em; fill: #3a2a14; }
+    .pen { font: italic 13px "Caveat", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive; fill: #5a5a66; }
+    .stamp { fill: none; stroke: #9e2b25; stroke-width: 2; opacity: .75; }
+    .stampt { font: 700 10px "DM Mono", monospace; fill: #9e2b25; opacity: .8; letter-spacing: .1em; }
+    .seat { fill: #3a2a14; opacity: .55; }
+  </style>
+  <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#3a2a14" stroke-width=".7" opacity=".5"/></pattern></defs>
+  <rect class="paper" width="760" height="640"/><rect class="frame" x="12" y="12" width="736" height="616"/>
+  <text class="hd" x="40" y="44">GRUNDRISS KELLERGESCHOSS · M 1:200 · UMBAU 1938</text>
+  <g transform="translate(700 44)"><circle r="14" class="w2"/><path d="M0 -12 L5 6 L0 2 L-5 6 Z" fill="#2b2418"/><text class="sm" x="-3" y="-17">N</text></g>
+  <rect class="w2" x="40" y="70" width="680" height="240" stroke-dasharray="3 3"/><rect class="w2" x="40" y="310" width="680" height="220" stroke-dasharray="3 3"/><rect class="w2" x="40" y="530" width="680" height="80" stroke-dasharray="3 3"/>
+  <text class="sm" x="380" y="86" text-anchor="middle">(darüber: Bühne)</text><text class="sm" x="380" y="326" text-anchor="middle">(darüber: Parkett)</text><text class="sm" x="380" y="546" text-anchor="middle">(darüber: Foyer)</text>
+  <rect class="w" x="160" y="110" width="440" height="190"/>
+  <rect class="hatch" x="160" y="186" width="440" height="20"/><text class="sm" x="380" y="200" text-anchor="middle">Gegengewichtsschacht</text>
+  <text class="lbl" x="380" y="150" text-anchor="middle">UNTERBÜHNE HINTEN</text><text class="lbl" x="380" y="256" text-anchor="middle">UNTERBÜHNE VORN</text>
+  <rect class="w2" x="604" y="120" width="40" height="60"/>
+  <line class="thin" x1="604" y1="126.7" x2="644" y2="126.7"/>
+  <line class="thin" x1="604" y1="133.3" x2="644" y2="133.3"/>
+  <line class="thin" x1="604" y1="140.0" x2="644" y2="140.0"/>
+  <line class="thin" x1="604" y1="146.7" x2="644" y2="146.7"/>
+  <line class="thin" x1="604" y1="153.3" x2="644" y2="153.3"/>
+  <line class="thin" x1="604" y1="160.0" x2="644" y2="160.0"/>
+  <line class="thin" x1="604" y1="166.7" x2="644" y2="166.7"/>
+  <line class="thin" x1="604" y1="173.3" x2="644" y2="173.3"/>
+  <path class="thin" d="M624.0 124 V174 m-4 -6 l4 6 l4 -6"/>
+  <text class="sm" x="650" y="154.0">Bühnentreppe</text>
+  <rect class="w2" x="40" y="530" width="170" height="80"/><text class="lbl" x="125" y="580" text-anchor="middle">GARDEROBE</text>
+  <rect class="w2" x="70" y="488" width="34" height="40"/>
+  <line class="thin" x1="70" y1="494.7" x2="104" y2="494.7"/>
+  <line class="thin" x1="70" y1="501.3" x2="104" y2="501.3"/>
+  <line class="thin" x1="70" y1="508.0" x2="104" y2="508.0"/>
+  <line class="thin" x1="70" y1="514.7" x2="104" y2="514.7"/>
+  <line class="thin" x1="70" y1="521.3" x2="104" y2="521.3"/>
+  <path class="thin" d="M87.0 492 V522 m-4 -6 l4 6 l4 -6"/>
+  <text class="sm" x="110" y="500">Abgang</text><text class="sm" x="110" y="512">Künstler</text>
+  <path class="w2" d="M70 488 V130 H160 M104 488 V164 H160"/>
+  <path class="w2" d="M70 300 q17 -14 34 0" stroke-width="2.2"/><text class="sm" x="112" y="296">Bogen</text>
+  <text class="lbl" x="87" y="400" text-anchor="middle" transform="rotate(-90 87 400)">KÜNSTLERGANG</text>
+  <g transform="translate(160 130) rotate(90)"><line class="gap" x1="0" y1="0" x2="18" y2="0"/><line class="door" x1="0" y1="0" x2="0" y2="-18"/><path class="door" d="M18 0 A18 18 0 0 0 0 -18"/></g>
+  <text class="pen" x="200" y="474" transform="rotate(-3 200 474)">direkt zur Unterbühne hinten,</text><text class="pen" x="200" y="492" transform="rotate(-3 200 492)">ohne über die Bühne – f. Artisten</text>
+  <rect class="w2" x="430" y="560" width="290" height="58" fill="#e6d5ae"/>
+  <text class="ttl" x="440" y="580">VARIETÉ MIRAGE</text><text class="sm" x="440" y="596">Umbau Bühnenhaus · Kellergeschoss · Blatt 2/5</text><text class="sm" x="440" y="610">Baupolizei Nordhafen, 1938</text>
+</svg>

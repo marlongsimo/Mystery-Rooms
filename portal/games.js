@@ -3,9 +3,11 @@
  * Ein neuer Escape Room = ein neuer Eintrag in dieser Liste.
  *
  * status:     "spielbar" | "vorschau" (spielbar, aber noch im Ausbau) | "geplant" (wird nicht angezeigt)
- * category:   "klassisch" | "crime" | "digital" (Kategorien siehe CATEGORIES in portal.js)
+ * kind:       "online" (Escape Room im Browser, Standard) | "tisch" (Krimidinner am Tisch)
+ * category:   "klassisch" | "crime" | "digital" (Filter der Escape Rooms, siehe CATEGORIES in portal.js)
  * difficulty: 1 = leicht, 2 = mittel, 3 = anspruchsvoll, 4 = schwer
- * art:        Name der Titelgrafik (siehe ART in portal.js)
+ * art:        Name der Titelgrafik (siehe portal/art.js)
+ * Nach jeder Änderung: node tools/build-site.js (Spielseiten, Vorschaubilder, sitemap.xml)
  * saveKey:    localStorage-Schlüssel des Spiels, um „Weiterspielen“ anzuzeigen
  * featured:   true = großes Hauptabenteuer auf der Startseite (genau eines)
  * tagline, puzzles, minutes, shots, poster: zusätzliche Angaben für das Hauptabenteuer
@@ -116,6 +118,7 @@ window.MR_GAMES = [
   },
   {
     id: "krimidinner-eichenfels",
+    kind: "tisch",
     title: "Der letzte Stern von Eichenfels",
     subtitle: "Krimidinner · Fall 01",
     category: "crime",
@@ -132,6 +135,7 @@ window.MR_GAMES = [
   },
   {
     id: "krimidinner-silberkamm",
+    kind: "tisch",
     title: "Der letzte Halt",
     subtitle: "Krimidinner · Fall 02",
     category: "crime",

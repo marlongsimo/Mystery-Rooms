@@ -4,9 +4,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b111c">
-  <meta name="description" content="Mystery Rooms – kostenlose digitale Escape Rooms. Direkt im Browser, ohne Anmeldung, allein oder mit bis zu vier Personen.">
-  <title>Mystery Rooms – Dein Zuhause. Dein Abenteuer.</title>
-  <link rel="stylesheet" href="portal/portal.css?v=9">
+  <meta name="description" content="Kostenlose Escape Rooms im Browser und Krimidinner für zu Hause – ohne Anmeldung, allein, gemeinsam mit bis zu vier Personen oder am Tisch mit bis zu zehn.">
+  <title>Mystery Rooms – Online Escape Rooms &amp; Krimidinner kostenlos</title>
+  <!-- SEO:START (erzeugt von tools/build-site.js) -->
+  <link rel="canonical" href="https://marlongsimo.github.io/Mystery-Rooms/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mystery Rooms">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:title" content="Mystery Rooms – Online Escape Rooms &amp; Krimidinner kostenlos">
+  <meta property="og:description" content="Kostenlose Escape Rooms im Browser und Krimidinner für zu Hause – ohne Anmeldung, allein, gemeinsam mit bis zu vier Personen oder am Tisch mit bis zu zehn.">
+  <meta property="og:url" content="https://marlongsimo.github.io/Mystery-Rooms/">
+  <meta property="og:image" content="https://marlongsimo.github.io/Mystery-Rooms/portal/og/start.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","name":"Mystery Rooms","url":"https://marlongsimo.github.io/Mystery-Rooms/","inLanguage":"de","description":"Kostenlose Escape Rooms im Browser und Krimidinner für zu Hause – ohne Anmeldung, allein, gemeinsam mit bis zu vier Personen oder am Tisch mit bis zu zehn."},{"@type":"ItemList","name":"Escape Rooms und Krimidinner","itemListElement":[{"@type":"ListItem","position":1,"url":"https://marlongsimo.github.io/Mystery-Rooms/spiele/hotel-nocturne.html","name":"Hotel Nocturne"},{"@type":"ListItem","position":2,"url":"https://marlongsimo.github.io/Mystery-Rooms/spiele/der-letzte-fall.html","name":"Der letzte Fall"},{"@type":"ListItem","position":3,"url":"https://marlongsimo.github.io/Mystery-Rooms/spiele/deadline.html","name":"DEADLINE.exe"},{"@type":"ListItem","position":4,"url":"https://marlongsimo.github.io/Mystery-Rooms/spiele/archon.html","name":"Das ARCHON-Protokoll"},{"@type":"ListItem","position":5,"url":"https://marlongsimo.github.io/Mystery-Rooms/spiele/sektor-9.html","name":"SEKTOR 9"},{"@type":"ListItem","position":6,"url":"https://marlongsimo.github.io/Mystery-Rooms/spiele/krimidinner-eichenfels.html","name":"Der letzte Stern von Eichenfels"},{"@type":"ListItem","position":7,"url":"https://marlongsimo.github.io/Mystery-Rooms/spiele/krimidinner-silberkamm.html","name":"Der letzte Halt"}]}]}</script>
+  <!-- SEO:END -->
+  <link rel="stylesheet" href="portal/portal.css?v=11">
 </head>
 <body>
   <header class="header" id="header">
@@ -15,8 +29,8 @@
       <span>MYSTERY <b>ROOMS</b></span>
     </a>
     <nav class="nav" id="nav" aria-label="Hauptnavigation">
-      <a href="#kategorien">Kategorien</a>
-      <a href="#abenteuer">Abenteuer</a>
+      <a href="#escape-rooms">Escape Rooms</a>
+      <a href="#krimidinner">Krimidinner</a>
       <a href="#so-gehts">So geht’s</a>
       <a href="ueber-uns.html">Über uns</a>
     </nav>
@@ -44,42 +58,64 @@
         <div class="fog fog-1"></div><div class="fog fog-2"></div><div class="fog fog-3"></div>
       </div>
       <div class="hero-inner">
-        <p class="kicker">MYSTERY ROOMS · DIGITALE ESCAPE ROOMS</p>
+        <p class="kicker">MYSTERY ROOMS · ESCAPE ROOMS &amp; KRIMIDINNER</p>
         <h1>Dein Zuhause. <em>Dein Abenteuer.</em></h1>
-        <p class="hero-lead">Erlebe spannende digitale Escape Rooms. Entdecke Geheimnisse, löse Rätsel und tauche in andere Welten ein.</p>
-        <div class="hero-actions">
-          <a class="btn gold big" href="#kategorien">Abenteuer entdecken <span aria-hidden="true">→</span></a>
+        <p class="hero-lead">Rätsle dich online durch verschlossene Räume oder lade zum Krimidinner ein. Kostenlos, ohne Anmeldung, direkt im Browser.</p>
+        <div class="doors">
+          <a class="door" href="#escape-rooms">
+            <span class="door-kicker">ONLINE</span>
+            <b>Escape Room spielen</b>
+            <small>Im Browser, allein oder gemeinsam auf mehreren Geräten.</small>
+            <em id="doorOnline">Escape Rooms</em>
+          </a>
+          <a class="door" href="#krimidinner">
+            <span class="door-kicker">AM TISCH</span>
+            <b>Krimidinner veranstalten</b>
+            <small>Jede Person bekommt eine Rolle per Handy oder ausgedruckt.</small>
+            <em id="doorTable">Krimidinner</em>
+          </a>
         </div>
         <ul class="usp">
-          <li>Kostenlos</li><li>Ohne Anmeldung</li><li>Direkt spielbar</li><li>Allein oder zu viert</li>
+          <li>Kostenlos</li><li>Ohne Anmeldung</li><li>Smartphone, Tablet, Computer</li><li>Keine Werbung</li>
         </ul>
       </div>
-      <a class="scroll-cue" href="#kategorien" aria-label="Weiter nach unten"><span></span></a>
+      <a class="scroll-cue" href="#escape-rooms" aria-label="Weiter nach unten"><span></span></a>
     </section>
 
-    <!-- ========== Kategorien ========== -->
-    <section class="section" id="kategorien" aria-labelledby="catTitle">
-      <div class="section-head reveal">
-        <p class="kicker">WELCHES ABENTEUER SUCHST DU?</p>
-        <h2 id="catTitle">Drei Arten zu rätseln</h2>
+    <!-- ========== Escape Rooms ========== -->
+    <section class="section" id="escape-rooms" aria-labelledby="erTitle">
+      <div class="section-head row reveal">
+        <div>
+          <p class="kicker">ONLINE · IM BROWSER</p>
+          <h2 id="erTitle">Escape Rooms</h2>
+          <p class="muted">Jede Geschichte eine eigene Herausforderung. Allein oder mit bis zu vier Personen, jede auf ihrem Gerät.</p>
+        </div>
+        <div class="filters" id="filters" role="group" aria-label="Escape Rooms filtern"></div>
       </div>
-      <div class="categories" id="kategorien-list"></div>
-    </section>
-
-    <!-- ========== Unsere Abenteuer ========== -->
-    <section class="section" id="abenteuer" aria-labelledby="gamesTitle">
-      <div class="section-head reveal">
-        <p class="kicker">UNSERE ABENTEUER</p>
-        <h2 id="gamesTitle">Jede Geschichte. Eine eigene Herausforderung.</h2>
-        <p class="muted">Alle kostenlos spielbar – auf Smartphone, Tablet und Computer.</p>
-      </div>
+      <p class="filter-note" id="filterNote" aria-live="polite"></p>
       <div class="cards cards-3" id="cards"></div>
+    </section>
+
+    <!-- ========== Krimidinner ========== -->
+    <section class="section krimi" id="krimidinner" aria-labelledby="kdTitle">
+      <div class="section-head reveal">
+        <p class="kicker">AM TISCH · FÜR EUREN ABEND</p>
+        <h2 id="kdTitle">Krimidinner</h2>
+        <p class="muted">Ein Mord, ein Tisch voller Verdächtiger, und eine Person kennt die Wahrheit. Ihr spielt Figuren mit Geheimnissen, die Beweise kommen Runde für Runde aufs Handy oder als Karte auf den Tisch.</p>
+      </div>
+      <ol class="steps steps-kd">
+        <li class="reveal"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="8" width="28" height="34" rx="2"/><path d="M16 17h16M16 24h16M16 31h10"/></svg><b>Abend anlegen</b><p>Die Spielleitung trägt die Gäste ein. Die Rollen werden zufällig verteilt, auch die Spielleitung spielt mit.</p></li>
+        <li class="reveal"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24l32-14-8 30-8-10-16-6z"/><path d="M24 30l8-20"/></svg><b>Codes verschicken</b><p>Jede Person bekommt ihren eigenen Code und liest ihre Rolle in Ruhe vorher, gern auch Wochen vor dem Abend.</p></li>
+        <li class="reveal"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15"/><path d="M24 14v10l7 5"/></svg><b>Gemeinsam ermitteln</b><p>Losungswörter öffnen Runde für Runde neue Beweise. Am Ende klagt jede Person an, dann folgt die Auflösung.</p></li>
+      </ol>
+      <div class="cases" id="cases"></div>
+      <p class="kd-facts reveal">Mit Handy oder komplett ausgedruckt · Gastgeberheft mit Ablauf und Vorlesetexten · fehlende Rollen ersetzen Aussagekarten · optional live verbunden</p>
     </section>
 
     <!-- ========== Spielprinzip ========== -->
     <section class="section" id="so-gehts" aria-labelledby="howTitle">
       <div class="section-head reveal">
-        <p class="kicker">SO GEHT’S</p>
+        <p class="kicker">SO GEHT’S · ESCAPE ROOMS</p>
         <h2 id="howTitle">In drei Schritten ins Abenteuer</h2>
       </div>
       <ol class="steps">
@@ -107,12 +143,27 @@
         <p class="kicker">FRAGEN &amp; ANTWORTEN</p>
         <h2 id="faqTitle">Häufige Fragen</h2>
       </div>
-      <details><summary>Kostet das Spielen etwas?</summary><p>Nein. Alle Abenteuer sind kostenlos und ohne Registrierung spielbar.</p></details>
-      <details><summary>Auf welchen Geräten kann ich spielen?</summary><p>Auf Smartphone, Tablet und Computer – in jedem aktuellen Browser. Auf dem Smartphone am besten quer halten. Für die beste Atmosphäre empfehlen wir Ton.</p></details>
-      <details><summary>Kann ich eine Pause machen?</summary><p>Ja. Dein Spielstand wird automatisch gespeichert. Öffne das Spiel später im selben Browser, und du machst genau dort weiter.</p></details>
-      <details><summary>Was mache ich, wenn ich nicht weiterkomme?</summary><p>In jedem Spiel gibt es Hinweise in mehreren Stufen: erst eine kleine Orientierung, dann ein konkreter Denkanstoß, zuletzt die Lösung. Du entscheidest selbst, wann du sie brauchst.</p></details>
-      <details><summary>Wie spiele ich mit anderen zusammen?</summary><p>Auf dem Titelbildschirm eines Abenteuers „Gemeinsam spielen“ wählen, eine Sitzung erstellen und den Einladungscode teilen. Bis zu vier Personen spielen dann jeweils auf ihrem eigenen Gerät – Rucksack, Akte und gelöste Rätsel sind gemeinsam.</p></details>
-      <details><summary>Was passiert mit meinen Daten?</summary><p>Keine Cookies, kein Tracking, keine Werbung. Allein gespielt bleibt dein Spielstand nur in deinem Browser. Bei gemeinsamen Sitzungen werden der gewählte Spielername und der gemeinsame Spielstand auf einem Server (Supabase) gespeichert, damit alle Geräte denselben Stand sehen. Bewertungen nach dem Spiel sind anonym. Alles Weitere steht in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p></details>
+      <div class="faq-cols">
+        <div>
+          <h3>Allgemein</h3>
+          <details><summary>Kostet das etwas?</summary><p>Nein. Alle Escape Rooms und Krimidinner sind kostenlos und ohne Registrierung spielbar.</p></details>
+          <details><summary>Auf welchen Geräten geht das?</summary><p>Auf Smartphone, Tablet und Computer – in jedem aktuellen Browser. Bei den Escape Rooms das Smartphone am besten quer halten. Für die beste Atmosphäre empfehlen wir Ton.</p></details>
+          <details><summary>Was passiert mit meinen Daten?</summary><p>Keine Cookies, kein Tracking, keine Werbung. Spielstände und Rollen bleiben in deinem Browser. Nur bei gemeinsamen Sitzungen werden der gewählte Name und der gemeinsame Spielstand auf einem Server (Supabase) gespeichert, damit alle Geräte denselben Stand sehen. Krimidinner-Rollen gehen dabei nie an den Server. Alles Weitere steht in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p></details>
+        </div>
+        <div>
+          <h3>Escape Rooms</h3>
+          <details><summary>Kann ich eine Pause machen?</summary><p>Ja. Dein Spielstand wird automatisch gespeichert. Öffne das Spiel später im selben Browser, und du machst genau dort weiter.</p></details>
+          <details><summary>Was mache ich, wenn ich nicht weiterkomme?</summary><p>In jedem Spiel gibt es Hinweise in mehreren Stufen: erst eine kleine Orientierung, dann ein konkreter Denkanstoß, zuletzt die Lösung. Du entscheidest selbst, wann du sie brauchst.</p></details>
+          <details><summary>Wie spiele ich mit anderen zusammen?</summary><p>Auf dem Titelbildschirm eines Abenteuers „Gemeinsam spielen“ wählen, eine Sitzung erstellen und den Einladungscode teilen. Bis zu vier Personen spielen dann jeweils auf ihrem eigenen Gerät – Rucksack, Akte und gelöste Rätsel sind gemeinsam.</p></details>
+        </div>
+        <div>
+          <h3>Krimidinner</h3>
+          <details><summary>Was brauchen wir für den Abend?</summary><p>Eine Person als Spielleitung, die den Abend anlegt, dazu Essen, Getränke und etwas Zeit. Kostüme sind freiwillig, jede Rolle schlägt Kleidung und ein Requisit vor. Wer ohne Handys spielen möchte, druckt Rollen, Beweiskarten und Gastgeberheft aus.</p></details>
+          <details><summary>Kann die Spielleitung mitspielen?</summary><p>Ja. Sie bekommt wie alle anderen eine zufällige Rolle, auch die Täterrolle ist möglich. Die Lösung bleibt versiegelt, bis alle angeklagt haben.</p></details>
+          <details><summary>Wie lange vorher sollen die Gäste ihre Rolle bekommen?</summary><p>Am besten ein paar Tage vorher, damit alle ihre Figur kennen. Die Codes funktionieren unbegrenzt. Was in der Tatnacht geschah, öffnet sich erst am Abend mit den Losungswörtern.</p></details>
+          <details><summary>Was, wenn wir weniger Personen sind?</summary><p>Jeder Fall nennt seine Spielerzahl. Rollen, die niemand spielt, werden zu Nebenfiguren: Ihr Wissen kommt als Aussagekarte zu den Beweisen, damit der Fall lösbar bleibt.</p></details>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -120,17 +171,18 @@
   <footer class="footer">
     <a href="#top" class="logo-text">MYSTERY <b>ROOMS</b></a>
     <p>Mit Leidenschaft entwickelt. Für alle kostenlos.</p>
+    <nav class="footer-games" aria-label="Alle Spiele">
+      <!-- SPIELE:START (erzeugt von tools/build-site.js) -->
+      <b>ESCAPE ROOMS</b><a href="spiele/hotel-nocturne.html">Hotel Nocturne</a><a href="spiele/der-letzte-fall.html">Der letzte Fall</a><a href="spiele/deadline.html">DEADLINE.exe</a><a href="spiele/archon.html">Das ARCHON-Protokoll</a><a href="spiele/sektor-9.html">SEKTOR 9</a><b>KRIMIDINNER</b><a href="spiele/krimidinner-eichenfels.html">Der letzte Stern von Eichenfels</a><a href="spiele/krimidinner-silberkamm.html">Der letzte Halt</a>
+  <!-- SPIELE:END -->
+    </nav>
     <nav class="footer-nav" aria-label="Fußzeile"><a href="ueber-uns.html">Über uns</a><a href="impressum.html#kontakt">Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
     <p class="footer-small">Keine Cookies, kein Tracking, keine Werbung.</p>
   </footer>
 
-  <dialog id="details" aria-labelledby="detailsTitle">
-    <button class="dialog-close" id="closeDetails" aria-label="Schließen">×</button>
-    <div id="detailsBody" class="details-body"></div>
-  </dialog>
-
   <script src="platform/multiplayer/mp-config.js?v=1"></script>
-  <script src="portal/games.js?v=22"></script>
-  <script src="portal/portal.js?v=15"></script>
+  <script src="portal/games.js?v=24"></script>
+  <script src="portal/art.js?v=1"></script>
+  <script src="portal/portal.js?v=16"></script>
 </body>
 </html>

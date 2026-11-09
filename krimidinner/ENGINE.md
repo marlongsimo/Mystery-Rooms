@@ -12,7 +12,7 @@ Stand: 1.0 · Grundlage: Konzept „Plattform für digitale Krimidinner“ 1.0 u
 2. **Eine Quelle für Inhalte.** Die freigegebenen Markdown-Texte sind die Quelle. Ein Werkzeug erzeugt daraus die Spieldaten. Niemand pflegt Inhalte doppelt.
 3. **Alles Fallspezifische steht in `fall.json`** oder in den Texten. Die Engine kennt keine Namen, Rollennummern, Losungswörter oder Kartennummern.
 4. **Rollen gehen nie an einen Server.**
-5. **Die Spielleitung bekommt nie eine Täterrolle** (Standard, abschaltbar je Fall).
+5. **Die Spielleitung kann jede Rolle bekommen, auch die Täterrolle** (Entscheidung November 2026). Je Fall abschaltbar mit `host.neverCulprit: true`; dann markiert sich die Spielleitung beim Anlegen.
 6. **Bestehendes bleibt gültig.** URLs, Eichenfels-Codes (6 Zeichen) und gespeicherte Spielstände funktionieren weiter.
 7. **Erste Ausbaustufe:** feste Rollen, ein vorgegebener Täter (oder eine feste Tätergruppe), lineare Runden. Wechselnde Täter, mehrere Enden oder verzweigte Runden kommen später und dürfen die erste Engine nicht verkomplizieren.
 
@@ -96,7 +96,7 @@ Eine Datei je Fall. Alles, was nicht Text ist, steht hier. Beispiel Eichenfels, 
   ],
   "cast": { "order": ["R02", "R08", "R09", "R10", "R01", "R03", "R06", "R04", "R05", "R07"] },
   "culprits": ["R08"],
-  "host": { "mayPlay": true, "neverCulprit": true },
+  "host": { "mayPlay": true, "neverCulprit": false },
   "rounds": [
     { "no": 1, "name": "Runde 1 · nach dem Fund",          "word": "KUPPEL",       "color": "#2c4a7a", "rolePart": "Runde 1" },
     { "no": 2, "name": "Runde 2 · Geheimnisse",            "word": "ORION",        "color": "#a8823e", "rolePart": "Runde 2" },
@@ -253,7 +253,7 @@ Bei einem Verstoß bricht das Werkzeug mit Datei und Zeile ab.
   - Anlegen, Verteilen, Codes (v1 und v2, falsche Codes, Code eines fremden Falls)
   - jede Rolle in beiden Varianten ohne offene Klammern
   - alle Personenzahlen von `min` bis `max`: Besetzung, Täterrolle dabei, bedingte Karten, Aussagekarten
-  - Spielleitung spielt mit und bekommt nie eine Täterrolle (z. B. 200 Verteilungen)
+  - Spielleitung spielt mit und kann jede Rolle bekommen; mit `host.neverCulprit: true` nie eine Täterrolle
   - Runden gesperrt und per Losungswort geöffnet, geführter Ablauf, Siegel, Druck
 - **Fallspezifisch** (`<fall>/tests/`): Beweiskette, besondere Karten, Live gegen die echte Datenbank.
 - **Testabende:** kleinste, mittlere und größte Besetzung. Dazu ein Protokoll nach Vorlage `krimidinner/TESTPROTOKOLL.md`: Rückfragen, Leerlauf, welcher Hinweis die Lösung brachte, Dauer je Phase.
@@ -335,7 +335,7 @@ Umgesetzt sind die Engine, Code v2, die gemeinsame Live-Kennung und beide Fälle
 | `faelle.js` | Verzeichnis der Fälle für die Meldung „Dieser Code gehört zu …“. |
 | Code v2 | wie Abschnitt 5: 2 + 6 + 1 + 5 + 5 + R + 6 + 8 Bit, bei bis zu 12 Rollen 9 Zeichen. Alte 6-Zeichen-Codes gelten weiter (`codeV1: true` nur bei Eichenfels). |
 | Live | Kennung `krimidinner` für alle Fälle, Sitzungsstand `fall`. Rückfall auf `live.legacySlug`. Einrichtung siehe `SUPABASE.md`. |
-| Spielleitung | Beim Anlegen markiert sich die Spielleitung („Das bin ich“). Sie bekommt dann nie die Täterrolle. |
+| Spielleitung | kann jede Rolle bekommen, auch die Täterrolle (`host.neverCulprit: false` in beiden Fällen). Nur bei `true` erscheint beim Anlegen „Das bin ich“, und die markierte Person bekommt keine Täterrolle. |
 
 **Abweichungen von der Spezifikation:**
 - **Speicherschlüssel** bleiben je Fall mit festem Präfix (`fall.json → store`: `kd_eich_`, `kd_silb_`) statt `kd:<fall>:*`. Gespeicherte Abende und Rollenblätter brauchen dadurch keine Übernahme.
@@ -360,6 +360,6 @@ Umgesetzt sind die Engine, Code v2, die gemeinsame Live-Kennung und beide Fälle
 | `eichenfels/tests/live.test.js` | 16, gegen die echte Datenbank |
 | `silberkamm/tests/silberkamm.test.js` | 51 |
 
-Der Silberkamm-Test prüft unter anderem: 8 Rollen, 4 Runden und Finale, `present`- und `missing`-Karte, Wagenplan statt Grundriss, Codes eines anderen Falls, 300 Verteilungen ohne Täterrolle für die Spielleitung, Live mit Sitzungsstand `fall`.
+Der Silberkamm-Test prüft unter anderem: 8 Rollen, 4 Runden und Finale, `present`- und `missing`-Karte, Wagenplan statt Grundriss, Codes eines anderen Falls, gleiche Chance auf die Täterrolle für alle (600 Verteilungen), Live mit Sitzungsstand `fall`.
 
 **Abnahme aus Abschnitt 12:** Fall 02 läuft, ohne dass `engine/` einen fallspezifischen Begriff enthält. Geprüft per Suche nach Fallnamen, Rollennummern und Losungswörtern in `engine/`.

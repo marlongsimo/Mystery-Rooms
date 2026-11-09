@@ -19,7 +19,7 @@
   ],
   "cast": { "order": ["R02", "R08", "R09", "R10", "R01", "R03", "R06", "R04", "R05", "R07"] },
   "culprits": ["R08"],
-  "host": { "mayPlay": true, "neverCulprit": true },
+  "host": { "mayPlay": true, "neverCulprit": false },
   "rounds": [
     { "no": 1, "name": "Runde 1 · nach dem Fund",         "word": "KUPPEL",       "color": "#2c4a7a", "rolePart": "Runde 1" },
     { "no": 2, "name": "Runde 2 · Geheimnisse",           "word": "ORION",        "color": "#a8823e", "rolePart": "Runde 2" },

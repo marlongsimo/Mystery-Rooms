@@ -1,8 +1,8 @@
 /*
  * Krimidinner Fall 02 „Der letzte Halt“ auf der gemeinsamen Engine – Ablauf im Browser
- * Abend für 6 Personen mit markierter Spielleitung → Codes v2 → jede Rolle öffnen (Varianten, Vorwissen, alle vier Runden) →
+ * Abend für 6 Personen (Spielleitung kann jede Rolle bekommen) → Codes v2 → jede Rolle öffnen (Varianten, Vorwissen, alle vier Runden) →
  * Zug-Plan → Losungswörter (auch LAEUTWERK) → bedingte Karten B8 (present R03) und B13 (missing R05) → Aussagekarten →
- * geführter Ablauf mit 8 Schritten → Finale B16 → Druck → Codes eines anderen Falls → Spielleitung nie Täter → Live (sektor-9).
+ * geführter Ablauf mit 8 Schritten → Finale B16 → Druck → Codes eines anderen Falls → Live (sektor-9).
  * Aufruf: python3 -m http.server 8765 &  ·  node krimidinner/silberkamm/tests/silberkamm.test.js   (LIVE=0 → ohne Datenbank)
  */
 const BASE = process.env.BASE || 'http://localhost:8765';
@@ -28,14 +28,15 @@ const LEAK = /Mord|Ermittlung|Leiche|Tatzeit|Tatwaffe|Alibi|verdächtig|Polizei|
   check((await H.$$('[data-name]')).length === 6, 'Anlegen beginnt mit 6 Personen (players.min)');
   const names = ['Anna', 'Ben', 'Cem', 'Dora', 'Emil', 'Fritzi'];
   for (let i = 0; i < 6; i++) await H.fill(`[data-name="${i}"]`, names[i]);
-  await H.click('[data-v="1|1"]'); await H.click('[data-host="0"]');
+  await H.click('[data-v="1|1"]');
+  check(!(await H.$('[data-host]')), 'Keine Markierung „Das bin ich“: Die Spielleitung kann jede Rolle bekommen');
   await H.click('[data-deal]'); await H.waitForSelector('.bigcode');
   const host = await H.evaluate(() => JSON.parse(localStorage.getItem('kd_silb_host')));
   check(host.people.length === 6 && host.people.every((p) => /^[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}$/.test(p.code)) && /^[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}$/.test(host.code), 'Sechs Codes und Spielleitungscode im Format XXX-XXX-XXX');
   const dec = await H.evaluate((h) => h.people.map((p) => KD.decode(p.code)), host);
   check(JSON.stringify(dec.map((d) => d.role).sort()) === JSON.stringify(['R01', 'R02', 'R04', 'R06', 'R07', 'R08']), 'Besetzung für 6: R01, R02, R04, R06, R07, R08');
-  check(dec[0].role !== 'R07', 'Die markierte Spielleitung (Anna) hat nicht die Täterrolle');
-  check(await H.evaluate(() => [...Array(300)].every(() => { const r = KD.assign(6, Math.floor(Math.random() * 6)); return true; }) && [...Array(300)].every(() => { const h = Math.floor(Math.random() * 6); return KD.assign(6, h)[h] !== 'R07'; })), 'Spielleitung bekommt in 300 Verteilungen nie R07');
+  const share = await H.evaluate(() => { let k = 0; for (let i = 0; i < 600; i++) if (KD.assign(6, -1)[0] === 'R07') k++; return k / 600; });
+  check(share > 0.1 && share < 0.25, `Täterrolle für jede Person gleich wahrscheinlich, auch für die Spielleitung (${Math.round(share * 100)} %, erwartet ~17 %)`);
   check(await H.evaluate(() => KD.decode('ABC-DEF') === null), 'Eichenfels-v1-Format gilt hier nicht');
 
   // Codes über Fallgrenzen

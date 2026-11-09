@@ -90,7 +90,7 @@
   ],
   "host": {
     "mayPlay": true,
-    "neverCulprit": true
+    "neverCulprit": false
   },
   "rounds": [
     {

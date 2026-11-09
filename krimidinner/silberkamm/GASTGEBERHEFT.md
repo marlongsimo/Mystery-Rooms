@@ -13,7 +13,7 @@ Du bist Erzählstimme, Zeitwächter und Beweisausgabe:
 - Du gibst die Beweise frei.
 - Du achtest darauf, dass der Abend im Fluss bleibt.
 
-Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Die Täterrolle bekommst du als Spielleitung nie.
+Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Wer welche Rolle hat, siehst du nicht. Auch die Täterrolle kann dich treffen; das erfährst du erst, wenn du dein Blatt öffnest. Teil B mit der Lösung öffnest du trotzdem erst nach den Anklagen.
 
 ## A2 · Vorbereitung (eine Woche bis zwei Tage vorher)
 

@@ -173,13 +173,13 @@
   if (draft.hostIdx === undefined) draft.hostIdx = -1;
   const saveDraft = () => store.set(SK("draft"), draft);
   function viewAnlegen() {
-    const n = draft.people.length, hostRule = !F.host || F.host.neverCulprit !== false;
+    const n = draft.people.length, hostRule = Boolean(F.host && F.host.neverCulprit);
     app.innerHTML = `<p class="eyebrow">Spielleitung · Schritt 1</p><h1>Gäste eintragen</h1>
       <p>Trag alle ein, die mitspielen – <b>auch dich selbst, wenn du mitspielst</b>. Wähle für jede Person die Rollenvariante: wie die Figur dargestellt wird, weiblich oder männlich. Jede Person darf frei wählen.</p>
       <div class="people">${draft.people.map((p, i) => `<div class="person"><input type="text" data-name="${i}" value="${esc(p.name)}" placeholder="Name ${i + 1}" maxlength="30" autocomplete="off">
         <span class="seg"><button type="button" data-v="${i}|0" class="${p.m ? "" : "on"}">weiblich</button><button type="button" data-v="${i}|1" class="${p.m ? "on" : ""}">männlich</button></span>
         <button type="button" class="x" data-del="${i}" aria-label="Entfernen" ${n <= MIN ? "disabled" : ""}>×</button>
-        <label class="ishost small"><input type="checkbox" data-host="${i}" ${draft.hostIdx === i ? "checked" : ""}> Das bin ich (Spielleitung)</label></div>`).join("")}</div>
+        ${hostRule ? `<label class="ishost small"><input type="checkbox" data-host="${i}" ${draft.hostIdx === i ? "checked" : ""}> Das bin ich (Spielleitung)</label>` : ""}</div>`).join("")}</div>
       <div class="row"><button class="btn ghost small" data-add ${n >= MAX ? "disabled" : ""}>+ Person hinzufügen (${n}/${MAX})</button></div>
       <p class="note">Es spielen ${n} Personen. Besetzt werden die ${n} Rollen für diese Gruppengröße${n < IDS.length ? ", die übrigen sind Nebenfiguren, deren Wissen über die Beweise kommt" : ""}.${hostRule ? " Spielst du selbst mit, markiere dich: Die Spielleitung bekommt nie die Täterrolle." : ""}</p>
       <div class="row"><button class="btn" data-deal>Rollen verteilen</button><a class="btn ghost" href="#start">Abbrechen</a></div><p class="fb" id="fb"></p>`;
@@ -194,7 +194,7 @@
   function assign(n, hostIdx) {
     const roles = cast(n).slice();
     for (let i = roles.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [roles[i], roles[j]] = [roles[j], roles[i]]; }
-    const never = !F.host || F.host.neverCulprit !== false;
+    const never = Boolean(F.host && F.host.neverCulprit); // je Fall: true → Spielleitung nie Täter; Standard: alle Rollen möglich
     if (never && hostIdx >= 0 && F.culprits.includes(roles[hostIdx])) {
       const ok = roles.map((r, k) => k).filter((k) => k !== hostIdx && !F.culprits.includes(roles[k]));
       if (ok.length) { const k = ok[Math.floor(Math.random() * ok.length)]; [roles[hostIdx], roles[k]] = [roles[k], roles[hostIdx]]; }
@@ -204,7 +204,7 @@
   function deal() {
     const ppl = draft.people.map((p) => ({ ...p, name: p.name.trim() }));
     if (ppl.some((p) => !p.name)) { $("#fb").textContent = "Bitte bei allen Personen einen Namen eintragen."; return; }
-    const n = ppl.length, roles = assign(n, draft.hostIdx);
+    const n = ppl.length, roles = assign(n, F.host && F.host.neverCulprit ? draft.hostIdx : -1);
     let variants = 0;
     IDS.forEach((id, i) => { if (!roles.includes(id) && Math.random() < 0.5) variants |= 1 << i; }); // Nebenfiguren zufällig
     ppl.forEach((p, k) => { if (p.m) variants |= 1 << IDS.indexOf(roles[k]); });

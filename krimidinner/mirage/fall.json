@@ -1,0 +1,71 @@
+{
+  "id": "mirage",
+  "nr": 3,
+  "title": "Die letzte Illusion",
+  "players": { "min": 6, "max": 10 },
+  "store": "kd_mira_",
+  "roles": [
+    { "id": "R01", "file": "rollen/R01-vey.md",    "names": ["Elara Vey", "Elian Vey"] },
+    { "id": "R02", "file": "rollen/R02-rohn.md",   "names": ["Nele Rohn", "Niko Rohn"] },
+    { "id": "R03", "file": "rollen/R03-zorn.md",   "names": ["Mirelle Zorn", "Marius Zorn"] },
+    { "id": "R04", "file": "rollen/R04-senn.md",   "names": ["Klara Senn", "Klemens Senn"] },
+    { "id": "R05", "file": "rollen/R05-dorne.md",  "names": ["Rafaela Dorne", "Rafael Dorne"] },
+    { "id": "R06", "file": "rollen/R06-velten.md", "names": ["Valeria Velten", "Valerian Velten"] },
+    { "id": "R07", "file": "rollen/R07-malven.md", "names": ["Talia Malven", "Tarek Malven"] },
+    { "id": "R08", "file": "rollen/R08-kest.md",   "names": ["Noemi Kest", "Nestor Kest"] },
+    { "id": "R09", "file": "rollen/R09-thier.md",  "names": ["Alma Thier", "Arne Thier"] },
+    { "id": "R10", "file": "rollen/R10-quell.md",  "names": ["Berta Quell", "Bastian Quell"] }
+  ],
+  "cast": { "order": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10"] },
+  "culprits": ["R06"],
+  "host": { "mayPlay": true, "neverCulprit": false },
+  "rounds": [
+    { "no": 1, "name": "Runde 1 · Der Mann hinter dem Spiegel", "word": "VORHANG",  "color": "#8e2430", "rolePart": "Runde 1" },
+    { "no": 2, "name": "Runde 1 · Kulisse",                    "word": "KULISSE",  "color": "#a8823e" },
+    { "no": 3, "name": "Runde 2 · Was 1949 geschah",           "word": "KLAPPE",   "color": "#2f5a46", "rolePart": "Runde 2" },
+    { "no": 4, "name": "Runde 3 · Die Stimme aus dem Nichts",  "word": "TONBAND",  "color": "#2c4a7a", "rolePart": "Runde 3" },
+    { "no": 5, "name": "Runde 4 · Der alte Weg",               "word": "VEILCHEN", "color": "#6b4b8a", "rolePart": "Runde 4" },
+    { "no": 6, "name": "Finale · nach der Anklage",            "word": "APPLAUS",  "color": "#c9a24a", "final": true }
+  ],
+  "cards": {
+    "B4":  { "print": "sheet" },
+    "B5":  { "print": "dense" },
+    "B9":  { "when": { "present": ["R07"] } },
+    "B10": { "when": { "missing": ["R07"] } },
+    "B14": { "print": "dense" },
+    "B17": { "when": { "present": ["R09"] } },
+    "B18": { "when": { "missing": ["R09"] } }
+  },
+  "steps": [
+    { "key": "vorb",  "title": "Vorbereitung",                         "sections": ["A1", "A2", "A3", "A4"] },
+    { "key": "start", "title": "Start · Regeln vorlesen",              "sections": ["A5"], "mins": 5 },
+    { "key": "p1",    "title": "Phase 1 · Die letzte Vorstellung",     "sections": ["Phase 1"], "phase": 1, "mins": 15 },
+    { "key": "p2",    "title": "Phase 2 · Der Mann hinter dem Spiegel", "sections": ["Phase 2"], "phase": 2, "round": 1, "mins": 20 },
+    { "key": "p2b",   "title": "Kulisse · Das Haus und der Abend",     "sections": ["Kulisse"], "round": 2, "mins": 15, "label": "P2b" },
+    { "key": "p3",    "title": "Phase 3 · Was 1949 geschah",           "sections": ["Phase 3"], "phase": 3, "round": 3, "mins": 40 },
+    { "key": "p4",    "title": "Phase 4 · Die Stimme aus dem Nichts",  "sections": ["Phase 4"], "phase": 4, "round": 4, "mins": 35 },
+    { "key": "p5",    "title": "Phase 5 · Der alte Weg",               "sections": ["Phase 5"], "phase": 5, "round": 5, "mins": 25 },
+    { "key": "fin",   "title": "Finale · Anklage und Auflösung",       "sections": ["Finale"], "phase": 6, "round": 6, "mins": 25, "accusation": true }
+  ],
+  "npc": { "phaseToRound": { "2": 1, "3": 3, "4": 4, "5": 5 } },
+  "house": {
+    "tab": "Theater",
+    "head": "DAS THEATER",
+    "title": "Das Palais Mirage",
+    "svg": "assets/theaterplan.svg",
+    "intro": "Ein Varieté von 1929 im alten Hafenviertel von Nordhafen: Foyer mit Garderobe und Salon, Zuschauerraum mit zwei Logen, die Bühne mit dem fest eingebauten Spiegelkabinett, darunter die Unterbühne mit dem Gegengewichtsschacht.",
+    "note": "Wer welche Wege durch das Haus kennt, erfahrt ihr im Lauf der Nacht."
+  },
+  "texts": {
+    "brand": "MIRAGE",
+    "cardHeader": "PALAIS MIRAGE",
+    "eyebrow": "Krimidinner · Fall 03",
+    "teaser": "November 1958, die letzte Vorstellung in einem Varieté am Hafen. Der Impresario will nach dem Vorhang eine Wahrheit enthüllen und liegt danach hinter dem Spiegelkabinett. Dabei hat er doch um 21:58 noch aus der Loge gegrüßt.",
+    "accusation": "Wer hat Aurel Varn getötet?",
+    "inviteText": "{name}, hier ist dein Rollenblatt für „{title}“. Bitte nur selbst öffnen: {link} (Code {code})"
+  },
+  "rulesSections": ["Die fünf Regeln", "Der Ablauf", "Die Anklage", "Tipps für einen guten Abend"],
+  "theme": { "bg": "#120c10", "accent": "#c9a24a" },
+  "live": { "slug": "krimidinner", "maxDevices": 11 },
+  "leakCheck": ["Mord", "Ermittlung", "Leiche", "Tatzeit", "Tatwaffe", "Alibi", "verdächtig", "Polizei", "tot "]
+}

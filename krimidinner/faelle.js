@@ -3,4 +3,5 @@
 window.KD_FAELLE = [
   { id: "eichenfels", nr: 1, title: "Der letzte Stern von Eichenfels", path: "eichenfels/index.html" },
   { id: "silberkamm", nr: 2, title: "Der letzte Halt", path: "silberkamm/index.html" },
+  { id: "mirage", nr: 3, title: "Die letzte Illusion", path: "mirage/index.html" },
 ];

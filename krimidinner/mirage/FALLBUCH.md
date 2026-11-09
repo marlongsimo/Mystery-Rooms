@@ -462,4 +462,9 @@ Die Rollenhefte R01–R10 liegen unter `rollen/`, aufgebaut wie bei Eichenfels u
 - **Runde 4:** dritte Linie, das Treffen.
 - **Finale:** Das Geständnis enthält auch die eigene Schuld von 1949.
 
-**Was als Nächstes fehlt:** BEWEISKARTEN.md, GASTGEBERHEFT.md (mit den Aussagekarten für R07–R10), ANLEITUNG.md, `fall.json`, `theaterplan.svg`. Ein Probetisch steht aus.
+**Stand 1.0 (spielbar in der App):**
+- BEWEISKARTEN.md: B1–B19. Die a/b-Fassungen des Fallbuchs sind eigene Karten, die Zuordnung steht oben in der Datei.
+- GASTGEBERHEFT.md mit 11 Aussagekarten für R07–R10, ANLEITUNG.md, `fall.json`, `assets/theaterplan.svg`.
+- `tests/mirage.test.js` mit 51 Prüfungen.
+
+Ein Probetisch steht aus.

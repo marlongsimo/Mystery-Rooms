@@ -363,3 +363,8 @@ Umgesetzt sind die Engine, Code v2, die gemeinsame Live-Kennung und beide Fälle
 Der Silberkamm-Test prüft unter anderem: 8 Rollen, 4 Runden und Finale, `present`- und `missing`-Karte, Wagenplan statt Grundriss, Codes eines anderen Falls, gleiche Chance auf die Täterrolle für alle (600 Verteilungen), Live mit Sitzungsstand `fall`.
 
 **Abnahme aus Abschnitt 12:** Fall 02 läuft, ohne dass `engine/` einen fallspezifischen Begriff enthält. Geprüft per Suche nach Fallnamen, Rollennummern und Losungswörtern in `engine/`.
+
+**Nachtrag Fall 03 (Mirage):**
+- **Freigabe ohne Rollenteil:** `rounds[]` ohne `rolePart` funktioniert auch mitten im Ablauf. KULISSE öffnet nur Karten. Die Rollenteile Runde 2–4 hängen an den Engine-Runden 3–5.
+- **Neues Feld `steps[].label`:** setzt die Kurzbeschriftung im Ablauf, etwa „P2b“.
+- **Pflege von `engine/`:** bleibt fallneutral.

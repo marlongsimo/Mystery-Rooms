@@ -338,7 +338,7 @@
   /* Spielleitung: geführter Ablauf Schritt für Schritt (Schritte aus fall.json) */
   const filterNpcTable = (root, c) => $$("table", root).forEach((t) => { const th = $("thead th", t); if (th && th.textContent.trim() === "Nebenfigur") $$("tbody tr", t).forEach((tr) => { if (c.includes(tr.children[0].textContent.trim())) tr.remove(); }); });
   const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
-  const stepLabel = (s, k) => (k === 0 ? "Vorb." : s.key === "start" ? "Start" : k === STEPS.length - 1 ? "Finale" : "P" + (s.phase || k - 1));
+  const stepLabel = (s, k) => (s.label ? s.label : k === 0 ? "Vorb." : s.key === "start" ? "Start" : k === STEPS.length - 1 ? "Finale" : "P" + (s.phase || k - 1));
   let htab = "ablauf", timerTick = null;
   function viewLeitung() {
     clearInterval(timerTick);

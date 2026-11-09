@@ -43,6 +43,16 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 
 *Die Brillenkette ist wichtig: Sie ist eine Spur. Trag sie trotzdem, wer die Täterrolle hat, darf sich nicht durch fehlende Requisiten verraten. Jede Kette tut es, auch eine selbst gebastelte.*
 
+## Vertraulich · Dein Spickzettel
+
+> **Deine Geschichte in einem Satz:** „Wegen des Unwetters wollte ich in der Restaurierung nach den Leihgaben sehen – dann fiel der Strom aus, und ich habe unten vor der verriegelten Tür gewartet.“
+>
+> **Drei gefährliche Punkte:** ① wer zwischen 21:15 und 21:22 unten war (die Küche) · ② das schwere Bündel um 21:22 und das Klirren · ③ „21:15 R. – Liste mitbringen!“ im Kalender
+>
+> **Notantwort:** „Faber und Falk klirren auch. Und R. – heißt Ritter nicht auch so?“
+>
+> **Zweite Linie, wenn nichts mehr hält:** den Verkauf der Blätter zugeben, den Mord nie (siehe unten).
+
 ## Vertraulich · Dein Geheimnis — STRENG VERTRAULICH
 
 **Du hast Professor Theodor Sander getötet.**
@@ -61,6 +71,14 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 - Auf das „R.“: Ritter heißt auch so, und „J. R.“ steht auf der Archivliste, weil du die Inventur abzeichnest, das ist dein Beruf.
 - Lenk auf Faber: Wer den Strom abschaltet, will im Dunkeln etwas tun.
 - Lenk auf Marwitz: allein in der Kuppel, bis 21:26 im Westflügel, und das stärkste Motiv im Haus.
+
+**Zweite Linie – das Kleinere zugeben, um das Größere zu retten.** Nimm sie erst, wenn deine Geschichte wirklich nicht mehr hält: frühestens in Phase 3 und erst, wenn dich mindestens zwei Personen direkt beschuldigen. Dann erzählst du:
+
+„Also gut. Ja – ich habe die acht Blätter gegen Kopien getauscht und an Falk verkauft. Sander hatte mich für Viertel nach neun in den Kartenraum bestellt, ich war schon kurz nach neun da. Er hat mir gedroht, mit der Polizei, mit allem. Nach ein paar Minuten bin ich gegangen. **Da hat er noch gelebt.** Ich habe mich auf die Treppe gesetzt, im Dunkeln, ich konnte nicht mehr. Das Paket um zwanzig nach? Die Mappe mit den Kopien, die er mir hingeworfen hat. Ich wollte sie in die Restaurierung bringen, bevor sie jemand findet.“
+
+- Ab jetzt gilt: **Den Verkauf gibst du zu, den Mord nie.** Bleib bis zum Finale dabei.
+- Falk gerät dadurch mit in den Verdacht. Das ist gewollt, denn jetzt muss die Gruppe zwischen euch beiden entscheiden.
+- **Wo die zweite Linie verwundbar ist:** Eine Mappe trägt man nicht „schwer, wie ein Kind“. Der Sockel der Armillarsphäre und das Samttuch fehlen. Und Seebach weiß, dass der Täter Handschuhe getragen haben muss, und Hollerbach weiß, dass du immer welche bei dir hast. Hoffe, dass niemand das zusammenbringt.
 
 ## Vertraulich · Deine Ziele
 
@@ -100,11 +118,11 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 - Ritter heißt mit Nachnamen auf R., genau wie du. Und hat dieselben Initialen: J. R.
 - {R01: Leonie / Leon} Sander erbt, oder erbte.
 
-- **Phase 3 (Kalender und Archivliste):** Gefährlich. Das „R.“ und das „J. R.“ passen auch auf Ritter, nutze das, aber greif Ritter nicht zu offen an. Zur Archivliste: „Die Inventarnummern habe ich auf Anweisung geändert, als die Originale zur Restaurierung gingen. Das ist ein normaler Vorgang.“
+- **Phase 3 (Kalender und Archivliste):** Gefährlich. Das „R.“ und das „J. R.“ passen auch auf Ritter, nutze das, aber greif Ritter nicht zu offen an. Zur Archivliste: „Die Inventarnummern habe ich auf Anweisung geändert, als die Originale zur Restaurierung gingen. Das ist ein normaler Vorgang.“ Kippt es jetzt schon gegen dich, denk an die **zweite Linie** (Teil „Vertraulich“).
 - **Wen du ansprechen solltest:** Faber, um ihn wegen des Stromausfalls nervös zu machen. Marwitz, um {R02: sie / ihn} über den Streit reden zu lassen.
 - **Was du vermeiden solltest:** die Restaurierung zu erwähnen, bevor es jemand anderes tut. Mit Falk auffällig zu tuscheln.
 
 ## Runde 3 · Die letzte Ermittlung
 
-- **Phase 4 (Protokoll, Küche):** Das Protokoll stützt deine Geschichte, bleib ruhig. Gefährlich ist die Küche: Jemand hat um 21:22 eine Person mit einem schweren Bündel gesehen, und es klirrte. Erinnere daran, dass mehrere Menschen hier klirren, und dass „im Dunkeln“ niemand genau hinsieht.
-- **Finale:** Bleib bei deiner Geschichte, bis die Anklagen abgegeben sind. Danach legst du dein Blatt offen.
+- **Phase 4 (Protokoll, Küche):** Das Protokoll stützt deine Geschichte, bleib ruhig. Gefährlich ist die Küche: Jemand hat um 21:22 eine Person mit einem schweren Bündel gesehen, und es klirrte. Erinnere daran, dass mehrere Menschen hier klirren, und dass „im Dunkeln“ niemand genau hinsieht. Hält deine Geschichte nicht mehr: **zweite Linie** – Verkauf zugeben, Mord nie.
+- **Finale:** Bleib bei deiner Geschichte (oder bei der zweiten Linie), bis die Anklagen abgegeben sind. Danach legst du dein Blatt offen.

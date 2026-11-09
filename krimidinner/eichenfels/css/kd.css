@@ -172,3 +172,6 @@ input.code { text-transform: uppercase; letter-spacing: .25em; font: 600 22px va
 .ecard.npc-card h4 { font-style: italic; text-transform: none; letter-spacing: 0; }
 .ecard.npc-card .body p { font: 16px/1.5 Georgia, serif; }
 .npc details { margin-top: 8px; } .npc summary { cursor: pointer; color: var(--brass); }
+
+/* Spickzettel der Täterrolle (erstes Zitat im vertraulichen Teil) */
+.doc.secret h2 + blockquote { border-left-color: #9e2b25; background: #f6e3dc; font-family: var(--sans); font-size: 15px; }

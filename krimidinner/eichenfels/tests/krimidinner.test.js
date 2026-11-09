@@ -77,6 +77,9 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
   // Täterrolle kennt die Tat von Anfang an
   const R8 = by.R08.P; await R8.click('[data-tab="p2"]');
   check(/Du hast Professor Theodor Sander getötet/.test(await R8.textContent('.doc')) && /Was heute Abend geschieht/.test(await R8.textContent('.doc')), 'R08: Tat und Ablauf schon im Teil „Vertraulich“');
+  const r8v = await R8.textContent('.doc');
+  check(r8v.indexOf('Spickzettel') >= 0 && r8v.indexOf('Spickzettel') < r8v.indexOf('Du hast Professor'), 'R08: Spickzettel ganz vorn im vertraulichen Teil');
+  check(/Zweite Linie/.test(r8v) && /Den Verkauf gibst du zu, den Mord nie/.test(r8v), 'R08: zweite Verteidigungslinie vorhanden');
   // Beweise
   await A.click('[data-tab="bew"]');
   check(JSON.stringify((await cardIds(A)).filter((x) => /^B/.test(x))) === JSON.stringify(['B1', 'B2', 'B3', 'B4']), 'Nach KUPPEL: Beweise B1–B4');

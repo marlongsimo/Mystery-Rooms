@@ -196,6 +196,8 @@ Für die Nachbesprechung. Zwei Schritte genügen, der dritte macht es endgültig
 
 **Das Motiv:** acht Originalblätter, gegen Faksimiles getauscht und für 180 000 € an Falk verkauft. Dazu die geänderte Versicherungsliste (Ritter), der Sitzplan „R. neben F.“ (Hollerbach) und die SMS um 21:29 (Falk).
 
+**Falls die Täterrolle die „zweite Linie“ genommen hat** (Verkauf zugegeben, Mord bestritten): Was sie widerlegt, ist das Gewicht des Bündels (B11: „schwer, wie ein Kind“ – keine Mappe), der fehlende Sockel samt Samttuch (B1), die Handschuhe (Seebach, Hollerbach) und am Ende die Kiste (B13).
+
 ## B-4 · Die übrigen Geheimnisse (zum Nachlesen)
 
 | Rolle | Geheimnis |

@@ -2,7 +2,7 @@
 
 **Interaktives Krimidinner für 4–10 Personen · 120–150 Minuten · Fall 01 der Reihe „Krimidinner“**
 
-Stand: 0.9 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
+Stand: 0.10 · Grundlage freigegeben (Namen, Regel 2, Ton, Rollenblatt-Standards) · überarbeitet nach zwei Prüfungen (Schließanlage, Beweiskette, Klirren, Zeitrahmen, Pflichtrequisiten, B3 vollständig) · Grundlage: Konzept „Der letzte Stern von Eichenfels“
 **Enthält die vollständige Lösung. Nicht an Mitspielende weitergeben.**
 
 ---
@@ -101,6 +101,8 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 **Rademachers Geschichte (die Lüge):** „Wegen des Unwetters wollte ich nach den Leihgaben in der Restaurierung sehen, Feuchtigkeit ist Gift für Papier. Um 21:03 bin ich aus dem Archiv, um 21:05 in den Westflügel. Kurz bevor ich an der Restaurierung war, fiel der Strom aus, die Tür war verriegelt. Ich habe im Dunkeln davor gewartet, unten im Erdgeschoss. Als der Strom zurück war, habe ich die Temperatur geprüft und bin um halb zehn zurück ins Archiv.“
 
 Diese Geschichte **passt zum Zutrittsprotokoll**. Das Protokoll zeigt nur, dass Rademacher zur Tatzeit im Westflügel war, genau wie Marwitz, Faber und Lindner. **Gelogen ist der Ort:** Rademacher stand nicht unten vor der Restaurierung, sondern oben im Kartenraum. **Verschwiegen ist das Bündel:** Dass {R08: sie / er} um 21:22 etwas getragen hat, erwähnt {R08: sie / er} nicht. Das ist nach Regel 1 noch keine Lüge. Wird {R08: sie / er} direkt danach gefragt, muss {R08: sie / er} lügen. Widerlegt wird die Geschichte erst durch die Kombination aus Kalender, Aufnahme, Beobachtung der Küche und Kartenlogik (Abschnitt 6).
+
+**Zweite Linie der Täterrolle (ab 0.10):** Hält die Geschichte nicht mehr (frühestens Phase 3, bei mindestens zwei direkten Beschuldigungen), gibt Rademacher den Verkauf der Blätter und das Treffen im Kartenraum zu, behauptet aber, Sander habe beim Gehen noch gelebt, und das Bündel um 21:22 sei die Mappe mit den Kopien gewesen. Widerlegt wird das durch B11 (schwer, „wie ein Kind“), B1 (Sockel und Samttuch fehlen), Seebach/B8 (Handschuhe) und Hollerbach (Rademacher hat immer Handschuhe bei sich), endgültig durch B13. Das Rollenblatt R08 beginnt im vertraulichen Teil mit einem **Spickzettel** (Geschichte in einem Satz, drei gefährliche Punkte, Notantwort, zweite Linie).
 
 ---
 

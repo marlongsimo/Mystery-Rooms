@@ -95,7 +95,9 @@ function gamePage(g) {
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(desc)}">
 ${seoHead({ title, desc, url, image, type: "article", jsonld })}
+  <link rel="icon" href="../portal/img/favicon-192.png" sizes="192x192" type="image/png">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../portal/img/apple-touch-icon.png">
   <link rel="stylesheet" href="../portal/portal.css?v=${CSS_V}">
 </head>
 <body>
@@ -247,7 +249,9 @@ function topicPage(s) {
   <title>${esc(s.title)}</title>
   <meta name="description" content="${esc(s.desc)}">
 ${seoHead({ title: s.title, desc: s.desc, url, image: SITE_URL + "portal/og/start.png", jsonld })}
+  <link rel="icon" href="portal/img/favicon-192.png" sizes="192x192" type="image/png">
   <link rel="icon" href="portal/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="portal/img/apple-touch-icon.png">
   <link rel="stylesheet" href="portal/portal.css?v=${CSS_V}">
 </head>
 <body>

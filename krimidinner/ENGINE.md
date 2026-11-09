@@ -297,3 +297,26 @@ Gelingt das, ohne `engine/` anzufassen, ist die Architektur bestätigt.
 | Spielleitung nie Täter | Standard ja, je Fall abschaltbar |
 | Gestaltung je Fall | gemeinsames Layout, je Fall nur Farben, Schriften, Kopfzeile, Bilder |
 | Startseite | eigene Kategorie „Krimidinner“ ab Fall 02 |
+
+---
+
+## Nachtrag: Erweiterungen aus Fall 02 (Silberkamm)
+
+Diese Felder nutzt `silberkamm/fall.json` zusätzlich. Die Engine muss sie bei der Migration verstehen.
+
+| Feld | Bedeutung |
+|---|---|
+| `rounds[].alt` | weitere Schreibweisen des Losungsworts, zum Beispiel `LAEUTWERK` für `LÄUTWERK`. Vergleich ohne Groß- und Kleinschreibung. |
+| `house.tab` | Name des Reiters für das Orientierungsblatt („Haus“ in Eichenfels, „Zug“ in Silberkamm). Standard ist „Haus“. |
+| `cards.*.when.present` | wird erstmals genutzt (B8 nur mit R03). Mit B13 (`missing: R05`) sind beide Bedingungsarten im Einsatz. |
+| `rounds` mit 4 Runden und Finale | Rollenblätter haben Runde 1–4. Die Spielleitung hat 6 Phasen. |
+
+**Prüfwerkzeug:** `tools/check_case.py <Ordner>` prüft einen Fall schon jetzt gegen die Norm aus Abschnitt 6, ohne etwas zu erzeugen. Es prüft:
+- Besetzung und Täterrolle bei der Mindestzahl
+- Rollenteile und Varianten
+- Lecks vor Runde 1
+- Kartennummern und Bedingungen, Kartenzahl je Besetzung
+- Abschnitte des Gastgeberhefts, Aussagekarten
+- Regelabschnitte und Asset
+
+Später geht es in `build_case.py` auf.

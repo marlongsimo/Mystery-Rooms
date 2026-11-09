@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 486" class="plan-svg" role="img" aria-label="Wagenplan des Silberkamm-Express: Schlafwagen, Salonwagen und Speisewagen mit Abteilen und Seitengang">
+  <style>
+    .wall { fill: #fbf6ea; stroke: #3b3122; stroke-width: 2.2; }
+    .room { fill: #f3ead6; stroke: #6b5a3e; stroke-width: 1.2; }
+    .key  { fill: #ead9b4; stroke: #6b5a3e; stroke-width: 1.2; }
+    .hall { fill: #e7dcc2; stroke: #6b5a3e; stroke-width: 1; }
+    .t { font: 600 13px "DM Sans", Arial, sans-serif; fill: #231e14; }
+    .s { font: 11px "DM Sans", Arial, sans-serif; fill: #4a3f2c; }
+    .wing { font: 700 12px "DM Mono", monospace; letter-spacing: .14em; fill: #7a6233; }
+    .floor { font: 11px "DM Mono", monospace; fill: #7a6233; }
+    .bell { fill: #9e2b25; stroke: #fff; stroke-width: 1; }
+    .heat { fill: #2c4a7a; stroke: #fff; stroke-width: 1; }
+    .walk { fill: none; stroke: #9e2b25; stroke-width: 1.6; stroke-dasharray: 5 4; }
+  </style>
+  <text class="wing" x="76" y="38">WAGEN 1 · SCHLAFWAGEN</text>
+  <rect class="wall" x="20" y="46" width="600" height="98" rx="6"/>
+  <rect class="key" x="20" y="46" width="120" height="72"/>
+  <text class="t" x="80.0" y="76" text-anchor="middle">Dienstabteil</text>
+  <text class="s" x="80.0" y="94" text-anchor="middle">Zugbegleitung</text>
+  <rect class="room" x="140" y="46" width="120" height="72"/>
+  <text class="t" x="200.0" y="76" text-anchor="middle">Abteil 1</text>
+  <text class="s" x="200.0" y="94" text-anchor="middle">Hagen</text>
+  <rect class="room" x="260" y="46" width="120" height="72"/>
+  <text class="t" x="320.0" y="76" text-anchor="middle">Abteil 2</text>
+  <text class="s" x="320.0" y="94" text-anchor="middle">Sattler</text>
+  <rect class="room" x="380" y="46" width="120" height="72"/>
+  <text class="t" x="440.0" y="76" text-anchor="middle">Abteil 3</text>
+  <text class="s" x="440.0" y="94" text-anchor="middle">Reiter</text>
+  <rect class="room" x="500" y="46" width="120" height="72"/>
+  <text class="t" x="560.0" y="76" text-anchor="middle">Abteil 4</text>
+  <text class="s" x="560.0" y="94" text-anchor="middle">Bell</text>
+  <rect class="hall" x="20" y="118" width="600" height="26"/>
+  <text class="floor" x="320.0" y="135" text-anchor="middle">Seitengang</text>
+  <text class="wing" x="20" y="188">WAGEN 2 · SALONWAGEN</text>
+  <rect class="wall" x="20" y="196" width="600" height="98" rx="6"/>
+  <rect class="room" x="20" y="196" width="180" height="72"/>
+  <text class="t" x="110.0" y="226" text-anchor="middle">Salon 6</text>
+  <text class="s" x="110.0" y="244" text-anchor="middle">v. Auen</text>
+  <rect class="room" x="200" y="196" width="120" height="72"/>
+  <text class="t" x="260.0" y="226" text-anchor="middle">Abteil 7</text>
+  <text class="s" x="260.0" y="244" text-anchor="middle">Lorenz</text>
+  <rect class="room" x="320" y="196" width="120" height="72"/>
+  <text class="t" x="380.0" y="226" text-anchor="middle">Abteil 8</text>
+  <text class="s" x="380.0" y="244" text-anchor="middle">Steinach</text>
+  <rect class="key" x="440" y="196" width="180" height="72"/>
+  <text class="t" x="530.0" y="226" text-anchor="middle">Steward-Dienstabteil</text>
+  <text class="s" x="530.0" y="244" text-anchor="middle">Speisewagen-Dienst</text>
+  <rect class="hall" x="20" y="268" width="600" height="26"/>
+  <text class="floor" x="320.0" y="285" text-anchor="middle">Seitengang</text>
+  <text class="wing" x="20" y="338">WAGEN 3 · SPEISEWAGEN</text>
+  <rect class="wall" x="20" y="346" width="600" height="98" rx="6"/>
+  <rect class="room" x="20" y="346" width="600" height="98" rx="6"/>
+  <text class="t" x="90" y="398" text-anchor="middle">Bar</text>
+  <rect class="hall" x="178" y="358" width="44" height="26" rx="3"/>
+  <rect class="hall" x="178" y="394" width="44" height="26" rx="3"/>
+  <rect class="hall" x="248" y="358" width="44" height="26" rx="3"/>
+  <rect class="hall" x="248" y="394" width="44" height="26" rx="3"/>
+  <rect class="hall" x="318" y="358" width="44" height="26" rx="3"/>
+  <rect class="hall" x="318" y="394" width="44" height="26" rx="3"/>
+  <rect class="hall" x="388" y="358" width="44" height="26" rx="3"/>
+  <rect class="hall" x="388" y="394" width="44" height="26" rx="3"/>
+  <text class="s" x="305" y="436" text-anchor="middle">Tische</text>
+  <rect class="key" x="520" y="372" width="70" height="44" rx="4"/>
+  <text class="t" x="555" y="399" text-anchor="middle">Klavier</text>
+  <text class="floor" x="20" y="38">◄ LOK</text>
+  <path class="walk" d="M614 131.0 C 634 161.0, 634 162, 320.0 166 S 6 176, 26 281.0"/>
+  <path class="walk" d="M614 281.0 C 634 311.0, 634 312, 320.0 316 S 6 326, 26 406"/>
+  <circle class="bell" cx="610" cy="208" r="6"/>
+  <rect class="heat" x="185" y="254" width="9" height="9"/>
+  <rect class="heat" x="305" y="254" width="9" height="9"/>
+  <rect class="heat" x="425" y="254" width="9" height="9"/>
+  <circle class="bell" cx="26" cy="466" r="6"/><text class="s" x="38" y="470">Läutwerk-Tafel (Abteile 6–8)</text>
+  <rect class="heat" x="216" y="461" width="9" height="9"/><text class="s" x="232" y="470">Heizregler, nur mit Vierkant</text>
+  <line class="walk" x1="412" y1="466" x2="440" y2="466"/><text class="s" x="446" y="470">Weg durch den Zug</text>
+</svg>

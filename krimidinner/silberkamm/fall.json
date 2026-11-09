@@ -1,0 +1,62 @@
+{
+  "id": "silberkamm",
+  "nr": 2,
+  "title": "Der letzte Halt",
+  "players": { "min": 6, "max": 8 },
+  "roles": [
+    { "id": "R01", "file": "rollen/R01-aerztin.md",        "names": ["Dr. Helena Hagen", "Dr. Heinrich Hagen"] },
+    { "id": "R02", "file": "rollen/R02-zugbegleitung.md",  "names": ["Emilie Hartmann", "Emil Hartmann"] },
+    { "id": "R03", "file": "rollen/R03-klavier.md",        "names": ["Lili Bell", "Leo Bell"] },
+    { "id": "R04", "file": "rollen/R04-ingenieur.md",      "names": ["Viktoria Sattler", "Viktor Sattler"] },
+    { "id": "R05", "file": "rollen/R05-presse.md",         "names": ["Margot Lorenz", "Moritz Lorenz"] },
+    { "id": "R06", "file": "rollen/R06-steinach.md",       "names": ["Baronin Charlotte von Steinach", "Baron Ludwig von Steinach"] },
+    { "id": "R07", "file": "rollen/R07-steward.md",        "names": ["Pauline Brandl", "Paul Brandl"] },
+    { "id": "R08", "file": "rollen/R08-handel.md",         "names": ["Henriette Reiter", "Jakob Reiter"] }
+  ],
+  "cast": { "order": ["R07", "R01", "R02", "R04", "R06", "R08", "R05", "R03"] },
+  "culprits": ["R07"],
+  "host": { "mayPlay": true, "neverCulprit": true },
+  "rounds": [
+    { "no": 1, "name": "Runde 1 · Der Tote im Abteil",           "word": "SALON",     "color": "#2f5a46", "rolePart": "Runde 1" },
+    { "no": 2, "name": "Runde 2 · Die Vergangenheit kehrt zurück", "word": "SIGNAL",    "color": "#a8823e", "rolePart": "Runde 2" },
+    { "no": 3, "name": "Runde 3 · Die falsche Zeit",             "word": "LÄUTWERK",  "alt": ["LAEUTWERK", "LAUTWERK"], "color": "#9e2b25", "rolePart": "Runde 3" },
+    { "no": 4, "name": "Runde 4 · Die Wahrheit",                 "word": "KILOMETER", "color": "#2c4a7a", "rolePart": "Runde 4" },
+    { "no": 5, "name": "Finale · nach der Anklage",              "word": "SCHNEE",    "color": "#c9ced6", "final": true }
+  ],
+  "cards": {
+    "B3":  { "print": "dense" },
+    "B8":  { "when": { "present": ["R03"] } },
+    "B10": { "print": "dense" },
+    "B12": { "print": "dense" },
+    "B13": { "when": { "missing": ["R05"] } }
+  },
+  "steps": [
+    { "key": "vorb",  "title": "Vorbereitung",                         "sections": ["A1", "A2", "A3", "A4"] },
+    { "key": "start", "title": "Start · Regeln vorlesen",              "sections": ["A5"], "mins": 5 },
+    { "key": "p1",    "title": "Phase 1 · Abfahrt",                    "sections": ["Phase 1"], "phase": 1, "mins": 15 },
+    { "key": "p2",    "title": "Phase 2 · Der Tote im Abteil",         "sections": ["Phase 2"], "phase": 2, "round": 1, "mins": 35 },
+    { "key": "p3",    "title": "Phase 3 · Die Vergangenheit kehrt zurück", "sections": ["Phase 3"], "phase": 3, "round": 2, "mins": 40 },
+    { "key": "p4",    "title": "Phase 4 · Die falsche Zeit",           "sections": ["Phase 4"], "phase": 4, "round": 3, "mins": 40 },
+    { "key": "p5",    "title": "Phase 5 · Die Wahrheit",               "sections": ["Phase 5"], "phase": 5, "round": 4, "mins": 30 },
+    { "key": "fin",   "title": "Finale · Anklage und Auflösung",       "sections": ["Finale"], "phase": 6, "round": 5, "mins": 25, "accusation": true }
+  ],
+  "npc": { "phaseToRound": { "2": 1, "3": 2, "4": 3, "5": 4 } },
+  "house": {
+    "tab": "Zug",
+    "svg": "assets/wagenplan.svg",
+    "intro": "Der Silberkamm-Express, Wien–Zürich, drei Wagen: Schlafwagen, Salonwagen, Speisewagen. Wer von Wagen 1 in den Speisewagen will, geht durch den Seitengang von Wagen 2 – an Salon 6 vorbei.",
+    "note": "Das Läutwerk der Abteile 6–8 klingelt im Steward-Dienstabteil. Heizregler und Dienstabteile öffnet nur das Zugpersonal mit dem Vierkantschlüssel."
+  },
+  "texts": {
+    "brand": "SILBERKAMM",
+    "cardHeader": "SILBERKAMM-EXPRESS",
+    "eyebrow": "Krimidinner · Fall 02",
+    "teaser": "Februar 1929, ein Nachtzug von Wien nach Zürich bleibt im Schnee stecken. Im Salonabteil liegt ein toter Fabrikant – und die Uhr zeigt eine Zeit, zu der fast alle ein Alibi haben.",
+    "accusation": "Wer hat Konstantin von Auen getötet?",
+    "inviteText": "{name}, hier ist dein Rollenblatt für „{title}“. Bitte nur selbst öffnen: {link} (Code {code})"
+  },
+  "rulesSections": ["Die fünf Regeln", "Der Ablauf", "Die Anklage", "Tipps für einen guten Abend"],
+  "theme": { "bg": "#0f1214", "accent": "#c9ced6" },
+  "live": { "maxDevices": 9 },
+  "leakCheck": ["Mord", "Ermittlung", "Leiche", "Tatzeit", "Tatwaffe", "Alibi", "verdächtig", "Polizei", "tot "]
+}

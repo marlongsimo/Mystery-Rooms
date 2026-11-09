@@ -31,12 +31,17 @@ const OPEN = /\[[^\]]* \/ [^\]]*\]|\{R\d\d:/;
   await H.click('[data-deal]'); await H.waitForSelector('.bigcode');
   check(await H.isVisible('.bigcode'), 'Rollen verteilt, Spielleitungscode sichtbar');
   const host = await H.evaluate(() => JSON.parse(localStorage.getItem('kd_eich_host')));
-  check(host.people.length === 5 && host.people.every((p) => /^[0-9A-Z]{3}-[0-9A-Z]{3}$/.test(p.code)), 'Fünf Codes im Format XXX-XXX');
+  check(host.people.length === 5 && host.people.every((p) => /^[0-9A-Z]{3}-[0-9A-Z]{3}-[0-9A-Z]{3}$/.test(p.code)), 'Fünf Codes im Format XXX-XXX-XXX (Code v2)');
   check(!(await H.textContent('main')).match(/R0\d|R10|Rademacher|Marwitz/), 'Die Spielleitung sieht keine Rollen, nur Codes');
   const decoded = await H.evaluate((h) => h.people.map((p) => KD.decode(p.code)), host);
   check(JSON.stringify(decoded.map((d) => d.role).sort()) === JSON.stringify(['R01', 'R02', 'R08', 'R09', 'R10']), 'Besetzung für 5: R01, R02, R08, R09, R10');
   check(decoded.every((d) => d.variants === decoded[0].variants && d.n === 5), 'Alle Codes tragen dieselben Varianten und n = 5');
-  check(await H.evaluate(() => KD.decode('ABC-DEF') === null && KD.decode('') === null), 'Falsche Codes werden abgelehnt');
+  check(await H.evaluate(() => KD.decode('ABC-DEF') === null && KD.decode('') === null && KD.decode('ABC-DEF-GHJ') === null), 'Falsche Codes werden abgelehnt');
+  // alte 6-Zeichen-Codes (v1) gelten weiter
+  const v1 = await H.evaluate(() => { const c = KD.encodeV1({ host: false, role: 7, n: 5, variants: 1 << 7 }); const d = KD.decode(c); return { c, d }; });
+  check(/^[0-9A-Z]{3}-[0-9A-Z]{3}$/.test(v1.c) && v1.d && v1.d.role === 'R08' && v1.d.n === 5 && v1.d.v === 1 && (v1.d.variants & (1 << 7)), 'Alter 6-Zeichen-Code (v1) öffnet weiter dieselbe Rolle');
+  check(await H.evaluate(() => [...Array(200)].every(() => { const v = Math.floor(Math.random() * 1024), n = 4 + Math.floor(Math.random() * 7), r = KD.cast(n)[Math.floor(Math.random() * n)], i = ['R01','R02','R03','R04','R05','R06','R07','R08','R09','R10'].indexOf(r); const d = KD.decode(KD.encode({ host: false, role: i, n, variants: v })); return d && d.role === r && d.n === n && d.variants === v && d.v === 2; })), 'Code v2: 200 zufällige Codes hin und zurück');
+  check(await H.evaluate(() => { const c = KD.encode({ host: false, role: 1, n: 5, variants: 0 }).replace(/-/g, ''); let bad = 0; for (let i = 0; i < c.length; i++) for (const ch of '0123456789ABCDEFGHJKMNPQRSTVWXYZ') { if (ch === c[i]) continue; const d = KD.decode(c.slice(0, i) + ch + c.slice(i + 1)); if (d && !d.other) bad++; } return bad < 4; }), 'Code v2: Tippfehler in einem Zeichen werden (fast) immer erkannt');
 
   // Jede Person öffnet ihr Rollenblatt
   const by = {};

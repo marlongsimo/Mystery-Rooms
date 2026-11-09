@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 """
-Erzeugt js/content.js aus den freigegebenen Texten (einzige Quelle):
-  rollen/R01-…R10-*.md  → Rollenblätter, je vier Seiten
-  BEWEISKARTEN.md       → Karten B1–B14 mit Runde
-  GASTGEBERHEFT.md      → Teil A (offen) und Teil B (Lösung)
-  ANLEITUNG.md          → Anleitung für alle
-Geheimes (Rollenblätter, Karten, Teil B) wird leicht verschleiert, damit es nicht im Klartext im Quelltext steht.
-Aufruf (im Ordner krimidinner/eichenfels):  python3 tools/build_content.py
+Krimidinner-Engine: erzeugt <fall>/js/content.js aus den freigegebenen Texten (einzige Quelle) und fall.json.
+  rollen/*.md       → Rollenblätter (Charakter, Kleidung, Vertraulich, je Runde ein Teil laut fall.json)
+  BEWEISKARTEN.md   → Karten mit Runde
+  GASTGEBERHEFT.md  → Teil A (offen) und Teil B (Lösung, verschleiert)
+  ANLEITUNG.md      → Anleitung für alle, Regeln fürs Rollenblatt (fall.json → rulesSections)
+Vorher prüft tools/check_case.py den Fall; bei einem Fehler wird nichts geschrieben.
+Geheimes wird leicht verschleiert, damit es nicht im Klartext im Quelltext steht.
+Aufruf:  python3 krimidinner/engine/build_case.py krimidinner/eichenfels
 """
-import base64, glob, html, json, os, re
+import base64, glob, html, json, os, re, sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KEY = b"Eichenfels-1901-Sternwarte"
+ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
+import check_case  # noqa: E402
+if check_case.main(ROOT):
+    sys.exit("Abbruch: der Fall erfüllt die Norm nicht (siehe oben).")
+FALL = json.load(open(os.path.join(ROOT, "fall.json"), encoding="utf-8"))
+KEY_STR = "kd:" + FALL["id"] + ":veil"
+KEY = KEY_STR.encode()
 
 
 def inline(t):
@@ -114,44 +121,48 @@ def split_on(src, pattern):
 
 
 # ---------- Rollenblätter ----------
+PARTS = ["Charakter", "Kleidung", "Vertraulich"] + [r["rolePart"] for r in FALL["rounds"] if r.get("rolePart")]
+part_re = "|".join(re.escape(p) for p in PARTS)
 roles = {}
-for path in sorted(glob.glob(os.path.join(ROOT, "rollen", "R*.md"))):
-    rid = os.path.basename(path)[:3]
-    src = read(os.path.relpath(path, ROOT))
+for r in FALL["roles"]:
+    rid = r["id"]
+    src = read(r["file"])
     lines = src.split("\n")
     title = re.sub(r"^#\s*Rollenblatt\s+R\d\d\s*·\s*", "", lines[0]).strip()
     body = "\n".join(l for l in lines[1:] if not l.startswith("*Schreibweise"))
-    PARTS = ["Charakter", "Kleidung", "Vertraulich", "Runde 1", "Runde 2", "Runde 3"]
     pages = {}
-    for chunk in re.split(r"(?=^## (?:Charakter|Kleidung|Vertraulich|Runde \d) · )", body, flags=re.M):
-        m = re.match(r"^## (Charakter|Kleidung|Vertraulich|Runde \d) · (.*)", chunk)
+    for chunk in re.split(r"(?=^## (?:" + part_re + r") · )", body, flags=re.M):
+        m = re.match(r"^## (" + part_re + r") · (.*)", chunk)
         if not m: continue
         rest = chunk.split("\n", 1)[1] if "\n" in chunk else ""
         pages.setdefault(m.group(1), []).append(f"## {m.group(2)}\n{rest}")
     assert sorted(pages) == sorted(PARTS), (rid, sorted(pages))
-    roles[rid] = {"title": title, "pages": [veil(md("\n".join(pages[k]).replace("\n---\n", "\n"))) for k in PARTS], "culprit": "TÄTERROLLE" in lines[0]}
+    roles[rid] = {"title": title, "pages": [veil(md("\n".join(pages[k]).replace("\n---\n", "\n"))) for k in PARTS], "culprit": rid in FALL["culprits"]}
 
 # ---------- Beweiskarten ----------
+FINAL_NO = max(r["no"] for r in FALL["rounds"])
+house_svg = read(FALL["house"]["svg"]) if FALL.get("house", {}).get("svg") else ""
 cards, rnd = {}, None
 src = read("BEWEISKARTEN.md")
 for chunk in re.split(r"(?=^## |^### B\d)", src, flags=re.M):
     if chunk.startswith("## Runde"):
-        rnd = int(re.match(r"## Runde (\d)", chunk).group(1)); continue
+        rnd = int(re.match(r"## Runde (\d+)", chunk).group(1)); continue
     if chunk.startswith("## Finale"):
-        rnd = 4; continue
+        rnd = FINAL_NO; continue
+    if chunk.startswith("## "):
+        rnd = None; continue
     m = re.match(r"^### (B\d+) · (\S+) (.*)", chunk)
     if not m: continue
     cid = m.group(1)
+    assert rnd, f"{cid} liegt in keiner Runde"
     body = chunk.split("\n", 1)[1].strip()
     body = re.sub(r"\n---\s*$", "", body).strip()
     foot = re.findall(r"^\*Freigabe:.*\*$", body, flags=re.M)
     body = re.sub(r"^\*Freigabe:.*\*$", "", body, flags=re.M).strip()
     html_body = md(body)
-    if cid == "B3":  # Grundriss als Zeichnung statt Textplan
-        svg = read("assets/grundriss.svg")
-        html_body = re.sub(r'<pre class="plan">.*?</pre>', '<p class="plan-hint">↔ Plan zum Verschieben wischen</p><div class="plan-wrap">' + svg + '</div>', html_body, count=1, flags=re.S)
+    if FALL.get("cards", {}).get(cid, {}).get("print") == "sheet" and house_svg:  # Plan als Zeichnung statt Textplan
+        html_body = re.sub(r'<pre class="plan">.*?</pre>', '<p class="plan-hint">↔ Plan zum Verschieben wischen</p><div class="plan-wrap">' + house_svg + '</div>', html_body, count=1, flags=re.S)
     cards[cid] = {"round": rnd, "icon": m.group(2), "title": m.group(3).strip(), "html": veil(html_body), "foot": foot[0].strip("*") if foot else ""}
-assert len(cards) == 14, sorted(cards)
 
 # ---------- Gastgeberheft, Anleitung ----------
 gh = read("GASTGEBERHEFT.md")
@@ -166,26 +177,25 @@ for chunk in re.split(r"(?=^## )", a_src, flags=re.M):
     if not m: continue
     key = m.group(1).split(" · ")[0].strip()  # „A1“ … „Phase 1“ … „Finale“
     sections[key] = {"title": m.group(1).strip(), "html": md(chunk.split("\n", 1)[1])}
-# Wissen der Nebenfiguren (A8) und Impulse (A7) als Daten
+# Wissen der Nebenfiguren (Tabelle | Rolle | Phase | Zum Vorlesen |) und Impulse („Wenn es stockt“) als Daten
 npc = []
-a8 = a_src.split("## A8", 1)[1].split("\n## ", 1)[0]
-for row in re.findall(r"^\| (R\d\d) \| (\d) \| (.+) \|$", a8, flags=re.M):
+for row in re.findall(r"^\| (R\d\d) \| (\d) \| (.+) \|$", a_src, flags=re.M):
     npc.append({"role": row[0], "phase": int(row[1]), "html": veil(inline(row[2]))})
 impulses = {}
-a7 = a_src.split("## A7", 1)[1].split("\n## ", 1)[0]
-for m in re.finditer(r"^- \*\*(Phase \d|Immer):\*\* (.+)$", a7, flags=re.M):
+for m in re.finditer(r"^- \*\*(Phase \d|Immer):\*\* (.+)$", a_src, flags=re.M):
     impulses[m.group(1)] = inline(m.group(2))
 host_b = veil(md("# Teil B" + b_part))
 guide_src = read("ANLEITUNG.md").split("\n", 1)[1]
 guide = md(guide_src)
-# Für das Rollenblatt nur, was am Abend gilt: Regeln, Ablauf, Anklage, Tipps (ohne Klappentext und Vorbereitung)
-RULE_PARTS = ("Die fünf Regeln", "Der Ablauf", "Die Anklage", "Tipps für einen guten Abend")
-rules = md("\n".join(c for c in re.split(r"(?=^## )", guide_src, flags=re.M) if c[3:].startswith(RULE_PARTS)))
+# Für das Rollenblatt nur, was am Abend gilt (fall.json → rulesSections)
+RULE_PARTS = tuple(FALL.get("rulesSections", []))
+rules = md("\n".join(c for c in re.split(r"(?=^## )", guide_src, flags=re.M) if c[3:].startswith(RULE_PARTS))) if RULE_PARTS else guide
 
-plan = read("assets/grundriss.svg")  # Grundriss für alle (Orientierung, ohne Schließregeln – die stehen auf B3)
-data = {"plan": plan, "roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide, "rules": rules, "sections": sections, "npc": npc, "impulses": impulses}
-out = "/* Erzeugt von tools/build_content.py aus den .md-Dateien – nicht von Hand bearbeiten. */\nwindow.KD_CONTENT = " + json.dumps(data, ensure_ascii=False) + ";\n"
+emblem = read("assets/emblem.svg") if os.path.exists(os.path.join(ROOT, "assets", "emblem.svg")) else ""
+fall_pub = {k: v for k, v in FALL.items() if k not in ("leakCheck",)}
+data = {"fall": fall_pub, "key": KEY_STR, "plan": house_svg, "emblem": emblem, "roles": roles, "cards": cards, "hostA": host_a, "hostB": host_b, "guide": guide, "rules": rules, "sections": sections, "npc": npc, "impulses": impulses}
+out = "/* Erzeugt von krimidinner/engine/build_case.py aus den .md-Dateien und fall.json – nicht von Hand bearbeiten. */\nwindow.KD_CONTENT = " + json.dumps(data, ensure_ascii=False) + ";\n"
 os.makedirs(os.path.join(ROOT, "js"), exist_ok=True)
 with open(os.path.join(ROOT, "js", "content.js"), "w", encoding="utf-8") as f:
     f.write(out)
-print("ok", len(roles), "Rollen,", len(cards), "Karten,", len(out) // 1024, "KB")
+print("ok", FALL["id"], len(roles), "Rollen,", len(cards), "Karten,", len(npc), "Aussagen,", len(out) // 1024, "KB")

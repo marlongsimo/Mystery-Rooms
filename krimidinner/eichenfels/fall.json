@@ -1,0 +1,66 @@
+{
+  "id": "eichenfels",
+  "nr": 1,
+  "title": "Der letzte Stern von Eichenfels",
+  "players": { "min": 4, "max": 10 },
+  "store": "kd_eich_",
+  "codeV1": true,
+  "roles": [
+    { "id": "R01", "file": "rollen/R01-familie.md",       "names": ["Leonie Sander", "Leon Sander"] },
+    { "id": "R02", "file": "rollen/R02-forschung.md",     "names": ["Dr. Irene Marwitz", "Dr. Ingo Marwitz"] },
+    { "id": "R03", "file": "rollen/R03-kanzlei.md",       "names": ["Johanna Ritter", "Johannes Ritter"] },
+    { "id": "R04", "file": "rollen/R04-presse.md",        "names": ["Clara Lindner", "Carl Lindner"] },
+    { "id": "R05", "file": "rollen/R05-veranstaltung.md", "names": ["Tessa Hollerbach", "Tom Hollerbach"] },
+    { "id": "R06", "file": "rollen/R06-kueche.md",        "names": ["Mina Yilmaz", "Emre Yilmaz"] },
+    { "id": "R07", "file": "rollen/R07-arzt.md",          "names": ["Dr. Nina Seebach", "Dr. Nils Seebach"] },
+    { "id": "R08", "file": "rollen/R08-archiv.md",        "names": ["Dr. Judith Rademacher", "Dr. Julius Rademacher"] },
+    { "id": "R09", "file": "rollen/R09-technik.md",       "names": ["Paula Faber", "Pascal Faber"] },
+    { "id": "R10", "file": "rollen/R10-sammler.md",       "names": ["Eva Falk", "Egon Falk"] }
+  ],
+  "cast": { "order": ["R02", "R08", "R09", "R10", "R01", "R03", "R06", "R04", "R05", "R07"] },
+  "culprits": ["R08"],
+  "host": { "mayPlay": true, "neverCulprit": true },
+  "rounds": [
+    { "no": 1, "name": "Runde 1 · nach dem Fund",         "word": "KUPPEL",       "color": "#2c4a7a", "rolePart": "Runde 1" },
+    { "no": 2, "name": "Runde 2 · Geheimnisse",           "word": "ORION",        "color": "#a8823e", "rolePart": "Runde 2" },
+    { "no": 3, "name": "Runde 3 · die letzte Ermittlung", "word": "NEBEL",        "color": "#9e2b25", "rolePart": "Runde 3" },
+    { "no": 4, "name": "Finale · nach der Anklage",       "word": "MORGENGRAUEN", "color": "#d5ad62", "final": true }
+  ],
+  "cards": {
+    "B3":  { "print": "sheet" },
+    "B8":  { "when": { "missing": ["R07"] } },
+    "B9":  { "print": "dense" },
+    "B11": { "print": "dense" },
+    "B12": { "when": { "missing": ["R04"] }, "extraWord": "FUNK", "extraHint": "Hat Lindner die Aufnahme noch nicht vorgelegt? Dann zusätzlich:" }
+  },
+  "steps": [
+    { "key": "vorb",  "title": "Vorbereitung",                       "sections": ["A1", "A2", "A3", "A4"] },
+    { "key": "start", "title": "Start · Regeln vorlesen",            "sections": ["A5"], "mins": 5 },
+    { "key": "p1",    "title": "Phase 1 · Der Empfang",              "sections": ["Phase 1"], "phase": 1, "mins": 20 },
+    { "key": "p2",    "title": "Phase 2 · Der Mord",                 "sections": ["Phase 2"], "phase": 2, "round": 1, "mins": 20 },
+    { "key": "p3",    "title": "Phase 3 · Geheimnisse und Intrigen", "sections": ["Phase 3"], "phase": 3, "round": 2, "mins": 30 },
+    { "key": "p4",    "title": "Phase 4 · Die letzte Ermittlung",    "sections": ["Phase 4"], "phase": 4, "round": 3, "mins": 25 },
+    { "key": "fin",   "title": "Finale · Anklage und Auflösung",     "sections": ["Finale"], "phase": 5, "round": 4, "mins": 25, "accusation": true }
+  ],
+  "npc": { "phaseToRound": { "2": 1, "3": 2, "4": 3 } },
+  "house": {
+    "tab": "Haus",
+    "head": "DAS HAUS",
+    "title": "Die Sternwarte Eichenfels",
+    "svg": "assets/grundriss.svg",
+    "intro": "Ein Herrenhaus von 1901 mit Kuppel, heute Sitz der Stiftung. Drei Flügel: im Westen Kartenraum, Restaurierung und die Treppe zur Kuppel, in der Mitte Festsaal, Salon, Küche und Bibliothek, im Osten Archiv und Gästezimmer. Die roten Quadrate sind Türen mit Kartenleser.",
+    "note": "Wer welche Tür öffnen kann und was bei einem Stromausfall geschieht, erfahrt ihr im Lauf des Abends."
+  },
+  "texts": {
+    "brand": "EICHENFELS",
+    "cardHeader": "STERNWARTE EICHENFELS",
+    "eyebrow": "Krimidinner · Fall 01",
+    "teaser": "Ein Galadinner in einer Sternwarte im Thüringer Wald. Ein Professor kündigt für 22 Uhr die Wahrheit an – und erlebt es nicht mehr.",
+    "accusation": "Wer hat Theodor Sander getötet?",
+    "inviteText": "{name}, hier ist dein Rollenblatt für „{title}“. Bitte nur selbst öffnen: {link} (Code {code})"
+  },
+  "rulesSections": ["Die fünf Regeln", "Der Ablauf", "Die Anklage", "Tipps für einen guten Abend"],
+  "theme": { "bg": "#0d1018", "accent": "#d5ad62" },
+  "live": { "slug": "krimidinner", "legacySlug": "krimidinner-eichenfels", "maxDevices": 11 },
+  "leakCheck": ["Mord", "Ermittlung", "Kalender steht", "Leiche", "Tatzeit", "Tatwaffe", "Alibi"]
+}

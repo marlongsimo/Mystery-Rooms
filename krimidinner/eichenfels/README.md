@@ -13,8 +13,8 @@ Krimidinner für 4–10 Personen am Tisch, mit einer Spielleitung, die mitspiele
 | `BEWEISKARTEN.md` | B1–B14 mit Gestaltung und Freigabe |
 | `GASTGEBERHEFT.md` | Teil A offen, Teil B versiegelt (Lösung) |
 | `ANLEITUNG.md` | für alle, ohne Lösung |
-| `index.html`, `css/kd.css`, `js/app.js` | die Anwendung |
-| `js/content.js` | **erzeugt** aus den .md-Dateien: `python3 tools/build_content.py` (nach jeder Textänderung ausführen) |
+| `index.html`, `fall.json` | Seite und Fallkonfiguration; die Anwendung selbst ist die gemeinsame Engine unter `../engine/` |
+| `js/content.js` | **erzeugt** aus den .md-Dateien und `fall.json`: `python3 krimidinner/engine/build_case.py krimidinner/eichenfels` (nach jeder Textänderung ausführen) |
 | `tests/krimidinner.test.js` | Ablauf im Browser |
 | `assets/grundriss.svg` | Grundriss für B3 (wird beim Erzeugen in die Karte eingesetzt, im Druck als eigenes Blatt) |
 

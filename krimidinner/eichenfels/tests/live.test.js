@@ -2,7 +2,8 @@
  * Krimidinner Eichenfels – Live-Verbindung gegen die echte Datenbank (zwei Browserprofile)
  * Spielleitung eröffnet eine Live-Sitzung → Gast verbindet sich vom Rollenblatt aus → Spielleitung öffnet Runde 1 →
  * beim Gast öffnet sich Runde 1 von selbst → Anklage digital → Spielleitung sieht sie, nach der Lösung mit ✓ → Ende.
- * Solange „krimidinner-eichenfels“ nicht in game_catalog steht, läuft der Test über LIVE_SLUG (Standard: sektor-9).
+ * Der Hauptteil läuft über LIVE_SLUG (Standard: sektor-9), unabhängig von den Katalogeinträgen. Der erste Teil prüft
+ * ohne Test-Kennung: erst „krimidinner“, dann die alte Kennung „krimidinner-eichenfels“, sonst eine Meldung.
  * Aufruf: python3 -m http.server 8765 &  ·  node krimidinner/eichenfels/tests/live.test.js
  */
 const BASE = process.env.BASE || 'http://localhost:8765';
@@ -23,8 +24,9 @@ const { chromium } = require('playwright');
   await X.goto(BASE + '/krimidinner/eichenfels/index.html#leitung'); await X.waitForSelector('#liveStart');
   await X.click('#liveStart'); await until(X, () => !document.querySelector('#liveStart') || document.querySelector('#liveStart').disabled === false && document.querySelector('.live .fb'));
   const msg = await X.evaluate(() => (document.querySelector('.live .fb') || {}).textContent || (document.querySelector('.live.on') ? 'verbunden' : ''));
-  console.log('    ohne game_catalog-Eintrag:', msg);
-  check(msg && msg !== 'verbunden', 'Ohne Katalogeintrag: Meldung statt Fehler, Losungswörter bleiben');
+  const used = await X.evaluate(() => (KD.live() && KD.live().session ? KD.live().session.game_slug : ''));
+  console.log('    ohne Test-Kennung:', msg, used ? '(Kennung ' + used + ')' : '');
+  check(msg === 'verbunden' ? ['krimidinner', 'krimidinner-eichenfels'].includes(used) : /noch nicht freigeschaltet/.test(msg), 'Ohne Test-Kennung: gemeinsame Kennung „krimidinner“, sonst die alte, sonst eine Meldung statt Fehler');
   if (msg === 'verbunden') await X.click('#liveEnd');
 
   // Spielleitung
@@ -51,7 +53,7 @@ const { chromium } = require('playwright');
   check(await until(G, () => !/🔒/.test(document.querySelector('[data-tab="p3"]').textContent), null, 30000), 'Gast: Runde 1 öffnet sich von selbst (ohne Losungswort)');
   check(await G.evaluate(() => (document.querySelector('#toast') || {}).textContent || '').then((t) => /Runde 1 ist offen/.test(t)), 'Gast: Meldung „Runde 1 ist offen …“');
   await G.click('[data-tab="bew"]');
-  check((await G.$$('.ecard')).length === 4, 'Gast: Beweise B1–B4 da');
+  check((await G.$$('.ecard:not(.npc-card)')).length === 4, 'Gast: Beweise B1–B4 da');
 
   // Anklage
   await H.evaluate(() => { const h = JSON.parse(localStorage.getItem('kd_eich_host')); h.step = 6; localStorage.setItem('kd_eich_host', JSON.stringify(h)); }); await H.reload(); await H.waitForSelector('#accOpen');

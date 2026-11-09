@@ -320,3 +320,46 @@ Diese Felder nutzt `silberkamm/fall.json` zusätzlich. Die Engine muss sie bei d
 - Regelabschnitte und Asset
 
 Später geht es in `build_case.py` auf.
+
+---
+
+## Umsetzungsstand (Engine 1.0)
+
+Umgesetzt sind die Engine, Code v2, die gemeinsame Live-Kennung und beide Fälle.
+
+| Teil | Stand |
+|---|---|
+| `engine/kd.js` | gemeinsame App für alle Fälle. Enthält keinen Fallnamen, keine Rolle und kein Losungswort. Die Aufteilung in fünf Module (Abschnitt 7) ist vorerst eine Datei. |
+| `engine/kd.css` | gemeinsame Gestaltung. Farben kommen aus `fall.json → theme` und `rounds[].color`. |
+| `engine/build_case.py <fall>` | erzeugt `<fall>/js/content.js`. Vorher läuft `tools/check_case.py`, bei einem Fehler wird nichts geschrieben. |
+| `faelle.js` | Verzeichnis der Fälle für die Meldung „Dieser Code gehört zu …“. |
+| Code v2 | wie Abschnitt 5: 2 + 6 + 1 + 5 + 5 + R + 6 + 8 Bit, bei bis zu 12 Rollen 9 Zeichen. Alte 6-Zeichen-Codes gelten weiter (`codeV1: true` nur bei Eichenfels). |
+| Live | Kennung `krimidinner` für alle Fälle, Sitzungsstand `fall`. Rückfall auf `live.legacySlug`. Einrichtung siehe `SUPABASE.md`. |
+| Spielleitung | Beim Anlegen markiert sich die Spielleitung („Das bin ich“). Sie bekommt dann nie die Täterrolle. |
+
+**Abweichungen von der Spezifikation:**
+- **Speicherschlüssel** bleiben je Fall mit festem Präfix (`fall.json → store`: `kd_eich_`, `kd_silb_`) statt `kd:<fall>:*`. Gespeicherte Abende und Rollenblätter brauchen dadurch keine Übernahme.
+- **Neue Felder in `fall.json`:**
+
+  | Feld | Bedeutung |
+  |---|---|
+  | `store` | Präfix der Speicherschlüssel |
+  | `codeV1` | alte 6-Zeichen-Codes zulassen |
+  | `cards.*.extraHint` | Hinweistext für die Spielleitung zum Zusatzwort |
+  | `house.head` | Kopfzeile des Orientierungsblatts |
+  | `house.title` | Überschrift des Orientierungsblatts |
+  | `steps[].accusation` | in diesem Schritt werden die Anklagen gesammelt |
+  | `live.slug`, `live.legacySlug` | Live-Kennung und alte Kennung als Rückfall |
+  | `assets/emblem.svg` | optionales Zeichen auf der Startseite |
+
+**Tests:**
+
+| Test | Prüfungen |
+|---|---|
+| `eichenfels/tests/krimidinner.test.js` | 70, darunter v1-Code, 200 v2-Codes hin und zurück, Tippfehler |
+| `eichenfels/tests/live.test.js` | 16, gegen die echte Datenbank |
+| `silberkamm/tests/silberkamm.test.js` | 51 |
+
+Der Silberkamm-Test prüft unter anderem: 8 Rollen, 4 Runden und Finale, `present`- und `missing`-Karte, Wagenplan statt Grundriss, Codes eines anderen Falls, 300 Verteilungen ohne Täterrolle für die Spielleitung, Live mit Sitzungsstand `fall`.
+
+**Abnahme aus Abschnitt 12:** Fall 02 läuft, ohne dass `engine/` einen fallspezifischen Begriff enthält. Geprüft per Suche nach Fallnamen, Rollennummern und Losungswörtern in `engine/`.

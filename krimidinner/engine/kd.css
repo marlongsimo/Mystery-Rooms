@@ -1,4 +1,4 @@
-/* Der letzte Stern von Eichenfels – Krimidinner */
+/* Krimidinner-Engine – gemeinsame Gestaltung. Fälle setzen Farben über fall.json (theme, rounds[].color). */
 :root {
   --bg: #0d1018; --panel: #151a26; --line: #2b3244; --text: #e9e3d4; --muted: #a2a6b3;
   --brass: #d5ad62; --night: #2c4a7a; --messing: #a8823e; --siegel: #9e2b25; --gold: #d5ad62;
@@ -32,6 +32,8 @@ input[type=text] { width: 100%; padding: 12px; border-radius: 10px; border: 1px 
 input.code { text-transform: uppercase; letter-spacing: .25em; font: 600 22px var(--mono); text-align: center; }
 .people { display: grid; gap: 8px; margin: 14px 0; }
 .person { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; }
+.person .ishost { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; color: var(--muted); margin: -2px 0 6px; }
+.person .ishost input { width: 18px; height: 18px; accent-color: var(--brass); }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .seg button { padding: 10px 12px; border: 0; background: none; color: var(--muted); font: 14px var(--sans); cursor: pointer; }
 .seg button.on { background: #2a3146; color: var(--text); }

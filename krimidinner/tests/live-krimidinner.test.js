@@ -1,5 +1,5 @@
 /*
- * Live über die gemeinsame Kennung „krimidinner“ gegen die echte Datenbank – beide Fälle, ohne Test-Kennung.
+ * Live über die gemeinsame Kennung „krimidinner“ gegen die echte Datenbank – Eichenfels, Silberkamm und Nebenan, ohne Test-Kennung.
  * Je Fall: Spielleitung eröffnet (KRIM-Code, Geräte laut fall.json), Gast verbindet sich, Runde 1 öffnet sich von selbst.
  * Dazu: Ein Eichenfels-Gast wird in einer Silberkamm-Sitzung abgewiesen.
  * Aufruf: python3 -m http.server 8765 &  ·  node krimidinner/tests/live-krimidinner.test.js
@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
   const page = async () => { const p = await (await b.newContext({ viewport: { width: 390, height: 844 } })).newPage(); p.setDefaultTimeout(30000); p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept()); return p; };
   const until = async (p, fn, ms = 30000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn).catch(() => false)) return true; await p.waitForTimeout(400); } return false; };
   const rooms = {};
-  for (const [fall, store, n, role] of [['silberkamm', 'kd_silb_', 6, 1], ['eichenfels', 'kd_eich_', 5, 1]]) {
+  for (const [fall, store, n, role] of [['silberkamm', 'kd_silb_', 6, 1], ['eichenfels', 'kd_eich_', 5, 1], ['nebenan', 'kd_neb_', 5, 1]]) {
     const U = BASE + fall + '/index.html';
     const H = await page(); await H.goto(U);
     const hc = await H.evaluate((n) => KD.encode({ host: true, n, variants: 0 }), n);
@@ -22,7 +22,7 @@ const { chromium } = require('playwright');
     check(await until(H, () => Boolean(document.querySelector('.live.on .lcode'))), `${fall}: Live-Sitzung eröffnet`);
     const room = (await H.textContent('.live.on .lcode')).trim(), max = await H.textContent('.live.on');
     const slug = await H.evaluate(() => KD.live().session.game_slug);
-    check(/^KRIM-/.test(room) && slug === 'krimidinner' && (fall === 'eichenfels' ? /max\. 11/ : /max\. 9/).test(max), `${fall}: Kennung krimidinner, Code ${room}, Geräte laut fall.json`);
+    check(/^KRIM-/.test(room) && slug === 'krimidinner' && (fall === 'silberkamm' ? /max\. 9/ : /max\. 11/).test(max), `${fall}: Kennung krimidinner, Code ${room}, Geräte laut fall.json`);
     rooms[fall] = { H, room, gc, U };
     const G = await page(); await G.goto(U + '#c=' + gc.replace(/-/g, '')); await G.waitForSelector('.doc');
     await G.click('.live summary'); await G.fill('#liveCode', room); await G.fill('#liveName', 'Gast'); await G.click('#liveJoin');
@@ -36,6 +36,11 @@ const { chromium } = require('playwright');
   await X.click('.live summary'); await X.fill('#liveCode', rooms.silberkamm.room); await X.fill('#liveName', 'Falsch'); await X.click('#liveJoin');
   await until(X, () => /anderen Krimidinner/.test(document.body.textContent) && !document.querySelector('.live.on'), 20000);
   check(/anderen Krimidinner/.test(await X.textContent('body')) && !(await X.$('.live.on')), 'Eichenfels-Gast in der Silberkamm-Sitzung: abgewiesen („anderen Krimidinner“)');
+  // Gast von Nebenan versucht die Eichenfels-Sitzung
+  const Y = await page(); await Y.goto(rooms.nebenan.U + '#c=' + rooms.nebenan.gc.replace(/-/g, '')); await Y.waitForSelector('.doc');
+  await Y.click('.live summary'); await Y.fill('#liveCode', rooms.eichenfels.room); await Y.fill('#liveName', 'Falsch'); await Y.click('#liveJoin');
+  await until(Y, () => /anderen Krimidinner/.test(document.body.textContent) && !document.querySelector('.live.on'), 20000);
+  check(/anderen Krimidinner/.test(await Y.textContent('body')) && !(await Y.$('.live.on')), 'Nebenan-Gast in der Eichenfels-Sitzung: abgewiesen');
   for (const f of Object.values(rooms)) { await f.H.click('#liveEnd'); }
   console.log(errs.join('\n') || '  ✓ keine Fehler'); if (errs.length) ok = false;
   await b.close(); console.log(ok ? '\nLive über krimidinner in Ordnung.' : '\nFEHLER'); process.exit(ok ? 0 : 1);

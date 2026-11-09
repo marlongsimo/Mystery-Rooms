@@ -328,6 +328,7 @@
       <p class="term">Entscheidung: ${esc(e.choice)}. ${esc(e.verdict)}</p>
       <p class="muted">Habt ihr das selbst entschieden?</p></div>` : "";
     overlay("endOv", `<div class="end-card"><p class="eyebrow">${esc(e.kicker)}</p><h2>${esc(e.title)}</h2>${e.html}${evalHtml}<p class="muted small">Spielzeit ${clockText()} · Hinweise genutzt: ${hints}</p><button class="btn" data-restart>Neu beginnen</button></div>`);
+    if (e.final && window.MRRating) { const card = document.querySelector("#endOv .end-card"); if (card) window.MRRating.mount(card, { game: "sektor-9", title: "SEKTOR 9", ending: id }); }
   }
 
   /* ---------- Start ---------- */

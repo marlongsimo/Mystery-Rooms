@@ -333,6 +333,7 @@
     pane.appendChild(unlockForm(me, () => viewRolle()));
     pane.insertAdjacentHTML("beforeend", `${unlocked.length ? "" : `<p class="muted">Noch keine Beweise freigegeben.</p>`}
       <div class="cardlist">${unlocked.slice().reverse().map((r) => `<h3>${esc(r.name)}</h3>` + cardsFor(r.no, d.n, open).map((id) => cardHtml(id, d.variants)).join("") + npcFor(r.no, d.n).map((x) => npcHtml(x, d.variants)).join("")).join("")}</div>`);
+    if (open[FINAL.no]) mountRating(pane);
   }
 
   /* Spielleitung: geführter Ablauf Schritt für Schritt (Schritte aus fall.json) */
@@ -406,6 +407,7 @@
       return;
     }
     pane.innerHTML = `${liveOn() && host.anklage ? hostAccusations({ ...host, accShow: true }, d) : ""}<div class="hostdoc">${resolve(unveil(C.hostB), d.variants)}</div><p class="row" style="margin-top:14px"><button class="btn ghost small" data-p="hostB">Teil B drucken</button></p>`;
+    mountRating(pane);
     $("[data-p]").onclick = () => printDocs("hostB", d);
   }
 
@@ -433,6 +435,15 @@
     $(".close", o).onclick = () => { o.hidden = true; o.innerHTML = ""; };
   }
 
+
+  /* ---------- Bewertung nach dem Abend (platform/rating, nur wenn eingebunden) ---------- */
+  const RATING_SLUG = F.ratingSlug || "krimidinner-" + F.id;
+  function mountRating(where) {
+    if (!window.MRRating || !where) return;
+    const slot = document.createElement("div"); slot.className = "kd-rating no-print";
+    where.appendChild(slot);
+    window.MRRating.mount(slot, { game: RATING_SLUG, title: F.title });
+  }
 
   /* ---------- Live-Verbindung (optional, über platform/multiplayer – nur vorhandene Funktionen, Publishable Key) ----------
      Eine Spielkennung für alle Fälle („krimidinner“). Geteilt wird nur: „fall“ (welcher Fall), „runde“ (Rundenstand, nur die

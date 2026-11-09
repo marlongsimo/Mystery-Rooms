@@ -7,7 +7,8 @@
 -- 1) Tabelle
 create table if not exists public.game_ratings (
   id          bigint generated always as identity primary key,
-  game_slug   text        not null check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline')),
+  game_slug   text        not null check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline', 'archon', 'sektor-9',
+                                                        'krimidinner-eichenfels', 'krimidinner-silberkamm', 'krimidinner-mirage')),
   stars       smallint    not null check (stars between 1 and 5),
   comment     text                 check (comment is null or char_length(comment) <= 500),
   ending      text                 check (ending  is null or char_length(ending)  <= 40),
@@ -81,3 +82,9 @@ grant execute on function public.game_rating_summary() to anon, authenticated;
 alter table public.game_ratings drop constraint if exists game_ratings_game_slug_check;
 alter table public.game_ratings add constraint game_ratings_game_slug_check
   check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline', 'archon'));
+
+-- Nachtrag 11/2026: Für eine bestehende Tabelle die erlaubten Spiele erweitern (bestehende Bewertungen bleiben):
+--   alter table public.game_ratings drop constraint if exists game_ratings_game_slug_check;
+--   alter table public.game_ratings add constraint game_ratings_game_slug_check
+--     check (game_slug in ('hotel-nocturne', 'der-letzte-fall', 'deadline', 'archon', 'sektor-9',
+--                          'krimidinner-eichenfels', 'krimidinner-silberkamm', 'krimidinner-mirage'));

@@ -1,5 +1,5 @@
 /*
- * Abenteuer „Das Siegel von Grauwacht“ – Szenen
+ * Abenteuer „Das Siegel von Grauwacht“ – Szenen (Abschnitt 1 und 2)
  * 1. Ohne Browser: 400 zufällige Durchläufe durch alle Entscheidungen (Normal/Hardcore, 3–6 Figuren) –
  *    jede Szene erreichbar, jeder Durchlauf endet, keine Fehler; Speichern/Laden mitten im Abenteuer.
  * 2. Browser, ein Gerät: Gruppe wählen → Abenteuer beginnen → Abschnitt 1 über die Oberfläche bis zum Ende
@@ -23,12 +23,14 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const nimm = async (p, fid) => { await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
 
   // 1. Alle Wege
-  const besucht = new Set(), enden = {}; let fehler = 0, haenger = 0;
+  const besucht = new Set(), enden = {}; let fehler = 0, haenger = 0, ersaetze = 0;
   function spiele(A, r) {
     for (let n = 0; n < 300; n++) {
       const s = S.szene(A); besucht.add(A.szene);
       if (s.art === 'ende') { enden[A.szene] = (enden[A.szene] || 0) + 1; return true; }
+      if (s.art === 'lager' && A.ersatzOffen && A.ersatzOffen.length) { for (const alt of A.ersatzOffen.slice()) { const frei = S.freieFiguren(A); if (frei.length) S.ersatz(A, alt, frei[0]); } ersaetze++; }
       if (s.art === 'erzaehlung' || s.art === 'lager') { if (s.rastErlaubt && r() < 0.3) S.kurzeRast(A); S.weiter(A); continue; }
+      if (s.art === 'raetsel') { const x = r(); if (x < 0.15) { S.raetselAufgeben(A); continue; } const folge = x < 0.45 ? s.glocken.map((g) => g.id).sort(() => r() - 0.5) : s.loesung; for (const g of folge) { if (S.szene(A).art !== 'raetsel') break; S.raetselTipp(A, g); } continue; }
       if (s.art === 'gespraech') {
         if (A.zwischenprobe) { const pz = S.probeZustand(A); if (!pz.wer) S.probeWer(A, S.lebende(A)[Math.floor(r() * S.lebende(A).length)]); S.probeWurf(A, pz.wer); continue; }
         const o = S.optionen(A); S.waehle(A, o[Math.floor(r() * o.length)].id); continue;
@@ -53,6 +55,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
     } catch (e) { fehler++; if (fehler < 3) console.log(e.stack.split('\n').slice(0, 4).join('\n')); }
   }
   const alle = Object.keys(D.SZENEN), nie = alle.filter((k) => !besucht.has(k));
+  check(ersaetze > 0, `Hardcore: Gefallene bekommen am Lagerfeuer eine Ersatzfigur (${ersaetze}×)`);
   check(fehler === 0 && haenger === 0, `400 Durchläufe ohne Fehler und ohne Hänger (Enden: ${Object.entries(enden).map(([k, v]) => k + ' ' + v).join(', ')})`);
   check(nie.length === 0, `alle ${alle.length} Szenen erreichbar` + (nie.length ? ' – nie erreicht: ' + nie.join(', ') : ''));
   // Folgen von Entscheidungen
@@ -75,7 +78,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   await p.click('#abenteuer-los');
   check(await p.isVisible('#szene') && /Halmbruck/.test(await p.textContent('#szene h1')), 'Abenteuer beginnt in Halmbruck');
   const gesehen = new Set(); let kaempfe = 0, neuGeladen = false, i = 0;
-  for (; i < 400; i++) {
+  let raetselGeloest = false;
+  for (; i < 900; i++) {
     if (await p.isVisible('#szene')) {
       const titel = (await p.textContent('#szene h1')).trim(); gesehen.add(titel);
       if (process.env.SHOT_DIR && titel === 'Am Brunnen' && !gesehen.has('shot1')) { gesehen.add('shot1'); await p.screenshot({ path: process.env.SHOT_DIR + '/szene-gespraech.png', fullPage: true }); }
@@ -88,6 +92,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
       if (await klick('[data-wer]')) continue;
       if (await p.$('[data-geheim]')) { for (const v of await p.$$eval('[data-geheim$=":trinken"]', (xs) => xs.map((x) => x.dataset.geheim))) await p.click(`[data-geheim="${v}"]`); await klick('#sz-weiter'); continue; }
       if (await klick('#sz-kampf')) { kaempfe++; continue; }
+      if (await p.$('[data-glocke]')) { if (process.env.SHOT_DIR && !gesehen.has('shot3')) { gesehen.add('shot3'); await p.screenshot({ path: process.env.SHOT_DIR + '/szene-raetsel.png', fullPage: true }); } for (const g of D.SZENEN.gruft_raetsel.loesung) await p.click(`[data-glocke="${g}"]`); raetselGeloest = true; continue; }
+      if (await klick('[data-ersatz]')) continue;
       if (await klick('#sz-weiter')) continue;
       // Gespräch: erst zwei Fragen, dann aufbrechen; Abstimmung: erste Option
       const opts = await p.$$eval('[data-opt]', (xs) => xs.map((x) => x.dataset.opt));
@@ -101,9 +107,11 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
     } else await p.waitForTimeout(50);
   }
   const ende = await p.textContent('#szene h1').catch(() => '');
-  check(/Ende von Abschnitt 1|Grauwacht behält/.test(ende), `Abschnitt 1 durchgespielt bis „${ende.trim()}“ (${gesehen.size - 2} Szenen, ${kaempfe} Kämpfe)`);
+  check(/Ende von Abschnitt 2|Grauwacht behält/.test(ende), `Abschnitt 1 und 2 durchgespielt bis „${ende.trim()}“ (${gesehen.size - 3} Szenen, ${kaempfe} Kämpfe)`);
+  check(raetselGeloest || /behält/.test(ende) || !gesehen.has('Das Glockenjoch'), 'Glockenrätsel über die Glocken am Tisch gelöst');
+  check(['Der Abstieg', 'Der Schacht', 'Tam', 'Lagerfeuer in der Bibliothek', 'Anselms Tagebuch'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Abschnitt 2: Abstieg, Schacht, Tam, Bibliothek, Tagebuch gesehen');
   check(['Am Brunnen', 'Der bittere Brunnen', 'Der Klostergarten', 'Der Glockenturm', 'Nisk', 'Lagerfeuer im Kreuzgang'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Gespräch, geheime Entscheidung, Kampf, Abstimmung und Lagerfeuer gesehen');
-  check(/Stufe 2/.test(await p.textContent('#szene')) || /behält/.test(ende), 'nach dem Lagerfeuer Stufe 2');
+  check(/Stufe 3/.test(await p.textContent('#szene')) || /behält/.test(ende), 'nach der Bibliothek Stufe 3');
   if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + '/szene-ende.png', fullPage: true });
   check(errs.length === 0, 'keine Konsolenfehler' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await b.close();

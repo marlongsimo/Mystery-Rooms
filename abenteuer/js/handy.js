@@ -42,8 +42,9 @@
     if (!host || H.row.updated_by !== host.user_id) { render(); return; }
     const alt = H.spiel; H.spiel = H.row.state || null;
     const s = H.spiel || {};
-    if (H.warte && s.antwort && s.antwort.uid === ich() && s.antwort.n === H.warte.n) {
-      if (s.antwort.ok) { H.fehler = ""; H.sel = null; H.ziel = null; } else H.fehler = s.antwort.fehler || "Das ging nicht.";
+    const an = (s.antworten && s.antworten[ich()]) || s.antwort;
+    if (H.warte && an && an.uid === ich() && an.n === H.warte.n) {
+      if (an.ok) { H.fehler = ""; H.sel = null; H.ziel = null; } else H.fehler = an.fehler || "Das ging nicht.";
       H.warte = null;
     }
     const fid = meineFid(), fd = fid && figDaten(fid);
@@ -180,6 +181,7 @@
     const w = $("#wuerfeln"); if (w) w.onclick = () => senden({ typ: "aktion", aktion: H.sel, ziel: H.ziel || (fd && fd.id) });
     const e = $("#zugende"); if (e) e.onclick = () => senden({ typ: "ende" });
     const a = $("#andere"); if (a) a.onclick = () => waehle(null);
+    if (ab && ab.ersatz) app.querySelectorAll(".tabinhalt [data-fid]").forEach((b) => { b.onclick = () => senden({ typ: "ersatz", fid: b.dataset.fid }); });
     app.querySelectorAll("[data-stimme]").forEach((b) => { b.onclick = () => { H.meineStimme = { szene: ab.szene, opt: b.dataset.stimme }; senden({ typ: "stimme", opt: b.dataset.stimme }); }; });
     app.querySelectorAll("[data-gantwort]").forEach((b) => { b.onclick = () => { H.meinGeheim = { szene: ab.szene, antwort: b.dataset.gantwort }; senden({ typ: "geheim", antwort: b.dataset.gantwort }); }; });
     const pw = $("#probe-wer"); if (pw) pw.onclick = () => senden({ typ: "probe_wer" });
@@ -204,13 +206,16 @@
     const ab = s.abenteuer; if (s.phase !== "szene" || !ab) return false;
     if (ab.art === "wahl") return !(ab.stimmen || []).includes(fid);
     if (ab.art === "geheim") return !(ab.geheimFrage.fertig || []).includes(fid);
+    if (ab.ersatz && ab.ersatz.offen.includes(fid)) return true;
+    if (ab.raetsel) return true;
     if (ab.probe && !ab.probe.ergebnis) return ab.probe.gruppe ? !ab.probe.wuerfe[fid] : !ab.probe.wer || (ab.probe.wer === fid && !ab.probe.wuerfe[fid]);
     return false;
   }
   function tabSzene(ab, fid) {
-    const fett = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    const fett = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
     let h = `<div class="handy-szene"><p class="eyebrow">Abschnitt ${ab.abschnitt} · ${esc(ab.ort)} · Glocke ${ab.glocke}/7</p><h2>${esc(ab.titel)}</h2>`;
     const tot = ab.zust && ab.zust[fid] && ab.zust[fid].tot;
+    if (tot && ab.ersatz && ab.ersatz.offen.includes(fid)) return h + `<div class="info dran"><b>${esc(F.FIGUREN[fid].name)} ist gefallen.</b> Am Lagerfeuer stößt jemand Neues zur Gruppe. Wen spielst du jetzt?</div><div class="fkarten handy-karten">${ab.ersatz.frei.map((neu) => window.ABH_HELDEN.kachel(neu, {})).join("")}</div></div>`;
     if (tot) return h + `<div class="info schlecht">${esc(F.FIGUREN[fid].name)} ist gefallen. Am nächsten Lagerfeuer kannst du eine neue Figur übernehmen.</div></div>`;
     if (ab.art === "wahl") {
       const schon = (ab.stimmen || []).includes(fid), meine = H.meineStimme && H.meineStimme.szene === ab.szene ? H.meineStimme.opt : null;
@@ -219,6 +224,9 @@
     } else if (ab.art === "geheim") {
       const q = ab.geheimFrage, meins = H.meinGeheim && H.meinGeheim.szene === ab.szene ? H.meinGeheim.antwort : null;
       h += `<div class="info dran"><b>${esc(q.frage)}</b><br><small>Nur du siehst deine Antwort.</small></div><div class="optionen">${q.antworten.map((a) => `<button class="opt ${meins === a.id ? "gewaehlt" : ""}" data-gantwort="${a.id}" ${H.warte ? "disabled" : ""}><b>${esc(a.text)}</b></button>`).join("")}</div>`;
+    } else if (ab.raetsel) {
+      const meine = (ab.raetsel.hinweise || {})[fid] || [];
+      h += `<div class="info dran"><b>Deine Grabplatte.</b> Lies sie den anderen vor. Am Tisch werden die Glocken angeschlagen.</div>${meine.map((t) => `<blockquote class="platte">${fett(t)}</blockquote>`).join("")}<p class="note">Angeschlagen: ${ab.raetsel.folge.length} von ${ab.raetsel.laenge}</p>`;
     } else if (ab.probe) {
       const p = ab.probe, b = p.boni[fid];
       h += `<div class="info"><b>${esc(p.name)}</b> gegen SG ${p.sg}${p.gruppe ? " · alle würfeln" : ""}. Dein Bonus: ${b >= 0 ? "+" : ""}${b}</div>`;

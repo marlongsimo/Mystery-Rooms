@@ -85,6 +85,20 @@ const { chromium } = require('playwright');
     check(await until(T, () => window.ABT.A().szene === 'turm_schleichen'), 'Alle haben abgestimmt: Mehrheit „Anschleichen“ gilt');
     check(await until(H.Ben, () => Boolean(document.querySelector('#probe-wurf'))), 'Gruppenprobe: jedes Handy würfelt selbst');
   }
+  // Glockenrätsel: jedes Handy sieht eine andere Grabplatte
+  await T.evaluate(() => { const o = window.ABT.speichern(); o.szene = 'gruft_raetsel'; o.raetsel = { folge: [] }; o.stufe = 2; window.ABT.laden(o); window.ABT.zeige(); });
+  const platten = [];
+  for (const n of Object.keys(fids)) { await until(H[n], () => Boolean(document.querySelector('.platte'))); platten.push(await H[n].textContent('.tabinhalt .platte')); }
+  check(platten.length === 3 && new Set(platten).size === 3, 'Rätsel: drei Handys, drei verschiedene Grabplatten');
+  if (SHOT) await H.Ben.screenshot({ path: SHOT + '/live-platte.png', fullPage: true });
+  for (const g of ['rabe', 'lamm', 'taube', 'wolf']) await T.click(`[data-glocke="${g}"]`);
+  check(await until(T, () => window.ABT.A().szene === 'gruft_nischen' && window.ABT.A().merker.silberglocke), 'Rätsel am Tisch gelöst: silberne Glocke gefunden');
+  // Hardcore-Ersatz: Kael ist gefallen, Anna wählt am Lagerfeuer eine neue Figur auf dem Handy
+  await T.evaluate(() => { const o = window.ABT.speichern(); o.schwierigkeit = 'hardcore'; o.zust.wildnislaeufer.tot = true; o.gefallen = ['wildnislaeufer']; o.lagerZust = JSON.parse(JSON.stringify(o.zust)); o.ersatzOffen = ['wildnislaeufer']; o.szene = 'bibliothek'; window.ABT.laden(o); window.ABT.zeige(); });
+  check(await until(H.Anna, () => /Wen spielst du jetzt/.test(document.body.textContent) && document.querySelectorAll('.tabinhalt [data-fid]').length >= 10), 'Ersatz: Annas Handy bietet die freien Figuren an');
+  await H.Anna.click('.tabinhalt [data-fid="duellant"]');
+  check(await until(T, () => window.ABT.A().gruppe.includes('duellant') && !window.ABT.A().gruppe.includes('wildnislaeufer')), 'Tisch: Isolde ersetzt Kael in der Gruppe');
+  check(await until(H.Anna, () => /Isolde/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Annas Handy zeigt jetzt Isoldes Bogen');
   await T.evaluate(() => { const b = document.querySelector('#live-ende'); if (b) b.click(); else window.AB.LIVE.client.leave(); });
   check(await until(H.Anna, () => Boolean(document.querySelector('#rein')), null, 20000), 'Sitzung beendet');
   check(errs.length === 0, 'keine Seitenfehler' + (errs.length ? ': ' + errs.join(' | ') : ''));

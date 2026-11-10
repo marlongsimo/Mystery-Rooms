@@ -124,13 +124,14 @@
     const n = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)) * 4;
     for (let i = 1; i < n; i++) {
       const x = Math.round(a.x + (b.x - a.x) * i / n), y = Math.round(a.y + (b.y - a.y) * i / n);
-      if ((x !== a.x || y !== a.y) && (x !== b.x || y !== b.y) && (st.karte.block.has(key(x, y)) || imRauch(st, x, y))) return false;
+      if ((x !== a.x || y !== a.y) && (x !== b.x || y !== b.y) && ((st.karte.block.has(key(x, y)) && !(st.karte.offen && st.karte.offen.has(key(x, y)))) || imRauch(st, x, y))) return false;
     }
     return true;
   }
   /** Deckung: Hindernis direkt neben dem Ziel auf der Seite des Schützen */
   function deckung(st, a, z) {
     for (const k of st.karte.block) {
+      if (st.karte.offen && st.karte.offen.has(k)) continue;
       const [x, y] = k.split(",").map(Number), o = { x, y };
       if (abstand(o, z) !== 1 || abstand(a, o) >= abstand(a, z)) continue;
       if ((o.x - z.x) * (a.x - z.x) + (o.y - z.y) * (a.y - z.y) > 0) return true;
@@ -179,7 +180,7 @@
       stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [] };
     zufall(st);
     const r = st.r, k = opts.karte || KARTE_GARTEN;
-    st.karte = { name: k.name, b: k.b, h: k.h, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))) };
+    st.karte = { name: k.name, b: k.b, h: k.h, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y))) };
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
     fids.forEach((fid, i) => {
       const [x, y] = k.start.spieler[i];
@@ -1164,6 +1165,7 @@
   function laden(o) {
     const st = JSON.parse(JSON.stringify(o));
     st.karte.block = new Set(st.karte.hindernisse.map(([, x, y]) => key(x, y)));
+    st.karte.offen = new Set(st.karte.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y)));
     st.zonen = st.zonen || []; st.brand = st.brand || [];
     return zufall(st);
   }

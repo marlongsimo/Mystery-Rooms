@@ -74,6 +74,7 @@
     if (s.art === "lager") lagerfeuer(A, s);
     if (s.art === "probe") A.probe = { wer: s.probe.wer === "gruppe" ? "gruppe" : null, wuerfe: {} };
     if (s.art === "gespraech") A.gewaehlt[id] = A.gewaehlt[id] || [];
+    if (s.art === "raetsel") A.raetsel = { folge: [] };
   }
   /** Optionen, die gerade sichtbar sind */
   function optionen(A) {
@@ -87,7 +88,7 @@
     const s = szene(A);
     if (s.art === "erzaehlung") return ziel(A, s), { ok: true };
     if (s.art === "probe" && A.ergebnis) { const e = s.probe[A.ergebnis.stufe]; wirke(A, e); ziel(A, e); return { ok: true }; }
-    if (s.art === "lager") return ziel(A, s), { ok: true };
+    if (s.art === "lager") { A.ersatzOffen = []; return ziel(A, s), { ok: true }; }
     if (s.art === "geheim" && alleGeheim(A)) return geheimAuswerten(A), { ok: true };
     if (s.art === "wahl" && Object.keys(A.stimmen).length) return auswerten(A), { ok: true };
     return { fehler: "Hier geht es nicht einfach weiter." };
@@ -207,6 +208,8 @@
       A.zust[fid] = Object.assign(neuZ, { tp: Math.max(z.tp, Math.floor(neuZ.tp * anteil)), rucksack: z.rucksack });
     }
     A.lagerZust = JSON.parse(JSON.stringify(A.zust)); A.lagerSzene = A.szene;
+    // Hardcore: Wer gefallen ist, wählt am Lagerfeuer eine neue Figur
+    A.ersatzOffen = A.gruppe.filter((f) => A.zust[f].tot);
     notiz(A, `Lagerfeuer: lange Rast${A.glocke >= 3 ? " (das Flüstern lässt niemanden ganz schlafen: TP bis ¾)" : ""}. Gespeichert.`, "gut");
   }
   /** Kurze Rast zwischen Kämpfen (nur Normal): halbe fehlende TP, Glocke schlägt */
@@ -215,6 +218,42 @@
     if (A.merker["kurz_" + (szene(A).abschnitt || 1)]) return { fehler: "In diesem Abschnitt habt ihr schon gerastet." };
     const z = R.kurzeRast(A.zust); for (const fid of Object.keys(z)) z[fid].stufe = A.stufe;
     A.merker["kurz_" + (szene(A).abschnitt || 1)] = true; glocke(A, 1); notiz(A, "Kurze Rast: Wunden verbunden.", "gut");
+    return { ok: true };
+  }
+
+  /* ---------- Rätsel: Glocken in der richtigen Reihenfolge ---------- */
+  /** Hinweise je Figur: Platte i geht an Figur i mod n; Zusatzhinweise (z. B. Lyra) obendrauf */
+  function raetselHinweise(A) {
+    const s = szene(A); if (s.art !== "raetsel") return {};
+    const leb = lebende(A), out = {};
+    leb.forEach((f) => { out[f] = []; });
+    s.hinweise.forEach((h, i) => { if (leb.length) out[leb[i % leb.length]].push(h); });
+    if (s.zusatz) for (const [fid, t] of Object.entries(s.zusatz)) if (out[fid]) out[fid].push(t);
+    return out;
+  }
+  function raetselTipp(A, glockeId) {
+    const s = szene(A); if (s.art !== "raetsel") return { fehler: "Hier gibt es kein Rätsel." };
+    if (!s.glocken.some((g) => g.id === glockeId)) return { fehler: "Diese Glocke gibt es nicht." };
+    A.raetsel.folge.push(glockeId);
+    notiz(A, `Ihr schlagt die Glocke „${s.glocken.find((g) => g.id === glockeId).name}“.`);
+    if (A.raetsel.folge.length < s.loesung.length) return { ok: true };
+    if (A.raetsel.folge.join() === s.loesung.join()) { notiz(A, s.richtig, "gut"); wirke(A, s.erfolg); ziel(A, s.erfolg); return { ok: true, geloest: true }; }
+    A.merker[A.szene + "_fehl"] = (A.merker[A.szene + "_fehl"] || 0) + 1; A.raetsel.folge = [];
+    notiz(A, s.falsch, "schlecht"); glocke(A, 1);
+    if (s.waechter && A.merker[A.szene + "_fehl"] % 2 === 0) geheZu(A, s.waechter);
+    return { ok: true, falsch: true };
+  }
+  function raetselNeu(A) { if (A.raetsel) A.raetsel.folge = []; return { ok: true }; }
+  function raetselAufgeben(A) { const s = szene(A); if (s.art !== "raetsel") return { fehler: "Kein Rätsel." }; notiz(A, "Ihr gebt das Rätsel auf."); wirke(A, s.aufgeben); ziel(A, s.aufgeben); return { ok: true }; }
+
+  /* ---------- Ersatzfigur (Hardcore) ---------- */
+  const freieFiguren = (A) => F.REIHE.filter((f) => !A.gruppe.includes(f) && !A.gefallen.includes(f));
+  function ersatz(A, alt, neu) {
+    if (!(A.ersatzOffen || []).includes(alt)) return { fehler: "Diese Figur braucht keinen Ersatz." };
+    if (!freieFiguren(A).includes(neu)) return { fehler: "Diese Figur ist nicht frei." };
+    A.gruppe[A.gruppe.indexOf(alt)] = neu; A.zust[neu] = frisch(neu, A.stufe); A.lagerZust[neu] = JSON.parse(JSON.stringify(A.zust[neu]));
+    A.ersatzOffen = A.ersatzOffen.filter((f) => f !== alt);
+    notiz(A, `${name(A, neu)} stößt am Lagerfeuer zur Gruppe. ${name(A, alt)} wird nicht vergessen.`, "gut");
     return { ok: true };
   }
 
@@ -258,13 +297,15 @@
       geheimFrage: s.art === "geheim" ? { frage: s.frage, antworten: s.antworten.map((a) => ({ id: a.id, text: a.text })), fertig: Object.keys(A.geheim) } : null,
       probe: p ? { name: p.name, attr: p.attr, sg: p.sg, wer: pz.wer, wuerfe: pz.wuerfe, gruppe: pz.wer === "gruppe",
         boni: Object.fromEntries(lebende(A).map((f) => [f, bonus(A, f, p).wert])), ergebnis: A.ergebnis } : null,
+      raetsel: s.art === "raetsel" ? { glocken: s.glocken, folge: A.raetsel.folge, fehl: A.merker[A.szene + "_fehl"] || 0, laenge: s.loesung.length, hinweise: raetselHinweise(A) } : null,
+      ersatz: (A.ersatzOffen || []).length ? { offen: A.ersatzOffen, frei: freieFiguren(A) } : null,
       zust: A.zust, gruppe: A.gruppe, gefallen: A.gefallen, protokoll: A.protokoll.slice(-6),
     };
   }
   function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
   function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
 
-  const API = { neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

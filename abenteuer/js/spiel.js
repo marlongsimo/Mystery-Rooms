@@ -44,7 +44,7 @@
     if (LIVE.schreibt) { LIVE.nochmal = true; return; }
     LIVE.schreibt = true; LIVE.nochmal = false;
     const namen = {}; LIVE.client.players.forEach((p) => { namen[p.user_id] = p.player_name; });
-    const daten = Object.assign(window.ABT ? window.ABT.oeffentlich() : {}, { phase: LIVE.phase, besitz: LIVE.besitz, namen, gruppe: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, antwort: LIVE.antwort, at: Date.now() }, st && LIVE.phase === "kampf" ? R.ansicht(st) : {});
+    const daten = Object.assign(window.ABT ? window.ABT.oeffentlich() : {}, { phase: LIVE.phase, besitz: LIVE.besitz, namen, gruppe: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, antwort: LIVE.antwort, antworten: LIVE.antworten || {}, at: Date.now() }, st && LIVE.phase === "kampf" ? R.ansicht(st) : {});
     LIVE.client.writeOwn("spiel", daten)
       .catch((e) => toast("Live: " + e.message))
       .then(() => { LIVE.schreibt = false; if (LIVE.nochmal) veroeffentlichen(); });
@@ -74,8 +74,8 @@
     }
     if (!v.n || v.n <= (LIVE.erledigt[uid] || 0)) return;
     LIVE.erledigt[uid] = v.n;
-    const antwort = (fehler) => { LIVE.antwort = { uid, n: v.n, ok: !fehler, fehler: fehler || null }; };
-    if (["stimme", "geheim", "probe_wer", "probe_wurf"].includes(v.typ)) { antwort(window.ABT ? window.ABT.wunsch(uid, v) : "Kein Abenteuer."); veroeffentlichen(); return; }
+    const antwort = (fehler) => { LIVE.antwort = { uid, n: v.n, ok: !fehler, fehler: fehler || null }; LIVE.antworten = LIVE.antworten || {}; LIVE.antworten[uid] = LIVE.antwort; };
+    if (["stimme", "geheim", "probe_wer", "probe_wurf", "ersatz"].includes(v.typ)) { antwort(window.ABT ? window.ABT.wunsch(uid, v) : "Kein Abenteuer."); veroeffentlichen(); return; }
     if (LIVE.phase !== "kampf" || !st || st.ende) { antwort("Der Kampf läuft gerade nicht."); veroeffentlichen(); return; }
     const akt = R.aktiv(st);
     if (akt.seite !== "spieler" || LIVE.besitz[akt.fid] !== uid) { antwort("Du bist gerade nicht am Zug."); veroeffentlichen(); return; }
@@ -244,6 +244,7 @@
     if (t === "G") return `<g transform="translate(${cx} ${cy})"><path d="M-14 22 V-8 Q-14 -22 0 -22 Q14 -22 14 -8 V22 Z" fill="#7c7a72" stroke="#3b3a35" stroke-width="2"/><path d="M0 -12 V8 M-6 -4 H6" stroke="#4c4a44" stroke-width="2.4"/><ellipse cy="24" rx="20" ry="5" fill="#000" opacity=".25"/></g>`;
     if (t === "M") return `<g><rect x="${x * Z + 2}" y="${y * Z + 2}" width="${Z - 4}" height="${Z - 4}" fill="#6b6152" stroke="#3a332a" stroke-width="2"/><path d="M${x * Z + 2} ${y * Z + 22}h${Z - 4}M${x * Z + 2} ${y * Z + 40}h${Z - 4}M${x * Z + 30} ${y * Z + 2}v20M${x * Z + 16} ${y * Z + 22}v18M${x * Z + 44} ${y * Z + 22}v18" stroke="#3a332a" stroke-width="1.5"/></g>`;
     if (t === "S") return `<g><rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" fill="#4a4036" stroke="#2a231c" stroke-width="2"/>${[0, 1, 2, 3].map((i) => `<rect x="${x * Z + 8 + i * 3}" y="${y * Z + 10 + i * 10}" width="${Z - 16 - i * 6}" height="6" fill="#6b5d4c"/>`).join("")}</g>`;
+    if (t === "P") return `<g><rect x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="#050506"/><rect x="${x * Z + 4}" y="${y * Z + 4}" width="${Z - 8}" height="${Z - 8}" fill="#000" opacity=".7"/><path d="M${x * Z + 10} ${y * Z + 20} q10 -8 20 0 t20 0" stroke="#d8d0c0" stroke-opacity=".25" fill="none"/></g>`;
     if (t === "K") return `<g><rect x="${x * Z + 8}" y="${y * Z + 8}" width="${Z - 16}" height="${Z - 16}" fill="#6a4e30" stroke="#2e2014" stroke-width="2"/><path d="M${x * Z + 8} ${y * Z + 8}L${x * Z + Z - 8} ${y * Z + Z - 8}M${x * Z + Z - 8} ${y * Z + 8}L${x * Z + 8} ${y * Z + Z - 8}" stroke="#2e2014" stroke-width="2"/></g>`;
     if (t === "R") return `<g transform="translate(${cx} ${cy})"><path d="M-22 -22 Q0 -34 22 -22 L18 4 L-18 4 Z" fill="#8a6a2a" stroke="#3a2a10" stroke-width="2"/><path d="M0 4 V26" stroke="#b08850" stroke-width="4"/><circle cy="27" r="3" fill="#b08850"/></g>`;
     return `<g transform="translate(${cx} ${cy})"><circle r="24" fill="#6f6a60" stroke="#3b3a35" stroke-width="3"/><circle r="15" fill="#10161a"/><path d="M-10 -4 Q0 -10 10 -4" stroke="#3d5a6a" stroke-width="2" fill="none"/></g>`;
@@ -440,5 +441,6 @@
   // Für automatische Tests
   window.AB = { st: null, R, LIVE, SETUP: () => SETUP, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
     liveAn, besitzVon: (fid) => (liveAn() ? LIVE.besitz[fid] : null), spielerName,
+    besitzTauschen(alt, neu) { const i = SETUP.gruppe.indexOf(alt); if (i >= 0) SETUP.gruppe[i] = neu; if (LIVE.besitz[alt]) { LIVE.besitz[neu] = LIVE.besitz[alt]; delete LIVE.besitz[alt]; } setupMerken(); },
     auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };
 })();

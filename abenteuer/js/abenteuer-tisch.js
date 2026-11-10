@@ -7,7 +7,7 @@
   "use strict";
   const S = window.ABS, R = window.ABR, F = window.ABF, B = window.ABB, AB = window.AB, $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const fett = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  const fett = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
   const KEY = "ab_abenteuer";
   let A = null;
 
@@ -64,8 +64,22 @@
     if (offen.length) h += `<div class="wer">${offen.map((fid) => `<button class="btn" data-wurf="${fid}">🎲 ${esc(F.FIGUREN[fid].name)} würfelt${live() && besitzer(fid) ? " (oder am Handy)" : ""}</button>`).join("")}</div>`;
     return h;
   }
+  function raetselHtml(v) {
+    const r = v.raetsel, n = r.folge.length;
+    let h = `<div class="joch">${r.glocken.map((g) => `<button class="glockenknopf" data-glocke="${g.id}"><svg viewBox="0 0 60 70" aria-hidden="true"><path d="M30 6 C14 6 12 24 12 36 L8 52 H52 L48 36 C48 24 46 6 30 6Z" fill="#b08850" stroke="#5a4020" stroke-width="2"/><circle cx="30" cy="58" r="5" fill="#5a4020"/></svg><b>${esc(g.name)}</b></button>`).join("")}</div>`;
+    h += `<p class="note">Angeschlagen: ${n ? r.folge.map((id) => `<b>${esc(r.glocken.find((g) => g.id === id).name)}</b>`).join(" → ") : "noch keine"} (${n} von ${r.laenge})${r.fehl ? ` · Fehlversuche: ${r.fehl}` : ""}</p>`;
+    if (!live()) h += `<div class="platten">${Object.entries(r.hinweise).map(([fid, hs]) => hs.map((t) => `<blockquote class="platte"><small>${esc(F.FIGUREN[fid].name)} liest:</small>${fett(t)}</blockquote>`).join("")).join("")}</div>`;
+    else h += `<p class="note">Die Verse der Grabplatten stehen auf euren Handys. Lest sie einander vor.</p>`;
+    return h + `<div class="knoepfe"><button class="btn ghost" id="rz-neu" ${n ? "" : "disabled"}>Neu beginnen</button><button class="btn ghost" id="rz-auf">Aufgeben</button></div>`;
+  }
+  function ersatzHtml(v) {
+    return `<div class="ersatz"><h2 class="klein">Ersatz für die Gefallenen</h2>${v.ersatz.offen.map((alt) => `<p>Wer kommt an ${esc(F.FIGUREN[alt].name)}s Stelle?${live() && besitzer(alt) ? ` (${esc(AB.spielerName(besitzer(alt)))} wählt auf dem Handy oder hier)` : ""}</p>
+      <div class="ersatz-wahl">${v.ersatz.frei.map((neu) => `<button class="btn ghost klein" data-ersatz="${alt}:${neu}">${B.marke(neu, 26)} ${esc(F.FIGUREN[neu].name)}</button>`).join("")}</div>`).join("")}</div>`;
+  }
   function interaktion(v, s) {
     if (A.zwischenprobe || (s.art === "probe")) return probeHtml(v);
+    if (s.art === "raetsel") return raetselHtml(v);
+    if (s.art === "lager" && v.ersatz) return ersatzHtml(v) + `<div class="knoepfe"><button class="btn ghost" id="sz-weiter">Ohne Ersatz weiter</button></div>`;
     if (s.art === "erzaehlung" || s.art === "lager") {
       const rast = s.rastErlaubt && A.schwierigkeit === "normal" && !A.merker["kurz_" + (s.abschnitt || 1)];
       return `<div class="knoepfe"><button class="btn" id="sz-weiter">Weiter</button>${rast ? `<button class="btn ghost" id="sz-rast" title="Halbe fehlende TP zurück. Die Glocke schlägt.">Kurze Rast (Glocke +1)</button>` : ""}</div>`;
@@ -93,6 +107,10 @@
     el.querySelectorAll("[data-wer]").forEach((b) => { b.onclick = () => { S.probeWer(A, b.dataset.wer); nach(); }; });
     el.querySelectorAll("[data-wurf]").forEach((b) => { b.onclick = () => { S.probeWurf(A, b.dataset.wurf); nach(); }; });
     el.querySelectorAll("[data-geheim]").forEach((b) => { b.onclick = () => { const [fid, a] = b.dataset.geheim.split(":"); S.geheim(A, fid, a); nach(); }; });
+    el.querySelectorAll("[data-glocke]").forEach((b) => { b.onclick = () => { if (window.ABE) window.ABE.glocke(0.35); S.raetselTipp(A, b.dataset.glocke); nachSzene(); }; });
+    el.querySelectorAll("[data-ersatz]").forEach((b) => { b.onclick = () => { const [alt, neu] = b.dataset.ersatz.split(":"); if (!S.ersatz(A, alt, neu).fehler) AB.besitzTauschen(alt, neu); nach(); }; });
+    const rn = $("#rz-neu"); if (rn) rn.onclick = () => { S.raetselNeu(A); nach(); };
+    const ra = $("#rz-auf"); if (ra) ra.onclick = () => { if (confirm("Das Rätsel aufgeben? Was im Joch verborgen ist, bleibt dort.")) { S.raetselAufgeben(A); nachSzene(); } };
     const w = $("#sz-weiter"); if (w) w.onclick = () => { S.weiter(A); nachSzene(); };
     const r = $("#sz-rast"); if (r) r.onclick = () => { S.kurzeRast(A); nach(); };
     const au = $("#sz-auswerten"); if (au) au.onclick = () => { S.auswerten(A); nachSzene(); };
@@ -122,6 +140,7 @@
     else if (v.typ === "geheim") r = S.geheim(A, fid, String(v.antwort));
     else if (v.typ === "probe_wer") r = S.probeWer(A, fid);
     else if (v.typ === "probe_wurf") r = S.probeWurf(A, fid);
+    else if (v.typ === "ersatz") { r = S.ersatz(A, fid, String(v.fid)); if (!r.fehler) AB.besitzTauschen(fid, String(v.fid)); }
     else return "Unbekannter Wunsch.";
     if (r.fehler) return r.fehler;
     const s = S.szene(A);

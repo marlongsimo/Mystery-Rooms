@@ -340,3 +340,13 @@ body { overflow-x: hidden; }
 .titel { width: 100vw; margin: -16px calc(50% - 50vw) 0; min-height: 100vh; place-items: end center; }
 .titel-inhalt { padding-bottom: 9vh; }
 main:has(#lobby:not([hidden])) { max-width: 1220px; }
+/* Rätsel und Ersatz */
+.joch { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; padding: 14px; background: linear-gradient(#2a2216, #15120e); border: 1px solid #6a5a3a; border-radius: 8px; margin-bottom: 10px; }
+.glockenknopf { background: none; border: 0; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font: 600 14px Cinzel, serif; padding: 6px; border-radius: 6px; }
+.glockenknopf svg { width: 64px; height: 74px; transition: transform .2s; transform-origin: 50% 0; }
+.glockenknopf:active svg, .glockenknopf:hover svg { transform: rotate(8deg); }
+.platten { display: grid; gap: 8px; margin: 10px 0; }
+.platte { margin: 6px 0; background: #1d1b18; border: 1px solid #4a4438; border-radius: 4px; padding: 12px 14px; font: italic 16px/1.5 Georgia, serif; color: #e2dac8; box-shadow: inset 0 0 20px #000; }
+.platte small { display: block; font: 600 11px Inter, sans-serif; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; font-style: normal; }
+.ersatz-wahl { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.ersatz-wahl .btn { display: inline-flex; align-items: center; gap: 6px; }

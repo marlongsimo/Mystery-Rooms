@@ -13,17 +13,13 @@ const R = require("../js/regeln.js"), F = R.FD;
 const N = +process.argv.find((a) => /^\d+$/.test(a)) || 400;
 const HARD = process.argv.includes("--hardcore");
 const GRENZE = 5; // Prozentpunkte
-const STAERKE = { 1: +(process.env.S1 || 1.3), 2: +(process.env.S2 || 1.7), 3: +(process.env.S3 || 1.4) }; // Gegner-Faktor je Stufe (kalibriert)
-const BEGEGNUNGEN = {
-  1: [(n) => [{ art: "rostkaefer", anzahl: n }], (n) => [{ art: "schattenkobold", anzahl: Math.round(n * 1.5) }], (n) => [{ art: "rostkaefer", anzahl: Math.ceil(n / 2) }, { art: "schattenkobold", anzahl: Math.ceil(n / 2) + 1 }]],
-  2: [(n) => [{ art: "knochenwaechter", anzahl: n }], (n) => [{ art: "pilzbrut", anzahl: Math.ceil(n / 2) }, { art: "schattenkobold", anzahl: n }], (n) => [{ art: "netzweber", anzahl: n >= 5 ? 2 : 1 }, { art: "knochenwaechter", anzahl: Math.ceil(n / 2) }]],
-  3: [(n) => [{ art: "aschehund", anzahl: Math.ceil(n / 2) + 1 }], (n) => [{ art: "grabritter", anzahl: 1 }, { art: "knochenwaechter", anzahl: n - 1 }], (n) => [{ art: "aschehund", anzahl: Math.ceil(n / 2) }, { art: "knochenwaechter", anzahl: Math.ceil(n / 2) }]],
-};
-function abschnitt(seed, gruppe, stufe) {
+const ABSCHNITT = { 1: ["garten", "kobolde", "kaefer_kobolde"], 2: ["gruft", "pilze", "netz"], 3: ["asche", "ritter", "asche_knochen"] };
+/** Ein Abschnitt: drei Kämpfe, kurze Rast vor dem dritten (nicht in Hardcore). skala: Faktor statt der Tabelle SKALA */
+function abschnitt(seed, gruppe, stufe, skala, hard = HARD) {
   let zust = null;
   for (let k = 0; k < 3; k++) {
-    if (zust) zust = k === 2 && !HARD ? R.kurzeRast(zust) : R.neuerKampf(zust);
-    const st = R.neuesSpiel(seed * 7 + k, { figuren: gruppe, stufe, gegner: BEGEGNUNGEN[stufe][k](Math.round(gruppe.length * STAERKE[stufe])), vorher: zust, sparen: [1.6, 1.0, 0.2][k], schwierigkeit: HARD ? "hardcore" : "normal" });
+    if (zust) zust = k === 2 && !hard ? R.kurzeRast(zust) : R.neuerKampf(zust);
+    const st = R.neuesSpiel(seed * 7 + k, { figuren: gruppe, stufe, begegnung: ABSCHNITT[stufe][k], skala, vorher: zust, sparen: [1.6, 1.0, 0.2][k], schwierigkeit: hard ? "hardcore" : "normal" });
     let z = 0;
     while (!st.ende && z++ < 800) { if (R.aktiv(st).seite === "gegner") R.gegnerZug(st); else R.autoZug(st); }
     if (st.ende !== "sieg") return { sieg: false, tp: 0, tote: R.spielerFiguren(st).filter((f) => f.tot).length };
@@ -32,6 +28,8 @@ function abschnitt(seed, gruppe, stufe) {
   const sp = Object.entries(zust);
   return { sieg: true, tp: sp.reduce((a, [fid, z]) => a + (z.tot ? 0 : z.tp / F.tpVon(fid, stufe)), 0) / sp.length, tote: sp.filter(([, z]) => z.tot).length };
 }
+module.exports = { abschnitt, ABSCHNITT };
+if (require.main !== module) return;
 const rnd = R.rng(424242);
 let ausserhalb = 0;
 const t0 = Date.now();
@@ -58,4 +56,4 @@ for (const stufe of [1, 2, 3]) {
   }
 }
 console.log(`\n${ausserhalb ? ausserhalb + " Werte außerhalb ±" + GRENZE + " Prozentpunkte" : "Alle 45 Werte innerhalb ±" + GRENZE + " Prozentpunkte"} · ${((Date.now() - t0) / 1000).toFixed(0)} s`);
-if (require.main === module) process.exit(ausserhalb ? 1 : 0);
+process.exit(ausserhalb ? 1 : 0);

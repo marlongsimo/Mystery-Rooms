@@ -127,15 +127,15 @@
     let zuletzt = null; try { zuletzt = localStorage.getItem(FIGUR_KEY); } catch (e) { /* privat */ }
     const liste = kampf ? gruppe : F.REIHE;
     app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)} · Stufe ${s.stufe || 1}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p><h1>Wähle deine Figur</h1>
-      ${kampf ? `<p class="note">Der Kampf läuft schon. Du kannst eine Figur übernehmen, die gerade der Tisch steuert.</p>` : ""}
+      ${kampf ? `<p class="note">Der Kampf läuft schon. Du kannst eine Figur übernehmen, deren Handy die Runde verlassen hat.</p>` : `<p class="note">Jede Person spielt eine Figur. Es spielen nur die gewählten Figuren, mindestens 3.</p>`}
       <div class="fkarten handy-karten">${liste.map((fid) => {
         const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], uid = s.besitz && s.besitz[fid], frei = !uid;
-        const voll = !kampf && !gruppe.includes(fid) && gruppe.length >= 6;
-        const status = H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : gruppe.includes(fid) ? "in der Gruppe" : voll ? "Gruppe voll" : "frei";
+        const voll = !kampf && Object.keys(s.besitz || {}).length >= 6;
+        const status = H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : kampf ? "wartet auf jemanden" : voll ? "Gruppe voll" : "frei";
         return `<button class="fkarte ${gruppe.includes(fid) ? "an" : ""} ${zuletzt === fid ? "zuletzt" : ""}" data-fid="${fid}" ${frei && !voll && !H.wahlOffen ? "" : "disabled"} style="--k:${k.farbe}">
           <img src="${F.bild(fid)}" alt=""><span class="klasse">${esc(k.name)}</span><b>${esc(d.name)}</b><small>${esc(d.titel)}</small><em>${esc(status)}</em></button>`;
       }).join("")}</div>
-      <p class="note">Figuren, die niemand wählt, steuert ihr am Tisch.</p><p class="fb">${esc(H.fehler)}</p></section>`;
+      <p class="fb">${esc(H.fehler)}</p></section>`;
     app.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => waehle(b.dataset.fid); });
   }
 

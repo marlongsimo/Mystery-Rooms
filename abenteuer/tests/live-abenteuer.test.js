@@ -2,7 +2,7 @@
  * Abenteuer – Tablet als Spieltisch, Handys als Charakterbogen, gegen die echte Datenbank (Kennung „abenteuer“).
  * Tisch eröffnet (QR, Code) → zwei Handys treten bei, wählen Figuren aus den 15 (eine schon in der Gruppe, eine neu
  * dazu; Doppelwahl gesperrt) → Sicherheit: fremde Einträge („wahl:“ eines anderen, gefälschtes „spiel“) werden ignoriert →
- * Kampf: Bewegen am Tisch, Aktion + Ziel + Würfeln am Handy, Zug beenden am Handy, freie Figuren am Tisch →
+ * Kampf: Bewegen am Tisch, Aktion + Ziel + Würfeln am Handy, Zug beenden am Handy, nur Figuren der Handys →
  * Handy und Tisch neu laden mitten im Kampf → Kampf bis zum Ende → Tisch beendet, Handys werden getrennt.
  * Aufruf: python3 -m http.server 8765 &  ·  node abenteuer/tests/live-abenteuer.test.js
  */
@@ -28,8 +28,8 @@ const { chromium } = require('playwright');
   check((await T.$$('.fkarte')).length === 15, 'Tisch: 15 Figuren zur Wahl');
 
   // Handys
-  const A = await page({ width: 390, height: 844 }, 'Anna'), Bn = await page({ width: 390, height: 844 }, 'Ben');
-  for (const [P, n] of [[A, 'Anna'], [Bn, 'Ben']]) {
+  const A = await page({ width: 390, height: 844 }, 'Anna'), Bn = await page({ width: 390, height: 844 }, 'Ben'), C = await page({ width: 390, height: 844 }, 'Cara');
+  for (const [P, n] of [[A, 'Anna'], [Bn, 'Ben'], [C, 'Cara']]) {
     await P.goto(BASE + '/abenteuer/handy.html' + QH + '#' + code);
     await P.evaluate(() => localStorage.clear());
     await P.goto(BASE + '/abenteuer/handy.html' + QH + '#' + code);
@@ -39,11 +39,15 @@ const { chromium } = require('playwright');
   }
   if (SHOT) await A.screenshot({ path: SHOT + '/live-handy-wahl.png', fullPage: true });
   await A.click('[data-fid="schildwaechter"]');
-  check(await until(A, () => /Torvald/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Anna: Torvald (schon in der Gruppe) gewählt, Charakterbogen offen');
+  check(await until(A, () => /Torvald/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Anna: Torvald gewählt, Charakterbogen offen');
   check(await until(Bn, () => document.querySelector('[data-fid="schildwaechter"]')?.disabled === true), 'Ben: Torvald ist für ihn gesperrt');
   await Bn.click('[data-fid="tiergefaehrte"]');
-  check(await until(Bn, () => /Faye/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Ben: Faye gewählt (kommt neu in die Gruppe)');
-  check(await until(T, () => { const t = document.querySelector('.fkarten').textContent; return /Anna/.test(t) && /Ben/.test(t) && document.querySelectorAll('.fkarte.an').length === 4; }), 'Tisch: Gruppe jetzt 4 Figuren, Anna und Ben sichtbar');
+  check(await until(Bn, () => /Faye/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Ben: Faye gewählt');
+  check(await until(T, () => document.querySelectorAll('.fkarte.an').length === 2 && document.querySelector('#los').disabled && /noch 1/.test(document.querySelector('#lobby').textContent)), 'Tisch: nur die 2 gewählten Figuren in der Gruppe, Start gesperrt (mindestens 3)');
+  check(await T.evaluate(() => [...document.querySelectorAll('.fkarte')].every((b) => b.disabled)), 'Tisch: Mit Handys kann der Tisch keine Figuren dazunehmen');
+  await C.click('[data-fid="gelehrter"]');
+  check(await until(C, () => /Lyra/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Cara: Lyra gewählt');
+  check(await until(T, () => { const t = document.querySelector('.fkarten').textContent; return /Anna/.test(t) && /Ben/.test(t) && /Cara/.test(t) && document.querySelectorAll('.fkarte.an').length === 3 && !document.querySelector('#los').disabled; }), 'Tisch: Gruppe = genau die 3 Figuren der Handys, Start frei');
   if (SHOT) await T.screenshot({ path: SHOT + '/live-lobby.png', fullPage: true });
 
   // Sicherheit innerhalb der Sitzung
@@ -65,10 +69,10 @@ const { chromium } = require('playwright');
 
   await T.click('#los');
   check(await until(A, () => window.ABH.H.spiel && window.ABH.H.spiel.phase === 'kampf'), 'Kampf beginnt, Anna bekommt den Stand');
-  check(await T.evaluate(() => window.AB.st.figuren.some((f) => f.art === 'wolf')), 'Faye kämpft mit Grau');
+  check(await T.evaluate(() => window.AB.st.figuren.some((f) => f.art === 'wolf') && window.AB.R.spielerFiguren(window.AB.st).map((f) => f.fid).sort().join() === 'gelehrter,schildwaechter,tiergefaehrte'), 'Im Kampf nur Torvald, Faye (mit Grau) und Lyra');
 
   // Kampf
-  const handys = { schildwaechter: A, tiergefaehrte: Bn };
+  const handys = { schildwaechter: A, tiergefaehrte: Bn, gelehrter: C };
   let handyAktion = false, bewegt = false, neuGeladen = false, tischNeu = false, Tc = T;
   for (let i = 0; i < 400; i++) {
     const s = await Tc.evaluate(() => { const st = window.AB.st; if (!st) return null; const f = window.AB.R.aktiv(st); return { ende: st.ende, id: f.id, fid: f.fid, seite: f.seite }; });
@@ -82,7 +86,7 @@ const { chromium } = require('playwright');
     const ziel = await Tc.evaluate(() => { const st = window.AB.st, R = window.AB.R, f = R.aktiv(st); const g = st.figuren.filter((o) => o.seite === 'gegner' && o.tp > 0).sort((a, c) => R.abstand(f, a) - R.abstand(f, c))[0]; if (!g || R.abstand(f, g) <= 1) return null; let best = null; for (const [k, c] of R.bewegungsfelder(st, f)) { if (c === 'schritt') continue; const [x, y] = k.split(',').map(Number); const d = R.abstand({ x, y }, g); if (!best || d < best.d) best = { x, y, d }; } return best && (best.x !== f.x || best.y !== f.y) ? best : null; });
     if (ziel) { await Tc.click(`#karte .feld[data-x="${ziel.x}"][data-y="${ziel.y}"]`, { force: true }); bewegt = true; await until(P, () => window.ABH.H.spiel.zug.bewegung < 6, null, 10000); }
     // Aktion am Handy: Angriff mit Gegner-Ziel
-    const opt = await P.evaluate(() => { const o = (window.ABH.H.spiel.optionen || []).find((o) => o.ok && o.ziele.some((z) => z.seite === 'gegner') && /schwert|bogen|befehl|langschwert/.test(o.id)); return o && o.id; });
+    const opt = await P.evaluate(() => { const o = (window.ABH.H.spiel.optionen || []).find((o) => o.ok && o.ziele.some((z) => z.seite === 'gegner') && /schwert|bogen|befehl|funke/.test(o.id)); return o && o.id; });
     if (opt) {
       const vorher = await Tc.evaluate(() => window.AB.st.log.length);
       await P.click(`[data-opt="${opt}"]`);
@@ -121,7 +125,7 @@ const { chromium } = require('playwright');
 
   await Tc.click('#live-ende');
   check(await until(A, () => Boolean(document.querySelector('#rein')), null, 20000), 'Tisch beendet die Sitzung: Anna ist wieder beim Beitreten');
-  check(await until(Bn, () => Boolean(document.querySelector('#rein')), null, 20000), 'Ben ebenso');
+  check(await until(Bn, () => Boolean(document.querySelector('#rein')), null, 20000) && await until(C, () => Boolean(document.querySelector('#rein')), null, 20000), 'Ben und Cara ebenso');
 
   check(errs.length === 0, 'keine Seitenfehler' + (errs.length ? ': ' + errs.join(' | ') : ''));
   await b.close(); console.log(ok ? '\nLIVE IN ORDNUNG' : '\nFEHLER'); process.exit(ok ? 0 : 1);

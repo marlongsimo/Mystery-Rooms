@@ -1,7 +1,7 @@
 # Die 15 Charaktere – Stufe 1 bis 3
 
 **Case Unlocked · Abenteuer · Die Splitterlande**
-Stand 0.1 · Entwurf zur Freigabe. Die Zahlen sind mit `abenteuer/tools/balance.js` abgestimmt (Abschnitt 7).
+Stand 0.2 · in der Engine (`js/figuren.js`, `js/regeln.js`). Die Zahlen sind mit der Kampf-Simulation `tools/simulation.js` abgestimmt (Abschnitt 7).
 
 Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 - **Grundangriff:** immer verfügbar
@@ -31,275 +31,357 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Klasse | Würfel | Merkmal (alle drei Figuren) | ab Stufe 2 |
 |---|---|---|---|
-| **Krieger** | W10 | **Zweiter Atem:** Bonusaktion, heilt 1W10 + Stufe, 1× je Rast | **Tatendrang:** eine zusätzliche Aktion, 1× je Rast |
+| **Krieger** | W10 | **Zweiter Atem:** Bonusaktion, heilt 1W10 + Stufe, 1× je Rast | **Tatendrang:** eine zusätzliche Aktion, 1× je lange Rast |
 | **Zauberer** | W8 | **Arkaner Schutz:** RK 11 + GES ohne Rüstung (13). **Arkane Wucht:** Zaubertricks + INT Schaden. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad | – |
-| **Schurke** | W8 | **Hinterhalt:** +1W6 (Stufe 3: +2W6) einmal je Zug, wenn mit Vorteil oder ein Verbündeter neben dem Ziel steht | **Gerissene Aktion:** Bonusaktion Spurt, Verstecken oder Rückzug |
+| **Schurke** | W8 | **Hinterhalt:** +1W6 (ab Stufe 2: +2W6) einmal je Zug, wenn mit Vorteil oder ein Verbündeter neben dem Ziel steht | **Gerissene Aktion:** Bonusaktion Spurt, Verstecken oder Rückzug |
 | **Kleriker** | W8 | **Heilendes Wort:** Bonusaktion, Platz, 1W4 + WEI auf 6 Felder, auch am Boden. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad | **Göttliche Macht:** je Figur verschieden, 1× je Rast |
 | **Waldläufer** | W10 | **Jägermal:** Bonusaktion, ein Ziel bis Kampfende markiert, +1W6 Schaden bei jedem Treffer, 2 / 3 / 3 je lange Rast. **Fährtenleser:** Vorteil auf Spuren und Wahrnehmung im Freien | – |
 
 ---
 
+<!-- FIGUREN:START -->
+<!-- Dieser Teil wird von tools/charaktere-doc.js aus js/figuren.js erzeugt. Nicht von Hand ändern. -->
+
 ## 2 · Krieger
 
-### Schildwächter – „Niemand fällt, solange ich stehe.“
-**Rolle:** vorn, beschützt · **Werte:** STR 16 · KON 14 · WEI 13 · CHA 12 · GES 10 · INT 8
-**TP** 12 / 20 / 28 · **RK** 18 (Kettenpanzer und Schild), Stufe 3: 19
+### Torvald – Der Schildwächter
+„Niemand fällt, solange ich stehe.“
 
-| | |
-|---|---|
-| **Grundangriff** | Langschwert +5, 1W8 + 3 |
-| **Passiv: Schutzhaltung** | Reaktion: Ein Angriff gegen einen Verbündeten **neben ihm** erfolgt mit Nachteil. |
-| **Aktiv: Spott** | Bonusaktion, beliebig oft: Ein Gegner in 6 Feldern hat bis zu seinem nächsten Zug Nachteil gegen alle außer dem Schildwächter. |
-| **Aktiv: Schildstoß** | Statt eines Angriffs, 1× je Kampf: Ziel macht einen STR-Rettungswurf gegen SG 13, sonst wird es 1 Feld weggestoßen und liegt. |
-| **Außerhalb: Stemmen** | Vorteil auf Stärke für Türen, Gitter, Trümmer; zieht Verbündete über Abgründe |
-| **Stufe 2** | Tatendrang |
-| **Stufe 3: Bollwerk** | Schutzhaltung zweimal je Runde, RK 19 |
-| **Versuchung** | „Du kannst jeden beschützen, den du je verloren hast. Ich gebe sie dir zurück.“ Wahr, aber sie kehren als Schatten zurück, die nur leben, solange das Siegel offen ist. |
-| **Moment in Grauwacht** | 2.3 Der Schacht: Er kann Tam halten, während die anderen kämpfen (zählt als Aktion, ersetzt die Kletterprobe). |
+**Rolle:** vorn, beschützt · **Werte:** STR 16 (+3) · GES 10 (+0) · KON 14 (+2) · INT 8 (-1) · WEI 13 (+1) · CHA 12 (+1)
+**TP** 12 / 20 / 28 · **RK** 18 (Kettenpanzer und Schild)
 
-### Berserker – „Je mehr es wehtut, desto klarer sehe ich.“
-**Rolle:** vorn, hoher Schaden, nimmt viel · **Werte:** STR 16 · KON 14 · GES 13 · WEI 12 · CHA 10 · INT 8
-**TP** 12 / 20 / 28 · **RK** 13 (Fell 12 + GES)
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Langschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
+| **Spott** | 1 | Bonusaktion · 6 Felder · 2× je Rast | Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir. |
+| **Schildstoß** | 1 | Aktion · Nahkampf · STR-Rettung SG 13 · 1× je Kampf | STR-Rettungswurf, sonst wird das Ziel 1 Feld weggestoßen und liegt. |
+| **Zweiter Atem** | 1 | Bonusaktion · heilt 1W10 + Stufe · 1× je Rast | Heilt dich um 1W10 + Stufe. |
+| **Tatendrang** | 2 | frei · 1× je lange Rast | Eine zusätzliche Aktion in diesem Zug, einmal je lange Rast. |
+| **Schutzhaltung** | 1 | passiv | Reaktion, automatisch: Ein Angriff gegen einen Verbündeten neben dir erfolgt mit Nachteil (ab Stufe 3 zweimal je Runde). |
+| **Bollwerk** | 3 | passiv | Schutzhaltung zweimal je Runde. |
+| **Stemmen** | – | außerhalb des Kampfes | Vorteil auf Stärke für Türen, Gitter, Trümmer; zieht Verbündete über Abgründe. |
 
-| | |
-|---|---|
-| **Grundangriff** | Großaxt +5, 1W12 + 3 |
-| **Passiv: Blutrausch** | Unter halben TP: +1 Schaden und Vorteil auf Stärke-Proben |
-| **Aktiv: Raserei** | Bonusaktion, 1× je Rast, bis Kampfende: Waffenschaden gegen ihn halbiert, +2 Schaden. In Raserei kann er nicht zaubern oder heilen lassen*. |
-| **Aktiv: Rücksichtslos** | Bei jedem Angriff wählbar: Vorteil auf seine Angriffe in diesem Zug, Angriffe gegen ihn mit Vorteil bis zu seinem nächsten Zug. |
-| **Außerhalb: Einschüchtern** | Vorteil auf Drohungen; im Glockenturm ersetzt er die Charisma-Probe der Verhandlung. |
-| **Stufe 2** | Tatendrang |
-| **Stufe 3: Unbändig** | Raserei zusätzlich 1× je lange Rast |
-| **Versuchung** | „Du wirst nie wieder Angst haben.“ Wahr: Er fühlt danach gar nichts mehr. |
-| **Moment in Grauwacht** | 3.1 Coldric: Hält er Coldric allein im Zweikampf eine Runde stand, ohne zu fallen, erkennt Coldric einen Krieger und nimmt den Namen leichter an (Probe mit Vorteil). |
+**Versuchung des Abts:** „Du kannst jeden beschützen, den du je verloren hast. Ich gebe sie dir zurück.“ Wahr, aber sie kehren als Schatten zurück, die nur leben, solange das Siegel offen ist.
 
-\* Heilung wirkt in Raserei nur zur Hälfte. Das ist im Modell als Teil der Schadenshalbierung berücksichtigt.
+**Moment in Grauwacht:** Der Schacht: Er kann Tam halten, während die anderen kämpfen.
 
-### Duellant – „Ein Fehler. Mehr brauche ich nicht.“
-**Rolle:** vorn, Einzelkampf, Gegenangriffe · **Werte:** GES 16 · KON 14 · CHA 13 · WEI 12 · STR 10 · INT 8
-**TP** 12 / 20 / 28 · **RK** 15 (beschlagenes Leder 12 + GES)
+### Ragnar – Der Berserker
+„Je mehr es wehtut, desto klarer sehe ich.“
 
-| | |
-|---|---|
-| **Grundangriff** | Rapier +5, 1W8 + 3 |
-| **Passiv: Parade** | Reaktion: Verfehlt ihn ein Nahangriff, greift er den Angreifer sofort an. |
-| **Aktiv: Finte** | Bonusaktion, 2× je Rast: Nächster Angriff mit Vorteil und +1W6 Schaden |
-| **Aktiv: Entwaffnen** | Statt eines Angriffs, 1× je Kampf: Ziel macht einen STR-Rettungswurf gegen SG 13, sonst macht es 2 Runden nur halben Schaden. |
-| **Außerhalb: Ehrenkodex** | Vorteil bei Gesprächen mit Rittern und Kriegern, erkennt Kampfstile und Waffenspuren |
-| **Stufe 2** | Tatendrang |
-| **Stufe 3: Klingenmeister** | Kritischer Treffer schon bei 19–20 |
-| **Versuchung** | „Ich zeige dir den einen Gegner, den du nie besiegt hast, und lasse dich gewinnen.“ Wahr, aber der Sieg ist eine Erinnerung, die alle anderen ersetzt. |
-| **Moment in Grauwacht** | 3.1 Coldric: Er kann Coldric zum Ehrenduell fordern. Dann kämpfen nur die beiden, die Aschehunde warten (CHA-Probe, Vorteil durch Ehrenkodex). |
+**Rolle:** vorn, hoher Schaden · **Werte:** STR 16 (+3) · GES 13 (+1) · KON 14 (+2) · INT 8 (-1) · WEI 12 (+1) · CHA 10 (+0)
+**TP** 12 / 20 / 28 · **RK** 13 (Fell)
 
----
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Großaxt** | 1 | Aktion · Nahkampf · Angriff +5 · 1W12 + 3 | Nahkampf. |
+| **Großaxt, rücksichtslos** | 1 | Aktion · Nahkampf · Angriff +5 · 1W12 + 3 | Vorteil auf deinen Angriff, aber Angriffe gegen dich haben Vorteil bis zu deinem nächsten Zug. |
+| **Raserei** | 1 | Bonusaktion · 1× je Rast | Bis Kampfende: Waffenschaden gegen dich halbiert, +2 Schaden. Heilung wirkt nur halb. |
+| **Zweiter Atem** | 1 | Bonusaktion · heilt 1W10 + Stufe · 1× je Rast | Heilt dich um 1W10 + Stufe. |
+| **Tatendrang** | 2 | frei · 1× je lange Rast | Eine zusätzliche Aktion in diesem Zug, einmal je lange Rast. |
+| **Blutrausch** | 1 | passiv | Unter halben TP: +1 Schaden und Vorteil auf Stärke-Proben. |
+| **Unbändig** | 3 | passiv | Blutrausch gibt +2 statt +1 Schaden. |
+| **Einschüchtern** | – | außerhalb des Kampfes | Vorteil auf Drohungen; im Glockenturm ersetzt er die Charisma-Probe. |
+
+**Versuchung des Abts:** „Du wirst nie wieder Angst haben.“ Wahr: Er fühlt danach gar nichts mehr.
+
+**Moment in Grauwacht:** Coldric: Hält er ihm eine Runde allein stand, nimmt Coldric den Namen leichter an.
+
+### Isolde – Die Duellantin
+„Ein Fehler. Mehr brauche ich nicht.“
+
+**Rolle:** vorn, Einzelkampf · **Werte:** STR 10 (+0) · GES 16 (+3) · KON 14 (+2) · INT 8 (-1) · WEI 12 (+1) · CHA 13 (+1)
+**TP** 12 / 20 / 28 · **RK** 15 (beschlagenes Leder)
+
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Rapier** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
+| **Finte** | 1 | Bonusaktion · 2× je Rast | Dein nächster Angriff hat Vorteil und macht +1W6. |
+| **Entwaffnen** | 1 | Aktion · Nahkampf · STR-Rettung SG 13 · 1× je Kampf | STR-Rettungswurf, sonst macht das Ziel 2 Runden nur halben Schaden. |
+| **Zweiter Atem** | 1 | Bonusaktion · heilt 1W10 + Stufe · 1× je Rast | Heilt dich um 1W10 + Stufe. |
+| **Tatendrang** | 2 | frei · 1× je lange Rast | Eine zusätzliche Aktion in diesem Zug, einmal je lange Rast. |
+| **Parade** | 1 | passiv | Reaktion, automatisch: Verfehlt dich ein Nahangriff, greifst du sofort an. |
+| **Klingenmeisterin** | 3 | passiv | Kritischer Treffer schon bei 19–20. |
+| **Ehrenkodex** | – | außerhalb des Kampfes | Vorteil bei Gesprächen mit Rittern und Kriegern, erkennt Kampfstile. |
+
+**Versuchung des Abts:** „Ich zeige dir den einen Gegner, den du nie besiegt hast, und lasse dich gewinnen.“ Wahr, aber der Sieg ersetzt alle anderen Erinnerungen.
+
+**Moment in Grauwacht:** Coldric: Sie kann ihn zum Ehrenduell fordern.
 
 ## 3 · Zauberer
 
-### Gelehrter – „Alles hat eine Ordnung. Auch das hier.“
-**Rolle:** hinten, Schwächen aufdecken, schützen, Rätsel · **Werte:** INT 16 · GES 14 · KON 13 · WEI 12 · CHA 10 · STR 8
-**TP** 9 / 15 / 21 · **RK** 13 · **Plätze** 3 / 4 / 5
+### Lyra – Die Gelehrte
+„Alles hat eine Ordnung. Auch das hier.“
 
-| | |
-|---|---|
-| **Grundangriff** | Arkaner Funke (Zaubertrick) +5, 12 Felder, 1W10 + 3 |
-| **Passiv: Analyse** | Bonusaktion, beliebig oft: Ein Gegner hat bis Rundenende −2 RK; TP, Widerstände und Schwächen werden für alle sichtbar. |
-| **Aktiv: Schutzglyphe** | Reaktion, Platz: Ein Verbündeter in 6 Feldern bekommt +5 RK gegen einen Angriff. |
-| **Aktiv: Zeitriss** | Aktion, Platz: Ziel macht einen WEI-Rettungswurf gegen SG 13, sonst ist es 2 Runden verlangsamt, ohne Bonusaktion und mit −2 RK. |
-| **Außerhalb: Alte Schriften** | Liest jede Schrift der Abtei, erhält bei Rätseln einen zusätzlichen Hinweis, Vorteil auf Intelligenz |
-| **Stufe 2: Gedankenstütze** | 2× je Rast: Ein Verbündeter darf einen gerade gewürfelten W20 wiederholen. |
-| **Stufe 3: Bannkreis** | Grad 2: Kreis mit 2 Feldern Radius, 3 Runden, Gegner darin −2 RK |
-| **Versuchung** | „Ich gebe dir Wissen, das niemand sonst besitzen darf.“ Wahr, aber man kann es nie wieder vergessen und nie jemandem sagen. |
-| **Moment in Grauwacht** | 2.4 Bibliothek: Er liest Anselms Tagebuch ohne Probe vollständig (`wahrheit_frueh`). |
+**Rolle:** hinten, Schwächen aufdecken, schützen · **Werte:** STR 8 (-1) · GES 14 (+2) · KON 13 (+1) · INT 16 (+3) · WEI 12 (+1) · CHA 10 (+0)
+**TP** 9 / 15 / 21 · **RK** 13 (Arkaner Schutz) · **Zauberplätze** 3 / 4 / 3+2
 
-### Elementarist – „Feuer fragt nicht.“
-**Rolle:** hinten, Flächenschaden, Gelände · **Werte:** INT 16 · GES 14 · KON 13 · WEI 12 · CHA 10 · STR 8
-**TP** 9 / 15 / 21 · **RK** 13 · **Plätze** 3 / 4 / 5
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Arkaner Funke** | 1 | Aktion · 12 Felder · Angriff +5 · 1W10 + 3 | Zaubertrick. |
+| **Analyse** | 1 | Bonusaktion · 12 Felder | Der nächste Angriff gegen den Gegner (bis Rundenende) trifft gegen −2 RK; seine Werte sind für alle sichtbar. |
+| **Zeitriss** | 1 | Aktion · 12 Felder · WEI-Rettung SG 13 · 1 Zauberplatz | WEI-Rettungswurf, sonst 2 Runden verlangsamt, ohne Bonusaktion und −2 RK. |
+| **Bannkreis** | 3 | Aktion · 12 Felder · Radius 2 · Platz vom 2. Grad | Kreis mit 2 Feldern Radius um ein Ziel, 3 Runden: Gegner darin −2 RK. |
+| **Schutzglyphe** | 1 | passiv | Reaktion, automatisch, kostet einen Platz: +5 RK für einen Verbündeten in 6 Feldern gegen einen Treffer, wenn es ihn sonst schwer erwischt. |
+| **Gedankenstütze** | 2 | passiv · 2× je Rast | Automatisch, 2× je Rast: Ein Verbündeter wiederholt einen knapp misslungenen W20. |
+| **Arkaner Schutz und Arkane Wucht** | 1 | passiv | RK 11 + GES ohne Rüstung. Deine Zaubertricks machen + INT Schaden. |
+| **Alte Schriften** | – | außerhalb des Kampfes | Liest jede Schrift der Abtei, zusätzlicher Hinweis bei Rätseln. |
 
-| | |
-|---|---|
-| **Grundangriff** | Glutpfeil (Zaubertrick) +5, 12 Felder, 1W10 + 3; das getroffene Feld brennt 1 Runde (1W4 beim Betreten). |
-| **Passiv: Zauberformung** | Eigene Flächenzauber treffen keine Verbündeten. |
-| **Aktiv: Frosthauch** | Aktion, Platz: Kegel 3 Felder, 3W6 Kälte, KON-Rettungswurf gegen SG 13 halbiert; wer verfehlt, ist 1 Runde verlangsamt. |
-| **Aktiv: Magisches Geschoss** | Aktion, Platz: drei Pfeile, je 1W4 + 1, treffen immer (auch verteilt). |
-| **Außerhalb: Elementarsinn** | Spürt Hitze, Kälte und Luftzug: findet Geheimgänge und Glutfallen, entzündet und löscht Feuer |
-| **Stufe 2: Donnerwelle** | Platz: Kegel 3 Felder, 2W8, Rettung halbiert, wer verfehlt, wird 2 Felder zurückgestoßen. |
-| **Stufe 3: Glutsphäre** | Grad 2: 3W6 Feuer in 2 Feldern Radius, Rettung halbiert |
-| **Versuchung** | „Ich gebe dir das Feuer, das nie erlischt.“ Wahr, aber es brennt in dir weiter. |
-| **Moment in Grauwacht** | 3.1 Halle der Asche: Er kann die Glut im Boden mit Frosthauch löschen. Ein Bereich wird sicher, und ein Aschehund verliert seinen Glutatem. |
+**Versuchung des Abts:** „Ich gebe dir Wissen, das niemand sonst besitzen darf.“ Wahr, aber man kann es nie wieder vergessen und nie jemandem sagen.
 
-### Schattenmagier – „Was du siehst, entscheide ich.“
-**Rolle:** hinten, Kontrolle, Illusion · **Werte:** INT 16 · GES 14 · KON 13 · CHA 12 · WEI 10 · STR 8
-**TP** 9 / 15 / 21 · **RK** 13 · **Plätze** 3 / 4 / 5
+**Moment in Grauwacht:** Bibliothek: Sie liest Anselms Tagebuch ohne Probe vollständig.
 
-| | |
-|---|---|
-| **Grundangriff** | Schattenstich (Zaubertrick) 12 Felder, WEI-Rettungswurf gegen SG 13, sonst 1W10 + 3 und Nachteil auf den nächsten Angriff des Ziels |
-| **Passiv: Trugbild** | Der erste Angriff gegen ihn in jedem Kampf erfolgt mit Nachteil. |
-| **Aktiv: Furcht** | Aktion, Platz: WEI-Rettungswurf gegen SG 13, sonst ist das Ziel 2 Runden verängstigt. |
-| **Aktiv: Schattenfesseln** | Aktion, Platz: STR-Rettungswurf gegen SG 13, sonst ist das Ziel 2 Runden festgehalten. |
-| **Außerhalb: Blendwerk** | Erzeugt Geräusche und Trugbilder (Ablenkung statt Schleichen), erkennt Illusionen |
-| **Stufe 2: Schattenschritt und Spiegelbilder** | Schattenschritt: Bonusaktion, 2× je Rast, 6 Felder teleportieren. Spiegelbilder: Platz, 3 Bilder, jeder Angriff trifft zu 50 % ein Bild statt ihn, bis alle verbraucht sind. |
-| **Stufe 3: Albtraum** | Grad 2: 2 Ziele, WEI-Rettungswurf; bei Fehlschlag 2W8 psychisch und 1 Runde verängstigt, bei Erfolg 1W8 |
-| **Versuchung** | „Niemand wird je wieder sehen, wer du wirklich bist.“ Wahr, auch nicht die, die dich lieben. |
-| **Moment in Grauwacht** | 3.2 Das Flüstern: Er erkennt das Angebot des Abts als Trugbild und sieht, welche anderen Figuren eines bekommen haben (nicht, wie sie entschieden haben). |
+### Vaelin – Der Elementarist
+„Feuer fragt nicht.“
 
----
+**Rolle:** hinten, Flächenschaden · **Werte:** STR 8 (-1) · GES 14 (+2) · KON 13 (+1) · INT 16 (+3) · WEI 12 (+1) · CHA 10 (+0)
+**TP** 9 / 15 / 21 · **RK** 13 (Arkaner Schutz) · **Zauberplätze** 3 / 4 / 3+2
 
-## 4 · Schurken
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Glutpfeil** | 1 | Aktion · 12 Felder · Angriff +5 · 1W10 + 3 | Zaubertrick. Das Feld des Ziels brennt 1 Runde (1W4). |
+| **Frosthauch** | 1 | Aktion · 12 Felder · Radius 1 · KON-Rettung SG 13 · 2W6 · 1 Zauberplatz | Eiswolke um ein Ziel (1 Feld Radius), 2W6 Kälte, Rettung halbiert; wer verfehlt, ist verlangsamt. |
+| **Magisches Geschoss** | 1 | Aktion · 12 Felder · 1W4 ×3 + 1 · 1 Zauberplatz | Drei Pfeile, je 1W4 + 1, treffen immer. |
+| **Donnerwelle** | 2 | Aktion · 6 Felder · Radius 1 · KON-Rettung SG 13 · 2W8 · 1 Zauberplatz | Donnerschlag um ein Ziel in 6 Feldern (1 Feld Radius), 2W8, Rettung halbiert, wer verfehlt, wird 2 Felder weggestoßen. |
+| **Glutsphäre** | 3 | Aktion · 12 Felder · Radius 2 · GES-Rettung SG 13 · 3W6 · Platz vom 2. Grad | 3W6 Feuer in 2 Feldern Radius um ein Ziel, Rettung halbiert. |
+| **Zauberformung** | 1 | passiv | Deine Flächenzauber treffen keine Verbündeten. |
+| **Elementarer Nachhall** | 2 | passiv | Glutpfeil macht +1W6. |
+| **Arkaner Schutz und Arkane Wucht** | 1 | passiv | RK 11 + GES ohne Rüstung. Deine Zaubertricks machen + INT Schaden. |
+| **Elementarsinn** | – | außerhalb des Kampfes | Spürt Hitze, Kälte und Luftzug: findet Geheimgänge, entzündet und löscht Feuer. |
 
-### Schattenläufer – „Ich war nie hier.“
-**Rolle:** Mitte, Fallen, Schlösser, Bewegung · **Werte:** GES 16 · KON 14 · INT 13 · WEI 12 · CHA 10 · STR 8
-**TP** 10 / 17 / 24 · **RK** 14 (Leder 11 + GES)
+**Versuchung des Abts:** „Ich gebe dir das Feuer, das nie erlischt.“ Wahr, aber es brennt in dir weiter.
 
-| | |
-|---|---|
-| **Grundangriff** | Kurzschwert oder Kurzbogen (16 Felder) +5, 1W6 + 3, dazu Hinterhalt |
-| **Passiv: Leiser Schritt** | Vorteil beim Schleichen; der erste Angriff aus dem Versteck erfolgt mit Vorteil. |
-| **Aktiv: Gerissene Aktion** | Schon ab Stufe 1 (für die anderen Schurken erst ab Stufe 2) |
-| **Aktiv: Rauchbombe** | Aktion, 1× je Rast: 2 Felder Radius, 2 Runden. Wer drin steht, sieht nicht hinaus und wird nicht gesehen. |
-| **Außerhalb: Fallen und Schlösser** | Geübt, Vorteil: entdeckt und entschärft Fallen, öffnet Schlösser ohne Schlüssel |
-| **Stufe 2: Kletterer** | Wände und Schächte ohne Probe, +2 Bewegung beim Klettern (ersetzt das Klassenmerkmal ab Stufe 2) |
-| **Stufe 3: Fallensteller** | Hinterhalt 2W6. Vor einem Kampf, den die Gruppe kommen sieht, legt er eine Falle (2W6, festgehalten). |
-| **Versuchung** | „Niemand wird dich jemals wieder finden.“ Wahr, auch nicht, wenn du gefunden werden willst. |
-| **Moment in Grauwacht** | 2.2b Schmugglerpfad: Er findet ohne Nisk den versteckten Zugang zum Koboldlager und das geheime Fach mit dem Ring des Kobolds. |
+**Moment in Grauwacht:** Halle der Asche: Er kann die Glut im Boden löschen.
 
-### Trickser – „Schau mal da drüben.“
-**Rolle:** Mitte, Ablenkung, Täuschung, rettet andere · **Werte:** GES 16 · CHA 14 · KON 13 · INT 12 · WEI 10 · STR 8
-**TP** 9 / 15 / 21 · **RK** 14
+### Morwen – Die Schattenmagierin
+„Was du siehst, entscheide ich.“
 
-| | |
-|---|---|
-| **Grundangriff** | Dolch, nah oder geworfen (8 Felder), +5, 1W4 + 3, dazu Hinterhalt; mit freier Bonusaktion ein zweiter Dolch 1W4 |
-| **Passiv: Glückspilz** | 1× je Kampf: einen eigenen Wurf wiederholen **oder** einen Gegner seinen Angriff gegen dich wiederholen lassen |
-| **Aktiv: Schmutziger Trick** | Bonusaktion, 2× je Rast (Stufe 3: 3×): Ein Gegner neben ihm macht einen GES-Rettungswurf gegen SG 13, sonst ist er 1 Runde geblendet. |
-| **Aktiv: Platztausch** | Bonusaktion, 1× je Rast: Er tauscht den Platz mit einem Verbündeten in 6 Feldern. |
-| **Außerhalb: Täuschen** | Vorteil auf Lügen, Verkleiden, Taschendiebstahl; erkennt, wenn ihn jemand anlügt, auf Charisma |
-| **Stufe 2** | Gerissene Aktion |
-| **Stufe 3** | Hinterhalt 2W6, Schmutziger Trick 3× je Rast |
-| **Versuchung** | „Ich mache, dass dir jeder glaubt.“ Wahr, du wirst nie wieder wissen, ob jemand dich mag oder nur glaubt. |
-| **Moment in Grauwacht** | 1.3 Glockenturm: Er kann die Kobolde glauben machen, der Abt selbst habe die Gruppe geschickt. Das ist eine dritte Verhandlungsoption, Nisk-Vertrauen +1. |
+**Rolle:** hinten, Kontrolle · **Werte:** STR 8 (-1) · GES 14 (+2) · KON 13 (+1) · INT 16 (+3) · WEI 10 (+0) · CHA 12 (+1)
+**TP** 9 / 15 / 21 · **RK** 14 (Arkaner Schutz und Schattenmantel) · **Zauberplätze** 3 / 4 / 3+2
 
-### Assassine – „Ein Schnitt. Kein Laut.“
-**Rolle:** Mitte, Einzelziel, Eröffnung · **Werte:** GES 16 · INT 14 · KON 13 · WEI 12 · CHA 10 · STR 8
-**TP** 9 / 15 / 21 · **RK** 14
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Schattenstich** | 1 | Aktion · 12 Felder · WEI-Rettung SG 13 · 1W10 + 3 | Zaubertrick. WEI-Rettungswurf, sonst Schaden und Nachteil auf den nächsten Angriff des Ziels. |
+| **Furcht** | 1 | Aktion · 12 Felder · Radius 1 · WEI-Rettung SG 13 · 1 Zauberplatz | Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf, sonst 2 Runden verängstigt. |
+| **Schattenfesseln** | 1 | Aktion · 12 Felder · STR-Rettung SG 13 · 1 Zauberplatz | STR-Rettungswurf, sonst 2 Runden festgehalten. |
+| **Schattenschritt** | 2 | Bonusaktion · 2× je Rast | Bis zu 6 Felder durch Schatten, über Hindernisse hinweg und ohne Gelegenheitsangriffe. |
+| **Spiegelbilder** | 2 | Aktion · 1 Zauberplatz | 3 Bilder: Jeder Angriff trifft zu 50 % ein Bild statt dich. |
+| **Albtraum** | 3 | Aktion · 12 Felder · Radius 1 · WEI-Rettung SG 13 · 2W8 · Platz vom 2. Grad | Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf; bei Fehlschlag 2W8 und 1 Runde verängstigt, sonst 1W8. |
+| **Trugbild** | 1 | passiv | Der erste Angriff gegen dich in jeder Runde erfolgt mit Nachteil. |
+| **Arkaner Schutz und Arkane Wucht** | 1 | passiv | RK 11 + GES ohne Rüstung. Deine Zaubertricks machen + INT Schaden. |
+| **Blendwerk** | – | außerhalb des Kampfes | Erzeugt Geräusche und Trugbilder als Ablenkung, erkennt Illusionen. |
 
-| | |
-|---|---|
-| **Grundangriff** | Kurzschwert +5, 1W8 + 3 (Klinge der Gilde) oder leichte Armbrust (16 Felder) 1W8 + 3, dazu Hinterhalt |
-| **Passiv: Todesstoß** | Vorteil gegen Gegner, die im Kampf noch nicht gehandelt haben; Treffer gegen **überraschte** Gegner sind kritisch. |
-| **Aktiv: Gift** | Bonusaktion, 2× je Rast: Der nächste Treffer macht +1W6 Gift, das Ziel ist 1 Runde vergiftet. |
-| **Aktiv: Aus dem Schatten** | Bonusaktion, beliebig oft: Verstecken, wenn er hinter Deckung steht |
-| **Außerhalb: Lautlos** | Kann einen einzelnen ahnungslosen Wächter ohne Kampf ausschalten (Probe GES mittel); verwischt Spuren |
-| **Stufe 2** | Gerissene Aktion |
-| **Stufe 3: Hinrichtung** | Hinterhalt 2W6; Gegner unter halben TP nehmen +1W6 |
-| **Versuchung** | „Nenn mir einen Namen. Ich nehme ihn, und niemand wird es je wissen.“ Wahr, der Abt erfüllt es, und Halmbruck verliert jemanden. |
-| **Moment in Grauwacht** | 1.3 Glockenturm: Er kann den Kobold am Glockenseil lautlos ausschalten, bevor der Kampf beginnt. Dann kein Alarm, aber `blutschuld`, wenn er tötet statt betäubt (Wahl auf dem Handy). |
+**Versuchung des Abts:** „Niemand wird je wieder sehen, wer du wirklich bist.“ Wahr, auch nicht die, die dich lieben.
 
----
+**Moment in Grauwacht:** Das Flüstern: Sie sieht, wer ein Angebot des Abts bekommen hat.
+
+## 4 · Schurke
+
+### Darian – Der Schattenläufer
+„Ich war nie hier.“
+
+**Rolle:** Mitte, Fallen, Bewegung · **Werte:** STR 8 (-1) · GES 16 (+3) · KON 14 (+2) · INT 13 (+1) · WEI 12 (+1) · CHA 10 (+0)
+**TP** 10 / 17 / 24 · **RK** 14 (Leder)
+
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
+| **Kurzbogen** | 1 | Aktion · 16 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
+| **Rauchbombe** | 1 | Aktion · Radius 2 · 1× je Rast | 2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus. |
+| **Gerissener Spurt** | 1 | Bonusaktion | Gerissene Aktion: 6 Felder zusätzliche Bewegung. |
+| **Verstecken** | 1 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
+| **Rückzug** | 1 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
+| **Leiser Schritt** | 1 | passiv | Du kannst dich auch ohne Deckung verstecken, solange kein Gegner neben dir steht. Gerissene Aktion schon ab Stufe 1. |
+| **Kletterer** | 2 | passiv | Wände und Schächte ohne Probe. |
+| **Fallensteller** | 3 | passiv | Vor einem Kampf, den die Gruppe kommen sieht, legt er eine Falle. |
+| **Hinterhalt** | 1 | passiv | Einmal je Zug +1W6 (ab Stufe 2 +2W6), wenn du Vorteil hast oder ein Verbündeter neben dem Ziel steht. |
+| **Fallen und Schlösser** | – | außerhalb des Kampfes | Entdeckt und entschärft Fallen, öffnet Schlösser ohne Schlüssel. |
+
+**Versuchung des Abts:** „Niemand wird dich jemals wieder finden.“ Wahr, auch nicht, wenn du gefunden werden willst.
+
+**Moment in Grauwacht:** Schmugglerpfad: Er findet ohne Nisk den Zugang zum Koboldlager.
+
+### Silra – Die Trickserin
+„Schau mal da drüben.“
+
+**Rolle:** Mitte, Ablenkung · **Werte:** STR 8 (-1) · GES 16 (+3) · KON 13 (+1) · INT 12 (+1) · WEI 10 (+0) · CHA 14 (+2)
+**TP** 9 / 15 / 21 · **RK** 14 (Leder)
+
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Dolch** | 1 | Aktion · 8 Felder · Angriff +5 · 1W4 + 3 | Nah oder geworfen (8 Felder). |
+| **Zweiter Dolch** | 1 | Bonusaktion · 8 Felder · Angriff +5 · 1W4 | Nach einem Dolchangriff: ein zweiter Dolch, 1W4. |
+| **Schmutziger Trick** | 1 | Bonusaktion · Nahkampf · GES-Rettung SG 13 · 2/2/3× je Rast | Ein Gegner neben dir: GES-Rettungswurf, sonst 1 Runde geblendet. |
+| **Platztausch** | 1 | Bonusaktion · 6 Felder · 1× je Rast | Tausche den Platz mit einem Verbündeten in 6 Feldern. |
+| **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: 6 Felder zusätzliche Bewegung. |
+| **Verstecken** | 2 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
+| **Rückzug** | 2 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
+| **Glückspilz** | 1 | passiv · 1× je Kampf | Automatisch, 1× je Kampf: einen knapp verfehlten eigenen Angriff wiederholen oder einen Gegner seinen Treffer gegen dich wiederholen lassen. |
+| **Hinterhalt** | 1 | passiv | Einmal je Zug +1W6 (ab Stufe 2 +2W6), wenn du Vorteil hast oder ein Verbündeter neben dem Ziel steht. |
+| **Täuschen** | – | außerhalb des Kampfes | Vorteil auf Lügen, Verkleiden, Taschendiebstahl. |
+
+**Versuchung des Abts:** „Ich mache, dass dir jeder glaubt.“ Wahr, du wirst nie wieder wissen, ob jemand dich mag oder nur glaubt.
+
+**Moment in Grauwacht:** Glockenturm: Sie lässt die Kobolde glauben, der Abt habe die Gruppe geschickt.
+
+### Vex – Der Assassine
+„Ein Schnitt. Kein Laut.“
+
+**Rolle:** Mitte, Einzelziel · **Werte:** STR 8 (-1) · GES 16 (+3) · KON 13 (+1) · INT 14 (+2) · WEI 12 (+1) · CHA 10 (+0)
+**TP** 9 / 15 / 21 · **RK** 14 (Leder)
+
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Klinge der Gilde** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
+| **Leichte Armbrust** | 1 | Aktion · 16 Felder · Angriff +5 · 1W8 + 3 | Fernkampf. |
+| **Gift** | 1 | Bonusaktion · 2× je Rast | Dein nächster Treffer macht +1W6 Gift (ab Stufe 2 +2W6), das Ziel ist 1 Runde vergiftet. |
+| **Aus dem Schatten** | 1 | Bonusaktion | Neben Deckung oder im Rauch: verstecken. |
+| **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: 6 Felder zusätzliche Bewegung. |
+| **Verstecken** | 2 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
+| **Rückzug** | 2 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
+| **Todesstoß** | 1 | passiv | Vorteil gegen Gegner, die im Kampf noch nicht gehandelt haben. |
+| **Hinrichtung** | 3 | passiv | Gegner unter halben TP nehmen +1W6. |
+| **Hinterhalt** | 1 | passiv | Einmal je Zug +1W6 (ab Stufe 2 +2W6), wenn du Vorteil hast oder ein Verbündeter neben dem Ziel steht. |
+| **Lautlos** | – | außerhalb des Kampfes | Schaltet einen ahnungslosen Wächter ohne Kampf aus; verwischt Spuren. |
+
+**Versuchung des Abts:** „Nenn mir einen Namen. Ich nehme ihn, und niemand wird es je wissen.“ Wahr, und Halmbruck verliert jemanden.
+
+**Moment in Grauwacht:** Glockenturm: Er schaltet den Kobold am Glockenseil lautlos aus.
 
 ## 5 · Kleriker
 
-### Lichtbringer – „Das Licht weicht nicht.“
-**Rolle:** vorn/Mitte, Untote, Gruppe stärken · **Werte:** WEI 16 · KON 14 · STR 13 · CHA 12 · INT 10 · GES 8
-**TP** 10 / 17 / 24 · **RK** 18 (Kettenpanzer und Schild) · **Plätze** 3 / 4 / 5
+### Elara – Die Lichtbringerin
+„Das Licht weicht nicht.“
 
-| | |
-|---|---|
-| **Grundangriff** | Heiliges Licht (Zaubertrick) 12 Felder, GES-Rettungswurf gegen SG 13, sonst 1W8; oder Streitkolben +3, 1W6 + 1 |
-| **Passiv: Strahlende Aura** | Untote neben ihm nehmen zu Beginn ihres Zugs 2 Schaden. |
-| **Aktiv: Segen** | Aktion, Platz, bis Kampfende: 3 Verbündete +1W4 auf Angriffe und Rettungswürfe |
-| **Aktiv: Heilendes Wort** | Klassenmerkmal |
-| **Außerhalb: Geweihtes Wissen** | Erkennt Flüche und Untote; kann schwache Untote ohne Kampf zur Ruhe bringen (Knochenwächter, die ihre Platte zurückbekommen) |
-| **Stufe 2: Untote vertreiben** | Göttliche Macht: Untote in 6 Feldern machen einen WEI-Rettungswurf gegen SG 13, sonst fliehen sie 2 Runden. |
-| **Stufe 3: Schutzkreis** | Grad 2: Verbündete in 2 Feldern +2 RK, 3 Runden |
-| **Versuchung** | „Ich mache den Tod eines Unschuldigen rückgängig. Wähle.“ Wahr, aber ein anderer Unschuldiger nimmt seinen Platz. |
-| **Moment in Grauwacht** | 2.2a Gruft: Er kann die Knochenwächter segnen statt zerschlagen. Dann ist die Gruft danach ruhig, und Coldrics Name steht ohne Suche fest. |
+**Rolle:** vorn/Mitte, gegen Untote · **Werte:** STR 13 (+1) · GES 8 (-1) · KON 14 (+2) · INT 10 (+0) · WEI 16 (+3) · CHA 12 (+1)
+**TP** 10 / 17 / 24 · **RK** 18 (Kettenpanzer und Schild) · **Zauberplätze** 3 / 4 / 3+2
 
-### Wanderheiler – „Erst die Wunde. Dann die Frage.“
-**Rolle:** Mitte, Heilung, Schutz · **Werte:** WEI 16 · KON 14 · GES 13 · INT 12 · CHA 10 · STR 8
-**TP** 10 / 17 / 24 · **RK** 15 (Schuppen 14 + GES) · **Plätze** 3 / 4 / 5
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Heiliges Licht** | 1 | Aktion · 12 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst 1W8 + WEI gleißender Schaden. |
+| **Streitkolben** | 1 | Aktion · Nahkampf · Angriff +3 · 1W6 + 1 | Nahkampf. |
+| **Segen** | 1 | Aktion · 6 Felder · 1 Zauberplatz | Bis Kampfende: 3 Verbündete in 6 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit. |
+| **Untote vertreiben** | 2 | Aktion · 6 Felder · WEI-Rettung SG 13 · 1× je Rast | Göttliche Macht: Untote in 6 Feldern fliehen 2 Runden (WEI-Rettungswurf). |
+| **Schutzkreis** | 3 | Aktion · Platz vom 2. Grad | Verbündete in 2 Feldern um dich +2 RK, 3 Runden. |
+| **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
+| **Strahlende Aura** | 1 | passiv | Gegner neben dir nehmen zu Beginn ihres Zugs 2 gleißenden Schaden, Untote 3. |
+| **Geweihtes Wissen** | – | außerhalb des Kampfes | Erkennt Flüche und Untote; bringt schwache Untote ohne Kampf zur Ruhe. |
 
-| | |
-|---|---|
-| **Grundangriff** | Dornenranke (Zaubertrick) 8 Felder, GES-Rettungswurf gegen SG 13, sonst 1W8 + 3 und 1 Runde verlangsamt |
-| **Passiv: Gesegnete Heilung** | Seine Heilzauber heilen zusätzlich 2 + Grad des Platzes. |
-| **Aktiv: Schild des Glaubens** | Bonusaktion, Platz: Ein Verbündeter in 6 Feldern +2 RK bis Kampfende |
-| **Aktiv: Lebenshauch** | Aktion, 1× je Kampf: Ein Verbündeter am Boden in 6 Feldern steht mit 1 TP auf (beendet in Hardcore die Todeswürfe). |
-| **Außerhalb: Kräuterkunde** | Erkennt Gifte und Krankheiten (das bittere Wasser!); nach jedem Kampf heilt die Gruppe je 1W4 mit Verbänden |
-| **Stufe 2: Bewahren** | Göttliche Macht: 5 × Stufe TP auf Verbündete in 6 Feldern verteilen |
-| **Stufe 3: Massenheilwort** | Grad 2, Bonusaktion: 3 Verbündete je 1W4 + 3 (+2 + Grad) |
-| **Versuchung** | „Ich zeige dir, wie man jede Wunde schließt.“ Wahr, aber jede geschlossene Wunde öffnet sich bei dir. |
-| **Moment in Grauwacht** | 1.1 Halmbruck: Er erkennt am Wasser sofort, dass es kein Gift ist, sondern ein Fluch, und sieht, dass Anselm Blut hustet (`anselm_durchschaut` ohne Probe). |
+**Versuchung des Abts:** „Ich mache den Tod eines Unschuldigen rückgängig. Wähle.“ Wahr, aber ein anderer Unschuldiger nimmt seinen Platz.
 
-### Inquisitor – „Ich frage nur einmal.“
-**Rolle:** vorn, Flüche, Lügen, Bann · **Werte:** STR 16 · KON 14 · WEI 14 · INT 10 · CHA 10 · GES 8
-**TP** 10 / 17 / 24 · **RK** 18 (Kettenpanzer und Schild) · **Plätze** 3 / 4 / 5
+**Moment in Grauwacht:** Gruft: Sie kann die Knochenwächter segnen statt zerschlagen.
 
-| | |
-|---|---|
-| **Grundangriff** | Kriegshammer +5, 1W8 + 3 |
-| **Passiv: Wahrheitsblick** | Vorteil darauf, Lügen zu erkennen; Illusionen und Unsichtbares im Umkreis von 2 Feldern sind für ihn sichtbar. |
-| **Aktiv: Brandmal** | Bonusaktion, 1× je Kampf ohne Platz, sonst mit Platz: Seine Treffer gegen das Ziel machen +1W6 gleißenden Schaden, und es kann sich nicht unsichtbar machen. |
-| **Aktiv: Befehl** | Aktion, Platz: WEI-Rettungswurf gegen SG 12, sonst gehorcht das Ziel einem Wort für 1 Runde („Flieh!“, „Nieder!“, „Lass fallen!“). |
-| **Außerhalb: Verhör** | Erkennt Flüche, Pakte und Lügen; Vorteil, um Anselm zu durchschauen |
-| **Stufe 2: Bannen** | Göttliche Macht: Ein Untoter oder Fluchwesen macht einen WEI-Rettungswurf gegen SG 12, sonst ist es 2 Runden aus dem Kampf verbannt. |
-| **Stufe 3: Gerechter Zorn** | Brandmal +2W6 statt +1W6 |
-| **Versuchung** | „Ich zeige dir jede Lüge, die man dir je erzählt hat.“ Wahr, alle, auch die gnädigen. |
-| **Moment in Grauwacht** | 3.2 Das Flüstern: Er spürt, wer einen Pakt angenommen hat, und kann die Person zur Rede stellen. Er erfährt nicht, was ihr angeboten wurde. |
+### Brogar – Der Wanderheiler
+„Erst die Wunde. Dann die Frage.“
 
----
+**Rolle:** Mitte, Heilung, Schutz · **Werte:** STR 8 (-1) · GES 13 (+1) · KON 14 (+2) · INT 12 (+1) · WEI 16 (+3) · CHA 10 (+0)
+**TP** 10 / 17 / 24 · **RK** 15 (Schuppenpanzer) · **Zauberplätze** 3 / 4 / 3+2
+
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Dornenranke** | 1 | Aktion · 8 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt. |
+| **Schild des Glaubens** | 1 | Bonusaktion · 6 Felder · 1 Zauberplatz | Ein Verbündeter +2 RK bis Kampfende. |
+| **Lebenshauch** | 1 | Aktion · 6 Felder · 1× je Kampf | Ein Verbündeter am Boden in 6 Feldern steht mit 1 TP auf. |
+| **Bewahren** | 2 | Aktion · 6 Felder · 1× je Rast | Göttliche Macht: 5 × Stufe TP auf Verbündete in 6 Feldern verteilen. |
+| **Massenheilwort** | 3 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · Platz vom 2. Grad | 3 Verbündete je 1W4 + 3 (+ Gesegnete Heilung). |
+| **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
+| **Gesegnete Heilung** | 1 | passiv | Deine Heilzauber heilen zusätzlich 2 + Grad des Platzes. |
+| **Kräuterkunde** | – | außerhalb des Kampfes | Erkennt Gifte und Flüche; nach jedem Kampf heilt die Gruppe je 1W4. |
+
+**Versuchung des Abts:** „Ich zeige dir, wie man jede Wunde schließt.“ Wahr, aber jede geschlossene Wunde öffnet sich bei dir.
+
+**Moment in Grauwacht:** Halmbruck: Er sieht sofort, dass Anselm Blut hustet.
+
+### Seran – Der Inquisitor
+„Ich frage nur einmal.“
+
+**Rolle:** vorn, Flüche, Bann · **Werte:** STR 16 (+3) · GES 8 (-1) · KON 14 (+2) · INT 10 (+0) · WEI 14 (+2) · CHA 10 (+0)
+**TP** 10 / 17 / 24 · **RK** 18 (Kettenpanzer und Schild) · **Zauberplätze** 3 / 4 / 3+2
+
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Kriegshammer** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
+| **Brandmal** | 1 | Bonusaktion · 12 Felder · 1 Zauberplatz | 1× je Kampf ohne Platz: Deine Treffer gegen das Ziel machen +1W4 (ab Stufe 3 +2W6). |
+| **Befehl: Flieh!** | 1 | Aktion · 12 Felder · WEI-Rettung SG 12 · 1 Zauberplatz | WEI-Rettungswurf, sonst flieht das Ziel 1 Runde. |
+| **Bannen** | 2 | Aktion · 12 Felder · WEI-Rettung SG 12 · 1× je Rast | Göttliche Macht: Ein Untoter oder Fluchwesen ist 2 Runden aus dem Kampf verbannt. |
+| **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
+| **Wahrheitsblick** | 1 | passiv | Vorteil, Lügen zu erkennen; sieht Illusionen und Unsichtbares in 2 Feldern. |
+| **Gerechter Zorn** | 3 | passiv | Brandmal +2W6. |
+| **Verhör** | – | außerhalb des Kampfes | Erkennt Flüche, Pakte und Lügen; Vorteil, um Anselm zu durchschauen. |
+
+**Versuchung des Abts:** „Ich zeige dir jede Lüge, die man dir je erzählt hat.“ Wahr, alle, auch die gnädigen.
+
+**Moment in Grauwacht:** Das Flüstern: Er spürt, wer einen Pakt angenommen hat.
 
 ## 6 · Waldläufer
 
-### Wildnisläufer – „Ich sehe dich, lange bevor du mich siehst.“
-**Rolle:** hinten, Fernkampf, Spuren · **Werte:** GES 16 · WEI 14 · KON 13 · INT 12 · STR 10 · CHA 8
-**TP** 11 / 18 / 25 · **RK** 14
+### Kael – Der Wildnisläufer
+„Ich sehe dich, lange bevor du mich siehst.“
 
-| | |
-|---|---|
-| **Grundangriff** | Langbogen +5 (Stufe 2: +6), 20 Felder, 1W8 + 3 (+ Jägermal) |
-| **Passiv: Scharfes Auge** | Ignoriert halbe Deckung; Vorteil auf Wahrnehmung, auch in Gebäuden |
-| **Aktiv: Fesselnder Pfeil** | Statt eines Angriffs, 2× je Rast: Treffer und STR-Rettungswurf gegen SG 13, sonst ist das Ziel 1–2 Runden festgehalten. |
-| **Aktiv: Leichtfüßig** | Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff, beliebig oft |
-| **Außerhalb: Fährtenleser** | Liest Spuren genau (wer, wie viele, wie lange her), findet sichere Wege durchs Moor |
-| **Stufe 2: Bogenschütze** | +1 auf Fernkampf |
-| **Stufe 3: Doppelschuss** | Zwei Ziele, die nebeneinander stehen, je ein Angriff |
-| **Versuchung** | „Du wirst nie wieder jemanden verlieren, den du beschützen willst.“ Wahr, weil du niemanden mehr nah genug heranlässt. |
-| **Moment in Grauwacht** | 1.1 Halmbruck: Er liest an Tams Spuren, dass der Junge nicht verschleppt wurde, sondern freiwillig ging, im Schlaf. Das ist ein früher Hinweis auf das Flüstern. |
+**Rolle:** hinten, Fernkampf, Spuren · **Werte:** STR 10 (+0) · GES 16 (+3) · KON 13 (+1) · INT 12 (+1) · WEI 14 (+2) · CHA 8 (-1)
+**TP** 11 / 18 / 25 · **RK** 14 (Leder)
 
-### Tiergefährte – „Grau geht vor. Ich folge.“
-**Rolle:** Mitte, zwei Figuren auf dem Feld · **Werte:** GES 16 · WEI 14 · KON 13 · INT 12 · STR 10 · CHA 8
-**TP** 9 / 16 / 23 · **RK** 14 · **Wolf „Grau“:** TP 8 / 12 / 16, RK 13, Biss +4 (Stufe 3: +5), 1W6 + 2, 8 Felder Bewegung
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Langbogen** | 1 | Aktion · 20 Felder · Angriff +5 (Stufe 2+: +6) · 1W8 + 3 | Fernkampf, ab Stufe 2 +1 zum Treffen. |
+| **Fesselnder Pfeil** | 1 | Aktion · 20 Felder · Angriff +5 (Stufe 2+: +6) · 1W8 + 3 · 2× je Rast | Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde). |
+| **Doppelschuss** | 3 | Aktion · 20 Felder · Angriff +5 (Stufe 2+: +6) · 1W8 + 3 · 2× je Rast | Zwei Ziele nebeneinander, je ein Angriff. |
+| **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Scharfes Auge** | 1 | passiv | Ignoriert Deckung. |
+| **Leichtfüßig** | 1 | passiv | Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff. |
+| **Bogenschütze** | 2 | passiv | +1 auf Fernkampf. |
+| **Fährtenleser** | 1 | passiv | Vorteil auf Spuren und Wahrnehmung im Freien. |
+| **Fährtenleser** | – | außerhalb des Kampfes | Liest Spuren genau, findet sichere Wege. |
 
-| | |
-|---|---|
-| **Grundangriff** | Kurzschwert oder Kurzbogen +5, 1W6 + 3 |
-| **Passiv: Rudeltaktik** | Er und der Wolf haben Vorteil gegen ein Ziel, neben dem der jeweils andere steht. |
-| **Aktiv: Befehl** | Bonusaktion: Der Wolf greift an. Ohne Befehl bewegt er sich nur und verteidigt sich. Befehl und Jägermal kosten beide die Bonusaktion. |
-| **Aktiv: Umreißen** | 2× je Rast, bei einem Biss: STR-Rettungswurf gegen SG 12, sonst liegt das Ziel. |
-| **Außerhalb: Witterung** | Der Wolf riecht Untote, Blut und Hinterhalte. Die Gruppe kann nicht überrascht werden. |
-| **Stufe 2: Eingespielt** | Der Wolf greift auch ohne Befehl an, wenn er neben einem Gegner steht, den sie in dieser Runde schon getroffen haben. |
-| **Stufe 3: Ein Rudel** | Jägermal gilt auch für den Wolf; Wolf +1 zum Treffen |
-| **Versuchung** | „Ich gebe deinem Wolf eine Stimme, und er wird nie sterben.“ Wahr, aber er wird nicht mehr dein Wolf sein. |
-| **Moment in Grauwacht** | 2.3 Der Schacht: Der Wolf findet Tam im Netz zuerst und beruhigt ihn. Tam zappelt nicht, Retten kostet eine Aktion weniger. |
+**Versuchung des Abts:** „Du wirst nie wieder jemanden verlieren, den du beschützen willst.“ Wahr, weil du niemanden mehr nah genug heranlässt.
 
-**Hinweis Hardcore:** Fällt der Wolf, ist er tot; am nächsten Lagerfeuer folgt ein junger Wolf mit denselben Werten. Der Charakter selbst stirbt nach den normalen Regeln.
+**Moment in Grauwacht:** Halmbruck: Er liest an Tams Spuren, dass der Junge im Schlaf ging.
 
-### Kopfgeldjäger – „Jeder hat einen Preis. Und eine Schwäche.“
-**Rolle:** hinten, markiert und erlegt · **Werte:** GES 16 · WEI 14 · KON 13 · INT 12 · STR 10 · CHA 8
+### Faye – Die Tiergefährtin
+„Grau geht vor. Ich folge.“
+
+**Rolle:** Mitte, mit Wolf · **Werte:** STR 10 (+0) · GES 16 (+3) · KON 13 (+1) · INT 12 (+1) · WEI 14 (+2) · CHA 8 (-1)
+**TP** 9 / 16 / 23 · **RK** 14 (Leder) · **Wolf Grau:** TP 8 / 12 / 20, RK 13, Biss +4/+4/+5, 1W6 + 2, 8 Felder
+
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
+| **Kurzbogen** | 1 | Aktion · 16 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
+| **Befehl an Grau** | 1 | Bonusaktion · 20 Felder | Grau läuft bis zu 8 Felder zum Ziel und beißt. |
+| **Grau: Umreißen** | 1 | Bonusaktion · 20 Felder · 2× je Rast | Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel. |
+| **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Rudeltaktik** | 1 | passiv | Du und Grau habt Vorteil gegen ein Ziel, neben dem der andere steht. |
+| **Eingespielt** | 2 | passiv | Grau beißt am Ende deines Zugs auch ohne Befehl, wenn er neben einem Gegner steht, den du getroffen hast. |
+| **Ein Rudel** | 3 | passiv | Jägermal gilt auch für Grau, Grau +1 zum Treffen. |
+| **Fährtenleser** | 1 | passiv | Vorteil auf Spuren und Wahrnehmung im Freien. |
+| **Witterung** | – | außerhalb des Kampfes | Grau riecht Untote und Hinterhalte. Die Gruppe kann nicht überrascht werden. |
+
+**Versuchung des Abts:** „Ich gebe deinem Wolf eine Stimme, und er wird nie sterben.“ Wahr, aber er wird nicht mehr dein Wolf sein.
+
+**Moment in Grauwacht:** Der Schacht: Grau findet Tam zuerst und beruhigt ihn.
+
+### Orin – Der Kopfgeldjäger
+„Jeder hat einen Preis. Und eine Schwäche.“
+
+**Rolle:** hinten, markiert und erlegt · **Werte:** STR 10 (+0) · GES 16 (+3) · KON 13 (+1) · INT 12 (+1) · WEI 14 (+2) · CHA 8 (-1)
 **TP** 11 / 18 / 25 · **RK** 15 (beschlagenes Leder)
 
-| | |
-|---|---|
-| **Grundangriff** | Leichte Armbrust +5, 16 Felder, 1W8 + 3 |
-| **Passiv: Schwachstelle** | Gegen sein markiertes Ziel kritisch bei 19–20. Sein Jägermal gibt dafür nur +1W4 statt +1W6. |
-| **Aktiv: Netz** | Aktion, 1× je Rast: STR-Rettungswurf gegen SG 13, sonst ist das Ziel festgehalten, bis es sich befreit (STR-Probe gegen SG 13 als Aktion). |
-| **Aktiv: Fangschuss** | Reaktion: Entfernt sich sein markiertes Ziel, schießt er einmal. |
-| **Außerhalb: Steckbriefe** | Kennt Kreaturen. Vor einem Kampf erfährt die Gruppe von ihm eine Schwäche des Gegners. Vorteil beim Verhören. |
-| **Stufe 2: Jagdvorbereitung** | Jägermal 3× je lange Rast |
-| **Stufe 3: Erlegen** | 1× je Kampf gegen sein markiertes Ziel unter halben TP: +2W6 |
-| **Versuchung** | „Nenn mir den Einen, den du nie gefunden hast. Ich bringe ihn dir.“ Wahr, er steht vor dir und hat dein Gesicht. |
-| **Moment in Grauwacht** | 1.1 Halmbruck: Er erkennt an Wennas Beschreibung ihres Vaters einen alten Steckbrief. Der Vater war Abenteurer und wurde gesucht, weil er ein Siegel brechen wollte (Verbindung zu Wennas Geschichte). |
+| Fähigkeit | Stufe | Werte | Wirkung |
+|---|---|---|---|
+| **Leichte Armbrust** | 1 | Aktion · 16 Felder · Angriff +5 · 1W8 + 3 | Fernkampf. |
+| **Netz** | 1 | Aktion · 6 Felder · STR-Rettung SG 13 · 1× je Rast | STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13). |
+| **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Schwachstelle** | 1 | passiv | Gegen dein markiertes Ziel kritisch bei 19–20. |
+| **Fangschuss** | 1 | passiv | Reaktion, automatisch: Bewegt sich dein markiertes Ziel, schießt du einmal. |
+| **Jagdvorbereitung** | 2 | passiv | Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz). |
+| **Erlegen** | 3 | passiv · 1× je Kampf | 1× je Kampf gegen dein markiertes Ziel unter halben TP: +2W6. |
+| **Fährtenleser** | 1 | passiv | Vorteil auf Spuren und Wahrnehmung im Freien. |
+| **Steckbriefe** | – | außerhalb des Kampfes | Kennt Kreaturen: vor einem Kampf eine Schwäche des Gegners. |
+
+**Versuchung des Abts:** „Nenn mir den Einen, den du nie gefunden hast. Ich bringe ihn dir.“ Wahr, er steht vor dir und hat dein Gesicht.
+
+**Moment in Grauwacht:** Halmbruck: Er erkennt Wennas Vater auf einem alten Steckbrief.
+
+<!-- FIGUREN:END -->
 
 ---
 

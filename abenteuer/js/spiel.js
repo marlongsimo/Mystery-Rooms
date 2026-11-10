@@ -19,15 +19,7 @@
   const SLUG = params.get("liveslug") || "abenteuer"; // ?liveslug= nur für Tests
   const SPEICHER = "ab_tisch", SETUP_KEY = "ab_setup";
   const SELBST = new Set(["selbstheilung", "trank", "raserei", "finte", "gift", "verstecken", "rueckzug", "spurt", "schattenschritt", "spiegelbilder", "segen", "schutzkreis", "vertreiben", "bewahren", "massenheil", "rauch", "tatendrang"]);
-  const BEGEGNUNGEN = {
-    garten: { name: "Rostkäfer im Klostergarten", gegner: (n) => [{ art: "rostkaefer", anzahl: n }] },
-    kobolde: { name: "Schattenkobolde", gegner: (n) => [{ art: "schattenkobold", anzahl: Math.round(n * 1.5) }] },
-    gruft: { name: "Knochenwächter", gegner: (n) => [{ art: "knochenwaechter", anzahl: n }] },
-    pilze: { name: "Pilzbrut und Kobolde", gegner: (n) => [{ art: "pilzbrut", anzahl: Math.ceil(n / 2) }, { art: "schattenkobold", anzahl: n }] },
-    netz: { name: "Netzweber und Knochenwächter", gegner: (n) => [{ art: "netzweber", anzahl: n >= 5 ? 2 : 1 }, { art: "knochenwaechter", anzahl: Math.ceil(n / 2) }] },
-    asche: { name: "Aschehunde", gegner: (n) => [{ art: "aschehund", anzahl: Math.ceil(n / 2) + 1 }] },
-    ritter: { name: "Grabritter mit Knochenwächtern", gegner: (n) => [{ art: "grabritter", anzahl: 1 }, { art: "knochenwaechter", anzahl: n - 1 }] },
-  };
+  const BEGEGNUNGEN = R.BEGEGNUNGEN;
   let st = null, wahl = null, gegnerTimer = null, letzterLog = 0;
   let SETUP = { gruppe: ["schildwaechter", "elementarist", "lichtbringer"], stufe: 1, schwierigkeit: "normal", begegnung: "garten" };
   try { const s = JSON.parse(localStorage.getItem(SETUP_KEY) || "null"); if (s && Array.isArray(s.gruppe)) SETUP = Object.assign(SETUP, s, { gruppe: s.gruppe.filter((f) => F.FIGUREN[f]).slice(0, 6) }); } catch (e) { /* privat */ }
@@ -69,10 +61,14 @@
       const fid = v.fid || null;
       if (fid && !F.FIGUREN[fid]) return;
       if (fid && LIVE.besitz[fid] && LIVE.besitz[fid] !== uid) { veroeffentlichen(); return; }
-      const inGruppe = fid && SETUP.gruppe.includes(fid);
-      if (fid && !inGruppe && (LIVE.phase === "kampf" || SETUP.gruppe.length >= 6)) { veroeffentlichen(); return; }
+      const kampf = LIVE.phase === "kampf";
+      // Im Kampf nur Figuren übernehmen, deren Handy weg ist; in der Lobby höchstens 6 Handys
+      if (fid && kampf && !SETUP.gruppe.includes(fid)) { veroeffentlichen(); return; }
+      if (fid && !kampf && !Object.values(LIVE.besitz).includes(uid) && Object.keys(LIVE.besitz).length >= 6) { veroeffentlichen(); return; }
+      if (kampf && !fid) { veroeffentlichen(); return; } // im Kampf behält man seine Figur
       for (const f of Object.keys(LIVE.besitz)) if (LIVE.besitz[f] === uid) delete LIVE.besitz[f];
-      if (fid) { LIVE.besitz[fid] = uid; if (!inGruppe) { SETUP.gruppe.push(fid); setupMerken(); } }
+      if (fid) LIVE.besitz[fid] = uid;
+      if (!kampf) gruppeAusHandys();
       zeichneSetup(); if (st) render(); veroeffentlichen();
       return;
     }
@@ -90,6 +86,11 @@
     antwort("Unbekannter Wunsch."); veroeffentlichen();
   }
 
+  /** Mit Handys spielen nur die Figuren, die jemand auf dem Handy gewählt hat */
+  function gruppeAusHandys() {
+    const alt = SETUP.gruppe.filter((f) => LIVE.besitz[f]);
+    SETUP.gruppe = alt.concat(Object.keys(LIVE.besitz).filter((f) => !alt.includes(f)));
+  }
   function liveClient() {
     if (LIVE.client) return LIVE.client;
     if (!window.MRMultiplayer) throw new Error("Die Live-Verbindung ist gerade nicht verfügbar. Ihr könnt allein auf diesem Gerät spielen.");
@@ -98,9 +99,10 @@
     c.on("players", () => {
       const da = new Set(c.players.map((p) => p.user_id)); let geaendert = false;
       for (const f of Object.keys(LIVE.besitz)) if (!da.has(LIVE.besitz[f])) { delete LIVE.besitz[f]; geaendert = true; }
+      if (LIVE.phase !== "kampf") gruppeAusHandys();
       zeichneSetup(); if (st) render();
       veroeffentlichen();
-      if (geaendert) toast("Ein Handy hat die Sitzung verlassen. Seine Figur steuert jetzt der Tisch.");
+      if (geaendert && LIVE.phase === "kampf") toast("Ein Handy hat die Sitzung verlassen. Bis jemand die Figur übernimmt, steuert sie der Tisch.");
     });
     c.on("lost", (why) => { toast(why || "Live-Verbindung beendet."); LIVE.phase = null; vergessen(); zeichneLiveBar(); zeichneSetup(); if (st) render(); });
     return c;
@@ -113,7 +115,7 @@
       const c = liveClient();
       try { await c.create("Spieltisch"); }
       catch (e) { if (/Gruppengröße|max/i.test(e.message || "")) { c.maxPlayers = 4; await c.create("Spieltisch"); } else throw e; }
-      LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null;
+      LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null; SETUP.gruppe = [];
       wach(); zeigeSetup(); veroeffentlichen();
     } catch (e) {
       fb.textContent = katalogFehler(e) ? "Das Spielen mit Handys ist für dieses Spiel noch nicht freigeschaltet. Ihr könnt allein auf diesem Gerät spielen." : (e.message || String(e));
@@ -160,9 +162,10 @@
   function zeichneSetup() {
     const el = $("#lobby"); if (el.hidden) return;
     const n = SETUP.gruppe.length;
+    const live = liveAn();
     const karten = F.REIHE.map((fid) => {
-      const uid = liveAn() ? LIVE.besitz[fid] : null, an = SETUP.gruppe.includes(fid);
-      return figurKarte(fid, { an, besitzer: uid ? spielerName(uid) : null, gesperrt: Boolean(uid) || (!an && n >= 6) });
+      const uid = live ? LIVE.besitz[fid] : null, an = SETUP.gruppe.includes(fid);
+      return figurKarte(fid, { an, besitzer: uid ? spielerName(uid) : null, gesperrt: live || (!an && n >= 6) });
     }).join("");
     const handys = liveAn() ? LIVE.client.players.filter((p) => !p.is_host) : [];
     el.innerHTML = `<h1>Der Klostergarten</h1>
@@ -170,19 +173,24 @@
       <div class="einstellungen">
         <div><span class="eyebrow">Stufe</span><div class="seg">${[1, 2, 3].map((s) => `<button data-stufe="${s}" class="${SETUP.stufe === s ? "an" : ""}">${s}</button>`).join("")}</div></div>
         <div><span class="eyebrow">Schwierigkeit</span><div class="seg">${[["normal", "Normal"], ["hardcore", "Hardcore"]].map(([v, t]) => `<button data-schwer="${v}" class="${SETUP.schwierigkeit === v ? "an" : ""}">${t}</button>`).join("")}</div></div>
-        <div><span class="eyebrow">Gegner</span><select id="begegnung">${Object.entries(BEGEGNUNGEN).map(([id, b]) => `<option value="${id}" ${SETUP.begegnung === id ? "selected" : ""}>${esc(b.name)}</option>`).join("")}</select></div>
+        <div><span class="eyebrow">Gegner</span><select id="begegnung">${Object.entries(BEGEGNUNGEN).map(([id, b]) => `<option value="${id}" ${SETUP.begegnung === id ? "selected" : ""}>${esc(b.name)} (Stufe ${b.stufe})</option>`).join("")}</select></div>
       </div>
+      <p class="note">${live && n < 3 ? "" : (() => { const g = R.gegnerFuer(SETUP.begegnung, Math.max(3, n), SETUP.stufe); return `Gegner bei ${Math.max(3, n)} Figuren: ${g.map((x) => `${x.anzahl} × ${R.GEGNER[x.art].name}${Math.abs(x.tpFaktor - 1) > 0.04 ? ` (${Math.round(R.GEGNER[x.art].tp * x.tpFaktor)} TP)` : ""}`).join(", ")}. Die Gegner passen sich an die Gruppengröße an.`; })()}</p>
       <p class="note">${SETUP.schwierigkeit === "hardcore" ? "<b>Hardcore:</b> Wer am Boden liegt, würfelt Todeswürfe. Tote bleiben tot." : "<b>Normal:</b> Am Boden ist das Schlimmste, was passieren kann."}</p>
-      <h2 class="klein">Gruppe · ${n} von 3–6 Figuren</h2>
+      <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (3–6)` : `Gruppe · ${n} von 3–6 Figuren`}</h2>
       <div class="fkarten">${karten}</div>
-      <p class="note">${liveAn() ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + "Figuren ohne Handy steuert ihr hier am Tisch." : "Tippe Figuren an, um sie in die Gruppe zu nehmen. Alle Figuren steuert ihr auf diesem Gerät."}</p>
+      <p class="note">${live ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Jede Person wählt ihre Figur auf dem Handy. Es spielen nur die gewählten Figuren${n < 3 ? `, und es braucht mindestens 3 – noch ${3 - n}` : ""}.` : "Tippe Figuren an, um sie in die Gruppe zu nehmen. Alle Figuren steuert ihr auf diesem Gerät."}</p>
       <div class="knoepfe"><button class="btn" id="los" ${n < 3 ? "disabled" : ""}>Kampf beginnen</button>${liveAn() ? `<button class="btn ghost" id="lobby-ende">Sitzung beenden</button>` : `<button class="btn ghost" id="zurueck">Zurück</button>`}</div>`;
-    el.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => {
+    if (!live) el.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => {
       const fid = b.dataset.fid, i = SETUP.gruppe.indexOf(fid);
       if (i >= 0) SETUP.gruppe.splice(i, 1); else if (SETUP.gruppe.length < 6) SETUP.gruppe.push(fid);
       setupMerken(); zeichneSetup(); veroeffentlichen();
     }; });
-    el.querySelectorAll("[data-stufe]").forEach((b) => { b.onclick = () => { SETUP.stufe = +b.dataset.stufe; setupMerken(); zeichneSetup(); veroeffentlichen(); }; });
+    el.querySelectorAll("[data-stufe]").forEach((b) => { b.onclick = () => {
+      SETUP.stufe = +b.dataset.stufe;
+      if ((BEGEGNUNGEN[SETUP.begegnung] || {}).stufe !== SETUP.stufe) SETUP.begegnung = Object.keys(BEGEGNUNGEN).find((id) => BEGEGNUNGEN[id].stufe === SETUP.stufe);
+      setupMerken(); zeichneSetup(); veroeffentlichen();
+    }; });
     el.querySelectorAll("[data-schwer]").forEach((b) => { b.onclick = () => { SETUP.schwierigkeit = b.dataset.schwer; setupMerken(); zeichneSetup(); veroeffentlichen(); }; });
     $("#begegnung").onchange = (e) => { SETUP.begegnung = e.target.value; setupMerken(); };
     $("#los").onclick = () => start(params.has("seed") ? +params.get("seed") : Math.floor(Math.random() * 1e9));
@@ -308,7 +316,7 @@
         : `<h2>Rückzug</h2><p>Die Gruppe liegt am Boden und zieht sich zum Lagerfeuer zurück. Im echten Abenteuer verliert ihr nichts, ihr versucht es einfach noch einmal.</p>`;
     e.innerHTML = text + `<div class="knoepfe mitte"><button class="btn" id="neu">Noch einmal</button><button class="btn ghost" id="gruppe">Gruppe ändern</button></div>`;
     $("#neu").onclick = () => start(Math.floor(Math.random() * 1e9));
-    $("#gruppe").onclick = () => { st = null; zeigeSetup(); };
+    $("#gruppe").onclick = () => { st = null; if (liveAn()) gruppeAusHandys(); zeigeSetup(); };
   }
 
   function toast(text) {
@@ -343,8 +351,7 @@
   function start(seed) {
     clearTimeout(gegnerTimer);
     if (SETUP.gruppe.length < 3) { zeigeSetup(); return; }
-    const beg = BEGEGNUNGEN[SETUP.begegnung] || BEGEGNUNGEN.garten;
-    st = R.neuesSpiel(seed, { figuren: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, gegner: beg.gegner(SETUP.gruppe.length) });
+    st = R.neuesSpiel(seed, { figuren: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, begegnung: BEGEGNUNGEN[SETUP.begegnung] ? SETUP.begegnung : "garten" });
     wahl = null; letzterLog = st.log.length;
     window.AB.st = st;
     if (liveAn()) { LIVE.phase = "kampf"; LIVE.antwort = null; }
@@ -360,7 +367,7 @@
     if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); return; }
     wahl = wahl === id ? null : id; render();
   });
-  $("#start").onclick = () => zeigeSetup();
+  $("#start").onclick = () => { if (SETUP.gruppe.length < 3) SETUP.gruppe = ["schildwaechter", "elementarist", "lichtbringer"]; zeigeSetup(); };
   $("#live").onclick = liveStarten;
 
   // Nach dem Neuladen: laufende Live-Sitzung und Kampf wiederherstellen

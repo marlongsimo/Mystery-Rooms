@@ -151,18 +151,17 @@
     return false;
   }
 
-  const KARTE_GARTEN = {
-    name: "Der Klostergarten", b: 12, h: 9,
-    hindernisse: [
-      ["G", 4, 1], ["G", 4, 3], ["G", 7, 2], ["G", 7, 6], ["G", 4, 7],
-      ["M", 6, 4], ["M", 6, 5], ["B", 9, 4],
-    ],
-    start: {
-      spieler: [[1, 3], [1, 5], [2, 4], [0, 2], [0, 6], [2, 2]],
-      wolf: [[2, 6], [3, 5], [0, 4], [3, 3]],
-      gegner: [[10, 1], [10, 7], [11, 4], [11, 2], [11, 6], [10, 3], [10, 5], [11, 0]],
-    },
-  };
+  /** Klostergarten als gemaltes Bild (12 × 9 Felder deckungsgleich). X = unsichtbare Mauer/Hindernis, das im Bild zu sehen ist */
+  const KARTE_GARTEN = (() => {
+    const X = (x, y) => ["X", x, y], rand = [];
+    for (let x = 0; x < 12; x++) rand.push(X(x, 0), X(x, 8));
+    for (let y = 1; y < 8; y++) rand.push(X(0, y), X(11, y));
+    // Baum, Säulen, Brunnen mit Statue, Schutt und Torbogen, Bank, Kisten und Karren
+    const innen = [X(1, 1), X(2, 1), X(4, 2), X(2, 3), X(3, 5), X(8, 4), X(5, 3), X(5, 4), X(6, 4), X(8, 1), X(9, 1), X(9, 2), X(10, 1), X(10, 2), X(1, 5), X(10, 6), X(10, 7), X(9, 7)];
+    return { name: "Der Klostergarten", b: 12, h: 9, bild: "img/welt/klostergarten.webp", hindernisse: rand.concat(innen),
+      start: { spieler: [[5, 7], [6, 7], [4, 7], [7, 7], [3, 7], [8, 7]], wolf: [[2, 7], [1, 7], [2, 6], [9, 6]],
+        gegner: [[6, 2], [3, 2], [8, 2], [7, 1], [4, 1], [3, 3], [9, 3], [2, 2], [10, 3], [7, 3], [5, 2], [10, 4]] } };
+  })();
 
   /* ---------- Figuren ---------- */
   const fig = (st, id) => st.figuren.find((f) => f.id === id);
@@ -193,7 +192,7 @@
     zufall(st);
     const r = st.r, k = opts.karte || KARTE_GARTEN;
     st.siegel = k.hindernisse.filter(([t]) => t === "Z").map(([, x, y]) => ({ x, y, beruehrt: false }));
-    st.karte = { name: k.name, b: k.b, h: k.h, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y))) };
+    st.karte = { name: k.name, b: k.b, h: k.h, bild: k.bild || null, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y))) };
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
     fids.forEach((fid, i) => {
       const [x, y] = k.start.spieler[i];

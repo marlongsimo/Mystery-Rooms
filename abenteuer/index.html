@@ -7,7 +7,7 @@
   <title>Das Siegel von Grauwacht – Abenteuer | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=12">
+  <link rel="stylesheet" href="css/abenteuer.css?v=14">
 </head>
 <body>
   <header class="top">
@@ -135,8 +135,9 @@
     <section class="spiel" id="spiel" hidden>
       <div class="livebar" id="livebar" hidden></div>
       <div class="reihe" id="reihe" aria-label="Zugreihenfolge"></div>
-      <div class="karte-wrap"><svg id="karte" role="img" aria-label="Kampfkarte"></svg></div>
+      <div class="karte-wrap"><svg id="karte" role="img" aria-label="Kampfkarte"></svg><div class="leiste" id="leiste"></div></div>
       <div class="panel">
+        <div class="gegner-info" id="gegner-info" hidden></div>
         <div class="aktiv" id="aktiv"></div>
         <div class="aktionen" id="aktionen"></div>
         <div class="hinweis" id="hinweis"></div>
@@ -148,7 +149,7 @@
   <div class="wurf" id="wurf" aria-hidden="true"></div>
   <div class="qr-overlay" id="qr-overlay" hidden></div>
   <script src="js/figuren.js?v=2"></script>
-  <script src="js/regeln.js?v=9"></script>
+  <script src="js/regeln.js?v=10"></script>
   <script src="js/bild.js?v=3"></script>
   <script src="js/wuerfel.js?v=1"></script>
   <script src="js/helden.js?v=3"></script>
@@ -158,7 +159,7 @@
   <script src="vendor/qrcode-generator-1.4.4.js"></script>
   <script src="daten/grauwacht.js?v=6"></script>
   <script src="js/szenen.js?v=5"></script>
-  <script src="js/spiel.js?v=12"></script>
+  <script src="js/spiel.js?v=14"></script>
   <script src="js/abenteuer-tisch.js?v=8"></script>
   <script src="js/einstieg.js?v=2"></script>
 </body>

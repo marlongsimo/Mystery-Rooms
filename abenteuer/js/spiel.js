@@ -20,6 +20,7 @@
   const SPEICHER = "ab_tisch", SETUP_KEY = "ab_setup";
   const SELBST = new Set(["selbstheilung", "trank", "raserei", "finte", "gift", "verstecken", "rueckzug", "spurt", "schattenschritt", "spiegelbilder", "segen", "schutzkreis", "vertreiben", "bewahren", "massenheil", "rauch", "tatendrang"]);
   const BEGEGNUNGEN = R.BEGEGNUNGEN;
+  let gegnerInfo = null; // id des angetippten Gegners (Infokarte)
   let st = null, wahl = null, gegnerTimer = null, letzterLog = 0, kampfEnde = null, tipp = null, letzteTP = {};
   let SETUP = { gruppe: [], stufe: 1, schwierigkeit: "normal", begegnung: "garten" };
   try { const s = JSON.parse(localStorage.getItem(SETUP_KEY) || "null"); if (s && Array.isArray(s.gruppe)) SETUP = Object.assign(SETUP, s, { gruppe: s.gruppe.filter((f) => F.FIGUREN[f]).slice(0, 6) }); } catch (e) { /* privat */ }
@@ -269,7 +270,14 @@
     // Boden je Ort: Garten, Holzboden im Turm, Stein in Gruft und Schacht, Pilzkammer, Asche mit Glut
     const n = k.name || "", boden = !n || /Garten/i.test(n) ? "garten" : /Turm/i.test(n) ? "holz" : /Pilz/i.test(n) ? "pilz" : /Asche/i.test(n) ? "asche" : "stein";
     const farbe = (v) => ({ garten: `hsl(${95 + v * 60} 22% ${20 + v * 18}%)`, holz: `hsl(${26 + v * 30} 32% ${17 + v * 12}%)`, pilz: `hsl(${165 + v * 40} 20% ${12 + v * 12}%)`, asche: `hsl(${12 + v * 20} 7% ${12 + v * 12}%)`, stein: `hsl(${215 + v * 20} 7% ${16 + v * 14}%)` }[boden]);
-    for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) {
+    if (k.bild) {
+      // Gemalte Karte: Bild als Boden, Raster nur auf begehbaren Feldern, leichte Vignette
+      o += `<defs><radialGradient id="vignette" cx="50%" cy="50%" r="72%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient></defs>`;
+      o += `<image href="${k.bild}" x="0" y="0" width="${k.b * Z}" height="${k.h * Z}" preserveAspectRatio="none"/>`;
+      o += `<rect width="${k.b * Z}" height="${k.h * Z}" fill="url(#vignette)"/>`;
+      for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) if (!k.block.has(x + "," + y)) o += `<rect x="${x * Z + 1}" y="${y * Z + 1}" width="${Z - 2}" height="${Z - 2}" rx="3" fill="none" stroke="#e8dcc0" stroke-opacity=".16"/>`;
+    }
+    else for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) {
       const v = ((x * 7 + y * 13) % 5) / 40;
       o += `<rect x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="${farbe(v)}"/>`;
       if (boden === "holz") o += `<path d="M${x * Z} ${y * Z + Z / 2}h${Z}" stroke="#000" stroke-opacity=".18"/>`;
@@ -277,8 +285,8 @@
       if (boden === "pilz" && (x * 3 + y * 5) % 9 === 0) o += `<circle cx="${x * Z + 20}" cy="${y * Z + 34}" r="3" fill="#7fe0c0" opacity=".35"/>`;
     }
     if (/Siegel/i.test(n)) o += `<circle cx="${k.b * Z / 2}" cy="${k.h * Z / 2}" r="${Z * 3.2}" fill="none" stroke="#c8ccd8" stroke-opacity=".35" stroke-width="5"/><circle cx="${k.b * Z / 2}" cy="${k.h * Z / 2}" r="${Z * 2.9}" fill="none" stroke="#c8ccd8" stroke-opacity=".15" stroke-width="2"/>`;
-    o += `<path d="${Array.from({ length: k.b + 1 }, (_, i) => `M${i * Z} 0V${k.h * Z}`).join("")}${Array.from({ length: k.h + 1 }, (_, i) => `M0 ${i * Z}H${k.b * Z}`).join("")}" stroke="#000" stroke-opacity=".22" stroke-width="1"/>`;
-    if (boden === "garten") o += `<rect x="0" y="${4 * Z + 18}" width="${k.b * Z}" height="24" fill="#8a7a5c" opacity=".25"/>`;
+    if (!k.bild) o += `<path d="${Array.from({ length: k.b + 1 }, (_, i) => `M${i * Z} 0V${k.h * Z}`).join("")}${Array.from({ length: k.h + 1 }, (_, i) => `M0 ${i * Z}H${k.b * Z}`).join("")}" stroke="#000" stroke-opacity=".22" stroke-width="1"/>`;
+    if (boden === "garten" && !k.bild) o += `<rect x="0" y="${4 * Z + 18}" width="${k.b * Z}" height="24" fill="#8a7a5c" opacity=".25"/>`;
     // Zonen und Glut
     for (const zo of st.zonen) {
       const x0 = Math.max(0, zo.x - zo.radius), y0 = Math.max(0, zo.y - zo.radius), x1 = Math.min(k.b - 1, zo.x + zo.radius), y1 = Math.min(k.h - 1, zo.y + zo.radius);
@@ -287,17 +295,19 @@
         : `<rect x="${x0 * Z + 2}" y="${y0 * Z + 2}" width="${(x1 - x0 + 1) * Z - 4}" height="${(y1 - y0 + 1) * Z - 4}" rx="12" fill="#9a6ad0" fill-opacity=".12" stroke="#b58cff" stroke-width="3" stroke-dasharray="8 6"/>`;
     }
     for (const b of st.brand) o += `<rect x="${b.x * Z + 4}" y="${b.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#ff7a2a" fill-opacity=".35"/>`;
-    for (const [kk, c] of reach) { const [x, y] = kk.split(",").map(Number); if (x === akt.x && y === akt.y) continue; o += `<rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${c === "schritt" ? "#b58cff" : "#7fb7ff"}" fill-opacity=".14" stroke="${c === "schritt" ? "#c9a8ff" : "#9cc8ff"}" stroke-opacity=".4"/>`; }
+    for (const [kk, c] of reach) { const [x, y] = kk.split(",").map(Number); if (x === akt.x && y === akt.y) continue; o += `<rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${c === "schritt" ? "#b58cff" : "#4D9DB6"}" fill-opacity="${k.bild ? ".32" : ".2"}" stroke="${c === "schritt" ? "#c9a8ff" : "#8fd0e6"}" stroke-opacity=".7" stroke-width="1.5"/>`; }
     if (tipp && tipp.feld && spielerDran) o += `<rect class="tipp-ring" x="${tipp.feld.x * Z + 4}" y="${tipp.feld.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#f2d35a" fill-opacity=".18" stroke="#f2d35a" stroke-width="3"/>`;
-    for (const [t, x, y] of k.hindernisse) o += hindernis(t, x, y);
+    for (const [t, x, y] of k.hindernisse) if (t !== "X") o += hindernis(t, x, y);
     for (const f of st.figuren) {
       if (f.x < 0 || (f.z && f.z.verbannt)) continue;
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
       if (f.seite === "gegner" && unten) { o += `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
-      if (f === akt && !st.ende) o += `<circle cx="${cx}" cy="${cy}" r="28" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>`;
+      if (!unten) o += `<ellipse cx="${cx}" cy="${cy + 6}" rx="27" ry="24" fill="${f.seite === "gegner" ? "#7B2932" : "#1d3c4a"}" fill-opacity=".45" stroke="${f.seite === "gegner" ? "#d0545e" : f.art === "wolf" ? "#6fbf8a" : "#4D9DB6"}" stroke-width="2.5"/>`;
+      if (f === akt && !st.ende) o += `<circle class="aktiv-ring" cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#C5A267" stroke-width="3.5"/><circle cx="${cx}" cy="${cy}" r="33" fill="none" stroke="#C5A267" stroke-opacity=".35" stroke-width="5"/>`;
+      if (gegnerInfo === f.id) o += `<circle cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#e8dcc0" stroke-width="2" stroke-dasharray="4 3"/>`;
       if (zs.includes(f)) {
-        o += `<circle cx="${cx}" cy="${cy}" r="28" fill="${f.seite === "gegner" ? "#ff5a3a" : "#6fd06a"}" fill-opacity=".25" stroke="${f.seite === "gegner" ? "#ff7a5a" : "#7fe07a"}" stroke-width="3"/>`;
+        o += `<circle cx="${cx}" cy="${cy}" r="29" fill="${f.seite === "gegner" ? "#d0545e" : "#6fd06a"}" fill-opacity=".28" stroke="${f.seite === "gegner" ? "#ff6a6a" : "#7fe07a"}" stroke-width="3.5"/>`;
         const c = R.chance(st, wahl, f.id);
         if (c.p != null && f !== akt) o += `<g transform="translate(${cx} ${cy - 34 < 12 ? cy + 42 : cy - 34})"><rect x="-26" y="-11" width="52" height="18" rx="9" fill="#1b1612" stroke="${c.p >= 0.6 ? "#7fe07a" : c.p >= 0.35 ? "#d6a23a" : "#ff7a5a"}" stroke-width="1.5"/><text y="3" text-anchor="middle" font-size="12" font-weight="700" fill="#ece4d4">${Math.round(c.p * 100)} %</text></g>`;
       }
@@ -321,7 +331,8 @@
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect class="feld" data-x="${x}" data-y="${y}" x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="transparent"/>`;
     svg.innerHTML = o;
 
-    $("#reihe").innerHTML = `<span>Runde ${st.runde}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${f.seite === "gegner" ? "g" : ""}">${esc(f.name)}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
+    const mini = (f) => f.seite === "gegner" ? `<svg class="mini" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(f.art)}</svg>` : `<img class="mini" src="${F.bild(f.fid)}" alt="">`;
+    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${f.seite === "gegner" ? "g" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${esc(f.name)}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
 
     if (st.ende) { $("#aktiv").innerHTML = ""; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
     else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
@@ -345,6 +356,7 @@
       $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt. Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
     }
     $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("");
+    zeichneGegnerInfo(); zeichneLeiste(akt, spielerDran);
     zeigeWurf();
     schwebeZahlen();
     zeichneLiveBar();
@@ -414,6 +426,8 @@
   function klickFeld(x, y) {
     if (!st) return;
     const akt = R.aktiv(st);
+    const g = st.figuren.find((f) => f.seite === "gegner" && f.x === x && f.y === y && f.tp > 0);
+    if (!wahl && g) { gegnerInfo = gegnerInfo === g.id ? null : g.id; render(); return; }
     if (st.ende || akt.seite !== "spieler") return;
     if (wahl) {
       const z = R.ziele(st, wahl).find((f) => f.x === x && f.y === y);
@@ -427,6 +441,41 @@
   function zeigeSektion(id) { for (const x of ["intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
   function zeigeIntro() { zeigeSektion("intro"); }
   function zeigeSpiel() { zeigeSektion("spiel"); }
+  /** Bekannte Eigenschaften der Gegner (für die Infokarte) */
+  const GEGNER_INFO = {
+    rost: "Rost: Treffer gegen Metallrüstung senken deren RK.",
+    flieht: "Flieht, wenn es schlecht für ihn steht.",
+    untot: "Untot: Heiliges Licht und Vertreiben wirken besonders.",
+    anfaellig: "Anfällig gegen Wuchtschaden.",
+    sporen: "Sporen: Wer in der Nähe ist, atmet giftige Sporen ein.",
+    netz: "Netz: Fesselt Getroffene an Ort und Stelle.",
+    atem: "Atem: Greift alle paar Runden mehrere Ziele auf einmal an.",
+    boss: "Anführer: ruft Tote zu Hilfe. Siegelsteine und sein wahrer Name schwächen ihn.",
+  };
+  function zeichneGegnerInfo() {
+    const el = $("#gegner-info"), g = gegnerInfo && R.fig(st, gegnerInfo);
+    if (!g || g.tp <= 0) { gegnerInfo = null; el.hidden = true; el.innerHTML = ""; return; }
+    const d = R.GEGNER[g.art], anteil = Math.max(0, g.tp / g.tpMax), z = R.zustaende(st, g);
+    const eig = Object.keys(GEGNER_INFO).filter((k) => d[k]).map((k) => `<li>${esc(GEGNER_INFO[k])}</li>`).join("");
+    el.hidden = false;
+    el.innerHTML = `<div class="gi-kopf"><svg class="gi-bild" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(g.art)}</svg><div><b>${esc(g.name)}</b><small>Gegner${d.untot ? " · untot" : ""}</small></div><button class="link" id="gi-zu" aria-label="Schließen">✕</button></div>
+      <div class="gi-tp"><i style="width:${anteil * 100}%"></i><span>❤ ${g.tp} / ${g.tpMax}</span></div>
+      <ul class="gi-werte"><li><span>Rüstungsklasse</span><b>${R.rkEff ? R.rkEff(st, g) : g.rk}</b></li><li><span>Bewegung</span><b>${d.bewegung || 6}</b></li>${d.angriff ? `<li><span>${esc(d.angriff.name)}</span><b>+${d.angriff.bonus} · ${esc(d.angriff.schaden)}${d.angriff.reichweite ? ` · ${d.angriff.reichweite} Felder` : ""}</b></li>` : ""}</ul>
+      ${eig ? `<ul class="gi-eig">${eig}</ul>` : ""}${z.length ? `<p class="gi-zust">${z.map(esc).join(" · ")}</p>` : ""}`;
+  }
+  /** Aktionsleiste unter der Karte: Bewegen · Angreifen · Fähigkeit · Gegenstand · Zug beenden */
+  function zeichneLeiste(akt, dran) {
+    const el = $("#leiste");
+    if (!st || st.ende || !akt || akt.seite !== "spieler") { el.innerHTML = st && !st.ende && akt ? `<div class="l-wer"><span class="l-warte">${esc(akt.name)} ist am Zug …</span></div>` : ""; return; }
+    const alle = R.aktionenVon(akt, st), frei = (a) => a && !R.grund(st, a.id);
+    const angriff = alle.find((a) => (a.typ || "aktion") === "aktion" && a.schaden && !a.platz && R.rest(akt, a) === Infinity);
+    const trank = alle.find((a) => a.art === "trank");
+    const anteil = Math.max(0, akt.tp / akt.tpMax);
+    const knopf = (l, sym, text, an, extra = "") => `<button class="l-knopf ${an ? "" : "aus"}" data-l="${l}" ${extra} ${dran && an ? "" : "disabled"}><span class="l-sym" aria-hidden="true">${sym}</span><span>${text}</span></button>`;
+    el.innerHTML = `<div class="l-wer">${akt.fid ? B.marke(akt.fid, 46) : ""}<div><b>${esc(akt.name)}</b><div class="l-tp"><i style="width:${anteil * 100}%"></i><span>❤ ${akt.tp} / ${akt.tpMax}</span></div></div></div>
+      <div class="l-knoepfe">${knopf("bewegen", "➶", "Bewegen", st.zug.bewegung || st.zug.schritt)}${knopf("angriff", "⚔", angriff ? esc(angriff.name) : "Angreifen", frei(angriff), angriff ? `data-a="${angriff.id}"` : "")}${knopf("faehig", "✶", "Fähigkeit", true)}${knopf("trank", "⚱", `Heiltrank (${R.trankZahl(akt)})`, frei(trank), trank ? `data-a="${trank.id}"` : "")}${knopf("ende", "⟳", "Zug beenden", true)}</div>`;
+    if (wahl) { const b = el.querySelector(`[data-a="${wahl}"]`); if (b) b.classList.add("gewaehlt"); }
+  }
   /** Kampf aus dem Abenteuer heraus: opts für neuesSpiel, cb(st) nach dem Ende */
   function kampfStarten(opts, cb) {
     clearTimeout(gegnerTimer);
@@ -447,6 +496,19 @@
   }
 
   $("#karte").addEventListener("click", (ev) => { const t = ev.target.closest(".feld"); if (t) klickFeld(+t.dataset.x, +t.dataset.y); });
+  $("#reihe").addEventListener("click", (ev) => { const t = ev.target.closest("[data-info]"); if (t && st) { gegnerInfo = gegnerInfo === t.dataset.info ? null : t.dataset.info; render(); } });
+  $("#gegner-info").addEventListener("click", (ev) => { if (ev.target.closest("#gi-zu")) { gegnerInfo = null; render(); } });
+  $("#leiste").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-l]"); if (!b || b.disabled || !st) return;
+    const akt = R.aktiv(st), l = b.dataset.l; tipp = null;
+    if (l === "bewegen") { wahl = null; render(); return; }
+    if (l === "ende") { wahl = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
+    if (l === "faehig") { const el = $("#aktionen"); if (el) { el.scrollIntoView({ behavior: "smooth", block: "nearest" }); el.classList.remove("blink"); void el.offsetWidth; el.classList.add("blink"); } return; }
+    const id = b.dataset.a; if (!id) return;
+    const h = R.findeAktion(akt, id);
+    if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); return; }
+    wahl = wahl === id ? null : id; render();
+  });
   $("#aktionen").addEventListener("click", (ev) => {
     const b = ev.target.closest("button"); if (!b || b.disabled || b.tagName !== "BUTTON") return;
     if (b.id === "ende-zug") { wahl = null; tipp = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }

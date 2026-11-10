@@ -600,3 +600,57 @@ body.ruhig .titel-hg img { animation: none; }
 html { background: var(--nacht-tief); }
 .wahl-body.stufe2 .held-bild { align-self: start; }
 .klassen-kopf { align-items: flex-start; }
+
+
+/* ================= 04 · Kampfoberfläche ================= */
+.karte-wrap { position: relative; border: 1px solid var(--line-stark); border-radius: 3px; overflow: hidden; background: var(--nacht-tief); box-shadow: var(--schatten); }
+#karte .aktiv-ring { animation: puls 1.8s ease-in-out infinite; }
+@keyframes puls { 50% { stroke-opacity: .55; } }
+.reihe { gap: 6px; align-items: center; }
+.reihe span { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 20px; background: var(--stein); border-color: var(--line); }
+.reihe span.runde { padding: 4px 10px; color: var(--altgold); font: 600 12px var(--schrift-titel); letter-spacing: .06em; }
+.reihe .mini { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 2px solid #4D9DB6; background: #0d141e; flex: none; }
+.reihe span.g .mini { border-color: #d0545e; }
+.reihe span.g { cursor: pointer; }
+.reihe span.dran { border-color: var(--altgold); box-shadow: var(--glut); color: var(--pergament); }
+.reihe span.dran .mini { border-color: var(--altgold); }
+/* Aktionsleiste */
+.leiste { display: flex; gap: 10px; align-items: stretch; padding: 10px; background: linear-gradient(180deg, rgba(26,37,51,.97), rgba(12,19,29,.98)); border-top: 1px solid var(--line-stark); flex-wrap: wrap; }
+.leiste:empty { display: none; }
+.l-wer { display: flex; gap: 10px; align-items: center; min-width: 170px; }
+.l-wer img.marke { border-color: var(--altgold); }
+.l-wer b { font: 600 16px var(--schrift-titel); color: var(--pergament); }
+.l-warte { color: var(--muted); font-size: 14px; padding: 8px 4px; }
+.l-tp, .gi-tp { position: relative; height: 16px; width: 130px; margin-top: 4px; background: #0a111b; border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
+.l-tp i, .gi-tp i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #6e2029, #b13a45); }
+.l-tp span, .gi-tp span { position: relative; display: block; text-align: center; font: 600 11px/14px var(--schrift-ui); color: #fff; text-shadow: 0 1px 2px #000; }
+.l-knoepfe { display: flex; gap: 6px; flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+.l-knopf { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 74px; min-height: 58px; padding: 6px 8px; cursor: pointer;
+  background: linear-gradient(180deg, #2a3646, #1a2533); color: var(--pergament); border: 1px solid var(--line); border-radius: 3px; font: 600 11px var(--schrift-ui); letter-spacing: .03em; }
+.l-knopf .l-sym { font-size: 20px; color: var(--altgold); line-height: 1; }
+.l-knopf:hover:not(:disabled) { border-color: var(--altgold); box-shadow: 0 0 12px rgba(197,162,103,.25); }
+.l-knopf.gewaehlt { border-color: var(--altgold); box-shadow: var(--glut); background: linear-gradient(180deg, #3a3a2e, #232a2a); }
+.l-knopf:disabled { opacity: .4; cursor: default; }
+.l-knopf[data-l="ende"] { background: linear-gradient(180deg, #933440, var(--blutrot)); border-color: var(--line-stark); min-width: 92px; }
+.l-knopf[data-l="ende"] .l-sym { color: var(--pergament); }
+@media (max-width: 700px) { .l-wer { min-width: 0; flex-basis: 100%; } .l-knoepfe { justify-content: space-between; } .l-knopf { min-width: 0; flex: 1; font-size: 10px; } }
+#aktionen.blink { animation: blink 1s ease; }
+@keyframes blink { 30% { box-shadow: 0 0 0 2px var(--altgold); } }
+/* Gegnerkarte */
+.gegner-info { margin: -12px -12px 12px; padding: 12px; background: linear-gradient(180deg, rgba(123,41,50,.35), rgba(26,37,51,.2)); border-bottom: 1px solid rgba(208,84,94,.5); }
+.gi-kopf { display: flex; gap: 10px; align-items: center; }
+.gi-kopf b { display: block; font: 600 17px var(--schrift-titel); color: var(--pergament); } .gi-kopf small { color: var(--muted); font-size: 12px; }
+.gi-kopf .link { margin-left: auto; text-decoration: none; font-size: 16px; }
+.gi-bild { width: 48px; height: 48px; border-radius: 50%; background: #0d141e; border: 2px solid #d0545e; flex: none; }
+.gi-tp { width: 100%; height: 18px; margin: 10px 0 8px; } .gi-tp span { line-height: 16px; font-size: 12px; }
+.gi-werte, .gi-eig { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.gi-werte li { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(197,162,103,.12); } .gi-werte li span { color: var(--muted); }
+.gi-eig { margin-top: 8px; display: grid; gap: 4px; color: #e3dccd; } .gi-eig li::before { content: "✶ "; color: var(--altgold); }
+.gi-zust { margin: 8px 0 0; font-size: 12px; color: #c9a8ff; }
+.leiste { flex-wrap: nowrap; }
+.l-wer { flex: 0 1 auto; min-width: 0; }
+.l-tp { width: 110px; }
+.l-knoepfe { flex-wrap: nowrap; min-width: 0; }
+.l-knopf { flex: 1 1 0; min-width: 0; padding: 6px 4px; text-align: center; }
+.l-knopf span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+@media (max-width: 700px) { .leiste { flex-wrap: wrap; } }

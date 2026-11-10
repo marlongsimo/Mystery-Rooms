@@ -239,6 +239,8 @@
     const fett = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
     let h = `<div class="handy-szene"><p class="eyebrow">Abschnitt ${ab.abschnitt} · ${esc(ab.ort)} · Glocke ${ab.glocke}/7</p><h2>${esc(ab.titel)}</h2>`;
     const tot = ab.zust && ab.zust[fid] && ab.zust[fid].tot;
+    if (ab.beute) return h + `<div class="info dran"><b>Beute!</b> Am Tisch entscheidet ihr gemeinsam, wer welchen Gegenstand bekommt:</div><ul class="faehig">${ab.beute.dinge.map((g) => `<li><b>${g.sym} ${esc(g.name)}</b><p>${esc(g.text)}</p></li>`).join("")}</ul></div>`;
+    if (ab.aufstieg && ab.aufstieg.helden[fid]) { const a = ab.aufstieg.helden[fid]; h += `<div class="info dran"><b>Stufe ${ab.aufstieg.auf}!</b> ❤ ${a.tp[0]} → ${a.tp[1]} Trefferpunkte${a.neu.length ? "<br>Neu: " + a.neu.map((n) => esc(n.name)).join(", ") + " – siehe Fähigkeiten" : ""}</div>`; }
     if (tot && ab.ersatz && ab.ersatz.offen.includes(fid)) return h + `<div class="info dran"><b>${esc(F.FIGUREN[fid].name)} ist gefallen.</b> Am Lagerfeuer stößt jemand Neues zur Gruppe. Wen spielst du jetzt?</div><div class="fkarten handy-karten">${ab.ersatz.frei.map((neu) => window.ABH_HELDEN.kachel(neu, {})).join("")}</div></div>`;
     if (tot) return h + `<div class="info schlecht">${esc(F.FIGUREN[fid].name)} ist gefallen. Am nächsten Lagerfeuer kannst du eine neue Figur übernehmen.</div></div>`;
     if (ab.art === "wahl") {
@@ -286,7 +288,7 @@
       for (const o of s.optionen || []) {
         const def = R.findeAktion({ fid, stufe, rucksack: fd.rucksack }, o.id); if (!def) continue;
         const a = def.a, gew = H.sel === o.id;
-        const zahl = a.art === "trank" ? ` (${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n})` : o.rest != null && o.rest !== Infinity ? ` · noch ${Math.max(0, o.rest)}` : "";
+        const zahl = a.art === "trank" && !a.gross ? ` (${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n})` : o.rest != null && o.rest !== Infinity ? ` · noch ${Math.max(0, o.rest)}` : "";
         h += `<button class="opt ${gew ? "gewaehlt" : ""} ${o.ok ? "" : "aus"}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}><b>${esc(a.name)}<span class="anzahl">${esc(zahl)}</span></b><small>${esc(aktionInfo(a, d, stufe))}</small>${!gew && a.text ? `<span class="opt-kurz">${esc(a.text)}</span>` : ""}${o.ok ? "" : `<i>${esc(o.grund === "Kein gültiges Ziel." ? (["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite.") : o.grund || "")}</i>`}</button>`;
         if (gew) {
           const selbst = SELBST.has(a.art);
@@ -319,7 +321,7 @@
   function tabRucksack(dinge, fid) {
     const d = F.FIGUREN[fid];
     const extra = { krieger: ["Seil, 15 m", "Fackel"], zauberer: ["Zauberbuch", "Kreide"], schurke: ["Dietriche", "Dunkler Umhang"], kleriker: ["Heiliges Symbol", "Verband"], waldlaeufer: ["Köcher", "Jagdmesser"] }[d.klasse] || [];
-    return `<ul class="faehig">${dinge.map((x) => { const t = R.DINGE[x.id] || { name: x.id, text: "" }; return `<li class="${x.n ? "" : "leer"}"><b>${esc(t.name)} <span class="anzahl">×${x.n}</span></b><p>${esc(t.text)}</p>${x.id === "heiltrank" && x.n ? `<small>Trinken: im Reiter „Zug“, wenn du dran bist.</small>` : ""}</li>`; }).join("")}
+    return `<ul class="faehig">${dinge.map((x) => { const t = R.DINGE[x.id] || (R.GEGENSTAENDE[x.id] && Object.assign({}, R.GEGENSTAENDE[x.id], { name: R.GEGENSTAENDE[x.id].sym + " " + R.GEGENSTAENDE[x.id].name })) || { name: x.id, text: "" }; return `<li class="${x.n ? "" : "leer"}"><b>${esc(t.name)} <span class="anzahl">×${x.n}</span></b><p>${esc(t.text)}</p>${x.id === "heiltrank" && x.n ? `<small>Trinken: im Reiter „Zug“, wenn du dran bist.</small>` : ""}</li>`; }).join("")}
       ${extra.map((e) => `<li><b>${esc(e)}</b></li>`).join("")}<li><b>${esc(d.ruestung)}</b><small>RK ${d.rk.join(" / ")}</small></li></ul>`;
   }
 

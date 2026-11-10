@@ -71,6 +71,11 @@ const { chromium } = require('playwright');
     const s = await T.evaluate(() => window.AB.st && !window.AB.st.ende ? window.AB.R.aktiv(window.AB.st).seite : 'x');
     if (s === 'spieler') await T.evaluate(() => window.AB.auto()); else await T.waitForTimeout(100);
   }
+  if (await until(T, () => Boolean(document.querySelector('[data-beute-ding]')), null, 8000)) {
+    check(await until(H.Ben, () => /Beute!/.test(document.body.textContent)), 'Beute: Handys sehen, was es gibt');
+    await T.click('[data-beute-ding]'); await T.click('[data-beute]:not([disabled])');
+    check(await until(T, () => !document.querySelector('[data-beute-ding]')), 'Beute am Tisch verteilt');
+  }
   const nach = await szene(T);
   check(nach === 'garten_danach' || nach === 'garten', `Nach dem Kampf: Szene „${nach}“`);
   if (nach === 'garten_danach') {

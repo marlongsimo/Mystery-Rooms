@@ -85,7 +85,9 @@
 
   /* ---------- Erzählung und Gespräch ---------- */
   function weiter(A) {
+    if (A.beute) return { fehler: "Erst die Beute verteilen." };
     const s = szene(A);
+    if (A.aufstieg) A.aufstieg = null;
     if (s.art === "erzaehlung") return ziel(A, s), { ok: true };
     if (s.art === "probe" && A.ergebnis) { const e = s.probe[A.ergebnis.stufe]; wirke(A, e); ziel(A, e); return { ok: true }; }
     if (s.art === "lager") { A.ersatzOffen = []; return ziel(A, s), { ok: true }; }
@@ -210,7 +212,18 @@
 
   /* ---------- Lagerfeuer ---------- */
   function lagerfeuer(A, s) {
-    if (s.aufstieg && A.stufe < s.aufstieg) { A.stufe = s.aufstieg; notiz(A, `Aufstieg: Die Gruppe erreicht Stufe ${A.stufe}.`, "gut"); }
+    if (s.aufstieg && A.stufe < s.aufstieg) {
+      const von = A.stufe; A.stufe = s.aufstieg; notiz(A, `Aufstieg: Die Gruppe erreicht Stufe ${A.stufe}.`, "gut");
+      // Was jede Figur dazugewinnt (für den Aufstiegsbildschirm)
+      A.aufstieg = { von, auf: A.stufe, helden: {} };
+      for (const fid of A.gruppe) {
+        if (A.zust[fid].tot) continue;
+        const alt = F.faehigVon(fid, von).map((a) => a.id), neu = F.faehigVon(fid, A.stufe).filter((a) => !alt.includes(a.id));
+        const k = F.KLASSEN[F.FIGUREN[fid].klasse];
+        A.aufstieg.helden[fid] = { tp: [F.tpVon(fid, von), F.tpVon(fid, A.stufe)], neu: neu.map((a) => ({ name: a.name, text: a.text, typ: a.typ })),
+          plaetze: k.plaetze ? [F.PLAETZE[von], F.PLAETZE[A.stufe]] : null };
+      }
+    }
     for (const fid of A.gruppe) {
       const z = A.zust[fid]; if (z.tot) continue;
       const neuZ = frisch(fid, A.stufe), anteil = A.glocke >= 3 ? 0.75 : 1;
@@ -266,6 +279,33 @@
     return { ok: true };
   }
 
+  /* ---------- Beute: nach jedem Sieg 3 Gegenstände zur Wahl, einer geht an eine Figur ---------- */
+  const MAX_GETRAGEN = 2;
+  const getragen = (A, fid) => (A.zust[fid].rucksack || []).filter((d) => R.GEGENSTAENDE[d.id] && !R.GEGENSTAENDE[d.id].verbrauch && d.n > 0).map((d) => d.id);
+  function darfTragen(A, fid, ding) {
+    const g = R.GEGENSTAENDE[ding], z = A.zust[fid]; if (!g || !z || z.tot) return false;
+    if (g.nur && !g.nur.includes(F.FIGUREN[fid].klasse)) return false;
+    if (g.verbrauch) return true;
+    const t = getragen(A, fid); return !t.includes(ding) && t.length < MAX_GETRAGEN;
+  }
+  function beuteZiehen(A) {
+    const vergeben = A.gruppe.flatMap((f) => getragen(A, f));
+    const topf = Object.keys(R.GEGENSTAENDE).filter((id) => R.GEGENSTAENDE[id].verbrauch || !vergeben.includes(id)).filter((id) => lebende(A).some((f) => darfTragen(A, f, id)));
+    const zug = [];
+    while (zug.length < 3 && topf.length) zug.push(topf.splice(Math.floor(A.r() * topf.length), 1)[0]);
+    A.beute = zug.length ? { dinge: zug } : null;
+  }
+  function beuteGeben(A, ding, fid) {
+    if (!A.beute || !A.beute.dinge.includes(ding)) return { fehler: "Diesen Gegenstand gibt es gerade nicht." };
+    if (!hat(A, fid)) return { fehler: "Diese Figur ist nicht dabei." };
+    if (!darfTragen(A, fid, ding)) return { fehler: `${name(A, fid)} kann das nicht mehr tragen.` };
+    const r = A.zust[fid].rucksack, d = r.find((x) => x.id === ding);
+    if (d) d.n++; else r.push({ id: ding, n: 1 });
+    notiz(A, `${name(A, fid)} nimmt ${R.GEGENSTAENDE[ding].name}.`, "gut");
+    A.beute = null; return { ok: true };
+  }
+  function beuteLassen(A) { if (!A.beute) return { fehler: "Keine Beute." }; notiz(A, "Ihr lasst die Beute liegen."); A.beute = null; return { ok: true }; }
+
   /* ---------- Kampf ---------- */
   function kampfOptionen(A) {
     const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
@@ -283,6 +323,7 @@
       for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
       R.neuerKampf(A.zust);
       wirke(A, k.sieg); ziel(A, k.sieg || {});
+      if (k.beute !== false) beuteZiehen(A);
       return { ok: true, ergebnis: "sieg" };
     }
     if (k.verloren && st.ende !== "sieg") {
@@ -318,13 +359,16 @@
         boni: Object.fromEntries(lebende(A).map((f) => [f, bonus(A, f, p).wert])), ergebnis: A.ergebnis } : null,
       raetsel: s.art === "raetsel" ? { glocken: s.glocken, folge: A.raetsel.folge, fehl: A.merker[A.szene + "_fehl"] || 0, laenge: s.loesung.length, hinweise: raetselHinweise(A) } : null,
       ersatz: (A.ersatzOffen || []).length ? { offen: A.ersatzOffen, frei: freieFiguren(A) } : null,
+      beute: A.beute ? { dinge: A.beute.dinge.map((id) => Object.assign({ id }, R.GEGENSTAENDE[id])), max: MAX_GETRAGEN,
+        helden: Object.fromEntries(lebende(A).map((f) => [f, { getragen: getragen(A, f), darf: Object.fromEntries(A.beute.dinge.map((id) => [id, darfTragen(A, f, id)])) }])) } : null,
+      aufstieg: A.aufstieg || null,
       zust: A.zust, gruppe: A.gruppe, gefallen: A.gefallen, protokoll: A.protokoll.slice(-6),
     };
   }
   function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
   function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
 
-  const API = { geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

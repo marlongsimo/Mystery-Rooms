@@ -305,7 +305,8 @@
     }
     // Ziel eines Läufers (Glockenseil) markieren, solange er unterwegs ist
     for (const g of st.figuren) if (g.laeufer && g.tp > 0) { const L = g.laeufer, lx = L.x * Z + Z / 2, ly = L.y * Z + Z / 2; o += `<g class="seil-ziel"><circle cx="${lx}" cy="${ly}" r="${Z * 0.44}" fill="#C5A267" fill-opacity="${L.da ? ".35" : ".12"}" stroke="#f0d488" stroke-width="2.5" stroke-dasharray="6 4"/><text x="${lx}" y="${ly - Z * 0.5}" text-anchor="middle" font-size="12" font-weight="700" fill="#f0d488" stroke="#000" stroke-width="3" paint-order="stroke">${L.da ? "Er zieht gleich!" : "Glockenseil"}</text></g>`; }
-    for (const f of st.figuren) {
+    // Wer am Boden liegt, wird zuerst gezeichnet, damit stehende Figuren darüber sichtbar bleiben
+    for (const f of st.figuren.slice().sort((a, b) => (a.tp > 0) - (b.tp > 0))) {
       if (f.x < 0 || (f.z && f.z.verbannt)) continue;
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
@@ -351,7 +352,7 @@
         const g = R.grund(st, a.id), r = R.rest(akt, a), typ = a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion";
         const kosten = a.platz ? ` · ${a.platz === 2 ? "Platz Grad 2" : "1 Platz"}` : "", rr = r !== Infinity ? ` · noch ${Math.max(0, r)}` : "";
         const wirk = a.schaden ? ` · ${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}` : a.heilung ? ` · heilt ${a.heilung}` : "";
-        return `<button class="akt ${wahl === a.id ? "gewaehlt" : ""} ${tipp && tipp.aktion === a.id ? "getippt" : ""}" data-a="${a.id}" ${g ? "disabled" : ""}><span class="akt-kopf"><b>${esc(a.name)}${a.art === "trank" ? ` (${R.trankZahl(akt)})` : ""}</b><small>${typ}${kosten}${rr}${wirk}</small></span><span class="akt-text">${esc(g && g !== "Kein gültiges Ziel." ? g : a.text || "")}${g === "Kein gültiges Ziel." ? ` <em>${["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite."}</em>` : ""}</span></button>`;
+        return `<button class="akt ${wahl === a.id ? "gewaehlt" : ""} ${tipp && tipp.aktion === a.id ? "getippt" : ""}" data-a="${a.id}" ${g ? "disabled" : ""}><span class="akt-kopf"><b>${esc(a.name)}${a.art === "trank" && !a.gross ? ` (${R.trankZahl(akt)})` : ""}</b><small>${typ}${kosten}${rr}${wirk}</small></span><span class="akt-text">${esc(g && g !== "Kein gültiges Ziel." ? g : a.text || "")}${g === "Kein gültiges Ziel." ? ` <em>${["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite."}</em>` : ""}</span></button>`;
       };
       const alle = R.aktionenVon(akt, st);
       const gruppe = (typen, titel) => { const l = alle.filter((a) => typen.includes(a.typ || "aktion")); return l.length ? `<p class="akt-gruppe">${titel}</p>${l.map(knopf).join("")}` : ""; };
@@ -476,7 +477,7 @@
     if (!st || st.ende || !akt || akt.seite !== "spieler") { el.innerHTML = st && !st.ende && akt ? `<div class="l-wer"><span class="l-warte">${esc(akt.name)} ist am Zug …</span></div>` : ""; return; }
     const alle = R.aktionenVon(akt, st), frei = (a) => a && !R.grund(st, a.id);
     const angriff = alle.find((a) => (a.typ || "aktion") === "aktion" && a.schaden && !a.platz && R.rest(akt, a) === Infinity);
-    const trank = alle.find((a) => a.art === "trank");
+    const trank = alle.find((a) => a.art === "trank" && !a.gross) || alle.find((a) => a.art === "trank");
     const anteil = Math.max(0, akt.tp / akt.tpMax);
     const knopf = (l, sym, text, an, extra = "") => `<button class="l-knopf ${an ? "" : "aus"}" data-l="${l}" ${extra} ${dran && an ? "" : "disabled"}><span class="l-sym" aria-hidden="true">${sym}</span><span>${text}</span></button>`;
     el.innerHTML = `<div class="l-wer">${akt.fid ? B.marke(akt.fid, 46) : ""}<div><b>${esc(akt.name)}</b><div class="l-tp"><i style="width:${anteil * 100}%"></i><span>❤ ${akt.tp} / ${akt.tpMax}</span></div></div></div>

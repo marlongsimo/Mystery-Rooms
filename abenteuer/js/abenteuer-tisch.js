@@ -46,7 +46,8 @@
   function glockeHtml(n) { return `<span class="glocke" title="Die Glocke hat ${n}× geschlagen">${Array.from({ length: 7 }, (_, i) => `<i class="${i < n ? "an" : ""}"></i>`).join("")}<small>Glocke ${n}/7</small></span>`; }
   function gruppeHtml() {
     return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
-      return `<span class="${z.tot ? "tot" : ""}">${B.marke(fid, 34)}<b>${esc(d.name)}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small></span>`; }).join("")}</div>`;
+      const dinge = (z.rucksack || []).filter((x) => R.GEGENSTAENDE[x.id] && x.n > 0).map((x) => `<i title="${esc(R.GEGENSTAENDE[x.id].name)}: ${esc(R.GEGENSTAENDE[x.id].text)}">${R.GEGENSTAENDE[x.id].sym}</i>`).join("");
+      return `<span class="${z.tot ? "tot" : ""}">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small></span>`; }).join("")}</div>`;
   }
   /* ---------- Chronik: jedes beendete Abenteuer bleibt auf dem Gerät ---------- */
   const CHRONIK = "ab_chronik";
@@ -132,10 +133,35 @@
     return `<div class="ersatz"><h2 class="klein">Ersatz für die Gefallenen</h2>${v.ersatz.offen.map((alt) => `<p>Wer kommt an ${esc(F.FIGUREN[alt].name)}s Stelle?${live() && besitzer(alt) ? ` (${esc(AB.spielerName(besitzer(alt)))} wählt auf dem Handy oder hier)` : ""}</p>
       <div class="ersatz-wahl">${v.ersatz.frei.map((neu) => `<button class="btn ghost klein" data-ersatz="${alt}:${neu}">${B.marke(neu, 26)} ${esc(F.FIGUREN[neu].name)}</button>`).join("")}</div>`).join("")}</div>`;
   }
+  /** Beutewahl: drei Gegenstände, einer geht an eine Figur */
+  function beuteHtml(v) {
+    const b = v.beute;
+    const karte = (g) => `<div class="beute-karte ${A.beuteWahl === g.id ? "an" : ""}" data-beute-ding="${g.id}" role="button" tabindex="0">
+      <span class="beute-sym" aria-hidden="true">${g.sym}</span><b>${esc(g.name)}</b><p>${esc(g.text)}</p>
+      <small>${g.verbrauch ? "Verbrauchsgegenstand – kommt in den Rucksack" : `Wird getragen · höchstens ${b.max} je Figur`}${g.nur ? ` · nur ${g.nur.map((k) => F.KLASSEN[k].name).join(" und ")}` : ""}</small></div>`;
+    const gewaehlt = A.beuteWahl && b.dinge.find((g) => g.id === A.beuteWahl);
+    const helden = gewaehlt ? `<p class="note">Wer bekommt <b>${esc(gewaehlt.name)}</b>?</p><div class="beute-helden">${Object.entries(b.helden).map(([fid, h]) => {
+      const tr = h.getragen.map((id) => R.GEGENSTAENDE[id].sym + " " + R.GEGENSTAENDE[id].name).join(", ");
+      return `<button class="btn ${h.darf[gewaehlt.id] ? "ghost" : "ghost"} beute-held" data-beute="${gewaehlt.id}:${fid}" ${h.darf[gewaehlt.id] ? "" : "disabled"}>${B.marke(fid, 30)}<span><b>${esc(F.FIGUREN[fid].name)}</b><small>${tr ? "trägt: " + esc(tr) : "trägt noch nichts"}${h.darf[gewaehlt.id] ? "" : " · kann das nicht nehmen"}</small></span></button>`;
+    }).join("")}</div>` : `<p class="note">Wählt einen Gegenstand. Danach entscheidet ihr, wer ihn bekommt.</p>`;
+    return `<section class="beute"><h2>Beute</h2><p>Zwischen den Gefallenen findet ihr etwas. Ihr könnt <b>eines</b> davon mitnehmen.</p>
+      <div class="beute-karten">${b.dinge.map(karte).join("")}</div>${helden}
+      <div class="knoepfe"><button class="link" id="beute-lassen">Nichts mitnehmen</button></div></section>`;
+  }
+  /** Aufstieg am Lagerfeuer: was jede Figur dazugewinnt */
+  function aufstiegHtml(v) {
+    const a = v.aufstieg; if (!a) return "";
+    const pl = (p) => p ? `${p[0]}${p[1] ? " + " + p[1] + " starke" : ""}` : "";
+    return `<section class="aufstieg"><h2>Stufe ${a.auf}</h2><div class="aufstieg-liste">${Object.entries(a.helden).map(([fid, h]) => `<div class="aufstieg-held">${B.marke(fid, 40)}<div>
+      <b>${esc(F.FIGUREN[fid].name)}</b><span class="auf-werte">❤ ${h.tp[0]} → <b>${h.tp[1]}</b> Trefferpunkte${h.plaetze ? ` · Zauberplätze ${pl(h.plaetze[0])} → <b>${pl(h.plaetze[1])}</b>` : ""}</span>
+      ${h.neu.length ? `<ul>${h.neu.map((n) => `<li><b>Neu: ${esc(n.name)}</b> – ${esc(n.text)}</li>`).join("")}</ul>` : `<p class="note">Keine neue Fähigkeit, aber manche werden stärker.</p>`}</div></div>`).join("")}</div></section>`;
+  }
   function interaktion(v, s) {
+    if (v.beute) return beuteHtml(v);
     if (A.zwischenprobe || (s.art === "probe")) return probeHtml(v);
     if (s.art === "raetsel") return raetselHtml(v);
     if (s.art === "lager" && v.ersatz) return ersatzHtml(v) + `<div class="knoepfe"><button class="btn ghost" id="sz-weiter">Ohne Ersatz weiter</button></div>`;
+    if (s.art === "lager" && v.aufstieg) return aufstiegHtml(v) + interaktion(Object.assign({}, v, { aufstieg: null }), s);
     if (s.art === "erzaehlung" || s.art === "lager") {
       const rast = s.rastErlaubt && A.schwierigkeit === "normal" && !A.merker["kurz_" + (s.abschnitt || 1)];
       return `<div class="knoepfe"><button class="btn" id="sz-weiter">Weiter</button>${rast ? `<button class="btn ghost" id="sz-rast" title="Halbe fehlende TP zurück. Die Glocke schlägt.">Kurze Rast (Glocke +1)</button>` : ""}</div>`;
@@ -165,6 +191,9 @@
   function binde(el, v, s) {
     const nach = () => { merken(); render(); AB.veroeffentlichen(); };
     el.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { S.waehle(A, b.dataset.opt); nachSzene(); }; });
+    el.querySelectorAll("[data-beute-ding]").forEach((b) => { b.onclick = () => { A.beuteWahl = b.dataset.beuteDing; render(); }; b.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); b.click(); } }; });
+    el.querySelectorAll("[data-beute]").forEach((b) => { b.onclick = () => { const [ding, fid] = b.dataset.beute.split(":"); const r = S.beuteGeben(A, ding, fid); if (r.fehler) AB.toast(r.fehler); else A.beuteWahl = null; nach(); }; });
+    const bl = $("#beute-lassen"); if (bl) bl.onclick = () => { if (confirm("Wirklich nichts mitnehmen?")) { S.beuteLassen(A); A.beuteWahl = null; nach(); } };
     el.querySelectorAll("[data-wer]").forEach((b) => { b.onclick = () => { S.probeWer(A, b.dataset.wer); nach(); }; });
     el.querySelectorAll("[data-wurf]").forEach((b) => { b.onclick = () => { S.probeWurf(A, b.dataset.wurf); nach(); }; });
     el.querySelectorAll("[data-geheim]").forEach((b) => { b.onclick = () => { const [fid, a] = b.dataset.geheim.split(":"); S.geheim(A, fid, a); nach(); }; });

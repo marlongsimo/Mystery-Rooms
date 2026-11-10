@@ -28,7 +28,23 @@
   const mittel = (expr) => { const p = parse(expr); return p.n * (p.s + 1) / 2 + p.b; };
   const mod = (v) => Math.floor((v - 10) / 2);
   const UEBUNG = 2;
-  const SG = (f, attr) => 8 + UEBUNG + mod(f.werte[attr]);
+  /* ---------- Gegenstände (Beute): getragen im Rucksack, wirken im Kampf ---------- */
+  const GEGENSTAENDE = {
+    stiefel: { name: "Stiefel des Wanderers", sym: "🥾", text: "+1 Feld Bewegung je Zug." },
+    amulett: { name: "Amulett der Abtei", sym: "✠", text: "+1 Rüstungsklasse." },
+    ring: { name: "Ring der Stärke", sym: "💍", text: "+1 auf Angriffe im Nahkampf." },
+    feder: { name: "Falkenfeder", sym: "🪶", text: "+1 auf Angriffe auf Entfernung (Bogen, Wurf, Zauber)." },
+    stab: { name: "Stab der Brüder", sym: "⚚", text: "Gegner haben es schwerer, deinen Zaubern zu widerstehen: Rettungswurf-SG +1.", nur: ["zauberer", "kleriker"] },
+    gluecksbringer: { name: "Glücksbringer", sym: "🍀", text: "+1 auf alle Rettungswürfe." },
+    silberdolch: { name: "Silberdolch", sym: "🗡", text: "Deine Treffer gegen Untote: +1W4 Schaden." },
+    kerze: { name: "Gesegnete Kerze", sym: "🕯", text: "Untote greifen dich mit Nachteil an." },
+    grosser_trank: { name: "Großer Heiltrank", sym: "⚗", verbrauch: true, text: "Einmal: Bonusaktion, heilt 4W4+4 TP." },
+    rauchbeutel: { name: "Rauchbeutel", sym: "☁", verbrauch: true, text: "Einmal: Aktion, Rauchwolke um dich (1 Feld, 2 Runden). Niemand sieht hinein oder hinaus." },
+  };
+  const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
+  const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
+  const RAUCH_DING = { id: "rauchbeutel", name: "Rauchbeutel werfen", typ: "aktion", art: "rauch", ding: "rauchbeutel", radius: 1, dauer: 2, text: GEGENSTAENDE.rauchbeutel.text };
+  const SG = (f, attr) => 8 + UEBUNG + mod(f.werte[attr]) + (hatDing(f, "stab") ? 1 : 0);
 
   /* ---------- Gegenstände ---------- */
   const DINGE = {
@@ -92,7 +108,8 @@
   const abstand = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
   const lebt = (f) => f.tp > 0 && !f.tot && !(f.z && f.z.verbannt);
   function blockiert(st, x, y) { return x < 0 || y < 0 || x >= st.karte.b || y >= st.karte.h || st.karte.block.has(key(x, y)); }
-  function belegt(st, x, y, ausser) { return st.figuren.some((f) => f !== ausser && !f.tot && !(f.z && f.z.verbannt) && (f.tp > 0 || f.seite === "spieler") && f.x === x && f.y === y); }
+  /** Belegt ist ein Feld nur von stehenden Figuren: Wer am Boden liegt, versperrt keinen Platz (man kann über ihr stehen) */
+  function belegt(st, x, y, ausser) { return st.figuren.some((f) => f !== ausser && !f.tot && !(f.z && f.z.verbannt) && f.tp > 0 && f.x === x && f.y === y); }
   const imRauch = (st, x, y) => st.zonen.some((z) => z.art === "rauch" && Math.max(Math.abs(z.x - x), Math.abs(z.y - y)) <= z.radius);
 
   /** Erreichbare Felder (8 Richtungen, keine Ecken durch Hindernisse), Map key → Kosten */
@@ -166,7 +183,7 @@
   /* ---------- Figuren ---------- */
   const fig = (st, id) => st.figuren.find((f) => f.id === id);
   /** Grundbewegung einer Heldin, eines Helden: je Figur, sonst je Klasse, sonst 6 Felder */
-  const bewegungVon = (f) => (f.fid && FD.FIGUREN[f.fid] && FD.FIGUREN[f.fid].bewegung) || (f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].bewegung) || 6;
+  const bewegungVon = (f) => ((f.fid && FD.FIGUREN[f.fid] && FD.FIGUREN[f.fid].bewegung) || (f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].bewegung) || 6) + (hatDing(f, "stiefel") ? 1 : 0);
   const aktiv = (st) => fig(st, st.reihe[st.am]);
   const istFig = (f, fid) => f && f.fid === fid;
   const wolfVon = (st, f) => st.figuren.find((o) => o.art === "wolf" && o.besitzer === f.id);
@@ -262,6 +279,8 @@
     if (id === "siegelstein") return { a: SIEGEL_A, typ: "aktion" };
     if (id === "wahrer_name") return { a: NAME_A, typ: "aktion" };
     if (id === "silberglocke") return { a: SILBER_A, typ: "bonus" };
+    if (id === "grosser_trank") return { a: GROSS_TRANK, typ: "bonus" };
+    if (id === "rauchbeutel") return { a: RAUCH_DING, typ: "aktion" };
     const fid = f.fid, liste = fid ? FD.faehigVon(fid, f.stufe) : [];
     const a = liste.find((x) => x.id === id && x.typ !== "passiv");
     return a ? { a, typ: a.typ } : null;
@@ -270,6 +289,8 @@
   function aktionenVon(f, st) {
     const liste = faehigkeiten(f).filter((a) => a.typ === "aktion" || a.typ === "bonus" || a.typ === "frei");
     if (trankZahl(f)) liste.push(TRANK);
+    if (hatDing(f, "grosser_trank")) liste.push(GROSS_TRANK);
+    if (hatDing(f, "rauchbeutel")) liste.push(RAUCH_DING);
     if (!st || st.figuren.some((o) => o.seite === "spieler" && o.art !== "wolf" && o.tp <= 0 && !o.tot)) liste.push(STABIL);
     if (st && st.siegel && st.siegel.some((z) => !z.beruehrt) && !imPakt(st, f)) liste.push(SIEGEL_A);
     if (st && st.boss && st.boss.name && !st.boss.nameGenutzt) liste.push(NAME_A);
@@ -313,7 +334,7 @@
 
   /** Effektive Rüstungsklasse gegen einen Angriff */
   function rkEff(st, z, a, spec = {}) {
-    let rk = z.rk;
+    let rk = z.rk + (hatDing(z, "amulett") ? 1 : 0);
     if (z.z.schild) rk += 2;
     if (z.seite === "spieler" && st.figuren.some((l) => istFig(l, "lichtbringer") && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2)) rk += 2;
     if (z.z.analyse === st.runde) rk -= 2;
@@ -342,6 +363,7 @@
     if (a.z.liegend) minus.push("liegt");
     if (a.z.stich) minus.push("Schattenstich");
     if (a.z.spott && a.z.spott !== z.id) minus.push("verspottet");
+    if (a.seite === "gegner" && GEGNER[a.art] && GEGNER[a.art].untot && hatDing(z, "kerze")) minus.push("Gesegnete Kerze");
     if (istFig(z, "schattenmagier") && z.trugbildRunde !== st.runde) minus.push("Trugbild");
     if (spec.fern && a.seite === "spieler" && st.figuren.some((o) => o.seite !== a.seite && lebt(o) && abstand(o, a) <= 1)) minus.push("Gegner daneben");
     const v = plus.length && minus.length ? 0 : plus.length ? 1 : minus.length ? -1 : 0;
@@ -368,7 +390,8 @@
     let v = 0; if (attr === "GES" && z.z.festgehalten) v = -1;
     let { w } = w20(st, v);
     const bon = () => mod(z.werte[attr]) + (z.seite === "spieler" && z.klasse && FD.KLASSEN[z.klasse].rettung.includes(attr) ? UEBUNG : 0);
-    let total = w + bon() + (z.z.segen ? W(st.r, 4) : 0);
+    const glueck = hatDing(z, "gluecksbringer") ? 1 : 0;
+    let total = w + bon() + glueck + (z.z.segen ? W(st.r, 4) : 0);
     if (total < sg) { const g = gedankenstuetze(st, z, sg - total); if (g) { w = W(st.r, 20); total = w + bon() + (z.z.segen ? W(st.r, 4) : 0); st.log.push({ t: `${g.name}: Gedankenstütze – ${z.name} würfelt noch einmal.`, art: "gut" }); } }
     return { erfolg: total >= sg, w, total };
   }
@@ -510,12 +533,14 @@
   /** Angriff einer Spielerfigur mit einer Waffe oder einem Angriffszauber */
   function spielerAngriff(st, f, a, z, opt = {}) {
     let bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") && f.stufe >= 2 ? 1 : 0);
+    bonus += abstand(f, z) <= 1 ? (hatDing(f, "ring") ? 1 : 0) : (hatDing(f, "feder") ? 1 : 0);
     const fest = a.ohneMod ? 0 : mod(f.werte[a.attr]);
     const extra = [];
     let krit = 20, zusatz = "";
     if (f.z.raserei && a.attr === "STR") extra.push("0W1+2");
     if (istFig(f, "berserker") && f.tp < f.tpMax / 2) extra.push(f.stufe >= 3 ? "0W1+2" : "0W1+1");
     if (f.z.finte) extra.push("1W6");
+    if (hatDing(f, "silberdolch") && GEGNER[z.art] && GEGNER[z.art].untot) extra.push("1W4");
     if (f.z.gift) extra.push(f.stufe >= 2 ? "2W6" : "1W6");
     if (z.z.mal_jaeger === f.id) extra.push(FD.FIGUREN[f.fid].malWuerfel || "1W6");
     if (z.z.brandmal === f.id) extra.push(f.stufe >= 3 ? "2W6" : "1W4");
@@ -727,7 +752,7 @@
         heilen(st, ziel, n, `${f.name}: ${a.name}`); break;
       }
       case "selbstheilung": heilen(st, f, roll(r, a.heilung).total + (a.plusStufe ? f.stufe : 0), `${f.name}: ${a.name}`); break;
-      case "trank": f.rucksack.find((d) => d.id === "heiltrank").n -= 1; heilen(st, f, roll(r, a.heilung).total, `${f.name}: Heiltrank`); break;
+      case "trank": f.rucksack.find((d) => d.id === (a.gross ? "grosser_trank" : "heiltrank")).n -= 1; heilen(st, f, roll(r, a.heilung).total, `${f.name}: ${a.gross ? "Großer Heiltrank" : "Heiltrank"}`); break;
       case "aufrichten": {
         if (a.stabil && st.schwierigkeit === "hardcore") { ziel.stabil = true; st.log.push({ t: `${f.name} stabilisiert ${ziel.name}. Die Todeswürfe hören auf.`, art: "gut" }); }
         else { ziel.tp = 1; ziel.todes = { e: 0, f: 0 }; ziel.stabil = false; st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} steht mit 1 TP wieder auf.`, art: "gut" }); }
@@ -774,7 +799,7 @@
         break;
       }
       case "bannkreis": st.zonen.push({ art: "bann", x: ziel.x, y: ziel.y, radius: a.radius, bis: st.runde + a.dauer }); st.log.push({ t: `${f.name} zieht einen Bannkreis um ${ziel.name}: Gegner darin −2 RK.`, art: "gut" }); break;
-      case "rauch": st.zonen.push({ art: "rauch", x: f.x, y: f.y, radius: a.radius, bis: st.runde + a.dauer }); st.log.push({ t: `${f.name} wirft eine Rauchbombe.` }); break;
+      case "rauch": if (a.ding) f.rucksack.find((d) => d.id === a.ding).n -= 1; st.zonen.push({ art: "rauch", x: f.x, y: f.y, radius: a.radius, bis: st.runde + a.dauer }); st.log.push({ t: `${f.name} wirft eine Rauchbombe.` }); break;
       case "siegel": {
         const z = st.siegel.find((x) => !x.beruehrt && abstand(x, f) <= 1), b = bossVon(st); z.beruehrt = true;
         const s = roll(r, "2W6").total; b.rk -= 2;
@@ -1219,7 +1244,7 @@
     // 5. Bonusaktionen danach
     if (kann("zweiter_dolch")) { const z = ziele(st, "zweiter_dolch").sort((a, b) => a.tp - b.tp)[0]; if (z) handeln(st, "zweiter_dolch", z.id); }
     if (kann("wolf_befehl")) { const z = ziele(st, "wolf_befehl").sort((a, b) => a.tp - b.tp)[0]; if (z) handeln(st, "wolf_befehl", z.id); }
-    if (f.tp < f.tpMax * 0.5) { if (!versuche(st, "zweiter_atem")) versuche(st, "heiltrank"); }
+    if (f.tp < f.tpMax * 0.5) { if (!versuche(st, "zweiter_atem") && !versuche(st, "heiltrank")) versuche(st, "grosser_trank"); }
     for (const id of ["heilendes_wort", "massenheilwort"]) { const zs = kann(id) ? ziele(st, id) : []; const z = zs.find((o) => o.tp <= 0 || o.tp < o.tpMax * 0.4); if (z) handeln(st, id, z.id); }
     if (kann("aus_dem_schatten")) versuche(st, "aus_dem_schatten"); else if (kann("verstecken")) versuche(st, "verstecken");
     // 6. Fernkämpfer: nach dem Schuss leichtfüßig weg
@@ -1337,7 +1362,7 @@
     };
   }
 
-  const API = { bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
     findeAktion, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

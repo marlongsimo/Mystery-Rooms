@@ -654,3 +654,28 @@ html { background: var(--nacht-tief); }
 .l-knopf { flex: 1 1 0; min-width: 0; padding: 6px 4px; text-align: center; }
 .l-knopf span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 @media (max-width: 700px) { .leiste { flex-wrap: wrap; } }
+
+
+/* ================= Beute und Aufstieg ================= */
+.beute, .aufstieg { margin: 8px 0 14px; padding: 16px; border: 1px solid var(--line-stark); border-radius: var(--radius); background: var(--stein); box-shadow: var(--schatten); }
+.beute h2, .aufstieg h2 { font: 600 24px var(--schrift-titel); color: var(--pergament); margin: 0 0 6px; }
+.beute > p { font: 400 19px/1.45 var(--schrift-text); margin: 0 0 12px; }
+.beute-karten { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+@media (max-width: 640px) { .beute-karten { grid-template-columns: 1fr; } }
+.beute-karte { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 14px 12px; cursor: pointer; border: 1px solid var(--line); border-radius: 3px;
+  background: linear-gradient(180deg, #2a3646, #18222e); transition: border-color .15s, box-shadow .2s, transform .1s; }
+.beute-karte:hover, .beute-karte:focus-visible { border-color: var(--altgold); }
+.beute-karte.an { border-color: var(--altgold); box-shadow: var(--glut); transform: translateY(-2px); }
+.beute-sym { font-size: 34px; line-height: 1; filter: drop-shadow(0 0 8px rgba(197,162,103,.35)); }
+.beute-karte b { font: 600 16px var(--schrift-titel); color: var(--pergament); }
+.beute-karte p { margin: 0; font-size: 14px; color: #e3dccd; }
+.beute-karte small { color: var(--muted); font-size: 11px; }
+.beute-helden { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.beute-held { display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 10px; }
+.beute-held span { display: flex; flex-direction: column; } .beute-held small { font-weight: 400; font-size: 11px; color: var(--muted); }
+.aufstieg-liste { display: grid; gap: 10px; }
+.aufstieg-held { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.aufstieg-held b { color: var(--pergament); } .auf-werte { display: block; font-size: 14px; color: #e3dccd; margin: 2px 0 4px; }
+.aufstieg-held ul { margin: 4px 0 0; padding-left: 18px; font-size: 14px; color: #e3dccd; }
+.gruppe-leiste .dinge { font-style: normal; font-size: 13px; margin-left: 4px; }
+.gruppe-leiste .dinge i { font-style: normal; cursor: help; }

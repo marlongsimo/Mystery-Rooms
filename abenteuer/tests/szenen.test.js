@@ -24,9 +24,10 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const nimm = async (p, fid) => { await zu(p, fid); await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
 
   // 1. Alle Wege
-  const besucht = new Set(), enden = {}; let fehler = 0, haenger = 0, ersaetze = 0;
+  const besucht = new Set(), enden = {}; let fehler = 0, haenger = 0, ersaetze = 0, beuteVerteilt = 0;
   function spiele(A, r) {
     for (let n = 0; n < 500; n++) {
+      if (A.beute) { const frei = S.lebende(A).filter((f) => S.darfTragen(A, f, A.beute.dinge[0])); if (frei.length && r() < 0.8) S.beuteGeben(A, A.beute.dinge[0], frei[Math.floor(r() * frei.length)]); else S.beuteLassen(A); beuteVerteilt++; }
       const s = S.szene(A); besucht.add(A.szene);
       if (s.art === 'ende') { enden[A.szene] = (enden[A.szene] || 0) + 1; return true; }
       if (s.art === 'lager' && A.ersatzOffen && A.ersatzOffen.length) { for (const alt of A.ersatzOffen.slice()) { const frei = S.freieFiguren(A); if (frei.length) S.ersatz(A, alt, frei[0]); } ersaetze++; }
@@ -56,6 +57,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
     } catch (e) { fehler++; if (fehler < 3) console.log(e.stack.split('\n').slice(0, 4).join('\n')); }
   }
   const alle = Object.keys(D.SZENEN), nie = alle.filter((k) => !besucht.has(k));
+  check(beuteVerteilt > 1000, `Beute nach Siegen verteilt (${beuteVerteilt}×)`);
   check(ersaetze > 0, `Hardcore: Gefallene bekommen am Lagerfeuer eine Ersatzfigur (${ersaetze}×)`);
   check(fehler === 0 && haenger === 0, `400 Durchläufe ohne Fehler und ohne Hänger (Enden: ${Object.entries(enden).map(([k, v]) => k + ' ' + v).join(', ')})`);
   check(['ende_waechter', 'ende_kobold', 'ende_opfer', 'ende_bruch', 'ende_verrat'].every((e) => enden[e]), 'Abschnitt 3: alle fünf Enden kommen vor');
@@ -68,16 +70,21 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   S.waehle(A1, 'tam'); check(A1.merker.tam_schlaf === true, 'Kael liest an Tams Spuren, dass der Junge im Schlaf ging');
   check(S.optionen(A1).some((o) => o.id === 'versprechen'), 'Versprechen an Wenna wird erst nach ihrer Geschichte angeboten');
 
-  // Karten: Jedes begehbare Feld ist von den Startplätzen der Helden erreichbar, kein Startplatz liegt auf einem Hindernis
+  // Karten: Jedes begehbare Feld ist von den Startplätzen der Helden erreichbar (schräg nicht an Ecken vorbei, wie im Spiel), kein Startplatz liegt auf einem Hindernis
   for (const [kn, k] of Object.entries(D.KARTEN).concat([['GARTEN', R.KARTE_GARTEN]])) {
     const block = new Set(k.hindernisse.map(([, x, y]) => x + ',' + y)), frei = (x, y) => x >= 0 && y >= 0 && x < k.b && y < k.h && !block.has(x + ',' + y);
     const starts = [...k.start.spieler, ...k.start.gegner.slice(0, 8)];
     const belegt = starts.filter(([x, y]) => !frei(x, y));
     const weg = new Set(), q = [k.start.spieler[0]]; weg.add(q[0].join(','));
-    while (q.length) { const [x, y] = q.shift(); for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const nx = x + dx, ny = y + dy, kk = nx + ',' + ny; if (frei(nx, ny) && !weg.has(kk)) { weg.add(kk); q.push([nx, ny]); } } }
+    while (q.length) { const [x, y] = q.shift(); for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const nx = x + dx, ny = y + dy, kk = nx + ',' + ny; if (frei(nx, ny) && !weg.has(kk) && !(dx && dy && (!frei(x + dx, y) || !frei(x, y + dy)))) { weg.add(kk); q.push([nx, ny]); } } }
     let alle = 0; for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) if (frei(x, y)) alle++;
     check(belegt.length === 0 && weg.size === alle, `Karte ${k.name}: alle ${alle} freien Felder erreichbar, Startplätze frei` + (belegt.length ? ` – blockiert: ${belegt.join(' ')}` : weg.size !== alle ? ` – nur ${weg.size} erreichbar` : ''));
   }
+  // Gegenstände wirken
+  { const st = R.neuesSpiel(3, { figuren: ['schildwaechter', 'elementarist', 'lichtbringer'], stufe: 1, vorher: { schildwaechter: { stufe: 1, tp: 12, tot: false, plaetze: [0, 0], genutzt: {}, rucksack: [{ id: 'heiltrank', n: 1 }, { id: 'stiefel', n: 1 }, { id: 'amulett', n: 1 }] } } });
+    const t = st.figuren.find((f) => f.fid === 'schildwaechter');
+    check(R.bewegungVon(t) === 4 && R.rkEff(st, t) === F.FIGUREN.schildwaechter.rk[0] + 1, 'Gegenstände: Stiefel +1 Bewegung, Amulett +1 RK');
+    check(R.aktionenVon(st.figuren.find((f) => f.fid === 'elementarist'), st).every((a) => a.id !== 'grosser_trank'), 'Ohne Großen Heiltrank keine Aktion dafür'); }
   // Coldrics Schild und der Splitter
   const A2 = S.neu(3, { gruppe: ['schildwaechter', 'duellant', 'lichtbringer'] }); A2.stufe = 3; A2.merker.coldric_frieden = true; A2.szene = 'halle_danach'; S.weiter(A2);
   check(A2.szene === 'coldric_schild' && S.optionen(A2).length === 3, 'Nach Coldrics Frieden: Abstimmung, wer seinen Schild trägt');
@@ -100,7 +107,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   await p.click('#abenteuer-los');
   check(await p.isVisible('#szene') && /Halmbruck/.test(await p.textContent('#szene h1')), 'Abenteuer beginnt in Halmbruck');
   const gesehen = new Set(); let kaempfe = 0, neuGeladen = false, i = 0;
-  let raetselGeloest = false;
+  let raetselGeloest = false, beuteGenommen = 0;
   for (; i < 4000; i++) {
     if (await p.isVisible('#szene')) {
       const titel = (await p.textContent('#szene h1')).trim(); gesehen.add(titel);
@@ -111,6 +118,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
       if (kaempfe === 1 && !neuGeladen) { const vorher = await p.evaluate(() => window.ABT.A().szene); await p.reload(); await p.waitForSelector('#szene:not([hidden])', { timeout: 15000 }).catch(async (e) => { console.log('NACH NEULADEN sichtbar:', await p.evaluate(() => ['intro','lobby','spiel','ende','szene'].filter((x) => !document.getElementById(x).hidden).join() + ' | solo=' + (localStorage.getItem('ab_solo') || '').slice(0, 120) + ' | tisch=' + Boolean(localStorage.getItem('ab_tisch')))); throw e; }); neuGeladen = await p.evaluate(() => window.ABT.A().szene) === vorher; check(neuGeladen, 'Neu laden: das Abenteuer geht von selbst an derselben Stelle weiter');
         await p.click('#sz-pause'); await p.click('#fortsetzen'); check(await p.isVisible('#szene'), 'Pause → Titel → „Abenteuer fortsetzen“'); continue; }
       const klick = async (sel) => { const e = await p.$(sel); if (e && await e.isEnabled()) { await e.click(); return true; } return false; };
+      if (await p.$('[data-beute-ding]')) { if (!gesehen.has('Beute')) { gesehen.add('Beute'); if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + '/beute.png', fullPage: true }); } if (!(await p.$('[data-beute]'))) await p.click('[data-beute-ding]'); if (!(await klick('[data-beute]:not([disabled])'))) { p.once('dialog', (d) => d.accept()); await p.click('#beute-lassen'); } beuteGenommen++; continue; }
+      if (await p.$('.aufstieg') && !gesehen.has('Aufstieg')) gesehen.add('Aufstieg');
       if (await klick('[data-wurf]')) continue;
       if (await klick('[data-wer]')) continue;
       if (await p.$('[data-geheim]')) { for (const v of await p.$$eval('[data-geheim]', (xs) => { const erst = {}; for (const x of xs) { const f = x.dataset.geheim.split(':')[0]; if (!erst[f]) erst[f] = x.dataset.geheim; } return Object.values(erst); })) await p.click(`[data-geheim="${v}"]`); await klick('#sz-weiter'); continue; }
@@ -133,6 +142,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const endeArt = await p.evaluate(() => { const A = window.ABT.A(); return A && window.ABS.szene(A).art === 'ende' ? A.szene : null; });
   check(/^ende_|grauwacht_behaelt/.test(endeArt || ''), `Abschnitte 1 bis 3 im Browser durchgespielt bis „${ende.trim()}“ (${gesehen.size - 3} Szenen, ${kaempfe} Kämpfe)`);
   check(['Die Halle der Asche', 'Die Siegelkammer', 'Das Flüstern', 'Valdric'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Abschnitt 3: Halle der Asche, Siegelkammer, Flüstern und Endkampf gesehen');
+  check(beuteGenommen > 0 && gesehen.has('Aufstieg'), `Browser: Beute verteilt (${beuteGenommen}×) und Aufstiegsbildschirm gesehen`);
   check(raetselGeloest || /behält/.test(ende) || !gesehen.has('Das Glockenjoch'), 'Glockenrätsel über die Glocken am Tisch gelöst');
   check(['Der Abstieg', 'Der Schacht', 'Tam', 'Lagerfeuer in der Bibliothek', 'Anselms Tagebuch'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Abschnitt 2: Abstieg, Schacht, Tam, Bibliothek, Tagebuch gesehen');
   check(['Am Brunnen', 'Der bittere Brunnen', 'Der Klostergarten', 'Der Glockenturm', 'Nisk', 'Lagerfeuer im Kreuzgang'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Gespräch, geheime Entscheidung, Kampf, Abstimmung und Lagerfeuer gesehen');

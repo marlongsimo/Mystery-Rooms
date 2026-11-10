@@ -54,6 +54,24 @@
   $("#ton").onclick = () => { tonAn = !tonAn; try { localStorage.setItem(TON_KEY, tonAn ? "an" : "aus"); } catch (e) { /* privat */ } zeigeTon(); if (tonAn) glocke(0.6); };
   zeigeTon();
 
+  // Hauptmenü: Gruppe verwalten, Einstellungen (Ton, bewegte Effekte, Spielhinweise)
+  const EFF_KEY = "ab_effekte";
+  let effekteAn = true; try { effekteAn = localStorage.getItem(EFF_KEY) !== "aus"; } catch (e) { /* privat */ }
+  const zeigeEffekte = () => document.body.classList.toggle("ruhig", !effekteAn);
+  zeigeEffekte();
+  $("#titel-gruppe").onclick = () => AB.zeigeSetup();
+  $("#titel-einst").onclick = () => {
+    $("#e-ton").checked = tonAn; $("#e-effekte").checked = effekteAn;
+    let h = true; try { h = localStorage.getItem("ab_hilfe") !== "aus"; } catch (e) { /* privat */ } $("#e-hilfe").checked = h;
+    $("#einst-panel").hidden = false; $("#e-ton").focus();
+  };
+  $("#e-ton").onchange = (e) => { tonAn = e.target.checked; try { localStorage.setItem(TON_KEY, tonAn ? "an" : "aus"); } catch (x) { /* privat */ } zeigeTon(); if (tonAn) glocke(0.5); };
+  $("#e-effekte").onchange = (e) => { effekteAn = e.target.checked; try { localStorage.setItem(EFF_KEY, effekteAn ? "an" : "aus"); } catch (x) { /* privat */ } zeigeEffekte(); };
+  $("#e-hilfe").onchange = (e) => { try { localStorage.setItem("ab_hilfe", e.target.checked ? "an" : "aus"); } catch (x) { /* privat */ } if (window.ABT && window.ABT.hilfe) window.ABT.hilfe(e.target.checked); };
+  $("#einst-zu").onclick = () => { $("#einst-panel").hidden = true; $("#titel-einst").focus(); };
+  $("#einst-panel").addEventListener("click", (e) => { if (e.target.id === "einst-panel") $("#einst-zu").click(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#einst-panel").hidden) $("#einst-zu").click(); });
+
   // Würfel zum Ausprobieren
   $("#w20").onclick = () => {
     const btn = $("#w20"); btn.classList.remove("rollt"); void btn.offsetWidth; btn.classList.add("rollt");

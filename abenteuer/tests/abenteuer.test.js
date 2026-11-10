@@ -47,7 +47,7 @@ const R = require('../js/regeln.js'), F = R.FD;
     await p.goto(URL + '?seed=42&schnell');
     await p.evaluate(() => localStorage.clear()); await p.reload();
     check(/Grauwacht/.test(await p.textContent('h1')), `${vp.width}px: Startseite`);
-    check(await p.isVisible('#titel-start') && await p.isVisible('.titel-bild'), `${vp.width}px: Titelbild mit Szene`);
+    check(await p.isVisible('#titel-start') && await p.isVisible('.titel-hg img'), `${vp.width}px: Titelbild mit Szene`);
     await p.click('#titel-start');
     check(await p.isVisible('#einleitung') && /Splitterlande/.test(await p.textContent('#einleitung .seite:not([hidden])')), `${vp.width}px: Einleitung, Seite 1`);
     for (let i = 0; i < 3; i++) await p.click('#einl-weiter');

@@ -7,7 +7,7 @@
   <title>Das Siegel von Grauwacht – Abenteuer | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=10">
+  <link rel="stylesheet" href="css/abenteuer.css?v=11">
 </head>
 <body>
   <header class="top">
@@ -16,44 +16,40 @@
   </header>
   <main id="app">
     <section class="titel" id="intro">
-      <svg class="titel-bild" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <defs>
-          <radialGradient id="mond" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f3ead2"/><stop offset=".6" stop-color="#d8cba4"/><stop offset="1" stop-color="#d8cba4" stop-opacity="0"/></radialGradient>
-          <radialGradient id="schein" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d8cba4" stop-opacity=".25"/><stop offset="1" stop-color="#d8cba4" stop-opacity="0"/></radialGradient>
-          <linearGradient id="himmel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07090d"/><stop offset=".6" stop-color="#151a22"/><stop offset="1" stop-color="#1d1a16"/></linearGradient>
-          <linearGradient id="nebel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa3ad" stop-opacity="0"/><stop offset=".5" stop-color="#9aa3ad" stop-opacity=".16"/><stop offset="1" stop-color="#9aa3ad" stop-opacity="0"/></linearGradient>
-        </defs>
-        <rect width="1200" height="700" fill="url(#himmel)"/>
-        <circle cx="860" cy="170" r="190" fill="url(#schein)"/>
-        <circle cx="860" cy="170" r="62" fill="url(#mond)"/>
-        <g class="wolken" fill="#0c0f14" opacity=".85">
-          <path d="M600 150 q60 -40 120 -10 q50 -30 100 0 q70 -10 90 30 q-150 20 -310 -20z"/>
-          <path d="M880 210 q50 -30 110 -5 q40 -20 90 10 q-100 25 -200 -5z"/>
-        </g>
-        <path d="M0 520 Q200 430 420 450 Q560 360 700 370 Q860 380 980 450 Q1100 470 1200 440 V700 H0Z" fill="#0d0f12"/>
-        <g class="abtei" fill="#07080a" transform="translate(-228 -150) scale(1.35)">
-          <path d="M560 372 V300 h40 v-30 h20 v30 h40 v72z"/>
-          <path d="M640 372 V250 L655 220 L670 250 V372z"/>
-          <path d="M650 190 h10 v30 h-10z"/><path d="M646 186 L655 170 L664 186z"/>
-          <rect x="690" y="320" width="90" height="52"/><path d="M690 320 L735 290 L780 320z"/>
-          <rect x="520" y="335" width="40" height="37"/>
-          <rect x="651" y="232" width="8" height="12" fill="#e8b860" class="licht"/>
-        </g>
-        <path d="M0 600 Q300 540 600 570 Q900 600 1200 560 V700 H0Z" fill="#090a0c"/>
-        <g fill="#090a0c"><path d="M120 600 l10 -70 l10 70z"/><path d="M160 605 l14 -95 l14 95z"/><path d="M1020 590 l12 -80 l12 80z"/><path d="M1060 595 l9 -60 l9 60z"/></g>
-        <rect class="nebel n1" x="-200" y="430" width="1600" height="160" fill="url(#nebel)"/>
-        <rect class="nebel n2" x="-200" y="520" width="1600" height="160" fill="url(#nebel)"/>
-      </svg>
-      <div class="regen" aria-hidden="true"></div>
+      <picture class="titel-hg" aria-hidden="true">
+        <source media="(max-width: 900px)" srcset="img/welt/abtei-960.webp">
+        <img src="img/welt/abtei-1672.webp" alt="" fetchpriority="high" decoding="async">
+      </picture>
+      <div class="titel-schleier" aria-hidden="true"></div>
+      <div class="regen effekt" aria-hidden="true"></div>
+      <div class="nebel-schicht effekt n1" aria-hidden="true"></div>
+      <div class="nebel-schicht effekt n2" aria-hidden="true"></div>
       <div class="titel-inhalt">
-        <p class="eyebrow">Ein Abenteuer in den Splitterlanden</p>
-        <h1>Das Siegel von Grauwacht</h1>
-        <p class="titel-zeile">Seit sieben Nächten läutet die Glocke. Niemand lebt mehr in der Abtei.</p>
-        <div class="knoepfe mitte">
-          <button class="btn gross" id="titel-start">Neues Abenteuer</button>
-          <button class="btn ghost" id="titel-regeln">Regeln</button>
-        </div>
+        <p class="eyebrow">Ein interaktives Rollenspiel-Abenteuer</p>
+        <h1 class="titel-logo">Das Siegel von <span>Grauwacht</span></h1>
+        <span class="titel-zier" aria-hidden="true"></span>
+        <nav class="titel-menue knoepfe" aria-label="Hauptmenü">
+          <button class="menue primaer" id="titel-start"><span class="m-sym" aria-hidden="true">▶</span>Abenteuer starten</button>
+          <button class="menue" id="titel-gruppe"><span class="m-sym" aria-hidden="true">⚔</span>Gruppe verwalten</button>
+          <button class="menue" id="titel-regeln"><span class="m-sym" aria-hidden="true">❦</span>Regelwerk</button>
+          <button class="menue" id="titel-einst"><span class="m-sym" aria-hidden="true">✦</span>Einstellungen</button>
+          <a class="menue" href="../index.html"><span class="m-sym" aria-hidden="true">←</span>Zurück zur Übersicht</a>
+        </nav>
         <p class="titel-fuss">3–6 Heldinnen und Helden · etwa 3 Stunden · ab 12 Jahren<br><button class="link" id="ton">🔔 Ton an</button></p>
+      </div>
+      <aside class="titel-pergament" aria-hidden="true"><p>Eine alte Abtei.<br>Ein vergessenes Siegel.<br>Und eine Entscheidung, die über das Schicksal vieler Seelen bestimmt.</p><span class="siegel-wachs"></span></aside>
+      <ul class="titel-leiste" aria-label="Was euch erwartet">
+        <li><span aria-hidden="true">⚄</span>Rollenspiel</li><li><span aria-hidden="true">⚔</span>Taktische Kämpfe</li><li><span aria-hidden="true">⑂</span>Eure Entscheidungen</li><li><span aria-hidden="true">✶</span>15 Charaktere</li><li><span aria-hidden="true">⌛</span>Fünf Enden</li>
+      </ul>
+      <div class="einst-panel" id="einst-panel" hidden>
+        <div class="einst-box" role="dialog" aria-labelledby="einst-titel">
+          <h2 id="einst-titel">Einstellungen</h2>
+          <label class="schalter"><input type="checkbox" id="e-ton"><span>Ton (Glocke und Klänge)</span></label>
+          <label class="schalter"><input type="checkbox" id="e-effekte"><span>Bewegte Effekte (Regen, Nebel, Licht)</span></label>
+          <label class="schalter"><input type="checkbox" id="e-hilfe"><span>Spielhinweise für Einsteiger</span></label>
+          <p class="note">Auf Geräten mit „Bewegung reduzieren“ sind die Effekte automatisch aus.</p>
+          <div class="knoepfe"><button class="btn" id="einst-zu">Fertig</button></div>
+        </div>
       </div>
     </section>
 
@@ -163,7 +159,7 @@
   <script src="daten/grauwacht.js?v=6"></script>
   <script src="js/szenen.js?v=5"></script>
   <script src="js/spiel.js?v=11"></script>
-  <script src="js/abenteuer-tisch.js?v=7"></script>
-  <script src="js/einstieg.js?v=1"></script>
+  <script src="js/abenteuer-tisch.js?v=8"></script>
+  <script src="js/einstieg.js?v=2"></script>
 </body>
 </html>

@@ -226,13 +226,13 @@
   function fortsetzenKnopf() {
     let da = false; try { da = Boolean(localStorage.getItem(KEY)); } catch (e) { /* privat */ }
     const k = document.querySelector("#intro .knoepfe"); if (!da || !k || document.querySelector("#fortsetzen")) return;
-    const b = document.createElement("button"); b.className = "btn gross"; b.id = "fortsetzen"; b.textContent = "Abenteuer fortsetzen"; b.onclick = fortsetzen; k.prepend(b);
-    const n = document.querySelector("#titel-start"); if (n) n.classList.remove("gross");
+    const b = document.createElement("button"); b.className = "menue primaer"; b.id = "fortsetzen"; b.innerHTML = '<span class="m-sym" aria-hidden="true">▶</span>Abenteuer fortsetzen'; b.onclick = fortsetzen; k.prepend(b);
+    const n = document.querySelector("#titel-start"); if (n) { n.classList.remove("primaer"); n.innerHTML = '<span class="m-sym" aria-hidden="true">✚</span>Neues Abenteuer'; }
   }
   fortsetzenKnopf(); chronikKnopf();
   /** Pause: zurück zum Titel, der Spielstand bleibt erhalten */
   function pause() { merken(); fortsetzenKnopf(); AB.zeigeSektion("intro"); }
 
-  window.ABT = { start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
+  window.ABT = { hilfe: (v) => { hilfeAn = v; if (A) render(); }, start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
     speichern: () => (A ? S.speichern(A) : null), laden: (o) => { A = S.laden(o); } };
 })();

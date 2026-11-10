@@ -297,7 +297,14 @@
     for (const b of st.brand) o += `<rect x="${b.x * Z + 4}" y="${b.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#ff7a2a" fill-opacity=".35"/>`;
     for (const [kk, c] of reach) { const [x, y] = kk.split(",").map(Number); if (x === akt.x && y === akt.y) continue; o += `<rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${c === "schritt" ? "#b58cff" : "#4D9DB6"}" fill-opacity="${k.bild ? ".32" : ".2"}" stroke="${c === "schritt" ? "#c9a8ff" : "#8fd0e6"}" stroke-opacity=".7" stroke-width="1.5"/>`; }
     if (tipp && tipp.feld && spielerDran) o += `<rect class="tipp-ring" x="${tipp.feld.x * Z + 4}" y="${tipp.feld.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#f2d35a" fill-opacity=".18" stroke="#f2d35a" stroke-width="3"/>`;
-    for (const [t, x, y] of k.hindernisse) if (t !== "X") o += hindernis(t, x, y);
+    // Auf gemalten Karten ist alles im Bild; nur berührte Siegelsteine leuchten zusätzlich auf
+    for (const [t, x, y] of k.hindernisse) {
+      if (t === "X") continue;
+      if (k.bild) { if (t === "Z" && st.siegel && (st.siegel.find((z) => z.x === x && z.y === y) || {}).beruehrt) o += `<circle cx="${x * Z + Z / 2}" cy="${y * Z + Z / 2}" r="${Z * 0.48}" fill="#f0d488" fill-opacity=".28" stroke="#f0d488" stroke-width="3"/>`; continue; }
+      o += hindernis(t, x, y);
+    }
+    // Ziel eines Läufers (Glockenseil) markieren, solange er unterwegs ist
+    for (const g of st.figuren) if (g.laeufer && g.tp > 0) { const L = g.laeufer, lx = L.x * Z + Z / 2, ly = L.y * Z + Z / 2; o += `<g class="seil-ziel"><circle cx="${lx}" cy="${ly}" r="${Z * 0.44}" fill="#C5A267" fill-opacity="${L.da ? ".35" : ".12"}" stroke="#f0d488" stroke-width="2.5" stroke-dasharray="6 4"/><text x="${lx}" y="${ly - Z * 0.5}" text-anchor="middle" font-size="12" font-weight="700" fill="#f0d488" stroke="#000" stroke-width="3" paint-order="stroke">${L.da ? "Er zieht gleich!" : "Glockenseil"}</text></g>`; }
     for (const f of st.figuren) {
       if (f.x < 0 || (f.z && f.z.verbannt)) continue;
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;

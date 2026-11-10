@@ -229,7 +229,7 @@
     if (opts.ueberraschung) for (const g of gegnerFiguren(st)) g.ueberrascht = true;
     if (opts.laeufer) {
       const kand = gegnerFiguren(st).filter((g) => g.art === opts.laeufer.art).sort((a, b) => abstand(b, { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1] }) - abstand(a, { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1] }));
-      if (kand[0]) { kand[0].laeufer = { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1], ereignis: opts.laeufer.ereignis }; kand[0].name += " (rennt zum Seil)"; }
+      if (kand[0]) { kand[0].laeufer = { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1], ereignis: opts.laeufer.ereignis, nah: opts.laeufer.nah != null ? opts.laeufer.nah : 1, warten: Boolean(opts.laeufer.warten) }; kand[0].name += " (rennt zum Seil)"; }
     }
     // Initiative (Wölfe handeln im Zug ihrer Besitzerin)
     const teil = st.figuren.filter((f) => f.art !== "wolf");
@@ -969,10 +969,13 @@
       const L = g.laeufer, m = erreichbar(st, g, st.zug.bewegung); let best = null;
       for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const d = abstand({ x, y }, L); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, d, c }; }
       if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
-      if (lebt(g) && abstand(g, L) <= 1) {
+      const amZiel = lebt(g) && abstand(g, L) <= (L.nah != null ? L.nah : 1);
+      // Mit „warten“ greift er erst im nächsten Zug zu: Die Gruppe hat eine Runde, um ihn aufzuhalten
+      if (amZiel && L.warten && !L.da) { L.da = true; st.log.push({ t: `${g.name} steht am Glockenseil und greift danach! Haltet ihn auf, bevor er zieht.`, art: "schlecht" }); }
+      else if (amZiel) {
         st.ereignisse.push(L.ereignis); delete g.laeufer; g.name = g.name.replace(" (rennt zum Seil)", "");
         st.log.push({ t: `${g.name} reißt am Glockenseil! Die Glocke dröhnt.`, art: "schlecht" });
-      } else if (lebt(g)) st.log.push({ t: `${g.name} rennt zum Glockenseil.`, art: "gegner" });
+      } else if (lebt(g)) { L.da = false; st.log.push({ t: `${g.name} rennt zum Glockenseil.`, art: "gegner" }); }
       fangschuss(st, g, startX, startY);
       if (!st.ende) weiter(st); return;
     }

@@ -6,16 +6,18 @@
  */
 (function (root) {
   "use strict";
-  const TURM = {
-    name: "Der Glockenturm", b: 11, h: 8,
-    // S = Treppe, M = Balken, K = Kisten, R = Glockenseil
-    hindernisse: [["R", 5, 0], ["S", 5, 3], ["S", 5, 4], ["M", 2, 2], ["M", 8, 2], ["M", 2, 5], ["K", 8, 5], ["K", 0, 0], ["K", 10, 0]],
-    start: {
-      spieler: [[1, 7], [2, 7], [3, 7], [0, 6], [4, 7], [1, 6]],
-      wolf: [[0, 7], [2, 6], [3, 6], [4, 6]],
-      gegner: [[10, 7], [3, 1], [7, 1], [9, 3], [1, 3], [6, 2], [8, 0], [4, 1], [9, 1], [7, 3], [2, 0], [10, 4]],
-    },
-  };
+  /** Glockenturm als gemaltes Bild (12 × 9). X = Mauer, Kisten, Pfeiler; P = Treppenauge (versperrt den Weg, nicht die Sicht) */
+  const TURM = (() => {
+    const X = (x, y) => ["X", x, y], P = (x, y) => ["P", x, y], h = [];
+    for (let x = 0; x < 12; x++) h.push(X(x, 0), X(x, 1), X(x, 8));
+    for (let y = 2; y < 8; y++) h.push(X(0, y), X(10, y), X(11, y));
+    h.push(X(1, 2), X(1, 3), X(2, 2), X(2, 3), X(3, 2), X(4, 2), X(8, 2), X(9, 2), X(9, 3), X(9, 4), X(9, 7), X(4, 7), X(7, 7), P(2, 5), P(3, 5), P(2, 6), P(3, 6));
+    return { name: "Der Glockenturm", b: 12, h: 9, bild: "img/welt/glockenturm.webp", hindernisse: h,
+      start: { spieler: [[5, 7], [6, 7], [1, 6], [1, 7], [2, 7], [3, 7]], wolf: [[4, 6], [5, 6], [1, 5], [3, 4]],
+        gegner: [[8, 3], [8, 4], [8, 5], [8, 6], [9, 5], [9, 6], [7, 2], [6, 2], [5, 2], [7, 3], [3, 3], [8, 7]] } };
+  })();
+  // Das Glockenseil hängt mitten im Raum: Der Kobold muss es erreichen und eine Runde dort ausharren, bevor er zieht
+  const SEIL = { art: "schattenkobold", feld: [6, 4], ereignis: "alarm", nah: 0, warten: true };
   const kurz = (A) => A.gruppe.length;
   const GRUFT = {
     name: "Die Gruft der Brüder", b: 12, h: 9,
@@ -219,19 +221,19 @@
     turm_kampf: {
       art: "kampf", abschnitt: 1, titel: "Kampf im Glockenturm", ort: "Glockenturm",
       text: ["Ein Kobold rennt zur Treppe hinauf, zum Glockenseil. Haltet ihn auf, bevor er Alarm schlägt!"],
-      kampf: { begegnung: "kobolde", karte: TURM, laeufer: { art: "schattenkobold", feld: [5, 0], ereignis: "alarm" }, sieg: { weiter: "nisk" } },
+      kampf: { begegnung: "kobolde", karte: TURM, skalaMal: 1.4, laeufer: SEIL, sieg: { weiter: "nisk" } },
       ereignisse: { alarm: { glocke: 1, notiz: "Der Kobold hat am Seil gezogen. Die Glocke dröhnt über das Land." } },
     },
     turm_kampf_ueberrascht: {
       art: "kampf", abschnitt: 1, titel: "Überfall im Glockenturm", ort: "Glockenturm",
       text: ["Ihr seid über ihnen, bevor sie die Messer ziehen. Trotzdem: Einer rennt zum Seil."],
-      kampf: { begegnung: "kobolde", karte: TURM, ueberraschung: true, laeufer: { art: "schattenkobold", feld: [5, 0], ereignis: "alarm" }, sieg: { weiter: "nisk" } },
+      kampf: { begegnung: "kobolde", karte: TURM, skalaMal: 1.4, ueberraschung: true, laeufer: SEIL, sieg: { weiter: "nisk" } },
       ereignisse: { alarm: { glocke: 1, notiz: "Der Kobold hat am Seil gezogen. Die Glocke dröhnt über das Land." } },
     },
     turm_kampf_still: {
       art: "kampf", abschnitt: 1, titel: "Stille im Glockenturm", ort: "Glockenturm",
       text: ["Am Seil steht niemand mehr. Die anderen Kobolde merken es erst, als ihr mitten unter ihnen seid."],
-      kampf: { begegnung: "kobolde", karte: TURM, ueberraschung: true, sieg: { weiter: "nisk" } },
+      kampf: { begegnung: "kobolde", karte: TURM, skalaMal: 1.4, ueberraschung: true, sieg: { weiter: "nisk" } },
     },
     nisk: {
       art: "wahl", abschnitt: 1, titel: "Nisk", ort: "Glockenturm",

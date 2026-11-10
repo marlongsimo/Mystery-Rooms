@@ -19,33 +19,48 @@
   // Das Glockenseil hängt mitten im Raum: Der Kobold muss es erreichen und eine Runde dort ausharren, bevor er zieht
   const SEIL = { art: "schattenkobold", feld: [6, 4], ereignis: "alarm", nah: 0, warten: true };
   const kurz = (A) => A.gruppe.length;
-  const GRUFT = {
-    name: "Die Gruft der Brüder", b: 12, h: 9,
-    hindernisse: [["G", 3, 2], ["G", 3, 6], ["G", 6, 2], ["G", 6, 6], ["G", 9, 2], ["G", 9, 6], ["M", 5, 4], ["M", 8, 4], ["M", 0, 0], ["M", 11, 0], ["M", 0, 8], ["M", 11, 8]],
-    start: { spieler: [[0, 3], [0, 4], [0, 5], [1, 3], [1, 5], [1, 4]], wolf: [[0, 2], [0, 6], [1, 2], [1, 6]], gegner: [[10, 1], [10, 7], [11, 4], [10, 3], [10, 5], [11, 2], [11, 6], [9, 4], [8, 1], [8, 7], [7, 4], [11, 3]] },
-  };
+  // Gruft der Brüder als gemaltes Bild: Steinsärge geben Deckung, Nischen und Pfeiler sind Wand
+  const GRUFT = (() => {
+    const X = (x, y) => ["X", x, y], h = [];
+    for (let x = 0; x < 12; x++) h.push(X(x, 0), X(x, 1));
+    for (let y = 2; y < 9; y++) h.push(X(0, y), X(11, y));
+    for (const x of [1, 2, 3, 4, 7, 8, 9, 10]) h.push(X(x, 2));
+    h.push(X(1, 3), X(1, 4), X(1, 5), X(1, 6), X(1, 7), X(2, 3), X(10, 3), X(10, 4), X(10, 5), X(10, 7), X(9, 3),
+      X(3, 3), X(4, 3), X(7, 3), X(8, 3), X(2, 4), X(3, 4), X(4, 4), X(8, 4), X(9, 4), X(2, 6), X(3, 6), X(8, 6), X(9, 6), X(10, 6));
+    return { name: "Die Gruft der Brüder", b: 12, h: 9, bild: "img/welt/gruft.webp", hindernisse: h,
+      start: { spieler: [[5, 8], [6, 8], [4, 8], [7, 8], [3, 8], [8, 8]], wolf: [[2, 8], [9, 8], [4, 7], [7, 7]],
+        gegner: [[5, 3], [6, 3], [5, 4], [6, 4], [2, 5], [9, 5], [4, 5], [7, 5], [5, 2], [6, 2], [3, 5], [8, 5]] } };
+  })();
+  // Gemalte Karten: Rand und Hindernisse im Bild sind unsichtbar blockiert (X), Gruben versperren nur den Weg (P), Siegelsteine (Z)
+  const BX = (x, y) => ["X", x, y], BP = (x, y) => ["P", x, y], BZ = (x, y) => ["Z", x, y];
+  const RAND = (oben2) => { const h = []; for (let x = 0; x < 12; x++) { h.push(BX(x, 0), BX(x, 8)); if (oben2) h.push(BX(x, 1)); } for (let y = oben2 ? 2 : 1; y < 8; y++) h.push(BX(0, y), BX(11, y)); return h; };
   const PILZE = {
-    name: "Die Pilzkammer", b: 12, h: 9,
-    hindernisse: [["M", 4, 0], ["M", 4, 1], ["M", 4, 2], ["M", 4, 6], ["M", 4, 7], ["M", 4, 8], ["M", 8, 1], ["M", 8, 2], ["M", 8, 6], ["M", 8, 7], ["K", 6, 4], ["K", 10, 4]],
-    start: { spieler: [[1, 3], [1, 5], [2, 4], [0, 2], [0, 6], [2, 2]], wolf: [[2, 6], [3, 5], [0, 4], [3, 3]], gegner: [[9, 4], [7, 2], [7, 6], [11, 1], [11, 7], [10, 2], [10, 6], [11, 4], [6, 1], [6, 7], [9, 0], [9, 8]] },
+    name: "Die Pilzkammer", b: 12, h: 9, bild: "img/welt/pilzkammer.webp",
+    hindernisse: RAND(false).concat([BX(1, 1), BX(1, 2), BX(1, 3), BX(4, 1), BX(1, 4), BX(1, 7), BX(6, 1), BX(7, 1), BX(5, 2), BX(6, 2), BX(4, 3), BX(5, 3), BX(4, 4), BX(6, 4),
+      BX(7, 4), BX(4, 5), BX(5, 5), BX(6, 5), BX(4, 6), BX(5, 6), BX(4, 7), BX(9, 2), BX(10, 2), BX(10, 3), BX(10, 4), BX(9, 6), BX(10, 6), BX(9, 7), BX(10, 7)]),
+    start: { spieler: [[2, 5], [3, 5], [2, 6], [3, 4], [2, 3], [3, 7]], wolf: [[1, 5], [1, 6], [3, 3], [2, 4]],
+      gegner: [[8, 3], [7, 3], [8, 4], [9, 4], [8, 2], [7, 2], [9, 5], [8, 5], [9, 1], [6, 3], [7, 6], [8, 6]] },
   };
   const SCHACHT = {
-    name: "Der Schacht", b: 12, h: 9,
-    // P = Abgrund
-    hindernisse: [["P", 5, 3], ["P", 6, 3], ["P", 5, 4], ["P", 6, 4], ["P", 5, 5], ["P", 6, 5], ["K", 2, 1], ["K", 9, 7], ["M", 0, 0], ["M", 11, 8]],
-    start: { spieler: [[1, 3], [1, 5], [2, 4], [0, 2], [0, 6], [2, 6]], wolf: [[2, 2], [3, 5], [0, 4], [3, 3]], gegner: [[7, 2], [8, 4], [7, 6], [10, 1], [10, 7], [11, 3], [11, 5], [9, 2], [9, 6], [10, 4], [8, 0], [8, 8]] },
+    name: "Der Schacht", b: 12, h: 9, bild: "img/welt/schacht.webp",
+    hindernisse: RAND(false).concat([BP(4, 2), BP(5, 2), BP(6, 2), BP(7, 2), BP(4, 3), BP(5, 3), BP(6, 3), BP(7, 3), BP(4, 4), BP(5, 4), BP(6, 4), BP(7, 4),
+      BX(1, 1), BX(1, 2), BX(9, 1), BX(10, 1), BX(10, 2), BX(1, 4), BX(1, 5), BX(1, 6), BX(1, 7), BX(10, 5), BX(10, 6), BX(10, 7)]),
+    start: { spieler: [[2, 3], [2, 4], [2, 5], [2, 6], [3, 4], [3, 5]], wolf: [[3, 3], [3, 6], [2, 2], [2, 7]],
+      gegner: [[9, 4], [8, 3], [8, 5], [10, 3], [10, 4], [9, 2], [9, 6], [8, 2], [8, 6], [9, 3], [9, 5], [8, 7]] },
   };
   const W = (x, y) => ["M", x, y];
   const HALLE = {
-    name: "Die Halle der Asche", b: 12, h: 9,
-    hindernisse: [W(3, 2), W(3, 6), W(6, 2), W(6, 6), W(9, 2), W(9, 6)],
-    start: { spieler: [[0, 3], [0, 4], [0, 5], [1, 3], [1, 5], [1, 4]], wolf: [[0, 2], [0, 6], [1, 2], [1, 6]], gegner: [[10, 4], [8, 1], [8, 7], [11, 2], [11, 6], [10, 0], [10, 8], [7, 4]] },
+    name: "Die Halle der Asche", b: 12, h: 9, bild: "img/welt/halle.webp",
+    hindernisse: RAND(true).concat([BX(1, 2), BX(1, 3), BX(1, 4), BX(1, 5), BX(1, 6), BX(1, 7), BX(2, 2), BX(2, 3), BX(2, 4), BX(3, 2),
+      BX(8, 2), BX(9, 2), BX(9, 3), BX(9, 4), BX(10, 2), BX(10, 3), BX(10, 4), BX(10, 5), BX(10, 6), BX(10, 7)]),
+    start: { spieler: [[5, 7], [6, 7], [4, 7], [7, 7], [3, 7], [8, 7]], wolf: [[2, 7], [9, 7], [3, 6], [8, 6]],
+      gegner: [[6, 2], [4, 3], [7, 3], [5, 2], [7, 2], [4, 2], [3, 3], [8, 3]] },
   };
   const SIEGEL = {
-    name: "Die Siegelkammer", b: 12, h: 9,
-    // Z = Siegelstein
-    hindernisse: [W(0, 0), W(1, 0), W(0, 1), W(11, 0), W(10, 0), W(11, 1), W(0, 8), W(1, 8), W(0, 7), W(11, 8), W(10, 8), W(11, 7), ["Z", 2, 2], ["Z", 9, 2], ["Z", 2, 6], ["Z", 9, 6]],
-    start: { spieler: [[5, 8], [6, 8], [4, 8], [7, 8], [3, 8], [8, 8]], wolf: [[4, 7], [7, 7], [3, 7], [8, 7]], gegner: [[6, 3], [4, 2], [8, 2], [4, 5], [8, 5], [6, 1], [3, 4], [9, 4]] },
+    name: "Die Siegelkammer", b: 12, h: 9, bild: "img/welt/siegelkammer.webp",
+    hindernisse: RAND(true).concat([BX(1, 2), BX(1, 3), BX(2, 2), BX(9, 2), BX(10, 2), BX(10, 3), BX(1, 6), BX(1, 7), BX(2, 7), BX(10, 7), BX(5, 3), BX(6, 3), BZ(3, 2), BZ(8, 2), BZ(3, 6), BZ(8, 6)]),
+    start: { spieler: [[5, 7], [6, 7], [4, 7], [7, 7], [3, 7], [8, 7]], wolf: [[4, 6], [7, 6], [2, 6], [9, 6]],
+      gegner: [[6, 4], [4, 3], [7, 3], [4, 5], [7, 5], [5, 2], [6, 2], [3, 4], [8, 4]] },
   };
   const KARTEN = { TURM, GRUFT, PILZE, SCHACHT, HALLE, SIEGEL };
   const FIG = () => root.ABF || (typeof require === "function" ? require("../js/figuren.js") : null);

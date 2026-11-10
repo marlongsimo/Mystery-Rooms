@@ -48,7 +48,17 @@
   }
   const szene = (A) => DATEN().SZENEN[A.szene];
   const text = (A, s = szene(A)) => (typeof s.text === "function" ? s.text(A, hilfen) : s.text || []).filter(Boolean);
-  const hilfen = { hat, m, name };
+  /** Zieht ein noch nicht erlebtes Ereignis für diesen Haltepunkt; danach geht es zu „danach“ weiter */
+  function ereignis(A, punkt, danach) {
+    const E = DATEN().EREIGNISSE || [];
+    A.erlebt = A.erlebt || [];
+    const moegl = E.filter((e) => e.punkte.includes(punkt) && !A.erlebt.includes(e.id) && (!e.wenn || e.wenn(A, hilfen)));
+    if (!moegl.length) return danach;
+    const e = moegl[Math.floor(A.r() * moegl.length)];
+    A.erlebt.push(e.id); A.ereignisZiel = danach;
+    return e.id;
+  }
+  const hilfen = { hat, m, name, ereignis, lebende: (A) => lebende(A) };
 
   function notiz(A, t, art) { A.protokoll.push({ t, art: art || "" }); if (A.protokoll.length > 200) A.protokoll.shift(); }
   /** Wirkung einer Option/eines Ergebnisses anwenden */
@@ -60,16 +70,24 @@
     if (w.plus) for (const [k, v] of Object.entries(w.plus)) A.merker[k] = (A.merker[k] || 0) + v;
     if (w.glocke) glocke(A, w.glocke);
     if (w.tranke) for (let i = 0; i < w.tranke; i++) { const fid = A.gruppe.filter((f) => !A.zust[f].tot)[i % Math.max(1, A.gruppe.length)]; if (fid) A.zust[fid].rucksack[0].n++; }
+    if (w.heilen) for (const fid of lebende(A)) { const max = F.tpVon(fid, A.stufe), z = A.zust[fid]; z.tp = Math.min(max, z.tp + Math.ceil(max * w.heilen)); }
+    if (w.schaden) for (const fid of lebende(A)) { const z = A.zust[fid]; z.tp = Math.max(1, z.tp - R.roll(A.r, w.schaden).total); }
+    if (w.schadenFig && A.zust[w.schadenFig.fid] && !A.zust[w.schadenFig.fid].tot) { const z = A.zust[w.schadenFig.fid]; z.tp = Math.max(1, z.tp - R.roll(A.r, w.schadenFig.wurf).total); }
+    if (w.trankWeg) for (let i = 0; i < w.trankWeg; i++) { const t = lebende(A).map((f) => A.zust[f].rucksack.find((d) => d.id === "heiltrank")).filter((d) => d && d.n > 0).sort((a, b) => b.n - a.n)[0]; if (t) t.n--; }
+    if (w.gegenstandWeg) { const traeger = lebende(A).filter((f) => getragen(A, f).length); if (traeger.length) { const f = traeger[Math.floor(A.r() * traeger.length)], id = getragen(A, f)[0]; A.zust[f].rucksack.find((d) => d.id === id).n = 0; notiz(A, `${name(A, f)} gibt ${R.GEGENSTAENDE[id].name} her.`, "schlecht"); } }
+    if (w.naechsterKampf) A.kampfMod = (A.kampfMod || 1) * w.naechsterKampf;
+    if (w.beute) beuteZiehen(A);
     if (w.notiz) notiz(A, typeof w.notiz === "function" ? w.notiz(A, hilfen) : w.notiz, "gut");
   }
   function glocke(A, n) {
-    A.glocke = Math.min(7, A.glocke + n);
-    notiz(A, `Die Glocke schlägt. (${A.glocke} von 7)`, "schlecht");
+    A.glocke = Math.max(0, Math.min(7, A.glocke + n));
+    notiz(A, n > 0 ? `Die Glocke schlägt. (${A.glocke} von 7)` : `Die Glocke verstummt ein wenig. (${A.glocke} von 7)`, n > 0 ? "schlecht" : "gut");
   }
   function geheZu(A, id) {
     if (!DATEN().SZENEN[id]) throw new Error("Unbekannte Szene: " + id);
     A.szene = id; A.gewaehlt = A.gewaehlt || {}; A.stimmen = {}; A.geheim = {}; A.probe = null; A.ergebnis = null;
     const s = szene(A);
+    if (s.abschnitt) A.abschnitt = s.abschnitt;
     if (s.beimEintritt) wirke(A, s.beimEintritt(A, hilfen));
     if (s.art === "lager") lagerfeuer(A, s);
     if (s.art === "probe") A.probe = { wer: s.probe.wer === "gruppe" ? "gruppe" : null, wuerfe: {} };
@@ -109,7 +127,7 @@
       if (o.weiter) { A.antwort = null; ziel(A, o); }
       return { ok: true };
     }
-    if (s.art === "wahl") { entscheide(A, o); return { ok: true }; }
+    if (s.art === "wahl") { A.letzteAbstimmung = null; A.letzteStimmen = null; entscheide(A, o); return { ok: true }; }
     return { fehler: "Hier wird nicht gewählt." };
   }
   function entscheide(A, o) {
@@ -133,6 +151,7 @@
     const gew = vorne.length > 1 ? vorne[Math.floor(A.r() * vorne.length)] : vorne[0];
     const o = optionen(A).find((x) => x.id === gew);
     A.letzteAbstimmung = { szene: A.szene, zaehl, gewinner: gew, wuerfel: vorne.length > 1 };
+    A.letzteStimmen = Object.assign({}, A.stimmen);
     if (vorne.length > 1) notiz(A, "Gleichstand – der Würfel entscheidet.");
     entscheide(A, o);
     return { ok: true, gewinner: gew };
@@ -238,9 +257,9 @@
   /** Kurze Rast zwischen Kämpfen (nur Normal): halbe fehlende TP, Glocke schlägt */
   function kurzeRast(A) {
     if (A.schwierigkeit === "hardcore") return { fehler: "In Hardcore gibt es keine kurze Rast." };
-    if (A.merker["kurz_" + (szene(A).abschnitt || 1)]) return { fehler: "In diesem Abschnitt habt ihr schon gerastet." };
+    if (A.merker["kurz_" + (szene(A).abschnitt || A.abschnitt || 1)]) return { fehler: "In diesem Abschnitt habt ihr schon gerastet." };
     const z = R.kurzeRast(A.zust); for (const fid of Object.keys(z)) z[fid].stufe = A.stufe;
-    A.merker["kurz_" + (szene(A).abschnitt || 1)] = true; glocke(A, 1); notiz(A, "Kurze Rast: Wunden verbunden.", "gut");
+    A.merker["kurz_" + (szene(A).abschnitt || A.abschnitt || 1)] = true; glocke(A, 1); notiz(A, "Kurze Rast: Wunden verbunden.", "gut");
     return { ok: true };
   }
 
@@ -316,7 +335,11 @@
   function kampfOptionen(A) {
     const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
     const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: A.stufe });
-    return Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher }, k);
+    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher }, k);
+    // Abwechslung: gemischte Startplätze, in etwa jedem dritten Kampf ein Anführer (nicht im Duell und nicht beim Endgegner)
+    if (!o.gegner && !o.boss) { o.mischen = true; const key = "anfuehrer_" + A.szene; if (A.merker[key] == null) A.merker[key] = A.r() < 0.33; o.anfuehrer = A.merker[key]; }
+    if (A.kampfMod) { o.skalaMal = (o.skalaMal || 1) * A.kampfMod; }
+    return o;
   }
   /** Nach dem Kampf: Ergebnis übernehmen und weiter */
   function kampfEnde(A, st) {
@@ -327,7 +350,7 @@
       const nz = R.nachKampf(st);
       for (const fid of A.gruppe) if (nz[fid]) A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); else if (A.gefallen.includes(fid)) A.zust[fid].tot = true;
       for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
-      R.neuerKampf(A.zust);
+      R.neuerKampf(A.zust); A.kampfMod = null;
       wirke(A, k.sieg); ziel(A, k.sieg || {});
       if (k.beute !== false) beuteZiehen(A);
       return { ok: true, ergebnis: "sieg" };
@@ -355,7 +378,7 @@
     const s = szene(A), pz = probeZustand(A), p = pz ? aktuelleProbe(A) : null;
     return {
       dialog: (A.dialog && A.dialog[A.szene]) || [],
-      szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || 1, text: text(A), antwort: A.antwort || null,
+      szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || A.abschnitt || 1, text: text(A), antwort: A.antwort || null,
       glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit,
       optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: o.probe.sg } : null, weiter: Boolean(o.weiter) })),
       stimmen: s.art === "wahl" ? A.stimmen : null,

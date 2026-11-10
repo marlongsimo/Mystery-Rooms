@@ -85,6 +85,9 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
     const t = st.figuren.find((f) => f.fid === 'schildwaechter');
     check(R.bewegungVon(t) === 4 && R.rkEff(st, t) === F.FIGUREN.schildwaechter.rk[0] + 1, 'Gegenstände: Stiefel +1 Bewegung, Amulett +1 RK');
     check(R.aktionenVon(st.figuren.find((f) => f.fid === 'elementarist'), st).every((a) => a.id !== 'grosser_trank'), 'Ohne Großen Heiltrank keine Aktion dafür'); }
+  // Zufall: Einstiege und Ereignisse
+  { const einst = new Set(), erlebt = new Set(); for (let i = 1; i <= 30; i++) { const A = S.neu(i, { gruppe: ['schildwaechter', 'elementarist', 'lichtbringer'] }); einst.add(A.merker.einstieg); A.szene = 'garten_danach'; S.weiter(A); if (A.szene !== 'turm') erlebt.add(A.szene); }
+    check(einst.size === 3 && erlebt.size >= 5, `Zufall: alle 3 Einstiege und ${erlebt.size} verschiedene Ereignisse nach dem Klostergarten`); }
   // Coldrics Schild und der Splitter
   const A2 = S.neu(3, { gruppe: ['schildwaechter', 'duellant', 'lichtbringer'] }); A2.stufe = 3; A2.merker.coldric_frieden = true; A2.szene = 'halle_danach'; S.weiter(A2);
   check(A2.szene === 'coldric_schild' && S.optionen(A2).length === 3, 'Nach Coldrics Frieden: Abstimmung, wer seinen Schild trägt');

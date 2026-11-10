@@ -222,7 +222,7 @@
     const st = { sparen: opts.sparen != null ? opts.sparen : 1, seed, rs: seed >>> 0 || 1, karte: null, figuren: [], log: [], runde: 1, reihe: [], am: 0, zug: null, ende: null, xp: 0, zonen: [], brand: [],
       stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [], boss: opts.boss ? JSON.parse(JSON.stringify(opts.boss)) : null, siegel: [] };
     zufall(st);
-    const r = st.r, k = opts.karte || KARTE_GARTEN;
+    const r = st.r; let k = opts.karte || KARTE_GARTEN;
     st.siegel = k.hindernisse.filter(([t]) => t === "Z").map(([, x, y]) => ({ x, y, beruehrt: false }));
     st.karte = { name: k.name, b: k.b, h: k.h, bild: k.bild || null, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y))) };
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
@@ -243,6 +243,8 @@
         st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[st.stufe - 1], tpMax: wd.tp[st.stufe - 1], rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
       }
     });
+    // Gemischte Startplätze der Gegner (Abwechslung)
+    if (opts.mischen) { const g = k.start.gegner.slice(); for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; } k = Object.assign({}, k, { start: Object.assign({}, k.start, { gegner: g }) }); }
     const gruppen = (opts.gegner || gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore")).map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * (opts.skalaMal || 1) })).concat(opts.zusatz || []);
     let gi = 0;
     for (const g of gruppen) for (let i = 0; i < g.anzahl; i++) {
@@ -259,6 +261,8 @@
       st.figuren.push({ id: "g" + gi, seite: "gegner", art: g.art, name: ((opts.namen && opts.namen[g.art]) || g.name || d.name) + nr, x, y, tp: gtp, tpMax: gtp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true });
       gi++;
     }
+    // Anführer: der zäheste Gegner bekommt mehr Leben, bessere Rüstung und trifft besser
+    if (opts.anfuehrer) { const a = gegnerFiguren(st).filter((g) => !GEGNER[g.art].boss).sort((x, y) => y.tpMax - x.tpMax)[0]; if (a) { a.tp = a.tpMax = Math.round(a.tpMax * 1.6); a.rk += 1; a.rkBasis += 1; a.anfuehrer = true; a.name = a.name.replace(/ \d+$/, "") + " (Anführer)"; st.log.push({ t: `Ein Anführer führt die Gegner: ${a.name}.`, art: "schlecht" }); } }
     // Überraschung: Gegner setzen die erste Runde aus. Läufer: ein Gegner rennt zu einem Feld (z. B. Glockenseil)
     if (opts.ueberraschung) for (const g of gegnerFiguren(st)) g.ueberrascht = true;
     if (opts.laeufer) {
@@ -969,7 +973,7 @@
     const d = GEGNER[g.art];
     const metallVorher = z.rk;
     return angriffswurf(st, g, z, {
-      name: d.angriff.name, bonus: d.angriff.bonus, schaden: d.angriff.schaden.replace(/[+-]\d+$/, ""), fest: parse(d.angriff.schaden).b, nah: abstand(g, z) <= 1, magisch: Boolean(d.boss),
+      name: d.angriff.name, bonus: d.angriff.bonus + (g.anfuehrer ? 1 : 0), schaden: d.angriff.schaden.replace(/[+-]\d+$/, ""), fest: parse(d.angriff.schaden).b, nah: abstand(g, z) <= 1, magisch: Boolean(d.boss),
       nachTreffer: () => { if (d.rost && z.metall && z.rk > z.rkBasis - 2 && metallVorher === z.rk) { z.rk -= 1; st.log.push({ t: `Die Rüstung von ${z.name} rostet: RK ${z.rk}.` }); } },
     });
   }

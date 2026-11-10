@@ -79,6 +79,7 @@ const { chromium } = require('playwright');
   const nach = await szene(T);
   check(nach === 'garten_danach' || nach === 'garten', `Nach dem Kampf: Szene „${nach}“`);
   if (nach === 'garten_danach') {
+    await T.evaluate(() => { window.ABT.A().erlebt = window.ABD.EREIGNISSE.map((e) => e.id); }); // hier ohne Zufallsereignis direkt zum Turm
     await T.click('#sz-weiter');
     // Tisch neu laden mitten im Abenteuer
     await T.reload();

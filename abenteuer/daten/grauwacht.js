@@ -67,6 +67,8 @@
   /** Das Angebot aus der Versuchung einer Figur – nur der Teil in Anführungszeichen, der Haken bleibt geheim */
   const versprechen = (fid) => { const v = FIG().FIGUREN[fid].versuchung || ""; const e = v.indexOf("“"); return e > 0 ? v.slice(0, e + 1) : v; };
   const haken = (fid) => { const v = FIG().FIGUREN[fid].versuchung || ""; const e = v.indexOf("“"); return e > 0 ? v.slice(e + 1).trim() : ""; };
+  /** Gab es bei der letzten Abstimmung Überstimmte (optional: die für eine bestimmte Option waren)? */
+  const minderheit = (A, fuer) => { if (!A.letzteAbstimmung || A.letzteAbstimmung.szene !== A.szene) return false; const st = A.letzteStimmen || {}, gew = A.letzteAbstimmung.gewinner; return Object.values(st).some((o) => o !== gew && (!fuer || o === fuer)); };
   const lebendeVon = (A) => A.gruppe.filter((f) => !A.zust[f].tot);
   const anselmListig = (A) => (A.merker.anselm_vertrauen || 0) < 0 && !A.merker.wahrheit_frueh;
   const nisk_kann = (A) => Boolean(A.merker.nisk_dabei && !A.merker.nisk_fort && !A.merker.nisk_tot && (A.merker.nisk_vertrauen || 0) >= 2);
@@ -83,6 +85,10 @@
   function epilog(A, h) {
     const m = A.merker, t = [];
     t.push(A.glocke <= 2 ? "In Halmbruck schmecken die Brunnen wieder süß. Das Vieh steht mit dem Rücken zur Abtei und frisst." : A.glocke <= 5 ? "In Halmbruck wird das Wasser langsam wieder klar. Nicht alle Kühe überstehen den Winter, und manche Kinder schlafen noch lange bei Licht." : "Halmbruck hat die Glocke zu oft gehört. Drei Häuser stehen im Frühjahr leer. Die Leute, die dort wohnten, sind eines Nachts zur Abtei hinaufgegangen und nicht zurückgekommen.");
+    if (m.halmbruck_gewarnt) t.push("Die Kinder haben die Nächte in der Kirche verbracht, dicht aneinander, und keines ist zur Abtei hinaufgegangen. Wenna sagt, das war eure Warnung.");
+    if (m.tam_heimlich) t.push(`Tam erzählt jedem, der es hören will, wer ihn aus dem Netz geschnitten hat, als alle anderen gegangen waren: ${h.name(A, m.tam_heimlich)}.`);
+    if (m.tam_pferd) t.push(m.tam_gerettet ? "Ihr gebt Tam sein Holzpferd zurück. Er sagt nichts. Er hält es nur fest, die ganze Nacht." : "Das Holzpferd stellt ihr seiner Mutter ins Fenster, neben die Kerze.");
+    if (m.kobold_freund) t.push("Ein Kobold mit einem verheilten Bein sitzt manchmal am Waldrand und sieht den Kindern zu. Er tut niemandem etwas.");
     if (m.tam_gerettet) t.push("Tam ist wieder bei seiner Mutter. Er spricht nicht oft über die Abtei. Aber manchmal, wenn es still ist, legt er den Kopf schief, als würde er auf etwas lauschen, das nicht mehr da ist.");
     else if (m.tam_zurueck) t.push("Auf dem Rückweg kommt ihr am Schacht vorbei. Das Netz ist leer. Ihr sagt Tams Mutter, dass ihr ihn nicht gefunden habt. Es ist nicht ganz gelogen.");
     else t.push("Tam wird nie gefunden. Seine Mutter stellt jeden Abend eine Kerze ins Fenster.");
@@ -109,7 +115,18 @@
     /* ================= Abschnitt 1 · Die Abtei ================= */
     prolog: {
       art: "erzaehlung", abschnitt: 1, titel: "Halmbruck", ort: "Halmbruck, Abenddämmerung", weiter: "halmbruck",
+      // Drei Einstiege, ausgelost: Söldner (mehr Vorräte, Anselm misstraut), Pilger (Anselm vertraut), Verwandte (Wennas Geschichte)
+      beimEintritt: (A) => {
+        if (A.merker.einstieg) return null;
+        const e = ["soeldner", "pilger", "verwandt"][Math.floor(A.r() * 3)];
+        return e === "soeldner" ? { setzt: { einstieg: e }, plus: { anselm_vertrauen: -1 }, tranke: A.gruppe.length }
+          : e === "pilger" ? { setzt: { einstieg: e }, plus: { anselm_vertrauen: 1 } }
+          : { setzt: { einstieg: e, wenna_versprechen: true } };
+      },
       text: (A, h) => [
+        A.merker.einstieg === "soeldner" ? "*Ihr seid Söldner.* Wenna hat euch bezahlt, gut bezahlt, mit dem Geld des ganzen Dorfes. Jede Person trägt einen zusätzlichen Heiltrank. Aber nicht alle hier trauen Leuten, die für Geld kommen."
+          : A.merker.einstieg === "pilger" ? "*Ihr seid Pilger* auf dem Weg nach Süden, und der Regen hat euch hierher getrieben. Niemand hat euch gerufen. Vielleicht vertraut man euch gerade deshalb."
+          : "*Ihr seid Verwandte.* Wenna Hald ist eure Base. Sie hat euch geschrieben, mit zitternder Hand. Ihr Vater ist vor zwanzig Jahren zur Abtei hinaufgegangen. Ihr habt ihr versprochen, nach ihm zu suchen.",
         "Seit sieben Nächten läutet die Glocke der Abtei Grauwacht. Niemand lebt dort mehr.",
         "Halmbruck liegt geduckt im Nieselregen. An jede Tür hat jemand ein Kreidezeichen gemalt. Das Vieh steht auf den Weiden mit dem Kopf zur Abtei und brüllt, wenn es dunkel wird. Die Brunnen schmecken bitter, seit die Glocke läutet.",
         "Am Dorfbrunnen wartet Wenna Hald, die Vorsteherin, eine Laterne in der Hand. Etwas abseits, auf einer nassen Bank, sitzt ein alter Mönch, den Mantel bis zum Kinn gezogen. Er hustet, als ihr näher kommt, und dreht sich weg.",
@@ -172,7 +189,7 @@
       kampf: (A) => ({ begegnung: "garten", sieg: { weiter: "garten_danach", tranke: Math.ceil(kurz(A) / 2) } }),
     },
     garten_danach: {
-      art: "erzaehlung", abschnitt: 1, titel: "Zwischen den Gräbern", ort: "Klostergarten", weiter: "turm", rastErlaubt: true,
+      art: "erzaehlung", abschnitt: 1, titel: "Zwischen den Gräbern", ort: "Klostergarten", weiter: (A, h) => h.ereignis(A, 1, "turm"), rastErlaubt: true,
       beimEintritt: () => ({ setzt: { schluessel: true } }),
       text: (A) => [
         "Die letzten Käfer zucken im Gras. Zwischen den Grabsteinen findet ihr, was frühere Besucher zurückgelassen haben: " + Math.ceil(kurz(A) / 2) + (Math.ceil(kurz(A) / 2) === 1 ? " Heiltrank" : " Heiltränke") + " in einem verrotteten Beutel und einen rostigen Schlüssel mit dem Zeichen der Abtei.",
@@ -258,10 +275,10 @@
         "Er zittert. Er könnte lügen. Er könnte euch in eine Falle führen. Stimmt ab.",
       ],
       optionen: [
-        { id: "mitnehmen", text: "Mitnehmen", setzt: { nisk_dabei: true }, plus: { nisk_vertrauen: 1 }, weiter: "nisk_folge" },
-        { id: "gefesselt", text: "Mitnehmen, aber gefesselt", setzt: { nisk_dabei: true, nisk_gefesselt: true }, weiter: "nisk_folge" },
-        { id: "freilassen", text: "Freilassen", setzt: { nisk_frei: true }, weiter: "nisk_folge" },
-        { id: "toeten", text: "Töten", setzt: { blutschuld: true, nisk_tot: true }, weiter: "nisk_folge" },
+        { id: "mitnehmen", text: "Mitnehmen", setzt: { nisk_dabei: true }, plus: { nisk_vertrauen: 1 }, weiter: (A) => (minderheit(A) ? "nisk_heimlich" : "nisk_folge") },
+        { id: "gefesselt", text: "Mitnehmen, aber gefesselt", setzt: { nisk_dabei: true, nisk_gefesselt: true }, weiter: (A) => (minderheit(A) ? "nisk_heimlich" : "nisk_folge") },
+        { id: "freilassen", text: "Freilassen", setzt: { nisk_frei: true }, weiter: (A) => (minderheit(A) ? "nisk_heimlich" : "nisk_folge") },
+        { id: "toeten", text: "Töten", setzt: { blutschuld: true, nisk_tot: true }, weiter: (A) => (minderheit(A) ? "nisk_heimlich" : "nisk_folge") },
       ],
     },
     nisk_folge: {
@@ -278,7 +295,7 @@
       },
     },
     kreuzgang: {
-      art: "lager", abschnitt: 1, titel: "Lagerfeuer im Kreuzgang", ort: "Abtei Grauwacht", aufstieg: 2, weiter: "abstieg",
+      art: "lager", abschnitt: 1, titel: "Lagerfeuer im Kreuzgang", ort: "Abtei Grauwacht", aufstieg: 2, weiter: (A, h) => h.ereignis(A, 2, "abstieg"),
       text: (A, h) => [
         "Im Kreuzgang, zwischen eingestürzten Bögen, macht ihr Feuer. Der Regen hat aufgehört. Über euch der Turm, schwarz gegen die Wolken.",
         A.merker.nisk_dabei ? (A.merker.nisk_vertrauen >= 2 ? "Nisk hockt am Feuer und wärmt sich die Hände. „Der Alte im Keller flüstert“, sagt er leise. „Jede Nacht. Er verspricht. Er verspricht allen etwas. Auch euch, bald.“" : A.merker.nisk_vertrauen >= 1 ? "Nisk hockt etwas abseits. Als ihr ihn fragt, was unten wartet, sagt er nur: „Der Alte. Er flüstert.“" : "Nisk sitzt gefesselt im Dunkeln. Er spricht nicht. Einmal glaubt ihr, ihn lachen zu hören.") : "",
@@ -428,12 +445,12 @@
       ],
       optionen: [
         { id: "retten", text: "Tam retten", setzt: { tam_gerettet: true, abt_name: true }, glocke: 0, weiter: "tam_folge" },
-        { id: "zuruecklassen", text: "Ihn zurücklassen – wir holen ihn auf dem Rückweg", setzt: { tam_zurueck: true }, weiter: "tam_folge" },
+        { id: "zuruecklassen", text: "Ihn zurücklassen – wir holen ihn auf dem Rückweg", setzt: { tam_zurueck: true }, weiter: (A) => (minderheit(A, "retten") ? "tam_heimlich" : "tam_folge") },
       ],
     },
     tam_folge: {
-      art: "erzaehlung", abschnitt: 2, titel: "Tam", ort: "Der Schacht", weiter: "bibliothek", rastErlaubt: true,
-      beimEintritt: (A, h) => (A.merker.tam_gerettet && !(h.hat(A, "schildwaechter") || h.hat(A, "tiergefaehrte")) ? { glocke: 1 } : null),
+      art: "erzaehlung", abschnitt: 2, titel: "Tam", ort: "Der Schacht", weiter: (A, h) => h.ereignis(A, 3, "bibliothek"), rastErlaubt: true,
+      beimEintritt: (A, h) => (A.merker.tam_heimlich ? { glocke: 1, schadenFig: { fid: A.merker.tam_heimlich, wurf: "2W6" } } : A.merker.tam_gerettet && !(h.hat(A, "schildwaechter") || h.hat(A, "tiergefaehrte")) ? { glocke: 1 } : null),
       text: (A, h) => A.merker.tam_gerettet ? [
         "Tam fällt euch in die Arme, leicht wie ein Vogel. Er zittert. Dann flüstert er, mit einer Stimme, die nicht ganz seine ist:",
         "„Er hat einen Namen. Er hat ihn vergessen, aber ich hab ihn gehört, im Traum. **Valdric.** Er heißt Valdric.“",
@@ -798,12 +815,152 @@
         ];
       },
     },
+    /* ================= Zufällige Ereignisse unterwegs (Entwurf) =================
+       An drei Haltepunkten wird eines gezogen, keines doppelt in einem Abenteuer.
+       Punkt 1: nach dem Klostergarten · Punkt 2: nach dem Kreuzgang · Punkt 3: nach dem Schacht */
+    ereignis_folge: {
+      art: "erzaehlung", titel: "Unterwegs", rastErlaubt: false, weiter: (A) => A.ereignisZiel,
+      text: (A) => [A.merker.ereignis_text || "Ihr geht weiter."],
+    },
+    e_kobold: {
+      art: "wahl", titel: "Ein verwundeter Kobold", ort: "Unterwegs",
+      text: (A) => [
+        "Hinter einem umgestürzten Pfeiler liegt ein Kobold, kaum größer als eine Katze. Ein Bolzen steckt in seinem Bein. Er faucht euch an, aber er kann nicht weg.",
+        A.merker.nisk_dabei ? "Nisk erstarrt. „Das ist Rikk“, flüstert er. „Mein Bruder.“" : "Er hat Angst. Und Hunger.",
+        "Was tut ihr? Stimmt ab.",
+      ],
+      optionen: [
+        { id: "helfen", text: "Verbinden und einen Heiltrank geben", trankWeg: 1, plus: { nisk_vertrauen: 1 }, setzt: { kobold_freund: true, ereignis_text: "Der Kobold trinkt, hustet, starrt euch an. Dann ist er weg. Später, in der Dunkelheit, hört ihr ein leises Pfeifen vor euch, als würde jemand den Weg freimachen." }, weiter: "ereignis_folge" },
+        { id: "liegen", text: "Liegen lassen", setzt: { ereignis_text: "Ihr geht an ihm vorbei. Sein Fauchen folgt euch noch eine ganze Weile." }, weiter: "ereignis_folge" },
+        { id: "erloesen", text: "Ihn erlösen", plus: { nisk_vertrauen: -1 }, setzt: { kobold_erloest: true, ereignis_text: "Es geht schnell. Irgendwo in den Wänden hört ihr kleine Krallen davonhuschen. Sie haben es gesehen." }, weiter: "ereignis_folge" },
+      ],
+    },
+    e_bruder: {
+      art: "wahl", titel: "Ein Bruder ohne Ruhe", ort: "Unterwegs",
+      text: (A, h) => [
+        "Ein Mönch steht im Gang, durchscheinend wie Rauch. Er betet, immer dieselben drei Worte, immer wieder. Als er euch sieht, hört er auf.",
+        "„Ihr geht zu ihm“, sagt er. „Geht nicht. Oder geht, und vergesst nicht, wer ihn bewacht hat.“",
+      ],
+      optionen: [
+        { id: "zuhoeren", text: "Ihm zuhören", setzt: { coldric_name: true, ereignis_text: "„Coldric“, sagt der Geist. „Unser Bruder Coldric. Er hält die Halle. Er wartet darauf, dass ihn jemand bei seinem Namen ruft.“ Dann ist er fort." }, weiter: "ereignis_folge" },
+        { id: "segnen", text: "Ihn segnen und erlösen (Kleriker)", wenn: (A, h) => ["lichtbringer", "wanderheiler", "inquisitor"].some((f) => h.hat(A, f)), heilen: 0.5, setzt: { ereignis_text: "Die Gestalt lächelt und verblasst. Eine Wärme bleibt im Gang zurück, die euch bis in die Knochen geht. Eure Wunden schmerzen weniger." }, weiter: "ereignis_folge" },
+        { id: "weiter", text: "Schnell weitergehen", setzt: { ereignis_text: "Ihr lasst ihn hinter euch. Seine drei Worte hallen euch nach, bis ihr sie nicht mehr hört." }, weiter: "ereignis_folge" },
+      ],
+    },
+    e_kapelle: {
+      art: "probe", titel: "Die vergessene Kapelle", ort: "Unterwegs",
+      text: ["Eine kleine Kapelle, die Tür halb aus den Angeln. Auf dem Altar brennt eine Kerze, die niemand angezündet hat. Ihr kniet nieder. Alle würfeln."],
+      probe: { name: "Andacht", attr: "WEI", sg: 12, wer: "gruppe", geuebt: ["kleriker"], knapp: true,
+        erfolg: { text: "Stille, dann Wärme. Ihr steht auf und fühlt euch, als hättet ihr eine Nacht durchgeschlafen. Alle Wunden heilen.", heilen: 1, weiter: (A) => A.ereignisZiel },
+        knapp: { text: "Ein kurzer Moment Frieden. Er reicht für ein wenig Kraft.", heilen: 0.4, weiter: (A) => A.ereignisZiel },
+        fehl: { text: "Die Kerze erlischt. Weit über euch schlägt die Glocke, als hätte jemand euer Gebet gehört und es nicht gemocht.", glocke: 1, weiter: (A) => A.ereignisZiel } },
+    },
+    e_haendler: {
+      art: "wahl", titel: "Der Händler im Dunkeln", ort: "Unterwegs",
+      wenn: (A) => A.gruppe.some((f) => !A.zust[f].tot && A.zust[f].rucksack.some((d) => d.id === "heiltrank" && d.n > 0)),
+      text: [
+        "Am Rand des Lichts sitzt ein Mann mit einem Bauchladen. Er hat kein Gesicht, nur einen Schatten, wo eines sein sollte. „Tauschen?“, fragt er. „Ein Trank für ein Ding. Ein gutes Ding.“",
+      ],
+      optionen: [
+        { id: "tauschen", text: "Einen Heiltrank tauschen", trankWeg: 1, beute: true, setzt: { haendler: true, ereignis_text: "Er nimmt den Trank, ohne ihn anzusehen, und breitet seine Waren aus. Als ihr aufblickt, ist er fort. Die Waren sind noch da." }, weiter: "ereignis_folge" },
+        { id: "ablehnen", text: "Ablehnen", setzt: { ereignis_text: "„Schade“, sagt der Schatten. „Ich komme wieder. Ich komme immer wieder.“" }, weiter: "ereignis_folge" },
+      ],
+    },
+    e_falle: {
+      art: "probe", titel: "Der Gang der Klingen", ort: "Unterwegs",
+      text: ["Der Boden klickt unter einem Fuß. Aus den Wänden fahren rostige Klingen. Alle würfeln, um auszuweichen."],
+      probe: { name: "Ausweichen", attr: "GES", sg: 13, wer: "gruppe", geuebt: ["schurke"], knapp: true,
+        erfolg: { text: "Ihr duckt euch, rollt, springt. Niemand blutet. Hinter einer der Klingen klemmt etwas, das jemand vor euch verloren hat.", beute: true, weiter: (A) => A.ereignisZiel },
+        knapp: { text: "Nur Kratzer. Aber Kratzer von rostigen Klingen.", schaden: "1W4", weiter: (A) => A.ereignisZiel },
+        fehl: { text: "Die Klingen treffen. Ihr verbindet euch gegenseitig, so gut es geht.", schaden: "2W4", weiter: (A) => A.ereignisZiel } },
+    },
+    e_zweite_glocke: {
+      art: "wahl", titel: "Die zweite Glocke", ort: "Unterwegs",
+      text: [
+        "In einer Nische hängt eine kleine Glocke aus schwarzem Eisen. Eingeritzt: *Wer mich läutet, schläfert die Toten ein. Wer mich läutet, weckt den Abt.*",
+        "Ein Dilemma. Stimmt ab.",
+      ],
+      optionen: [
+        { id: "laeuten", text: "Läuten: die nächsten Gegner sind geschwächt, aber die Glocke schlägt", glocke: 1, naechsterKampf: 0.75, setzt: { ereignis_text: "Ein dünner, kalter Ton. Irgendwo weit vor euch fällt etwas klappernd zu Boden. Und weit über euch antwortet die große Glocke." }, weiter: "ereignis_folge" },
+        { id: "lassen", text: "Nicht läuten", setzt: { ereignis_text: "Ihr lasst sie hängen. Sie schwingt trotzdem ein wenig, als ihr vorbeigeht, ohne einen Ton." }, weiter: "ereignis_folge" },
+      ],
+    },
+    e_schrein: {
+      art: "wahl", titel: "Der Schrein der Brüder", ort: "Unterwegs",
+      wenn: (A) => A.gruppe.some((f) => !A.zust[f].tot && A.zust[f].rucksack.some((d) => d.n > 0 && d.id !== "heiltrank")),
+      text: [
+        "Ein Schrein, darauf Opfergaben: ein Ring, eine Feder, ein Kinderschuh. Eine Inschrift: *Gib, was dir lieb ist, und die Glocke schweigt einen Schlag lang.*",
+        "Ein Dilemma. Stimmt ab.",
+      ],
+      optionen: [
+        { id: "opfern", text: "Einen getragenen Gegenstand opfern: Wunden heilen, die Glocke wird leiser", gegenstandWeg: true, heilen: 1, glocke: -1, setzt: { ereignis_text: "Das Ding liegt auf dem Schrein, und für einen Herzschlag hört ihr nichts. Keine Glocke, kein Tropfen, nichts. Dann geht es euch besser als seit Tagen." }, weiter: "ereignis_folge" },
+        { id: "nicht", text: "Nichts geben", setzt: { ereignis_text: "Ihr behaltet, was ihr habt. Der Kinderschuh auf dem Schrein ist sehr klein." }, weiter: "ereignis_folge" },
+      ],
+    },
+    e_holzpferd: {
+      art: "wahl", titel: "Ein Holzpferd", ort: "Unterwegs",
+      wenn: (A) => !A.merker.tam_gerettet && !A.merker.tam_zurueck,
+      text: ["Auf dem Boden liegt ein geschnitztes Holzpferd, eines der Beine abgebrochen. Tams, ganz sicher. Er war hier. Es ist noch nicht lange her."],
+      optionen: [
+        { id: "mitnehmen", text: "Mitnehmen", setzt: { tam_pferd: true, ereignis_text: "Ihr steckt es ein. Es wiegt fast nichts und doch mehr als alles andere im Gepäck." }, weiter: "ereignis_folge" },
+        { id: "liegen", text: "Liegen lassen", setzt: { ereignis_text: "Ihr lasst es liegen, wo er es verloren hat. Vielleicht findet er es selbst auf dem Rückweg." }, weiter: "ereignis_folge" },
+      ],
+    },
+    e_wand: {
+      art: "probe", titel: "Die flüsternde Wand", ort: "Unterwegs",
+      text: ["In eine Wand sind hunderte Namen geritzt, übereinander, durcheinander. Einer davon flüstert. Wer liest ihn?"],
+      probe: { name: "Entziffern", attr: "INT", sg: 13, geuebt: ["zauberer"], knapp: true,
+        erfolg: { text: "Unter allen anderen, ganz tief geritzt: *Valdric, Abt von Grauwacht, der den Tod betrog.* Ihr kennt jetzt seinen Namen.", setzt: { abt_name: true, wahrheit_halb: true }, weiter: (A) => A.ereignisZiel },
+        knapp: { text: "„Val…“ Der Rest ist weggekratzt, absichtlich, wie es aussieht.", weiter: (A) => A.ereignisZiel },
+        fehl: { text: "Die Wand flüstert lauter, je länger ihr hinseht. Ihr reißt euch los. Über euch schlägt die Glocke.", glocke: 1, weiter: (A) => A.ereignisZiel } },
+    },
+    e_bote: {
+      art: "wahl", titel: "Ein Bote aus Halmbruck", ort: "Unterwegs",
+      text: [
+        "Hinter euch Schritte. Ein Mädchen aus dem Dorf, nass bis auf die Haut, mit einem Beutel. „Wenna schickt das. Für euch.“ Im Beutel: zwei Heiltränke.",
+        "„Und sie fragt, ob sie die Kinder in die Kirche holen soll. Weil die Glocke.“",
+      ],
+      optionen: [
+        { id: "behalten", text: "Die Tränke behalten und sie zurückschicken", tranke: 2, setzt: { ereignis_text: "Das Mädchen nickt und rennt los. Ihr habt zwei Tränke mehr." }, weiter: "ereignis_folge" },
+        { id: "warnen", text: "Die Tränke zurückgeben: „Holt die Kinder in die Kirche, alle, sofort.“", setzt: { halmbruck_gewarnt: true, ereignis_text: "Sie rennt, den Beutel noch in der Hand. Ihr hofft, dass sie schnell genug ist." }, weiter: "ereignis_folge" },
+      ],
+    },
+
+    /* ----- Heimlich handeln: wer überstimmt wurde, kann allein anders handeln (geheim, auf dem Handy) ----- */
+    nisk_heimlich: {
+      art: "geheim", abschnitt: 1, titel: "Nisk", ort: "Glockenturm", weiter: "nisk_folge",
+      text: ["Die Gruppe hat entschieden. Aber nicht jede Person ist einverstanden. Jede entscheidet jetzt für sich, auf ihrem Handy."],
+      frage: (A, h, fid) => {
+        const st = A.letzteStimmen || {}, gew = (A.letzteAbstimmung || {}).gewinner, meine = st[fid];
+        if (!meine || meine === gew) return "Du warst einverstanden. Es gibt nichts für dich zu tun.";
+        return gew === "toeten" ? "Du hast dagegen gestimmt, ihn zu töten. Du könntest heimlich das Seil durchschneiden, bevor es jemand tut." : meine === "toeten" ? "Du wolltest ihn tot sehen. Du könntest heimlich zustechen, wenn niemand hinsieht." : "Die anderen haben anders entschieden als du. Du lässt es dabei.";
+      },
+      antworten: (A, h, fid) => {
+        const st = A.letzteStimmen || {}, gew = (A.letzteAbstimmung || {}).gewinner, meine = st[fid];
+        if (meine && meine !== gew && gew === "toeten") return [{ id: "retten", text: "Heimlich das Seil durchschneiden", setzt: (f) => ({ nisk_tot: false, blutschuld: false, nisk_frei: true, nisk_heimlich: f }) }, { id: "nichts", text: "Nichts tun" }];
+        if (meine === "toeten" && gew !== "toeten") return [{ id: "toeten", text: "Heimlich zustechen", setzt: (f) => ({ nisk_tot: true, blutschuld: true, nisk_dabei: false, nisk_frei: false, nisk_heimlich_tot: f }) }, { id: "nichts", text: "Nichts tun" }];
+        return [{ id: "nichts", text: "Weiter" }];
+      },
+      abschluss: (A) => (A.merker.nisk_heimlich ? "Als ihr euch umdreht, ist das Seil durchgeschnitten. Nisk ist weg. Niemand sagt, wer es war." : A.merker.nisk_heimlich_tot ? "Ein kurzes Geräusch, dann Stille. Nisk liegt still. Niemand sagt, wer es war." : "Niemand rührt sich."),
+    },
+    tam_heimlich: {
+      art: "geheim", abschnitt: 2, titel: "Tam", ort: "Der Schacht", weiter: "tam_folge",
+      text: ["Die Gruppe geht weiter. Aber vielleicht nicht alle. Jede Person entscheidet jetzt für sich, auf ihrem Handy."],
+      frage: (A, h, fid) => ((A.letzteStimmen || {})[fid] === "retten" ? "Du wolltest Tam retten. Du könntest zurückbleiben und ihn allein losschneiden. Es wird dich etwas kosten, und die Glocke wird es hören." : "Du gehst mit den anderen."),
+      antworten: (A, h, fid) => ((A.letzteStimmen || {})[fid] === "retten" ? [{ id: "bleiben", text: "Heimlich zurückbleiben und Tam befreien", setzt: (f) => ({ tam_heimlich: f, tam_gerettet: true, tam_zurueck: false, abt_name: true }) }, { id: "gehen", text: "Mit den anderen gehen" }] : [{ id: "gehen", text: "Weiter" }]),
+      abschluss: (A, h) => (A.merker.tam_heimlich ? `Eine Stunde später holt ${h.name(A, A.merker.tam_heimlich)} euch ein, zerschnitten, blutend, und mit Tam auf dem Rücken.` : "Ihr geht. Alle."),
+    },
     grauwacht_behaelt: {
       art: "ende", abschnitt: 0, titel: "Grauwacht behält euch", ort: "",
       text: ["Die Glocke läutet weiter. Im nächsten Jahr kommt eine neue Gruppe nach Halmbruck. Eure Namen stehen auf ihrer Karte."],
     },
   };
-  const API = { START: "prolog", NIEDERLAGE: "grauwacht_behaelt", SZENEN, KARTEN };
+  const EREIGNISSE = [
+    { id: "e_kobold", punkte: [1, 2] }, { id: "e_bruder", punkte: [2, 3] }, { id: "e_kapelle", punkte: [1, 2, 3] }, { id: "e_haendler", punkte: [1, 2, 3] },
+    { id: "e_falle", punkte: [2, 3] }, { id: "e_zweite_glocke", punkte: [1, 2, 3] }, { id: "e_schrein", punkte: [2, 3] }, { id: "e_holzpferd", punkte: [1, 2] },
+    { id: "e_wand", punkte: [2, 3], wenn: (A) => !A.merker.abt_name }, { id: "e_bote", punkte: [1] },
+  ].map((e) => Object.assign(e, { wenn: e.wenn || SZENEN[e.id].wenn }));
+  const API = { EREIGNISSE, START: "prolog", NIEDERLAGE: "grauwacht_behaelt", SZENEN, KARTEN };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABD = API;
 })(typeof window !== "undefined" ? window : globalThis);

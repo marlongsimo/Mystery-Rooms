@@ -413,3 +413,6 @@ main:has(#lobby:not([hidden])) { max-width: 1220px; }
 .ergebnis.wuerfel-erg { gap: 12px; }
 .ergebnis.wuerfel-erg .w20-box { width: 60px; height: 60px; }
 .geheim-frage { margin: 12px 0 4px; font-size: .95em; line-height: 1.45; }
+.karte-box.chronik { max-height: 86vh; overflow: auto; background: var(--panel, #1c1712); border: 1px solid var(--line, #3a3128); border-radius: 6px; padding: 20px; }
+.chronik ol { margin: 0; padding-left: 20px; display: grid; gap: 12px; line-height: 1.5; }
+.chronik .schlecht { color: #d98b7a; }

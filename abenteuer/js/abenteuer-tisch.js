@@ -48,9 +48,35 @@
     return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
       return `<span class="${z.tot ? "tot" : ""}">${B.marke(fid, 34)}<b>${esc(d.name)}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small></span>`; }).join("")}</div>`;
   }
+  /* ---------- Chronik: jedes beendete Abenteuer bleibt auf dem Gerät ---------- */
+  const CHRONIK = "ab_chronik";
+  function chronik() { try { return JSON.parse(localStorage.getItem(CHRONIK) || "[]"); } catch (e) { return []; } }
+  function chronikSchreiben(s) {
+    if (A.chronik) return; A.chronik = true; merken();
+    const n = (fid) => (F.FIGUREN[fid] ? F.FIGUREN[fid].name : fid), m = A.merker;
+    const e = { zeit: Date.now(), ende: s.titel, szene: A.szene, schwierigkeit: A.schwierigkeit, glocke: A.glocke,
+      gruppe: A.gruppe.map(n), gefallen: A.gefallen.map(n), hueter: m.hueter ? n(m.hueter) : m.verrat_opfer ? n(m.verrat_opfer) : A.szene === "ende_kobold" ? "Nisk" : A.szene === "ende_waechter" ? "Anselm" : null,
+      splitter: Boolean(m.splitter), tam: Boolean(m.tam_gerettet) };
+    const c = chronik(); c.unshift(e); try { localStorage.setItem(CHRONIK, JSON.stringify(c.slice(0, 50))); } catch (x) { /* privat */ }
+    chronikKnopf();
+  }
+  function chronikKnopf() {
+    const c = chronik(), fuss = document.querySelector("#intro .titel-fuss"); if (!fuss || !c.length) return;
+    let b = document.querySelector("#chronik"); if (!b) { b = document.createElement("button"); b.className = "link"; b.id = "chronik"; fuss.append(" · ", b); b.onclick = chronikZeigen; }
+    b.textContent = `📜 Chronik (${c.length})`;
+  }
+  function chronikZeigen() {
+    const o = $("#qr-overlay"), c = chronik();
+    const zeile = (e) => `<li><b>${esc(e.ende)}</b> <span class="note">${new Date(e.zeit).toLocaleDateString("de-DE")} · ${e.schwierigkeit === "hardcore" ? "Hardcore" : "Normal"} · Glocke ${e.glocke}/7</span><br>
+      ${esc(e.gruppe.join(", "))}${e.gefallen.length ? `<br><span class="schlecht">Gefallen: ${esc(e.gefallen.join(", "))}</span>` : ""}${e.hueter ? `<br>Hüter von Grauwacht: ${esc(e.hueter)}` : ""}${e.splitter ? "<br>✦ Splitter von Grauwacht im Gepäck" : ""}${e.tam ? "<br>Tam kam nach Hause." : ""}</li>`;
+    o.innerHTML = `<div class="karte-box chronik"><h2>Chronik von Grauwacht</h2><ol>${c.map(zeile).join("")}</ol><button class="btn" id="chronik-zu">Schließen</button></div>`;
+    o.hidden = false; $("#chronik-zu").onclick = () => { o.hidden = true; };
+  }
+
   function render() {
     const el = $("#szene"); if (!el || !A) return;
     const v = S.ansicht(A), s = S.szene(A);
+    if (s.art === "ende") chronikSchreiben(s);
     if (window.ABE && render.letzte != null && A.glocke > render.letzte) window.ABE.glocke(0.9);
     render.letzte = A.glocke;
     let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}${AB.liveAn() ? "" : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}</div>
@@ -133,7 +159,7 @@
       return `<p><b>${esc(gleich ? q.frage : "Jede Person hört etwas anderes.")}</b></p><p class="note">Jede Person entscheidet auf ihrem Handy: <b>${q.fertig.length} von ${S.lebende(A).length}</b>. Niemand sieht, wie die anderen entschieden haben.</p>`;
     }
     if (s.art === "kampf") return `<div class="knoepfe"><button class="btn" id="sz-kampf">Zum Kampf</button></div>`;
-    if (s.art === "ende") return `<div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
+    if (s.art === "ende") return `<p class="note">Dieses Ende steht jetzt in eurer Chronik${A.merker.splitter ? ", zusammen mit dem Splitter von Grauwacht" : ""}. Ihr findet sie auf der Startseite.</p><div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
     return "";
   }
   function binde(el, v, s) {
@@ -203,7 +229,7 @@
     const b = document.createElement("button"); b.className = "btn gross"; b.id = "fortsetzen"; b.textContent = "Abenteuer fortsetzen"; b.onclick = fortsetzen; k.prepend(b);
     const n = document.querySelector("#titel-start"); if (n) n.classList.remove("gross");
   }
-  fortsetzenKnopf();
+  fortsetzenKnopf(); chronikKnopf();
   /** Pause: zurück zum Titel, der Spielstand bleibt erhalten */
   function pause() { merken(); fortsetzenKnopf(); AB.zeigeSektion("intro"); }
 

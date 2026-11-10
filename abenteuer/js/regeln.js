@@ -199,6 +199,8 @@
       const [x, y] = k.start.spieler[i];
       const f = neueFigur(fid, i, st.stufe, x, y);
       const v = opts.vorher && opts.vorher[fid];
+      const extra = opts.ausruestung && opts.ausruestung[fid];
+      if (extra) { f.rk += extra.rk || 0; f.rkBasis += extra.rk || 0; f.ausruestung = extra.name; st.log.push({ t: `${f.name} trägt ${extra.name}: RK ${f.rk}.`, art: "gut" }); }
       if (v) { f.tp = v.tot ? 0 : Math.max(v.tp, 1); f.tot = Boolean(v.tot); f.plaetze = v.plaetze.slice(); f.genutzt = Object.assign({}, v.genutzt); f.rucksack = JSON.parse(JSON.stringify(v.rucksack)); }
       st.figuren.push(f);
       if (f.tot) { f.x = -1; f.y = -1; }

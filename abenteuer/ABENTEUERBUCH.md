@@ -341,11 +341,13 @@ Säulen, Glut unter der Asche, Aschehunde, und vor der Eisentür **Coldric**, de
   - Das Versprechen erfüllt sich.
   - Jetzt erst steht der Haken dazu, der Teil „Wahr, aber …“ aus der Versuchung.
 
-**Noch nicht gebaut** (aus 0.1):
-- Coldrics Schild (+1 RK).
-- Splitter von Grauwacht und Ausblick auf das nächste Abenteuer.
-- Gedenkbuch auf dem Gerät.
-- Anselm als Gegner im nächsten Abenteuer.
+**Ausrüstung und Nachklang:**
+- **Coldrics Schild:** Wer Coldric beim Namen ruft oder das Duell gewinnt, findet seinen Schild. Die Gruppe stimmt ab, wer ihn trägt: +1 RK im Endkampf.
+- **Splitter von Grauwacht:** Wer das Siegel zerbricht, nimmt ihn mit (`splitter`).
+- **Ausblick:** Jedes Ende schließt mit einem Faden ins nächste Abenteuer. Er führt zu den sieben Siegeln und zu einem Turm im Norden.
+- **Chronik:** Jedes beendete Abenteuer steht auf dem Gerät, mit Ende, Gruppe, Gefallenen, Hüter und Splitter. Ihr findet sie auf der Startseite.
+
+**Noch offen:** Anselm als Gegner im nächsten Abenteuer und die Übernahme des Splitters in ein nächstes Abenteuer. Dafür muss es das nächste Abenteuer erst geben.
 
 ---
 

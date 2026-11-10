@@ -67,6 +67,16 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   S.waehle(A1, 'tam'); check(A1.merker.tam_schlaf === true, 'Kael liest an Tams Spuren, dass der Junge im Schlaf ging');
   check(S.optionen(A1).some((o) => o.id === 'versprechen'), 'Versprechen an Wenna wird erst nach ihrer Geschichte angeboten');
 
+  // Coldrics Schild und der Splitter
+  const A2 = S.neu(3, { gruppe: ['schildwaechter', 'duellant', 'lichtbringer'] }); A2.stufe = 3; A2.merker.coldric_frieden = true; A2.szene = 'halle_danach'; S.weiter(A2);
+  check(A2.szene === 'coldric_schild' && S.optionen(A2).length === 3, 'Nach Coldrics Frieden: Abstimmung, wer seinen Schild trägt');
+  S.waehle(A2, 'duellant'); S.weiter(A2); for (const f of S.lebende(A2)) S.geheim(A2, f, 'ablehnen'); S.weiter(A2);
+  const stS = R.neuesSpiel(1, S.kampfOptionen(A2));
+  check(stS.figuren.find((f) => f.fid === 'duellant').rk === F.FIGUREN.duellant.rk[2] + 1, 'Coldrics Schild: +1 RK im Endkampf');
+  A2.szene = 'siegel_wahl'; S.waehle(A2, 'zerbrechen');
+  check(A2.merker.splitter === true && /Ausblick/.test(S.text(A2).join(' ')), 'Zerbrechen: Splitter von Grauwacht und Ausblick');
+  check(['ende_waechter', 'ende_kobold', 'ende_opfer', 'ende_bruch', 'ende_verrat'].every((e) => /ausblick\(/.test(D.SZENEN[e].text.toString())), 'Jedes Ende hat einen Ausblick');
+
   // 2. Browser
   const b = await chromium.launch();
   const p = await (await b.newContext({ viewport: { width: 1024, height: 900 } })).newPage();
@@ -117,6 +127,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   check(['Am Brunnen', 'Der bittere Brunnen', 'Der Klostergarten', 'Der Glockenturm', 'Nisk', 'Lagerfeuer im Kreuzgang'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Gespräch, geheime Entscheidung, Kampf, Abstimmung und Lagerfeuer gesehen');
   check(await p.evaluate(() => window.ABT.A().stufe === 3) || /behält/.test(ende), 'nach der Bibliothek Stufe 3');
   if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + '/szene-ende.png', fullPage: true });
+  if (endeArt && endeArt !== 'grauwacht_behaelt') check(await p.evaluate(() => JSON.parse(localStorage.getItem('ab_chronik') || '[]').length === 1), 'Das Ende steht einmal in der Chronik des Geräts');
   check(errs.length === 0, 'keine Konsolenfehler' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await b.close();
   console.log(ok ? '\nALLE PRÜFUNGEN BESTANDEN' : '\nFEHLER'); process.exit(ok ? 0 : 1);

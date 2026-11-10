@@ -53,6 +53,15 @@
   const lebendeVon = (A) => A.gruppe.filter((f) => !A.zust[f].tot);
   const anselmListig = (A) => (A.merker.anselm_vertrauen || 0) < 0 && !A.merker.wahrheit_frueh;
   const nisk_kann = (A) => Boolean(A.merker.nisk_dabei && !A.merker.nisk_fort && !A.merker.nisk_tot && (A.merker.nisk_vertrauen || 0) >= 2);
+  /** Ausblick am Ende: der Faden ins nächste Abenteuer */
+  const AUSBLICK = {
+    waechter: "Valdric ist nicht der Einzige. In der Bibliothek lag eine Karte mit sieben Kreisen aus Silber, über die Splitterlande verteilt. Einer davon ist durchgestrichen. Die anderen nicht.",
+    kobold: "Im Sommer bringt ein Kobold einen Brief nach Halmbruck, in krakeliger Schrift: „Der Alte träumt. Er träumt von einem Turm im Norden, wo jemand wie er wartet. Nisk passt auf. Aber ihr solltet nachsehen.“",
+    opfer: "Manchmal, kurz vor dem Einschlafen, hört ihr eine vertraute Stimme. Sie sagt immer dasselbe: „Er ist nicht allein. Es gibt sieben Siegel. Findet die anderen, bevor sie brechen.“",
+    bruch: "Über den Splitterlanden reißt in dieser Nacht der Himmel einen Spalt weit auf, im Norden, wie eine Narbe aus Licht. Der Splitter in eurem Gepäck summt lauter, wenn ihr ihn in diese Richtung haltet.",
+    verrat: "In den Dörfern des Nordens erzählt man bald von einem alten Mönch, der in den Gasthäusern sitzt und Fremde fragt, ob sie eine Glocke gehört haben. Er hat ein Tagebuch bei sich. Und er hat aufgehört zu husten.",
+  };
+  const ausblick = (art) => "**Ausblick:** " + AUSBLICK[art];
   /** Epilog: was aus Halmbruck, Tam, Wenna, den Kobolden und euch wird */
   function epilog(A, h) {
     const m = A.merker, t = [];
@@ -541,18 +550,23 @@
       kampf: (A) => ({ begegnung: "halle_asche", karte: KARTEN.HALLE, skalaMal: A.merker.glut_aus ? 0.85 : 1, zusatz: A.merker.blutschuld ? [{ art: "schattenkobold", anzahl: 2, tpFaktor: 1 }] : [], sieg: { weiter: "halle_danach", tranke: 1 } }),
     },
     halle_danach: {
-      art: "erzaehlung", abschnitt: 3, titel: "Vor der Eisentür", ort: "Halle der Asche", weiter: "siegel_vor", rastErlaubt: true,
+      art: "erzaehlung", abschnitt: 3, titel: "Vor der Eisentür", ort: "Halle der Asche", weiter: (A) => (A.merker.coldric_frieden && !A.merker.coldric_schild ? "coldric_schild" : "siegel_vor"), rastErlaubt: true,
       text: (A) => {
         const m = A.merker;
         if (m.halle_umgangen) return ["Die Eisentür fällt hinter euch ins Schloss. Ihr seid durch, ohne Kampf. Hinter euch steht Coldric noch immer und wacht über eine Halle, durch die gerade alle gegangen sind, die er aufhalten sollte."];
         return [
           m.coldric_frieden
-            ? "Coldric zieht den Handschuh aus. Darunter ist keine Hand, nur Asche, die die Form einer Hand hält. „Er hat mich gerufen, als ich starb, und ich bin gekommen. Vierzig Jahre war ich sein Hund.“ Er sieht zur Eisentür. „Bindet ihn. Und dann lasst mich gehen.“ Er zerfällt, bevor ihr antworten könnt."
+            ? "Coldric zieht den Handschuh aus. Darunter ist keine Hand, nur Asche, die die Form einer Hand hält. „Er hat mich gerufen, als ich starb, und ich bin gekommen. Vierzig Jahre war ich sein Hund.“ Er sieht zur Eisentür. „Bindet ihn. Und dann lasst mich gehen.“ Er zerfällt, bevor ihr antworten könnt. In der Asche bleibt sein Schild zurück, schwarz und schwer, mit dem Zeichen der Abtei."
             : "Coldrics Rüstung fällt in sich zusammen. Darin ist nur Asche. Für einen Augenblick glaubt ihr, eine Stimme zu hören, erleichtert: „Endlich.“",
           "Hinter der Eisentür liegt eine Treppe, die letzte. Von unten kommt kein Licht. Nur ein Flüstern.",
           A.schwierigkeit === "normal" ? "Wenn ihr Wunden verbinden wollt: Jetzt ist die letzte Gelegenheit." : "",
         ];
       },
+    },
+    coldric_schild: {
+      art: "wahl", abschnitt: 3, titel: "Coldrics Schild", ort: "Halle der Asche",
+      text: ["Coldrics Schild liegt in der Asche. Er ist noch warm. Wer ihn trägt, steht fester: **+1 Rüstungsklasse** im Kampf gegen Valdric.", "Wer nimmt ihn? Stimmt ab."],
+      optionen: FIG().REIHE.map((fid) => ({ id: fid, text: `${FIG().FIGUREN[fid].name} (RK ${FIG().FIGUREN[fid].rk[2]})`, wenn: (A, h) => h.hat(A, fid), setzt: { coldric_schild: fid }, weiter: "siegel_vor" })),
     },
     siegel_vor: {
       art: "erzaehlung", abschnitt: 3, titel: "Die Siegelkammer", ort: "Die Siegelkammer", weiter: "fluestern",
@@ -609,6 +623,7 @@
         const m = A.merker, pakt = A.gruppe.filter((f) => m["pakt_" + f] && !A.zust[f].tot);
         let mal = 1; if (m.ring) mal *= 0.9; if (A.glocke >= 7) mal *= 1.15;
         return { begegnung: "siegel", karte: KARTEN.SIEGEL, skalaMal: mal, namen: m.abt_name ? {} : { abt: "Der Abt" },
+          ausruestung: m.coldric_schild && !A.zust[m.coldric_schild]?.tot ? { [m.coldric_schild]: { name: "Coldrics Schild", rk: 1 } } : {},
           boss: { name: Boolean(m.abt_name), silber: Boolean(m.silberglocke), pakt },
           zusatz: A.glocke >= 5 ? [{ art: "knochenwaechter", anzahl: 1, tpFaktor: 1 }] : [],
           sieg: { weiter: "abt_fall" } };
@@ -704,6 +719,7 @@
         "Die Steine leuchten auf. Valdric verschwindet im Boden wie in Wasser.",
         ...epilog(A, h),
         "Im Frühjahr läutet die Glocke wieder. Einmal. Dann ist es still. Anselm ist gestorben, und das Siegel sucht. In Halmbruck beginnt man, auf Fremde zu warten.",
+        ausblick("waechter"),
       ],
     },
     ende_kobold: {
@@ -713,6 +729,7 @@
         "Anselm legt ihm die Hand auf den Kopf, ein einziges Mal. Dann geht er mit euch hinauf, und zum ersten Mal seit vierzig Jahren sieht er die Sonne aufgehen.",
         ...epilog(A, h),
         "Kobolde leben lange. Die Glocke von Grauwacht schweigt für hundert Jahre. Manchmal, in klaren Nächten, hört man unter der Abtei jemanden kichern.",
+        ausblick("kobold"),
       ],
     },
     ende_opfer: {
@@ -730,19 +747,23 @@
           "Anselm geht mit euch hinauf. Er stirbt im Frühjahr, in einem Bett in Halmbruck, und am Ende lächelt er.",
           ...epilog(A, h),
           `Die Glocke von Grauwacht schweigt. In Halmbruck stellt man jedes Jahr am letzten Herbstabend eine Laterne auf den Pfad zur Abtei. Für ${n}.`,
+          ausblick("opfer"),
         ];
       },
     },
     ende_bruch: {
       art: "ende", abschnitt: 3, titel: "Der Einsturz", ort: "Halmbruck",
+      beimEintritt: () => ({ setzt: { splitter: true } }),
       text: (A, h) => [
         "Ihr legt die Hände auf die Steine und drückt. Einer nach dem anderen kippt. Der Kreis zerspringt, und Valdric lacht, dann schreit er, dann ist er Staub. Über euch ächzt die Abtei.",
+        "Wo er gekniet hat, liegt ein Splitter aus dem Siegelstein, so lang wie eine Hand. Er ist warm, und er summt leise, wenn man ihn hält. Ihr nehmt ihn mit: den **Splitter von Grauwacht**.",
         "Ihr rennt. Anselm schafft es nicht. Er will es auch nicht. Er sitzt im zerbrochenen Kreis, als die Decke fällt, und sein Gesicht ist ruhig.",
         A.glocke >= 4
           ? "Ihr erreicht den Hang, als die Abtei in sich zusammenstürzt. Dann seht ihr, was die Glocke gerufen hat: Schatten, die aus den Trümmern steigen und ins Tal ziehen. In Halmbruck brennt in dieser Nacht die Mühle."
           : "Ihr erreicht den Hang, als die Abtei in sich zusammenstürzt. Eine Staubwolke steigt auf, dann ist es still. Zum ersten Mal seit sieben Nächten: wirklich still.",
         ...epilog(A, h),
         "Grauwacht ist ein Haufen Steine. Niemand wacht mehr. Niemand muss mehr wachen.",
+        ausblick("bruch"),
       ],
     },
     ende_verrat: {
@@ -755,6 +776,7 @@
           `Ihr versucht es. Stundenlang. ${n} sieht euch an und sagt schließlich: „Geht. Bitte. Bevor er euch auch noch nimmt.“`,
           ...epilog(A, h),
           `Anselm wird nie wieder gesehen. Die Glocke schweigt. Unter Grauwacht wacht ${n} und wartet darauf, dass jemand die Glocke läutet.`,
+          ausblick("verrat"),
         ];
       },
     },

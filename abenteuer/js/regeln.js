@@ -40,7 +40,20 @@
     kerze: { name: "Gesegnete Kerze", sym: "🕯", text: "Untote greifen dich mit Nachteil an." },
     grosser_trank: { name: "Großer Heiltrank", sym: "⚗", verbrauch: true, text: "Einmal: Bonusaktion, heilt 4W4+4 TP." },
     rauchbeutel: { name: "Rauchbeutel", sym: "☁", verbrauch: true, text: "Einmal: Aktion, Rauchwolke um dich (1 Feld, 2 Runden). Niemand sieht hinein oder hinaus." },
+    rune: { name: "Rune des Schutzes", sym: "ᛟ", text: "Zu Beginn jedes Kampfes 3 zusätzliche Trefferpunkte (verfallen danach)." },
+    auge: { name: "Wachsames Auge", sym: "👁", text: "+3 auf die Initiative: Du handelst früher." },
+    bernstein: { name: "Bernsteinanhänger", sym: "🔶", text: "Wenn du geheilt wirst, bekommst du 2 TP mehr." },
+    wolfszahn: { name: "Wolfszahn", sym: "🦷", text: "Deine Treffer gegen Tiere und Käfer: +1W4 Schaden." },
+    eulenmantel: { name: "Eulenmantel", sym: "🦉", text: "Angriffe auf Entfernung gegen dich haben Nachteil." },
+    baerenguertel: { name: "Gürtel des Bären", sym: "🐻", text: "Vorteil auf Rettungswürfe für Stärke und Konstitution." },
+    katzenbrosche: { name: "Katzenbrosche", sym: "🐈", text: "Vorteil auf Rettungswürfe für Geschicklichkeit." },
+    wetzstein: { name: "Wetzstein", sym: "🪨", text: "Deine Angriffe sind schon bei 19 und 20 kritisch." },
+    schleifstein: { name: "Geschliffene Klinge", sym: "⚔", text: "+1 Schaden im Nahkampf." },
+    eisenspitzen: { name: "Eisenspitzen", sym: "➹", text: "+1 Schaden auf Entfernung (Bogen, Wurf, Zauber)." },
+    manastein: { name: "Manastein", sym: "💠", text: "+1 Zauberplatz, nach jeder langen Rast wieder voll.", nur: ["zauberer", "kleriker"] },
+    heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
+  const TIERE = new Set(["rostkaefer", "netzweber", "aschehund"]);
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
   const RAUCH_DING = { id: "rauchbeutel", name: "Rauchbeutel werfen", typ: "aktion", art: "rauch", ding: "rauchbeutel", radius: 1, dauer: 2, text: GEGENSTAENDE.rauchbeutel.text };
@@ -221,6 +234,8 @@
       if (extra) { f.rk += extra.rk || 0; f.rkBasis += extra.rk || 0; f.ausruestung = extra.name; st.log.push({ t: `${f.name} trägt ${extra.name}: RK ${f.rk}.`, art: "gut" }); }
       if (v) { f.tp = v.tot ? 0 : Math.max(v.tp, 1); f.tot = Boolean(v.tot); f.plaetze = v.plaetze.slice(); f.genutzt = Object.assign({}, v.genutzt); f.rucksack = JSON.parse(JSON.stringify(v.rucksack)); }
       st.figuren.push(f);
+      if (hatDing(f, "rune") && !f.tot && f.tp > 0) { f.tp += 3; f.tpMax += 3; }
+      if (hatDing(f, "manastein") && f.plaetzeMax) f.plaetzeMax[0]++;
       if (f.tot) { f.x = -1; f.y = -1; }
       const wd = FD.FIGUREN[fid].wolf;
       if (wd) {
@@ -252,7 +267,7 @@
     }
     // Initiative (Wölfe handeln im Zug ihrer Besitzerin)
     const teil = st.figuren.filter((f) => f.art !== "wolf");
-    for (const f of teil) { const w = W(r, 20); f.ini = w + mod(f.werte.GES); f.iniWurf = w; }
+    for (const f of teil) { const w = W(r, 20); f.ini = w + mod(f.werte.GES) + (hatDing(f, "auge") ? 3 : 0); f.iniWurf = w; }
     st.reihe = teil.slice().sort((a, b) => b.ini - a.ini || mod(b.werte.GES) - mod(a.werte.GES) || (a.seite === "spieler" ? -1 : 1)).map((f) => f.id);
     st.log.push({ t: "Initiative: " + st.reihe.map((id) => { const f = fig(st, id); return `${f.name} (${f.ini})`; }).join(" · ") });
     if (st.schwierigkeit === "hardcore") st.log.push({ t: "Hardcore: Wer am Boden liegt, würfelt Todeswürfe. Der Tod ist endgültig.", art: "schlecht" });
@@ -364,6 +379,7 @@
     if (a.z.stich) minus.push("Schattenstich");
     if (a.z.spott && a.z.spott !== z.id) minus.push("verspottet");
     if (a.seite === "gegner" && GEGNER[a.art] && GEGNER[a.art].untot && hatDing(z, "kerze")) minus.push("Gesegnete Kerze");
+    if (!nah && hatDing(z, "eulenmantel")) minus.push("Eulenmantel");
     if (istFig(z, "schattenmagier") && z.trugbildRunde !== st.runde) minus.push("Trugbild");
     if (spec.fern && a.seite === "spieler" && st.figuren.some((o) => o.seite !== a.seite && lebt(o) && abstand(o, a) <= 1)) minus.push("Gegner daneben");
     const v = plus.length && minus.length ? 0 : plus.length ? 1 : minus.length ? -1 : 0;
@@ -388,6 +404,7 @@
   /** Rettungswurf: {erfolg, w, total} */
   function rettung(st, z, attr, sg) {
     let v = 0; if (attr === "GES" && z.z.festgehalten) v = -1;
+    if (((attr === "STR" || attr === "KON") && hatDing(z, "baerenguertel")) || (attr === "GES" && hatDing(z, "katzenbrosche"))) v += 1;
     let { w } = w20(st, v);
     const bon = () => mod(z.werte[attr]) + (z.seite === "spieler" && z.klasse && FD.KLASSEN[z.klasse].rettung.includes(attr) ? UEBUNG : 0);
     const glueck = hatDing(z, "gluecksbringer") ? 1 : 0;
@@ -430,6 +447,7 @@
   function heilen(st, z, n, quelle) {
     if (z.tot) return 0;
     if (z.z.raserei) n = Math.floor(n / 2);
+    if (hatDing(z, "bernstein")) n += 2;
     const vorher = z.tp; z.tp = Math.min(z.tpMax, z.tp + n);
     if (vorher === 0 && z.tp > 0) { z.todes = { e: 0, f: 0 }; z.stabil = false; }
     st.log.push({ t: `${quelle}: ${z.name} heilt ${z.tp - vorher} TP${vorher === 0 && z.tp > 0 ? " und steht wieder auf" : ""}.`, art: "gut" });
@@ -541,6 +559,8 @@
     if (istFig(f, "berserker") && f.tp < f.tpMax / 2) extra.push(f.stufe >= 3 ? "0W1+2" : "0W1+1");
     if (f.z.finte) extra.push("1W6");
     if (hatDing(f, "silberdolch") && GEGNER[z.art] && GEGNER[z.art].untot) extra.push("1W4");
+    if (hatDing(f, "wolfszahn") && TIERE.has(z.art)) extra.push("1W4");
+    if (abstand(f, z) <= 1 ? hatDing(f, "schleifstein") : hatDing(f, "eisenspitzen")) extra.push("0W1+1");
     if (f.z.gift) extra.push(f.stufe >= 2 ? "2W6" : "1W6");
     if (z.z.mal_jaeger === f.id) extra.push(FD.FIGUREN[f.fid].malWuerfel || "1W6");
     if (z.z.brandmal === f.id) extra.push(f.stufe >= 3 ? "2W6" : "1W4");
@@ -548,6 +568,7 @@
     if (istFig(f, "assassine") && f.stufe >= 3 && z.tp < z.tpMax / 2) extra.push("1W6");
     if (istFig(f, "kopfgeldjaeger") && f.stufe >= 3 && z.z.mal_jaeger === f.id && z.tp < z.tpMax / 2 && !(f.genutzt.erlegen)) { extra.push("2W6"); f.genutzt.erlegen = 1; zusatz = " Erlegen!"; }
     if (istFig(f, "duellant") && f.stufe >= 3) krit = 19;
+    if (hatDing(f, "wetzstein")) krit = Math.min(krit, 19);
     if (istFig(f, "kopfgeldjaeger") && z.z.mal_jaeger === f.id) krit = 19;
     const giftAktiv = Boolean(f.z.gift);
     const spec = {
@@ -1311,7 +1332,7 @@
   /** Zustand der Spielerfiguren nach einem Kampf (am Boden in Normal: 1 TP) */
   function nachKampf(st) {
     const out = {};
-    for (const f of spielerFiguren(st)) out[f.fid] = { stufe: f.stufe, tp: f.tot ? 0 : Math.max(1, f.tp), tot: Boolean(f.tot), plaetze: f.plaetze.slice(), genutzt: Object.assign({}, f.genutzt), rucksack: JSON.parse(JSON.stringify(f.rucksack)) };
+    for (const f of spielerFiguren(st)) out[f.fid] = { stufe: f.stufe, tp: f.tot ? 0 : Math.max(1, Math.min(f.tp, FD.tpVon(f.fid, f.stufe))), tot: Boolean(f.tot), plaetze: f.plaetze.slice(), genutzt: Object.assign({}, f.genutzt), rucksack: JSON.parse(JSON.stringify(f.rucksack)) };
     return out;
   }
   /** Kurze Rast: halbe fehlende TP, „je Rast“ und „je Kampf“ kommen zurück */
@@ -1362,7 +1383,7 @@
     };
   }
 
-  const API = { GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
     findeAktion, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

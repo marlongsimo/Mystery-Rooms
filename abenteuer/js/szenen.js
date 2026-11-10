@@ -227,6 +227,7 @@
     for (const fid of A.gruppe) {
       const z = A.zust[fid]; if (z.tot) continue;
       const neuZ = frisch(fid, A.stufe), anteil = A.glocke >= 3 ? 0.75 : 1;
+      if ((z.rucksack || []).some((d) => d.id === "manastein" && d.n > 0)) neuZ.plaetze[0]++;
       A.zust[fid] = Object.assign(neuZ, { tp: Math.max(z.tp, Math.floor(neuZ.tp * anteil)), rucksack: z.rucksack });
     }
     A.lagerZust = JSON.parse(JSON.stringify(A.zust)); A.lagerSzene = A.szene;
@@ -290,17 +291,22 @@
   }
   function beuteZiehen(A) {
     const vergeben = A.gruppe.flatMap((f) => getragen(A, f));
-    const topf = Object.keys(R.GEGENSTAENDE).filter((id) => R.GEGENSTAENDE[id].verbrauch || !vergeben.includes(id)).filter((id) => lebende(A).some((f) => darfTragen(A, f, id)));
+    // Was einmal gezeigt wurde, ist weg: liegen gelassene Dinge tauchen nicht wieder auf
+    A.gezeigt = A.gezeigt || [];
+    const topf = Object.keys(R.GEGENSTAENDE).filter((id) => !A.gezeigt.includes(id) && !vergeben.includes(id)).filter((id) => lebende(A).some((f) => darfTragen(A, f, id)));
     const zug = [];
     while (zug.length < 3 && topf.length) zug.push(topf.splice(Math.floor(A.r() * topf.length), 1)[0]);
+    A.gezeigt.push(...zug);
     A.beute = zug.length ? { dinge: zug } : null;
   }
   function beuteGeben(A, ding, fid) {
     if (!A.beute || !A.beute.dinge.includes(ding)) return { fehler: "Diesen Gegenstand gibt es gerade nicht." };
     if (!hat(A, fid)) return { fehler: "Diese Figur ist nicht dabei." };
     if (!darfTragen(A, fid, ding)) return { fehler: `${name(A, fid)} kann das nicht mehr tragen.` };
-    const r = A.zust[fid].rucksack, d = r.find((x) => x.id === ding);
-    if (d) d.n++; else r.push({ id: ding, n: 1 });
+    const r = A.zust[fid].rucksack;
+    if (ding === "heiltraenke") { const t = r.find((x) => x.id === "heiltrank"); if (t) t.n += 2; else r.push({ id: "heiltrank", n: 2 }); }
+    else { const d = r.find((x) => x.id === ding); if (d) d.n++; else r.push({ id: ding, n: 1 }); }
+    if (ding === "manastein" && A.zust[fid].plaetze) A.zust[fid].plaetze[0]++;
     notiz(A, `${name(A, fid)} nimmt ${R.GEGENSTAENDE[ding].name}.`, "gut");
     A.beute = null; return { ok: true };
   }

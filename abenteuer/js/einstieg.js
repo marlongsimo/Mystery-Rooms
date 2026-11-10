@@ -72,6 +72,9 @@
   $("#e-hilfe").onchange = (e) => { try { localStorage.setItem("ab_hilfe", e.target.checked ? "an" : "aus"); } catch (x) { /* privat */ } if (window.ABT && window.ABT.hilfe) window.ABT.hilfe(e.target.checked); };
   $("#e-vorlesen").onchange = (e) => { try { localStorage.setItem("ab_vorlesen", e.target.checked ? "an" : "aus"); } catch (x) { /* privat */ } if (window.ABT && window.ABT.vorlesen) window.ABT.vorlesen(e.target.checked);
     if (e.target.checked && window.speechSynthesis) { const u = new SpeechSynthesisUtterance("Seit sieben Nächten läutet die Glocke."); u.lang = "de-DE"; u.rate = 0.92; window.speechSynthesis.speak(u); } };
+  const zeigeTempo = () => { let t = "normal"; try { t = localStorage.getItem("ab_tempo") || "normal"; } catch (e) { /* privat */ } document.querySelectorAll("[data-tempo]").forEach((b) => { b.classList.toggle("an", b.dataset.tempo === t); b.setAttribute("aria-checked", String(b.dataset.tempo === t)); }); };
+  document.querySelectorAll("[data-tempo]").forEach((b) => { b.onclick = () => { try { localStorage.setItem("ab_tempo", b.dataset.tempo); } catch (e) { /* privat */ } zeigeTempo(); }; });
+  zeigeTempo();
   $("#einst-zu").onclick = () => { $("#einst-panel").hidden = true; $("#titel-einst").focus(); };
   $("#einst-panel").addEventListener("click", (e) => { if (e.target.id === "einst-panel") $("#einst-zu").click(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#einst-panel").hidden) $("#einst-zu").click(); });

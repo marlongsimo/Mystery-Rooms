@@ -15,7 +15,10 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const Z = 60; // Feldgröße im SVG
   const params = new URLSearchParams(location.search);
-  const TEMPO = params.has("schnell") ? 0 : 650;
+  // Tempo der Gegnerzüge (Einstellungen): langsam 2,4 s, normal 1,6 s, schnell 0,8 s; im Testmodus sofort
+  const TEMPI = { langsam: 2400, normal: 1600, schnell: 800 };
+  const tempo = () => { if (params.has("schnell")) return 0; let t = "normal"; try { t = localStorage.getItem("ab_tempo") || "normal"; } catch (e) { /* privat */ } return TEMPI[t] || TEMPI.normal; };
+  const TEMPO = params.has("schnell") ? 0 : 1;
   const SLUG = params.get("liveslug") || "abenteuer"; // ?liveslug= nur für Tests
   const SPEICHER = "ab_tisch", SETUP_KEY = "ab_setup";
   const SELBST = new Set(["selbstheilung", "trank", "raserei", "finte", "gift", "verstecken", "rueckzug", "spurt", "schattenschritt", "spiegelbilder", "segen", "schutzkreis", "vertreiben", "bewahren", "massenheil", "rauch", "tatendrang"]);
@@ -385,8 +388,22 @@
   }
   /** Neue Würfe der Spielerfiguren groß einblenden */
   let wurfTimer = null;
+  /** Neue Einträge aus dem Verlauf erscheinen kurz als Banner oben auf der Karte */
+  function zeigeMeldungen(neu) {
+    if (TEMPO === 0 || !neu.length) return;
+    let box = $("#meldungen");
+    if (!box) { box = document.createElement("div"); box.id = "meldungen"; box.className = "meldungen"; box.setAttribute("aria-live", "polite"); $(".karte-wrap").appendChild(box); }
+    for (const l of neu) {
+      const runde = /^— Runde/.test(l.t), m = document.createElement("div");
+      m.className = `meldung ${l.art || ""} ${runde ? "runde" : ""}`; m.textContent = l.t;
+      box.appendChild(m);
+      setTimeout(() => m.classList.add("weg"), runde ? 1800 : 3600); setTimeout(() => m.remove(), runde ? 2300 : 4100);
+    }
+    while (box.children.length > 4) box.firstElementChild.remove();
+  }
   function zeigeWurf() {
     const neu = st.log.slice(letzterLog); letzterLog = st.log.length;
+    zeigeMeldungen(neu);
     const w = neu.filter((l) => l.art === "wurf" || (l.art === "gut" && / heilt /.test(l.t))).pop();
     const g = neu.filter((l) => l.art === "gegner" && l.wurf).pop();
     const zeig = w || g;
@@ -428,7 +445,7 @@
     if (!st) return;
     if (st.ende) { veroeffentlichen(); return; }
     const a = R.aktiv(st);
-    if (a.seite === "gegner") gegnerTimer = setTimeout(() => { R.gegnerZug(st); render(); veroeffentlichen(); gegnerSchleife(); }, TEMPO);
+    if (a.seite === "gegner") gegnerTimer = setTimeout(() => { R.gegnerZug(st); render(); veroeffentlichen(); gegnerSchleife(); }, tempo());
   }
 
   function klickFeld(x, y) {

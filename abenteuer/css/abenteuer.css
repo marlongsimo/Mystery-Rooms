@@ -700,3 +700,17 @@ body[data-abschnitt="3"] { background: radial-gradient(ellipse at 50% -10%, #3a1
 body[data-abschnitt="3"] .szene h1 { text-shadow: 0 0 24px rgba(201, 72, 40, .25); }
 #szene-kopf-vorlesen, #sz-vorlesen { font-size: 13px; text-decoration: none; }
 .kopf-links { display: inline-flex; gap: 14px; align-items: center; white-space: nowrap; }
+
+/* Meldungen aus dem Verlauf als Banner über der Karte */
+.meldungen { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 6px; width: min(92%, 560px); pointer-events: none; }
+.meldung { max-width: 100%; padding: 8px 14px; border-radius: 3px; font: 600 14px/1.35 var(--schrift-ui); text-align: center; color: var(--pergament);
+  background: rgba(14, 21, 31, .92); border: 1px solid var(--line-stark); box-shadow: 0 6px 18px rgba(0,0,0,.5); animation: meldungEin .3s ease both; transition: opacity .45s, transform .45s; }
+.meldung.gut { border-color: #6fbf8a; color: #d9f2e1; }
+.meldung.schlecht { border-color: #d0545e; color: #f6d5d5; background: rgba(43, 14, 18, .92); }
+.meldung.gegner { border-color: #c9774f; color: #f3dccd; }
+.meldung.wurf { border-color: var(--altgold); }
+.meldung.runde { font: 600 12px var(--schrift-titel); letter-spacing: .14em; color: var(--altgold); padding: 4px 12px; background: rgba(10,17,27,.8); }
+.meldung.weg { opacity: 0; transform: translateY(-6px); }
+@keyframes meldungEin { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@media (max-width: 700px) { .meldung { font-size: 12px; padding: 6px 10px; } }
+.tempo-wahl { justify-content: space-between; cursor: default; } .tempo-wahl .seg button { padding: 6px 10px; font-size: 13px; }

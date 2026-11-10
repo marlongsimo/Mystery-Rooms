@@ -53,7 +53,7 @@
     const v = S.ansicht(A), s = S.szene(A);
     if (window.ABE && render.letzte != null && A.glocke > render.letzte) window.ABE.glocke(0.9);
     render.letzte = A.glocke;
-    let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}</div>
+    let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}${AB.liveAn() ? "" : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}</div>
       <h1>${esc(v.titel)}</h1><div class="erzaehlung">${v.text.map((p) => `<p>${fett(p)}</p>`).join("")}</div>`;
     if (hilfeAn && HILFE[s.art] && !A.zwischenprobe) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE[s.art])}</p><button class="link" id="hilfe-aus">Hinweise ausblenden</button></div>`;
     if (A.zwischenprobe && hilfeAn) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE.probe)}</p></div>`;
@@ -150,19 +150,22 @@
     const r = $("#sz-rast"); if (r) r.onclick = () => { S.kurzeRast(A); nach(); };
     const au = $("#sz-auswerten"); if (au) au.onclick = () => { S.auswerten(A); nachSzene(); };
     const k = $("#sz-kampf"); if (k) k.onclick = kampf;
-    const e = $("#sz-schluss"); if (e) e.onclick = () => { try { localStorage.removeItem(KEY); } catch (x) { /* privat */ } A = null; AB.zeigeSetup(); };
+    const pz = $("#sz-pause"); if (pz) pz.onclick = pause;
+    const e = $("#sz-schluss"); if (e) e.onclick = () => { try { localStorage.removeItem(KEY); localStorage.removeItem("ab_solo"); } catch (x) { /* privat */ } A = null; AB.zeigeSetup(); };
   }
   function nachSzene() { merken(); render(); AB.veroeffentlichen(); }
 
   /* ---------- Kampf ---------- */
   function kampf() {
     const opts = S.kampfOptionen(A);
-    AB.kampfStarten(opts, (st) => {
-      const e = S.kampfEnde(A, st);
-      merken();
-      if (e.ergebnis === "rueckzug") AB.toast("Rückzug zum Lagerfeuer. Die Glocke schlägt.");
-      zeige();
-    });
+    AB.kampfStarten(opts, kampfFertig);
+  }
+  /** Nach dem Kampf (auch nach dem Neuladen mitten im Kampf) */
+  function kampfFertig(st) {
+    const e = S.kampfEnde(A, st);
+    merken();
+    if (e.ergebnis === "rueckzug") AB.toast("Rückzug zum Lagerfeuer. Die Glocke schlägt.");
+    zeige();
   }
 
   /* ---------- Wünsche der Handys ---------- */
@@ -193,8 +196,16 @@
   }
 
   // Start-Knopf „Abenteuer fortsetzen“, wenn ein Spielstand da ist (nur allein; live stellt spiel.js wieder her)
-  (() => { let da = false; try { da = Boolean(localStorage.getItem(KEY)); } catch (e) { /* privat */ } if (da) { const k = document.querySelector("#intro .knoepfe"); if (k) { const b = document.createElement("button"); b.className = "btn"; b.id = "fortsetzen"; b.textContent = "Abenteuer fortsetzen"; b.onclick = fortsetzen; k.prepend(b); } } })();
+  function fortsetzenKnopf() {
+    let da = false; try { da = Boolean(localStorage.getItem(KEY)); } catch (e) { /* privat */ }
+    const k = document.querySelector("#intro .knoepfe"); if (!da || !k || document.querySelector("#fortsetzen")) return;
+    const b = document.createElement("button"); b.className = "btn gross"; b.id = "fortsetzen"; b.textContent = "Abenteuer fortsetzen"; b.onclick = fortsetzen; k.prepend(b);
+    const n = document.querySelector("#titel-start"); if (n) n.classList.remove("gross");
+  }
+  fortsetzenKnopf();
+  /** Pause: zurück zum Titel, der Spielstand bleibt erhalten */
+  function pause() { merken(); fortsetzenKnopf(); AB.zeigeSektion("intro"); }
 
-  window.ABT = { start, fortsetzen, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
+  window.ABT = { start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
     speichern: () => (A ? S.speichern(A) : null), laden: (o) => { A = S.laden(o); } };
 })();

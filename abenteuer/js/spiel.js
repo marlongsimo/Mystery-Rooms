@@ -36,10 +36,14 @@
     try { localStorage.setItem(SPEICHER, JSON.stringify({ phase: LIVE.phase, besitz: LIVE.besitz, erledigt: LIVE.erledigt, setup: SETUP, st: st ? R.speichern(st) : null, abenteuer: window.ABT ? window.ABT.speichern() : null, imAbenteuer: Boolean(kampfEnde) })); } catch (e) { /* privat */ }
   }
   function vergessen() { try { localStorage.removeItem(SPEICHER); } catch (e) { /* privat */ } }
+  /** Allein am Tisch: laufenden Kampf im Abenteuer merken, damit Neuladen nichts kostet */
+  const SOLO = "ab_solo";
+  function soloMerken() { try { localStorage.setItem(SOLO, JSON.stringify({ st: st && kampfEnde ? R.speichern(st) : null })); } catch (e) { /* privat */ } }
 
   /** Öffentlichen Stand an alle Handys (immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig) */
   function veroeffentlichen() {
-    if (!liveAn() || !LIVE.client.session.is_host) return;
+    if (!liveAn()) { soloMerken(); return; }
+    if (!LIVE.client.session.is_host) return;
     speichern();
     if (LIVE.schreibt) { LIVE.nochmal = true; return; }
     LIVE.schreibt = true; LIVE.nochmal = false;
@@ -449,25 +453,38 @@
   (async () => {
     let gespeichert = null;
     try { gespeichert = JSON.parse(localStorage.getItem(SPEICHER) || "null"); } catch (e) { /* defekt */ }
-    if (!gespeichert || !window.MRMultiplayer) return;
+    if (!gespeichert || !window.MRMultiplayer) { setTimeout(allein, 0); return; }
     try {
       const c = liveClient(), s = await c.restore();
-      if (!s || s.closed || !s.is_host) { vergessen(); return; }
+      if (!s || s.closed || !s.is_host) { vergessen(); setTimeout(allein, 0); return; }
       LIVE.phase = gespeichert.phase; LIVE.besitz = gespeichert.besitz || {}; LIVE.erledigt = gespeichert.erledigt || {};
       if (gespeichert.setup) SETUP = gespeichert.setup;
       wach();
       if (gespeichert.abenteuer && window.ABT) window.ABT.laden(gespeichert.abenteuer);
       if (LIVE.phase === "kampf" && gespeichert.st) {
         st = R.laden(gespeichert.st); window.AB.st = st; letzterLog = st.log.length;
-        if (gespeichert.imAbenteuer && window.ABT) kampfEnde = (s2) => { const S = window.ABS, A = window.ABT.A(); const e = S.kampfEnde(A, s2); if (e.ergebnis === "rueckzug") toast("Rückzug zum Lagerfeuer. Die Glocke schlägt."); window.ABT.zeige(); };
+        if (gespeichert.imAbenteuer && window.ABT) kampfEnde = window.ABT.kampfFertig;
         zeigeSpiel(); render(); gegnerSchleife();
       }
       else if (LIVE.phase === "szene" && window.ABT && window.ABT.laeuft()) window.ABT.zeige();
       else zeigeSetup();
       await c.fetchStates().catch(() => {});
       veroeffentlichen();
-    } catch (e) { vergessen(); }
+    } catch (e) { vergessen(); setTimeout(allein, 0); }
   })();
+  /** Allein am Tisch: Abenteuer (und ggf. den laufenden Kampf) nach dem Neuladen direkt fortsetzen */
+  function allein() {
+    if (!window.ABT || !window.ABT.gespeichert()) return;
+    let solo = null; try { solo = JSON.parse(localStorage.getItem(SOLO) || "null"); } catch (e) { /* defekt */ }
+    window.ABT.fortsetzen();
+    if (!window.ABT.laeuft()) return;
+    if (solo && solo.st) {
+      try {
+        st = R.laden(solo.st); window.AB.st = st; letzterLog = st.log.length; kampfEnde = window.ABT.kampfFertig;
+        zeigeSpiel(); render(); gegnerSchleife();
+      } catch (e) { st = null; window.AB.st = null; kampfEnde = null; window.ABT.zeige(); }
+    }
+  }
 
   // Für automatische Tests
   window.AB = { st: null, R, LIVE, SETUP: () => SETUP, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,

@@ -36,6 +36,11 @@
   };
   const TRANK = { id: "heiltrank", name: "Heiltrank trinken", typ: "bonus", art: "trank", heilung: "2W4+2", text: DINGE.heiltrank.text };
   const STABIL = { id: "stabilisieren", name: "Stabilisieren", typ: "aktion", art: "aufrichten", reichweite: 1, stabil: true, text: "Eine Figur am Boden neben dir: In Normal steht sie mit 1 TP auf, in Hardcore hören ihre Todeswürfe auf." };
+  const SIEGEL_A = { id: "siegelstein", name: "Siegelstein berühren", typ: "aktion", art: "siegel", text: "Leg die Hand auf einen Siegelstein neben dir: Valdric verliert 2 RK und nimmt 2W6 gleißenden Schaden. Sind alle vier berührt, ist er gebunden und kann keine Toten mehr rufen." };
+  const NAME_A = { id: "wahrer_name", name: "„Valdric!“ – den Namen rufen", typ: "aktion", art: "name", text: "Der Name, den Tam euch verraten hat: Valdric verliert seinen nächsten Zug und für den Rest des Kampfes 2 RK. Einmal." };
+  const SILBER_A = { id: "silberglocke", name: "Die silberne Glocke läuten", typ: "bonus", art: "silber", text: "Knochenwächter in 6 Feldern machen einen WEI-Rettungswurf (SG 13), sonst zerfallen sie. Einmal." };
+  const imPakt = (st, f) => Boolean(st && st.boss && (st.boss.pakt || []).includes(f.fid));
+  const bossVon = (st) => st.figuren.find((g) => g.seite === "gegner" && GEGNER[g.art].boss && lebt(g));
   const SPURT = { id: "spurt_aktion", name: "Spurt", typ: "aktion", art: "spurt", text: "6 Felder zusätzliche Bewegung statt einer Aktion." };
 
   /* ---------- Gegner (Grauwacht) ---------- */
@@ -46,6 +51,7 @@
     pilzbrut: { name: "Pilzbrut", tp: 18, rk: 5, werte: { STR: 6, GES: 1, KON: 14, INT: 1, WEI: 3, CHA: 1 }, sporen: { sg: 12, schaden: "1W8" }, bewegung: 0, xp: 50 },
     netzweber: { name: "Netzweber", tp: 26, rk: 14, werte: { STR: 14, GES: 16, KON: 12, INT: 2, WEI: 11, CHA: 4 }, angriff: { name: "Biss", bonus: 5, schaden: "1W10+3" }, netz: { bonus: 5, sg: 12, reichweite: 6 }, xp: 200 },
     aschehund: { name: "Aschehund", tp: 22, rk: 13, werte: { STR: 17, GES: 12, KON: 14, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Biss", bonus: 5, schaden: "1W8+3" }, atem: { schaden: "3W6", sg: 12, alle: 3 }, xp: 200 },
+    abt: { name: "Valdric", tp: 70, rk: 14, werte: { STR: 14, GES: 12, KON: 16, INT: 18, WEI: 16, CHA: 18 }, angriff: { name: "Fluchhand", bonus: 6, schaden: "2W8", reichweite: 6 }, boss: true, bewegung: 3, atem: { schaden: "3W6", sg: 14, alle: 2 }, xp: 1100 },
     grabritter: { name: "Grabritter", tp: 45, rk: 17, werte: { STR: 18, GES: 11, KON: 16, INT: 10, WEI: 12, CHA: 12 }, angriff: { name: "Zweihänder", bonus: 6, schaden: "2W6+4" }, untot: true, xp: 450 },
   };
   const WOLF_WERTE = { STR: 12, GES: 15, KON: 12, INT: 3, WEI: 12, CHA: 6 };
@@ -62,6 +68,10 @@
     asche: { name: "Aschehunde", stufe: 3, gegner: [["aschehund", 1.0]] },
     ritter: { name: "Grabritter mit Knochenwächtern", stufe: 3, gegner: [["grabritter", 0.25], ["knochenwaechter", 1.25]] },
     asche_knochen: { name: "Aschehunde und Knochenwächter", stufe: 3, gegner: [["aschehund", 0.75], ["knochenwaechter", 0.75]] },
+    // Finale: eigener Faktor je Gruppengröße (mit tools/simulation kalibriert: Halle ≈ 85 %, Endkampf ≈ 65 % Sieg)
+    halle: { name: "Coldric und die Aschehunde", stufe: 3, gegner: [["grabritter", 0.25], ["aschehund", 0.5]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
+    halle_asche: { name: "Die Aschehunde", stufe: 3, gegner: [["aschehund", 0.75]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
+    siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.2, 4: 3.3, 5: 3.4, 6: 2.6 } },
   };
   /**
    * Feinabstimmung nach Gruppengröße (Faktor auf die Gegner-TP), je Stufe der Figuren.
@@ -71,7 +81,9 @@
   const SKALA_HARDCORE = { 1: { 3: 1.16, 4: 1.11, 5: 1.11, 6: 1.09 }, 2: { 3: 0.89, 4: 1.03, 5: 0.89, 6: 0.91 }, 3: { 3: 0.81, 4: 0.81, 5: 0.81, 6: 0.73 } };
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
   function gegnerFuer(begId, n, stufe, skala, hardcore) {
-    const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, s = stufe || b.stufe, tab = hardcore ? SKALA_HARDCORE : SKALA, k = skala != null ? skala : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
+    const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, s = stufe || b.stufe, tab = hardcore ? SKALA_HARDCORE : SKALA;
+    let k = skala != null ? skala : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
+    if (b.faktor) k *= b.faktor[Math.max(3, Math.min(6, n))] || 1;
     return b.gegner.map(([art, je]) => { const soll = je * n, anzahl = Math.max(1, Math.round(soll)); return { art, anzahl, tpFaktor: k * soll / anzahl }; });
   }
 
@@ -177,9 +189,10 @@
    */
   function neuesSpiel(seed, opts = {}) {
     const st = { sparen: opts.sparen != null ? opts.sparen : 1, seed, rs: seed >>> 0 || 1, karte: null, figuren: [], log: [], runde: 1, reihe: [], am: 0, zug: null, ende: null, xp: 0, zonen: [], brand: [],
-      stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [] };
+      stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [], boss: opts.boss ? JSON.parse(JSON.stringify(opts.boss)) : null, siegel: [] };
     zufall(st);
     const r = st.r, k = opts.karte || KARTE_GARTEN;
+    st.siegel = k.hindernisse.filter(([t]) => t === "Z").map(([, x, y]) => ({ x, y, beruehrt: false }));
     st.karte = { name: k.name, b: k.b, h: k.h, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y))) };
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
     fids.forEach((fid, i) => {
@@ -195,7 +208,7 @@
         st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[st.stufe - 1], tpMax: wd.tp[st.stufe - 1], rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
       }
     });
-    const gruppen = opts.gegner || gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore");
+    const gruppen = (opts.gegner || gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore")).map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * (opts.skalaMal || 1) })).concat(opts.zusatz || []);
     let gi = 0;
     for (const g of gruppen) for (let i = 0; i < g.anzahl; i++) {
       const d = GEGNER[g.art];
@@ -208,7 +221,7 @@
       }
       const nr = gruppen.length === 1 || g.anzahl > 1 ? " " + (i + 1) : "";
       const gtp = Math.max(1, Math.round(d.tp * (g.tpFaktor || 1)));
-      st.figuren.push({ id: "g" + gi, seite: "gegner", art: g.art, name: d.name + nr, x, y, tp: gtp, tpMax: gtp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true });
+      st.figuren.push({ id: "g" + gi, seite: "gegner", art: g.art, name: ((opts.namen && opts.namen[g.art]) || g.name || d.name) + nr, x, y, tp: gtp, tpMax: gtp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true });
       gi++;
     }
     // Überraschung: Gegner setzen die erste Runde aus. Läufer: ein Gegner rennt zu einem Feld (z. B. Glockenseil)
@@ -243,6 +256,9 @@
     if (id === "heiltrank") return { a: TRANK, typ: "bonus" };
     if (id === "stabilisieren") return { a: STABIL, typ: "aktion" };
     if (id === "spurt_aktion") return { a: SPURT, typ: "aktion" };
+    if (id === "siegelstein") return { a: SIEGEL_A, typ: "aktion" };
+    if (id === "wahrer_name") return { a: NAME_A, typ: "aktion" };
+    if (id === "silberglocke") return { a: SILBER_A, typ: "bonus" };
     const fid = f.fid, liste = fid ? FD.faehigVon(fid, f.stufe) : [];
     const a = liste.find((x) => x.id === id && x.typ !== "passiv");
     return a ? { a, typ: a.typ } : null;
@@ -252,6 +268,9 @@
     const liste = faehigkeiten(f).filter((a) => a.typ === "aktion" || a.typ === "bonus" || a.typ === "frei");
     if (trankZahl(f)) liste.push(TRANK);
     if (!st || st.figuren.some((o) => o.seite === "spieler" && o.art !== "wolf" && o.tp <= 0 && !o.tot)) liste.push(STABIL);
+    if (st && st.siegel && st.siegel.some((z) => !z.beruehrt) && !imPakt(st, f)) liste.push(SIEGEL_A);
+    if (st && st.boss && st.boss.name && !st.boss.nameGenutzt) liste.push(NAME_A);
+    if (st && st.boss && st.boss.silber && !st.boss.silberGenutzt) liste.push(SILBER_A);
     liste.push(SPURT);
     return liste;
   }
@@ -579,6 +598,9 @@
       case "bewahren": case "massenheil": return freunde.some((o) => o.tp < o.tpMax && abstand(f, o) <= a.reichweite) ? [f] : [];
       case "rauch": case "spurt": return [f];
       case "tatendrang": return !st.zug.aktion && !st.zug.tatendrang ? [f] : [];
+      case "siegel": return !imPakt(st, f) && st.siegel.some((z) => !z.beruehrt && abstand(z, f) <= 1) && bossVon(st) ? [f] : [];
+      case "name": { const b = bossVon(st); return b && !st.boss.nameGenutzt && abstand(f, b) <= 12 && sicht(st, f, b) ? [b] : []; }
+      case "silber": return !st.boss.silberGenutzt && gegnerFiguren(st).some((g) => lebt(g) && g.art === "knochenwaechter" && abstand(g, f) <= 6) ? [f] : [];
       default: return [];
     }
   }
@@ -750,6 +772,23 @@
       }
       case "bannkreis": st.zonen.push({ art: "bann", x: ziel.x, y: ziel.y, radius: a.radius, bis: st.runde + a.dauer }); st.log.push({ t: `${f.name} zieht einen Bannkreis um ${ziel.name}: Gegner darin −2 RK.`, art: "gut" }); break;
       case "rauch": st.zonen.push({ art: "rauch", x: f.x, y: f.y, radius: a.radius, bis: st.runde + a.dauer }); st.log.push({ t: `${f.name} wirft eine Rauchbombe.` }); break;
+      case "siegel": {
+        const z = st.siegel.find((x) => !x.beruehrt && abstand(x, f) <= 1), b = bossVon(st); z.beruehrt = true;
+        const s = roll(r, "2W6").total; b.rk -= 2;
+        st.log.push({ t: `${f.name} legt die Hand auf einen Siegelstein. Licht bricht aus dem Stein: ${b.name} verliert 2 RK und ${s} TP.`, art: "gut" });
+        schaden(st, b, s);
+        if (st.siegel.every((x) => x.beruehrt) && lebt(b)) { b.gebunden = true; st.log.push({ t: `Alle vier Steine leuchten. ${b.name} ist gebunden und kann keine Toten mehr rufen.${(st.boss.pakt || []).length ? " Und er weiß, wer ihn verraten hat." : ""}`, art: "gut" }); }
+        break;
+      }
+      case "name": ziel.z.betaeubt = 1; ziel.rk -= 2; st.boss.nameGenutzt = true; st.log.push({ t: `${f.name} ruft: „Valdric!“ Der Abt erstarrt. Zum ersten Mal seit dreihundert Jahren hört er seinen Namen.`, art: "gut" }); break;
+      case "silber": {
+        st.boss.silberGenutzt = true; st.log.push({ t: `${f.name} läutet die silberne Glocke. Ein reiner Ton füllt die Kammer.`, art: "gut" });
+        for (const g of gegnerFiguren(st).filter((g) => lebt(g) && g.art === "knochenwaechter" && abstand(g, f) <= 6)) {
+          const rw = rettung(st, g, "WEI", 13);
+          if (rw.erfolg) st.log.push({ t: `${g.name} widersteht dem Klang.`, art: "wurf" }); else { st.log.push({ t: `${g.name} zerfällt zu Staub.`, art: "gut" }); schaden(st, g, g.tp); }
+        }
+        break;
+      }
       case "tatendrang": st.zug.aktion = true; st.zug.tatendrang = true; st.log.push({ t: `${f.name}: Tatendrang – noch eine Aktion!`, art: "gut" }); break;
       default: return { fehler: "Unbekannte Fähigkeit." };
     }
@@ -880,7 +919,7 @@
     const d = GEGNER[g.art];
     const metallVorher = z.rk;
     return angriffswurf(st, g, z, {
-      name: d.angriff.name, bonus: d.angriff.bonus, schaden: d.angriff.schaden.replace(/[+-]\d+$/, ""), fest: parse(d.angriff.schaden).b, nah: true,
+      name: d.angriff.name, bonus: d.angriff.bonus, schaden: d.angriff.schaden.replace(/[+-]\d+$/, ""), fest: parse(d.angriff.schaden).b, nah: abstand(g, z) <= 1, magisch: Boolean(d.boss),
       nachTreffer: () => { if (d.rost && z.metall && z.rk > z.rkBasis - 2 && metallVorher === z.rk) { z.rk -= 1; st.log.push({ t: `Die Rüstung von ${z.name} rostet: RK ${z.rk}.` }); } },
     });
   }
@@ -902,6 +941,7 @@
       for (const [k] of m) { const [x, y] = k.split(",").map(Number); const dd = Math.min(...lebende.map((f) => abstand({ x, y }, f))); if (!best || dd > best.d) best = { x, y, d: dd }; }
       if (best) { g.x = best.x; g.y = best.y; }
     };
+    if (d.boss) { bossZug(st, g); return; }
     // Verängstigt: weg, kein Angriff
     if (g.z.veraengstigt) { flieheVon(); st.log.push({ t: `${g.name} weicht ängstlich zurück.`, art: "gegner" }); fangschuss(st, g, startX, startY); if (!st.ende) weiter(st); return; }
     // Im Netz: befreien
@@ -964,6 +1004,46 @@
     if (ziel && abstand(g, ziel) <= 1 && d.angriff) gegnerAngriff(st, g, ziel);
     if (!st.ende) weiter(st);
   }
+  /** Valdric: Fluchhand auf Entfernung, ruft Tote, ab halben TP Phase 2 mit Fluchwelle; schont Paktierer, bis er gebunden ist */
+  function bossZug(st, g) {
+    const d = GEGNER[g.art];
+    if (g.z.betaeubt) { delete g.z.betaeubt; st.log.push({ t: `${g.name} ringt um seinen Namen und handelt nicht.`, art: "gut" }); weiter(st); return; }
+    if (!g.phase2 && g.tp <= g.tpMax / 2) { g.phase2 = true; g.atemBereit = true; st.log.push({ t: "Das Siegel bricht! Risse laufen durch den Boden, Flammen schlagen heraus. Valdric wird körperlich.", art: "schlecht" }); }
+    if (!g.gebunden && st.runde % 2 === 0 && g.letzterRuf !== st.runde) { g.letzterRuf = st.runde; rufe(st, g, "knochenwaechter"); }
+    let ziele = zieleFuerGegner(st, g);
+    const pakt = (st.boss && st.boss.pakt) || [];
+    if (!g.gebunden) { const ohne = ziele.filter((f) => !pakt.includes(f.fid)); if (ohne.length) ziele = ohne; }
+    else { const verraeter = ziele.filter((f) => pakt.includes(f.fid)); if (verraeter.length) ziele = verraeter; }
+    if (!ziele.length) { weiter(st); return; }
+    const reich = d.angriff.reichweite || 1;
+    const nah = () => ziele.slice().sort((a, b) => abstand(g, a) - abstand(g, b) || a.tp - b.tp)[0];
+    let ziel = ziele.filter((f) => abstand(g, f) <= reich && sicht(st, g, f)).sort((a, b) => a.tp - b.tp)[0];
+    if (g.phase2 && g.atemBereit && (ziel || nah())) {
+      const z = ziel || nah(), betroffen = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && abstand(f, z) <= 1 && !(pakt.includes(f.fid) && !g.gebunden)), teile = [];
+      for (const f of betroffen) { const rw = rettung(st, f, "WEI", d.atem.sg); let s = roll(st.r, d.atem.schaden).total; if (rw.erfolg) s = Math.floor(s / 2); teile.push(`${f.name} ${s}`); schaden(st, f, s); }
+      g.atemBereit = false; g.atemRunde = st.runde;
+      st.log.push({ t: `${g.name}: Fluchwelle – ${teile.join(", ") || "niemand"}.`, art: "gegner" });
+      if (!st.ende) weiter(st); return;
+    }
+    if (!ziel && st.zug.bewegung > 0) {
+      const m = erreichbar(st, g, st.zug.bewegung); let best = null;
+      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number), p = { x, y }; const ok = ziele.some((f) => abstand(p, f) <= reich && sicht(st, p, f)); const dd = Math.min(...ziele.map((f) => abstand(p, f))); const w = (ok ? 0 : 50) + dd + c * 0.1; if (!best || w < best.w) best = { x, y, w }; }
+      if (best) { g.x = best.x; g.y = best.y; }
+      ziel = ziele.filter((f) => abstand(g, f) <= reich && sicht(st, g, f)).sort((a, b) => a.tp - b.tp)[0];
+    }
+    if (ziel) { gegnerAngriff(st, g, ziel); if (g.phase2 && lebt(ziel) && !st.ende) gegnerAngriff(st, g, ziel); }
+    if (!st.ende) weiter(st);
+  }
+  /** Ein Gegner wird herbeigerufen und handelt noch in dieser Runde */
+  function rufe(st, g, art) {
+    const d = GEGNER[art]; let feld = null;
+    for (let r2 = 1; r2 <= 3 && !feld; r2++) for (let dx = -r2; dx <= r2 && !feld; dx++) for (let dy = -r2; dy <= r2 && !feld; dy++) { const x = g.x + dx, y = g.y + dy; if (!blockiert(st, x, y) && !belegt(st, x, y)) feld = { x, y }; }
+    if (!feld) return;
+    st.gerufen = (st.gerufen || 0) + 1;
+    const n = { id: "r" + st.gerufen, seite: "gegner", art, name: d.name + " (gerufen)", x: feld.x, y: feld.y, tp: d.tp, tpMax: d.tp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, ini: 0 };
+    st.figuren.push(n); st.reihe.splice(st.am + 1, 0, n.id);
+    st.log.push({ t: `${g.name} reißt die Hand hoch. Aus dem Boden steigt ein Knochenwächter.`, art: "schlecht" });
+  }
   /** Fangschuss: bewegt sich das markierte Ziel des Kopfgeldjägers, schießt er einmal */
   function fangschuss(st, g, sx, sy) {
     if (g.x === sx && g.y === sy) return;
@@ -1019,6 +1099,9 @@
       case "bewahren": return spielerFiguren(st).some((o) => o.tp < o.tpMax * 0.5) ? 5 * f.stufe * 0.8 - begrenzt : -1;
       case "bannkreis": return gegnerFiguren(st).filter((o) => lebt(o) && abstand(o, z) <= 2).length * 3 - slot;
       case "rauch": return -1;
+      case "siegel": return 9;
+      case "name": return 12;
+      case "silber": return gegnerFiguren(st).filter((g) => lebt(g) && g.art === "knochenwaechter" && abstand(g, f) <= 6).length * 4;
       default: return -1;
     }
   }
@@ -1047,6 +1130,16 @@
     const zielWahl = () => gegner().sort((a, b) => (a.tp / a.tpMax + abstand(f, a) * 0.08) - (b.tp / b.tpMax + abstand(f, b) * 0.08))[0];
     let ziel = zielWahl(); if (!ziel) return zugEnde(st);
     if (kann("raserei") && gegner().some((g) => abstand(g, f) <= 8)) handeln(st, "raserei", f.id);
+    // Endkampf: freie Siegelsteine berühren, wenn erreichbar
+    if (st.siegel && st.siegel.some((z) => !z.beruehrt) && bossVon(st) && !imPakt(st, f) && st.zug.aktion) {
+      if (kann("siegelstein")) { handeln(st, "siegelstein", f.id); }
+      else if (!gegner().some((g) => abstand(g, f) <= 1)) {
+        let best = null;
+        for (const [k, c] of bewegungsfelder(st, f)) { const [x, y] = k.split(",").map(Number); if (st.siegel.some((z) => !z.beruehrt && abstand(z, { x, y }) <= 1) && (!best || (c === "schritt" ? 0 : c) < best.c)) best = { x, y, c: c === "schritt" ? 0 : c }; }
+        if (best) { bewegen(st, best.x, best.y); if (lebt(f) && kann("siegelstein")) handeln(st, "siegelstein", f.id); }
+      }
+      if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
+    }
     // 2. Bewegen
     const nah = Boolean(nahAngriff) && (!fernAngriff || ["krieger"].includes(f.klasse) || ["inquisitor", "assassine", "schattenlaeufer", "tiergefaehrte"].includes(f.fid));
     const m = bewegungsfelder(st, f);

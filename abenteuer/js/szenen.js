@@ -189,17 +189,22 @@
   }
 
   /* ---------- Geheime Entscheidungen ---------- */
+  /** Frage und Antworten für eine Figur (Szenen können je Figur verschieden fragen) */
+  function geheimFuer(A, fid) {
+    const s = szene(A);
+    return { frage: typeof s.frage === "function" ? s.frage(A, hilfen, fid) : s.frage, antworten: typeof s.antworten === "function" ? s.antworten(A, hilfen, fid) : s.antworten };
+  }
   function geheim(A, fid, antwort) {
     const s = szene(A); if (s.art !== "geheim") return { fehler: "Gerade gibt es nichts zu entscheiden." };
     if (!hat(A, fid)) return { fehler: "Diese Figur ist nicht dabei." };
-    if (!s.antworten.some((x) => x.id === antwort)) return { fehler: "Unbekannte Antwort." };
+    if (!geheimFuer(A, fid).antworten.some((x) => x.id === antwort)) return { fehler: "Unbekannte Antwort." };
     A.geheim[fid] = antwort; return { ok: true };
   }
   const alleGeheim = (A) => lebende(A).every((f) => A.geheim[f]);
   function geheimAuswerten(A) {
     const s = szene(A);
-    for (const [fid, ant] of Object.entries(A.geheim)) { const a = s.antworten.find((x) => x.id === ant); if (a.setzt) wirke(A, { setzt: a.setzt(fid) }); }
-    notiz(A, s.abschluss || "Jede Person hat für sich entschieden.");
+    for (const [fid, ant] of Object.entries(A.geheim)) { const a = geheimFuer(A, fid).antworten.find((x) => x.id === ant); if (a && a.setzt) wirke(A, { setzt: a.setzt(fid) }); }
+    notiz(A, (typeof s.abschluss === "function" ? s.abschluss(A, hilfen) : s.abschluss) || "Jede Person hat für sich entschieden.");
     ziel(A, s);
   }
 
@@ -280,6 +285,14 @@
       wirke(A, k.sieg); ziel(A, k.sieg || {});
       return { ok: true, ergebnis: "sieg" };
     }
+    if (k.verloren && st.ende !== "sieg") {
+      const nz = R.nachKampf(st);
+      for (const fid of A.gruppe) if (nz[fid]) { A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); if (!A.zust[fid].tot && A.zust[fid].tp < 1) A.zust[fid].tp = 1; }
+      for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
+      R.neuerKampf(A.zust);
+      wirke(A, k.verloren); ziel(A, k.verloren);
+      return { ok: true, ergebnis: "verloren" };
+    }
     if (st.ende === "rueckzug") {
       notiz(A, "Rückzug zum Lagerfeuer.", "schlecht"); glocke(A, 1);
       A.zust = JSON.parse(JSON.stringify(A.lagerZust || startZustand(A)));
@@ -299,7 +312,8 @@
       glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit,
       optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: o.probe.sg } : null, weiter: Boolean(o.weiter) })),
       stimmen: s.art === "wahl" ? A.stimmen : null,
-      geheimFrage: s.art === "geheim" ? { frage: s.frage, antworten: s.antworten.map((a) => ({ id: a.id, text: a.text })), fertig: Object.keys(A.geheim) } : null,
+      geheimFrage: s.art === "geheim" ? { frage: typeof s.frage === "string" ? s.frage : "Jede Person entscheidet für sich.", antworten: Array.isArray(s.antworten) ? s.antworten.map((a) => ({ id: a.id, text: a.text })) : [],
+        proFigur: Object.fromEntries(lebende(A).map((f) => { const q = geheimFuer(A, f); return [f, { frage: q.frage, antworten: q.antworten.map((a) => ({ id: a.id, text: a.text })) }]; })), fertig: Object.keys(A.geheim) } : null,
       probe: p ? { name: p.name, attr: p.attr, sg: p.sg, wer: pz.wer, wuerfe: pz.wuerfe, gruppe: pz.wer === "gruppe",
         boni: Object.fromEntries(lebende(A).map((f) => [f, bonus(A, f, p).wert])), ergebnis: A.ergebnis } : null,
       raetsel: s.art === "raetsel" ? { glocken: s.glocken, folge: A.raetsel.folge, fehl: A.merker[A.szene + "_fehl"] || 0, laenge: s.loesung.length, hinweise: raetselHinweise(A) } : null,
@@ -310,7 +324,7 @@
   function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
   function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
 
-  const API = { raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

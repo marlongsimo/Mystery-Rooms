@@ -86,7 +86,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
       if (process.env.SHOT_DIR && titel === 'Der Glockenturm' && !gesehen.has('shot2')) { gesehen.add('shot2'); await p.screenshot({ path: process.env.SHOT_DIR + '/szene-wahl.png', fullPage: true }); }
       if (await p.$('#sz-schluss')) break;
       // nach der ersten Kampfszene einmal neu laden und fortsetzen
-      if (kaempfe === 1 && !neuGeladen) { await p.reload(); await p.click('#fortsetzen'); neuGeladen = await p.isVisible('#szene'); check(neuGeladen, 'Neu laden: „Abenteuer fortsetzen“ bringt euch an dieselbe Stelle'); continue; }
+      if (kaempfe === 1 && !neuGeladen) { const vorher = await p.evaluate(() => window.ABT.A().szene); await p.reload(); await p.waitForSelector('#szene:not([hidden])'); neuGeladen = await p.evaluate(() => window.ABT.A().szene) === vorher; check(neuGeladen, 'Neu laden: das Abenteuer geht von selbst an derselben Stelle weiter');
+        await p.click('#sz-pause'); await p.click('#fortsetzen'); check(await p.isVisible('#szene'), 'Pause → Titel → „Abenteuer fortsetzen“'); continue; }
       const klick = async (sel) => { const e = await p.$(sel); if (e && await e.isEnabled()) { await e.click(); return true; } return false; };
       if (await klick('[data-wurf]')) continue;
       if (await klick('[data-wer]')) continue;

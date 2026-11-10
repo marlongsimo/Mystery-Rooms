@@ -165,6 +165,8 @@
 
   /* ---------- Figuren ---------- */
   const fig = (st, id) => st.figuren.find((f) => f.id === id);
+  /** Grundbewegung einer Heldin, eines Helden: je Figur, sonst je Klasse, sonst 6 Felder */
+  const bewegungVon = (f) => (f.fid && FD.FIGUREN[f.fid] && FD.FIGUREN[f.fid].bewegung) || (f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].bewegung) || 6;
   const aktiv = (st) => fig(st, st.reihe[st.am]);
   const istFig = (f, fid) => f && f.fid === fid;
   const wolfVon = (st, f) => st.figuren.find((o) => o.art === "wolf" && o.besitzer === f.id);
@@ -739,7 +741,7 @@
       case "finte": f.z.finte = true; st.log.push({ t: `${f.name} täuscht einen Angriff an.` }); break;
       case "gift": f.z.gift = true; st.log.push({ t: `${f.name} bestreicht die Klinge mit Gift.` }); break;
       case "rueckzug": f.z.rueckzug = true; st.log.push({ t: `${f.name} zieht sich geschickt zurück.` }); break;
-      case "spurt": st.zug.bewegung += 6; st.log.push({ t: `${f.name} spurtet.` }); break;
+      case "spurt": st.zug.bewegung += st.zug.basis || 6; st.log.push({ t: `${f.name} spurtet.` }); break;
       case "schattenschritt": st.zug.schritt = 6; st.log.push({ t: `${f.name} tritt in die Schatten.` }); break;
       case "spiegelbilder": f.z.spiegel = 3; st.log.push({ t: `${f.name} teilt sich in drei Spiegelbilder.`, art: "gut" }); break;
       case "segen": {
@@ -868,9 +870,10 @@
     f.gehandelt = true;
     f.reaktion = istFig(f, "schildwaechter") && f.stufe >= 3 ? 2 : 1;
     delete f.z.ruecksichtslos;
-    let bew = f.seite === "gegner" ? (GEGNER[f.art].bewegung != null ? GEGNER[f.art].bewegung : 6) : 6;
+    let bew = f.seite === "gegner" ? Math.round((GEGNER[f.art].bewegung != null ? GEGNER[f.art].bewegung : 6) * (st.gegnerTempo || 1)) : bewegungVon(f);
+    const basis = bew;
     if (f.z.verlangsamt || f.z.zeitriss) bew = Math.floor(bew / 2);
-    st.zug = { figur: f.id, bewegung: bew, aktion: true, bonus: !f.z.zeitriss, hinterhalt: false, tatendrang: false, leicht: 0, schritt: 0, dolch: false, getroffen: [], wolfBiss: false };
+    st.zug = { figur: f.id, bewegung: bew, basis, aktion: true, bonus: !f.z.zeitriss, hinterhalt: false, tatendrang: false, leicht: 0, schritt: 0, dolch: false, getroffen: [], wolfBiss: false };
     if (f.z.festgehalten) {
       const fg = f.z.festgehalten;
       if (fg.flucht && !fg.netz) { const rw = rettung(st, f, "STR", fg.flucht); if (rw.erfolg) { delete f.z.festgehalten; st.log.push({ t: `${f.name} reißt sich los.` }); } }

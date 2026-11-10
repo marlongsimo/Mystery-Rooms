@@ -118,6 +118,7 @@ ${seoHead({ title, desc, url, image, type: "article", jsonld })}
       <div class="game-art">${artHtml(g, "../")}</div>
       <div>
         <p class="card-cat">${esc(g.categoryLabel)}</p>
+        ${g.banner ? `<p class="game-banner">${esc(g.banner)}</p>` : ""}
         <h1>${esc(g.title)}</h1>
         <p class="card-sub">${esc(g.subtitle)}</p>
         <p class="game-teaser">${esc(g.teaser)}</p>
@@ -166,7 +167,7 @@ const together = (g) => /–[2-9]/.test(g.players);
 const cardArt = (g) => (g.poster ? `<img src="${esc(g.poster)}" alt="${esc(g.title)} – ${esc(g.subtitle)}" loading="lazy">` : `<svg viewBox="0 0 400 240" aria-hidden="true" preserveAspectRatio="xMidYMid slice">${ART[g.art] || ""}</svg>`);
 function staticCards() {
   return GAMES.filter((g) => !isTable(g)).sort((a, b) => CAT_ORDER.indexOf(a.category) - CAT_ORDER.indexOf(b.category)).map((g) => `      <article class="card" id="spiel-${esc(g.id)}">
-        <a class="card-art" href="spiele/${g.id}.html" tabindex="-1" aria-hidden="true">${cardArt(g)}<span class="card-badges">${g.isNew ? `<span class="badge new">Neu</span>` : ""}${together(g) ? `<span class="badge team">Gemeinsam</span>` : `<span class="badge solo">Allein</span>`}</span></a>
+        <a class="card-art" href="spiele/${g.id}.html" tabindex="-1" aria-hidden="true">${cardArt(g)}${g.banner ? `<span class="card-banner">${esc(g.banner)}</span>` : ""}<span class="card-badges">${g.isNew ? `<span class="badge new">Neu</span>` : ""}${together(g) ? `<span class="badge team">Gemeinsam</span>` : `<span class="badge solo">Allein</span>`}</span></a>
         <div class="card-body">
           <p class="card-cat">${esc(g.categoryLabel)}</p>
           <h3><a href="spiele/${g.id}.html">${esc(g.title)}</a></h3>

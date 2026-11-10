@@ -10,6 +10,7 @@
  * Nach jeder Änderung: node tools/build-site.js (Spielseiten, Vorschaubilder, sitemap.xml)
  * saveKey:    localStorage-Schlüssel des Spiels, um „Weiterspielen“ anzuzeigen
  * featured:   true = großes Hauptabenteuer auf der Startseite (genau eines)
+ * banner:     roter Hinweis quer über der Kachel und auf der Detailseite, z. B. "Aktuell noch in Vorbereitung"
  * tagline, puzzles, minutes, shots, poster: zusätzliche Angaben für das Hauptabenteuer
  */
 window.MR_GAMES = [
@@ -58,6 +59,7 @@ window.MR_GAMES = [
     status: "vorschau",
     isNew: true,
     statusNote: "Alle fünf Bereiche spielbar · Hagedorns Wand als Pinnwand auf dem Tablet",
+    banner: "Aktuell noch in Vorbereitung",
     url: "der-letzte-fall/index.html",
     art: "krimi",
   },

@@ -447,3 +447,8 @@ dialog[open] { animation: rise .25s ease-out; }
 .topic-cross a { color: var(--gold-2); }
 @media (max-width: 760px) { .quick-grid, .topic-steps { grid-template-columns: 1fr; } }
 .nav .beta { font-size: .78em; color: var(--gold-2); letter-spacing: .04em; }
+
+/* Roter Hinweis quer über der Kachel, z. B. „Aktuell noch in Vorbereitung“ */
+.card-banner { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 2; padding: 7px 12px; text-align: center; font: 700 12px/1.2 var(--font-body, Inter, sans-serif); letter-spacing: .14em; text-transform: uppercase; color: #fff;
+  background: linear-gradient(90deg, rgba(150, 24, 32, .92), #c0262f 50%, rgba(150, 24, 32, .92)); border-top: 1px solid rgba(255,255,255,.25); border-bottom: 1px solid rgba(0,0,0,.4); box-shadow: 0 4px 14px rgba(0,0,0,.45); }
+.game-banner { display: inline-block; margin: 0 0 12px; padding: 7px 14px; border-radius: 3px; font: 700 13px/1.2 var(--font-body, Inter, sans-serif); letter-spacing: .12em; text-transform: uppercase; color: #fff; background: #c0262f; box-shadow: 0 4px 14px rgba(0,0,0,.35); }

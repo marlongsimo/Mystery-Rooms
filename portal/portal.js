@@ -66,7 +66,7 @@
   function card(g) {
     const p = progress(g);
     return `<article class="card reveal" id="spiel-${esc(g.id)}">
-      <a class="card-art" href="${page(g)}" tabindex="-1" aria-hidden="true">${art(g)}<span class="card-badges">${g.isNew ? `<span class="badge new">Neu</span>` : ""}${together(g) ? `<span class="badge team">Gemeinsam</span>` : `<span class="badge solo">Allein</span>`}</span></a>
+      <a class="card-art" href="${page(g)}" tabindex="-1" aria-hidden="true">${art(g)}${g.banner ? `<span class="card-banner">${esc(g.banner)}</span>` : ""}<span class="card-badges">${g.isNew ? `<span class="badge new">Neu</span>` : ""}${together(g) ? `<span class="badge team">Gemeinsam</span>` : `<span class="badge solo">Allein</span>`}</span></a>
       <div class="card-body">
         <p class="card-cat">${esc(g.categoryLabel)}</p>
         <h3><a href="${page(g)}">${esc(g.title)}</a></h3>${stars(g)}

@@ -533,3 +533,70 @@ body.ruhig .titel-hg img { animation: none; }
   .titel-menue { max-width: none; }
 }
 @media (max-width: 480px) { .titel-leiste { display: none; } .titel-inhalt { padding-bottom: 28px; } }
+
+/* ================= 03 · Charakterauswahl: Klassen, dann Helden ================= */
+.wahl-schritt { color: var(--muted); margin: 0 0 12px; }
+.klassen-banner { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.banner { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 0 12px 16px; min-height: 440px; overflow: hidden; cursor: pointer; color: var(--text);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--k) 38%, #0d141e) 0%, color-mix(in srgb, var(--k) 14%, #0d141e) 55%, #0d141e 100%);
+  border: 1px solid color-mix(in srgb, var(--k) 55%, var(--line)); border-radius: 3px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 50% 100%, 0 calc(100% - 22px)); transition: transform .15s, box-shadow .2s, border-color .15s; font: inherit; }
+.banner::before { content: ""; position: absolute; inset: 6px; border: 1px solid rgba(197,162,103,.28); clip-path: inherit; pointer-events: none; }
+.banner:hover, .banner:focus-visible { transform: translateY(-3px); border-color: var(--altgold); box-shadow: 0 0 22px color-mix(in srgb, var(--k) 45%, transparent); }
+.banner-bild { position: relative; display: flex; width: calc(100% + 24px); height: 150px; margin: 0 -12px 4px; }
+.banner-bild img { flex: 1; min-width: 0; object-fit: cover; object-position: 50% 20%; filter: saturate(.85) brightness(.85); }
+.banner-bild::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, color-mix(in srgb, var(--k) 30%, #0d141e) 0%, transparent 60%); }
+.banner-zeichen { display: grid; place-items: center; width: 46px; height: 46px; margin-top: -30px; z-index: 1; border-radius: 50%; font-size: 22px; color: var(--pergament);
+  background: radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--k) 80%, #fff 10%), var(--k)); border: 2px solid var(--altgold); box-shadow: 0 4px 12px rgba(0,0,0,.5); }
+.banner-name { font: 600 21px var(--schrift-titel); color: var(--pergament); letter-spacing: .04em; }
+.banner-kurz { font: italic 400 17px/1.3 var(--schrift-text); color: #e3dccd; min-height: 3.9em; }
+.banner-spec { display: grid; gap: 5px; width: 100%; margin-top: 4px; text-align: left; font-size: 12px; line-height: 1.35; color: #cfd5dc; }
+.banner-spec > span { padding-top: 5px; border-top: 1px solid rgba(197,162,103,.18); }
+.banner-spec i { display: block; font-style: normal; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--altgold); }
+.banner-fuss { margin-top: auto; padding-top: 10px; display: flex; gap: 8px; align-items: center; font: 600 12px var(--schrift-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--altgold); }
+.banner-fuss em { font-style: normal; color: var(--green); }
+@media (max-width: 1100px) { .klassen-banner { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .klassen-banner { grid-template-columns: 1fr; gap: 10px; }
+  .banner { min-height: 0; display: grid; grid-template-columns: 92px 1fr; grid-template-areas: "bild name" "bild kurz" "spec spec" "fuss fuss"; text-align: left; gap: 2px 12px; padding: 12px; clip-path: none; }
+  .banner::before { clip-path: none; }
+  .banner-bild { grid-area: bild; width: 92px; height: 92px; margin: 0; border-radius: 3px; overflow: hidden; }
+  .banner-bild img:not(:first-child) { display: none; }
+  .banner-zeichen { display: none; }
+  .banner-name { grid-area: name; align-self: end; } .banner-kurz { grid-area: kurz; min-height: 0; font-size: 16px; }
+  .banner-spec { grid-area: spec; grid-template-columns: 1fr 1fr; } .banner-spec > span:last-child { grid-column: 1 / -1; }
+  .banner-fuss { grid-area: fuss; }
+}
+.klassen-leiste { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 12px; }
+.klassen-leiste button:not(.link) { background: var(--stein); border: 1px solid var(--line); color: var(--muted); border-radius: 3px; padding: 7px 12px; font: 600 13px var(--schrift-ui); cursor: pointer; }
+.klassen-leiste button.an { color: var(--pergament); border-color: var(--k); background: linear-gradient(180deg, color-mix(in srgb, var(--k) 45%, #1a2533), #1a2533); }
+.klassen-kopf { display: flex; gap: 14px; align-items: center; margin: 0 0 12px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--k) 50%, var(--line)); border-radius: 3px; background: linear-gradient(90deg, color-mix(in srgb, var(--k) 28%, #0d141e), transparent); }
+.klassen-kopf .banner-zeichen { margin: 0; flex: none; }
+.klassen-kopf h2 { font: 600 24px var(--schrift-titel); margin: 0; color: var(--pergament); }
+.klassen-kopf p { margin: 2px 0 0; font: 400 17px/1.35 var(--schrift-text); color: #e3dccd; }
+.fkarten.drei { grid-template-columns: 1fr; }
+.fkarten.drei .fkarte { display: grid; grid-template-columns: 96px 1fr; grid-template-rows: auto auto 1fr; padding: 0; column-gap: 12px; }
+.fkarten.drei .fkarte img { grid-row: span 3; aspect-ratio: 1; height: 100%; }
+.fkarten.drei .fkarte b { padding: 12px 8px 0 0; font-size: 18px; } .fkarten.drei .fkarte small { padding: 0; font-size: 13px; } .fkarten.drei .fkarte em { padding: 4px 0 0; }
+.fkarten.drei .fkarte .klasse { display: none; }
+.fkarte.fokus { border-color: var(--altgold); box-shadow: var(--glut); }
+@media (min-width: 980px) { .wahl-body.stufe2 { grid-template-columns: 300px minmax(0, 1fr); } .wahl-body.stufe2 .wahl-detail { position: static; } }
+/* Vorstellung: größeres Porträt, Reiter */
+.wahl-body.stufe2 .held { grid-template-columns: minmax(200px, 300px) 1fr; }
+.wahl-body.stufe2 .held-bild img { aspect-ratio: 3 / 4; object-position: 50% 20%; }
+@media (max-width: 700px) { .wahl-body.stufe2 .held { grid-template-columns: 1fr; } .wahl-body.stufe2 .held-bild img { aspect-ratio: 4 / 3; } }
+.held h2 { font-family: var(--schrift-titel); }
+.held blockquote { font: italic 400 19px/1.35 var(--schrift-text); }
+.held-spielweise { font: 400 18px/1.4 var(--schrift-text); }
+.held-reiter { display: flex; border-bottom: 1px solid var(--line); margin: 6px 0 10px; }
+.held-reiter button { flex: 1; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 9px 4px; font: 600 13px var(--schrift-ui); letter-spacing: .04em; cursor: pointer; }
+.held-reiter button.an { color: var(--pergament); border-bottom-color: var(--altgold); }
+.held-attr { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+.held-attr li { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(197,162,103,.14); }
+.held-attr li span { flex: 1; color: var(--muted); } .held-attr li b { font-size: 17px; } .held-attr li em { font-style: normal; color: var(--muted); font-size: 12px; width: 2em; text-align: right; }
+.held-attr li.haupt b { color: var(--altgold); }
+.handy .klassen-kopf p { font-size: 15px; }
+.handy .fkarten.handy-karten { margin-bottom: 12px; }
+html { background: var(--nacht-tief); }
+.wahl-body.stufe2 .held-bild { align-self: start; }
+.klassen-kopf { align-items: flex-start; }

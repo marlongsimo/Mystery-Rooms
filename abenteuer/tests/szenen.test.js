@@ -20,7 +20,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
     for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
     await p.click(modus === 'live' ? '#live' : '#start');
   };
-  const nimm = async (p, fid) => { await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
+  const zu = async (p, fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
+  const nimm = async (p, fid) => { await zu(p, fid); await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
 
   // 1. Alle Wege
   const besucht = new Set(), enden = {}; let fehler = 0, haenger = 0, ersaetze = 0;

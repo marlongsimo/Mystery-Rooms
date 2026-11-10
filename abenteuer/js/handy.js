@@ -131,6 +131,28 @@
     const voll = !laeuft && Object.keys(s.besitz || {}).length >= 6;
     const status = (fid) => { const uid = s.besitz && s.besitz[fid]; return H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : laeuft ? "wartet auf jemanden" : voll ? "Gruppe voll" : zuletzt === fid ? "zuletzt gespielt" : ""; };
     const kopf = `<p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p>`;
+    const plaetzeHtml = gruppe.length ? HL.plaetze(gruppe, Object.fromEntries(Object.entries(s.besitz || {}).map(([f, u]) => [f, (s.namen || {})[u] || ""]))) : "";
+    if (!laeuft) {
+      // Schritt 1: Klasse wählen · Schritt 2: die drei Helden der Klasse mit Vorstellung
+      if (!H.klasse) {
+        app.innerHTML = `<section class="karte-h">${kopf}<h1>Wähle deine Klasse</h1><p class="note">Schritt 1 von 2. In jeder Klasse stellen sich dir drei Helden vor. Jede Person spielt eine Figur, mindestens 3.</p>
+          ${plaetzeHtml}${HL.klassenWahl({ gruppe })}<p class="fb">${esc(H.fehler)}</p></section>`;
+        app.querySelectorAll("[data-klasse]").forEach((b) => { b.onclick = () => { H.klasse = b.dataset.klasse; H.fokus = null; render(); window.scrollTo(0, 0); }; });
+        return;
+      }
+      const helden = HL.vonKlasse(H.klasse);
+      if (!H.fokus || !helden.includes(H.fokus)) H.fokus = helden.find((f) => zuletzt === f) || helden[0];
+      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !voll && !H.wahlOffen;
+      const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : voll ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
+      app.innerHTML = `<section class="karte-h">${kopf}${HL.klassenLeiste(H.klasse)}${HL.klassenKopf(H.klasse)}
+        <div class="fkarten handy-karten">${helden.map((f) => HL.kachel(f, { an: gruppe.includes(f), fokus: f === fid, status: status(f), statusArt: s.besitz && s.besitz[f] ? "" : "tisch" })).join("")}</div>
+        ${HL.detail(fid, s.stufe || 1, knopf)}<p class="fb">${esc(H.fehler)}</p></section>`;
+      app.querySelectorAll("[data-klasse]").forEach((b) => { b.onclick = () => { H.klasse = b.dataset.klasse; H.fokus = null; render(); }; });
+      $("#klassen-zurueck").onclick = () => { H.klasse = null; H.fokus = null; render(); window.scrollTo(0, 0); };
+      app.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => { H.fokus = b.dataset.fid; render(); }; });
+      $("#f-spielen").onclick = () => waehle(fid);
+      return;
+    }
     if (H.fokus && liste.includes(H.fokus)) {
       const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !voll && !H.wahlOffen;
       const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : voll ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;

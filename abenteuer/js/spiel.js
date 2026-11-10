@@ -158,14 +158,15 @@
     if (liveAn()) LIVE.phase = "lobby";
     zeichneSetup(); veroeffentlichen();
   }
-  let fokus = null, filter = "alle";
+  let fokus = null, klasseSicht = null; // Heldenwahl: null = Schritt 1 (Klassen), sonst Schritt 2 (Helden dieser Klasse)
   /** Heldenwahl wie in einem Spiel: Gruppenplätze, Galerie mit Klassenfilter, große Vorstellung */
   function zeichneSetup() {
     const el = $("#lobby"); if (el.hidden) return;
     const HL = window.ABH_HELDEN, n = SETUP.gruppe.length, live = liveAn();
+    if (klasseSicht && (!fokus || !F.FIGUREN[fokus] || F.FIGUREN[fokus].klasse !== klasseSicht)) fokus = HL.vonKlasse(klasseSicht).find((f) => SETUP.gruppe.includes(f)) || HL.vonKlasse(klasseSicht)[0];
     if (!fokus || !F.FIGUREN[fokus]) fokus = SETUP.gruppe[n - 1] || F.REIHE[0];
     const namen = {}; if (live) for (const [fid, uid] of Object.entries(LIVE.besitz)) namen[fid] = spielerName(uid);
-    const sicht = F.REIHE.filter((fid) => filter === "alle" || F.FIGUREN[fid].klasse === filter);
+    const sicht = klasseSicht ? HL.vonKlasse(klasseSicht) : [];
     const kacheln = sicht.map((fid) => {
       const uid = live ? LIVE.besitz[fid] : null, an = SETUP.gruppe.includes(fid);
       return HL.kachel(fid, { an, fokus: fid === fokus, status: uid ? "📱 " + spielerName(uid) : an ? "in der Gruppe" : "", statusArt: uid ? "" : "tisch" });
@@ -182,13 +183,11 @@
     el.innerHTML = `
       <div class="wahl-kopf"><div><p class="eyebrow">Die Gemeinschaft von Grauwacht</p><h1>Wählt eure Helden</h1></div>${HL.plaetze(SETUP.gruppe, namen)}</div>
       ${live ? beitrittBox() : ""}
-      <div class="wahl-body">
-        <div class="wahl-galerie">
-          <div class="klassen-filter">${[["alle", "Alle"]].concat(Object.entries(F.KLASSEN).map(([k, v]) => [k, HL.KLASSE_ZEICHEN[k] + " " + v.name])).map(([k, t]) => `<button data-filter="${k}" class="${filter === k ? "an" : ""}">${esc(t)}</button>`).join("")}</div>
-          <div class="fkarten">${kacheln}</div>
-        </div>
+      ${klasseSicht ? `${HL.klassenLeiste(klasseSicht)}
+      <div class="wahl-body stufe2">
+        <div class="wahl-galerie">${HL.klassenKopf(klasseSicht)}<div class="fkarten drei">${kacheln}</div></div>
         <div class="wahl-detail">${HL.detail(fokus, 1, knopf)}</div>
-      </div>
+      </div>` : `<p class="wahl-schritt"><b>Schritt 1 von 2:</b> Wählt eine Klasse. Darin stellen sich euch je drei Helden vor.</p>${HL.klassenWahl({ gruppe: SETUP.gruppe })}`}
       <div class="wahl-fuss">
         <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (3–6)` : `Gruppe · ${n} von 3–6 Figuren`}</h2>
         <p class="note">${status}</p>
@@ -207,8 +206,9 @@
     const uebung = el.querySelector(".uebung"); if (uebung && zeichneSetup.uebungOffen) uebung.open = true;
     if (uebung) uebung.ontoggle = () => { zeichneSetup.uebungOffen = uebung.open; };
     el.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => { fokus = b.dataset.fid; zeichneSetup(); if (window.innerWidth < 980) { const d = $(".wahl-detail"); if (d) d.scrollIntoView({ behavior: "smooth", block: "start" }); } }; });
-    el.querySelectorAll("[data-platz]").forEach((b) => { b.onclick = () => { fokus = b.dataset.platz; zeichneSetup(); }; });
-    el.querySelectorAll("[data-filter]").forEach((b) => { b.onclick = () => { filter = b.dataset.filter; zeichneSetup(); }; });
+    el.querySelectorAll("[data-platz]").forEach((b) => { b.onclick = () => { fokus = b.dataset.platz; klasseSicht = F.FIGUREN[fokus].klasse; zeichneSetup(); }; });
+    el.querySelectorAll("[data-klasse]").forEach((b) => { b.onclick = () => { klasseSicht = b.dataset.klasse; fokus = null; zeichneSetup(); const k = $(".klassen-leiste"); if (k) k.scrollIntoView({ block: "nearest" }); }; });
+    const kz = $("#klassen-zurueck"); if (kz) kz.onclick = () => { klasseSicht = null; zeichneSetup(); };
     const w = $("#f-waehlen"); if (w) w.onclick = () => {
       const i = SETUP.gruppe.indexOf(fokus);
       if (i >= 0) SETUP.gruppe.splice(i, 1); else if (SETUP.gruppe.length < 6) { SETUP.gruppe.push(fokus); if (window.ABE) window.ABE.glocke(0.25); }

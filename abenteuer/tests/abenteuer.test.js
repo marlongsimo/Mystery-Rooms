@@ -13,7 +13,8 @@ const R = require('../js/regeln.js'), F = R.FD;
 (async () => {
   let ok = true; const errs = [];
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
-  const nimm = async (p, fid) => { await p.click('[data-fid="' + fid + '"]'); await p.click('#f-waehlen'); };
+  const zu = async (p, fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
+  const nimm = async (p, fid) => { await zu(p, fid); await p.click('[data-fid="' + fid + '"]'); await p.click('#f-waehlen'); };
 
   // 1. Regeln ohne Browser: jede Figur auf jeder Stufe, beide Schwierigkeiten
   check(F.REIHE.length === 15 && F.REIHE.every((fid) => F.FIGUREN[fid].name && F.FIGUREN[fid].titel), '15 Figuren mit Namen und Titel');
@@ -58,18 +59,21 @@ const R = require('../js/regeln.js'), F = R.FD;
     await p.click('[data-schwer-wahl="hardcore"]'); await p.click('[data-schwer-wahl="normal"]');
     if (process.env.SHOT_DIR && vp.width === 1280) await p.screenshot({ path: process.env.SHOT_DIR + '/kodex-ende.png' });
     await p.click('#start');
-    check((await p.$$('.fkarte')).length === 15, `${vp.width}px: Gruppenwahl mit 15 Karten`);
-    const bilder = await p.$$eval('.fkarte img', (xs) => Promise.all(xs.map((x) => x.complete ? x.naturalWidth : new Promise((r) => { x.onload = () => r(x.naturalWidth); x.onerror = () => r(0); }))));
+    check((await p.$$('.banner[data-klasse]')).length === 5 && (await p.$$('.banner img')).length === 15, `${vp.width}px: Schritt 1: fünf Klassenbanner mit den 15 Helden`);
+    const bilder = await p.$$eval('.banner img', (xs) => Promise.all(xs.map((x) => x.complete ? x.naturalWidth : new Promise((r) => { x.onload = () => r(x.naturalWidth); x.onerror = () => r(0); }))));
     check(bilder.every((w) => w > 100), `${vp.width}px: alle 15 Porträts geladen`);
     // Gruppe: Standard 3, dazu Faye (Wolf) und Silra; Torvald raus und wieder rein
-    check(await p.isVisible('.held h2') && (await p.$$('.platz.leer')).length === 6, `${vp.width}px: Vorstellung eines Helden, 6 leere Plätze`);
+    check((await p.$$('.platz.leer')).length === 6, `${vp.width}px: 6 leere Plätze`);
+    await p.click('[data-klasse="krieger"]');
+    check(await p.isVisible('.held h2') && (await p.$$('.fkarte')).length === 3 && /Krieger/.test(await p.textContent('.klassen-kopf')), `${vp.width}px: Schritt 2: drei Krieger, Vorstellung des ersten`);
+    await p.click('[data-reiter="werte"]'); check(await p.isVisible('.held-attr') && !(await p.isVisible('.held-faehig')), `${vp.width}px: Reiter Attribute in der Vorstellung`);
     for (const f of ['schildwaechter', 'elementarist', 'lichtbringer', 'tiergefaehrte', 'trickser']) await nimm(p, f);
-    await p.click('[data-fid="schildwaechter"]'); await p.click('#f-waehlen');
+    await zu(p, 'schildwaechter'); await p.click('[data-fid="schildwaechter"]'); await p.click('#f-waehlen');
     check(!(await p.$eval('[data-fid="schildwaechter"]', (x) => x.classList.contains('an'))), `${vp.width}px: Figur abwählen`);
     await p.click('#f-waehlen');
-    await p.click('[data-filter="zauberer"]');
-    check((await p.$$('.fkarte')).length === 3, `${vp.width}px: Filter Zauberer zeigt 3 Helden`);
-    await p.click('[data-filter="alle"]');
+    await p.click('[data-klasse="zauberer"]');
+    check((await p.$$('.fkarte')).length === 3 && /Lyra/.test(await p.textContent('.fkarten')), `${vp.width}px: Klasse wechseln: Zauberer zeigt 3 Helden`);
+    await p.click('#klassen-zurueck'); check((await p.$$('.banner')).length === 5, `${vp.width}px: Zurück zu den Klassen`);
     check(/5 von 3–6/.test(await p.textContent('.wahl-fuss h2')), `${vp.width}px: 5 Figuren in der Gruppe`);
     await p.click('.uebung summary');
     await p.click('[data-stufe="2"]'); await p.click('[data-schwer="hardcore"]'); await p.selectOption('#begegnung', 'gruft');
@@ -123,7 +127,7 @@ const R = require('../js/regeln.js'), F = R.FD;
     // bis zum Ende und dann Gruppe ändern
     for (let i = 0; i < 400; i++) { const s = await p.evaluate(() => window.AB.st.ende ? 'ende' : window.AB.R.aktiv(window.AB.st).seite); if (s === 'ende') break; if (s === 'spieler') await p.evaluate(() => window.AB.auto()); else await p.waitForTimeout(20); }
     await p.click('#gruppe');
-    check(await p.isVisible('#lobby') && (await p.$$('.fkarte.an')).length === 5, `${vp.width}px: Gruppe ändern behält die Auswahl`);
+    check(await p.isVisible('#lobby') && (await p.$$('.platz:not(.leer)')).length === 5, `${vp.width}px: Gruppe ändern behält die Auswahl`);
     check(await p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${vp.width}px: kein seitliches Scrollen`);
     check(kaputt.length === 0, `${vp.width}px: alle Dateien geladen` + (kaputt.length ? ': ' + kaputt.join(', ') : ''));
   }

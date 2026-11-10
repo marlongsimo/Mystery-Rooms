@@ -128,8 +128,9 @@
     }
     if (s.art === "geheim") {
       const q = v.geheimFrage;
-      if (!live()) return `<p><b>${esc(q.frage)}</b></p>${S.lebende(A).map((fid) => `<div class="opt-zeile">${B.marke(fid, 28)} <span>${esc(F.FIGUREN[fid].name)}</span>${q.antworten.map((a) => `<button class="btn ${A.geheim[fid] === a.id ? "" : "ghost"} klein" data-geheim="${fid}:${a.id}">${esc(a.text)}</button>`).join("")}</div>`).join("")}<div class="knoepfe"><button class="btn" id="sz-weiter" ${S.alleGeheim(A) ? "" : "disabled"}>Weiter</button></div>`;
-      return `<p><b>${esc(q.frage)}</b></p><p class="note">Jede Person entscheidet auf ihrem Handy: <b>${q.fertig.length} von ${S.lebende(A).length}</b>. Niemand sieht, wie die anderen entschieden haben.</p>`;
+      const pf = (fid) => (q.proFigur && q.proFigur[fid]) || q, gleich = S.lebende(A).every((fid) => pf(fid).frage === q.frage);
+      if (!live()) return `${gleich ? `<p><b>${esc(q.frage)}</b></p>` : ""}${S.lebende(A).map((fid) => `${gleich ? "" : `<p class="geheim-frage"><b>${esc(F.FIGUREN[fid].name)}:</b> ${esc(pf(fid).frage)}</p>`}<div class="opt-zeile">${B.marke(fid, 28)} <span>${esc(F.FIGUREN[fid].name)}</span>${pf(fid).antworten.map((a) => `<button class="btn ${A.geheim[fid] === a.id ? "" : "ghost"} klein" data-geheim="${fid}:${a.id}">${esc(a.text)}</button>`).join("")}</div>`).join("")}<div class="knoepfe"><button class="btn" id="sz-weiter" ${S.alleGeheim(A) ? "" : "disabled"}>Weiter</button></div>`;
+      return `<p><b>${esc(gleich ? q.frage : "Jede Person hört etwas anderes.")}</b></p><p class="note">Jede Person entscheidet auf ihrem Handy: <b>${q.fertig.length} von ${S.lebende(A).length}</b>. Niemand sieht, wie die anderen entschieden haben.</p>`;
     }
     if (s.art === "kampf") return `<div class="knoepfe"><button class="btn" id="sz-kampf">Zum Kampf</button></div>`;
     if (s.art === "ende") return `<div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;

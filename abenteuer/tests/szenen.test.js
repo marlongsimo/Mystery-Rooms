@@ -25,7 +25,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   // 1. Alle Wege
   const besucht = new Set(), enden = {}; let fehler = 0, haenger = 0, ersaetze = 0;
   function spiele(A, r) {
-    for (let n = 0; n < 300; n++) {
+    for (let n = 0; n < 500; n++) {
       const s = S.szene(A); besucht.add(A.szene);
       if (s.art === 'ende') { enden[A.szene] = (enden[A.szene] || 0) + 1; return true; }
       if (s.art === 'lager' && A.ersatzOffen && A.ersatzOffen.length) { for (const alt of A.ersatzOffen.slice()) { const frei = S.freieFiguren(A); if (frei.length) S.ersatz(A, alt, frei[0]); } ersaetze++; }
@@ -35,10 +35,10 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
         if (A.zwischenprobe) { const pz = S.probeZustand(A); if (!pz.wer) S.probeWer(A, S.lebende(A)[Math.floor(r() * S.lebende(A).length)]); S.probeWurf(A, pz.wer); continue; }
         const o = S.optionen(A); S.waehle(A, o[Math.floor(r() * o.length)].id); continue;
       }
-      if (s.art === 'geheim') { for (const f of S.lebende(A)) S.geheim(A, f, r() < 0.5 ? 'trinken' : 'nicht'); S.weiter(A); continue; }
+      if (s.art === 'geheim') { for (const f of S.lebende(A)) { const q = S.geheimFuer(A, f).antworten; S.geheim(A, f, q[Math.floor(r() * q.length)].id); } S.weiter(A); continue; }
       if (s.art === 'wahl') { const o = S.optionen(A); for (const f of S.lebende(A)) S.stimme(A, f, o[Math.floor(r() * o.length)].id); S.auswerten(A); continue; }
       if (s.art === 'probe') { if (A.ergebnis) { S.weiter(A); continue; } const pz = S.probeZustand(A); if (pz.wer === 'gruppe') for (const f of S.lebende(A)) S.probeWurf(A, f); else { S.probeWer(A, S.lebende(A)[Math.floor(r() * S.lebende(A).length)]); S.probeWurf(A, pz.wer); } continue; }
-      if (s.art === 'kampf') { const st = R.neuesSpiel(Math.floor(r() * 1e9), S.kampfOptionen(A)); let z = 0; while (!st.ende && z++ < 900) R.aktiv(st).seite === 'gegner' ? R.gegnerZug(st) : R.autoZug(st); if (!st.ende) return false; S.kampfEnde(A, st); continue; }
+      if (s.art === 'kampf') { const st = R.neuesSpiel(Math.floor(r() * 1e9), S.kampfOptionen(A)); let z = 0; while (!st.ende && z++ < 2500) R.aktiv(st).seite === 'gegner' ? R.gegnerZug(st) : R.autoZug(st); if (!st.ende) return false; S.kampfEnde(A, st); continue; }
       throw new Error('Unbekannte Szenenart ' + s.art);
     }
     return false;
@@ -57,6 +57,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const alle = Object.keys(D.SZENEN), nie = alle.filter((k) => !besucht.has(k));
   check(ersaetze > 0, `Hardcore: Gefallene bekommen am Lagerfeuer eine Ersatzfigur (${ersaetze}×)`);
   check(fehler === 0 && haenger === 0, `400 Durchläufe ohne Fehler und ohne Hänger (Enden: ${Object.entries(enden).map(([k, v]) => k + ' ' + v).join(', ')})`);
+  check(['ende_waechter', 'ende_kobold', 'ende_opfer', 'ende_bruch', 'ende_verrat'].every((e) => enden[e]), 'Abschnitt 3: alle fünf Enden kommen vor');
   check(nie.length === 0, `alle ${alle.length} Szenen erreichbar` + (nie.length ? ' – nie erreicht: ' + nie.join(', ') : ''));
   // Folgen von Entscheidungen
   const A1 = S.neu(5, { gruppe: ['wanderheiler', 'kopfgeldjaeger', 'wildnislaeufer'] });
@@ -79,7 +80,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   check(await p.isVisible('#szene') && /Halmbruck/.test(await p.textContent('#szene h1')), 'Abenteuer beginnt in Halmbruck');
   const gesehen = new Set(); let kaempfe = 0, neuGeladen = false, i = 0;
   let raetselGeloest = false;
-  for (; i < 900; i++) {
+  for (; i < 4000; i++) {
     if (await p.isVisible('#szene')) {
       const titel = (await p.textContent('#szene h1')).trim(); gesehen.add(titel);
       if (process.env.SHOT_DIR && titel === 'Am Brunnen' && !gesehen.has('shot1')) { gesehen.add('shot1'); await p.screenshot({ path: process.env.SHOT_DIR + '/szene-gespraech.png', fullPage: true }); }
@@ -91,7 +92,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
       const klick = async (sel) => { const e = await p.$(sel); if (e && await e.isEnabled()) { await e.click(); return true; } return false; };
       if (await klick('[data-wurf]')) continue;
       if (await klick('[data-wer]')) continue;
-      if (await p.$('[data-geheim]')) { for (const v of await p.$$eval('[data-geheim$=":trinken"]', (xs) => xs.map((x) => x.dataset.geheim))) await p.click(`[data-geheim="${v}"]`); await klick('#sz-weiter'); continue; }
+      if (await p.$('[data-geheim]')) { for (const v of await p.$$eval('[data-geheim]', (xs) => { const erst = {}; for (const x of xs) { const f = x.dataset.geheim.split(':')[0]; if (!erst[f]) erst[f] = x.dataset.geheim; } return Object.values(erst); })) await p.click(`[data-geheim="${v}"]`); await klick('#sz-weiter'); continue; }
       if (await klick('#sz-kampf')) { kaempfe++; continue; }
       if (await p.$('[data-glocke]')) { if (process.env.SHOT_DIR && !gesehen.has('shot3')) { gesehen.add('shot3'); await p.screenshot({ path: process.env.SHOT_DIR + '/szene-raetsel.png', fullPage: true }); } for (const g of D.SZENEN.gruft_raetsel.loesung) await p.click(`[data-glocke="${g}"]`); raetselGeloest = true; continue; }
       if (await klick('[data-ersatz]')) continue;
@@ -108,11 +109,13 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
     } else await p.waitForTimeout(50);
   }
   const ende = await p.textContent('#szene h1').catch(() => '');
-  check(/Ende von Abschnitt 2|Grauwacht behält/.test(ende), `Abschnitt 1 und 2 durchgespielt bis „${ende.trim()}“ (${gesehen.size - 3} Szenen, ${kaempfe} Kämpfe)`);
+  const endeArt = await p.evaluate(() => { const A = window.ABT.A(); return A && window.ABS.szene(A).art === 'ende' ? A.szene : null; });
+  check(/^ende_|grauwacht_behaelt/.test(endeArt || ''), `Abschnitte 1 bis 3 im Browser durchgespielt bis „${ende.trim()}“ (${gesehen.size - 3} Szenen, ${kaempfe} Kämpfe)`);
+  check(['Die Halle der Asche', 'Die Siegelkammer', 'Das Flüstern', 'Valdric'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Abschnitt 3: Halle der Asche, Siegelkammer, Flüstern und Endkampf gesehen');
   check(raetselGeloest || /behält/.test(ende) || !gesehen.has('Das Glockenjoch'), 'Glockenrätsel über die Glocken am Tisch gelöst');
   check(['Der Abstieg', 'Der Schacht', 'Tam', 'Lagerfeuer in der Bibliothek', 'Anselms Tagebuch'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Abschnitt 2: Abstieg, Schacht, Tam, Bibliothek, Tagebuch gesehen');
   check(['Am Brunnen', 'Der bittere Brunnen', 'Der Klostergarten', 'Der Glockenturm', 'Nisk', 'Lagerfeuer im Kreuzgang'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Gespräch, geheime Entscheidung, Kampf, Abstimmung und Lagerfeuer gesehen');
-  check(/Stufe 3/.test(await p.textContent('#szene')) || /behält/.test(ende), 'nach der Bibliothek Stufe 3');
+  check(await p.evaluate(() => window.ABT.A().stufe === 3) || /behält/.test(ende), 'nach der Bibliothek Stufe 3');
   if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + '/szene-ende.png', fullPage: true });
   check(errs.length === 0, 'keine Konsolenfehler' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await b.close();

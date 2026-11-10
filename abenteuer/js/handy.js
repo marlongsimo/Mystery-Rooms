@@ -224,7 +224,7 @@
       h += `<div class="info dran"><b>Abstimmung.</b> Die anderen sehen nicht, wofür du stimmst.</div><div class="optionen">${ab.optionen.map((o) => `<button class="opt ${meine === o.id ? "gewaehlt" : ""}" data-stimme="${o.id}" ${H.warte ? "disabled" : ""}><b>${esc(o.text)}</b></button>`).join("")}</div>`;
       if (schon) h += `<p class="note">Deine Stimme ist abgegeben${meine ? ` (${esc((ab.optionen.find((o) => o.id === meine) || {}).text || "")})` : ""}. Du kannst sie noch ändern, bis alle abgestimmt haben.</p>`;
     } else if (ab.art === "geheim") {
-      const q = ab.geheimFrage, meins = H.meinGeheim && H.meinGeheim.szene === ab.szene ? H.meinGeheim.antwort : null;
+      const q = (ab.geheimFrage.proFigur && ab.geheimFrage.proFigur[fid]) || ab.geheimFrage, meins = H.meinGeheim && H.meinGeheim.szene === ab.szene ? H.meinGeheim.antwort : null;
       h += `<div class="info dran"><b>${esc(q.frage)}</b><br><small>Nur du siehst deine Antwort.</small></div><div class="optionen">${q.antworten.map((a) => `<button class="opt ${meins === a.id ? "gewaehlt" : ""}" data-gantwort="${a.id}" ${H.warte ? "disabled" : ""}><b>${esc(a.text)}</b></button>`).join("")}</div>`;
     } else if (ab.raetsel) {
       const meine = (ab.raetsel.hinweise || {})[fid] || [];

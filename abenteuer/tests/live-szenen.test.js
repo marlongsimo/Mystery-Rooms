@@ -2,7 +2,7 @@
  * Abenteuer live: Tablet + drei Handys durch den Anfang von Abschnitt 1, gegen die echte Datenbank.
  * Prolog → Gespräch mit Probe (gewürfelt am Handy) → bitterer Brunnen (geheim, jedes Handy für sich) →
  * Klostergarten-Kampf → Abstimmung im Glockenturm über die Handys (Ergebnis erst, wenn alle abgestimmt haben) →
- * Tisch neu laden mitten im Abenteuer → Sitzung beenden.
+ * Tisch neu laden mitten im Abenteuer → Rätsel → Hardcore-Ersatz → Flüstern (eigene Versuchung je Handy) → Sitzung beenden.
  * Aufruf: python3 -m http.server 8765 &  ·  node abenteuer/tests/live-szenen.test.js
  */
 const BASE = process.env.BASE || 'http://localhost:8765';
@@ -99,6 +99,18 @@ const { chromium } = require('playwright');
   await H.Anna.click('.tabinhalt [data-fid="duellant"]');
   check(await until(T, () => window.ABT.A().gruppe.includes('duellant') && !window.ABT.A().gruppe.includes('wildnislaeufer')), 'Tisch: Isolde ersetzt Kael in der Gruppe');
   check(await until(H.Anna, () => /Isolde/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Annas Handy zeigt jetzt Isoldes Bogen');
+  // Das Flüstern: jedes Handy hört seine eigene Versuchung
+  await T.evaluate(() => { const o = window.ABT.speichern(); o.szene = 'fluestern'; o.geheim = {}; o.stufe = 3; o.merker.wasser_trickser = true; window.ABT.laden(o); window.ABT.zeige(); });
+  const fragen = {};
+  for (const n of ['Anna', 'Ben', 'Cara']) { await until(H[n], () => Boolean(document.querySelector('[data-gantwort="annehmen"]'))); fragen[n] = await H[n].textContent('.tabinhalt .info.dran'); }
+  check(/dass dir jeder glaubt/.test(fragen.Cara) && /bitteren Brunnen/.test(fragen.Cara), 'Flüstern: Silra (hat getrunken) hört ihr persönliches Angebot');
+  check(/wie durch Wasser/.test(fragen.Ben) && !/bitteren Brunnen/.test(fragen.Ben), 'Flüstern: Seran (hat nicht getrunken) hört nur ein fernes Angebot');
+  if (SHOT) await H.Cara.screenshot({ path: SHOT + '/live-fluestern.png', fullPage: true });
+  for (const [n, a] of [['Anna', 'ablehnen'], ['Ben', 'ablehnen'], ['Cara', 'annehmen']]) await H[n].click(`[data-gantwort="${a}"]`);
+  check(await until(T, () => window.ABT.A().szene === 'abt_kampf'), 'Alle haben geantwortet: Endkampf gegen Valdric steht bevor');
+  const m3 = await T.evaluate(() => window.ABT.A().merker);
+  check(m3.pakt_trickser === true && !m3.pakt_inquisitor && !m3.pakt_duellant, 'Merker: nur Silra hat den Pakt angenommen');
+  check(await T.evaluate(() => /Seran spürt/.test(JSON.stringify(window.ABT.A().protokoll))), 'Seran spürt, dass jemand Ja gesagt hat');
   await T.evaluate(() => { const b = document.querySelector('#live-ende'); if (b) b.click(); else window.AB.LIVE.client.leave(); });
   check(await until(H.Anna, () => Boolean(document.querySelector('#rein')), null, 20000), 'Sitzung beendet');
   check(errs.length === 0, 'keine Seitenfehler' + (errs.length ? ': ' + errs.join(' | ') : ''));

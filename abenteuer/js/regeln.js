@@ -71,7 +71,7 @@
     // Finale: eigener Faktor je Gruppengröße (mit tools/simulation kalibriert: Halle ≈ 85 %, Endkampf ≈ 65 % Sieg)
     halle: { name: "Coldric und die Aschehunde", stufe: 3, gegner: [["grabritter", 0.25], ["aschehund", 0.5]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
     halle_asche: { name: "Die Aschehunde", stufe: 3, gegner: [["aschehund", 0.75]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
-    siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.2, 4: 3.3, 5: 3.4, 6: 2.6 } },
+    siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
    * Feinabstimmung nach Gruppengröße (Faktor auf die Gegner-TP), je Stufe der Figuren.

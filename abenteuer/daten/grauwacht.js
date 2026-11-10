@@ -1,5 +1,5 @@
 /*
- * Das Siegel von Grauwacht – Szenen (Abschnitt 1: Die Abtei, Abschnitt 2: Die Krypta)
+ * Das Siegel von Grauwacht – Szenen (Abschnitt 1: Die Abtei, Abschnitt 2: Die Krypta, Abschnitt 3: Das Siegel)
  * Texte nach Abenteuerbuch 0.1 mit den Verbesserungen aus 0.2 (Anselm als tragische Figur, Wennas Vater,
  * Momente der 15 Figuren). Entwurf: Texte werden beim Spielen freigegeben.
  * text: Absätze (Array) oder Funktion (A, h) → Array; h.hat(A, fid), h.m(A, merker), h.name(A, fid)
@@ -33,7 +33,43 @@
     hindernisse: [["P", 5, 3], ["P", 6, 3], ["P", 5, 4], ["P", 6, 4], ["P", 5, 5], ["P", 6, 5], ["K", 2, 1], ["K", 9, 7], ["M", 0, 0], ["M", 11, 8]],
     start: { spieler: [[1, 3], [1, 5], [2, 4], [0, 2], [0, 6], [2, 6]], wolf: [[2, 2], [3, 5], [0, 4], [3, 3]], gegner: [[7, 2], [8, 4], [7, 6], [10, 1], [10, 7], [11, 3], [11, 5], [9, 2], [9, 6], [10, 4], [8, 0], [8, 8]] },
   };
-  const KARTEN = { TURM, GRUFT, PILZE, SCHACHT };
+  const W = (x, y) => ["M", x, y];
+  const HALLE = {
+    name: "Die Halle der Asche", b: 12, h: 9,
+    hindernisse: [W(3, 2), W(3, 6), W(6, 2), W(6, 6), W(9, 2), W(9, 6)],
+    start: { spieler: [[0, 3], [0, 4], [0, 5], [1, 3], [1, 5], [1, 4]], wolf: [[0, 2], [0, 6], [1, 2], [1, 6]], gegner: [[10, 4], [8, 1], [8, 7], [11, 2], [11, 6], [10, 0], [10, 8], [7, 4]] },
+  };
+  const SIEGEL = {
+    name: "Die Siegelkammer", b: 12, h: 9,
+    // Z = Siegelstein
+    hindernisse: [W(0, 0), W(1, 0), W(0, 1), W(11, 0), W(10, 0), W(11, 1), W(0, 8), W(1, 8), W(0, 7), W(11, 8), W(10, 8), W(11, 7), ["Z", 2, 2], ["Z", 9, 2], ["Z", 2, 6], ["Z", 9, 6]],
+    start: { spieler: [[5, 8], [6, 8], [4, 8], [7, 8], [3, 8], [8, 8]], wolf: [[4, 7], [7, 7], [3, 7], [8, 7]], gegner: [[6, 3], [4, 2], [8, 2], [4, 5], [8, 5], [6, 1], [3, 4], [9, 4]] },
+  };
+  const KARTEN = { TURM, GRUFT, PILZE, SCHACHT, HALLE, SIEGEL };
+  const FIG = () => root.ABF || (typeof require === "function" ? require("../js/figuren.js") : null);
+  /** Das Angebot aus der Versuchung einer Figur – nur der Teil in Anführungszeichen, der Haken bleibt geheim */
+  const versprechen = (fid) => { const v = FIG().FIGUREN[fid].versuchung || ""; const e = v.indexOf("“"); return e > 0 ? v.slice(0, e + 1) : v; };
+  const haken = (fid) => { const v = FIG().FIGUREN[fid].versuchung || ""; const e = v.indexOf("“"); return e > 0 ? v.slice(e + 1).trim() : ""; };
+  const lebendeVon = (A) => A.gruppe.filter((f) => !A.zust[f].tot);
+  const anselmListig = (A) => (A.merker.anselm_vertrauen || 0) < 0 && !A.merker.wahrheit_frueh;
+  const nisk_kann = (A) => Boolean(A.merker.nisk_dabei && !A.merker.nisk_fort && !A.merker.nisk_tot && (A.merker.nisk_vertrauen || 0) >= 2);
+  /** Epilog: was aus Halmbruck, Tam, Wenna, den Kobolden und euch wird */
+  function epilog(A, h) {
+    const m = A.merker, t = [];
+    t.push(A.glocke <= 2 ? "In Halmbruck schmecken die Brunnen wieder süß. Das Vieh steht mit dem Rücken zur Abtei und frisst." : A.glocke <= 5 ? "In Halmbruck wird das Wasser langsam wieder klar. Nicht alle Kühe überstehen den Winter, und manche Kinder schlafen noch lange bei Licht." : "Halmbruck hat die Glocke zu oft gehört. Drei Häuser stehen im Frühjahr leer. Die Leute, die dort wohnten, sind eines Nachts zur Abtei hinaufgegangen und nicht zurückgekommen.");
+    if (m.tam_gerettet) t.push("Tam ist wieder bei seiner Mutter. Er spricht nicht oft über die Abtei. Aber manchmal, wenn es still ist, legt er den Kopf schief, als würde er auf etwas lauschen, das nicht mehr da ist.");
+    else if (m.tam_zurueck) t.push("Auf dem Rückweg kommt ihr am Schacht vorbei. Das Netz ist leer. Ihr sagt Tams Mutter, dass ihr ihn nicht gefunden habt. Es ist nicht ganz gelogen.");
+    else t.push("Tam wird nie gefunden. Seine Mutter stellt jeden Abend eine Kerze ins Fenster.");
+    if (m.medaillon) t.push("Ihr gebt Wenna das Medaillon. Sie öffnet es, sieht das Kinderbild, ihr eigenes, und schließt es wieder. „Danke“, sagt sie. Mehr nicht. Am nächsten Tag geht sie mit einer Schaufel zur Abtei, um ihren Vater nach Hause zu holen.");
+    else if (m.vater_gefunden) t.push("Ihr sagt Wenna, wo ihr Vater liegt. Sie nickt nur. Ihr hattet ihr nichts versprochen, und ihr bringt ihr nichts mit.");
+    else if (m.wenna_versprechen) t.push("Wenna fragt nicht nach ihrem Vater. Sie sieht euch an, und ihr schüttelt den Kopf. Sie wartet weiter, wie sie zwanzig Jahre gewartet hat.");
+    if (A.glocke >= 7) t.push("Der Dorfbrunnen von Halmbruck bleibt bitter. Für immer. Die Kinder lernen früh, nicht daraus zu trinken.");
+    if (m.blutschuld) t.push("Die Kobolde vergessen nicht. Im Winter verschwinden in Halmbruck Hühner, dann Schafe. An eine Tür hat jemand mit Kreide ein kleines Gesicht gemalt, mit zu vielen Zähnen.");
+    else if (m.kobolde_friedlich || m.nisk_frei || nisk_kann(A)) t.push("Die Kobolde ziehen tiefer in die Hügel. Manchmal finden die Kinder von Halmbruck kleine Geschenke am Waldrand: einen glatten Stein, eine Feder, einen Knopf.");
+    if (A.gefallen.length) t.push(`Ihr begrabt ${A.gefallen.map((f) => h.name(A, f)).join(", ")} auf dem Hügel über Halmbruck, mit Blick auf die Abtei.`);
+    for (const fid of A.gruppe) if (m["pakt_" + fid] && !A.zust[fid].tot && m.hueter !== fid && m.verrat_opfer !== fid) t.push(`**${h.name(A, fid)}** hat Ja gesagt, unten im Flüstern. Valdric hält sein Wort: ${versprechen(fid)} ${haken(fid)}`);
+    return t;
+  }
   /** Anselms Tagebuch – der Ton hängt davon ab, wie ihr ihm begegnet seid */
   function TAGEBUCH(A) {
     let t = "„Ich bin der letzte Hüter. Das Siegel unter Grauwacht hält den, der einmal unser Abt war. Aber es hält nur, solange ein Lebender bei ihm wacht, und es nimmt sich, was es braucht: jeden Tag ein wenig von dem, der wacht. Vierzig Jahre. Ich habe keine Kraft mehr. Ich habe die Glocke geläutet, weil ich nicht fragen konnte. Wie fragt man jemanden, ob er an meiner Stelle sterben will?“";
@@ -395,22 +431,332 @@
       art: "probe", abschnitt: 2, titel: "Anselms Tagebuch", ort: "Die alte Bibliothek",
       text: ["Das Buch auf dem Pult ist ein Tagebuch. Die Schrift ist zittrig, die Tinte an manchen Stellen verlaufen. Wer liest es?"],
       probe: { name: "Entziffern", attr: "INT", sg: 13, geuebt: ["zauberer"], vorteil: (A, h, fid) => (fid === "elementarist" ? 1 : 0), knapp: true,
-        erfolg: { text: (A) => TAGEBUCH(A, true), setzt: { wahrheit_frueh: true }, weiter: "abschnitt2_ende" },
-        knapp: { text: "Nur Bruchstücke: „… das Siegel nimmt, was es hält … ich bin der Letzte … verzeiht mir, dass ich läute …“ Der Rest ist verlaufen.", setzt: { wahrheit_halb: true }, weiter: "abschnitt2_ende" },
-        fehl: { text: "Die Seiten zerfallen unter euren Fingern. Ihr erfahrt nichts.", weiter: "abschnitt2_ende" } },
+        erfolg: { text: (A) => TAGEBUCH(A, true), setzt: { wahrheit_frueh: true }, weiter: "treppe_asche" },
+        knapp: { text: "Nur Bruchstücke: „… das Siegel nimmt, was es hält … ich bin der Letzte … verzeiht mir, dass ich läute …“ Der Rest ist verlaufen.", setzt: { wahrheit_halb: true }, weiter: "treppe_asche" },
+        fehl: { text: "Die Seiten zerfallen unter euren Fingern. Ihr erfahrt nichts.", weiter: "treppe_asche" } },
     },
     tagebuch_lyra: {
-      art: "erzaehlung", abschnitt: 2, titel: "Anselms Tagebuch", ort: "Die alte Bibliothek", weiter: "abschnitt2_ende",
+      art: "erzaehlung", abschnitt: 2, titel: "Anselms Tagebuch", ort: "Die alte Bibliothek", weiter: "treppe_asche",
       beimEintritt: () => ({ setzt: { wahrheit_frueh: true } }),
       text: (A) => ["Lyra liest das Tagebuch in einem Zug. Sie braucht keine Probe: Sie kennt die alte Kurzschrift der Mönche.", TAGEBUCH(A, true)],
     },
-    abschnitt2_ende: {
-      art: "ende", abschnitt: 2, titel: "Ende von Abschnitt 2", ort: "Die alte Bibliothek",
-      text: (A) => [
-        "Hinter der Bibliothek führt eine Treppe in die Tiefe. Von unten steigt Wärme auf, und ein Geruch nach Asche.",
-        "**Abschnitt 3 – Das Siegel** ist in Arbeit. Euer Spielstand ist gespeichert.",
-        `Bisher: Die Glocke hat ${A.glocke}× geschlagen. ${A.merker.tam_gerettet ? "Tam ist gerettet, und ihr kennt einen Namen. " : A.merker.tam_zurueck ? "Tam hängt noch im Netz. " : ""}${A.merker.vater_gefunden ? "Ihr habt Jorek Hald gefunden. " : ""}${A.merker.wahrheit_frueh ? "Ihr kennt Anselms Geheimnis. " : ""}`,
+    /* ================= Abschnitt 3 · Das Siegel ================= */
+    treppe_asche: {
+      art: "erzaehlung", abschnitt: 3, titel: "Die Treppe der Asche", ort: "Unter der Bibliothek", weiter: "halle", rastErlaubt: true,
+      beimEintritt: (A) => {
+        const m = A.merker, w = { setzt: {}, plus: {} };
+        if (m.nisk_dabei && m.tam_gerettet && (m.nisk_vertrauen || 0) >= 1) w.plus.nisk_vertrauen = 1; // Er hat Wort gehalten und kommt zurück
+        else if (m.nisk_dabei && (m.nisk_vertrauen || 0) <= 0) Object.assign(w.setzt, { nisk_verrat: true, nisk_fort: true });
+        return w;
+      },
+      text: (A, h) => {
+        const m = A.merker;
+        return [
+          "Hinter der Bibliothek führt eine Treppe in die Tiefe, breit genug für eine Prozession. Die Stufen sind warm. Von unten steigt ein Geruch nach Asche auf, und ein Licht, rot wie Glut hinter einer Ofentür.",
+          m.nisk_verrat ? "Auf halber Treppe reißt Nisk sich los. Das Seil fällt leer auf die Stufen. Er rennt voraus, in die Glut hinein, und ihr hört ihn rufen, hoch und schrill: „Sie kommen! Sie kommen!“ Wer dort unten wartet, weiß jetzt Bescheid." : "",
+          m.nisk_dabei && !m.nisk_verrat && m.tam_gerettet && (m.nisk_vertrauen || 0) >= 2 ? "Schritte hinter euch, leicht und schnell. Nisk. Er keucht. „Junge ist oben. Bei der Frau mit der Laterne. Nisk hat es versprochen.“ Er grinst, und diesmal sieht es nicht gefährlich aus." : "",
+          m.nisk_dabei && !m.nisk_verrat && (m.nisk_vertrauen || 0) >= 2 ? "„Halle der Asche“, flüstert Nisk. „Der tote Ritter wacht dort. Aber es gibt einen Gang an der Seite. Nisk zeigt ihn euch.“" : "",
+          m.nisk_frei ? "In einer Nische an der Wand sitzt ein kleiner Schatten. Nisk. Ihr habt ihn freigelassen, oben im Turm. Er sagt nichts, aber er hebt die Hand, als ihr vorbeigeht, und deutet nach links: Dort ist der Boden fester." : "",
+          m.blutschuld ? "Hinter euch, weit oben, klappern kleine Krallen auf Stein. Die Kobolde folgen euch. Sie haben nicht vergessen, was im Turm geschehen ist." : "",
+          "Am Fuß der Treppe öffnet sich eine Halle.",
+        ];
+      },
+    },
+    halle: {
+      art: "wahl", abschnitt: 3, titel: "Die Halle der Asche", ort: "Halle der Asche",
+      beimEintritt: (A, h) => (h.hat(A, "elementarist") ? { setzt: { glut_aus: true } } : null),
+      text: (A, h) => {
+        const m = A.merker;
+        return [
+          "Säulen aus schwarzem Stein tragen eine Decke, die ihr nicht seht. Der Boden ist mit Asche bedeckt, knöcheltief, und darunter glüht es. Zwischen den Säulen liegen Hunde aus Asche und Glut, die Köpfe auf den Pfoten. Sie heben die Köpfe, als ihr eintretet.",
+          "Am anderen Ende der Halle, vor einer Tür aus Eisen, steht ein Ritter in rußgeschwärzter Rüstung. Ein Zweihänder, die Spitze im Boden. Hinter dem Visier ist nichts als Dunkelheit. Er hat hier gestanden, seit die Abtei noch Mönche hatte.",
+          m.coldric_name ? "Ihr kennt seinen Namen von der Grabplatte: **Coldric**, Wächter des Siegels. Er schwor, nicht zu ruhen, bis das Siegel hält." : "",
+          h.hat(A, "elementarist") ? "Vaelin kniet sich in die Asche und legt die Hand flach auf den Boden. Kälte breitet sich aus. Die Glut unter der Asche wird dunkel, Schritt für Schritt. Die Hunde werden schwächer, wenn ihnen die Hitze fehlt." : "",
+          "Der Ritter hebt das Schwert. Was tut ihr? Stimmt ab.",
+        ];
+      },
+      optionen: [
+        { id: "kampf", text: "Kämpfen", weiter: "halle_kampf" },
+        { id: "name", text: "Ihn bei seinem Namen rufen: Coldric", wenn: (A) => A.merker.coldric_name, weiter: "halle_name" },
+        { id: "duell", text: "Isolde: Coldric zum Ehrenduell fordern", wenn: (A, h) => h.hat(A, "duellant"), weiter: "halle_duell" },
+        { id: "umhang", text: "Im Umhang der Dämmerung an der Wand entlangschleichen", wenn: (A) => A.merker.umhang, weiter: "halle_schleichen" },
       ],
+    },
+    halle_name: {
+      art: "probe", abschnitt: 3, titel: "Ein Name in der Asche", ort: "Halle der Asche",
+      text: (A, h) => [
+        "Eine Person tritt vor, allein, die Hände offen. Wer ruft ihn?",
+        h.hat(A, "berserker") ? "Ragnar könnte es tun. Wenn einer dem Ritter einen Herzschlag lang allein standhält, dann er." : "",
+      ],
+      probe: { name: "Den Namen rufen", attr: "CHA", sg: 10, geuebt: ["trickser"], vorteil: (A, h, fid) => (fid === "berserker" ? 1 : 0), knapp: true,
+        erfolg: { text: "„Coldric.“ Der Ritter erstarrt. Langsam senkt er das Schwert. Eine Stimme, rau wie Asche: „So lange … hat niemand … meinen Namen gesagt.“ Er tritt zur Seite. Die Hunde gehorchen ihm nicht mehr. Sie gehören dem, der unten wartet.", setzt: { coldric_frieden: true }, weiter: "halle_kampf_asche" },
+        knapp: { text: "Er zögert. Das Schwert sinkt, nur ein wenig. Dann hebt er es wieder, aber langsamer, als hätte er etwas vergessen, das ihm gerade wieder einfällt.", setzt: { coldric_zoegert: true }, weiter: "halle_kampf" },
+        fehl: { text: "Der Name verhallt in der Asche. Coldric hört ihn nicht mehr. Er hört nur den Befehl.", weiter: "halle_kampf" } },
+    },
+    halle_duell: {
+      art: "kampf", abschnitt: 3, titel: "Das Ehrenduell", ort: "Halle der Asche",
+      text: [
+        "Isolde tritt vor und hebt die Klinge zum Gruß. „Ritter. Ich fordere dich. Nur du und ich.“",
+        "Coldric hält inne. Dann hebt er den Zweihänder zum selben Gruß, so alt, dass ihn außer Isolde niemand mehr kennt. Die Hunde legen sich nieder. Die anderen treten zurück. Isolde kämpft allein.",
+      ],
+      kampf: { figuren: ["duellant"], gegner: [{ art: "grabritter", anzahl: 1, tpFaktor: 0.75 }], karte: KARTEN.HALLE, namen: { grabritter: "Coldric" },
+        sieg: { setzt: { coldric_frieden: true, duell_sieg: true }, weiter: "halle_duell_sieg" },
+        verloren: { setzt: { duell_verloren: true }, weiter: "halle_kampf" } },
+    },
+    halle_duell_sieg: {
+      art: "erzaehlung", abschnitt: 3, titel: "Ehre", ort: "Halle der Asche", weiter: "halle_danach", rastErlaubt: true,
+      text: [
+        "Coldric sinkt auf ein Knie. Er hätte noch einmal zuschlagen können. Er tut es nicht.",
+        "„Gut gekämpft“, sagt er, und es klingt, als hätte er diese Worte lange nicht benutzt. Er hebt die Hand, und die Hunde aus Asche zerfallen, einer nach dem anderen, zu grauem Staub.",
+      ],
+    },
+    halle_schleichen: {
+      art: "probe", abschnitt: 3, titel: "Im Schatten der Säulen", ort: "Halle der Asche",
+      text: ["Der Umhang der Dämmerung schluckt das Licht der Glut. Ihr drängt euch dicht zusammen und geht an der Wand entlang, Säule für Säule. Alle würfeln."],
+      probe: { name: "Schleichen", attr: "GES", sg: 12, wer: "gruppe", geuebt: ["schurke"], knapp: true,
+        erfolg: { text: "Kein Laut. Die Hunde schnuppern, finden nichts und legen die Köpfe wieder ab. Coldric starrt an euch vorbei, als stündet ihr nicht da. Die Eisentür ist nicht verschlossen.", setzt: { halle_umgangen: true }, weiter: "halle_danach" },
+        knapp: { text: "Fast. Dann knirscht Asche unter einem Stiefel. Die Hunde springen auf, aber ihr seid schon mitten zwischen ihnen.", setzt: { halle_ueberrascht: true }, weiter: "halle_kampf" },
+        fehl: { text: "Ein Hund hebt die Schnauze und heult. Coldric dreht sich um.", weiter: "halle_kampf" } },
+    },
+    halle_kampf: {
+      art: "kampf", abschnitt: 3, titel: "Kampf in der Halle der Asche", ort: "Halle der Asche",
+      text: (A) => [
+        A.merker.coldric_zoegert ? "Coldric kämpft, aber jeder Hieb kommt einen Herzschlag zu spät." : "Coldric kommt auf euch zu, langsam, unaufhaltsam. Die Hunde aus Asche jagen voraus.",
+        A.merker.nisk_verrat ? "Sie haben auf euch gewartet. Nisk hat sie gewarnt." : "",
+      ],
+      kampf: (A) => {
+        const m = A.merker; let mal = 1;
+        if (m.glut_aus) mal *= 0.85;
+        if (m.coldric_zoegert) mal *= 0.9;
+        if (m.nisk_verrat) mal *= 1.15;
+        if (m.nisk_dabei && !m.nisk_verrat && (m.nisk_vertrauen || 0) >= 2) mal *= 0.8;
+        else if (m.nisk_frei) mal *= 0.9;
+        return { begegnung: "halle", karte: KARTEN.HALLE, skalaMal: mal, namen: { grabritter: "Coldric" }, ueberraschung: Boolean(m.halle_ueberrascht || (m.nisk_dabei && !m.nisk_verrat && (m.nisk_vertrauen || 0) >= 2)),
+          zusatz: m.blutschuld ? [{ art: "schattenkobold", anzahl: 2, tpFaktor: 1 }] : [], sieg: { weiter: "halle_danach", tranke: 1 } };
+      },
+    },
+    halle_kampf_asche: {
+      art: "kampf", abschnitt: 3, titel: "Die Hunde aus Asche", ort: "Halle der Asche",
+      text: ["Coldric steht still, das Schwert gesenkt. Aber die Hunde springen auf, die Augen voller Glut. Sie gehorchen einem anderen Herrn."],
+      kampf: (A) => ({ begegnung: "halle_asche", karte: KARTEN.HALLE, skalaMal: A.merker.glut_aus ? 0.85 : 1, zusatz: A.merker.blutschuld ? [{ art: "schattenkobold", anzahl: 2, tpFaktor: 1 }] : [], sieg: { weiter: "halle_danach", tranke: 1 } }),
+    },
+    halle_danach: {
+      art: "erzaehlung", abschnitt: 3, titel: "Vor der Eisentür", ort: "Halle der Asche", weiter: "siegel_vor", rastErlaubt: true,
+      text: (A) => {
+        const m = A.merker;
+        if (m.halle_umgangen) return ["Die Eisentür fällt hinter euch ins Schloss. Ihr seid durch, ohne Kampf. Hinter euch steht Coldric noch immer und wacht über eine Halle, durch die gerade alle gegangen sind, die er aufhalten sollte."];
+        return [
+          m.coldric_frieden
+            ? "Coldric zieht den Handschuh aus. Darunter ist keine Hand, nur Asche, die die Form einer Hand hält. „Er hat mich gerufen, als ich starb, und ich bin gekommen. Vierzig Jahre war ich sein Hund.“ Er sieht zur Eisentür. „Bindet ihn. Und dann lasst mich gehen.“ Er zerfällt, bevor ihr antworten könnt."
+            : "Coldrics Rüstung fällt in sich zusammen. Darin ist nur Asche. Für einen Augenblick glaubt ihr, eine Stimme zu hören, erleichtert: „Endlich.“",
+          "Hinter der Eisentür liegt eine Treppe, die letzte. Von unten kommt kein Licht. Nur ein Flüstern.",
+          A.schwierigkeit === "normal" ? "Wenn ihr Wunden verbinden wollt: Jetzt ist die letzte Gelegenheit." : "",
+        ];
+      },
+    },
+    siegel_vor: {
+      art: "erzaehlung", abschnitt: 3, titel: "Die Siegelkammer", ort: "Die Siegelkammer", weiter: "fluestern",
+      text: (A) => [
+        "Die Kammer ist rund und so hoch, dass die Fackeln die Decke nicht erreichen. In den Boden ist ein Kreis aus Silber eingelassen, und an vier Stellen ragen Steine auf, so hoch wie ein Mensch, bedeckt mit Zeichen, die schwach leuchten. Die **Siegelsteine**.",
+        "In der Mitte des Kreises sitzt ein Mann auf einem Stuhl aus Stein. Er trägt die Kutte eines Abts. Er ist sehr alt und sehr dünn, und seine Augen sind offen. Er sieht euch an und lächelt.",
+        A.merker.abt_name ? "„Valdric“, sagt jemand von euch, leise. Der Abt neigt den Kopf. „Ein Kind hat es euch verraten. Wie schön. Mich hat lange niemand mehr bei meinem Namen genannt.“" : "„Willkommen“, sagt er. „Ich habe die Glocke für euch geläutet. Nun ja. Nicht ich. Aber ich habe zugehört.“",
+        "Dann spricht er nicht mehr laut. Er spricht in euren Köpfen. Jede und jeder von euch hört etwas anderes.",
+      ],
+    },
+    fluestern: {
+      art: "geheim", abschnitt: 3, titel: "Das Flüstern", ort: "Die Siegelkammer", weiter: "abt_kampf",
+      text: [
+        "Valdric flüstert. Jede Person hört ihn allein. Niemand sieht, was die anderen hören oder antworten.",
+        "Wer zusagt, bekommt, was versprochen wird. Und muss die Bedingung halten.",
+      ],
+      frage: (A, h, fid) => {
+        const F = FIG(), f = F.FIGUREN[fid];
+        const angebot = A.merker["wasser_" + fid] ? versprechen(fid) : "„Du wirst lebend hier herauskommen. Die anderen vielleicht nicht. Aber du.“";
+        const leise = A.merker["wasser_" + fid] ? "Seit dem bitteren Brunnen ist seine Stimme in dir. Sie ist ganz nah." : "Die Stimme klingt fern, wie durch Wasser.";
+        let t = `${leise} ${angebot} „Ich verlange nur eines: Berühre keinen Siegelstein. Und wenn ich dich ansehe, sieh weg.“`;
+        if (fid === "schattenmagier") {
+          const trinker = A.gruppe.filter((x) => x !== fid && !A.zust[x].tot && A.merker["wasser_" + x]).map((x) => F.FIGUREN[x].name);
+          t += ` Und Morwen sieht mehr: Schatten legen sich um die, denen er näher kommt. ${trinker.length ? trinker.join(", ") + (trinker.length === 1 ? " hört" : " hören") + " ihn so deutlich wie du." : "Niemand sonst hört ihn so deutlich wie du."}`;
+        }
+        return t;
+      },
+      antworten: [
+        { id: "annehmen", text: "Ich nehme an", setzt: (fid) => ({ ["pakt_" + fid]: true }) },
+        { id: "ablehnen", text: "Ich lehne ab" },
+      ],
+      abschluss: (A, h) => {
+        const pakt = A.gruppe.filter((f) => A.merker["pakt_" + f] && !A.zust[f].tot);
+        let t = "Das Flüstern verstummt. Valdric lächelt noch immer.";
+        if (h.hat(A, "inquisitor")) {
+          const andere = pakt.filter((f) => f !== "inquisitor");
+          if (andere.length) t += ` Seran spürt es wie Kälte im Nacken: Jemand hat Ja gesagt. Er sieht ${andere.map((f) => h.name(A, f)).join(" und ")} an. Er weiß es.`;
+          else t += " Seran lauscht in die Stille. Niemand hat Ja gesagt. Er atmet aus.";
+        }
+        return t;
+      },
+    },
+    abt_kampf: {
+      art: "kampf", abschnitt: 3, titel: "Valdric", ort: "Die Siegelkammer",
+      text: (A) => [
+        "Valdric steht auf. Der Stuhl zerbröckelt hinter ihm. Aus dem Boden kriechen die Toten, die er gerufen hat.",
+        "**Die vier Siegelsteine:** Wer neben einem steht, kann ihn mit einer Aktion berühren. Jeder Stein schwächt Valdric. Sind alle vier berührt, ist er gebunden.",
+        A.merker.abt_name ? "Ihr kennt seinen wahren Namen. Einmal im Kampf könnt ihr ihn damit lähmen." : "",
+        A.merker.silberglocke ? "Die silberne Glocke aus der Gruft: Ihr Klang zerbricht die Knochenwächter." : "",
+        A.merker.ring ? "Darians Ring wird eiskalt. Valdric sieht ihn und zuckt zurück: Es ist sein eigener." : "",
+        A.glocke >= 5 ? "Die Glocke hat zu oft geschlagen. Er ist stärker, als er sein dürfte." : "",
+      ],
+      kampf: (A) => {
+        const m = A.merker, pakt = A.gruppe.filter((f) => m["pakt_" + f] && !A.zust[f].tot);
+        let mal = 1; if (m.ring) mal *= 0.9; if (A.glocke >= 7) mal *= 1.15;
+        return { begegnung: "siegel", karte: KARTEN.SIEGEL, skalaMal: mal, namen: m.abt_name ? {} : { abt: "Der Abt" },
+          boss: { name: Boolean(m.abt_name), silber: Boolean(m.silberglocke), pakt },
+          zusatz: A.glocke >= 5 ? [{ art: "knochenwaechter", anzahl: 1, tpFaktor: 1 }] : [],
+          sieg: { weiter: "abt_fall" } };
+      },
+    },
+    abt_fall: {
+      art: "erzaehlung", abschnitt: 3, titel: "Stille", ort: "Die Siegelkammer", weiter: "anselm_kommt",
+      text: (A, h) => {
+        const pakt = A.gruppe.filter((f) => A.merker["pakt_" + f] && !A.zust[f].tot);
+        return [
+          "Valdric fällt auf die Knie. Er ist nicht tot. Er kann nicht sterben, nicht hier. Aber er ist schwach, und die Toten um ihn sind wieder Knochen.",
+          "„Ihr habt mich nicht besiegt“, flüstert er. „Ihr habt mich nur müde gemacht. Das Siegel ist zerbrochen. Morgen bin ich wieder stark. Oder ihr gebt ihm, was es braucht.“",
+          pakt.length ? `${pakt.map((f) => h.name(A, f)).join(" und ")} ${pakt.length === 1 ? "spürt" : "spüren"} etwas Warmes in der Brust. Das Versprechen. Es ist noch da.` : "",
+          "Auf der Treppe hinter euch: Schritte. Langsam. Ein Stock auf Stein.",
+        ];
+      },
+    },
+    anselm_kommt: {
+      art: "erzaehlung", abschnitt: 3, titel: "Bruder Anselm", ort: "Die Siegelkammer",
+      weiter: (A) => (anselmListig(A) ? "anselm_list" : "anselm_gespraech"),
+      text: (A) => {
+        const m = A.merker;
+        return [
+          "Bruder Anselm steht in der Tür. Er ist euch gefolgt, den ganzen Weg. Er sieht aus, als könnte er keinen Schritt mehr gehen.",
+          m.wahrheit_frueh || m.wahrheit_halb ? "Ihr wisst, wer er ist. Der letzte Hüter. Der Mann, der vierzig Jahre hier unten gewacht hat." : "Er geht an euch vorbei zum Kreis, als würde er den Weg im Schlaf kennen.",
+          anselmListig(A) ? "Er lächelt euch an. Es ist kein freundliches Lächeln. Es ist das Lächeln eines Mannes, der endlich bekommt, worauf er gewartet hat." : "Er sieht euch an, und in seinen Augen ist etwas, das ihr bei ihm noch nie gesehen habt: Hoffnung. Und Scham.",
+        ];
+      },
+    },
+    anselm_list: {
+      art: "probe", abschnitt: 3, titel: "Anselms Plan", ort: "Die Siegelkammer",
+      text: [
+        "Anselm hebt die Hände und beginnt zu singen, leise, in der alten Sprache. Die Siegelsteine antworten. Ihr Licht wandert, langsam, auf euch zu.",
+        "Jetzt versteht ihr: Er hat die Glocke nicht geläutet, um Hilfe zu holen. Er hat sie geläutet, um jemanden zu holen, der seinen Platz einnimmt. Und ihr habt ihm nie einen Grund gegeben, euch zu fragen. Alle würfeln.",
+      ],
+      probe: { name: "Den Bann brechen", attr: "WEI", sg: 13, wer: "gruppe", geuebt: ["kleriker"], knapp: false,
+        erfolg: { text: "Ihr reißt euch los. Das Licht weicht zurück, und Anselm sinkt zusammen, als hätte man ihm die Fäden durchgeschnitten. „Ich musste es versuchen“, flüstert er. „Verzeiht mir. Oder nicht. Es spielt keine Rolle mehr.“", setzt: { anselm_ertappt: true }, weiter: "siegel_wahl" },
+        fehl: { setzt: (A) => ({ verrat_opfer: lebendeVon(A)[Math.floor(A.r() * lebendeVon(A).length)] }), text: "Das Licht ist schneller.", weiter: "ende_verrat" } },
+    },
+    anselm_gespraech: {
+      art: "gespraech", abschnitt: 3, titel: "Bruder Anselm", ort: "Die Siegelkammer",
+      text: ["„Das Siegel braucht einen Hüter“, sagt Anselm. „Einen Lebenden, der bei ihm wacht. Es nimmt sich jeden Tag ein wenig von ihm. Ich habe es vierzig Jahre getragen.“ Er hustet. „Ich trage es nicht mehr lange.“"],
+      optionen: [
+        { id: "glocke", text: "„Warum hast du die Glocke geläutet?“", wer: "Anselm", frage: "„Warum hast du die Glocke geläutet?“", antwort: (A) => (A.merker.anselm_vertrauen || 0) > 0 ? "„Weil ich gehofft habe, dass jemand kommt, den ich fragen kann. Ihr wart freundlich zu mir. Das hat es schwerer gemacht, nicht leichter.“" : "„Weil ich feige bin. Ich wollte, dass jemand kommt. Ich wollte nicht fragen müssen.“" },
+        { id: "jorek", text: "„Jorek Hald liegt in der Gruft.“", wer: "Anselm", frage: "„Wennas Vater liegt in der Gruft. Er wollte dich befreien.“", wenn: (A) => A.merker.vater_gefunden, antwort: "Anselm schließt die Augen. Lange. „Er hat das Siegel angegriffen, allein, mit einem Hammer und einem Gebet. Valdric hat ihn in einer Nacht verbraucht. Ich habe ihn begraben. Ich habe Wenna nie gesagt, wo.“" },
+        { id: "zerbrechen", text: "„Was passiert, wenn wir es zerbrechen?“", wer: "Anselm", frage: "„Was passiert, wenn wir das Siegel einfach zerbrechen?“", antwort: (A) => `„Dann ist er frei, aber schwach, so schwach wie jetzt. Vielleicht stirbt er. Vielleicht nicht. Die Abtei stürzt ein, so viel ist sicher.“ Er zögert. ${A.glocke >= 4 ? "„Und die Glocke hat oft geschlagen. Was sie gerufen hat, geht nicht mit ihm unter. Das trifft Halmbruck.“" : "„Die Glocke hat selten geschlagen. Vielleicht reicht das.“"}` },
+        { id: "weiter", text: "Entscheiden", weiter: "siegel_wahl" },
+      ],
+    },
+    siegel_wahl: {
+      art: "wahl", abschnitt: 3, titel: "Das Siegel", ort: "Die Siegelkammer",
+      text: (A) => [
+        "Valdric kniet im Kreis und wartet. Die Siegelsteine flackern. Ihr habt nicht viel Zeit.",
+        "Erneuert ihr das Siegel – dann braucht es einen neuen Hüter? Oder zerbrecht ihr es und nehmt in Kauf, was dann kommt?",
+        A.merker.anselm_ertappt ? "Anselm sitzt an der Wand und sieht euch nicht an." : "",
+        "Stimmt ab.",
+      ],
+      optionen: [
+        { id: "erneuern", text: "Das Siegel erneuern", weiter: "hueter_wahl" },
+        { id: "zerbrechen", text: "Das Siegel zerbrechen", weiter: "ende_bruch" },
+      ],
+    },
+    hueter_wahl: {
+      art: "wahl", abschnitt: 3, titel: "Wer wacht?", ort: "Die Siegelkammer",
+      text: (A) => [
+        "Das Siegel braucht einen Hüter. Wer bleibt?",
+        A.merker.anselm_ertappt ? "Anselm hebt den Kopf. „Ich. Bis ich sterbe. Das ist nicht lange. Dann fängt alles von vorn an.“" : "„Ich kann noch ein wenig“, sagt Anselm. „Ein paar Monate. Vielleicht einen Winter.“",
+        nisk_kann(A) ? "Nisk zupft euch am Ärmel. „Kobolde leben lange“, sagt er. „Sehr lange. Und Nisk hat keine Angst vor dem Alten. Nicht mehr.“" : "",
+      ],
+      optionen: [
+        { id: "anselm", text: "Anselm bleibt", weiter: "ende_waechter" },
+        { id: "nisk", text: "Nisk bleibt", wenn: (A) => nisk_kann(A), weiter: "ende_kobold" },
+        { id: "einer", text: "Einer von uns bleibt", weiter: "freiwillig" },
+      ],
+    },
+    freiwillig: {
+      art: "geheim", abschnitt: 3, titel: "Einer von uns", ort: "Die Siegelkammer",
+      weiter: (A) => (A.gruppe.some((f) => A.merker["bleibt_" + f]) ? "ende_opfer" : "ende_waechter"),
+      text: ["Jede Person entscheidet für sich, auf ihrem Handy. Wenn sich mehrere melden, entscheidet das Los."],
+      frage: (A, h, fid) => `Bleibst du hier unten, ${h.name(A, fid)}? Für immer, oder bis jemand kommt, den du fragen kannst.`,
+      antworten: [
+        { id: "bleiben", text: "Ich bleibe", setzt: (fid) => ({ ["bleibt_" + fid]: true }) },
+        { id: "gehen", text: "Ich gehe" },
+      ],
+      abschluss: (A) => (A.gruppe.some((f) => A.merker["bleibt_" + f]) ? "Jemand ist vorgetreten." : "Niemand tritt vor. Anselm nickt, als hätte er es gewusst."),
+    },
+    ende_waechter: {
+      art: "ende", abschnitt: 3, titel: "Der letzte Winter", ort: "Halmbruck",
+      text: (A, h) => [
+        A.merker.anselm_ertappt
+          ? "Anselm setzt sich auf den Boden im Kreis. Er sagt nichts mehr zu euch. Als ihr die Treppe hinaufsteigt, hört ihr ihn beten, oder weinen."
+          : "Anselm setzt sich in den Kreis, wo Valdric saß, und legt die Hände auf die Knie. „Geht“, sagt er. „Und danke. Ihr habt mir einen Winter geschenkt, in dem ich weiß, dass es jemanden gab, der gekommen ist.“",
+        "Die Steine leuchten auf. Valdric verschwindet im Boden wie in Wasser.",
+        ...epilog(A, h),
+        "Im Frühjahr läutet die Glocke wieder. Einmal. Dann ist es still. Anselm ist gestorben, und das Siegel sucht. In Halmbruck beginnt man, auf Fremde zu warten.",
+      ],
+    },
+    ende_kobold: {
+      art: "ende", abschnitt: 3, titel: "Der Hüter mit den vielen Zähnen", ort: "Halmbruck",
+      text: (A, h) => [
+        "Nisk setzt sich in den Kreis. Er ist so klein, dass seine Füße den Boden nicht berühren. „Nisk passt auf“, sagt er. „Und ihr kommt besuchen. Ja? Ihr kommt besuchen.“",
+        "Anselm legt ihm die Hand auf den Kopf, ein einziges Mal. Dann geht er mit euch hinauf, und zum ersten Mal seit vierzig Jahren sieht er die Sonne aufgehen.",
+        ...epilog(A, h),
+        "Kobolde leben lange. Die Glocke von Grauwacht schweigt für hundert Jahre. Manchmal, in klaren Nächten, hört man unter der Abtei jemanden kichern.",
+      ],
+    },
+    ende_opfer: {
+      art: "ende", abschnitt: 3, titel: "Der neue Hüter", ort: "Halmbruck",
+      beimEintritt: (A) => {
+        if (A.merker.hueter) return null;
+        const frei = A.gruppe.filter((f) => A.merker["bleibt_" + f]);
+        return { setzt: { hueter: frei[Math.floor(A.r() * frei.length)] } };
+      },
+      text: (A, h) => {
+        const fid = A.merker.hueter, n = fid ? h.name(A, fid) : "Jemand";
+        return [
+          `${n} tritt in den Kreis. Die Steine leuchten auf, und das Licht ist warm, nicht kalt. Valdric verschwindet im Boden wie in Wasser.`,
+          `„Geht“, sagt ${n}. „Ich halte das. Eine Weile.“`,
+          "Anselm geht mit euch hinauf. Er stirbt im Frühjahr, in einem Bett in Halmbruck, und am Ende lächelt er.",
+          ...epilog(A, h),
+          `Die Glocke von Grauwacht schweigt. In Halmbruck stellt man jedes Jahr am letzten Herbstabend eine Laterne auf den Pfad zur Abtei. Für ${n}.`,
+        ];
+      },
+    },
+    ende_bruch: {
+      art: "ende", abschnitt: 3, titel: "Der Einsturz", ort: "Halmbruck",
+      text: (A, h) => [
+        "Ihr legt die Hände auf die Steine und drückt. Einer nach dem anderen kippt. Der Kreis zerspringt, und Valdric lacht, dann schreit er, dann ist er Staub. Über euch ächzt die Abtei.",
+        "Ihr rennt. Anselm schafft es nicht. Er will es auch nicht. Er sitzt im zerbrochenen Kreis, als die Decke fällt, und sein Gesicht ist ruhig.",
+        A.glocke >= 4
+          ? "Ihr erreicht den Hang, als die Abtei in sich zusammenstürzt. Dann seht ihr, was die Glocke gerufen hat: Schatten, die aus den Trümmern steigen und ins Tal ziehen. In Halmbruck brennt in dieser Nacht die Mühle."
+          : "Ihr erreicht den Hang, als die Abtei in sich zusammenstürzt. Eine Staubwolke steigt auf, dann ist es still. Zum ersten Mal seit sieben Nächten: wirklich still.",
+        ...epilog(A, h),
+        "Grauwacht ist ein Haufen Steine. Niemand wacht mehr. Niemand muss mehr wachen.",
+      ],
+    },
+    ende_verrat: {
+      art: "ende", abschnitt: 3, titel: "Der Hüter wider Willen", ort: "Die Siegelkammer",
+      text: (A, h) => {
+        const fid = A.merker.verrat_opfer, n = fid ? h.name(A, fid) : "Eine von euch";
+        return [
+          `Das Licht erreicht ${n} zuerst. Es legt sich um die Füße, dann um die Brust, und ${n} kann sich nicht mehr bewegen. Die anderen werden aus dem Kreis geschleudert.`,
+          "Anselm lacht, dann weint er. „Es tut mir leid. Es tut mir so leid. Ich konnte nicht mehr.“ Er steigt die Treppe hinauf und dreht sich nicht um.",
+          `Ihr versucht es. Stundenlang. ${n} sieht euch an und sagt schließlich: „Geht. Bitte. Bevor er euch auch noch nimmt.“`,
+          ...epilog(A, h),
+          `Anselm wird nie wieder gesehen. Die Glocke schweigt. Unter Grauwacht wacht ${n} und wartet darauf, dass jemand die Glocke läutet.`,
+        ];
+      },
     },
     grauwacht_behaelt: {
       art: "ende", abschnitt: 0, titel: "Grauwacht behält euch", ort: "",

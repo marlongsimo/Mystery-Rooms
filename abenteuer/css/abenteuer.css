@@ -412,3 +412,4 @@ main:has(#lobby:not([hidden])) { max-width: 1220px; }
 .handy-szene .schritte, .tabinhalt .schritte { margin-bottom: 10px; }
 .ergebnis.wuerfel-erg { gap: 12px; }
 .ergebnis.wuerfel-erg .w20-box { width: 60px; height: 60px; }
+.geheim-frage { margin: 12px 0 4px; font-size: .95em; line-height: 1.45; }

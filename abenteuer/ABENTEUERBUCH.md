@@ -1,4 +1,4 @@
-# Das Siegel von Grauwacht – Abenteuerbuch 0.1
+# Das Siegel von Grauwacht – Abenteuerbuch 0.3
 
 **Case Unlocked · Abenteuer · Die Splitterlande**
 Stand 0.1 · Entwurf zur Freigabe. Erst nach Freigabe werden Texte und Szenen gebaut.
@@ -236,65 +236,116 @@ Ein senkrechter Schacht, überspannt von Netzen. Darin, eingesponnen, aber leben
 
 ### Abschnitt 3 · Das Siegel
 
-#### 3.1 Die Halle der Asche (≈ 25 Min.)
-Glut im Boden, Säulen, Aschehunde, und vor dem Tor der Siegelkammer steht **Coldric**, der Grabritter.
-- **Coldrics Name:** Ist `coldric_name` gesetzt, kann jemand ihn rufen (Probe Charisma leicht).
-  - Er erinnert sich, kniet nieder und zerfällt zu Asche.
-  - Die Gruppe kämpft nur gegen die Aschehunde.
-  - Fund: sein Schild, +1 RK.
-- **Nisk:**
-  - `nisk_dabei` und `nisk_vertrauen` ≥ 2: Er zeigt einen Seitengang, und ein Aschehund weniger kämpft.
-  - `nisk_dabei` und `nisk_vertrauen` ≤ 0: Er läuft vor und warnt Coldric. Keine Überraschung, Coldric beginnt mit Initiative 20. Nisk ist danach fort.
-  - Nicht dabei, aber in 1.3 freigelassen: Er erscheint mitten im Kampf und lenkt einen Aschehund ab, einmalig.
-  - `blutschuld`: 2 Schattenkobolde kämpfen auf der Seite der Hunde.
+> Stand 0.3: So ist Abschnitt 3 gebaut. Die Texte sind Entwürfe und werden beim Spielen freigegeben.
 
-#### 3.2 Die Siegelkammer – Der Abt ohne Namen (≈ 25 Min.)
-Ein runder Raum, vier Siegelsteine an den Ecken. In der Mitte schwebt etwas in einem Mantel ohne Körper.
-- **Phase 1:** Der Abt greift aus der Mitte an und ruft jede zweite Runde einen Knochenwächter.
-  - Ab Glocke 5 stehen von Beginn an 2 Knochenwächter mehr.
-  - Bei Glocke 7 beginnt der Kampf direkt in Phase 2.
-- **Phase 2** (ab halben TP): Das Siegel bricht.
-  - Felder auf dem Raster brennen.
-  - Wer einen der vier Siegelsteine berührt (Aktion, angrenzend), schwächt ihn: −2 RK, und er verliert seine Reaktion.
-  - Sind alle vier berührt, ist er verwundbar.
-- **Das Flüstern:** Zu Beginn von Phase 2 bekommt **jede Figur mit `wasser_getrunken`** auf ihrem Handy ein geheimes Angebot: *„Berühre den vierten Stein nicht, und ich verschone dich. Ich gebe dir, was du verloren hast.“*
-  - Annehmen oder ablehnen, niemand sonst sieht es.
-  - **Annehmen** setzt `fluesterpakt`. Der Abt greift diese Figur nicht mehr an, aber sie kann keinen Siegelstein berühren.
-  - Berühren alle anderen die vier Steine trotzdem, ist der Pakt gebrochen, und der Abt rächt sich zuerst an ihr.
-- **Normal:** Liegt die Gruppe am Boden, Rückzug in die Bibliothek, die Glocke schlägt, der Kampf beginnt neu.
-- **Hardcore:** Liegt die Gruppe am Boden, Ende E6.
+#### 3.0 Die Treppe der Asche
+- Hat Nisk Tam nach oben gebracht, kommt er zurück: `nisk_vertrauen` +1 (so ist 3 erreichbar).
+- `nisk_dabei` und `nisk_vertrauen` ≤ 0: Er reißt sich los und warnt die Halle (`nisk_verrat`, `nisk_fort`).
+- Freigelassener Nisk zeigt festen Boden. Mit `blutschuld` folgen Kobolde.
 
-#### 3.3 Die letzte Entscheidung
-Der Abt liegt am Boden, aber er ist nicht tot. Er kann nicht sterben, nur gehalten werden. Anselm steht plötzlich in der Tür, keuchend. Er ist doch hinuntergekommen. Jetzt sagt er die Wahrheit, falls sie nicht schon bekannt ist.
+#### 3.1 Die Halle der Asche (Abstimmung)
+Säulen, Glut unter der Asche, Aschehunde, und vor der Eisentür **Coldric**, der Grabritter.
+- **Kämpfen:** Coldric und Aschehunde.
+- **Coldric beim Namen rufen** (wenn `coldric_name`): Probe Charisma SG 10, Ragnar mit Vorteil.
+  - Erfolg: Coldric tritt zur Seite, es kämpfen nur die Aschehunde.
+  - Knapp: Er zögert, der Kampf ist etwas leichter.
+- **Ehrenduell** (wenn Isolde dabei ist): Isolde allein gegen Coldric (sein Leben ×0,75, etwa 75 % Siegchance).
+  - Sieg: Die Hunde zerfallen, kein Kampf.
+  - Niederlage: Coldric verschont sie (1 TP), dann kämpft die ganze Gruppe.
+- **Mit dem Umhang der Dämmerung schleichen** (wenn `umhang`): Gruppenprobe Geschicklichkeit SG 12.
+  - Erfolg: an der Halle vorbei.
+  - Knapp: Kampf mit Überraschung.
+- **Modifikatoren:**
+  - Vaelin löscht die Glut: Gegner ×0,85.
+  - Nisk mit Vertrauen ≥ 2: Seitengang, Überraschung, ×0,8.
+  - Freigelassener Nisk: ×0,9.
+  - Verrat: ×1,15.
+  - `blutschuld`: +2 Schattenkobolde.
+- Danach kann in Normal ein letztes Mal kurz gerastet werden.
 
-**Abstimmung** (geheim, bei Gleichstand entscheidet der Würfel am Tisch):
-1. **Das Siegel erneuern.** Dann eine zweite Abstimmung: **Wer bleibt als Hüter?**
-   - **Anselm.** Er stirbt in wenigen Jahren, dann ruft die Glocke wieder.
-   - **Nisk**, nur wenn `nisk_dabei` und `nisk_vertrauen` = 3. Er bietet es selbst an.
-   - **Eine der Figuren**, freiwillig, die Person entscheidet auf ihrem Handy. Die Figur verlässt die Gruppe für immer und wird im Speicher als „Hüterin/Hüter von Grauwacht“ geführt.
-2. **Das Siegel zerbrechen.** Der Abt wird ausgelöscht, seine Kraft wird frei. Die Gruppe erhält den **Splitter von Grauwacht**, einen mächtigen Gegenstand für das nächste Abenteuer. Die Splitterlande verändern sich.
+#### 3.2 Die Siegelkammer und das Flüstern
+- Valdric sitzt im Kreis aus Silber, vier Siegelsteine stehen im Raum.
+- Vor dem Kampf flüstert er **jeder Figur** einzeln, auf ihrem Handy (geheim):
+  - Wer am Brunnen getrunken hat, hört das persönliche Angebot aus der Versuchung der Figur.
+  - Alle anderen hören ein fernes Angebot: „Du wirst lebend hier herauskommen.“
+  - Die Bedingung ist für alle gleich: keinen Siegelstein berühren.
+- **Annehmen** setzt `pakt_<figur>`.
+- **Morwen** sieht auf ihrem Handy, wer ihn genauso deutlich hört (wer getrunken hat).
+- **Seran** spürt danach am Tisch, wer Ja gesagt hat.
+
+#### 3.3 Der Endkampf gegen Valdric
+- **Valdric:** 70 TP, RK 14, Fluchhand auf 6 Felder, ruft jede 2. Runde einen Knochenwächter.
+- **Ab halben TP:**
+  - Fluchwelle um ein Ziel.
+  - Zwei Angriffe pro Zug.
+- **Siegelstein berühren** (Aktion, angrenzend): Valdric −2 RK und 2W6 Schaden.
+  - Sind alle vier berührt, ist er gebunden und ruft niemanden mehr.
+- **Wahrer Name** (wenn `abt_name`): einmal pro Kampf. Valdric setzt einen Zug aus und hat −2 RK.
+- **Silberne Glocke** (wenn `silberglocke`): Knochenwächter in der Nähe zerfallen (WEI-Rettungswurf).
+- **Pakt:**
+  - Paktierer können keinen Stein berühren.
+  - Valdric schont sie, bis er gebunden ist.
+  - Danach greift er sie zuerst an.
+- **Modifikatoren:**
+  - Darians Ring (`ring`): ×0,9.
+  - Glocke ≥ 5: +1 Knochenwächter.
+  - Glocke 7: ×1,15. Es gibt keinen Sprung in Phase 2.
+- Niederlage:
+  - Normal: Rückzug zum Lagerfeuer in der Bibliothek.
+  - Hardcore: E6.
+
+#### 3.4 Anselm und die letzte Entscheidung
+- Nach dem Sieg kommt Anselm die Treppe herunter.
+- **Hat die Gruppe ihm misstraut** (`anselm_vertrauen` < 0) **und das Tagebuch nicht ganz gelesen**, zeigt er seinen wahren Plan:
+  - Er hat die Glocke geläutet, um einen Nachfolger zu holen.
+  - Gruppenprobe Weisheit SG 13.
+  - Erfolg: Ihr reißt euch los (`anselm_ertappt`).
+  - Misserfolg: E5.
+- **Sonst** folgt ein Gespräch: Warum die Glocke? Jorek? Was passiert beim Zerbrechen?
+- **Abstimmung:** Siegel erneuern oder zerbrechen.
+- **Erneuern → Wer wacht?**
+  - Anselm.
+  - Nisk, wenn er dabei ist und Vertrauen ≥ 2 hat.
+  - Einer von uns: Jede Person entscheidet geheim. Bei mehreren entscheidet das Los. Meldet sich niemand, bleibt Anselm.
 
 ### Die Enden
 
 | Ende | Bedingung | Kern |
 |---|---|---|
-| **E1 · Der alte Wächter** | erneuern, Anselm bleibt | Die Glocke schweigt. Für jetzt. Im nächsten Frühjahr hört man sie wieder, ganz leise. |
-| **E2 · Der Kobold im Turm** | erneuern, Nisk bleibt | Der Kleinste hält, was die Großen nicht konnten. Sein Stamm kehrt zurück und hütet die Abtei mit ihm. |
-| **E3 · Das letzte Opfer** | erneuern, eine Figur bleibt | Die Gruppe kehrt ohne sie zurück. Ihr Name steht ab jetzt auf der fünften Grabplatte. |
-| **E4 · Der Bruch** | zerbrechen, und `anselm_misstraut` ist nicht gesetzt | Anselm stirbt friedlich, frei von seiner Pflicht. Über den Splitterlanden reißt der Himmel einen Spalt weit auf. |
-| **E5 · Der Verrat** | zerbrechen, und `anselm_misstraut` ist gesetzt **oder** jemand hat `fluesterpakt` und das Siegel bricht | Anselm wendet sich ab: „Ihr seid wie er.“ Er verschwindet mit dem Tagebuch. Im nächsten Abenteuer ist er gegen euch. |
-| **E6 · Grauwacht behält euch** | Hardcore: die ganze Gruppe tot | Die Glocke läutet weiter. Im nächsten Jahr kommt eine neue Gruppe nach Halmbruck. Eure Namen stehen auf ihrer Karte. |
+| **E1 · Der letzte Winter** | erneuern, Anselm bleibt | Er hält noch einen Winter. Im Frühjahr läutet die Glocke wieder. |
+| **E2 · Der Hüter mit den vielen Zähnen** | erneuern, Nisk bleibt | Kobolde leben lange. Die Glocke schweigt für hundert Jahre. |
+| **E3 · Der neue Hüter** | erneuern, eine Figur bleibt | Halmbruck stellt jedes Jahr eine Laterne auf den Pfad, für sie. |
+| **E4 · Der Einsturz** | zerbrechen | Valdric wird Staub, die Abtei stürzt ein, Anselm bleibt darin. Ab Glocke 4 zieht etwas ins Tal. |
+| **E5 · Der Hüter wider Willen** | Anselms Plan gelingt | Eine zufällige Figur wird gegen ihren Willen zur Hüterin. Anselm verschwindet. |
+| **E6 · Grauwacht behält euch** | Hardcore: die ganze Gruppe tot | Die Glocke läutet weiter. |
 
 ### Der Epilog (setzt sich aus Merkern zusammen)
-Nach dem Ende liest der Tisch einen kurzen Epilog aus Bausteinen vor, je ein Satz oder Absatz:
-- **Halmbruck:** Das Wasser wird süß. Bei Glocke 7 bleibt der Dorfbrunnen bitter, für immer.
-- **Tam:** Er kommt heim (`tam_gerettet`), oder seine Mutter stellt jeden Abend eine Kerze ins Fenster.
-- **Wenna:** Hat die Gruppe das Medaillon (`wenna_versprechen` und Gruft-Weg), weint sie und dankt. Mit Versprechen, aber ohne Medaillon, wartet sie weiter. Ohne Versprechen gibt es keinen Absatz.
-- **Die Kobolde:** Sie kehren zurück, wenn `nisk_vertrauen` ≥ 2 und keine `blutschuld`. Mit `blutschuld` meiden sie Menschen fortan.
-- **Gefallene** (Hardcore): Ihre Namen werden am Ende einzeln vorgelesen und bleiben im Gedenkbuch des Geräts.
-- **Ausblick** auf das nächste Abenteuer, je nach Ende.
+- **Halmbruck** nach Glocke:
+  - 0–2: Die Brunnen schmecken wieder süß.
+  - 3–5: Das Dorf erholt sich langsam.
+  - 6–7: Drei Häuser stehen leer.
+  - Glocke 7: Der Dorfbrunnen bleibt für immer bitter.
+- **Tam:**
+  - gerettet;
+  - zurückgelassen: das Netz ist leer;
+  - sonst: die Kerze im Fenster.
+- **Wenna:**
+  - Medaillon: Sie holt ihren Vater heim.
+  - gefunden, aber nichts versprochen: Ihr sagt es ihr.
+  - versprochen, aber nicht gefunden: Sie wartet weiter.
+- **Kobolde:**
+  - `blutschuld`: Sie rächen sich im Winter.
+  - Frieden mit Nisk: kleine Geschenke am Waldrand.
+- **Gefallene** werden auf dem Hügel begraben und namentlich genannt.
+- **Paktierer, die überlebt haben:**
+  - Das Versprechen erfüllt sich.
+  - Jetzt erst steht der Haken dazu, der Teil „Wahr, aber …“ aus der Versuchung.
 
-Grob gezählt gibt es 6 Enden und etwa 200 Epilog-Kombinationen. Geschrieben werden müssen nur rund 20 Textbausteine.
+**Noch nicht gebaut** (aus 0.1):
+- Coldrics Schild (+1 RK).
+- Splitter von Grauwacht und Ausblick auf das nächste Abenteuer.
+- Gedenkbuch auf dem Gerät.
+- Anselm als Gegner im nächsten Abenteuer.
 
 ---
 

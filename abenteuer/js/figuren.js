@@ -7,11 +7,11 @@
 (function (root) {
   "use strict";
   const KLASSEN = {
-    krieger: { name: "Krieger", farbe: "#a8322a", wuerfel: 10, rettung: ["STR", "KON"], zeichen: "schild" },
-    zauberer: { name: "Zauberer", farbe: "#2f5fa8", wuerfel: 8, rettung: ["INT", "WEI"], zeichen: "buch", plaetze: true },
-    schurke: { name: "Schurke", farbe: "#6b3fa0", wuerfel: 8, rettung: ["GES", "INT"], zeichen: "dolche" },
-    kleriker: { name: "Kleriker", farbe: "#c9a24a", wuerfel: 8, rettung: ["WEI", "CHA"], zeichen: "sonne", plaetze: true },
-    waldlaeufer: { name: "Waldläufer", farbe: "#3f7a3a", wuerfel: 10, rettung: ["STR", "GES"], zeichen: "pfote" },
+    krieger: { bewegung: 3, name: "Krieger", farbe: "#a8322a", wuerfel: 10, rettung: ["STR", "KON"], zeichen: "schild" },
+    zauberer: { bewegung: 4, name: "Zauberer", farbe: "#2f5fa8", wuerfel: 8, rettung: ["INT", "WEI"], zeichen: "buch", plaetze: true },
+    schurke: { bewegung: 5, name: "Schurke", farbe: "#6b3fa0", wuerfel: 8, rettung: ["GES", "INT"], zeichen: "dolche" },
+    kleriker: { bewegung: 4, name: "Kleriker", farbe: "#c9a24a", wuerfel: 8, rettung: ["WEI", "CHA"], zeichen: "sonne", plaetze: true },
+    waldlaeufer: { bewegung: 5, name: "Waldläufer", farbe: "#3f7a3a", wuerfel: 10, rettung: ["STR", "GES"], zeichen: "pfote" },
   };
   /** Zauberplätze je Stufe: [Grad 1, Grad 2] */
   const PLAETZE = { 1: [3, 0], 2: [4, 0], 3: [3, 2] };
@@ -27,7 +27,7 @@
     ],
     schurke: [
       { id: "hinterhalt", name: "Hinterhalt", typ: "passiv", ab: 1, text: "Einmal je Zug +1W6 (ab Stufe 2 +2W6), wenn du Vorteil hast oder ein Verbündeter neben dem Ziel steht." },
-      { id: "spurt", name: "Gerissener Spurt", typ: "bonus", ab: 2, art: "spurt", gerissen: true, text: "Gerissene Aktion: 6 Felder zusätzliche Bewegung." },
+      { id: "spurt", name: "Gerissener Spurt", typ: "bonus", ab: 2, art: "spurt", gerissen: true, text: "Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst." },
       { id: "verstecken", name: "Verstecken", typ: "bonus", ab: 2, art: "verstecken", gerissen: true, text: "Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an." },
       { id: "rueckzug", name: "Rückzug", typ: "bonus", ab: 2, art: "rueckzug", gerissen: true, text: "Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich." },
     ],

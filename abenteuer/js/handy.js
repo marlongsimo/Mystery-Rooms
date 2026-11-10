@@ -187,7 +187,7 @@
       <div class="kopf"><img class="portraet" src="${F.bild(fid)}" alt=""><div><h1>${esc(d.name)}</h1><p>${esc(d.titel)} · ${esc(k.name)} · Stufe ${stufe}${meinName ? " · " + esc(meinName) : ""}</p><p class="spruch">„${esc(d.spruch)}“</p></div></div>
       ${balken(tp, tpMax)}
       ${fd && fd.tot ? `<div class="info schlecht">${esc(d.name)} ist tot.</div>` : fd && fd.tp <= 0 && s.schwierigkeit === "hardcore" ? `<div class="info schlecht">Todeswürfe: ${"✓".repeat(fd.todes.e)}${"·".repeat(3 - fd.todes.e)} | ${"✗".repeat(fd.todes.f)}${"·".repeat(Math.max(0, 3 - fd.todes.f))}${fd.stabil ? " · stabil" : ""}</div>` : ""}
-      <div class="werte-zeile"><span><b>${rk}</b>RK</span>${platzText}<span><b>${dran ? s.zug.bewegung : 6}</b>Felder</span></div>
+      <div class="werte-zeile"><span><b>${rk}</b>RK</span>${platzText}<span><b>${dran ? s.zug.bewegung : (k.bewegung || 6)}</b>Felder</span></div>
       ${zust.length ? `<p class="zustaende">${zust.map((z) => `<span>${esc(z)}</span>`).join("")}</p>` : ""}
       <nav class="tabs">${[["zug", s.phase === "szene" ? "Szene" : "Zug"], ["faehig", "Fähigkeiten"], ["rucksack", "Rucksack"]].map(([id, t]) => `<button data-tab="${id}" class="${H.tab === id ? "an" : ""}">${t}${id === "zug" && (dran || szeneWartet(s, fid)) ? " ●" : ""}</button>`).join("")}</nav>
       <div class="tabinhalt">`;
@@ -313,7 +313,7 @@
       <p class="note">${esc(d.rolle)} · ${esc(d.ruestung)} · TP ${F.tpVon(fid, 1)} / ${F.tpVon(fid, 2)} / ${F.tpVon(fid, 3)}</p>
       <h3 class="klein">Im Kampf</h3><ul class="faehig">${alle.filter((a) => a.typ !== "passiv").map(li).join("")}</ul>
       <h3 class="klein">Immer aktiv</h3><ul class="faehig">${alle.filter((a) => a.typ === "passiv").map(li).join("")}</ul>
-      <h3 class="klein">Außerhalb des Kampfes</h3><ul class="faehig"><li><b>${esc(d.aussen.name)}</b><p>${esc(d.aussen.text)}</p></li><li><b>Bewegung</b><small>6 Felder pro Zug</small><p>Schräg zählt wie gerade. Wer neben einem Gegner losläuft, riskiert einen Gelegenheitsangriff.</p></li></ul>`;
+      <h3 class="klein">Außerhalb des Kampfes</h3><ul class="faehig"><li><b>${esc(d.aussen.name)}</b><p>${esc(d.aussen.text)}</p></li><li><b>Bewegung</b><small>${F.KLASSEN[F.FIGUREN[fid].klasse].bewegung || 6} Felder pro Zug</small><p>Schräg zählt wie gerade. Wer neben einem Gegner losläuft, riskiert einen Gelegenheitsangriff.</p></li></ul>`;
   }
 
   function tabRucksack(dinge, fid) {

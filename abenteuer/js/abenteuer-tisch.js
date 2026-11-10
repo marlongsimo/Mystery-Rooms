@@ -18,7 +18,7 @@
     wahl: "Gruppenentscheidung: Besprecht euch. Dann entscheidet die Gruppe – mit Handys stimmt jede Person geheim ab, die Mehrheit gilt, bei Gleichstand der Würfel. Viele Entscheidungen haben Folgen, manche erst viel später.",
     probe: "Probe: Eine Figur versucht es und würfelt einen W20 plus ihren Bonus. Erreicht sie den Schwierigkeitsgrad (SG), gelingt es. Knapp daneben kostet oft etwas, ein Fehlschlag führt auf einen anderen Weg. Wählt jemanden mit hohem Bonus.",
     geheim: "Geheime Entscheidung: Jede Person entscheidet ganz allein. Niemand am Tisch erfährt, wie die anderen entschieden haben.",
-    kampf: "Kampf: Gleich wechselt ihr auf die Karte. Wer dran ist, zieht bis zu 6 Felder, macht eine Aktion und eine Bonusaktion, dann „Zug beenden“. Der Knopf „💡 Tipp“ schlägt einen sinnvollen Zug vor.",
+    kampf: "Kampf: Gleich wechselt ihr auf die Karte. Wer dran ist, läuft so weit, wie die Figur kann (Krieger 3, Zauberer und Kleriker 4, Schurken und Waldläufer 5 Felder), macht eine Aktion und eine Bonusaktion, dann „Zug beenden“. Der Knopf „💡 Tipp“ schlägt einen sinnvollen Zug vor.",
     lager: "Lagerfeuer: Ihr ruht, heilt vollständig und bekommt eure Zauberplätze zurück. Das Spiel speichert hier.",
     raetsel: "Rätsel: Lest euch gegenseitig vor, was auf euren Handys steht. Dann schlagt die Glocken am Tisch in der richtigen Reihenfolge an. Jeder falsche Versuch lässt die Glocke von Grauwacht schlagen.",
   };

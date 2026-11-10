@@ -41,7 +41,7 @@
   const SILBER_A = { id: "silberglocke", name: "Die silberne Glocke läuten", typ: "bonus", art: "silber", text: "Knochenwächter in 6 Feldern machen einen WEI-Rettungswurf (SG 13), sonst zerfallen sie. Einmal." };
   const imPakt = (st, f) => Boolean(st && st.boss && (st.boss.pakt || []).includes(f.fid));
   const bossVon = (st) => st.figuren.find((g) => g.seite === "gegner" && GEGNER[g.art].boss && lebt(g));
-  const SPURT = { id: "spurt_aktion", name: "Spurt", typ: "aktion", art: "spurt", text: "6 Felder zusätzliche Bewegung statt einer Aktion." };
+  const SPURT = { id: "spurt_aktion", name: "Spurt", typ: "aktion", art: "spurt", text: "Statt einer Aktion: noch einmal so weit laufen, wie du ohnehin kannst." };
 
   /* ---------- Gegner (Grauwacht) ---------- */
   const GEGNER = {
@@ -956,7 +956,7 @@
       weiter(st); return;
     }
     // Kobold flieht bei wenig TP
-    if (d.flieht && g.tp < d.flieht) { flieheVon(); st.log.push({ t: `${g.name} flieht.`, art: "gegner" }); fangschuss(st, g, startX, startY); if (!st.ende) weiter(st); return; }
+    if (d.flieht && g.tp < d.flieht && !g.geflohen) { g.geflohen = true; flieheVon(); st.log.push({ t: `${g.name} flieht.`, art: "gegner" }); fangschuss(st, g, startX, startY); if (!st.ende) weiter(st); return; }
     // Pilzbrut: Sporen auf alle Nachbarn
     if (d.sporen) {
       const nach = lebende.filter((f) => abstand(g, f) <= 1);
@@ -1337,7 +1337,7 @@
     };
   }
 
-  const API = { chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
     findeAktion, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

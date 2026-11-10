@@ -53,6 +53,7 @@
         <span class="banner-spec">
           <span><i>Stärke</i>${esc(info.stark)}</span>
           <span><i>Platz</i>${esc(info.platz)}</span>
+          <span><i>Bewegung</i>${kl.bewegung || 6} Felder je Zug</span>
           <span><i>Lebenswürfel</i>W${kl.wuerfel}${kl.plaetze ? " · zaubert" : ""}</span>
           <span><i>Rettung</i>${kl.rettung.map((a) => ATTR_NAME[a]).join(", ")}</span>
           <span><i>Klasse</i>${esc(faehig)}</span>
@@ -94,7 +95,7 @@
         <blockquote>„${esc(d.spruch)}“</blockquote>
         <p class="held-spielweise">${esc(pr.spielweise)}</p>
         <div class="held-achsen">${balken}</div>
-        <div class="held-kern"><span><b>${F.tpVon(fid, stufe)}</b><small>Trefferpunkte</small></span><span><b>${d.rk[stufe - 1]}</b><small>Rüstungsklasse</small></span>${k.plaetze ? `<span><b>${F.PLAETZE[stufe][0] + F.PLAETZE[stufe][1]}</b><small>Zauberplätze</small></span>` : ""}${d.wolf ? `<span><b>🐺</b><small>Wolf ${esc(d.wolf.name)}</small></span>` : ""}</div>
+        <div class="held-kern"><span><b>${F.tpVon(fid, stufe)}</b><small>Trefferpunkte</small></span><span><b>${d.rk[stufe - 1]}</b><small>Rüstungsklasse</small></span><span><b>${d.bewegung || k.bewegung || 6}</b><small>Felder Bewegung</small></span>${k.plaetze ? `<span><b>${F.PLAETZE[stufe][0] + F.PLAETZE[stufe][1]}</b><small>Zauberplätze</small></span>` : ""}${d.wolf ? `<span><b>🐺</b><small>Wolf ${esc(d.wolf.name)}</small></span>` : ""}</div>
         <div class="held-werte">${werte}</div>
         ${knopf}
         <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="werte">Attribute</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>

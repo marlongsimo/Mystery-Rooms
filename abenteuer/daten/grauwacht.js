@@ -36,8 +36,8 @@
   const RAND = (oben2) => { const h = []; for (let x = 0; x < 12; x++) { h.push(BX(x, 0), BX(x, 8)); if (oben2) h.push(BX(x, 1)); } for (let y = oben2 ? 2 : 1; y < 8; y++) h.push(BX(0, y), BX(11, y)); return h; };
   const PILZE = {
     name: "Die Pilzkammer", b: 12, h: 9, bild: "img/welt/pilzkammer.webp",
-    hindernisse: RAND(false).concat([BX(1, 1), BX(1, 2), BX(1, 3), BX(4, 1), BX(1, 4), BX(1, 7), BX(6, 1), BX(7, 1), BX(5, 2), BX(6, 2), BX(4, 3), BX(5, 3), BX(4, 4), BX(6, 4),
-      BX(7, 4), BX(4, 5), BX(5, 5), BX(6, 5), BX(4, 6), BX(5, 6), BX(4, 7), BX(9, 2), BX(10, 2), BX(10, 3), BX(10, 4), BX(9, 6), BX(10, 6), BX(9, 7), BX(10, 7)]),
+    hindernisse: RAND(false).concat([BX(1, 1), BX(1, 2), BX(1, 3), BX(4, 1), BX(1, 4), BX(1, 7), BX(6, 1), BX(7, 1), BX(5, 2), BX(6, 2), BX(4, 3), BX(5, 3), BX(6, 4),
+      BX(7, 4), BX(4, 5), BX(5, 5), BX(6, 5), BX(4, 6), BX(5, 6), BX(9, 2), BX(10, 2), BX(10, 3), BX(10, 4), BX(9, 6), BX(10, 6), BX(9, 7), BX(10, 7)]),
     start: { spieler: [[2, 5], [3, 5], [2, 6], [3, 4], [2, 3], [3, 7]], wolf: [[1, 5], [1, 6], [3, 3], [2, 4]],
       gegner: [[8, 3], [7, 3], [8, 4], [9, 4], [8, 2], [7, 2], [9, 5], [8, 5], [9, 1], [6, 3], [7, 6], [8, 6]] },
   };

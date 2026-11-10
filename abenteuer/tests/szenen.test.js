@@ -68,6 +68,16 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   S.waehle(A1, 'tam'); check(A1.merker.tam_schlaf === true, 'Kael liest an Tams Spuren, dass der Junge im Schlaf ging');
   check(S.optionen(A1).some((o) => o.id === 'versprechen'), 'Versprechen an Wenna wird erst nach ihrer Geschichte angeboten');
 
+  // Karten: Jedes begehbare Feld ist von den Startplätzen der Helden erreichbar, kein Startplatz liegt auf einem Hindernis
+  for (const [kn, k] of Object.entries(D.KARTEN).concat([['GARTEN', R.KARTE_GARTEN]])) {
+    const block = new Set(k.hindernisse.map(([, x, y]) => x + ',' + y)), frei = (x, y) => x >= 0 && y >= 0 && x < k.b && y < k.h && !block.has(x + ',' + y);
+    const starts = [...k.start.spieler, ...k.start.gegner.slice(0, 8)];
+    const belegt = starts.filter(([x, y]) => !frei(x, y));
+    const weg = new Set(), q = [k.start.spieler[0]]; weg.add(q[0].join(','));
+    while (q.length) { const [x, y] = q.shift(); for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const nx = x + dx, ny = y + dy, kk = nx + ',' + ny; if (frei(nx, ny) && !weg.has(kk)) { weg.add(kk); q.push([nx, ny]); } } }
+    let alle = 0; for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) if (frei(x, y)) alle++;
+    check(belegt.length === 0 && weg.size === alle, `Karte ${k.name}: alle ${alle} freien Felder erreichbar, Startplätze frei` + (belegt.length ? ` – blockiert: ${belegt.join(' ')}` : weg.size !== alle ? ` – nur ${weg.size} erreichbar` : ''));
+  }
   // Coldrics Schild und der Splitter
   const A2 = S.neu(3, { gruppe: ['schildwaechter', 'duellant', 'lichtbringer'] }); A2.stufe = 3; A2.merker.coldric_frieden = true; A2.szene = 'halle_danach'; S.weiter(A2);
   check(A2.szene === 'coldric_schild' && S.optionen(A2).length === 3, 'Nach Coldrics Frieden: Abstimmung, wer seinen Schild trägt');

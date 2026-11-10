@@ -446,3 +446,4 @@ dialog[open] { animation: rise .25s ease-out; }
 .topic-cross { margin: 26px 0 0; }
 .topic-cross a { color: var(--gold-2); }
 @media (max-width: 760px) { .quick-grid, .topic-steps { grid-template-columns: 1fr; } }
+.nav .beta { font-size: .78em; color: var(--gold-2); letter-spacing: .04em; }

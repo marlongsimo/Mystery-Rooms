@@ -46,7 +46,7 @@
       const info = KLASSE_INFO[k], helden = vonKlasse(k), dabei = helden.filter((f) => gruppe.includes(f)).length;
       const faehig = F.KLASSE_FAEHIG[k].filter((a) => a.ab === 1).map((a) => a.name).join(", ");
       return `<button class="banner" data-klasse="${k}" style="--k:${kl.farbe}" aria-label="${esc(kl.name)}: ${esc(info.kurz)}">
-        <span class="banner-bild">${helden.map((f) => `<img src="${F.bild(f)}" alt="" loading="lazy">`).join("")}</span>
+        <span class="banner-bild">${helden.map((f) => `<img src="${F.bild(f)}" alt="" decoding="async">`).join("")}</span>
         <span class="banner-zeichen" aria-hidden="true">${KLASSE_ZEICHEN[k]}</span>
         <b class="banner-name">${esc(kl.name)}</b>
         <span class="banner-kurz">${esc(info.kurz)}</span>

@@ -20,7 +20,7 @@
   const SPEICHER = "ab_tisch", SETUP_KEY = "ab_setup";
   const SELBST = new Set(["selbstheilung", "trank", "raserei", "finte", "gift", "verstecken", "rueckzug", "spurt", "schattenschritt", "spiegelbilder", "segen", "schutzkreis", "vertreiben", "bewahren", "massenheil", "rauch", "tatendrang"]);
   const BEGEGNUNGEN = R.BEGEGNUNGEN;
-  let st = null, wahl = null, gegnerTimer = null, letzterLog = 0;
+  let st = null, wahl = null, gegnerTimer = null, letzterLog = 0, kampfEnde = null;
   let SETUP = { gruppe: ["schildwaechter", "elementarist", "lichtbringer"], stufe: 1, schwierigkeit: "normal", begegnung: "garten" };
   try { const s = JSON.parse(localStorage.getItem(SETUP_KEY) || "null"); if (s && Array.isArray(s.gruppe)) SETUP = Object.assign(SETUP, s, { gruppe: s.gruppe.filter((f) => F.FIGUREN[f]).slice(0, 6) }); } catch (e) { /* privat */ }
   const setupMerken = () => { try { localStorage.setItem(SETUP_KEY, JSON.stringify(SETUP)); } catch (e) { /* privat */ } };
@@ -33,7 +33,7 @@
 
   function speichern() {
     if (!liveAn()) return;
-    try { localStorage.setItem(SPEICHER, JSON.stringify({ phase: LIVE.phase, besitz: LIVE.besitz, erledigt: LIVE.erledigt, setup: SETUP, st: st ? R.speichern(st) : null })); } catch (e) { /* privat */ }
+    try { localStorage.setItem(SPEICHER, JSON.stringify({ phase: LIVE.phase, besitz: LIVE.besitz, erledigt: LIVE.erledigt, setup: SETUP, st: st ? R.speichern(st) : null, abenteuer: window.ABT ? window.ABT.speichern() : null, imAbenteuer: Boolean(kampfEnde) })); } catch (e) { /* privat */ }
   }
   function vergessen() { try { localStorage.removeItem(SPEICHER); } catch (e) { /* privat */ } }
 
@@ -44,7 +44,7 @@
     if (LIVE.schreibt) { LIVE.nochmal = true; return; }
     LIVE.schreibt = true; LIVE.nochmal = false;
     const namen = {}; LIVE.client.players.forEach((p) => { namen[p.user_id] = p.player_name; });
-    const daten = Object.assign({ phase: LIVE.phase, besitz: LIVE.besitz, namen, gruppe: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, antwort: LIVE.antwort, at: Date.now() }, st && LIVE.phase === "kampf" ? R.ansicht(st) : {});
+    const daten = Object.assign(window.ABT ? window.ABT.oeffentlich() : {}, { phase: LIVE.phase, besitz: LIVE.besitz, namen, gruppe: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, antwort: LIVE.antwort, at: Date.now() }, st && LIVE.phase === "kampf" ? R.ansicht(st) : {});
     LIVE.client.writeOwn("spiel", daten)
       .catch((e) => toast("Live: " + e.message))
       .then(() => { LIVE.schreibt = false; if (LIVE.nochmal) veroeffentlichen(); });
@@ -75,6 +75,7 @@
     if (!v.n || v.n <= (LIVE.erledigt[uid] || 0)) return;
     LIVE.erledigt[uid] = v.n;
     const antwort = (fehler) => { LIVE.antwort = { uid, n: v.n, ok: !fehler, fehler: fehler || null }; };
+    if (["stimme", "geheim", "probe_wer", "probe_wurf"].includes(v.typ)) { antwort(window.ABT ? window.ABT.wunsch(uid, v) : "Kein Abenteuer."); veroeffentlichen(); return; }
     if (LIVE.phase !== "kampf" || !st || st.ende) { antwort("Der Kampf läuft gerade nicht."); veroeffentlichen(); return; }
     const akt = R.aktiv(st);
     if (akt.seite !== "spieler" || LIVE.besitz[akt.fid] !== uid) { antwort("Du bist gerade nicht am Zug."); veroeffentlichen(); return; }
@@ -149,7 +150,7 @@
 
   /* ---------- Gruppe zusammenstellen ---------- */
   function zeigeSetup() {
-    $("#intro").hidden = true; $("#spiel").hidden = true; $("#ende").hidden = true; $("#lobby").hidden = false;
+    zeigeSektion("lobby");
     if (liveAn()) LIVE.phase = "lobby";
     zeichneSetup(); veroeffentlichen();
   }
@@ -168,19 +169,19 @@
       return figurKarte(fid, { an, besitzer: uid ? spielerName(uid) : null, gesperrt: live || (!an && n >= 6) });
     }).join("");
     const handys = liveAn() ? LIVE.client.players.filter((p) => !p.is_host) : [];
-    el.innerHTML = `<h1>Der Klostergarten</h1>
+    el.innerHTML = `<h1>Gruppe zusammenstellen</h1>
       ${liveAn() ? beitrittBox() : ""}
       <div class="einstellungen">
-        <div><span class="eyebrow">Stufe</span><div class="seg">${[1, 2, 3].map((s) => `<button data-stufe="${s}" class="${SETUP.stufe === s ? "an" : ""}">${s}</button>`).join("")}</div></div>
+        <div title="Das Abenteuer beginnt immer auf Stufe 1. Die Stufe gilt für einzelne Kämpfe."><span class="eyebrow">Stufe (einzelner Kampf)</span><div class="seg">${[1, 2, 3].map((s) => `<button data-stufe="${s}" class="${SETUP.stufe === s ? "an" : ""}">${s}</button>`).join("")}</div></div>
         <div><span class="eyebrow">Schwierigkeit</span><div class="seg">${[["normal", "Normal"], ["hardcore", "Hardcore"]].map(([v, t]) => `<button data-schwer="${v}" class="${SETUP.schwierigkeit === v ? "an" : ""}">${t}</button>`).join("")}</div></div>
-        <div><span class="eyebrow">Gegner</span><select id="begegnung">${Object.entries(BEGEGNUNGEN).map(([id, b]) => `<option value="${id}" ${SETUP.begegnung === id ? "selected" : ""}>${esc(b.name)} (Stufe ${b.stufe})</option>`).join("")}</select></div>
+        <div><span class="eyebrow">Gegner (einzelner Kampf)</span><select id="begegnung">${Object.entries(BEGEGNUNGEN).map(([id, b]) => `<option value="${id}" ${SETUP.begegnung === id ? "selected" : ""}>${esc(b.name)} (Stufe ${b.stufe})</option>`).join("")}</select></div>
       </div>
       <p class="note">${live && n < 3 ? "" : (() => { const g = R.gegnerFuer(SETUP.begegnung, Math.max(3, n), SETUP.stufe); return `Gegner bei ${Math.max(3, n)} Figuren: ${g.map((x) => `${x.anzahl} × ${R.GEGNER[x.art].name}${Math.abs(x.tpFaktor - 1) > 0.04 ? ` (${Math.round(R.GEGNER[x.art].tp * x.tpFaktor)} TP)` : ""}`).join(", ")}. Die Gegner passen sich an die Gruppengröße an.`; })()}</p>
       <p class="note">${SETUP.schwierigkeit === "hardcore" ? "<b>Hardcore:</b> Wer am Boden liegt, würfelt Todeswürfe. Tote bleiben tot." : "<b>Normal:</b> Am Boden ist das Schlimmste, was passieren kann."}</p>
       <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (3–6)` : `Gruppe · ${n} von 3–6 Figuren`}</h2>
       <div class="fkarten">${karten}</div>
       <p class="note">${live ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Jede Person wählt ihre Figur auf dem Handy. Es spielen nur die gewählten Figuren${n < 3 ? `, und es braucht mindestens 3 – noch ${3 - n}` : ""}.` : "Tippe Figuren an, um sie in die Gruppe zu nehmen. Alle Figuren steuert ihr auf diesem Gerät."}</p>
-      <div class="knoepfe"><button class="btn" id="los" ${n < 3 ? "disabled" : ""}>Kampf beginnen</button>${liveAn() ? `<button class="btn ghost" id="lobby-ende">Sitzung beenden</button>` : `<button class="btn ghost" id="zurueck">Zurück</button>`}</div>`;
+      <div class="knoepfe"><button class="btn" id="abenteuer-los" ${n < 3 ? "disabled" : ""}>Abenteuer beginnen</button><button class="btn ghost" id="los" ${n < 3 ? "disabled" : ""}>Einzelner Kampf</button>${liveAn() ? `<button class="btn ghost" id="lobby-ende">Sitzung beenden</button>` : `<button class="btn ghost" id="zurueck">Zurück</button>`}</div>`;
     if (!live) el.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => {
       const fid = b.dataset.fid, i = SETUP.gruppe.indexOf(fid);
       if (i >= 0) SETUP.gruppe.splice(i, 1); else if (SETUP.gruppe.length < 6) SETUP.gruppe.push(fid);
@@ -194,6 +195,7 @@
     el.querySelectorAll("[data-schwer]").forEach((b) => { b.onclick = () => { SETUP.schwierigkeit = b.dataset.schwer; setupMerken(); zeichneSetup(); veroeffentlichen(); }; });
     $("#begegnung").onchange = (e) => { SETUP.begegnung = e.target.value; setupMerken(); };
     $("#los").onclick = () => start(params.has("seed") ? +params.get("seed") : Math.floor(Math.random() * 1e9));
+    $("#abenteuer-los").onclick = () => { if (window.ABT) window.ABT.start(SETUP); };
     if ($("#lobby-ende")) $("#lobby-ende").onclick = liveBeenden;
     if ($("#zurueck")) $("#zurueck").onclick = zeigeIntro;
   }
@@ -218,6 +220,9 @@
     const cx = x * Z + Z / 2, cy = y * Z + Z / 2;
     if (t === "G") return `<g transform="translate(${cx} ${cy})"><path d="M-14 22 V-8 Q-14 -22 0 -22 Q14 -22 14 -8 V22 Z" fill="#7c7a72" stroke="#3b3a35" stroke-width="2"/><path d="M0 -12 V8 M-6 -4 H6" stroke="#4c4a44" stroke-width="2.4"/><ellipse cy="24" rx="20" ry="5" fill="#000" opacity=".25"/></g>`;
     if (t === "M") return `<g><rect x="${x * Z + 2}" y="${y * Z + 2}" width="${Z - 4}" height="${Z - 4}" fill="#6b6152" stroke="#3a332a" stroke-width="2"/><path d="M${x * Z + 2} ${y * Z + 22}h${Z - 4}M${x * Z + 2} ${y * Z + 40}h${Z - 4}M${x * Z + 30} ${y * Z + 2}v20M${x * Z + 16} ${y * Z + 22}v18M${x * Z + 44} ${y * Z + 22}v18" stroke="#3a332a" stroke-width="1.5"/></g>`;
+    if (t === "S") return `<g><rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" fill="#4a4036" stroke="#2a231c" stroke-width="2"/>${[0, 1, 2, 3].map((i) => `<rect x="${x * Z + 8 + i * 3}" y="${y * Z + 10 + i * 10}" width="${Z - 16 - i * 6}" height="6" fill="#6b5d4c"/>`).join("")}</g>`;
+    if (t === "K") return `<g><rect x="${x * Z + 8}" y="${y * Z + 8}" width="${Z - 16}" height="${Z - 16}" fill="#6a4e30" stroke="#2e2014" stroke-width="2"/><path d="M${x * Z + 8} ${y * Z + 8}L${x * Z + Z - 8} ${y * Z + Z - 8}M${x * Z + Z - 8} ${y * Z + 8}L${x * Z + 8} ${y * Z + Z - 8}" stroke="#2e2014" stroke-width="2"/></g>`;
+    if (t === "R") return `<g transform="translate(${cx} ${cy})"><path d="M-22 -22 Q0 -34 22 -22 L18 4 L-18 4 Z" fill="#8a6a2a" stroke="#3a2a10" stroke-width="2"/><path d="M0 4 V26" stroke="#b08850" stroke-width="4"/><circle cy="27" r="3" fill="#b08850"/></g>`;
     return `<g transform="translate(${cx} ${cy})"><circle r="24" fill="#6f6a60" stroke="#3b3a35" stroke-width="3"/><circle r="15" fill="#10161a"/><path d="M-10 -4 Q0 -10 10 -4" stroke="#3d5a6a" stroke-width="2" fill="none"/></g>`;
   }
   const farbeVon = (f) => (f.art === "wolf" ? "#3f7a3a" : F.KLASSEN[f.klasse].farbe);
@@ -314,6 +319,12 @@
       : st.ende === "niederlage"
         ? `<h2>Grauwacht behält euch</h2><p>Niemand ist mehr auf den Beinen. ${tote.length ? `Gefallen: ${tote.map((f) => esc(f.name)).join(", ")}.` : ""}</p>`
         : `<h2>Rückzug</h2><p>Die Gruppe liegt am Boden und zieht sich zum Lagerfeuer zurück. Im echten Abenteuer verliert ihr nichts, ihr versucht es einfach noch einmal.</p>`;
+    if (kampfEnde) {
+      const t2 = st.ende === "rueckzug" ? `<h2>Rückzug</h2><p>Die Gruppe schleppt sich zum letzten Lagerfeuer zurück. Die Glocke schlägt. Ihr versucht es noch einmal.</p>` : text;
+      e.innerHTML = t2 + `<div class="knoepfe mitte"><button class="btn" id="weiter-abenteuer">Weiter</button></div>`;
+      $("#weiter-abenteuer").onclick = () => { const cb = kampfEnde; kampfEnde = null; const s2 = st; st = null; window.AB.st = null; cb(s2); };
+      return;
+    }
     e.innerHTML = text + `<div class="knoepfe mitte"><button class="btn" id="neu">Noch einmal</button><button class="btn ghost" id="gruppe">Gruppe ändern</button></div>`;
     $("#neu").onclick = () => start(Math.floor(Math.random() * 1e9));
     $("#gruppe").onclick = () => { st = null; if (liveAn()) gruppeAusHandys(); zeigeSetup(); };
@@ -345,8 +356,17 @@
     if (r.fehler) $("#hinweis").textContent = r.fehler; else { render(); veroeffentlichen(); }
   }
 
-  function zeigeIntro() { $("#intro").hidden = false; $("#lobby").hidden = true; $("#spiel").hidden = true; $("#ende").hidden = true; }
-  function zeigeSpiel() { $("#intro").hidden = true; $("#lobby").hidden = true; $("#spiel").hidden = false; }
+  function zeigeSektion(id) { for (const x of ["intro", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
+  function zeigeIntro() { zeigeSektion("intro"); }
+  function zeigeSpiel() { zeigeSektion("spiel"); }
+  /** Kampf aus dem Abenteuer heraus: opts für neuesSpiel, cb(st) nach dem Ende */
+  function kampfStarten(opts, cb) {
+    clearTimeout(gegnerTimer);
+    st = R.neuesSpiel(Math.floor(Math.random() * 1e9), opts);
+    kampfEnde = cb; wahl = null; letzterLog = st.log.length; window.AB.st = st;
+    if (liveAn()) { LIVE.phase = "kampf"; LIVE.antwort = null; }
+    zeigeSpiel(); render(); veroeffentlichen(); gegnerSchleife();
+  }
 
   function start(seed) {
     clearTimeout(gegnerTimer);
@@ -381,7 +401,13 @@
       LIVE.phase = gespeichert.phase; LIVE.besitz = gespeichert.besitz || {}; LIVE.erledigt = gespeichert.erledigt || {};
       if (gespeichert.setup) SETUP = gespeichert.setup;
       wach();
-      if (LIVE.phase === "kampf" && gespeichert.st) { st = R.laden(gespeichert.st); window.AB.st = st; letzterLog = st.log.length; zeigeSpiel(); render(); gegnerSchleife(); }
+      if (gespeichert.abenteuer && window.ABT) window.ABT.laden(gespeichert.abenteuer);
+      if (LIVE.phase === "kampf" && gespeichert.st) {
+        st = R.laden(gespeichert.st); window.AB.st = st; letzterLog = st.log.length;
+        if (gespeichert.imAbenteuer && window.ABT) kampfEnde = (s2) => { const S = window.ABS, A = window.ABT.A(); const e = S.kampfEnde(A, s2); if (e.ergebnis === "rueckzug") toast("Rückzug zum Lagerfeuer. Die Glocke schlägt."); window.ABT.zeige(); };
+        zeigeSpiel(); render(); gegnerSchleife();
+      }
+      else if (LIVE.phase === "szene" && window.ABT && window.ABT.laeuft()) window.ABT.zeige();
       else zeigeSetup();
       await c.fetchStates().catch(() => {});
       veroeffentlichen();
@@ -389,6 +415,7 @@
   })();
 
   // Für automatische Tests
-  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, render, klickFeld, start, zeigeSetup,
+  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
+    liveAn, besitzVon: (fid) => (liveAn() ? LIVE.besitz[fid] : null), spielerName,
     auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };
 })();

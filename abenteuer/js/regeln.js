@@ -176,7 +176,7 @@
    */
   function neuesSpiel(seed, opts = {}) {
     const st = { sparen: opts.sparen != null ? opts.sparen : 1, seed, rs: seed >>> 0 || 1, karte: null, figuren: [], log: [], runde: 1, reihe: [], am: 0, zug: null, ende: null, xp: 0, zonen: [], brand: [],
-      stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal" };
+      stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [] };
     zufall(st);
     const r = st.r, k = opts.karte || KARTE_GARTEN;
     st.karte = { name: k.name, b: k.b, h: k.h, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))) };
@@ -210,12 +210,19 @@
       st.figuren.push({ id: "g" + gi, seite: "gegner", art: g.art, name: d.name + nr, x, y, tp: gtp, tpMax: gtp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true });
       gi++;
     }
+    // Überraschung: Gegner setzen die erste Runde aus. Läufer: ein Gegner rennt zu einem Feld (z. B. Glockenseil)
+    if (opts.ueberraschung) for (const g of gegnerFiguren(st)) g.ueberrascht = true;
+    if (opts.laeufer) {
+      const kand = gegnerFiguren(st).filter((g) => g.art === opts.laeufer.art).sort((a, b) => abstand(b, { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1] }) - abstand(a, { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1] }));
+      if (kand[0]) { kand[0].laeufer = { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1], ereignis: opts.laeufer.ereignis }; kand[0].name += " (rennt zum Seil)"; }
+    }
     // Initiative (Wölfe handeln im Zug ihrer Besitzerin)
     const teil = st.figuren.filter((f) => f.art !== "wolf");
     for (const f of teil) { const w = W(r, 20); f.ini = w + mod(f.werte.GES); f.iniWurf = w; }
     st.reihe = teil.slice().sort((a, b) => b.ini - a.ini || mod(b.werte.GES) - mod(a.werte.GES) || (a.seite === "spieler" ? -1 : 1)).map((f) => f.id);
     st.log.push({ t: "Initiative: " + st.reihe.map((id) => { const f = fig(st, id); return `${f.name} (${f.ini})`; }).join(" · ") });
     if (st.schwierigkeit === "hardcore") st.log.push({ t: "Hardcore: Wer am Boden liegt, würfelt Todeswürfe. Der Tod ist endgültig.", art: "schlecht" });
+    if (opts.ueberraschung) st.log.push({ t: "Überraschung! Die Gegner setzen die erste Runde aus.", art: "gut" });
     // Jagdvorbereitung: Kopfgeldjäger ab Stufe 2 beginnt mit einem markierten Gegner
     for (const f of spielerFiguren(st)) if (istFig(f, "kopfgeldjaeger") && f.stufe >= 2) {
       const z = gegnerFiguren(st).sort((a, b) => b.tp - a.tp)[0];
@@ -796,6 +803,7 @@
       const f = aktiv(st);
       if (f.seite === "gegner") {
         if (f.tp <= 0) { weiter(st, true); continue; }
+        if (f.ueberrascht) { delete f.ueberrascht; st.log.push({ t: `${f.name} ist überrascht und handelt nicht.` }); weiter(st, true); continue; }
         if (f.z.verbannt) { f.z.verbannt--; if (!f.z.verbannt) { delete f.z.verbannt; st.log.push({ t: `${f.name} kehrt aus der Verbannung zurück.` }); } else st.log.push({ t: `${f.name} ist noch verbannt.` }); weiter(st, true); continue; }
       } else {
         if (f.tot) { weiter(st, true); continue; }
@@ -912,6 +920,18 @@
         if (rw.erfolg) st.log.push({ t: `${g.name}: Sporen – ${f.name} hält die Luft an.`, art: "gegner" });
         else { const s = roll(st.r, d.sporen.schaden).total; f.z.vergiftet = 1; st.log.push({ t: `${g.name}: Sporen – ${f.name} hustet, ${s} Schaden, vergiftet.`, art: "gegner" }); schaden(st, f, s); }
       }
+      if (!st.ende) weiter(st); return;
+    }
+    // Läufer: rennt zu seinem Feld, löst dort ein Ereignis aus
+    if (g.laeufer) {
+      const L = g.laeufer, m = erreichbar(st, g, st.zug.bewegung); let best = null;
+      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const d = abstand({ x, y }, L); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, d, c }; }
+      if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
+      if (lebt(g) && abstand(g, L) <= 1) {
+        st.ereignisse.push(L.ereignis); delete g.laeufer; g.name = g.name.replace(" (rennt zum Seil)", "");
+        st.log.push({ t: `${g.name} reißt am Glockenseil! Die Glocke dröhnt.`, art: "schlecht" });
+      } else if (lebt(g)) st.log.push({ t: `${g.name} rennt zum Glockenseil.`, art: "gegner" });
+      fangschuss(st, g, startX, startY);
       if (!st.ende) weiter(st); return;
     }
     let ziel = naechste();

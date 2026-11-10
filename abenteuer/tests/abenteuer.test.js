@@ -45,7 +45,7 @@ const R = require('../js/regeln.js'), F = R.FD;
     p.on('response', (r) => { if (r.status() >= 400) kaputt.push(r.url()); });
     await p.goto(URL + '?seed=42&schnell');
     await p.evaluate(() => localStorage.clear()); await p.reload();
-    check(/Klostergarten/.test(await p.textContent('h1')), `${vp.width}px: Startseite`);
+    check(/Grauwacht/.test(await p.textContent('h1')), `${vp.width}px: Startseite`);
     await p.click('#start');
     check((await p.$$('.fkarte')).length === 15, `${vp.width}px: Gruppenwahl mit 15 Karten`);
     const bilder = await p.$$eval('.fkarte img', (xs) => Promise.all(xs.map((x) => x.complete ? x.naturalWidth : new Promise((r) => { x.onload = () => r(x.naturalWidth); x.onerror = () => r(0); }))));

@@ -4,21 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
-  <title>Abenteuer – Kampf-Prototyp | Case Unlocked</title>
+  <title>Das Siegel von Grauwacht – Abenteuer | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=4">
+  <link rel="stylesheet" href="css/abenteuer.css?v=5">
 </head>
 <body>
   <header class="top">
     <a class="back" href="../index.html">← Case Unlocked</a>
-    <span class="brand">ABENTEUER · PROTOTYP</span>
+    <span class="brand">ABENTEUER</span>
   </header>
   <main id="app">
     <section class="intro" id="intro">
-      <p class="eyebrow">Die Splitterlande · Kampf-Prototyp</p>
-      <h1>Der Klostergarten</h1>
-      <p>Zwischen den Grabsteinen der Abtei Grauwacht kriechen Rostkäfer aus dem Moos. Wählt 3 bis 6 der 15 Figuren, die Stufe und die Schwierigkeit, und stellt euch ihnen.</p>
+      <p class="eyebrow">Die Splitterlande · Abenteuer</p>
+      <h1>Das Siegel von Grauwacht</h1>
+      <p>Seit sieben Nächten läutet die Glocke der verlassenen Abtei Grauwacht. Die Brunnen von Halmbruck werden bitter, ein Junge ist verschwunden. Wählt 3 bis 6 der 15 Figuren und findet heraus, was unter der Abtei schläft. Eure Entscheidungen verändern den Verlauf.</p>
       <ul class="howto">
         <li><b>Bewegen:</b> Feld antippen (6 Felder pro Zug). Wer neben einem Gegner losläuft, riskiert einen Gelegenheitsangriff.</li>
         <li><b>Handeln:</b> eine Aktion oder Bonusaktion wählen, dann ein leuchtendes Ziel antippen.</li>
@@ -32,6 +32,7 @@
       <p class="fb" id="intro-fehler"></p>
     </section>
     <section class="lobby" id="lobby" hidden></section>
+    <section class="szene" id="szene" hidden></section>
     <section class="spiel" id="spiel" hidden>
       <div class="livebar" id="livebar" hidden></div>
       <div class="reihe" id="reihe" aria-label="Zugreihenfolge"></div>
@@ -47,13 +48,16 @@
   </main>
   <div class="wurf" id="wurf" aria-hidden="true"></div>
   <div class="qr-overlay" id="qr-overlay" hidden></div>
-  <script src="js/figuren.js?v=1"></script>
-  <script src="js/regeln.js?v=3"></script>
+  <script src="js/figuren.js?v=2"></script>
+  <script src="js/regeln.js?v=4"></script>
   <script src="js/bild.js?v=2"></script>
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>
   <script src="../platform/multiplayer/mp-core.js?v=1"></script>
   <script src="vendor/qrcode-generator-1.4.4.js"></script>
-  <script src="js/spiel.js?v=4"></script>
+  <script src="daten/grauwacht.js?v=1"></script>
+  <script src="js/szenen.js?v=1"></script>
+  <script src="js/spiel.js?v=5"></script>
+  <script src="js/abenteuer-tisch.js?v=1"></script>
 </body>
 </html>

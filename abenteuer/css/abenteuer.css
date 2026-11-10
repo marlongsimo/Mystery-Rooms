@@ -183,3 +183,34 @@ img.marke { border-radius: 50%; border: 2px solid var(--gold); object-fit: cover
 .ziel.freund { background: #16241a; border-color: #3a6a44; }
 .ziel.freund.gewaehlt { border-color: #7fe07a; background: #1f3a24; }
 .faehig li.gesperrt { opacity: .5; }
+
+/* ---------- Abenteuer: Szenen ---------- */
+.szene { max-width: 760px; margin: 16px auto; }
+.szene-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.glocke { display: inline-flex; align-items: center; gap: 4px; }
+.glocke i { width: 12px; height: 14px; border-radius: 6px 6px 2px 2px; border: 1px solid #6a5a3a; background: transparent; }
+.glocke i.an { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 6px rgba(201,162,74,.6); }
+.glocke small { margin-left: 6px; color: var(--muted); font-size: 12px; }
+.erzaehlung p { font-size: 17px; line-height: 1.65; margin: 0 0 12px; }
+.antwort { border-left: 3px solid var(--gold); background: var(--panel); padding: 10px 14px; margin: 8px 0 14px; font-size: 16px; line-height: 1.55; }
+.interaktion { margin: 14px 0; }
+.optionen-tisch { display: grid; gap: 8px; }
+.optionen-tisch .btn { text-align: left; }
+.optionen-tisch .btn small { display: inline; margin-left: 6px; opacity: .7; }
+.opt-zeile { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; flex-wrap: wrap; }
+.opt-zeile span { flex: 1; }
+.probe { background: var(--panel); border: 1px solid var(--gold); border-radius: 4px; padding: 10px 12px; margin-bottom: 10px; }
+.wer { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.wer .btn { display: inline-flex; align-items: center; gap: 6px; }
+.wer small { opacity: .75; }
+.wuerfe { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 4px; }
+.wuerfe li.gut { color: var(--green); } .wuerfe li.schlecht { color: #e08a6a; }
+.probe-erg { padding: 10px 12px; border-radius: 4px; margin: 8px 0 12px; background: var(--panel); border: 1px solid var(--line); }
+.probe-erg.erfolg { border-color: var(--green); } .probe-erg.fehl { border-color: var(--red); } .probe-erg.knapp { border-color: #d6a23a; }
+.gruppe-leiste { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+.gruppe-leiste span { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; font-size: 13px; }
+.gruppe-leiste span img { grid-row: span 2; }
+.gruppe-leiste small { color: var(--muted); font-size: 11px; }
+.gruppe-leiste .tot { opacity: .45; }
+.handy-szene .erzaehlung p { font-size: 15px; }
+.handy-szene h2 { font: 600 20px Cinzel, serif; margin: 4px 0 8px; }

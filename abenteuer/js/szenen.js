@@ -1,0 +1,271 @@
+/*
+ * Case Unlocked · Abenteuer – Szenen-Engine (ohne Darstellung, testbar in Node)
+ * Führt ein Abenteuer aus Szenen-Daten (daten/grauwacht.js): Erzählung, Gespräch, Abstimmung, Proben,
+ * geheime Entscheidungen je Figur, Merker, die Glocke, Lagerfeuer (Rast, Aufstieg, Speicherpunkt) und Kämpfe.
+ * Kämpfe selbst laufen in regeln.js; hier stehen nur Start und Auswertung.
+ *
+ * Szenen-Arten:
+ *   erzaehlung  Text, dann weiter
+ *   gespraech   Text + Optionen, die einzeln gewählt werden (jede höchstens einmal), bis eine Option „weiter“ führt
+ *   wahl        Gruppenentscheidung: jede Figur stimmt ab, Mehrheit gilt, Gleichstand entscheidet der Würfel
+ *   probe       eine Figur (oder die Gruppe) würfelt gegen SG: erfolg / knapp (bis 3 daneben) / fehl
+ *   geheim      jede Figur entscheidet für sich (z. B. vom Brunnen trinken); niemand sieht die Antwort der anderen am Tisch
+ *   kampf       Kampf mit Begegnung und Karte; Sieg / Rückzug (Normal) / Niederlage (Hardcore)
+ *   lager       Lagerfeuer: lange Rast, ggf. Aufstieg, Speicherpunkt
+ *   ende        Abschluss mit Epilog
+ */
+(function (root) {
+  "use strict";
+  const R = root.ABR || (typeof require === "function" ? require("./regeln.js") : null);
+  const F = R.FD;
+  const DATEN = () => root.ABD || (typeof require === "function" ? require("../daten/grauwacht.js") : null);
+
+  /* ---------- Hilfen für die Daten ---------- */
+  const hat = (A, fid) => A.gruppe.includes(fid) && !(A.zust && A.zust[fid] && A.zust[fid].tot);
+  const m = (A, k) => A.merker[k];
+  const name = (A, fid) => F.FIGUREN[fid].name;
+
+  function neu(seed, opts = {}) {
+    const A = {
+      seed, rs: seed >>> 0 || 1, szene: null, merker: {}, glocke: 0, stufe: 1,
+      schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal",
+      gruppe: (opts.gruppe || []).slice(0, 6), zust: null, lagerZust: null, lagerSzene: null,
+      gewaehlt: {}, stimmen: {}, geheim: {}, probe: null, ergebnis: null, protokoll: [], gefallen: [],
+    };
+    R.zufall(A);
+    A.zust = startZustand(A);
+    geheZu(A, DATEN().START);
+    return A;
+  }
+  function startZustand(A) {
+    const z = {};
+    for (const fid of A.gruppe) z[fid] = frisch(fid, A.stufe);
+    return z;
+  }
+  function frisch(fid, stufe) {
+    const k = F.KLASSEN[F.FIGUREN[fid].klasse];
+    return { stufe, tp: F.tpVon(fid, stufe), tot: false, plaetze: k.plaetze ? F.PLAETZE[stufe].slice() : [0, 0], genutzt: {}, rucksack: [{ id: "heiltrank", n: 1 }] };
+  }
+  const szene = (A) => DATEN().SZENEN[A.szene];
+  const text = (A, s = szene(A)) => (typeof s.text === "function" ? s.text(A, hilfen) : s.text || []).filter(Boolean);
+  const hilfen = { hat, m, name };
+
+  function notiz(A, t, art) { A.protokoll.push({ t, art: art || "" }); if (A.protokoll.length > 200) A.protokoll.shift(); }
+  /** Wirkung einer Option/eines Ergebnisses anwenden */
+  function wirke(A, w) {
+    if (!w) return;
+    if (w.setzt) for (const [k, v] of Object.entries(typeof w.setzt === "function" ? w.setzt(A, hilfen) : w.setzt)) {
+      if (typeof v === "number" && typeof A.merker[k] === "number" && w.addiere) A.merker[k] += v; else A.merker[k] = v;
+    }
+    if (w.plus) for (const [k, v] of Object.entries(w.plus)) A.merker[k] = (A.merker[k] || 0) + v;
+    if (w.glocke) glocke(A, w.glocke);
+    if (w.tranke) for (let i = 0; i < w.tranke; i++) { const fid = A.gruppe.filter((f) => !A.zust[f].tot)[i % Math.max(1, A.gruppe.length)]; if (fid) A.zust[fid].rucksack[0].n++; }
+    if (w.notiz) notiz(A, typeof w.notiz === "function" ? w.notiz(A, hilfen) : w.notiz, "gut");
+  }
+  function glocke(A, n) {
+    A.glocke = Math.min(7, A.glocke + n);
+    notiz(A, `Die Glocke schlägt. (${A.glocke} von 7)`, "schlecht");
+  }
+  function geheZu(A, id) {
+    if (!DATEN().SZENEN[id]) throw new Error("Unbekannte Szene: " + id);
+    A.szene = id; A.gewaehlt = A.gewaehlt || {}; A.stimmen = {}; A.geheim = {}; A.probe = null; A.ergebnis = null;
+    const s = szene(A);
+    if (s.beimEintritt) wirke(A, s.beimEintritt(A, hilfen));
+    if (s.art === "lager") lagerfeuer(A, s);
+    if (s.art === "probe") A.probe = { wer: s.probe.wer === "gruppe" ? "gruppe" : null, wuerfe: {} };
+    if (s.art === "gespraech") A.gewaehlt[id] = A.gewaehlt[id] || [];
+  }
+  /** Optionen, die gerade sichtbar sind */
+  function optionen(A) {
+    const s = szene(A), schon = A.gewaehlt[A.szene] || [];
+    return (s.optionen || []).filter((o) => (!o.wenn || o.wenn(A, hilfen)) && !(s.art === "gespraech" && (!o.weiter || o.einmal) && schon.includes(o.id)));
+  }
+  function ziel(A, w) { const z = typeof w.weiter === "function" ? w.weiter(A, hilfen) : w.weiter; if (z) geheZu(A, z); }
+
+  /* ---------- Erzählung und Gespräch ---------- */
+  function weiter(A) {
+    const s = szene(A);
+    if (s.art === "erzaehlung") return ziel(A, s), { ok: true };
+    if (s.art === "probe" && A.ergebnis) { const e = s.probe[A.ergebnis.stufe]; wirke(A, e); ziel(A, e); return { ok: true }; }
+    if (s.art === "lager") return ziel(A, s), { ok: true };
+    if (s.art === "geheim" && alleGeheim(A)) return geheimAuswerten(A), { ok: true };
+    if (s.art === "wahl" && Object.keys(A.stimmen).length) return auswerten(A), { ok: true };
+    return { fehler: "Hier geht es nicht einfach weiter." };
+  }
+  /** Gespräch: eine Option wählen (am Tisch). Bei „wahl“ entscheidet der Tisch damit sofort für alle. */
+  function waehle(A, optId) {
+    const s = szene(A), o = optionen(A).find((x) => x.id === optId);
+    if (!o) return { fehler: "Diese Möglichkeit gibt es gerade nicht." };
+    if (s.art === "gespraech") {
+      A.gewaehlt[A.szene].push(o.id);
+      A.antwort = typeof o.antwort === "function" ? o.antwort(A, hilfen) : o.antwort || null;
+      wirke(A, o);
+      if (o.probe) { A.zwischenprobe = { opt: o.id, wuerfe: {}, wer: null }; return { ok: true, probe: true }; }
+      if (o.weiter) { A.antwort = null; ziel(A, o); }
+      return { ok: true };
+    }
+    if (s.art === "wahl") { entscheide(A, o); return { ok: true }; }
+    return { fehler: "Hier wird nicht gewählt." };
+  }
+  function entscheide(A, o) {
+    notiz(A, `Entscheidung: ${o.text}`, "runde");
+    wirke(A, o);
+    ziel(A, o);
+  }
+
+  /* ---------- Abstimmung ---------- */
+  function stimme(A, fid, optId) {
+    const s = szene(A); if (s.art !== "wahl") return { fehler: "Gerade wird nicht abgestimmt." };
+    if (!hat(A, fid)) return { fehler: "Diese Figur ist nicht dabei." };
+    if (!optionen(A).some((o) => o.id === optId)) return { fehler: "Diese Möglichkeit gibt es nicht." };
+    A.stimmen[fid] = optId; return { ok: true };
+  }
+  const lebende = (A) => A.gruppe.filter((f) => !A.zust[f].tot);
+  function auswerten(A) {
+    const s = szene(A), zaehl = {};
+    for (const o of Object.values(A.stimmen)) zaehl[o] = (zaehl[o] || 0) + 1;
+    const max = Math.max(...Object.values(zaehl)), vorne = Object.keys(zaehl).filter((k) => zaehl[k] === max);
+    const gew = vorne.length > 1 ? vorne[Math.floor(A.r() * vorne.length)] : vorne[0];
+    const o = optionen(A).find((x) => x.id === gew);
+    A.letzteAbstimmung = { szene: A.szene, zaehl, gewinner: gew, wuerfel: vorne.length > 1 };
+    if (vorne.length > 1) notiz(A, "Gleichstand – der Würfel entscheidet.");
+    entscheide(A, o);
+    return { ok: true, gewinner: gew };
+  }
+
+  /* ---------- Proben ---------- */
+  /** Bonus einer Figur auf eine Probe: Attributsmodifikator + 2, wenn geübt */
+  function bonus(A, fid, p) {
+    const d = F.FIGUREN[fid], attr = typeof p.attr === "function" ? p.attr(A, fid) : p.attr;
+    const geuebt = (p.geuebt || []).some((x) => x === fid || x === d.klasse) ? 2 : 0;
+    return { attr, wert: R.mod(d.werte[attr]) + geuebt, geuebt: Boolean(geuebt) };
+  }
+  const aktuelleProbe = (A) => (A.zwischenprobe ? szene(A).optionen.find((o) => o.id === A.zwischenprobe.opt).probe : szene(A).probe);
+  const probeZustand = (A) => A.zwischenprobe || A.probe;
+  /** Wer würfelt (nur bei Proben für eine Figur) */
+  function probeWer(A, fid) {
+    const pz = probeZustand(A); if (!pz) return { fehler: "Keine Probe." };
+    if (!hat(A, fid)) return { fehler: "Diese Figur ist nicht dabei." };
+    if (pz.wer === "gruppe") return { fehler: "Hier würfeln alle." };
+    if (Object.keys(pz.wuerfe).length) return { fehler: "Schon gewürfelt." };
+    pz.wer = fid; return { ok: true };
+  }
+  function probeWurf(A, fid) {
+    const pz = probeZustand(A), p = aktuelleProbe(A); if (!pz) return { fehler: "Keine Probe." };
+    if (pz.wer !== "gruppe" && pz.wer !== fid) return { fehler: "Eine andere Figur würfelt." };
+    if (pz.wuerfe[fid]) return { fehler: "Schon gewürfelt." };
+    const b = bonus(A, fid, p), v = p.vorteil ? p.vorteil(A, hilfen, fid) : 0;
+    const a = 1 + Math.floor(A.r() * 20), c = 1 + Math.floor(A.r() * 20);
+    const w = v > 0 ? Math.max(a, c) : v < 0 ? Math.min(a, c) : a;
+    pz.wuerfe[fid] = { w, gesamt: w + b.wert, bonus: b.wert, attr: b.attr, vorteil: v };
+    notiz(A, `${name(A, fid)}: ${p.name || "Probe"} – W20 ${w}${v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : ""} ${b.wert >= 0 ? "+" : "−"} ${Math.abs(b.wert)} = ${w + b.wert} gegen SG ${p.sg}`, "wurf");
+    const fertig = pz.wer === "gruppe" ? lebende(A).every((f) => pz.wuerfe[f]) : true;
+    if (fertig) probeAuswerten(A);
+    return { ok: true, fertig };
+  }
+  function probeAuswerten(A) {
+    const pz = probeZustand(A), p = aktuelleProbe(A);
+    let stufe;
+    if (pz.wer === "gruppe") {
+      const ok = Object.values(pz.wuerfe).filter((x) => x.gesamt >= p.sg).length, n = Object.keys(pz.wuerfe).length;
+      stufe = ok * 2 >= n ? "erfolg" : ok * 2 >= n - 1 ? "knapp" : "fehl";
+    } else {
+      const x = Object.values(pz.wuerfe)[0];
+      stufe = x.w === 20 || x.gesamt >= p.sg ? "erfolg" : x.w !== 1 && x.gesamt >= p.sg - 3 ? "knapp" : "fehl";
+    }
+    if (!p.knapp && stufe === "knapp") stufe = "fehl";
+    const e = p[stufe];
+    const t = typeof e.text === "function" ? e.text(A, hilfen, pz) : e.text;
+    notiz(A, { erfolg: "Geschafft", knapp: "Knapp daneben", fehl: "Misslungen" }[stufe] + (t ? ": " + t : "."), stufe === "erfolg" ? "gut" : "schlecht");
+    if (A.zwischenprobe) {
+      A.antwort = t; wirke(A, e); A.zwischenprobe = null;
+      if (e.weiter) { A.antwort = null; ziel(A, e); }
+    } else A.ergebnis = { stufe, text: t };
+  }
+
+  /* ---------- Geheime Entscheidungen ---------- */
+  function geheim(A, fid, antwort) {
+    const s = szene(A); if (s.art !== "geheim") return { fehler: "Gerade gibt es nichts zu entscheiden." };
+    if (!hat(A, fid)) return { fehler: "Diese Figur ist nicht dabei." };
+    if (!s.antworten.some((x) => x.id === antwort)) return { fehler: "Unbekannte Antwort." };
+    A.geheim[fid] = antwort; return { ok: true };
+  }
+  const alleGeheim = (A) => lebende(A).every((f) => A.geheim[f]);
+  function geheimAuswerten(A) {
+    const s = szene(A);
+    for (const [fid, ant] of Object.entries(A.geheim)) { const a = s.antworten.find((x) => x.id === ant); if (a.setzt) wirke(A, { setzt: a.setzt(fid) }); }
+    notiz(A, s.abschluss || "Jede Person hat für sich entschieden.");
+    ziel(A, s);
+  }
+
+  /* ---------- Lagerfeuer ---------- */
+  function lagerfeuer(A, s) {
+    if (s.aufstieg && A.stufe < s.aufstieg) { A.stufe = s.aufstieg; notiz(A, `Aufstieg: Die Gruppe erreicht Stufe ${A.stufe}.`, "gut"); }
+    for (const fid of A.gruppe) {
+      const z = A.zust[fid]; if (z.tot) continue;
+      const neuZ = frisch(fid, A.stufe), anteil = A.glocke >= 3 ? 0.75 : 1;
+      A.zust[fid] = Object.assign(neuZ, { tp: Math.max(z.tp, Math.floor(neuZ.tp * anteil)), rucksack: z.rucksack });
+    }
+    A.lagerZust = JSON.parse(JSON.stringify(A.zust)); A.lagerSzene = A.szene;
+    notiz(A, `Lagerfeuer: lange Rast${A.glocke >= 3 ? " (das Flüstern lässt niemanden ganz schlafen: TP bis ¾)" : ""}. Gespeichert.`, "gut");
+  }
+  /** Kurze Rast zwischen Kämpfen (nur Normal): halbe fehlende TP, Glocke schlägt */
+  function kurzeRast(A) {
+    if (A.schwierigkeit === "hardcore") return { fehler: "In Hardcore gibt es keine kurze Rast." };
+    if (A.merker["kurz_" + (szene(A).abschnitt || 1)]) return { fehler: "In diesem Abschnitt habt ihr schon gerastet." };
+    const z = R.kurzeRast(A.zust); for (const fid of Object.keys(z)) z[fid].stufe = A.stufe;
+    A.merker["kurz_" + (szene(A).abschnitt || 1)] = true; glocke(A, 1); notiz(A, "Kurze Rast: Wunden verbunden.", "gut");
+    return { ok: true };
+  }
+
+  /* ---------- Kampf ---------- */
+  function kampfOptionen(A) {
+    const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
+    const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: A.stufe });
+    return Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher }, k);
+  }
+  /** Nach dem Kampf: Ergebnis übernehmen und weiter */
+  function kampfEnde(A, st) {
+    const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
+    for (const f of R.spielerFiguren(st)) if (f.tot && !A.gefallen.includes(f.fid)) { A.gefallen.push(f.fid); notiz(A, `${f.name} ist gefallen.`, "schlecht"); }
+    if (st.ereignisse) for (const e of st.ereignisse) if (s.ereignisse && s.ereignisse[e]) wirke(A, s.ereignisse[e]);
+    if (st.ende === "sieg") {
+      const nz = R.nachKampf(st);
+      for (const fid of A.gruppe) if (nz[fid]) A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); else if (A.gefallen.includes(fid)) A.zust[fid].tot = true;
+      for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
+      R.neuerKampf(A.zust);
+      wirke(A, k.sieg); ziel(A, k.sieg || {});
+      return { ok: true, ergebnis: "sieg" };
+    }
+    if (st.ende === "rueckzug") {
+      notiz(A, "Rückzug zum Lagerfeuer.", "schlecht"); glocke(A, 1);
+      A.zust = JSON.parse(JSON.stringify(A.lagerZust || startZustand(A)));
+      return { ok: true, ergebnis: "rueckzug" }; // gleiche Szene beginnt neu
+    }
+    for (const fid of A.gruppe) A.zust[fid].tot = true;
+    geheZu(A, DATEN().NIEDERLAGE);
+    return { ok: true, ergebnis: "niederlage" };
+  }
+
+  /* ---------- Ansicht für Tisch und Handys ---------- */
+  function ansicht(A) {
+    const s = szene(A), pz = probeZustand(A), p = pz ? aktuelleProbe(A) : null;
+    return {
+      szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || 1, text: text(A), antwort: A.antwort || null,
+      glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit,
+      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, probe: Boolean(o.probe), weiter: Boolean(o.weiter) })),
+      stimmen: s.art === "wahl" ? A.stimmen : null,
+      geheimFrage: s.art === "geheim" ? { frage: s.frage, antworten: s.antworten.map((a) => ({ id: a.id, text: a.text })), fertig: Object.keys(A.geheim) } : null,
+      probe: p ? { name: p.name, attr: p.attr, sg: p.sg, wer: pz.wer, wuerfe: pz.wuerfe, gruppe: pz.wer === "gruppe",
+        boni: Object.fromEntries(lebende(A).map((f) => [f, bonus(A, f, p).wert])), ergebnis: A.ergebnis } : null,
+      zust: A.zust, gruppe: A.gruppe, gefallen: A.gefallen, protokoll: A.protokoll.slice(-6),
+    };
+  }
+  function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
+  function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
+
+  const API = { neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+    kampfOptionen, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
+  if (typeof module !== "undefined" && module.exports) module.exports = API;
+  else root.ABS = API;
+})(typeof window !== "undefined" ? window : globalThis);

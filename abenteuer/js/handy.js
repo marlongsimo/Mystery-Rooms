@@ -55,7 +55,7 @@
     }
     if (s.nLog) H.nLog = s.nLog;
     if (s.phase !== "kampf" || (alt && alt.phase !== "kampf")) H.ergebnis = null;
-    const dran = Boolean(fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0);
+    const dran = Boolean((fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0) || (fid && szeneWartet(s, fid)));
     if (dran && !H.warDran) { try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) { /* egal */ } H.tab = "zug"; }
     if (!dran) { H.sel = null; H.ziel = null; }
     H.warDran = dran;
@@ -123,7 +123,7 @@
   }
 
   function viewWahl(app) {
-    const s = H.spiel, gruppe = s.gruppe || [], kampf = s.phase === "kampf";
+    const s = H.spiel, gruppe = s.gruppe || [], kampf = s.phase === "kampf" || s.phase === "szene";
     let zuletzt = null; try { zuletzt = localStorage.getItem(FIGUR_KEY); } catch (e) { /* privat */ }
     const liste = kampf ? gruppe : F.REIHE;
     app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)} · Stufe ${s.stufe || 1}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p><h1>Wähle deine Figur</h1>
@@ -145,9 +145,10 @@
   }
 
   function viewBogen(app, fid) {
-    const s = H.spiel, d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], fd = figDaten(fid), stufe = (fd && fd.stufe) || s.stufe || 1;
-    const tpMax = fd ? fd.tpMax : F.tpVon(fid, stufe), tp = fd ? fd.tp : tpMax, rk = fd ? fd.rk : d.rk[stufe - 1];
-    const plMax = fd && fd.plaetzeMax ? fd.plaetzeMax : k.plaetze ? F.PLAETZE[stufe] : [0, 0], pl = fd && fd.plaetze ? fd.plaetze : plMax;
+    const s = H.spiel, d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], fd = figDaten(fid), ab = s.abenteuer, az = ab && ab.zust && ab.zust[fid];
+    const stufe = (fd && fd.stufe) || (ab && ab.stufe) || s.stufe || 1;
+    const tpMax = fd ? fd.tpMax : F.tpVon(fid, stufe), tp = fd ? fd.tp : az ? az.tp : tpMax, rk = fd ? fd.rk : d.rk[stufe - 1];
+    const plMax = fd && fd.plaetzeMax ? fd.plaetzeMax : k.plaetze ? F.PLAETZE[stufe] : [0, 0], pl = fd && fd.plaetze ? fd.plaetze : az ? az.plaetze : plMax;
     const dran = Boolean(fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0);
     const meinName = (s.namen || {})[ich()] || "";
     const zust = fd ? fd.zustaende || [] : [];
@@ -158,10 +159,11 @@
       ${fd && fd.tot ? `<div class="info schlecht">${esc(d.name)} ist tot.</div>` : fd && fd.tp <= 0 && s.schwierigkeit === "hardcore" ? `<div class="info schlecht">Todeswürfe: ${"✓".repeat(fd.todes.e)}${"·".repeat(3 - fd.todes.e)} | ${"✗".repeat(fd.todes.f)}${"·".repeat(Math.max(0, 3 - fd.todes.f))}${fd.stabil ? " · stabil" : ""}</div>` : ""}
       <div class="werte-zeile"><span><b>${rk}</b>RK</span>${platzText}<span><b>${dran ? s.zug.bewegung : 6}</b>Felder</span></div>
       ${zust.length ? `<p class="zustaende">${zust.map((z) => `<span>${esc(z)}</span>`).join("")}</p>` : ""}
-      <nav class="tabs">${[["zug", "Zug"], ["faehig", "Fähigkeiten"], ["rucksack", "Rucksack"]].map(([id, t]) => `<button data-tab="${id}" class="${H.tab === id ? "an" : ""}">${t}${id === "zug" && dran ? " ●" : ""}</button>`).join("")}</nav>
+      <nav class="tabs">${[["zug", s.phase === "szene" ? "Szene" : "Zug"], ["faehig", "Fähigkeiten"], ["rucksack", "Rucksack"]].map(([id, t]) => `<button data-tab="${id}" class="${H.tab === id ? "an" : ""}">${t}${id === "zug" && (dran || szeneWartet(s, fid)) ? " ●" : ""}</button>`).join("")}</nav>
       <div class="tabinhalt">`;
     if (H.tab === "faehig") html += tabFaehig(fid, stufe);
-    else if (H.tab === "rucksack") html += tabRucksack(fd ? fd.rucksack : [{ id: "heiltrank", n: 1 }], fid);
+    else if (H.tab === "rucksack") html += tabRucksack(fd ? fd.rucksack : az ? az.rucksack : [{ id: "heiltrank", n: 1 }], fid);
+    else if (s.phase === "szene" && ab) html += tabSzene(ab, fid);
     else html += tabZug(s, fid, fd, dran, stufe);
     html += `</div></section>`;
     app.innerHTML = html;
@@ -171,6 +173,10 @@
     const w = $("#wuerfeln"); if (w) w.onclick = () => senden({ typ: "aktion", aktion: H.sel, ziel: H.ziel || (fd && fd.id) });
     const e = $("#zugende"); if (e) e.onclick = () => senden({ typ: "ende" });
     const a = $("#andere"); if (a) a.onclick = () => waehle(null);
+    app.querySelectorAll("[data-stimme]").forEach((b) => { b.onclick = () => { H.meineStimme = { szene: ab.szene, opt: b.dataset.stimme }; senden({ typ: "stimme", opt: b.dataset.stimme }); }; });
+    app.querySelectorAll("[data-gantwort]").forEach((b) => { b.onclick = () => { H.meinGeheim = { szene: ab.szene, antwort: b.dataset.gantwort }; senden({ typ: "geheim", antwort: b.dataset.gantwort }); }; });
+    const pw = $("#probe-wer"); if (pw) pw.onclick = () => senden({ typ: "probe_wer" });
+    const pr = $("#probe-wurf"); if (pr) pr.onclick = () => senden({ typ: "probe_wurf" });
   }
 
   function aktionInfo(a, d, stufe) {
@@ -184,6 +190,40 @@
     if (a.platz) teile.push(a.platz === 2 ? "Platz vom 2. Grad" : "1 Zauberplatz");
     if (a.pro) { const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange, n = Array.isArray(v) ? v[stufe - 1] : v; teile.push(`${n}× je ${a.pro.kampf != null ? "Kampf" : a.pro.rast != null ? "Rast" : "lange Rast"}`); }
     return teile.join(" · ");
+  }
+
+  /** Muss ich in der Szene gerade etwas tun? */
+  function szeneWartet(s, fid) {
+    const ab = s.abenteuer; if (s.phase !== "szene" || !ab) return false;
+    if (ab.art === "wahl") return !(ab.stimmen || []).includes(fid);
+    if (ab.art === "geheim") return !(ab.geheimFrage.fertig || []).includes(fid);
+    if (ab.probe && !ab.probe.ergebnis) return ab.probe.gruppe ? !ab.probe.wuerfe[fid] : !ab.probe.wer || (ab.probe.wer === fid && !ab.probe.wuerfe[fid]);
+    return false;
+  }
+  function tabSzene(ab, fid) {
+    const fett = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    let h = `<div class="handy-szene"><p class="eyebrow">Abschnitt ${ab.abschnitt} · ${esc(ab.ort)} · Glocke ${ab.glocke}/7</p><h2>${esc(ab.titel)}</h2>`;
+    const tot = ab.zust && ab.zust[fid] && ab.zust[fid].tot;
+    if (tot) return h + `<div class="info schlecht">${esc(F.FIGUREN[fid].name)} ist gefallen. Am nächsten Lagerfeuer kannst du eine neue Figur übernehmen.</div></div>`;
+    if (ab.art === "wahl") {
+      const schon = (ab.stimmen || []).includes(fid), meine = H.meineStimme && H.meineStimme.szene === ab.szene ? H.meineStimme.opt : null;
+      h += `<div class="info dran"><b>Abstimmung.</b> Die anderen sehen nicht, wofür du stimmst.</div><div class="optionen">${ab.optionen.map((o) => `<button class="opt ${meine === o.id ? "gewaehlt" : ""}" data-stimme="${o.id}" ${H.warte ? "disabled" : ""}><b>${esc(o.text)}</b></button>`).join("")}</div>`;
+      if (schon) h += `<p class="note">Deine Stimme ist abgegeben${meine ? ` (${esc((ab.optionen.find((o) => o.id === meine) || {}).text || "")})` : ""}. Du kannst sie noch ändern, bis alle abgestimmt haben.</p>`;
+    } else if (ab.art === "geheim") {
+      const q = ab.geheimFrage, meins = H.meinGeheim && H.meinGeheim.szene === ab.szene ? H.meinGeheim.antwort : null;
+      h += `<div class="info dran"><b>${esc(q.frage)}</b><br><small>Nur du siehst deine Antwort.</small></div><div class="optionen">${q.antworten.map((a) => `<button class="opt ${meins === a.id ? "gewaehlt" : ""}" data-gantwort="${a.id}" ${H.warte ? "disabled" : ""}><b>${esc(a.text)}</b></button>`).join("")}</div>`;
+    } else if (ab.probe) {
+      const p = ab.probe, b = p.boni[fid];
+      h += `<div class="info"><b>${esc(p.name)}</b> gegen SG ${p.sg}${p.gruppe ? " · alle würfeln" : ""}. Dein Bonus: ${b >= 0 ? "+" : ""}${b}</div>`;
+      if (p.ergebnis) h += `<div class="ergebnis ${p.ergebnis.stufe === "erfolg" ? "gut" : ""}"><span>${{ erfolg: "Geschafft", knapp: "Knapp daneben", fehl: "Misslungen" }[p.ergebnis.stufe]}${p.ergebnis.text ? ": " + fett(p.ergebnis.text) : ""}</span></div>`;
+      else if (p.wuerfe[fid]) h += `<div class="ergebnis"><b>${p.wuerfe[fid].w}</b><span>Dein Wurf: ${p.wuerfe[fid].gesamt}</span></div>`;
+      else if (p.gruppe || p.wer === fid) h += `<button class="btn breit wuerfel" id="probe-wurf" ${H.warte ? "disabled" : ""}>🎲 Würfeln</button>`;
+      else if (!p.wer) h += `<button class="btn breit" id="probe-wer" ${H.warte ? "disabled" : ""}>Ich versuche es</button>`;
+      else h += `<p class="note">${esc(F.FIGUREN[p.wer] ? F.FIGUREN[p.wer].name : "")} versucht es.</p>`;
+    } else h += `<div class="info">Der Tisch liest vor. Hört zu – oder lest mit:</div>`;
+    h += `<div class="erzaehlung">${ab.text.map((t) => `<p>${fett(t)}</p>`).join("")}</div>${ab.antwort ? `<div class="antwort">${fett(ab.antwort)}</div>` : ""}`;
+    if (H.fehler) h += `<p class="fb">${esc(H.fehler)}</p>`;
+    return h + "</div>";
   }
 
   function tabZug(s, fid, fd, dran, stufe) {

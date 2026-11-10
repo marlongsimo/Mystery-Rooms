@@ -61,12 +61,18 @@ const MEMBERS = ['R01', 'R03', 'R04', 'R10'];
   let ids = await cardIds(A);
   check(['B5', 'B6', 'B7', 'B8'].every((x) => ids.includes(x)) && !ids.includes('B9'), 'STILLE → B5–B8');
   await unlock(A, 'VORDRUCK'); ids = await cardIds(A);
-  check(['B9', 'B10', 'B11', 'B12', 'B13', 'B14'].every((x) => ids.includes(x)) && !ids.includes('B15'), 'VORDRUCK → B9–B14');
-  await unlock(A, 'FADEN'); ids = await cardIds(A);
-  check(['B15', 'B16', 'B17', 'B18', 'B19', 'B20', 'B22'].every((x) => ids.includes(x)) && !ids.includes('B21'), 'FADEN → B15–B20 und B22 (Wiesner und Özdemir fehlen), Finale zu');
+  check(['B9', 'B10', 'B11', 'B13', 'B14'].every((x) => ids.includes(x)) && !ids.includes('B12') && !ids.includes('B15'), 'VORDRUCK → B9–B11, B13, B14, die Streifen B12 noch nicht');
+  await unlock(A, 'STREIFEN'); ids = await cardIds(A);
+  check(ids.includes('B12') && !ids.includes('B15'), 'STREIFEN → B12 (Seiferts Moment)');
+  await A.click('[data-tab="p6"]'); check(/🔒/.test(await A.textContent('[data-tab="p6"]')), 'STREIFEN öffnet keinen Rollenteil');
+  await A.click('[data-tab="bew"]'); await unlock(A, 'FADEN'); ids = await cardIds(A);
+  check(['B15', 'B16', 'B18', 'B19', 'B20', 'B22'].every((x) => ids.includes(x)) && !ids.includes('B17') && !ids.includes('B21'), 'FADEN → B15, B16, B18–B20, B22, die Rückseite B17 noch nicht');
+  check(!/Linde/.test(await A.textContent('.ecard:has(header:has-text("B18"))')), 'B18 nennt niemanden');
+  await unlock(A, 'rueckseite'); ids = await cardIds(A);
+  check(ids.includes('B17') && !ids.includes('B21'), 'RÜCKSEITE (auch als RUECKSEITE) → B17 (Kranz’ Moment), Finale zu');
   check(!OPEN.test(await A.textContent('.cardlist')), 'Karten ohne offene Klammern');
   for (const [rid, P] of Object.entries(by)) {
-    if (P !== A) { await P.click('[data-tab="bew"]'); await unlock(P, 'FADEN'); }
+    if (P !== A) { await P.click('[data-tab="bew"]'); await unlock(P, 'RÜCKSEITE'); }
     let txt = '';
     for (const k of [3, 4, 5, 6]) { await P.click(`[data-tab="p${k}"]`); txt += await P.textContent('.doc'); }
     check(!OPEN.test(txt), `${rid}: Runde 1–4 offen, ohne Klammern`);
@@ -77,8 +83,8 @@ const MEMBERS = ['R01', 'R03', 'R04', 'R10'];
   // Spielleitung
   await H.goto(URL + '#leitung'); await H.waitForSelector('.steps');
   const steps = await H.$$eval('.steps button', (x) => x.map((y) => y.textContent));
-  check(steps.length === 8, 'Geführter Ablauf: 8 Schritte');
-  await H.click('[data-step="7"]'); H.once('dialog', (dl) => dl.accept()); await H.click('[data-round="5"]');
+  check(steps.length === 10 && steps.includes('P4b') && steps.includes('P5b'), 'Geführter Ablauf: 10 Schritte mit P4b (Streifen) und P5b (Rückseite)');
+  await H.click('[data-step="9"]'); H.once('dialog', (dl) => dl.accept()); await H.click('[data-round="7"]');
   check(/ZUR/.test(await H.textContent('.round .word')) && /B21/.test(await H.textContent('.round')), 'Finale: ZURÜCK öffnet B21');
   await H.click('[data-tab="loesung"]'); H.once('dialog', (dl) => dl.accept()); await H.click('#sol');
   check(/Linde/.test(await H.textContent('.hostdoc')) && !OPEN.test(await H.textContent('.hostdoc')), 'Lösung nennt Linde, ohne Klammern');
@@ -86,7 +92,7 @@ const MEMBERS = ['R01', 'R03', 'R04', 'R10'];
   await H.click('[data-tab="druck"]'); await H.click('[data-p="cards"]');
   check((await H.$$eval('#print .ecard:not(.npc-card)', (c) => c.length)) === 22, 'Druck bei 5 Personen: 22 Beweiskarten');
 
-  const t = await H.evaluate(() => [5, 7, 9, 10].map((n) => ({ n, b19: KD.cardsFor(4, n, false).includes('B19'), b20: KD.cardsFor(4, n, false).includes('B20'), b22: KD.cardsFor(4, n, false).includes('B22') })));
+  const t = await H.evaluate(() => [5, 7, 9, 10].map((n) => ({ n, b19: KD.cardsFor(5, n, false).includes('B19'), b20: KD.cardsFor(5, n, false).includes('B20'), b22: KD.cardsFor(5, n, false).includes('B22') })));
   check(t[0].b19 && t[0].b20 && t[1].b19 && !t[1].b20 && !t[2].b19 && !t[3].b19 && !t[3].b20 && t.every((x) => x.b22), 'B19 nach Wiesner, B20 nach Özdemir, B22 immer');
 
   // 10 Personen: R06–R10 vollständig lesbar, Nicht-Mitglieder ohne Kreis-Wissen vor Runde 2
@@ -95,7 +101,7 @@ const MEMBERS = ['R01', 'R03', 'R04', 'R10'];
       const code = await H.evaluate(([ri, v]) => KD.encode({ host: false, role: ri, n: 10, variants: v }), [ri, v]);
       const P = await page(); await P.goto(URL + '#c=' + code.replace(/-/g, '')); await P.waitForSelector('.doc');
       const pre = await beforeR2(P);
-      await P.click('[data-tab="bew"]'); await unlock(P, 'FADEN');
+      await P.click('[data-tab="bew"]'); await unlock(P, 'RÜCKSEITE');
       let txt = pre; for (const k of [3, 4, 5, 6]) { await P.click(`[data-tab="p${k}"]`); txt += await P.textContent('.doc'); }
       check(!OPEN.test(txt) && (MEMBERS.includes(rid) || !KREIS.test(pre)), `${rid} (${v ? 'männlich' : 'weiblich'}, 10 Personen): alle Teile ohne Klammern${MEMBERS.includes(rid) ? '' : ', kein Kreis-Wissen vor Runde 2'}`);
       await P.context().close();

@@ -26,8 +26,8 @@
   <rect class="room" x="510" y="60" width="110" height="130"/><text class="t" x="565" y="110" text-anchor="middle">Hausmeister-</text><text class="t" x="565" y="126" text-anchor="middle">kammer</text>
   <line class="door" x1="330" y1="190" x2="360" y2="190"/><line class="door" x1="420" y1="190" x2="450" y2="190"/><line class="door" x1="540" y1="190" x2="570" y2="190"/>
   <rect class="room" x="250" y="250" width="180" height="150"/><text class="t" x="340" y="330" text-anchor="middle">Küche</text>
-  <rect class="room" x="430" y="250" width="130" height="150"/><text class="t" x="495" y="330" text-anchor="middle">WC</text><rect class="room" x="560" y="300" width="60" height="100"/><text class="s" x="590" y="356" text-anchor="middle">Lager</text>
-  <rect class="room" x="560" y="190" width="60" height="110"/><text class="s" x="590" y="236" text-anchor="middle">Wind-</text><text class="s" x="590" y="250" text-anchor="middle">fang</text>
+  <rect class="room" x="430" y="250" width="130" height="150"/><text class="t" x="495" y="330" text-anchor="middle">WC</text>
+  <rect class="room" x="560" y="190" width="60" height="210"/><text class="s" x="590" y="236" text-anchor="middle">Wind-</text><text class="s" x="590" y="250" text-anchor="middle">fang</text>
   <line class="door" x1="290" y1="250" x2="320" y2="250"/><line class="door" x1="470" y1="250" x2="500" y2="250"/><line class="door" x1="560" y1="205" x2="560" y2="235"/><line class="door" x1="620" y1="220" x2="620" y2="250"/>
   <text class="s" x="590" y="270" text-anchor="middle">Hinter-</text><text class="s" x="590" y="284" text-anchor="middle">ausgang →</text>
   <rect class="obj" x="262" y="252" width="16" height="10"/><text class="s" x="262" y="276">Schlüsselkasten</text>

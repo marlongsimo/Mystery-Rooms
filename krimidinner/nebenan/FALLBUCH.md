@@ -1,4 +1,4 @@
-# Nebenan – Der stille Kreis · Fallbuch 0.3.4
+# Nebenan – Der stille Kreis · Fallbuch 0.3.5
 
 **Fall 04 der Krimidinner-Reihe**
 
@@ -8,11 +8,11 @@
 | Datum | Samstag, 16. Oktober 2004, Herbstfest „12 Jahre Miteinander Birkenhöhe e. V.“ |
 | Spielerzahl | 5–10 |
 | Runden | 4 + Finale mit zwei Entscheidungen |
-| Dauer | ca. 2,5–3 Stunden |
+| Dauer | ca. 3–3,5 Stunden |
 | Opfer | Hanno Rabe (61), Gründer und Vorsitzender des Vereins |
 | Täterrolle | R03 Merle/Mattis Linde |
 
-> **Enthält die vollständige Lösung.** 0.3.4 ist die letzte inhaltliche Bereinigungsfassung vor der Rollenproduktion. Sie übernimmt 0.3.3 vollständig und korrigiert neun Widersprüche sowie zwei Abhängigkeiten im Schlüsselsystem (Abschnitt 0.2). Danach wird die Grundmechanik nicht mehr verändert; die zehn Rollenhefte werden gegen diese Masterfassung geprüft.
+> **Enthält die vollständige Lösung.** 0.3.5 ist eine reine Konsistenz- und Spielmechanikfassung: keine neue Handlung, keine neuen Rollen, keine neuen Beweise (Abschnitt 0.3). Davor: 0.3.4 ist die letzte inhaltliche Bereinigungsfassung vor der Rollenproduktion. Sie übernimmt 0.3.3 vollständig und korrigiert neun Widersprüche sowie zwei Abhängigkeiten im Schlüsselsystem (Abschnitt 0.2). Danach wird die Grundmechanik nicht mehr verändert; die zehn Rollenhefte werden gegen diese Masterfassung geprüft.
 >
 > Aus 0.3.3 übernommen: die neue Raumgeometrie, die aktualisierte Bewegungsfolge von 20:38 bis 22:50 Uhr, die überarbeiteten Aussagenregeln und vier zusätzliche Produktionsbrücken: Kameraverwahrung, Seiferts Fundimpuls für B12, physische Handhabung von Kranz’ Notizen und die präzise Ortsangabe des Rückgabekartons in B21. Physische Tatmechanik und Raummaße sind als Konstruktionsstand festgelegt, aber noch nicht durch einen maßstäblichen Aufbau am Tisch validiert. Vorhandene Rollenbiografien aus 0.3 bleiben gültig, soweit sie dieser Fassung nicht widersprechen.
 
@@ -56,6 +56,26 @@
 - **Wer weiß, dass Linde einen eigenen Schlüssel hat?** Das ist kein neuer Fakt aus B6. Linde schließt seit 1998 jeden Donnerstag den Beratungsraum auf und zu. Das wissen Wiesner (führt das Schlüsselbuch und hat den Schlüssel 1998 ausgegeben), Klose und die Mitglieder Fuchs und Seifert. B6 bestätigt es schriftlich mit dem Eintrag „Linde – seit 03/1998“. Für die Nicht-Mitglieder ist der Eintrag neu, für die Mitglieder nicht.
 - **Woher kommt der Ersatzring, und warum darf Kranz ihn benutzen?** Der Schlüsselkasten hängt im westlichen Flur neben der Küche, außerhalb des versiegelten Büros. Den Kastenschlüssel tragen laut Vereinsordnung nur Vorsitz und stellvertretender Vorsitz (Hanno und Kranz) sowie die Hausmeisterei (Wiesner). Der Ring ist beschriftet „Vorstand – Notfall“. Mit Hannos Tod ist Kranz amtierender Vorsitz, die Polizei hat Kranz außerdem das Abschließen des Hauses übertragen. In Runde 2 hat Kranz einen konkreten Anlass: Im schwarzen Buch steht „21:00 K. S.“ und „Mo: Rückgabe beginnt“, Seiferts Einladung nennt den Beratungsraum, und Kranz will vor der Aussage um 9 Uhr wissen, was Hanno dort vorbereitet hat. Kranz sagt das laut, bevor aufgeschlossen wird. Wiesner (falls besetzt) bestätigt: „Der Ring ist für genau so etwas da.“
 
+### 0.3 · Was 0.3.5 bereinigt **[0.3.5]**
+
+| Nr. | Problem | Fassung 0.3.5 |
+|---|---|---|
+| 1 | In der App waren B12 und B17 sofort mit VORDRUCK bzw. FADEN sichtbar, obwohl Seifert und Kranz sie selbst aufdecken sollen. | Zwei Zwischenstufen ohne Rollenteil: **STREIFEN** gibt nur B12 frei, **RÜCKSEITE** nur B17. Die Spielleitung nennt das Wort erst, wenn Seifert die Streifen bringt bzw. Kranz das Blatt umdreht. |
+| 2 | Linde verließ das Büro, aber niemand schloss die Bürotür. | Linde zieht die Bürotür um 20:47 hinter sich zu. |
+| 3 | Linde sah um 21:32 „etwas Dunkles fallen“, Seifert nahm den Faden aber direkt aus der Hand. | Linde sieht von der Tür nur, dass Seifert sich über Hannos rechte Hand beugt, und weiß nicht, was geschah. |
+| 4 | Schluss C verteilte die Umschläge „am Montag“, obwohl der Karton im versiegelten Büro steht. | Verteilung erst, wenn die Polizei das Büro freigibt. |
+| 5 | Schluss C stellte die Seifert-Akte zur Wahl. | Alle Beweise zum Tod gehen in jedem Schluss an die Polizei. Die Abstimmung betrifft nur Geständnisse, Patenblätter und Hilfebuch. |
+| 6 | Fuchs' Standort um 20:40 war unklar. | Fuchs steht in der WC-Tür und schaut den Flur entlang nach Westen. Von dort ist die Bürotür sichtbar (anders als vom Windfang). |
+| 7 | Fuchs' Ziel war nicht erreichbar (B8 kommt ohnehin). | Fuchs entscheidet selbst, ob der gelbe Durchschlag vorgelegt wird und wie viel der eigenen Wahrheit preisgegeben wird. |
+| 8 | B18 nannte Linde als Treffer. | B18 beschreibt nur den Faden. Den Vergleich ziehen die Gäste selbst über B4 und Lindes Ärmel. |
+| 9 | B14 war schwer zu lesen. | drei Vorgänge und eine letzte Seite, Kürzel bleiben |
+| 10 | 23 Mitglieder, aber auch Seifert hat eine Mappe | **22 Mitglieder**, dazu Seiferts alte Mappe: 23 Mappen, 23 Umschläge, 22 Vornamen im schwarzen Buch |
+| 11 | Packliste unvollständig, Spielzeit zu knapp | vollständige Packliste im Gastgeberheft, Spielzeit 3–3,5 Std., Phase 5 40 Min. |
+| 12 | Wielands Pflichtrequisit war eine Kamera, die Kranz verwahrt. | Wieland: Notizblock und Presseausweis. Die Kamera ist Tischrequisit bei Kranz. |
+| 13 | Hollmann ohne weibliche Form, Spendendose unklar | „Kassenwartin“; Hollmann nimmt die Dose um 20:35 vom Büfett mit. |
+| 14 | Raum „Lager“ im Hausplan ohne Erklärung | entfernt; der Windfang reicht bis zur Südwand. |
+| 15 | Wiesner konnte die Reparatur schon in Runde 1 verraten. | Die Reparatur behält Wiesner bis Runde 4 für sich. |
+
 **Unveränderte Eckdaten**
 
 Herbstfest zum zwölfjährigen Bestehen des Vereins, Samstag, 16. Oktober 2004; Birkenhöhe; fünf bis zehn Spielende; vier Runden plus Finale; Hanno Rabe als Opfer; R03 Merle/Mattis Linde als Täterrolle. Die drei Außenfälle, die Doppelmanipulation des Archivs und das Finale mit einer zweiten moralischen Entscheidung bleiben erhalten. Die Fotos aus Wielands Digitalkamera sind ab jetzt auch bei fünf Personen als B22 verfügbar.
@@ -84,7 +104,7 @@ Beim Herbstfest eines freundlichen Nachbarschaftsvereins stirbt der Gründer bei
 
 ### 2.1 Was er ist
 
-- **Entstehung:** 1997 als „Gesprächskreis“ im Verein, für Menschen in Umbrüchen. Heute hat er 23 Mitglieder.
+- **Entstehung:** 1997 als „Gesprächskreis“ im Verein, für Menschen in Umbrüchen. Heute hat er 22 Mitglieder. Mit Seiferts alter Mappe liegen 23 Mappen im Schrank.
 - **Treffen:** donnerstags die „Stille Stunde“ im Beratungsraum.
 - **Kein Kult:** keine Symbole, keine Lehre, nur ein schwarzes Notizbuch und ein Schrank.
 - **Die gute Seite:** Viele Mitglieder hat der Kreis wirklich getragen, etwa Klose nach dem Tod des Ehepartners, Seifert 1999 in einer Depression und Fuchs beim Neuanfang.
@@ -234,7 +254,7 @@ Um 23:00 sagt Kranz: „Morgen erzählen zehn Leute zehn verschiedene Geschichte
 
 | Zeit | Handlung |
 |---|---|
-| 20:46–20:47 | Linde sieht, dass Hanno nicht reagiert. Sie nimmt Hannos Prüfnotiz und die Kopien der Seifert-Akte vom Schreibtisch, verlässt das Büro durch die Bürotür und geht über den nun leeren Flur in den Beratungsraum. |
+| 20:46–20:47 | Linde sieht, dass Hanno nicht reagiert. Sie nimmt Hannos Prüfnotiz und die Kopien der Seifert-Akte vom Schreibtisch, verlässt das Büro durch die Bürotür, zieht sie hinter sich zu und geht über den nun leeren Flur in den Beratungsraum. |
 | 20:48–20:52 | Linde schaltet den Aktenvernichter ein und vernichtet die Prüfnotiz sowie die Kopien. Um 20:51 hört Linde das Klopfen von R06 an der Tür des Beratungsraums und hält inne. Sie schaltet das Gerät spätestens um 20:52 aus, als R06 wieder Richtung Saal geht. |
 | 20:53 | Linde verlässt den Beratungsraum, schließt die Tür mit dem eigenen Schlüssel ab und geht in Richtung WC. Seifert sieht Linde von hinten in der langen dunklen Strickjacke verschwinden. |
 | 20:55–20:56 | Linde verlässt das WC und geht direkt über den Flur nach Westen zur Küche. |
@@ -429,7 +449,7 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 | 20:44 | Hollmann geht kurz zur Bürotür und hört aus dem Büro Hannos Satz: „Um neun erfährt sie es. Von mir!“ R06 parkt und sieht Kranz am Auto telefonieren. | Hanno lebt um 20:44. Der Streit ist laut genug, dass Hollmann den Satz versteht. R06 betritt das Gebäude erst um 20:47. |
 | 20:45 | Hanno steigt schweigend auf die Trittleiter und greift nach dem Karton „ZURÜCK“. | Der Karton steht leicht über der Schrankkante; aus dem braunen Umschlag schaut ein Stück heraus. |
 | **20:46** | Linde stößt Hanno. Hanno und die Leiter kippen nach links; die linke Kopfseite trifft die offene Schranktür. Der Faden bleibt in seiner halb geöffneten rechten Hand. | Wiesner hört ein dumpfes Poltern durch die Wand. |
-| 20:46:30–20:47 | Linde nimmt Prüfnotiz und Kopien vom Schreibtisch, verlässt das Büro über die Bürotür und wechselt über den nun leeren Flur in den Beratungsraum. | Kein Sichtkontakt mit R06: R06 betritt um 20:47 durch den Haupteingang den Saal; die Schwingtür ist blickdicht. |
+| 20:46:30–20:47 | Linde nimmt Prüfnotiz und Kopien vom Schreibtisch, verlässt das Büro über die Bürotür, zieht sie zu und wechselt über den nun leeren Flur in den Beratungsraum. | Kein Sichtkontakt mit R06: R06 betritt um 20:47 durch den Haupteingang den Saal; die Schwingtür ist blickdicht. |
 | 20:47 | R06 betritt das Gebäude und bleibt zunächst im Saal. | R06 sieht den östlichen Flur nicht. |
 | 20:48 | Linde schaltet im Beratungsraum den Aktenvernichter ein. | Wiesner hört später das Gerät durch die gemeinsame Wand. |
 | 20:49 | Seifert verlässt den Saal über die Schwingtür, durchquert den Flur zum Windfang und geht in den Hof. | Seifert hört den Aktenvernichter. Wieland kann Seifert später im Hof fotografieren. |
@@ -555,7 +575,7 @@ Alle Dokumente sind im gleichen Maßstab gezeichnet, damit man sie nebeneinander
 | **B9** Zwei Formulare | Links Seiferts „Nachgespräch“ vom 18.09.2002: „…habe ich Inhalte aus dem Kreis an die Presse gegeben.“ Feld „Gespräch geführt von: H. Rabe“, Unterschrift Seifert, darunter ein kurzes Stück gedruckter Linie. Fußzeile „Formular G · Stand 03/2003“. Rechts ein echtes Formular vom 05.06.2002 (Text aus Respekt abgedeckt), Fußzeile „Formular G · Stand 01/1999“, ohne Linie. |
 | **B10** Mitgliederkarte 2001 und Folie | Die Unterschrift steht auf einer gedruckten Linie. Daneben zwei weitere echte Unterschriften (Quittung 2000, gelber Durchschlag 1999): ähnlich, nie gleich. Die Folie mit der Unterschrift aus B9 liegt deckungsgleich auf der Karte, samt Linienstück. Zum Ausdrucken auf Klarsichtfolie. |
 | **B11** Eingangsbuch | Seite 2002: Nr. 112 vom 02.09., dazwischen ein eingeklebtes Zusatzblatt „112a – 18.09.02 – Nachgespräch K. Seifert“ in Druckbuchstaben (alle anderen Einträge seit 1998 in derselben Schreibschrift), Nr. 113 vom 24.09. „Ausschluss K. Seifert“. Seite 2003: „Nr. 131 – 11.06.03 – erste reguläre Verwendung Formular G neu“. |
-| **B12** Die Streifen | Frisch aus dem Auffangbehälter des Aktenvernichters. Zusammengesetzt in Hannos Handschrift: „Seifert: Vordruck 03/03 – Datum 18.09.02 unmöglich! Unterschrift = Kopie Mitgliederkarte (Strich!). ‚Geführt von H. Rabe‘ – ich habe dieses Gespräch nie geführt. Wer hatte im März 03 die neuen Vordrucke? Sa., unter vier Augen. H.“ Zum Ausdrucken in Streifen geschnitten. |
+| **B12** Die Streifen | **Eigene Stufe STREIFEN [0.3.5].** Frisch aus dem Auffangbehälter des Aktenvernichters. Zusammengesetzt in Hannos Handschrift: „Seifert: Vordruck 03/03 – Datum 18.09.02 unmöglich! Unterschrift = Kopie Mitgliederkarte (Strich!). ‚Geführt von H. Rabe‘ – ich habe dieses Gespräch nie geführt. Wer hatte im März 03 die neuen Vordrucke? Sa., unter vier Augen. H.“ Zum Ausdrucken in Streifen geschnitten. |
 | **B13** Briefwechsel Seifert | Seiferts Einsichtsbrief vom 12.02.2003 („…Wenn ihr mir meine Akte nicht zeigt, zeige ich Birkenhöhe, wer ihr seid. Und du, Hanno, wirst das bereuen.“) und Hannos Antwort vom 22.04.2003 als Durchschlag: „Ich habe deine Akte eingesehen. Das Nachgespräch vom 18.09.2002 liegt darin, von dir unterschrieben. Ich sehe keinen Anlass, den Beschluss zu ändern. H.“ |
 | **B14** Das grüne Heft | 2001 L. B. (aus B. K., Schwager): Mietvertrag Anger, 20 Jahre. 2002 J. S. (aus W. S.): Artikel erscheint nicht, Quelle war K. S. über V. W. 09/2004 S. H. (aus B. O.): 1.800 €, „Nicht drohen. Einladen. Helfen. Wenn S. H. nicht kommt: Montag Kassenprüfung offen, Kranz informieren.“ 10/2004: „L. B. ruft Kranz an. Er will das Haus zurück. Ich habe das gebaut, und es läuft ohne mich. Montag: zurückgeben. Alles.“ |
 
@@ -577,8 +597,8 @@ Alle Dokumente sind im gleichen Maßstab gezeichnet, damit man sie nebeneinander
 |---|---|---|
 | **B15** Lieferschein Druckerei Pohlmann | immer | „14.03.2003 · Formular G (Gespräch), Stand 03/2003, 500 St. · Lieferung ans Archiv · abgeholt: M. Linde“, mit Unterschrift. Liegt in Hollmanns Kassenmappe bei den Belegen 2003. |
 | **B16** Küchendienstplan | immer | „20:30–21:00 Kuchen – Özdemir ✓ · 20:45 Kaffee ansetzen – Linde“ ist durchgestrichen. Daneben von Hand: „21:07 an – S. H.“ Der Plan belegt, dass Hollmann den Kaffee um 21:07 angesetzt hat; er ist allein kein Beweis für Lindes genauen Aufenthaltsort. |
-| **B17** Kranz’ Notizen, Rückseite | immer | „Leise zum Sanitäter: rechter Oberarm außen, drei ovale Flecken nebeneinander, eher Finger als Leiter. Rechtsmedizin soll schauen.“ |
-| **B18** Der Faden | immer | Seifert legt ihn auf den Tisch. Er ist dunkelgrün, zweifädig, Merinowolle. Vergleich mit Hanno (hellgrau), Kranz (Blazer), Klose (brauner Tweed), Seifert (dunkelroter Schal) und Linde (linke Manschette: dunkelgrün, zweifädig, frische Schlaufe, ein Stück fehlt). Beim Druck kann optional ein Stück echte Wolle beiliegen. |
+| **B17** Kranz’ Notizen, Rückseite | eigene Stufe RÜCKSEITE [0.3.5] | „Leise zum Sanitäter: rechter Oberarm außen, drei ovale Flecken nebeneinander, eher Finger als Leiter. Rechtsmedizin soll schauen.“ |
+| **B18** Der Faden | immer | Seifert legt ihn auf den Tisch. Er ist dunkelgrün, zweifädig, Merinowolle. Die Karte nennt **niemanden**. Den Vergleich ziehen die Gäste selbst: mit dem Gruppenfoto B4 und mit der Kleidung im Raum. Lindes linke Manschette (frische Schlaufe, ein Stück fehlt) zeigt Linde, wenn jemand danach fragt. Beim Druck kann optional ein Stück echte Wolle beiliegen. |
 | **B19** Wiesners Aussage | wenn R09 fehlt | Schriftliche Aussage Wiesners: „Ich habe die Leiter am Freitag neu vernietet und geprüft. Den Warnzettel ließ ich bis zur formellen Abnahme am Montag hängen. Am Abend hörte ich um 20:46 ein dumpfes Poltern. Durch die Wand zum Beratungsraum hörte ich von etwa 20:48 bis 20:52 den Aktenvernichter.“ |
 | **B20** Özdemirs Aussage | wenn R07 fehlt | Schriftliche Aussage Özdemirs: „Linde war um 20:38 kurz in der Küche, in der grünen Strickjacke, und ging in den Flur. Zurück kam Linde um 20:57, blass und mit festgehaltenem linken Ärmel. Bis dahin war ich allein. Um 21:05 kam Hollmann.“ |
 | **B22** Wielands Digitalkamera | immer | Drei Aufnahmen mit eingeblendeter Kamerazeit: **20:41** Küche – Özdemir ist allein im Bild; **20:42** Basteltisch – Fuchs sitzt am Tisch; **20:51** Hof – Seifert steht rauchend draußen. Die Bilder bestätigen einzelne Aufenthaltsorte, ersetzen aber keine vollständige Beobachtung der Räume. Die Kamera ist das physische Requisit; B22 ist die ausgedruckte Beweis- und Auswertungskarte. |
@@ -705,11 +725,13 @@ Das Finale hat zwei getrennte Abstimmungen. Die Täterfrage wird zuerst abgeschl
 3. **Hannos Brief (B21):** Seifert öffnet den weißen Umschlag. Hanno erklärt, dass er den Kreis beenden und die ursprünglichen Geständnisse zurückgeben wollte. Er übernimmt Verantwortung für seine eigenen Eingriffe, ohne sich reinzuwaschen.
 4. **Entscheidung über den Kreis:** Die Gäste stimmen über den Umgang mit dem Archiv ab. Keine Variante veröffentlicht intime Geständnisse; der Verein bleibt bestehen, der Stille Kreis endet.
 
+**Was nicht zur Wahl steht [0.3.5]:** Alle Beweise zum Tod (Seiferts Akte, Eingangsbuch, Streifen, Lieferschein, Dienstplan, Kranz' Notizen, Faden, Kamera) gehen in jedem Schluss morgen um 9 Uhr an die Polizei. Abgestimmt wird nur über die übrigen Geständnisse, Patenblätter und das Hilfebuch. An den Karton im versiegelten Büro kommt erst jemand, wenn die Polizei das Büro freigibt.
+
 | Schluss | Entscheidung | Konsequenz |
 |---|---|---|
 | **A – Offenlegen** | Die Existenz des Stillen Kreises und seine Kontrollmethoden werden gegenüber Mitgliedern und Öffentlichkeit offengelegt. | Die persönlichen Geständnisse bleiben geschützt. Die Manipulationen und die institutionelle Verantwortung werden benannt. Der Verein muss sich öffentlich neu aufstellen. |
 | **B – Aufarbeiten** | Das Archiv wird gesichert und einer unabhängigen Stelle zur vertraulichen Prüfung übergeben. | Betroffene erhalten Zugang zu ihren Unterlagen und entscheiden über die Rückgabe. Die Öffentlichkeit erfährt zunächst nur, dass der Verein seine internen Strukturen untersucht. |
-| **C – Zurückgeben** | Hannos begonnener Weg wird fortgesetzt: Originale werden den Verfassern zurückgegeben, Kopien vernichtet und der innere Kreis intern aufgelöst. | Die Betroffenen erhalten ihre eigenen Geständnisse zurück. Der Verein bleibt bestehen; die Aufarbeitung bleibt zunächst innerhalb der Gemeinschaft. |
+| **C – Zurückgeben** | Hannos begonnener Weg wird fortgesetzt: Sobald die Polizei das Büro freigibt, werden die Originale aus dem Karton den Verfassern zurückgegeben, Kopien vernichtet und der innere Kreis intern aufgelöst. | Die Betroffenen erhalten ihre eigenen Geständnisse zurück. Der Verein bleibt bestehen; die Aufarbeitung bleibt zunächst innerhalb der Gemeinschaft. |
 
 **Dramaturgische Leitlinie:** Keine Variante ist moralisch perfekt. A schafft Transparenz, riskiert aber öffentliche Stigmatisierung. B schützt die Betroffenen, verlangt aber Vertrauen in eine unabhängige Stelle. C gibt den Menschen ihre Dokumente zurück, lässt aber die institutionelle Verantwortung weniger sichtbar werden.
 

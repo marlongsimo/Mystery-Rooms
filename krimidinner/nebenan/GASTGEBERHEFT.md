@@ -19,11 +19,25 @@ Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine 
 
 ## A2 · Vorbereitung (eine Woche bis zwei Tage vorher)
 
-- [ ] **Gäste einladen:** 5 bis 10 Personen. Der Abend dauert etwa 3 Stunden mit Essen.
+- [ ] **Gäste einladen:** 5 bis 10 Personen. Der Abend dauert etwa 3 bis 3,5 Stunden mit Essen.
 - [ ] **Namen und Rollenvarianten eintragen.** Jede Person wählt frei, ob ihre Figur weiblich oder männlich dargestellt wird.
 - [ ] **Codes verteilen**, jeder Person ihren eigenen, nie offen in eine Gruppe.
 - [ ] **Anleitung mitschicken** (`ANLEITUNG`).
-- [ ] **Hinweis an alle:** Das Rollenblatt zwei, drei Tage vorher lesen. Requisiten mit „Pflicht“ mitbringen, besonders die **dunkelgrüne Strickjacke**, den **dunkelroten Schal**, das **gefaltete Notizblatt** und die **Kassenmappe**.
+- [ ] **Hinweis an alle:** Das Rollenblatt zwei, drei Tage vorher lesen. Requisiten mit „Pflicht“ mitbringen.
+- [ ] **Packliste der Pflichtrequisiten** (darauf bauen Hinweise auf):
+
+  | Rolle | Pflicht |
+  |---|---|
+  | R01 Fuchs | bunte Bastelschürze |
+  | R02 Kranz | ein einmal gefaltetes Notizblatt, dazu als Tischrequisit eine kleine Kamera (Wielands Kamera) |
+  | R03 Linde | lange dunkelgrüne Strickjacke |
+  | R04 Seifert | dunkelroter Wollschal |
+  | R05 Hollmann | Mappe oder Ordner („Kassenmappe“) |
+  | R06 Rabe | Kopfhörer um den Hals |
+  | R07 Özdemir | Küchenschürze |
+  | R08 Wieland | Notizblock und Presseausweis |
+  | R09 Wiesner | großer Schlüsselbund |
+  | R10 Klose | braunes Sakko oder braune Jacke |
 - [ ] **Bei der Druckversion:**
   - Beweiskarten nach Farben sortieren.
   - **B10:** die Unterschrift zusätzlich auf Klarsichtfolie drucken.
@@ -64,10 +78,14 @@ Die Rollen werden in dieser Reihenfolge besetzt. Nicht besetzte Rollen sind **Ne
 | 0:10 | **Phase 1 · Nach dem Fest** (Vorspeise) | – |
 | 0:25 | **Phase 2 · Der Sturz** | LEITER: B1–B4 |
 | 0:55 | **Phase 3 · Das Hinterzimmer** (Hauptgang) | STILLE: B5–B8 |
-| 1:30 | **Phase 4 · Die Akten** | VORDRUCK: B9–B14 |
-| 2:10 | **Phase 5 · Der Stoß** (Dessert) | FADEN: B15–B18, B22, dazu B19 und/oder B20 |
-| 2:45 | **Finale · Anklage, Brief und Entscheidung** | ZURÜCK: B21 |
-| ca. 3:15 | Ende | – |
+| 1:30 | **Phase 4 · Die Akten** | VORDRUCK: B9–B11, B13, B14 |
+| ca. 1:50 | **Streifen** (innerhalb von Phase 4, sobald Seifert sich erinnert) | STREIFEN: B12 |
+| 2:10 | **Phase 5 · Der Stoß** (Dessert) | FADEN: B15, B16, B18, B22, dazu B19 und/oder B20 |
+| ca. 2:30 | **Rückseite** (innerhalb von Phase 5, sobald Kranz das Blatt umdreht) | RÜCKSEITE: B17 |
+| 2:50 | **Finale · Anklage, Brief und Entscheidung** | ZURÜCK: B21 |
+| ca. 3:20 | Ende | – |
+
+Rechne mit 3 bis 3,5 Stunden. Lange Diskussionen sind gut, kürze dann eher beim Essen als im Finale.
 
 ## A5 · Vor dem Start vorlesen
 
@@ -136,26 +154,46 @@ Dann sagt {R02: Beate / Benedikt} Kranz, wenn besetzt in eigenen Worten, sonst l
 > **Vorlesen:** „Kurz nach Mitternacht. Im Schrank des Beratungsraums liegen Mappen mit Vornamen, ein Eingangsbuch und eine verschlossene Schublade. Eine dieser Mappen trägt einen Namen, der heute Abend schon einmal gefallen ist.“
 
 **Losungswort: VORDRUCK.** Es öffnet:
-- die Beweise B9 Zwei Formulare · B10 Mitgliederkarte und Folie · B11 Eingangsbuch · B12 Die Streifen · B13 Briefwechsel Seifert · B14 Das grüne Heft,
+- die Beweise B9 Zwei Formulare · B10 Mitgliederkarte und Folie · B11 Eingangsbuch · B13 Briefwechsel Seifert · B14 Das grüne Heft,
 - in jedem Rollenblatt **Runde 3**.
 
-**Hinweis:** B12 bringt {R04: Karla / Karl} Seifert selbst auf den Tisch, sobald {R04: ihr / ihm} das Geräusch von 20:49 einfällt. Ist das nach der ersten Besprechung von B9 bis B11 noch nicht geschehen, frag Seifert: „Du hast vorhin von einem Geräusch im Flur erzählt. Was war das?“
+**Hinweis:** Die Streifen (B12) sind noch nicht dabei. Sie bringt {R04: Karla / Karl} Seifert selbst auf den Tisch, sobald {R04: ihr / ihm} das Geräusch von 20:49 einfällt (siehe **Streifen**). Ist das nach der ersten Besprechung von B9 bis B11 noch nicht geschehen, frag Seifert: „Du hast vorhin von einem Geräusch im Flur erzählt. Was war das?“
 
 **Tipp:** Lasst B9, B10 und B11 nebeneinander liegen. Wer die Folie auf die Karte legt, sieht mehr.
 
+## Streifen · Seifert erinnert sich (innerhalb von Phase 4)
+
+> **Vorlesen, sobald Seifert den Beutel auf den Tisch legt:** „Im Auffangbehälter des Aktenvernichters liegen frische Papierstreifen. Freitag war der Behälter noch leer.“
+
+**Losungswort: STREIFEN.** Es öffnet B12 Die Streifen. Das Rollenblatt bleibt bei Runde 3. Gib das Wort erst, wenn Seifert die Streifen gebracht hat, nicht vorher.
+
 ---
 
-## Phase 5 · Der Stoß (ca. 35 Min.)
+## Phase 5 · Der Stoß (ca. 40 Min.)
 
 > **Vorlesen:** „Ein Uhr nachts. Hollmann hat die Kassenmappe noch immer unter dem Arm. Auf der Kühlschranktür hängt der Küchendienstplan. Und Kranz hat seit Stunden ein gefaltetes Blatt in der Tasche.“
 
 **Losungswort: FADEN.** Es öffnet:
-- die Beweise B15 Lieferschein · B16 Küchendienstplan · B17 Kranz' Notizen (Rückseite) · B18 Der Faden · B22 Wielands Digitalkamera · dazu **B19** (wenn R09 fehlt) und **B20** (wenn R07 fehlt),
+- die Beweise B15 Lieferschein · B16 Küchendienstplan · B18 Der Faden · B22 Wielands Digitalkamera · dazu **B19** (wenn R09 fehlt) und **B20** (wenn R07 fehlt),
 - in jedem Rollenblatt **Runde 4**.
+
+Die Rückseite von Kranz' Notizen (B17) kommt erst, wenn Kranz das Blatt umdreht (siehe **Rückseite**).
+
+**B22 sind Momentaufnahmen.** Die Fotos zeigen, wo drei Menschen um 20:41, 20:42 und 20:51 waren. Sie schließen keine Lücken. Leite daraus kein vollständiges Alibi ab, und verbessere die Gäste, wenn sie es tun.
 
 **Spannungsregel:** Lass die Beweise nicht sofort zusammenführen. Zuerst müssen sich Kranz, Hollmann und Seifert zu ihren eigenen Auslassungen erklären (Griff am Arm, Bürotür, Faden). Erst danach legt ihr Fälschung, Wege und Spur zusammen.
 
 **Hinweis:** In dieser Runde legen Fuchs, Kranz, Seifert und Hollmann verbindlich etwas offen. Ist die Runde fast vorbei und das noch nicht geschehen, frag direkt: „Wer war heute zwischen 20:40 und 21:00 an einer Tür, und hat es noch nicht gesagt?“
+
+---
+
+## Rückseite · Kranz dreht das Blatt um (innerhalb von Phase 5)
+
+> **Vorlesen, sobald Kranz das Blatt umdreht:** „Auf der Rückseite steht, was die Notärztin nur leise gesagt hat.“
+
+**Losungswort: RÜCKSEITE.** Es öffnet B17 Kranz' Notizen (Rückseite). Das Rollenblatt bleibt bei Runde 4. Gib das Wort erst, wenn Kranz das Blatt umgedreht hat.
+
+**Wenn es nicht vorangeht:** Bleibt eine Runde länger als zehn Minuten stehen, nimm einen Impuls aus A7. Hilft auch der zweite nicht, leite zur nächsten Phase über. Was eine Figur „in dieser Runde offenlegt“, kannst du dann direkt erfragen.
 
 ---
 
@@ -274,16 +312,20 @@ Nach Hannos Brief stimmen alle ab (Mehrheit, bei Gleichstand entscheidet die Spi
 - Wird das Archiv vernichtet oder als Beweis gesichert?
 - Was wird aus einem Verein, der draußen wirklich Gutes getan hat?
 
-**Kein Schluss veröffentlicht private Geständnisse. Der Verein bleibt, der Kreis endet.** Lies den gewählten Schluss vor:
+**Kein Schluss veröffentlicht private Geständnisse. Der Verein bleibt, der Kreis endet.**
+
+**Was nicht zur Wahl steht:** Alles, was den Tod betrifft, geht in jedem Schluss morgen um 9 Uhr an die Polizei: Seiferts Akte, Eingangsbuch, Streifen, Lieferschein, Dienstplan, Kranz' Notizen, der Faden und die Kamera. Die Abstimmung betrifft nur die übrigen Geständnisse, Patenblätter und das Hilfebuch. Der Karton „ZURÜCK“ steht im versiegelten Büro. An ihn kommt erst jemand, wenn die Polizei das Büro freigibt.
+
+Lies den gewählten Schluss vor:
 
 **A · Offenlegen**
-> „Die Existenz des Kreises und seine Methoden werden öffentlich gemacht, gegenüber den Mitgliedern und gegenüber Birkenhöhe. Kein einziges Geständnis wird veröffentlicht. Die Fälschung, die Außenfälle und der Tod gehen an die Polizei. Brodersen und Sauer müssen sich erklären. Der Verein muss sich neu aufstellen, mit Narben, aber ohne Geheimnis.“
+> „Die Existenz des Kreises und seine Methoden werden öffentlich gemacht, gegenüber den Mitgliedern und gegenüber Birkenhöhe. Kein einziges Geständnis wird veröffentlicht. Auch die Außenfälle gehen an die Polizei. Brodersen und Sauer müssen sich erklären. Der Verein muss sich neu aufstellen, mit Narben, aber ohne Geheimnis.“
 
 **B · Aufarbeiten**
-> „Der Schrank wird versiegelt und einer unabhängigen Stelle übergeben. Die Beweise gehen an die Polizei. Alle Betroffenen erhalten Zugang zu ihren Unterlagen und entscheiden selbst, was damit geschieht. Birkenhöhe erfährt zunächst nur, dass der Verein seine Strukturen untersucht. Ob die Außenfälle je ans Licht kommen, bleibt offen.“
+> „Der Schrank wird versiegelt und einer unabhängigen Stelle übergeben. Alle Betroffenen erhalten Zugang zu ihren Unterlagen und entscheiden selbst, was damit geschieht. Birkenhöhe erfährt zunächst nur, dass der Verein seine Strukturen untersucht. Ob die Außenfälle je ans Licht kommen, bleibt offen.“
 
 **C · Zurückgeben**
-> „Hannos Weg wird zu Ende gegangen. Am Montag bekommt jedes Mitglied seinen braunen Umschlag aus dem Karton. Nur die Seifert-Akte geht zur Polizei. Patenblätter, Hilfebuch und Kopien werden vernichtet, der Kreis wird intern aufgelöst. Jede Person hält ihre Wahrheit wieder selbst in der Hand. Was Hanno anderen angetan hat, bleibt unter euch.“
+> „Hannos Weg wird zu Ende gegangen. Sobald die Polizei das Büro freigegeben hat, bekommt jedes Mitglied seinen braunen Umschlag aus dem Karton. Patenblätter, Hilfebuch und Kopien werden vernichtet, der Kreis wird intern aufgelöst. Jede Person hält ihre Wahrheit wieder selbst in der Hand. Was Hanno anderen angetan hat, bleibt unter euch.“
 
 ## B-6 · Punkte (wenn gewünscht)
 

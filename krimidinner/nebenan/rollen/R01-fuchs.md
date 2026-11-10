@@ -33,7 +33,7 @@
 
 ## Vertraulich · Der Stille Kreis
 
-Die Donnerstagsrunde heißt unter den Mitgliedern **der Stille Kreis**, das Treffen „die Stille Stunde“. 23 Mitglieder. Bei deiner Aufnahme im Juli hast du eine persönliche Wahrheit auf ein Formular G geschrieben und vorgelesen. Danach haben die anderen dir von sich erzählt, und du hast dich zum ersten Mal seit Monaten gehalten gefühlt. Du hast den gelben Durchschlag bekommen. Das Original liegt im Schrank im Beratungsraum, den {R03: Merle / Mattis} Linde führt.
+Die Donnerstagsrunde heißt unter den Mitgliedern **der Stille Kreis**, das Treffen „die Stille Stunde“. 22 Mitglieder. Bei deiner Aufnahme im Juli hast du eine persönliche Wahrheit auf ein Formular G geschrieben und vorgelesen. Danach haben die anderen dir von sich erzählt, und du hast dich zum ersten Mal seit Monaten gehalten gefühlt. Du hast den gelben Durchschlag bekommen. Das Original liegt im Schrank im Beratungsraum, den {R03: Merle / Mattis} Linde führt.
 
 **{R03: Merle / Mattis} Linde ist deine {R03: Patin / dein Pate}.** Jeden Dienstag ein Gespräch, Tee, Fragen nach deiner Woche. Du magst {R03: sie / ihn} sehr.
 
@@ -58,7 +58,7 @@ Das ist Unfallflucht, und sie ist noch nicht verjährt.
 - **19:15** Gruppenfoto für den Aushang. Du in der Bastelschürze.
 - **20:28** Du hältst es nicht aus und gehst an die Bürotür: „Was heißt, meine Wahrheit liegt nicht mehr bei dir?“ Hanno sagt: „Nach der Rede. Hab keine Angst.“ Er schließt die Tür.
 - **20:31–20:40** Im WC. Du heulst und wäschst dir das Gesicht.
-- **20:40** Als du aus dem WC kommst, siehst du **am östlichen Flurende eine Person in einer dunklen Strickjacke im Büro verschwinden**, das Gesicht abgewandt. Du denkst sofort an deine {R03: Patin / deinen Paten}. Sicher bist du nicht.
+- **20:40** Du trittst aus der WC-Tür und schaust den Flur entlang nach Westen, Richtung Saal. Weiter vorn siehst du **eine Person in einer dunklen Strickjacke in die Bürotür treten und verschwinden**, das Gesicht abgewandt. Du denkst sofort an deine {R03: Patin / deinen Paten}. Sicher bist du nicht.
 - **20:42** Am Basteltisch. Ab jetzt bis zum Fund bist du dort, mit Kindern und Eltern. Ein Reporter macht ein Foto.
 - **21:15** Unruhe, Kranz und Seifert im Büro. Später sagt {R03: Merle / Mattis} zu dir: „Bleib heute bei mir.“
 
@@ -69,7 +69,7 @@ Das ist Unfallflucht, und sie ist noch nicht verjährt.
 
 ## Vertraulich · Deine Ziele
 
-1. **Persönlich:** Dein Durchschlag und das Original im Schrank dürfen nicht in fremde Hände.
+1. **Persönlich:** Du willst nicht, dass dein gelber Durchschlag am Tisch herumgereicht wird. Entscheide selbst, ob du ihn als Beweis gegen Hanno vorlegst oder deine Wahrheit weiter schützt. Wie viel du von deiner Wahrheit preisgibst, bestimmst du.
 2. **Zu einer anderen Person:** Bleib bei {R03: Merle / Mattis}. {R03: Sie / Er} hat dich darum gebeten.
 3. **Zum Fall:** Du willst wissen, was Hanno mit deiner Wahrheit vorhatte.
 
@@ -94,7 +94,7 @@ Das ist Unfallflucht, und sie ist noch nicht verjährt.
 
 **In dieser Runde legst du offen, was du gesehen hast,** bevor die Anklagen abgegeben werden:
 
-> „Um 20:40, als ich aus dem WC kam, ist am Ende des Flurs jemand in einer dunklen Strickjacke ins Büro gegangen. Das Gesicht habe ich nicht gesehen.“
+> „Um 20:40, als ich aus dem WC kam, ist weiter vorn im Flur jemand in einer dunklen Strickjacke ins Büro gegangen. Das Gesicht habe ich nicht gesehen.“
 
 - Du ahnst, wer es war. Ob du den Namen deiner {R03: Patin / deines Paten} sagst, entscheidest du. Es fällt dir schwer.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab. Hannos Brief wird erklären, warum er deinen Text verändert hat. Hör gut zu.

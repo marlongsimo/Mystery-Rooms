@@ -30,6 +30,7 @@ Du bist seit 2000 im Vorstand. Ohne dich gäbe es keine Hausaufgabenhilfe, keine
 | Schuhe | Pumps oder Loafer | Lederschuhe |
 | **Requisit fürs Spiel (Pflicht)** | **ein Notizblatt, einmal gefaltet** (für B2/B17) | **dasselbe** |
 | **zweites Requisit** | ein Handy (2004 genügt jedes kleine Telefon) | dasselbe |
+| **Tischrequisit** | **Wielands Kamera** (jede kleine Kamera), die du verwahrst | dasselbe |
 
 ## Vertraulich · Dein Geheimnis
 
@@ -86,7 +87,7 @@ Von Hannos Donnerstagsrunde im Beratungsraum weißt du nur, dass es sie gibt. Er
 
 **In dieser Runde legst du offen,** bevor die Anklagen abgegeben werden:
 
-- **Den Griff:** „Ich habe Hanno um 20:25 am linken Arm gepackt.“ Dann entfaltest du dein Blatt, drehst es sichtbar um und legst die **Rückseite** (B17) vor: drei Flecken **rechts**.
+- **Den Griff:** „Ich habe Hanno um 20:25 am linken Arm gepackt.“ Dann entfaltest du dein Blatt, drehst es sichtbar um und legst die **Rückseite** vor: drei Flecken **rechts**. **Sag dabei der Spielleitung Bescheid:** Erst dann gibt sie mit dem Wort RÜCKSEITE die Karte B17 für alle frei.
 - **Das Telefonat:** Leg die Anrufliste deines Handys vor: Brodersen, 20:41, Dauer zehn Minuten. Den Satz „wenn Rabe weg ist“ musst du erklären, wenn jemand ihn gehört hat.
 - **Die Kamera:** Leg Wielands Kamera auf den Tisch. Ist {R08: Viola / Vincent} Wieland dabei, gib sie {R08: ihr / ihm} zurück. Sonst zeigst du die drei Aufnahmen selbst (B22).
 - **Finale:** Gib deine Anklage ab. Danach wirst du entscheiden müssen, was aus dem Verein wird, den du führen wolltest.

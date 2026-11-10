@@ -10,7 +10,7 @@ Birkenhöhe, Samstag, 16. Oktober 2004. Der Nachbarschaftsverein „Miteinander 
 
 Ihr seid die, die nach dem Fest geblieben sind. Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheimnissen und eigenen Zielen. Manche von euch wissen mehr über diesen Verein als andere. Eine Person weiß, was in dem Büro wirklich geschah.
 
-**5 bis 10 Personen · etwa 3 Stunden · eine Spielleitung, die mitspielen darf**
+**5 bis 10 Personen · etwa 3 bis 3,5 Stunden · eine Spielleitung, die mitspielen darf**
 
 ---
 
@@ -55,10 +55,10 @@ Nur die **Täterrolle** darf über ihre eigenen Handlungen zur Tatzeit bewusst f
 | **2 · Der Sturz** | Der Fund und die ersten Beweise. War es ein Unfall? | ca. 30 Min. |
 | **3 · Das Hinterzimmer** | Neben dem Büro liegt ein Raum, den nicht alle kennen. | ca. 35 Min. |
 | **4 · Die Akten** | Papiere, die nicht stimmen. | ca. 40 Min. |
-| **5 · Der Stoß** | Die letzten Beweise. | ca. 35 Min. |
+| **5 · Der Stoß** | Die letzten Beweise. | ca. 40 Min. |
 | **Finale · Anklage, Brief und Entscheidung** | Jede Person klagt verdeckt an. Dann wird aufgelöst, und ihr entscheidet gemeinsam über eine zweite Frage. | ca. 30 Min. |
 
-Die Spielleitung liest zu Beginn jeder Phase einen Text vor und nennt ein Losungswort. Damit öffnen sich auf euren Handys die neuen Beweise und der nächste Teil eures Rollenblatts. Manche Beweise bringen Figuren selbst auf den Tisch.
+Die Spielleitung liest zu Beginn jeder Phase einen Text vor und nennt ein Losungswort. Damit öffnen sich auf euren Handys die neuen Beweise und der nächste Teil eures Rollenblatts. Manche Beweise bringen Figuren selbst auf den Tisch. Sobald das geschieht, nennt die Spielleitung ein eigenes Wort, und der Beweis erscheint auch in der App.
 
 ---
 

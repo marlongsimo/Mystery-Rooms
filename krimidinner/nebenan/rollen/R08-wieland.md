@@ -26,8 +26,8 @@
 | Kleidung | Cordhose oder Jeans, Pullover, Jackett | dasselbe |
 | Details | Presseausweis an einem Band | dasselbe |
 | Schuhe | Stiefel | dasselbe |
-| **Requisit fürs Spiel (Pflicht)** | **eine Kamera** (jede kleine Kamera oder ein Handy in einer Hülle) | **dasselbe** |
-| **zweites Requisit** | ein Notizblock | dasselbe |
+| **Requisit fürs Spiel (Pflicht)** | **ein Notizblock und ein Presseausweis an einem Band** | **dasselbe** |
+| **Hinweis** | Deine Kamera liegt seit dem Polizeieinsatz bei Kranz. Kranz bringt sie als Tischrequisit mit. | dasselbe |
 
 ## Vertraulich · Dein Geheimnis
 

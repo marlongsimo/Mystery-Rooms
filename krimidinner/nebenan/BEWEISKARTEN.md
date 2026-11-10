@@ -1,6 +1,6 @@
 # Nebenan – Der stille Kreis – Beweiskarten B1–B22
 
-Stand 1.0 nach Fallbuch 0.3.4. **Die Karte B21 gehört ins Finale und wird erst nach der Anklage geöffnet.**
+Stand 1.1 nach Fallbuch 0.3.5. **Die Karte B21 gehört ins Finale und wird erst nach der Anklage geöffnet.**
 
 Die Überschriften „Runde 1 … Runde 4“ und „Finale“ unten sind die Freigabestufen der Engine.
 
@@ -8,9 +8,13 @@ Die Überschriften „Runde 1 … Runde 4“ und „Finale“ unten sind die Fre
 |---|---|---|
 | Runde 1 · Der Sturz | LEITER | B1–B4 |
 | Runde 2 · Das Hinterzimmer | STILLE | B5–B8 |
-| Runde 3 · Die Akten | VORDRUCK | B9–B14 |
-| Runde 4 · Der Stoß | FADEN | B15–B20, B22 |
+| Runde 3 · Die Akten | VORDRUCK | B9–B11, B13, B14 |
+| Runde 3 · Die Streifen | STREIFEN | B12 (erst wenn Seifert den Aktenvernichter erwähnt) |
+| Runde 4 · Der Stoß | FADEN | B15, B16, B18–B20, B22 |
+| Runde 4 · Die Rückseite | RÜCKSEITE | B17 (erst wenn Kranz das Blatt umdreht) |
 | Finale | ZURÜCK | B21 |
+
+**Warum zwei Zwischenstufen:** B12 und B17 sind Momente von Figuren. Die Spielleitung nennt STREIFEN erst, wenn Seifert die Streifen auf den Tisch bringt, und RÜCKSEITE erst, wenn Kranz das Blatt umdreht. So zeigt die App nichts, was am Tisch noch verborgen ist.
 
 ---
 
@@ -34,7 +38,7 @@ Die Überschriften „Runde 1 … Runde 4“ und „Finale“ unten sind die Fre
 | B19 | R09 Wiesner fehlt |
 | B20 | R07 Özdemir fehlt |
 
-Mit 5 bis 6 Personen liegen 22 Karten auf dem Tisch, mit 7 oder 8 Personen 21, mit 9 oder 10 Personen 20.
+Mit 5 oder 6 Personen liegen 22 Karten auf dem Tisch, mit 7 oder 8 Personen 21, mit 9 oder 10 Personen 20.
 
 ---
 
@@ -124,7 +128,7 @@ Ein schmales schwarzes Notizbuch. Vorne, in Hannos enger Schrift:
 > 6. Was im Kreis gesagt wird, bleibt im Kreis.
 > 7. Wer geht, lässt seine Wahrheit hier.
 
-Darunter 23 Vornamen. Auf der Kalenderseite dieser Woche:
+Darunter 22 Vornamen. Auf der Kalenderseite dieser Woche:
 
 > **Sa 16.10.:** 20:40 – unter vier Augen · 21:00 K. S. (Karte 2001!) · S. H. – 1.800 – Do?
 > **Mo:** Rückgabe beginnt.
@@ -153,7 +157,7 @@ Im Sakko steckt außerdem ein verschlossener **weißer Umschlag: „K. – pers�
 *Beratungsraum, geöffnet mit dem Ersatzring*
 
 Ein großer Holzschrank mit zwei Türen. Darin:
-- **23 Hängemappen** mit Vornamen
+- **23 Hängemappen** mit Vornamen (eine mehr, als das schwarze Buch Namen nennt)
 - Mitgliederkarten
 - ein gebundenes **Eingangsbuch**
 - ein Stapel **„Patenblätter“** mit Wochenberichten über einzelne Mitglieder
@@ -234,21 +238,6 @@ Alle übrigen Einträge seit 1998 stehen in derselben Schreibschrift. Im ganzen 
 
 ---
 
-### B12 · ✦ Die Streifen
-*aus dem Auffangbehälter des Aktenvernichters im Beratungsraum, zusammengesetzt*
-
-Frische Papierstreifen. Zusammengesetzt ergeben sie eine Notiz in Hannos Handschrift:
-
-> „Seifert: Vordruck 03/03 – Datum 18.09.02 unmöglich! Unterschrift = Kopie Mitgliederkarte (Strich!). ‚Geführt von H. Rabe‘ – ich habe dieses Gespräch nie geführt. Wer hatte im März 03 die neuen Vordrucke? Sa., unter vier Augen. H.“
-
-Dazu Streifen von Fotokopien: eine Mitgliederkarte und ein Formular.
-
-*Beim Druck: in Streifen geschnitten, in einem kleinen Papierbeutel. Seifert bringt ihn in Runde 3 auf den Tisch.*
-
-*Freigabe: Runde 3 (VORDRUCK)*
-
----
-
 ### B13 · ✎ Briefwechsel Seifert
 *aus der Mappe {R04: „Karla“ / „Karl“}; die Originalantwort hat Seifert dabei*
 
@@ -265,21 +254,42 @@ Dazu Streifen von Fotokopien: eine Mitgliederkarte und ein Formular.
 ### B14 · ✎ Das grüne Heft
 *aus der verschlossenen Schublade des Beratungsschranks*
 
-Ein grünes Haushaltsheft. Hannos Schrift:
+Ein grünes Haushaltsheft. Hannos Schrift, drei Vorgänge auf drei Seiten, dazu eine letzte Notiz. Die Kürzel stehen so im Heft.
 
-> **2001** – L. B. (aus B. K., Schwager): Mietvertrag Anger, 20 Jahre. Er hat unterschrieben.
->
-> **2002** – J. S. (aus W. S.): Artikel erscheint nicht. Quelle war K. S. über V. W.
->
-> **09/2004** – S. H. (aus B. O.): 1.800 €. Nicht drohen. Einladen. Helfen. Wenn S. H. nicht kommt: Montag Kassenprüfung offen, Kranz informieren.
->
-> **10/2004** – L. B. ruft Kranz an. Er will das Haus zurück. Ich habe das gebaut, und es läuft ohne mich. **Montag: zurückgeben. Alles.**
+**Erster Vorgang · 2001**
+> L. B. (aus B. K., Schwager): Mietvertrag Anger, 20 Jahre. Er hat unterschrieben.
+
+**Zweiter Vorgang · 2002**
+> J. S. (aus W. S.): Artikel erscheint nicht. Quelle war K. S. über V. W.
+
+**Dritter Vorgang · September 2004**
+> S. H. (aus B. O.): 1.800 €. Nicht drohen. Einladen. Helfen. Wenn S. H. nicht kommt: Montag Kassenprüfung offen, Kranz informieren.
+
+**Letzte Seite · Oktober 2004**
+> L. B. ruft Kranz an. Er will das Haus zurück. Ich habe das gebaut, und es läuft ohne mich. **Montag: zurückgeben. Alles.**
 
 *Freigabe: Runde 3 (VORDRUCK)*
 
 ---
 
-## Runde 4 · Tannengrün · FADEN · Der Stoß
+## Runde 4 · Aktenrot · STREIFEN · Die Streifen
+
+### B12 · ✦ Die Streifen
+*aus dem Auffangbehälter des Aktenvernichters im Beratungsraum, zusammengesetzt*
+
+Frische Papierstreifen. Zusammengesetzt ergeben sie eine Notiz in Hannos Handschrift:
+
+> „Seifert: Vordruck 03/03 – Datum 18.09.02 unmöglich! Unterschrift = Kopie Mitgliederkarte (Strich!). ‚Geführt von H. Rabe‘ – ich habe dieses Gespräch nie geführt. Wer hatte im März 03 die neuen Vordrucke? Sa., unter vier Augen. H.“
+
+Dazu Streifen von Fotokopien: eine Mitgliederkarte und ein Formular.
+
+*Beim Druck: in Streifen geschnitten, in einem kleinen Papierbeutel. Seifert bringt ihn in Runde 3 auf den Tisch.*
+
+*Freigabe: Runde 3 (STREIFEN), wenn Seifert den Beutel auf den Tisch bringt*
+
+---
+
+## Runde 5 · Tannengrün · FADEN · Der Stoß
 
 ### B15 · ✎ Lieferschein Druckerei Pohlmann
 *aus der Kassenmappe, Belege 2003*
@@ -310,29 +320,14 @@ Ein grünes Haushaltsheft. Hannos Schrift:
 
 ---
 
-### B17 · ☏ Kranz' Notizen, Rückseite
-*dasselbe Notizblatt wie B2, umgedreht*
-
-„Leise zum Sanitäter: rechter Oberarm außen, **drei ovale Flecken** nebeneinander, eher Finger als Leiter. Rechtsmedizin soll schauen.“
-
-*Freigabe: Runde 4 (FADEN)*
-
----
-
 ### B18 · ✦ Der Faden
 *von {R04: Karla / Karl} Seifert auf den Tisch gelegt*
 
-Ein Fadenstück, etwa drei Zentimeter: **dunkelgrün, zweifädig, Merinowolle.**
+Ein Fadenstück, etwa drei Zentimeter: **dunkelgrün, zweifädig, Merinowolle**, an einem Ende ausgefranst, als wäre es aus einer Masche gerissen.
 
-Vergleich mit der Kleidung im Raum:
+Seifert hat es um 21:32 aus Hannos rechter Hand genommen.
 
-| Person | Kleidung | passt? |
-|---|---|---|
-| Hanno Rabe | hellgraue Strickjacke | nein |
-| Kranz | dunkelblauer Blazer, Baumwolle | nein |
-| Klose | brauner Tweed | nein |
-| Seifert | dunkelroter Wollschal | nein |
-| **Linde** | **lange dunkelgrüne Strickjacke, zweifädig. An der linken Manschette eine frisch herausgezogene Schlaufe, ein kurzes Stück fehlt.** | **ja** |
+**Zum Vergleichen:** die Kleidung auf dem Gruppenfoto (B4) und die Kleidung, die heute Nacht im Raum ist. Wer nach einem Ärmel fragt, bekommt ihn gezeigt.
 
 *Beim Druck: optional ein Stück dunkelgrüne Wolle beilegen.*
 
@@ -370,6 +365,17 @@ Vergleich mit der Kleidung im Raum:
 *Die Bilder bestätigen einzelne Aufenthaltsorte. Was zwischen den Aufnahmen geschah, zeigen sie nicht.*
 
 *Freigabe: Runde 4 (FADEN)*
+
+---
+
+## Runde 6 · Tannengrün · RÜCKSEITE · Die Rückseite
+
+### B17 · ☏ Kranz' Notizen, Rückseite
+*dasselbe Notizblatt wie B2, umgedreht*
+
+„Leise zum Sanitäter: rechter Oberarm außen, **drei ovale Flecken** nebeneinander, eher Finger als Leiter. Rechtsmedizin soll schauen.“
+
+*Freigabe: Runde 4 (RÜCKSEITE), wenn Kranz das Blatt umdreht*
 
 ---
 

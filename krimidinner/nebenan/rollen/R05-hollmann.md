@@ -7,7 +7,7 @@
 ## Charakter · Wer du bist
 
 **[Svenja / Sören] Hollmann**, 38
-Kassenwart des Vereins, im Beruf [Bürokauffrau / Bürokaufmann] bei einer Spedition, alleinerziehend mit einem Sohn (9)
+[Kassenwartin / Kassenwart] des Vereins, im Beruf [Bürokauffrau / Bürokaufmann] bei einer Spedition, alleinerziehend mit einem Sohn (9)
 
 **Beziehung zum Opfer:** Hanno Rabe war dir immer freundlich und ein bisschen fremd. Du gehörst nicht zu den Leuten, die donnerstags mit ihm im Hinterzimmer verschwinden. Heute Abend hat er dich zum ersten Mal beiseite genommen.
 
@@ -33,7 +33,8 @@ Seit 2003 führst du die Kasse, weil {R02: Beate / Benedikt} Kranz dich gefragt 
 
 - **Die 1.800 Euro:** Im August hast du 1.800 € aus dem zweckgebundenen Topf „Ferienfahrt“ genommen, um eine Mietschuld zu bezahlen, bevor man dich und deinen Sohn rauswirft. Am **Montag ist Kassenprüfung**. Das Geld hast du dir von deiner Schwester geliehen. Es liegt in einem Umschlag in deiner Tasche. Du wolltest es am Montag früh einzahlen.
 - **20:15 an der Garderobe:** Hanno nimmt dich beiseite: „Ich weiß von den 1.800. Ich will dir helfen. Komm Donnerstag zu unserer Runde, schreib es auf, dann regeln wir das zusammen.“ Er gibt dir eine Karte (Beilage). Woher er es weiß, hast du keine Ahnung. Du hast es niemandem erzählt.
-- **20:35–21:05 Kassenecke:** Du zählst die Tombola-Kasse und **die Spendendose**, die du vom Büfett geholt hast.
+- **20:35** Du nimmst die **Spendendose** vom Büfett mit in die Kassenecke.
+- **20:35–21:05 Kassenecke:** Du zählst die Tombola-Kasse und die Spendendose.
 - **20:44** Du gehst zur Bürotür, um Hanno abzusagen. Drinnen streitet er mit jemandem. Du hörst ihn laut sagen: **„Um neun erfährt {R04: sie / er} es. Von mir!“** Die andere Stimme ist leise, du erkennst sie nicht. Du gehst wieder.
 - **20:50** {R10: Bärbel / Bernd} Klose holt neue Lose bei dir.
 - **21:05** In die Küche. **21:07** Du schaltest den Kaffeeautomaten ein und schreibst in den Küchendienstplan „21:07 an – S. H.“. Der Eintrag „20:45 Kaffee ansetzen – Linde“ war nicht abgehakt, du streichst ihn durch.

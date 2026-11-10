@@ -39,8 +39,8 @@ def hausplan():
     o.append(door(330, 190, 360, 190) + door(420, 190, 450, 190) + door(540, 190, 570, 190))
     # Südseite
     o.append('<rect class="room" x="250" y="250" width="180" height="150"/><text class="t" x="340" y="330" text-anchor="middle">Küche</text>')
-    o.append('<rect class="room" x="430" y="250" width="130" height="150"/><text class="t" x="495" y="330" text-anchor="middle">WC</text><rect class="room" x="560" y="300" width="60" height="100"/><text class="s" x="590" y="356" text-anchor="middle">Lager</text>')
-    o.append('<rect class="room" x="560" y="190" width="60" height="110"/><text class="s" x="590" y="236" text-anchor="middle">Wind-</text><text class="s" x="590" y="250" text-anchor="middle">fang</text>')
+    o.append('<rect class="room" x="430" y="250" width="130" height="150"/><text class="t" x="495" y="330" text-anchor="middle">WC</text>')
+    o.append('<rect class="room" x="560" y="190" width="60" height="210"/><text class="s" x="590" y="236" text-anchor="middle">Wind-</text><text class="s" x="590" y="250" text-anchor="middle">fang</text>')
     o.append(door(290, 250, 320, 250) + door(470, 250, 500, 250) + door(560, 205, 560, 235) + door(620, 220, 620, 250))
     o.append('<text class="s" x="590" y="270" text-anchor="middle">Hinter-</text><text class="s" x="590" y="284" text-anchor="middle">ausgang →</text>')
     o.append('<rect class="obj" x="262" y="252" width="16" height="10"/><text class="s" x="262" y="276">Schlüsselkasten</text>')

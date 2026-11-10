@@ -49,7 +49,7 @@ Seit 1998 führst du die Ablage des Vereins, das Eingangsbuch und den Schlüssel
 
 **Du hast Hanno Rabe getötet.**
 
-**Der Stille Kreis** ist Hannos Gesprächsrunde im Beratungsraum, donnerstags, die „Stille Stunde“. 23 Mitglieder. Wer aufgenommen wird, schreibt eine persönliche Wahrheit auf ein Formular G und liest sie vor. Das Mitglied bekommt einen gelben Durchschlag, das Original kommt in den Archivschrank. **Den Schrank führst du.** Du bist außerdem [Patin / Pate] vieler Mitglieder, auch von {R01: Janne / Lasse} Fuchs und früher von {R04: Karla / Karl} Seifert. Die sieben Sätze des Kreises kennst du auswendig (siehe „Der Stille Kreis“).
+**Der Stille Kreis** ist Hannos Gesprächsrunde im Beratungsraum, donnerstags, die „Stille Stunde“. 22 Mitglieder. Wer aufgenommen wird, schreibt eine persönliche Wahrheit auf ein Formular G und liest sie vor. Das Mitglied bekommt einen gelben Durchschlag, das Original kommt in den Archivschrank. **Den Schrank führst du.** Du bist außerdem [Patin / Pate] vieler Mitglieder, auch von {R01: Janne / Lasse} Fuchs und früher von {R04: Karla / Karl} Seifert. Die sieben Sätze des Kreises kennst du auswendig (siehe „Der Stille Kreis“).
 
 **Deine eigene Wahrheit von 1997:** In der Registratur hast du einem Bekannten einen Antrag rückdatiert. Deshalb die Kündigung. 2003 hast du dieses Blatt still aus dem Archiv genommen.
 
@@ -78,13 +78,13 @@ Seit 1998 führst du die Ablage des Vereins, das Eingangsbuch und den Schlüssel
 - **20:44** Er wird laut: „Um neun erfährt {R04: sie / er} es. Von mir!“ Du hörst draußen Schritte, die wieder gehen.
 - **20:45** Stille. Hanno steigt auf die Trittleiter und greift nach dem Karton „ZURÜCK“ oben auf dem Schrank. Aus einem braunen Umschlag schaut Seiferts Name.
 - **20:46** Du stehst rechts von ihm. Du stößt ihn mit beiden Händen, die rechte an seinem Oberarm, die linke an seinem Schulterblatt. Er kippt mit der Leiter nach links. Im Fallen greift seine rechte Hand nach deinem linken Ärmel. Sein Kopf schlägt gegen die offene Schranktür. Er bewegt sich nicht mehr.
-- **20:47** Du nimmst die Prüfnotiz und die Kopien vom Schreibtisch, gehst über den leeren Flur in den Beratungsraum nebenan.
+- **20:47** Du nimmst die Prüfnotiz und die Kopien vom Schreibtisch, ziehst die Bürotür hinter dir zu und gehst über den leeren Flur in den Beratungsraum nebenan.
 - **20:48–20:52** Aktenvernichter. Um 20:51 klopft jemand an diese Tür. Du hältst den Atem an. Die Schritte gehen. Du schaltest aus.
 - **20:53** Du schließt den Beratungsraum mit deinem Schlüssel ab und gehst ins WC. Dort siehst du die Manschette: eine Schlaufe herausgerissen, ein Stück fehlt.
 - **20:55–20:57** Vom WC direkt über den Flur in die Küche. Du hältst den linken Ärmel fest. Özdemir sieht dich an.
 - **21:07** {R05: Svenja / Sören} Hollmann schaltet den Kaffee ein, den du um 20:45 hättest ansetzen sollen.
 - **21:17** Kranz und Seifert haben Hanno gefunden. Du stehst in der Bürotür, die Arme verschränkt.
-- **21:32** Die Notärztin. Du siehst, wie aus Hannos rechter Hand etwas Dunkles fällt. Wohin, siehst du nicht.
+- **21:32** Die Notärztin. Du stehst in der Tür und siehst, wie {R04: Karla / Karl} Seifert sich rechts neben Hanno über seine Hand beugt. Was dort geschieht, kannst du von der Tür aus nicht erkennen.
 
 **Was du nicht weißt:** wo der Faden ist. Ob die Streifen im Aktenvernichter lesbar sind. Was im weißen Umschlag in Hannos Sakko steht.
 

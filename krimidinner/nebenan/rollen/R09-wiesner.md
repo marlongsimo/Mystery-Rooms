@@ -58,7 +58,7 @@ Du führst seit 1993 das Schlüsselbuch des Hauses. Jeder Schlüssel, der ausgeg
 
 ## Runde 1 · Der Sturz
 
-- Zeig auf den Warnzettel und das Mängelbuch (B3). Sag ehrlich: „Ich wollte Hanno die Reparatur am Montag offiziell abnehmen lassen. Bis dahin ließ ich den Zettel hängen.“ Ob du sagst, dass die Reparatur schon gemacht ist, entscheidest du. Behaupte nicht, die Leiter sei noch defekt gewesen.
+- Zeig auf den Warnzettel und das Mängelbuch (B3). Sag ehrlich: „Ich wollte Hanno die Reparatur am Montag offiziell abnehmen lassen. Bis dahin ließ ich den Zettel hängen.“ Dass die Reparatur schon gemacht ist, behältst du zunächst für dich. Erst in Runde 4 sagst du es. Behaupte aber nie, die Leiter sei noch defekt gewesen.
 
 ## Runde 2 · Das Hinterzimmer
 

@@ -94,7 +94,7 @@ Satz 7 hast du erlebt. Ehemalige werden „still gegrüßt“, das heißt: gar n
 
 - Leg deine **Mitgliederkarte von 2001** und **Hannos Brief vom 22.04.2003** auf den Tisch (B10, B13). Sag: „Ich hatte nie ein Nachgespräch. Mit Hanno schon gar nicht.“
 - B13 zeigt auch deinen Satz von 2003: „Und du, Hanno, wirst das bereuen.“ Steh dazu.
-- **Verbindlicher Erinnerungsimpuls:** Sobald die Gruppe über die Formulare, das Eingangsbuch oder Hannos Notizen spricht, fällt dir das Surren von 20:49 wieder ein. Sag: „Moment. Das Geräusch vorhin – das war der Aktenvernichter!“ Geh in den Beratungsraum, zieh den Auffangbehälter heraus und bring die Streifen auf den Tisch. *(Am Tisch: der vorbereitete kleine Papierbeutel mit den Streifen, B12.)* Spätestens nach der ersten Besprechung von B9–B11 tust du das.
+- **Verbindlicher Erinnerungsimpuls:** Sobald die Gruppe über die Formulare oder das Eingangsbuch spricht, fällt dir das Surren von 20:49 wieder ein. Sag: „Moment. Das Geräusch vorhin – das war der Aktenvernichter!“ Geh in den Beratungsraum, zieh den Auffangbehälter heraus und bring die Streifen auf den Tisch. *(Am Tisch: der vorbereitete kleine Papierbeutel mit den Streifen.)* **Sag dabei der Spielleitung Bescheid:** Erst dann gibt sie mit dem Wort STREIFEN die Karte B12 für alle frei. Spätestens nach der ersten Besprechung von B9–B11 tust du das.
 
 ## Runde 4 · Der Stoß
 

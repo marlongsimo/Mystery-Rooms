@@ -7,7 +7,7 @@
   <title>Abenteuer – Kampf-Prototyp | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=2">
+  <link rel="stylesheet" href="css/abenteuer.css?v=3">
 </head>
 <body>
   <header class="top">
@@ -21,13 +21,19 @@
       <p>Zwischen den Grabsteinen der Abtei Grauwacht kriechen Rostkäfer aus dem Moos. Drei Figuren stellen sich ihnen: <b>Schildwächter</b>, <b>Elementarist</b> und <b>Lichtbringer</b>.</p>
       <ul class="howto">
         <li><b>Bewegen:</b> Feld antippen (bis zu 6 Felder pro Zug).</li>
-        <li><b>Handeln:</b> unten eine Aktion wählen, dann ein leuchtendes Ziel antippen.</li>
+        <li><b>Handeln:</b> eine Aktion wählen, dann ein leuchtendes Ziel antippen.</li>
         <li><b>Zug beenden,</b> wenn deine Figur fertig ist. Die Käfer ziehen selbst.</li>
       </ul>
-      <button class="btn" id="start">Kampf beginnen</button>
-      <p class="note">Ein Prototyp für ein Gerät, ohne Speichern. Er zeigt nur den Kampf auf dem Raster.</p>
+      <div class="knoepfe">
+        <button class="btn" id="live">Mit Handys spielen</button>
+        <button class="btn ghost" id="start">Allein auf diesem Gerät</button>
+      </div>
+      <p class="note"><b>Mit Handys:</b> Dieses Gerät (am besten ein Tablet) liegt als Spieltisch in der Mitte. Jede Person öffnet auf ihrem Handy ihren Charakterbogen mit Aktionen, Fähigkeiten und Rucksack. Figuren ohne Handy steuert ihr hier am Tisch.</p>
+      <p class="fb" id="intro-fehler"></p>
     </section>
+    <section class="lobby" id="lobby" hidden></section>
     <section class="spiel" id="spiel" hidden>
+      <div class="livebar" id="livebar" hidden></div>
       <div class="reihe" id="reihe" aria-label="Zugreihenfolge"></div>
       <div class="karte-wrap"><svg id="karte" role="img" aria-label="Kampfkarte"></svg></div>
       <div class="panel">
@@ -39,7 +45,14 @@
     </section>
     <section class="ende" id="ende" hidden></section>
   </main>
-  <script src="js/regeln.js?v=1"></script>
-  <script src="js/spiel.js?v=2"></script>
+  <div class="wurf" id="wurf" aria-hidden="true"></div>
+  <div class="qr-overlay" id="qr-overlay" hidden></div>
+  <script src="js/regeln.js?v=2"></script>
+  <script src="js/bild.js?v=1"></script>
+  <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
+  <script src="../platform/multiplayer/mp-config.js?v=1"></script>
+  <script src="../platform/multiplayer/mp-core.js?v=1"></script>
+  <script src="vendor/qrcode-generator-1.4.4.js"></script>
+  <script src="js/spiel.js?v=3"></script>
 </body>
 </html>

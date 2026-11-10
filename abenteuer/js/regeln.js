@@ -27,34 +27,49 @@
     schildwaechter: {
       name: "Schildwächter", klasse: "Krieger", farbe: "#c9a24a", zeichen: "schild",
       werte: { STR: 16, GES: 12, KON: 15, INT: 8, WEI: 10, CHA: 11 }, tp: 12, rk: 18, metall: true,
+      rucksack: [["heiltrank", 1], ["seil", 1], ["fackel", 2]],
       aktionen: [
-        { id: "langschwert", name: "Langschwert", art: "angriff", reichweite: 1, attr: "STR", schaden: "1W8+3" },
+        { id: "langschwert", name: "Langschwert", art: "angriff", reichweite: 1, attr: "STR", schaden: "1W8+3", text: "Nahkampf gegen ein Ziel direkt neben dir." },
       ],
       bonus: [
-        { id: "zweiter_atem", name: "Zweiter Atem", art: "selbstheilung", heilung: "1W10+1", proRast: 1 },
+        { id: "zweiter_atem", name: "Zweiter Atem", art: "selbstheilung", heilung: "1W10+1", proRast: 1, text: "Du holst tief Luft und heilst dich selbst. Einmal pro Kampf." },
       ],
     },
     elementarist: {
       name: "Elementarist", klasse: "Magier", farbe: "#d0603a", zeichen: "flamme",
       werte: { STR: 8, GES: 14, KON: 13, INT: 16, WEI: 12, CHA: 10 }, tp: 7, rk: 12, metall: false, plaetze: 2,
+      rucksack: [["heiltrank", 1], ["zauberbuch", 1], ["kreide", 1]],
       aktionen: [
-        { id: "glutpfeil", name: "Glutpfeil", art: "angriff", reichweite: 12, attr: "INT", schaden: "1W10", fern: true },
-        { id: "magisches_geschoss", name: "Magisches Geschoss", art: "geschoss", reichweite: 12, schaden: "1W4+1", anzahl: 3, platz: 1 },
+        { id: "glutpfeil", name: "Glutpfeil", art: "angriff", reichweite: 12, attr: "INT", schaden: "1W10", fern: true, text: "Ein Funke aus Feuer gegen ein Ziel in Sichtweite. Beliebig oft." },
+        { id: "magisches_geschoss", name: "Magisches Geschoss", art: "geschoss", reichweite: 12, schaden: "1W4+1", anzahl: 3, platz: 1, text: "Drei Lichtpfeile treffen immer. Kostet einen Zauberplatz." },
       ],
       bonus: [],
     },
     lichtbringer: {
       name: "Lichtbringer", klasse: "Kleriker", farbe: "#e8d8a0", zeichen: "sonne",
       werte: { STR: 14, GES: 10, KON: 14, INT: 10, WEI: 16, CHA: 12 }, tp: 10, rk: 18, metall: true, plaetze: 2,
+      rucksack: [["heiltrank", 1], ["symbol", 1], ["verband", 3]],
       aktionen: [
-        { id: "streitkolben", name: "Streitkolben", art: "angriff", reichweite: 1, attr: "STR", schaden: "1W6+2" },
-        { id: "heiliges_licht", name: "Heiliges Licht", art: "rettungswurf", reichweite: 12, attr: "WEI", rettung: "GES", schaden: "1W8", fern: true },
+        { id: "streitkolben", name: "Streitkolben", art: "angriff", reichweite: 1, attr: "STR", schaden: "1W6+2", text: "Nahkampf gegen ein Ziel direkt neben dir." },
+        { id: "heiliges_licht", name: "Heiliges Licht", art: "rettungswurf", reichweite: 12, attr: "WEI", rettung: "GES", schaden: "1W8", fern: true, text: "Strahlendes Licht. Das Ziel muss ausweichen (Geschicklichkeit), sonst nimmt es Schaden." },
       ],
       bonus: [
-        { id: "heilendes_wort", name: "Heilendes Wort", art: "heilung", reichweite: 6, heilung: "1W4+3", platz: 1 },
+        { id: "heilendes_wort", name: "Heilendes Wort", art: "heilung", reichweite: 6, heilung: "1W4+3", platz: 1, text: "Heilt eine Figur bis 6 Felder entfernt, auch wenn sie am Boden liegt. Kostet einen Zauberplatz." },
       ],
     },
   };
+
+  /* ---------- Gegenstände ---------- */
+  const DINGE = {
+    heiltrank: { name: "Heiltrank", text: "Rote, warme Flüssigkeit. Trinken ist eine Bonusaktion und heilt 2W4+2 TP.", heilung: "2W4+2" },
+    seil: { name: "Seil, 15 m", text: "Hanfseil mit Knoten alle zwei Meter." },
+    fackel: { name: "Fackel", text: "Brennt etwa eine Stunde." },
+    zauberbuch: { name: "Zauberbuch", text: "Deine Zauber in enger Handschrift, mit Brandflecken." },
+    kreide: { name: "Kreide", text: "Zum Markieren von Wegen und Türen." },
+    symbol: { name: "Heiliges Symbol", text: "Eine Sonnenscheibe aus Messing, dein Fokus für Zauber." },
+    verband: { name: "Verband", text: "Für die Rast nach dem Kampf." },
+  };
+  const TRANK = { id: "heiltrank", name: "Heiltrank trinken", art: "trank", heilung: DINGE.heiltrank.heilung, text: DINGE.heiltrank.text };
 
   /* ---------- Gegner ---------- */
   const GEGNER = {
@@ -113,21 +128,23 @@
   };
 
   function neuesSpiel(seed, opts = {}) {
-    const r = rng(seed);
+    const st = { seed, rs: seed >>> 0 || 1, karte: null, figuren: [], log: [], runde: 1, reihe: [], am: 0, zug: null, ende: null, xp: 0 };
+    zufall(st);
+    const r = st.r;
     const k = opts.karte || KARTE_GARTEN;
     const karte = { name: k.name, b: k.b, h: k.h, hindernisse: k.hindernisse, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))) };
+    st.karte = karte;
     const klassen = opts.klassen || ["schildwaechter", "elementarist", "lichtbringer"];
-    const figuren = [];
+    const figuren = st.figuren;
     klassen.forEach((id, i) => {
       const c = KLASSEN[id], [x, y] = k.start.spieler[i];
-      figuren.push({ id: "f" + i, seite: "spieler", klasse: id, name: c.name, farbe: c.farbe, zeichen: c.zeichen, x, y, tp: c.tp, tpMax: c.tp, rk: c.rk, rkBasis: c.rk, metall: c.metall, werte: c.werte, plaetze: c.plaetze || 0, genutzt: {} });
+      figuren.push({ id: "f" + i, seite: "spieler", klasse: id, name: c.name, farbe: c.farbe, zeichen: c.zeichen, x, y, tp: c.tp, tpMax: c.tp, rk: c.rk, rkBasis: c.rk, metall: c.metall, werte: c.werte, plaetze: c.plaetze || 0, genutzt: {}, rucksack: (c.rucksack || []).map(([id, n]) => ({ id, n })) });
     });
     const anzahl = opts.gegner || klassen.length; // Gegner wachsen mit der Gruppe
     for (let i = 0; i < anzahl; i++) {
       const g = GEGNER.rostkaefer, [x, y] = k.start.gegner[i % k.start.gegner.length];
       figuren.push({ id: "g" + i, seite: "gegner", art: "rostkaefer", name: g.name + " " + (i + 1), x, y, tp: g.tp, tpMax: g.tp, rk: g.rk, werte: g.werte, genutzt: {} });
     }
-    const st = { seed, r, karte, figuren, log: [], runde: 1, reihe: [], am: 0, zug: null, ende: null, xp: 0 };
     // Initiative
     for (const f of figuren) { const w = W(r, 20); f.ini = w + mod(f.werte.GES); f.iniWurf = w; }
     st.reihe = figuren.slice().sort((a, b) => b.ini - a.ini || mod(b.werte.GES) - mod(a.werte.GES) || (a.seite === "spieler" ? -1 : 1)).map((f) => f.id);
@@ -135,6 +152,43 @@
     beginneZug(st);
     return st;
   }
+  /** Zufallsfolge an den Spielstand binden (Zustand st.rs, damit er sich speichern lässt) */
+  function zufall(st) {
+    st.r = function () { st.rs = (st.rs + 0x6d2b79f5) >>> 0; let t = st.rs; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    return st;
+  }
+  /** Spielstand als JSON (z. B. für localStorage) und zurück */
+  function speichern(st) {
+    const o = Object.assign({}, st); delete o.r;
+    o.karte = { name: st.karte.name, b: st.karte.b, h: st.karte.h, hindernisse: st.karte.hindernisse };
+    return JSON.parse(JSON.stringify(o));
+  }
+  function laden(o) {
+    const st = JSON.parse(JSON.stringify(o));
+    st.karte.block = new Set(st.karte.hindernisse.map(([, x, y]) => key(x, y)));
+    return zufall(st);
+  }
+  /** Was Handys sehen dürfen: Figuren, Zug, Möglichkeiten der aktiven Figur, letzte Einträge */
+  function ansicht(st, nLog = 8) {
+    const f = aktiv(st), optionen = [];
+    if (!st.ende && f.seite === "spieler") {
+      const alle = KLASSEN[f.klasse].aktionen.map((a) => [a, "aktion"]).concat(KLASSEN[f.klasse].bonus.map((a) => [a, "bonus"]));
+      if (trankZahl(f)) alle.push([TRANK, "bonus"]);
+      for (const [a] of alle) {
+        const ok = verfuegbar(st, a.id);
+        optionen.push({ id: a.id, ok, ziele: ok ? ziele(st, a.id).map((z) => ({ id: z.id, name: z.name, tp: z.tp, tpMax: z.tpMax })) : [] });
+      }
+    }
+    return {
+      runde: st.runde, ende: st.ende, aktiv: f.id, zug: st.zug,
+      reihe: st.reihe,
+      figuren: st.figuren.map((o) => ({ id: o.id, seite: o.seite, klasse: o.klasse || null, name: o.name, tp: o.tp, tpMax: o.tpMax, rk: o.rk, plaetze: o.plaetze || 0, genutzt: o.genutzt, rucksack: o.rucksack || [] })),
+      optionen,
+      log: st.log.slice(-nLog),
+      nLog: st.log.length,
+    };
+  }
+  const trankZahl = (f) => { const t = (f.rucksack || []).find((d) => d.id === "heiltrank"); return t ? t.n : 0; };
   const fig = (st, id) => st.figuren.find((f) => f.id === id);
   const aktiv = (st) => fig(st, st.reihe[st.am]);
 
@@ -170,6 +224,7 @@
     const c = KLASSEN[f.klasse];
     const a = c.aktionen.find((x) => x.id === id); if (a) return { a, typ: "aktion" };
     const b = c.bonus.find((x) => x.id === id); if (b) return { a: b, typ: "bonus" };
+    if (id === "heiltrank" && f.rucksack) return { a: TRANK, typ: "bonus" };
     return null;
   }
   /** Ziele, die für eine Aktion gerade gültig sind */
@@ -177,6 +232,7 @@
     const f = aktiv(st), h = findeAktion(f, aktionId); if (!h) return [];
     const a = h.a;
     if (a.art === "selbstheilung") return [f];
+    if (a.art === "trank") return f.tp < f.tpMax ? [f] : [];
     if (a.art === "heilung") return st.figuren.filter((o) => o.seite === "spieler" && o.tp < o.tpMax && abstand(f, o) <= a.reichweite && sicht(st, f, o));
     return st.figuren.filter((o) => o.seite === "gegner" && o.tp > 0 && abstand(f, o) <= a.reichweite && (a.reichweite === 1 || sicht(st, f, o)));
   }
@@ -186,6 +242,7 @@
     if (h.typ === "bonus" && !st.zug.bonus) return false;
     if (h.a.platz && f.plaetze < h.a.platz) return false;
     if (h.a.proRast && (f.genutzt[h.a.id] || 0) >= h.a.proRast) return false;
+    if (h.a.art === "trank" && !trankZahl(f)) return false;
     return ziele(st, aktionId).length > 0;
   }
 
@@ -218,9 +275,10 @@
       const sg = 8 + UEBUNG + mod(f.werte[a.attr]), w = W(r, 20), ges = w + mod(z.werte[a.rettung]);
       if (ges >= sg) st.log.push({ t: `${f.name}: ${a.name} – ${z.name} weicht aus (Rettungswurf ${ges} gegen SG ${sg}).`, art: "wurf" });
       else { const s = roll(r, a.schaden); schaden(st, z, s.total); st.log.push({ t: `${f.name}: ${a.name} – Rettungswurf ${ges} gegen SG ${sg} misslingt, ${s.total} Schaden.`, art: "wurf" }); }
-    } else if (a.art === "heilung" || a.art === "selbstheilung") {
+    } else if (a.art === "heilung" || a.art === "selbstheilung" || a.art === "trank") {
+      if (a.art === "trank") f.rucksack.find((d) => d.id === "heiltrank").n -= 1;
       const s = roll(r, a.heilung), vorher = z.tp; z.tp = Math.min(z.tpMax, z.tp + s.total);
-      st.log.push({ t: `${f.name}: ${a.name} – ${z.name} heilt ${z.tp - vorher} TP${vorher === 0 ? " und steht wieder auf" : ""}.`, art: "gut" });
+      st.log.push({ t: `${f.name}: ${a.name} – ${z.id === f.id ? "heilt sich um" : z.name + " heilt"} ${z.tp - vorher} TP${vorher === 0 ? " und steht wieder auf" : ""}.`, art: "gut" });
     }
     pruefeEnde(st);
     return { ok: true };
@@ -278,7 +336,7 @@
     if (!st.ende) zugEnde(st);
   }
 
-  const API = { rng, roll, mod, parse, KLASSEN, GEGNER, KARTE_GARTEN, neuesSpiel, aktiv, fig, erreichbar, sicht, abstand, bewegen, ziele, verfuegbar, handeln, zugEnde, gegnerZug, autoZug, findeAktion, key };
+  const API = { rng, roll, DINGE, TRANK, zufall, speichern, laden, ansicht, trankZahl, mod, parse, KLASSEN, GEGNER, KARTE_GARTEN, neuesSpiel, aktiv, fig, erreichbar, sicht, abstand, bewegen, ziele, verfuegbar, handeln, zugEnde, gegnerZug, autoZug, findeAktion, key };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;
 })(typeof window !== "undefined" ? window : globalThis);

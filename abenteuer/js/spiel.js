@@ -1,28 +1,170 @@
 /*
- * Case Unlocked · Abenteuer – Kampf-Prototyp: Darstellung und Bedienung
- * Zeichnet die Rasterkarte als SVG, nimmt Antippen entgegen und ruft nur Funktionen aus regeln.js.
+ * Case Unlocked · Abenteuer – Spieltisch (Tablet oder ein Gerät allein)
+ * Zeichnet die Rasterkarte, nimmt Antippen entgegen und ruft nur Funktionen aus regeln.js.
+ *
+ * Mit Handys: Dieses Gerät eröffnet eine Sitzung (vorhandene Plattform, mp-core.js) und ist der
+ * einzige Schiedsrichter. Es schreibt den öffentlichen Stand unter „spiel“. Handys schreiben nur
+ * eigene Einträge: „wahl:<Nutzer>“ (welche Figur) und „zug:<Nutzer>“ (gewünschte Aktion).
+ * Der Tisch prüft jeden Wunsch mit den Regeln, würfelt selbst und übernimmt nur Einträge,
+ * die der jeweilige Nutzer selbst geschrieben hat.
  */
 (function () {
   "use strict";
-  const R = window.ABR, $ = (s) => document.querySelector(s);
+  const R = window.ABR, B = window.ABB, $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const Z = 60; // Feldgröße im SVG
   const params = new URLSearchParams(location.search);
   const TEMPO = params.has("schnell") ? 0 : 650;
-  let st = null, wahl = null, gegnerTimer = null;
+  const SLUG = params.get("liveslug") || "abenteuer"; // ?liveslug= nur für Tests
+  const KLASSEN_REIHE = ["schildwaechter", "elementarist", "lichtbringer"];
+  const SPEICHER = "ab_tisch";
+  let st = null, wahl = null, gegnerTimer = null, letzterLog = 0;
 
-  const ICON = {
-    schild: '<path d="M0 -15 L12 -10 L11 4 Q8 12 0 16 Q-8 12 -11 4 L-12 -10 Z" fill="#1d1a14" stroke="#1d1a14" stroke-width="1"/><path d="M0 -10 V11 M-7 -2 H7" stroke="#c9a24a" stroke-width="2.5"/>',
-    flamme: '<path d="M0 -16 C9 -6 12 2 7 10 C4 15 -4 15 -7 10 C-11 3 -6 -4 -2 -7 C-2 -2 0 1 3 1 C4 -6 2 -11 0 -16 Z" fill="#1d1a14"/>',
-    sonne: '<circle r="7" fill="#1d1a14"/>' + [0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<rect x="-1.6" y="-16" width="3.2" height="6" fill="#1d1a14" transform="rotate(${a})"/>`).join(""),
-  };
+  /* ---------- Live-Zustand ---------- */
+  const LIVE = { client: null, phase: null, besitz: {}, erledigt: {}, antwort: null, schreibt: false, nochmal: false, sperre: null };
+  const liveAn = () => Boolean(LIVE.client && LIVE.client.session);
+  const spielerName = (uid) => (LIVE.client && LIVE.client.playerName(uid)) || "Handy";
+  const besitzer = (figId) => (liveAn() ? LIVE.besitz[figId] : null);
 
-  function svgKaefer() {
-    return '<g><ellipse rx="17" ry="13" fill="#7a4a2a" stroke="#2a1a10" stroke-width="2"/><path d="M0 -13 V13" stroke="#2a1a10" stroke-width="1.5"/>' +
-      [-1, 1].map((s) => `<path d="M${s * 12} -8 l${s * 9} -6 M${s * 14} 0 l${s * 10} 0 M${s * 12} 8 l${s * 9} 6" stroke="#2a1a10" stroke-width="2.4" stroke-linecap="round"/>`).join("") +
-      '<circle cx="-5" cy="-14" r="2.4" fill="#e8c27a"/><circle cx="5" cy="-14" r="2.4" fill="#e8c27a"/>' +
-      '<circle cx="-6" cy="-2" r="3" fill="#b5713d" opacity=".8"/><circle cx="6" cy="4" r="2.5" fill="#b5713d" opacity=".8"/></g>';
+  function speichern() {
+    if (!liveAn()) return;
+    try { localStorage.setItem(SPEICHER, JSON.stringify({ phase: LIVE.phase, besitz: LIVE.besitz, erledigt: LIVE.erledigt, st: st ? R.speichern(st) : null })); } catch (e) { /* privat */ }
+  }
+  function vergessen() { try { localStorage.removeItem(SPEICHER); } catch (e) { /* privat */ } }
+
+  /** Öffentlichen Stand an alle Handys (immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig) */
+  function veroeffentlichen() {
+    if (!liveAn() || !LIVE.client.session.is_host) return;
+    speichern();
+    if (LIVE.schreibt) { LIVE.nochmal = true; return; }
+    LIVE.schreibt = true; LIVE.nochmal = false;
+    const namen = {}; LIVE.client.players.forEach((p) => { namen[p.user_id] = p.player_name; });
+    const figuren = KLASSEN_REIHE.map((k, i) => ({ id: "f" + i, klasse: k, name: R.KLASSEN[k].name }));
+    const daten = Object.assign({ phase: LIVE.phase, besitz: LIVE.besitz, namen, liste: figuren, antwort: LIVE.antwort, at: Date.now() }, st && LIVE.phase === "kampf" ? R.ansicht(st) : {});
+    LIVE.client.writeOwn("spiel", daten)
+      .catch((e) => toast("Live: " + e.message))
+      .then(() => { LIVE.schreibt = false; if (LIVE.nochmal) veroeffentlichen(); });
   }
 
+  /** Einträge der Handys auswerten – nur, was der Nutzer selbst geschrieben hat */
+  function eintrag(row) {
+    if (!LIVE.client || !LIVE.client.session || !LIVE.client.session.is_host) return;
+    const k = row.state_key || "", uid = k.slice(k.indexOf(":") + 1);
+    if (!(k.startsWith("wahl:") || k.startsWith("zug:"))) return;
+    if (row.updated_by && row.updated_by !== uid) return; // fremder Eintrag: ignorieren
+    const v = row.state || {};
+    if (k.startsWith("wahl:")) {
+      if (v.fig && !/^f[0-2]$/.test(v.fig)) return;
+      const frei = !LIVE.besitz[v.fig] || LIVE.besitz[v.fig] === uid;
+      if (v.fig && !frei) { veroeffentlichen(); return; }
+      for (const f of Object.keys(LIVE.besitz)) if (LIVE.besitz[f] === uid) delete LIVE.besitz[f];
+      if (v.fig) LIVE.besitz[v.fig] = uid;
+      zeichneLobby(); if (st) render(); veroeffentlichen();
+      return;
+    }
+    // Zug-Wunsch
+    if (!v.n || v.n <= (LIVE.erledigt[uid] || 0)) return;
+    LIVE.erledigt[uid] = v.n;
+    const antwort = (fehler) => { LIVE.antwort = { uid, n: v.n, ok: !fehler, fehler: fehler || null }; };
+    if (LIVE.phase !== "kampf" || !st || st.ende) { antwort("Der Kampf läuft gerade nicht."); veroeffentlichen(); return; }
+    const akt = R.aktiv(st);
+    if (LIVE.besitz[akt.id] !== uid) { antwort("Du bist gerade nicht am Zug."); veroeffentlichen(); return; }
+    if (v.typ === "ende") { wahl = null; R.zugEnde(st); antwort(null); render(); gegnerSchleife(); veroeffentlichen(); return; }
+    if (v.typ === "aktion") {
+      const r = R.handeln(st, String(v.aktion), String(v.ziel || akt.id));
+      antwort(r.fehler); wahl = null; render(); veroeffentlichen(); return;
+    }
+    antwort("Unbekannter Wunsch."); veroeffentlichen();
+  }
+
+  function liveClient() {
+    if (LIVE.client) return LIVE.client;
+    if (!window.MRMultiplayer) throw new Error("Die Live-Verbindung ist gerade nicht verfügbar. Ihr könnt allein auf diesem Gerät spielen.");
+    const c = LIVE.client = window.MRMultiplayer.connect({ gameSlug: SLUG, maxPlayers: 4, storeKey: "ab_live:" + SLUG });
+    c.on("state", eintrag);
+    c.on("players", () => {
+      // Wer gegangen ist, gibt seine Figur ab
+      const da = new Set(c.players.map((p) => p.user_id)); let geaendert = false;
+      for (const f of Object.keys(LIVE.besitz)) if (!da.has(LIVE.besitz[f])) { delete LIVE.besitz[f]; geaendert = true; }
+      zeichneLobby(); if (st) render();
+      veroeffentlichen(); // neue Handys bekommen den Stand sofort
+      if (geaendert) toast("Ein Handy hat die Sitzung verlassen. Seine Figur steuert jetzt der Tisch.");
+    });
+    c.on("lost", (why) => { toast(why || "Live-Verbindung beendet."); LIVE.phase = null; vergessen(); zeichneLiveBar(); if (st) render(); });
+    return c;
+  }
+  const katalogFehler = (e) => /nicht verfügbar|game_catalog|unbekannt|unknown|not.*found|kein.*Spiel/i.test((e && e.message) || "");
+
+  async function liveStarten() {
+    const fb = $("#intro-fehler"); fb.textContent = ""; $("#live").disabled = true;
+    try {
+      const c = liveClient();
+      await c.create("Spieltisch");
+      LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null;
+      wach(); zeigeLobby(); veroeffentlichen();
+    } catch (e) {
+      fb.textContent = katalogFehler(e) ? "Das Spielen mit Handys ist für dieses Spiel noch nicht freigeschaltet. Ihr könnt allein auf diesem Gerät spielen." : (e.message || String(e));
+    }
+    $("#live").disabled = false;
+  }
+  async function liveBeenden() {
+    if (!confirm("Live-Sitzung beenden? Die Handys werden getrennt.")) return;
+    try { await LIVE.client.leave(); } catch (e) { /* schon zu */ }
+    LIVE.phase = null; vergessen(); zeichneLiveBar(); if (st) render(); else zeigeIntro();
+  }
+
+  /* ---------- Beitritt: Code, Link, QR ---------- */
+  function beitrittsLink() {
+    const u = new URL("handy.html", location.href);
+    if (params.get("liveslug")) u.searchParams.set("liveslug", SLUG);
+    u.hash = LIVE.client.session.room_code;
+    return u.href;
+  }
+  function qrSvg(text) {
+    if (!window.qrcode) return "";
+    const q = window.qrcode(0, "M"); q.addData(text); q.make();
+    return q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  }
+  function beitrittBox() {
+    const link = beitrittsLink(), code = LIVE.client.session.room_code;
+    return `<div class="beitritt"><div class="qr">${qrSvg(link)}</div><div>
+      <p class="eyebrow">Mit dem Handy beitreten</p><p class="code">${esc(code)}</p>
+      <p class="note">Kamera auf den QR-Code richten. Oder auf dem Handy <b>${esc(link.replace(/#.*$/, "").replace(/^https?:\/\//, ""))}</b> öffnen und den Code eingeben.</p></div></div>`;
+  }
+
+  /* ---------- Lobby ---------- */
+  function zeigeLobby() {
+    $("#intro").hidden = true; $("#spiel").hidden = true; $("#ende").hidden = true; $("#lobby").hidden = false;
+    zeichneLobby();
+  }
+  function zeichneLobby() {
+    const el = $("#lobby"); if (el.hidden || !liveAn()) return;
+    const handys = LIVE.client.players.filter((p) => !p.is_host);
+    el.innerHTML = `<h1>Der Klostergarten</h1>${beitrittBox()}
+      <h2 class="klein">Figuren</h2>
+      <ul class="figwahl">${KLASSEN_REIHE.map((k, i) => { const uid = LIVE.besitz["f" + i]; return `<li>${B.marke(k, 36)}<span><b>${R.KLASSEN[k].name}</b><small>${R.KLASSEN[k].klasse}</small></span><em class="${uid ? "hat" : ""}">${uid ? "📱 " + esc(spielerName(uid)) : "steuert der Tisch"}</em></li>`; }).join("")}</ul>
+      <p class="note">${handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}.` : "Noch kein Handy verbunden."} Auf dem Handy wählt jede Person ihre Figur. Ihr könnt jederzeit beginnen, auch später noch beitreten.</p>
+      <div class="knoepfe"><button class="btn" id="los">Kampf beginnen</button><button class="btn ghost" id="lobby-ende">Sitzung beenden</button></div>`;
+    $("#los").onclick = () => start(params.has("seed") ? +params.get("seed") : Math.floor(Math.random() * 1e9));
+    $("#lobby-ende").onclick = liveBeenden;
+  }
+  function zeichneLiveBar() {
+    const bar = $("#livebar");
+    if (!liveAn()) { bar.hidden = true; bar.innerHTML = ""; return; }
+    const n = LIVE.client.players.filter((p) => !p.is_host).length;
+    bar.hidden = false;
+    bar.innerHTML = `<span class="dot"></span><b>LIVE</b> <span>${esc(LIVE.client.session.room_code)} · ${n} ${n === 1 ? "Handy" : "Handys"}</span><button class="btn ghost klein" id="qr-zeigen">Beitreten</button><button class="btn ghost klein" id="live-ende">Beenden</button>`;
+    $("#qr-zeigen").onclick = () => { const o = $("#qr-overlay"); o.innerHTML = `<div class="karte-box">${beitrittBox()}<button class="btn" id="qr-zu">Schließen</button></div>`; o.hidden = false; $("#qr-zu").onclick = () => { o.hidden = true; }; };
+    $("#live-ende").onclick = liveBeenden;
+  }
+
+  /* ---------- Bildschirm wach halten (Tablet liegt lange auf dem Tisch) ---------- */
+  async function wach() {
+    try { if (navigator.wakeLock && !document.hidden && (!LIVE.sperre || LIVE.sperre.released)) LIVE.sperre = await navigator.wakeLock.request("screen"); } catch (e) { /* nicht unterstützt */ }
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && liveAn()) wach(); });
+
+  /* ---------- Karte ---------- */
   function hindernis(t, x, y) {
     const cx = x * Z + Z / 2, cy = y * Z + Z / 2;
     if (t === "G") return `<g transform="translate(${cx} ${cy})"><path d="M-14 22 V-8 Q-14 -22 0 -22 Q14 -22 14 -8 V22 Z" fill="#7c7a72" stroke="#3b3a35" stroke-width="2"/><path d="M0 -12 V8 M-6 -4 H6" stroke="#4c4a44" stroke-width="2.4"/><ellipse cy="24" rx="20" ry="5" fill="#000" opacity=".25"/></g>`;
@@ -37,48 +179,58 @@
     const reach = spielerDran && !wahl ? R.erreichbar(st, akt, st.zug.bewegung) : new Map();
     const zs = spielerDran && wahl ? R.ziele(st, wahl) : [];
     let o = "";
-    // Boden
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) {
       const v = ((x * 7 + y * 13) % 5) / 40;
       o += `<rect x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="hsl(${95 + v * 60} 22% ${20 + v * 18}%)"/>`;
     }
     o += `<path d="${Array.from({ length: k.b + 1 }, (_, i) => `M${i * Z} 0V${k.h * Z}`).join("")}${Array.from({ length: k.h + 1 }, (_, i) => `M0 ${i * Z}H${k.b * Z}`).join("")}" stroke="#000" stroke-opacity=".22" stroke-width="1"/>`;
-    // Weg zum Tor
     o += `<rect x="0" y="${4 * Z + 18}" width="${k.b * Z}" height="24" fill="#8a7a5c" opacity=".25"/>`;
-    // erreichbare Felder
-    for (const [kk, c] of reach) { const [x, y] = kk.split(",").map(Number); if (x === akt.x && y === akt.y) continue; o += `<rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="#7fb7ff" fill-opacity=".14" stroke="#9cc8ff" stroke-opacity=".4"/>`; }
+    for (const [kk] of reach) { const [x, y] = kk.split(",").map(Number); if (x === akt.x && y === akt.y) continue; o += `<rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="#7fb7ff" fill-opacity=".14" stroke="#9cc8ff" stroke-opacity=".4"/>`; }
     for (const [t, x, y] of k.hindernisse) o += hindernis(t, x, y);
-    // Figuren
     for (const f of st.figuren) {
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, tot = f.tp <= 0;
-      if (f.seite === "gegner" && tot) { o += `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${svgKaefer()}</g>`; continue; }
+      if (f.seite === "gegner" && tot) { o += `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.kaefer()}</g>`; continue; }
       if (f === akt && !st.ende) o += `<circle cx="${cx}" cy="${cy}" r="27" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>`;
       if (zs.includes(f)) o += `<circle cx="${cx}" cy="${cy}" r="27" fill="${f.seite === "gegner" ? "#ff5a3a" : "#6fd06a"}" fill-opacity=".25" stroke="${f.seite === "gegner" ? "#ff7a5a" : "#7fe07a"}" stroke-width="3"/>`;
-      if (f.seite === "gegner") o += `<g transform="translate(${cx} ${cy})">${svgKaefer()}</g>`;
-      else o += `<g transform="translate(${cx} ${cy})" opacity="${tot ? 0.45 : 1}"><circle r="21" fill="${f.farbe}" stroke="#1d1a14" stroke-width="3"/>${ICON[f.zeichen]}</g>`;
+      if (f.seite === "gegner") {
+        o += `<g transform="translate(${cx} ${cy})">${B.kaefer()}</g>`;
+        o += `<g transform="translate(${cx + 17} ${cy - 17})"><circle r="10" fill="#1b1612" stroke="#d79a7d" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#f0d0c0">${f.id.slice(1) * 1 + 1}</text></g>`;
+      } else o += `<g transform="translate(${cx} ${cy})" opacity="${tot ? 0.45 : 1}">${B.plakette(f.farbe, f.zeichen)}</g>`;
       const w = 44, anteil = Math.max(0, f.tp / f.tpMax);
       o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="${anteil > .5 ? "#6fa86a" : anteil > .25 ? "#d6a23a" : "#c0503a"}"/>`;
       if (tot && f.seite === "spieler") o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="13" fill="#fff" font-weight="600">am Boden</text>`;
     }
-    // unsichtbare Klickflächen
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect class="feld" data-x="${x}" data-y="${y}" x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="transparent"/>`;
     svg.innerHTML = o;
 
-    // Reihenfolge
-    $("#reihe").innerHTML = `<span>Runde ${st.runde}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${f.seite === "gegner" ? "g" : ""}">${f.name}</span>`; }).join("");
+    $("#reihe").innerHTML = `<span>Runde ${st.runde}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzer(id); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${f.seite === "gegner" ? "g" : ""}">${esc(f.name)}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
 
-    // Panel
     if (st.ende) { $("#aktiv").innerHTML = ""; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
-    else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${akt.name}</b><span class="werte">ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
+    else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
     else {
-      const c = R.KLASSEN[akt.klasse];
-      $("#aktiv").innerHTML = `<b>${akt.name}</b><span class="werte">TP ${akt.tp}/${akt.tpMax} · RK ${akt.rk} · Bewegung ${st.zug.bewegung}${c.plaetze ? ` · Zauberplätze ${akt.plaetze}` : ""}</span>`;
-      const knopf = (a, typ) => `<button class="btn ${wahl === a.id ? "gewaehlt" : ""}" data-a="${a.id}" ${R.verfuegbar(st, a.id) && (a.art === "selbstheilung" || R.ziele(st, a.id).length) ? "" : "disabled"}>${a.name}<small>${typ === "bonus" ? "Bonusaktion" : a.platz ? "Aktion · 1 Zauberplatz" : "Aktion"}${a.schaden ? " · " + a.schaden + (a.anzahl ? " ×" + a.anzahl : "") : a.heilung ? " · heilt " + a.heilung : ""}</small></button>`;
-      $("#aktionen").innerHTML = c.aktionen.map((a) => knopf(a, "aktion")).join("") + c.bonus.map((a) => knopf(a, "bonus")).join("") + `<button class="btn ghost" id="ende-zug">Zug beenden</button>`;
+      const c = R.KLASSEN[akt.klasse], b = besitzer(akt.id);
+      $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">TP ${akt.tp}/${akt.tpMax} · RK ${akt.rk} · Bewegung ${st.zug.bewegung}${c.plaetze ? ` · Zauberplätze ${akt.plaetze}` : ""}</span>${b ? `<span class="handy-dran">📱 ${esc(spielerName(b))} ist dran: hier auf der Karte bewegen, Aktionen auf dem Handy.</span>` : ""}`;
+      const alle = c.aktionen.map((a) => [a, "aktion"]).concat(c.bonus.map((a) => [a, "bonus"]));
+      if (R.trankZahl(akt)) alle.push([R.TRANK, "bonus"]);
+      const knopf = ([a, typ]) => `<button class="btn ${wahl === a.id ? "gewaehlt" : ""}" data-a="${a.id}" ${R.verfuegbar(st, a.id) ? "" : "disabled"}>${esc(a.name)}${a.art === "trank" ? ` (${R.trankZahl(akt)})` : ""}<small>${typ === "bonus" ? "Bonusaktion" : a.platz ? "Aktion · 1 Zauberplatz" : "Aktion"}${a.schaden ? " · " + a.schaden + (a.anzahl ? " ×" + a.anzahl : "") : a.heilung ? " · heilt " + a.heilung : ""}</small></button>`;
+      $("#aktionen").innerHTML = (b ? `<details class="uebernehmen"><summary>Aktionen hier am Tisch auslösen</summary><div class="aktionen">${alle.map(knopf).join("")}</div></details>` : alle.map(knopf).join("")) + `<button class="btn ghost" id="ende-zug">Zug beenden</button>`;
       $("#hinweis").textContent = wahl ? "Leuchtendes Ziel antippen. Noch einmal auf die Aktion tippen bricht ab." : st.zug.bewegung ? "Blaues Feld antippen, um dich zu bewegen, oder eine Aktion wählen." : "Wähle eine Aktion oder beende den Zug.";
     }
-    $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}">${l.t}</li>`).join("");
-    if (st.ende) zeigeEnde();
+    $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("");
+    zeigeWurf();
+    zeichneLiveBar();
+    if (st.ende) zeigeEnde(); else $("#ende").hidden = true;
+  }
+
+  /** Neue Würfe der Spielerfiguren groß einblenden */
+  let wurfTimer = null;
+  function zeigeWurf() {
+    const neu = st.log.slice(letzterLog); letzterLog = st.log.length;
+    const w = neu.filter((l) => l.art === "wurf" || (l.art === "gut" && / heilt /.test(l.t))).pop();
+    if (!w || TEMPO === 0) return;
+    const el = $("#wurf");
+    el.innerHTML = `${w.wurf ? `<b class="${w.wurf === 20 ? "krit" : w.wurf === 1 ? "patzer" : ""}">${w.wurf}</b>` : ""}<span>${esc(w.t)}</span>`;
+    el.classList.add("an"); clearTimeout(wurfTimer); wurfTimer = setTimeout(() => el.classList.remove("an"), 2600);
   }
 
   function zeigeEnde() {
@@ -89,42 +241,69 @@
     $("#neu").onclick = () => start(Math.floor(Math.random() * 1e9));
   }
 
+  function toast(text) {
+    let t = $("#toast"); if (!t) { t = document.createElement("div"); t.id = "toast"; t.className = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+    t.textContent = text; t.classList.add("an"); clearTimeout(t._tm); t._tm = setTimeout(() => t.classList.remove("an"), 4500);
+  }
+
   function gegnerSchleife() {
     clearTimeout(gegnerTimer);
-    if (st.ende) return;
-    if (R.aktiv(st).seite === "gegner") gegnerTimer = setTimeout(() => { R.gegnerZug(st); render(); gegnerSchleife(); }, TEMPO);
+    if (st.ende) { veroeffentlichen(); return; }
+    if (R.aktiv(st).seite === "gegner") gegnerTimer = setTimeout(() => { R.gegnerZug(st); render(); veroeffentlichen(); gegnerSchleife(); }, TEMPO);
   }
 
   function klickFeld(x, y) {
+    if (!st) return;
     const akt = R.aktiv(st);
     if (st.ende || akt.seite !== "spieler") return;
     if (wahl) {
       const z = R.ziele(st, wahl).find((f) => f.x === x && f.y === y);
       if (!z) { $("#hinweis").textContent = "Dort ist kein gültiges Ziel."; return; }
-      R.handeln(st, wahl, z.id); wahl = null; render(); return;
+      R.handeln(st, wahl, z.id); wahl = null; render(); veroeffentlichen(); return;
     }
     const r = R.bewegen(st, x, y);
-    if (r.fehler) $("#hinweis").textContent = r.fehler; else render();
+    if (r.fehler) $("#hinweis").textContent = r.fehler; else { render(); veroeffentlichen(); }
   }
+
+  function zeigeIntro() { $("#intro").hidden = false; $("#lobby").hidden = true; $("#spiel").hidden = true; $("#ende").hidden = true; }
+  function zeigeSpiel() { $("#intro").hidden = true; $("#lobby").hidden = true; $("#spiel").hidden = false; }
 
   function start(seed) {
     clearTimeout(gegnerTimer);
-    st = R.neuesSpiel(seed); wahl = null;
+    st = R.neuesSpiel(seed); wahl = null; letzterLog = st.log.length;
     window.AB.st = st;
-    $("#intro").hidden = true; $("#spiel").hidden = false; $("#ende").hidden = true;
-    render(); gegnerSchleife();
+    if (liveAn()) { LIVE.phase = "kampf"; LIVE.antwort = null; }
+    zeigeSpiel(); render(); veroeffentlichen(); gegnerSchleife();
   }
 
   $("#karte").addEventListener("click", (ev) => { const t = ev.target.closest(".feld"); if (t) klickFeld(+t.dataset.x, +t.dataset.y); });
   $("#aktionen").addEventListener("click", (ev) => {
     const b = ev.target.closest("button"); if (!b || b.disabled) return;
-    if (b.id === "ende-zug") { wahl = null; R.zugEnde(st); render(); gegnerSchleife(); return; }
+    if (b.id === "ende-zug") { wahl = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
     const id = b.dataset.a, h = R.findeAktion(R.aktiv(st), id);
-    if (h && h.a.art === "selbstheilung") { R.handeln(st, id, R.aktiv(st).id); wahl = null; render(); return; }
+    if (h && (h.a.art === "selbstheilung" || h.a.art === "trank")) { R.handeln(st, id, R.aktiv(st).id); wahl = null; render(); veroeffentlichen(); return; }
     wahl = wahl === id ? null : id; render();
   });
   $("#start").onclick = () => start(params.has("seed") ? +params.get("seed") : Math.floor(Math.random() * 1e9));
+  $("#live").onclick = liveStarten;
 
-  // Für automatische Tests: ein Zug der Spielerfigur nach einfacher Logik
-  window.AB = { st: null, R, render, klickFeld, auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); gegnerSchleife(); } } };
+  // Nach dem Neuladen: laufende Live-Sitzung und Kampf wiederherstellen
+  (async () => {
+    let gespeichert = null;
+    try { gespeichert = JSON.parse(localStorage.getItem(SPEICHER) || "null"); } catch (e) { /* defekt */ }
+    if (!gespeichert || !window.MRMultiplayer) return;
+    try {
+      const c = liveClient(), s = await c.restore();
+      if (!s || s.closed || !s.is_host) { vergessen(); return; }
+      LIVE.phase = gespeichert.phase; LIVE.besitz = gespeichert.besitz || {}; LIVE.erledigt = gespeichert.erledigt || {};
+      wach();
+      if (LIVE.phase === "kampf" && gespeichert.st) { st = R.laden(gespeichert.st); window.AB.st = st; letzterLog = st.log.length; zeigeSpiel(); render(); gegnerSchleife(); }
+      else zeigeLobby();
+      await c.fetchStates().catch(() => {});
+      veroeffentlichen();
+    } catch (e) { vergessen(); }
+  })();
+
+  // Für automatische Tests
+  window.AB = { st: null, R, LIVE, render, klickFeld, auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };
 })();

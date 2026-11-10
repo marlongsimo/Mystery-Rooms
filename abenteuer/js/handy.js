@@ -6,17 +6,18 @@
  */
 (function () {
   "use strict";
-  const R = window.ABR, B = window.ABB, $ = (s) => document.querySelector(s);
+  const R = window.ABR, F = window.ABF, B = window.ABB, $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const params = new URLSearchParams(location.search);
   const SLUG = params.get("liveslug") || "abenteuer";
-  const NAME_KEY = "ab_name";
+  const NAME_KEY = "ab_name", FIGUR_KEY = "ab_meine_figur";
   const ATTR = { STR: "Stärke", GES: "Geschicklichkeit", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
+  const SELBST = new Set(["selbstheilung", "trank", "raserei", "finte", "gift", "verstecken", "rueckzug", "spurt", "schattenschritt", "spiegelbilder", "segen", "schutzkreis", "vertreiben", "bewahren", "massenheil", "rauch", "tatendrang"]);
   const H = { client: null, row: null, spiel: null, tab: "zug", sel: null, ziel: null, warte: null, fehler: "", busy: false, warDran: false, ergebnis: null, wahlOffen: null, nLog: 0 };
   const ich = () => H.client && H.client.user && H.client.user.id;
-  const meineFig = () => { const s = H.spiel; if (!s || !s.besitz) return null; return Object.keys(s.besitz).find((f) => s.besitz[f] === ich()) || null; };
-  const figDaten = (id) => (H.spiel && H.spiel.figuren ? H.spiel.figuren.find((f) => f.id === id) : null);
-  const klasseVon = (id) => { const l = H.spiel && H.spiel.liste ? H.spiel.liste.find((f) => f.id === id) : null; return l ? l.klasse : null; };
+  const meineFid = () => { const s = H.spiel; if (!s || !s.besitz) return null; return Object.keys(s.besitz).find((f) => s.besitz[f] === ich()) || null; };
+  const figDaten = (fid) => (H.spiel && H.spiel.figuren ? H.spiel.figuren.find((f) => f.fid === fid && f.art !== "wolf") : null);
+  const figId = (id) => (H.spiel && H.spiel.figuren ? H.spiel.figuren.find((f) => f.id === id) : null);
   const vorz = (n) => (n >= 0 ? "+" + n : String(n));
 
   function toast(text) {
@@ -28,7 +29,7 @@
   function client() {
     if (H.client) return H.client;
     if (!window.MRMultiplayer) throw new Error("Die Live-Verbindung ist gerade nicht verfügbar.");
-    const c = H.client = window.MRMultiplayer.connect({ gameSlug: SLUG, maxPlayers: 4, storeKey: "ab_handy:" + SLUG });
+    const c = H.client = window.MRMultiplayer.connect({ gameSlug: SLUG, maxPlayers: 7, storeKey: "ab_handy:" + SLUG });
     c.on("state", (row) => { if (row.state_key === "spiel") { H.row = row; pruefe(); } });
     c.on("players", pruefe);
     c.on("lost", (why) => { H.spiel = null; H.row = null; toast(why || "Verbindung beendet."); render(); });
@@ -41,26 +42,24 @@
     if (!host || H.row.updated_by !== host.user_id) { render(); return; }
     const alt = H.spiel; H.spiel = H.row.state || null;
     const s = H.spiel || {};
-    // Antwort auf meinen letzten Wunsch
     if (H.warte && s.antwort && s.antwort.uid === ich() && s.antwort.n === H.warte.n) {
       if (s.antwort.ok) { H.fehler = ""; H.sel = null; H.ziel = null; } else H.fehler = s.antwort.fehler || "Das ging nicht.";
       H.warte = null;
     }
-    // Ergebnis meiner Figur aus den neuen Einträgen
-    const f = meineFig(), fd = f && figDaten(f);
+    const fid = meineFid(), fd = fid && figDaten(fid);
+    if (fid) { try { localStorage.setItem(FIGUR_KEY, fid); } catch (e) { /* privat */ } }
     if (fd && s.log && s.nLog > H.nLog) {
       const neu = s.log.slice(Math.max(0, s.log.length - (s.nLog - H.nLog)));
       const mein = neu.filter((l) => l.t.indexOf(fd.name + ":") === 0).pop();
       if (mein) H.ergebnis = mein;
     }
     if (s.nLog) H.nLog = s.nLog;
-    if (s.phase !== "kampf" || (alt && alt.runde > (s.runde || 0))) H.ergebnis = null;
-    // Ich bin dran → kurz vibrieren
-    const dran = Boolean(f && s.phase === "kampf" && !s.ende && s.aktiv === f);
+    if (s.phase !== "kampf" || (alt && alt.phase !== "kampf")) H.ergebnis = null;
+    const dran = Boolean(fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0);
     if (dran && !H.warDran) { try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) { /* egal */ } H.tab = "zug"; }
     if (!dran) { H.sel = null; H.ziel = null; }
     H.warDran = dran;
-    if (H.wahlOffen && s.besitz && (s.besitz[H.wahlOffen] === ich() || s.besitz[H.wahlOffen])) H.wahlOffen = null;
+    if (H.wahlOffen && s.besitz && s.besitz[H.wahlOffen]) H.wahlOffen = null;
     render();
   }
 
@@ -83,11 +82,11 @@
     catch (e) { H.warte = null; H.fehler = e.message || String(e); render(); return; }
     setTimeout(() => { if (H.warte && H.warte.n === n) { H.warte = null; H.fehler = "Der Tisch hat nicht geantwortet. Bitte noch einmal versuchen."; render(); } }, 9000);
   }
-  async function waehle(fig) {
-    H.wahlOffen = fig || null; render();
-    try { await H.client.writeOwn("wahl:" + ich(), { fig: fig || null, at: Date.now() }); }
+  async function waehle(fid) {
+    H.wahlOffen = fid || null; render();
+    try { await H.client.writeOwn("wahl:" + ich(), { fid: fid || null, at: Date.now() }); }
     catch (e) { H.wahlOffen = null; H.fehler = e.message; render(); }
-    setTimeout(() => { if (H.wahlOffen === fig) { H.wahlOffen = null; render(); } }, 8000);
+    setTimeout(() => { if (H.wahlOffen === fid) { H.wahlOffen = null; render(); } }, 8000);
   }
 
   let sperre = null;
@@ -100,9 +99,9 @@
     $("#verlassen").hidden = !drin;
     if (!drin) return viewBeitritt(app);
     if (!H.spiel) { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Einen Moment …</h1><p class="note">Der Spieltisch schickt gleich die Figuren.</p></section>`; return; }
-    const f = meineFig();
-    if (!f) return viewWahl(app);
-    viewBogen(app, f);
+    const fid = meineFid();
+    if (!fid) return viewWahl(app);
+    viewBogen(app, fid);
   }
 
   function viewBeitritt(app) {
@@ -124,14 +123,20 @@
   }
 
   function viewWahl(app) {
-    const s = H.spiel, liste = s.liste || [];
-    app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)}</p><h1>Wähle deine Figur</h1>
-      <ul class="figwahl handywahl">${liste.map((l) => {
-        const c = R.KLASSEN[l.klasse], uid = s.besitz && s.besitz[l.id], frei = !uid;
-        return `<li><button class="wahl" data-fig="${l.id}" ${frei && !H.wahlOffen ? "" : "disabled"}>${B.marke(l.klasse, 44)}<span><b>${esc(c.name)}</b><small>${esc(c.klasse)} · TP ${c.tp} · RK ${c.rk}</small></span><em>${H.wahlOffen === l.id ? "…" : frei ? "frei" : "📱 " + esc((s.namen || {})[uid] || "vergeben")}</em></button></li>`;
-      }).join("")}</ul>
+    const s = H.spiel, gruppe = s.gruppe || [], kampf = s.phase === "kampf";
+    let zuletzt = null; try { zuletzt = localStorage.getItem(FIGUR_KEY); } catch (e) { /* privat */ }
+    const liste = kampf ? gruppe : F.REIHE;
+    app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)} · Stufe ${s.stufe || 1}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p><h1>Wähle deine Figur</h1>
+      ${kampf ? `<p class="note">Der Kampf läuft schon. Du kannst eine Figur übernehmen, die gerade der Tisch steuert.</p>` : ""}
+      <div class="fkarten handy-karten">${liste.map((fid) => {
+        const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], uid = s.besitz && s.besitz[fid], frei = !uid;
+        const voll = !kampf && !gruppe.includes(fid) && gruppe.length >= 6;
+        const status = H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : gruppe.includes(fid) ? "in der Gruppe" : voll ? "Gruppe voll" : "frei";
+        return `<button class="fkarte ${gruppe.includes(fid) ? "an" : ""} ${zuletzt === fid ? "zuletzt" : ""}" data-fid="${fid}" ${frei && !voll && !H.wahlOffen ? "" : "disabled"} style="--k:${k.farbe}">
+          <img src="${F.bild(fid)}" alt=""><span class="klasse">${esc(k.name)}</span><b>${esc(d.name)}</b><small>${esc(d.titel)}</small><em>${esc(status)}</em></button>`;
+      }).join("")}</div>
       <p class="note">Figuren, die niemand wählt, steuert ihr am Tisch.</p><p class="fb">${esc(H.fehler)}</p></section>`;
-    app.querySelectorAll("[data-fig]").forEach((b) => { b.onclick = () => waehle(b.dataset.fig); });
+    app.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => waehle(b.dataset.fid); });
   }
 
   function balken(tp, max) {
@@ -140,62 +145,72 @@
   }
 
   function viewBogen(app, fid) {
-    const s = H.spiel, klasse = klasseVon(fid), c = R.KLASSEN[klasse], fd = figDaten(fid);
-    const tp = fd ? fd.tp : c.tp, max = fd ? fd.tpMax : c.tp, rk = fd ? fd.rk : c.rk, plaetze = fd ? fd.plaetze : c.plaetze || 0;
-    const dran = s.phase === "kampf" && !s.ende && s.aktiv === fid;
+    const s = H.spiel, d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], fd = figDaten(fid), stufe = (fd && fd.stufe) || s.stufe || 1;
+    const tpMax = fd ? fd.tpMax : F.tpVon(fid, stufe), tp = fd ? fd.tp : tpMax, rk = fd ? fd.rk : d.rk[stufe - 1];
+    const plMax = fd && fd.plaetzeMax ? fd.plaetzeMax : k.plaetze ? F.PLAETZE[stufe] : [0, 0], pl = fd && fd.plaetze ? fd.plaetze : plMax;
+    const dran = Boolean(fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0);
     const meinName = (s.namen || {})[ich()] || "";
-    let html = `<section class="bogen ${dran ? "ist-dran" : ""}">
-      <div class="kopf">${B.marke(klasse, 52)}<div><h1>${esc(c.name)}</h1><p>${esc(c.klasse)} · Stufe 1${meinName ? " · " + esc(meinName) : ""}</p></div></div>
-      ${balken(tp, max)}
-      <div class="werte-zeile"><span><b>${rk}</b>RK</span>${c.plaetze ? `<span><b>${"●".repeat(plaetze)}${"○".repeat(Math.max(0, c.plaetze - plaetze))}</b>Zauberplätze</span>` : ""}<span><b>${dran ? s.zug.bewegung : 6}</b>Felder Bewegung</span></div>
+    const zust = fd ? fd.zustaende || [] : [];
+    const platzText = plMax[0] + plMax[1] ? `<span><b>${"●".repeat(pl[0])}${"○".repeat(Math.max(0, plMax[0] - pl[0]))}${plMax[1] ? " " + "◆".repeat(pl[1]) + "◇".repeat(Math.max(0, plMax[1] - pl[1])) : ""}</b>Zauberplätze</span>` : "";
+    let html = `<section class="bogen ${dran ? "ist-dran" : ""}" style="--k:${k.farbe}">
+      <div class="kopf"><img class="portraet" src="${F.bild(fid)}" alt=""><div><h1>${esc(d.name)}</h1><p>${esc(d.titel)} · ${esc(k.name)} · Stufe ${stufe}${meinName ? " · " + esc(meinName) : ""}</p><p class="spruch">„${esc(d.spruch)}“</p></div></div>
+      ${balken(tp, tpMax)}
+      ${fd && fd.tot ? `<div class="info schlecht">${esc(d.name)} ist tot.</div>` : fd && fd.tp <= 0 && s.schwierigkeit === "hardcore" ? `<div class="info schlecht">Todeswürfe: ${"✓".repeat(fd.todes.e)}${"·".repeat(3 - fd.todes.e)} | ${"✗".repeat(fd.todes.f)}${"·".repeat(Math.max(0, 3 - fd.todes.f))}${fd.stabil ? " · stabil" : ""}</div>` : ""}
+      <div class="werte-zeile"><span><b>${rk}</b>RK</span>${platzText}<span><b>${dran ? s.zug.bewegung : 6}</b>Felder</span></div>
+      ${zust.length ? `<p class="zustaende">${zust.map((z) => `<span>${esc(z)}</span>`).join("")}</p>` : ""}
       <nav class="tabs">${[["zug", "Zug"], ["faehig", "Fähigkeiten"], ["rucksack", "Rucksack"]].map(([id, t]) => `<button data-tab="${id}" class="${H.tab === id ? "an" : ""}">${t}${id === "zug" && dran ? " ●" : ""}</button>`).join("")}</nav>
       <div class="tabinhalt">`;
-    if (H.tab === "faehig") html += tabFaehig(c);
-    else if (H.tab === "rucksack") html += tabRucksack(fd ? fd.rucksack : (c.rucksack || []).map(([id, n]) => ({ id, n })));
-    else html += tabZug(s, fid, fd, dran, c);
+    if (H.tab === "faehig") html += tabFaehig(fid, stufe);
+    else if (H.tab === "rucksack") html += tabRucksack(fd ? fd.rucksack : [{ id: "heiltrank", n: 1 }], fid);
+    else html += tabZug(s, fid, fd, dran, stufe);
     html += `</div></section>`;
     app.innerHTML = html;
     app.querySelectorAll("[data-tab]").forEach((b) => { b.onclick = () => { H.tab = b.dataset.tab; render(); }; });
     app.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { H.sel = H.sel === b.dataset.opt ? null : b.dataset.opt; H.ziel = null; H.fehler = ""; render(); }; });
     app.querySelectorAll("[data-ziel]").forEach((b) => { b.onclick = () => { H.ziel = b.dataset.ziel; render(); }; });
-    const w = $("#wuerfeln"); if (w) w.onclick = () => senden({ typ: "aktion", aktion: H.sel, ziel: H.ziel || fid });
+    const w = $("#wuerfeln"); if (w) w.onclick = () => senden({ typ: "aktion", aktion: H.sel, ziel: H.ziel || (fd && fd.id) });
     const e = $("#zugende"); if (e) e.onclick = () => senden({ typ: "ende" });
     const a = $("#andere"); if (a) a.onclick = () => waehle(null);
   }
 
-  function aktionInfo(a, typ, c) {
-    const teile = [typ === "bonus" ? "Bonusaktion" : "Aktion"];
-    if (a.reichweite) teile.push(a.reichweite === 1 ? "Nahkampf" : `Reichweite ${a.reichweite} Felder`);
-    if (a.art === "angriff") teile.push(`Angriff ${vorz(R.mod(c.werte[a.attr]) + 2)}`);
-    if (a.art === "rettungswurf") teile.push(`SG ${8 + 2 + R.mod(c.werte[a.attr])}`);
-    if (a.schaden) teile.push(`${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""} Schaden`);
+  function aktionInfo(a, d, stufe) {
+    const typ = { aktion: "Aktion", bonus: "Bonusaktion", reaktion: "Reaktion", passiv: "passiv", frei: "frei" }[a.typ] || "Aktion";
+    const teile = [typ];
+    if (a.reichweite) teile.push(a.reichweite === 1 ? "Nahkampf" : `${a.reichweite} Felder`);
+    if (a.art === "angriff") teile.push(`Angriff ${vorz(R.mod(d.werte[a.attr]) + 2 + (a.bogen && d === F.FIGUREN.wildnislaeufer && stufe >= 2 ? 1 : 0))}`);
+    if (a.rettung && a.attr) teile.push(`${a.rettung}-Rettung SG ${8 + 2 + R.mod(d.werte[a.attr])}`);
+    if (a.schaden) teile.push(`${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}${a.art === "angriff" && !a.ohneMod ? " + " + R.mod(d.werte[a.attr]) : a.plusAttr ? " + " + R.mod(d.werte[a.attr]) : a.plus ? " + " + a.plus : ""}`);
     if (a.heilung) teile.push(`heilt ${a.heilung}`);
-    if (a.platz) teile.push("1 Zauberplatz");
-    if (a.proRast) teile.push("1× pro Kampf");
+    if (a.platz) teile.push(a.platz === 2 ? "Platz vom 2. Grad" : "1 Zauberplatz");
+    if (a.pro) { const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange, n = Array.isArray(v) ? v[stufe - 1] : v; teile.push(`${n}× je ${a.pro.kampf != null ? "Kampf" : a.pro.rast != null ? "Rast" : "lange Rast"}`); }
     return teile.join(" · ");
   }
 
-  function tabZug(s, fid, fd, dran, c) {
+  function tabZug(s, fid, fd, dran, stufe) {
+    const d = F.FIGUREN[fid];
     let h = "";
-    if (s.phase !== "kampf") h += `<div class="info">Gleich geht's los. Der Tisch startet den Kampf.</div><button class="btn ghost breit" id="andere">Andere Figur wählen</button>`;
-    else if (s.ende) h += `<div class="info gross">${s.ende === "sieg" ? "Sieg! Die Rostkäfer sind besiegt." : "Rückzug. Ihr versucht es noch einmal."}</div>`;
-    else if (fd && fd.tp <= 0) h += `<div class="info schlecht">Du liegst am Boden. Nur Heilung bringt dich zurück in den Kampf.</div>`;
+    if (s.phase !== "kampf") h += `<div class="info">Gleich geht's los. Der Tisch stellt die Gruppe zusammen und startet den Kampf.</div><button class="btn ghost breit" id="andere">Andere Figur wählen</button>`;
+    else if (s.ende) h += `<div class="info gross">${s.ende === "sieg" ? "Sieg!" : s.ende === "niederlage" ? "Grauwacht behält euch." : "Rückzug. Ihr versucht es noch einmal."}</div>`;
+    else if (!fd) h += `<div class="info">Deine Figur ist in diesem Kampf nicht dabei.</div>`;
+    else if (fd.tot) h += `<div class="info schlecht">${esc(d.name)} ist gefallen.</div>`;
+    else if (fd.tp <= 0) h += `<div class="info schlecht">Du liegst am Boden. ${s.schwierigkeit === "hardcore" ? "Zu Beginn deines Zugs würfelt der Tisch deinen Todeswurf. " : ""}Nur Heilung oder Stabilisieren bringt dich zurück.</div>`;
     else if (!dran) {
-      const a = figDaten(s.aktiv), b = s.besitz && s.besitz[s.aktiv];
+      const a = figId(s.aktiv), b = a && a.fid && s.besitz && s.besitz[a.fid];
       h += `<div class="info">Am Zug: <b>${esc(a ? a.name : "…")}</b>${b && b !== ich() ? ` (📱 ${esc((s.namen || {})[b] || "")})` : a && a.seite === "spieler" ? " (am Tisch)" : ""}</div>`;
     } else {
-      h += `<div class="info dran"><b>Du bist dran!</b> Bewegen: Tippe am Tisch dein Zielfeld an (noch ${s.zug.bewegung} Felder).</div>`;
+      h += `<div class="info dran"><b>Du bist dran!</b> Bewegen: Tippe am Tisch dein Zielfeld an (noch ${s.zug.bewegung} Felder${s.zug.schritt ? ", Schattenschritt " + s.zug.schritt : ""}).</div>`;
       h += `<div class="optionen">`;
       for (const o of s.optionen || []) {
-        const def = R.findeAktion({ klasse: fd.klasse, rucksack: fd.rucksack }, o.id); if (!def) continue;
+        const def = R.findeAktion({ fid, stufe, rucksack: fd.rucksack }, o.id); if (!def) continue;
         const a = def.a, gew = H.sel === o.id;
-        const zahl = a.art === "trank" ? ` (${R.trankZahl(fd)})` : "";
-        h += `<button class="opt ${gew ? "gewaehlt" : ""}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}><b>${esc(a.name)}${zahl}</b><small>${esc(aktionInfo(a, def.typ, c))}</small></button>`;
+        const zahl = a.art === "trank" ? ` (${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n})` : o.rest != null && o.rest !== Infinity ? ` · noch ${Math.max(0, o.rest)}` : "";
+        h += `<button class="opt ${gew ? "gewaehlt" : ""} ${o.ok ? "" : "aus"}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}><b>${esc(a.name)}<span class="anzahl">${esc(zahl)}</span></b><small>${esc(aktionInfo(a, d, stufe))}</small>${o.ok ? "" : `<i>${esc(o.grund || "")}</i>`}</button>`;
         if (gew) {
-          const selbst = a.art === "selbstheilung" || a.art === "trank";
-          if (!selbst) h += `<div class="ziele">${o.ziele.map((z) => `<button class="ziel ${H.ziel === z.id ? "gewaehlt" : ""}" data-ziel="${z.id}">${esc(z.name)}${z.id[0] === "f" ? ` <small>${z.tp}/${z.tpMax} TP</small>` : ""}</button>`).join("")}</div>`;
+          const selbst = SELBST.has(a.art);
+          if (a.text) h += `<p class="opt-text">${esc(a.text)}</p>`;
+          if (!selbst) h += `<div class="ziele">${o.ziele.map((z) => `<button class="ziel ${z.seite === "spieler" ? "freund" : ""} ${H.ziel === z.id ? "gewaehlt" : ""}" data-ziel="${z.id}">${esc(z.name)}${z.seite === "spieler" ? ` <small>${z.tp}/${z.tpMax} TP</small>` : ""}</button>`).join("")}</div>`;
           const bereit = selbst || H.ziel;
-          h += `<button class="btn breit wuerfel" id="wuerfeln" ${bereit && !H.warte ? "" : "disabled"}>${H.warte ? "Der Tisch würfelt …" : bereit ? "🎲 Würfeln" : "Ziel wählen"}</button>`;
+          h += `<button class="btn breit wuerfel" id="wuerfeln" ${bereit && !H.warte ? "" : "disabled"}>${H.warte ? "Der Tisch würfelt …" : bereit ? (a.schaden || a.rettung || a.art === "angriff" ? "🎲 Würfeln" : "Ausführen") : "Ziel wählen"}</button>`;
         }
       }
       h += `</div><button class="btn ghost breit" id="zugende" ${H.warte ? "disabled" : ""}>Zug beenden</button>`;
@@ -206,16 +221,23 @@
     return h;
   }
 
-  function tabFaehig(c) {
-    const werte = Object.keys(ATTR).map((k) => `<span><b>${vorz(R.mod(c.werte[k]))}</b><small>${ATTR[k]} ${c.werte[k]}</small></span>`).join("");
-    const liste = c.aktionen.map((a) => [a, "aktion"]).concat(c.bonus.map((a) => [a, "bonus"]));
-    return `<div class="attr">${werte}</div><ul class="faehig">${liste.map(([a, typ]) => `<li><b>${esc(a.name)}</b><small>${esc(aktionInfo(a, typ, c))}</small><p>${esc(a.text || "")}</p></li>`).join("")}
-      <li><b>Bewegung</b><small>6 Felder pro Zug</small><p>Schräg zählt wie gerade. An Grabsteinen und Mauern kommt niemand vorbei.</p></li></ul>`;
+  function tabFaehig(fid, stufe) {
+    const d = F.FIGUREN[fid];
+    const werte = Object.keys(ATTR).map((k) => `<span><b>${vorz(R.mod(d.werte[k]))}</b><small>${ATTR[k]} ${d.werte[k]}</small></span>`).join("");
+    const alle = F.faehigVon(fid, 3);
+    const li = (a) => `<li class="${a.ab > stufe ? "gesperrt" : ""}"><b>${esc(a.name)}${a.ab > stufe ? ` <span class="anzahl">ab Stufe ${a.ab}</span>` : ""}</b><small>${esc(aktionInfo(a, d, stufe))}</small><p>${esc(a.text || "")}</p></li>`;
+    return `<div class="attr">${werte}</div>
+      <p class="note">${esc(d.rolle)} · ${esc(d.ruestung)} · TP ${F.tpVon(fid, 1)} / ${F.tpVon(fid, 2)} / ${F.tpVon(fid, 3)}</p>
+      <h3 class="klein">Im Kampf</h3><ul class="faehig">${alle.filter((a) => a.typ !== "passiv").map(li).join("")}</ul>
+      <h3 class="klein">Immer aktiv</h3><ul class="faehig">${alle.filter((a) => a.typ === "passiv").map(li).join("")}</ul>
+      <h3 class="klein">Außerhalb des Kampfes</h3><ul class="faehig"><li><b>${esc(d.aussen.name)}</b><p>${esc(d.aussen.text)}</p></li><li><b>Bewegung</b><small>6 Felder pro Zug</small><p>Schräg zählt wie gerade. Wer neben einem Gegner losläuft, riskiert einen Gelegenheitsangriff.</p></li></ul>`;
   }
 
-  function tabRucksack(dinge) {
-    if (!dinge || !dinge.length) return `<div class="info">Der Rucksack ist leer.</div>`;
-    return `<ul class="faehig">${dinge.map((d) => { const x = R.DINGE[d.id] || { name: d.id, text: "" }; return `<li class="${d.n ? "" : "leer"}"><b>${esc(x.name)} <span class="anzahl">×${d.n}</span></b><p>${esc(x.text)}</p>${d.id === "heiltrank" && d.n ? `<small>Trinken: im Reiter „Zug“, wenn du dran bist.</small>` : ""}</li>`; }).join("")}</ul>`;
+  function tabRucksack(dinge, fid) {
+    const d = F.FIGUREN[fid];
+    const extra = { krieger: ["Seil, 15 m", "Fackel"], zauberer: ["Zauberbuch", "Kreide"], schurke: ["Dietriche", "Dunkler Umhang"], kleriker: ["Heiliges Symbol", "Verband"], waldlaeufer: ["Köcher", "Jagdmesser"] }[d.klasse] || [];
+    return `<ul class="faehig">${dinge.map((x) => { const t = R.DINGE[x.id] || { name: x.id, text: "" }; return `<li class="${x.n ? "" : "leer"}"><b>${esc(t.name)} <span class="anzahl">×${x.n}</span></b><p>${esc(t.text)}</p>${x.id === "heiltrank" && x.n ? `<small>Trinken: im Reiter „Zug“, wenn du dran bist.</small>` : ""}</li>`; }).join("")}
+      ${extra.map((e) => `<li><b>${esc(e)}</b></li>`).join("")}<li><b>${esc(d.ruestung)}</b><small>RK ${d.rk.join(" / ")}</small></li></ul>`;
   }
 
   $("#verlassen").onclick = async () => {
@@ -224,7 +246,6 @@
     H.spiel = null; H.row = null; render();
   };
 
-  // Nach dem Neuladen wieder verbinden
   (async () => {
     render();
     try {

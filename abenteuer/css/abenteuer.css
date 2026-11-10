@@ -145,3 +145,41 @@ body.handy main { max-width: 520px; padding: 12px 16px 40px; }
 .faehig li p { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
 .faehig li.leer { opacity: .5; }
 .anzahl { color: var(--muted); font-weight: 400; }
+
+/* ---------- 15 Figuren: Karten, Einstellungen ---------- */
+.einstellungen { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0 4px; align-items: flex-end; }
+.einstellungen .eyebrow { display: block; margin-bottom: 4px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.seg button { background: transparent; color: var(--muted); border: 0; padding: 8px 14px; font: 600 14px Inter, sans-serif; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.an { background: var(--gold); color: #1a140b; }
+.einstellungen select { background: #0f0d0a; color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 8px; font: 14px Inter, sans-serif; }
+.fkarten { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.fkarte { position: relative; display: flex; flex-direction: column; align-items: stretch; text-align: left; padding: 0 0 8px; background: var(--panel); border: 2px solid var(--line); border-radius: 6px; color: var(--text); cursor: pointer; overflow: hidden; font: 13px Inter, sans-serif; }
+.fkarte img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; filter: saturate(.85); }
+.fkarte .klasse { position: absolute; top: 6px; left: 6px; background: var(--k); color: #fff; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; }
+.fkarte b { font: 600 15px Cinzel, serif; padding: 6px 8px 0; }
+.fkarte small { color: var(--muted); padding: 0 8px; font-size: 11px; }
+.fkarte em { font-style: normal; font-size: 11px; padding: 4px 8px 0; color: var(--green); }
+.fkarte em.tisch { color: var(--gold); }
+.fkarte.an { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.fkarte.an img { filter: none; }
+.fkarte.zuletzt:not(:disabled) { border-style: dashed; }
+.fkarte:disabled { opacity: .5; cursor: default; }
+.handy-karten { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.handy-karten .fkarte b { font-size: 13px; }
+.knoepfe.mitte { justify-content: center; }
+img.marke { border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; flex: none; }
+.kopf-klein { display: flex; gap: 10px; align-items: center; flex-basis: 100%; }
+.kopf-klein div { display: flex; flex-direction: column; }
+.aktiv .zust, .zustaende { flex-basis: 100%; color: #c9a8ff; font-size: 12px; }
+.zustaende { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.zustaende span { border: 1px solid #5a4a7a; border-radius: 10px; padding: 2px 8px; }
+.bogen .portraet { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid var(--k, var(--gold)); flex: none; }
+.bogen .spruch { font-style: italic; color: var(--muted); font-size: 12px; margin-top: 2px !important; }
+.opt i { display: block; font-style: normal; font-size: 11px; color: #e08a6a; margin-top: 2px; }
+.opt.aus b { color: var(--muted); }
+.opt-text { font-size: 13px; color: var(--muted); margin: -2px 2px 4px; }
+.ziel.freund { background: #16241a; border-color: #3a6a44; }
+.ziel.freund.gewaehlt { border-color: #7fe07a; background: #1f3a24; }
+.faehig li.gesperrt { opacity: .5; }

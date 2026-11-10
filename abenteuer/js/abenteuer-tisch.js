@@ -10,6 +10,40 @@
   const fett = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
   const KEY = "ab_abenteuer";
   let A = null, hilfeAn = true, letzterWurf = null;
+  const SCHNELL = new URLSearchParams(location.search).has("schnell");
+  const ABSCHNITTE = { 1: "Die Abtei", 2: "Die Krypta", 3: "Das Siegel" };
+  let vorlesenAn = false; try { vorlesenAn = localStorage.getItem("ab_vorlesen") === "an"; } catch (e) { /* privat */ }
+  const ohneMarkup = (t) => String(t || "").replace(/\*\*?/g, "").replace(/[„“"]/g, "");
+
+  /* ---------- Vorlesen (Browserstimme, experimentell) ---------- */
+  const sprache = typeof window !== "undefined" && window.speechSynthesis ? window.speechSynthesis : null;
+  function stimme() {
+    if (!sprache) return null;
+    const alle = sprache.getVoices().filter((v) => /^de(-|_|$)/i.test(v.lang));
+    const gut = ["Google Deutsch", "Anna", "Helena", "Markus", "Petra", "Yannick", "Katja", "Conrad"];
+    return gut.map((n) => alle.find((v) => v.name.includes(n))).find(Boolean) || alle[0] || null;
+  }
+  function vorlesen(texte) {
+    if (!sprache) return false;
+    sprache.cancel();
+    const v = stimme();
+    for (const t of texte.map(ohneMarkup).filter(Boolean)) {
+      const u = new SpeechSynthesisUtterance(t); u.lang = "de-DE"; if (v) u.voice = v; u.rate = 0.92; u.pitch = 0.9;
+      sprache.speak(u);
+    }
+    return true;
+  }
+  const verstummen = () => { if (sprache) sprache.cancel(); };
+
+  /* ---------- Titelkarte beim Wechsel in einen neuen Abschnitt ---------- */
+  function titelkarte(n, fertig) {
+    const el = document.createElement("div"); el.className = "titelkarte"; el.setAttribute("role", "presentation");
+    el.innerHTML = `<div><p class="eyebrow">Abschnitt ${n}</p><h2>${esc(ABSCHNITTE[n] || "")}</h2><span class="titel-zier" aria-hidden="true"></span></div>`;
+    document.body.appendChild(el);
+    if (window.ABE) window.ABE.glocke(n === 3 ? 1 : 0.7);
+    let weg = false; const schliessen = () => { if (weg) return; weg = true; el.classList.add("aus"); setTimeout(() => { el.remove(); if (fertig) fertig(); }, 700); };
+    el.onclick = schliessen; setTimeout(schliessen, 3400);
+  }
   try { hilfeAn = localStorage.getItem("ab_hilfe") !== "aus"; } catch (e) { /* privat */ }
   const ATTR = { STR: "Stärke", GES: "Geschicklichkeit", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
   const HILFE = {
@@ -78,15 +112,27 @@
     const el = $("#szene"); if (!el || !A) return;
     const v = S.ansicht(A), s = S.szene(A);
     if (s.art === "ende") chronikSchreiben(s);
+    // Inszenierung: neue Szene → Absätze erscheinen nacheinander; neuer Abschnitt → Titelkarte; Farbstimmung je Abschnitt
+    const neueSzene = render.szene !== v.szene, ruhig = SCHNELL || document.body.classList.contains("ruhig") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const auftritt = neueSzene && !ruhig && v.text.length > 0;
+    document.body.dataset.abschnitt = String(v.abschnitt || 1);
+    if (neueSzene) {
+      verstummen();
+      const neuerAbschnitt = render.abschnitt != null && v.abschnitt && v.abschnitt !== render.abschnitt && v.abschnitt <= 3;
+      render.szene = v.szene; render.abschnitt = v.abschnitt || render.abschnitt;
+      if (neuerAbschnitt && !ruhig) titelkarte(v.abschnitt);
+      if (vorlesenAn) setTimeout(() => vorlesen([v.titel].concat(v.text)), neuerAbschnitt && !ruhig ? 3600 : 300);
+    } else if (vorlesenAn && v.antwort && v.antwort !== render.antwort) vorlesen([v.antwort]);
+    render.antwort = v.antwort;
     if (window.ABE && render.letzte != null && A.glocke > render.letzte) window.ABE.glocke(0.9);
     render.letzte = A.glocke;
-    let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}${AB.liveAn() ? "" : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}</div>
-      <h1>${esc(v.titel)}</h1><div class="erzaehlung">${v.text.map((p) => `<p>${fett(p)}</p>`).join("")}</div>`;
+    let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}<span class="kopf-links">${sprache ? `<button class="link" id="sz-vorlesen" title="Text vorlesen (Browserstimme) – noch einmal tippen zum Anhalten">🔊 Vorlesen</button>` : ""}${AB.liveAn() ? "" : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}</span></div>
+      <h1>${esc(v.titel)}</h1><div class="erzaehlung ${auftritt ? "auftritt" : ""}">${v.text.map((p, i) => `<p style="--i:${i}">${fett(p)}</p>`).join("")}</div>`;
     if (hilfeAn && HILFE[s.art] && !A.zwischenprobe) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE[s.art])}</p><button class="link" id="hilfe-aus">Hinweise ausblenden</button></div>`;
     if (A.zwischenprobe && hilfeAn) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE.probe)}</p></div>`;
     if (s.art === "gespraech" && v.dialog.length) h += dialogHtml(v.dialog);
     else if (v.antwort) h += `<div class="antwort">${fett(v.antwort)}</div>`;
-    h += `<div class="interaktion">${interaktion(v, s)}</div>`;
+    h += `<div class="interaktion ${auftritt ? "auftritt" : ""}" style="--i:${v.text.length}">${interaktion(v, s)}</div>`;
     h += gruppeHtml();
     if (v.protokoll.length) h += `<ol class="log kurz">${v.protokoll.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("")}</ol>`;
     el.innerHTML = h;
@@ -96,6 +142,9 @@
       window.ABW.rollen(pw, w, `${F.FIGUREN[fid] ? F.FIGUREN[fid].name : ""}: ${w} + Bonus = ${ges} gegen SG ${sg}`, { titel: w === 20 || ges >= sg ? "Geschafft!" : ges >= sg - 3 ? "Knapp daneben" : "Daneben", gut: ges >= sg, sofort: !neu || new URLSearchParams(location.search).has("schnell") });
     }
     binde(el, v, s);
+    const erz = el.querySelector(".erzaehlung.auftritt");
+    if (erz) { const alles = () => el.querySelectorAll(".auftritt").forEach((x) => x.classList.remove("auftritt")); erz.onclick = alles; erz.title = "Tippen: alles sofort zeigen"; }
+    const vl = $("#sz-vorlesen"); if (vl) vl.onclick = () => { if (sprache && sprache.speaking) verstummen(); else vorlesen([v.titel].concat(v.text, v.antwort ? [v.antwort] : [])); };
   }
   function dialogHtml(d) {
     const l = d[d.length - 1], wuerfel = l && l.wurf ? `<div class="probe-wuerfel" data-wurf-key="${l.werWuerfelt}-${l.wurf.w}-${l.wurf.gesamt}-${l.sg || 0}"></div>` : "";
@@ -262,6 +311,6 @@
   /** Pause: zurück zum Titel, der Spielstand bleibt erhalten */
   function pause() { merken(); fortsetzenKnopf(); AB.zeigeSektion("intro"); }
 
-  window.ABT = { hilfe: (v) => { hilfeAn = v; if (A) render(); }, start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
+  window.ABT = { vorlesen: (an) => { vorlesenAn = an; if (!an) verstummen(); }, hilfe: (v) => { hilfeAn = v; if (A) render(); }, start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
     speichern: () => (A ? S.speichern(A) : null), laden: (o) => { A = S.laden(o); } };
 })();

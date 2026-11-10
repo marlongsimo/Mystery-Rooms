@@ -97,7 +97,7 @@ const R = require('../js/regeln.js'), F = R.FD;
         const a = await p.evaluate(() => { const st = window.AB.st, R = window.AB.R, f = R.aktiv(st); const a = R.aktionenVon(f, st).find((a) => a.typ === 'aktion' && R.verfuegbar(st, a.id) && R.ziele(st, a.id).some((z) => z.seite === 'gegner')); return a && a.id; });
         if (a) {
           await p.click(`#aktionen [data-a="${a}"]`);
-          const hinweis = /Ziel antippen/.test(await p.textContent('#hinweis'));
+          const hinweis = /leuchtendes Ziel/.test(await p.textContent('#hinweis'));
           const z = await p.evaluate((id) => { const t = window.AB.R.ziele(window.AB.st, id).find((z) => z.seite === 'gegner'); return { x: t.x, y: t.y }; }, a);
           const vorher = await p.evaluate(() => window.AB.st.log.length);
           await p.click(`#karte .feld[data-x="${z.x}"][data-y="${z.y}"]`, { force: true });

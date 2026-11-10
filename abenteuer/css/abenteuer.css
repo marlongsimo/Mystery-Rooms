@@ -350,3 +350,65 @@ main:has(#lobby:not([hidden])) { max-width: 1220px; }
 .platte small { display: block; font: 600 11px Inter, sans-serif; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; font-style: normal; }
 .ersatz-wahl { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .ersatz-wahl .btn { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ================= Kampfhilfen ================= */
+.schritte { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; flex-basis: 100%; }
+.schritte span { font-size: 11px; padding: 3px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); }
+.schritte span.an { border-color: var(--gold); color: var(--text); }
+.schritte span.fertig { text-decoration: line-through; opacity: .5; }
+.akt-gruppe { flex-basis: 100%; margin: 6px 0 2px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+.akt { flex-basis: 100%; text-align: left; background: #2a2216; color: var(--text); border: 1px solid #5a4a2a; border-radius: 6px; padding: 8px 10px; cursor: pointer; font: 14px Inter, sans-serif; display: grid; gap: 2px; }
+.akt:hover:not(:disabled) { border-color: var(--gold); }
+.akt .akt-kopf { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.akt .akt-kopf small { font-size: 11px; color: var(--muted); }
+.akt .akt-text { font-size: 12px; color: #c9bfa8; line-height: 1.35; }
+.akt .akt-text em { font-style: normal; color: #e08a6a; }
+.akt.gewaehlt { border-color: #fff; box-shadow: 0 0 0 1px #fff; background: #3a2f1c; }
+.akt.getippt { border-color: #f2d35a; box-shadow: 0 0 0 2px rgba(242,211,90,.5); }
+.akt:disabled { opacity: .45; cursor: default; }
+.aktionen .knoepfe { flex-basis: 100%; margin-top: 8px; }
+.hinweis b { color: var(--text); }
+.tipp-ring { animation: puls 1.2s ease-in-out infinite; }
+@keyframes puls { 50% { opacity: .35; } }
+.karte-wrap { position: relative; }
+.schwebe { position: absolute; transform: translate(-50%, 0); font: 700 22px Cinzel, serif; pointer-events: none; text-shadow: 0 2px 4px #000, 0 0 2px #000; animation: aufsteigen 1.4s ease-out forwards; z-index: 3; }
+.schwebe.minus { color: #ff8a6a; } .schwebe.plus { color: #8fe08a; }
+@keyframes aufsteigen { from { opacity: 0; transform: translate(-50%, 6px) scale(.8); } 15% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } to { opacity: 0; transform: translate(-50%, -46px) scale(1); } }
+/* Würfel */
+.w20-box { width: 74px; height: 74px; color: var(--gold); flex: none; }
+.w20-box .w20-svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 10px #000); }
+.w20-box.rollt .w20-svg { animation: taumeln .55s linear infinite; }
+.w20-box.gelandet .w20-svg { animation: landen .35s ease-out; }
+.w20-box.krit { color: #7fe07a; } .w20-box.patzer { color: var(--red); }
+.w20-box.gut { color: #9fd08a; } .w20-box.schlecht { color: #e08a6a; }
+@keyframes taumeln { 0% { transform: rotate(0) scale(.9); } 50% { transform: rotate(180deg) scale(1.05); } 100% { transform: rotate(360deg) scale(.9); } }
+@keyframes landen { 0% { transform: scale(1.3); } 100% { transform: scale(1); } }
+.w20-erg { opacity: 0; transition: opacity .25s; font-size: 14px; }
+.w20-erg.da { opacity: 1; }
+.w20-erg b { display: block; font: 600 15px Cinzel, serif; color: var(--gold); }
+.wurf { gap: 12px; }
+.wurf.gegner { border-color: #a0503a; }
+.wurf.gegner .w20-erg b { color: #e08a6a; }
+/* Szenen: Hilfe, Dialog, Proben */
+.hilfe { display: flex; gap: 10px; align-items: flex-start; background: #17202a; border: 1px solid #2e4458; border-radius: 6px; padding: 10px 12px; margin: 4px 0 14px; font-size: 14px; color: #c8d4de; flex-wrap: wrap; }
+.hilfe span { font-size: 18px; color: #7fb7ff; line-height: 1; }
+.hilfe p { margin: 0; flex: 1; min-width: 200px; }
+.hilfe .link { font-size: 12px; padding: 0; margin-left: auto; }
+.dialog { display: grid; gap: 8px; margin: 6px 0 14px; }
+.d-frage, .d-antwort { max-width: 88%; padding: 8px 12px; border-radius: 10px; }
+.d-frage { justify-self: end; background: #2a2216; border: 1px solid #5a4a2a; border-bottom-right-radius: 2px; }
+.d-antwort { justify-self: start; background: var(--panel); border: 1px solid var(--line); border-bottom-left-radius: 2px; }
+.d-antwort.erfolg { border-color: var(--green); } .d-antwort.fehl { border-color: var(--red); } .d-antwort.knapp { border-color: #d6a23a; } .d-antwort.offen { opacity: .7; border-style: dashed; }
+.d-frage small, .d-antwort small { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); margin-bottom: 2px; }
+.d-frage p, .d-antwort p { margin: 0; font-size: 15px; line-height: 1.5; }
+.btn.frage { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.btn.frage small { font-weight: 400; font-size: 12px; opacity: .8; }
+.probe-wuerfel { display: flex; align-items: center; gap: 14px; margin: 10px 0; }
+.wer-knopf { text-align: left; }
+.wer-knopf span { display: flex; flex-direction: column; }
+.wer-knopf small { font-size: 11px; font-weight: 400; opacity: .85; }
+.wer-knopf.beste { border-color: var(--gold); }
+.opt-kurz { display: block; font-size: 12px; color: #c9bfa8; margin-top: 3px; line-height: 1.35; }
+.handy-szene .schritte, .tabinhalt .schritte { margin-bottom: 10px; }
+.ergebnis.wuerfel-erg { gap: 12px; }
+.ergebnis.wuerfel-erg .w20-box { width: 60px; height: 60px; }

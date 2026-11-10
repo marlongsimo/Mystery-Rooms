@@ -9,7 +9,19 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fett = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
   const KEY = "ab_abenteuer";
-  let A = null;
+  let A = null, hilfeAn = true, letzterWurf = null;
+  try { hilfeAn = localStorage.getItem("ab_hilfe") !== "aus"; } catch (e) { /* privat */ }
+  const ATTR = { STR: "Stärke", GES: "Geschicklichkeit", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
+  const HILFE = {
+    erzaehlung: "Erzählung: Lest den Text laut vor und lasst ihn wirken. Mit „Weiter“ geht die Geschichte voran.",
+    gespraech: "Gespräch: Ihr könnt in beliebiger Reihenfolge fragen und handeln, jede Möglichkeit einmal. Was gesagt wurde, steht im Verlauf. Wenn ihr genug wisst, geht es mit dem goldenen Knopf weiter.",
+    wahl: "Gruppenentscheidung: Besprecht euch. Dann entscheidet die Gruppe – mit Handys stimmt jede Person geheim ab, die Mehrheit gilt, bei Gleichstand der Würfel. Viele Entscheidungen haben Folgen, manche erst viel später.",
+    probe: "Probe: Eine Figur versucht es und würfelt einen W20 plus ihren Bonus. Erreicht sie den Schwierigkeitsgrad (SG), gelingt es. Knapp daneben kostet oft etwas, ein Fehlschlag führt auf einen anderen Weg. Wählt jemanden mit hohem Bonus.",
+    geheim: "Geheime Entscheidung: Jede Person entscheidet ganz allein. Niemand am Tisch erfährt, wie die anderen entschieden haben.",
+    kampf: "Kampf: Gleich wechselt ihr auf die Karte. Wer dran ist, zieht bis zu 6 Felder, macht eine Aktion und eine Bonusaktion, dann „Zug beenden“. Der Knopf „💡 Tipp“ schlägt einen sinnvollen Zug vor.",
+    lager: "Lagerfeuer: Ihr ruht, heilt vollständig und bekommt eure Zauberplätze zurück. Das Spiel speichert hier.",
+    raetsel: "Rätsel: Lest euch gegenseitig vor, was auf euren Handys steht. Dann schlagt die Glocken am Tisch in der richtigen Reihenfolge an. Jeder falsche Versuch lässt die Glocke von Grauwacht schlagen.",
+  };
 
   const live = () => AB.liveAn();
   const besitzer = (fid) => AB.besitzVon(fid);
@@ -43,23 +55,41 @@
     render.letzte = A.glocke;
     let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}</div>
       <h1>${esc(v.titel)}</h1><div class="erzaehlung">${v.text.map((p) => `<p>${fett(p)}</p>`).join("")}</div>`;
-    if (v.antwort) h += `<div class="antwort">${fett(v.antwort)}</div>`;
+    if (hilfeAn && HILFE[s.art] && !A.zwischenprobe) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE[s.art])}</p><button class="link" id="hilfe-aus">Hinweise ausblenden</button></div>`;
+    if (A.zwischenprobe && hilfeAn) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE.probe)}</p></div>`;
+    if (s.art === "gespraech" && v.dialog.length) h += dialogHtml(v.dialog);
+    else if (v.antwort) h += `<div class="antwort">${fett(v.antwort)}</div>`;
     h += `<div class="interaktion">${interaktion(v, s)}</div>`;
     h += gruppeHtml();
     if (v.protokoll.length) h += `<ol class="log kurz">${v.protokoll.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("")}</ol>`;
     el.innerHTML = h;
+    const pw = el.querySelector(".probe-wuerfel");
+    if (pw && window.ABW) {
+      const [fid, w, ges, sg] = pw.dataset.wurfKey.split("-").map((x, i) => (i ? +x : x)), neu = pw.dataset.wurfKey !== letzterWurf; letzterWurf = pw.dataset.wurfKey;
+      window.ABW.rollen(pw, w, `${F.FIGUREN[fid] ? F.FIGUREN[fid].name : ""}: ${w} + Bonus = ${ges} gegen SG ${sg}`, { titel: w === 20 || ges >= sg ? "Geschafft!" : ges >= sg - 3 ? "Knapp daneben" : "Daneben", gut: ges >= sg, sofort: !neu || new URLSearchParams(location.search).has("schnell") });
+    }
     binde(el, v, s);
+  }
+  function dialogHtml(d) {
+    const l = d[d.length - 1], wuerfel = l && l.wurf ? `<div class="probe-wuerfel" data-wurf-key="${l.werWuerfelt}-${l.wurf.w}-${l.wurf.gesamt}-${l.sg || 0}"></div>` : "";
+    return `<div class="dialog">${d.map((e) => `<div class="d-frage"><small>Ihr</small><p>${fett(e.frage)}</p></div>${e.offen ? `<div class="d-antwort offen"><small>🎲 ${esc(e.probe)}</small><p>… eine Figur muss würfeln.</p></div>` : e.antwort ? `<div class="d-antwort ${e.stufe || ""}"><small>${e.probe ? `🎲 ${esc(e.probe)} · ${{ erfolg: "geschafft", knapp: "knapp daneben", fehl: "misslungen" }[e.stufe] || ""}${e.werWuerfelt ? " · " + esc(F.FIGUREN[e.werWuerfelt].name) + " würfelt " + e.wurf.w : ""}` : esc(e.wer || "")}</small><p>${fett(e.antwort)}</p></div>` : ""}`).join("")}</div>${wuerfel}`;
   }
   function probeHtml(v) {
     const p = v.probe, lebend = S.lebende(A);
     const attrName = typeof p.attr === "function" ? "Probe" : p.attr;
     let h = `<div class="probe"><b>${esc(p.name)}</b> · ${esc(attrName)} gegen SG ${p.sg}${p.gruppe ? " · alle würfeln, die Hälfte muss es schaffen" : ""}</div>`;
+    const lw = Object.entries(p.wuerfe).pop();
+    if (p.ergebnis && lw) h += `<div class="probe-wuerfel" data-wurf-key="${lw[0]}-${lw[1].w}-${lw[1].gesamt}-${p.sg}"></div>`;
     if (p.ergebnis) return h + `<div class="probe-erg ${p.ergebnis.stufe}">${{ erfolg: "Geschafft", knapp: "Knapp daneben", fehl: "Misslungen" }[p.ergebnis.stufe]}${p.ergebnis.text ? ": " + fett(p.ergebnis.text) : ""}</div><button class="btn" id="sz-weiter">Weiter</button>`;
     if (!p.gruppe && !p.wer) {
-      h += `<p class="note">Wer versucht es?${live() ? " (oder auf dem eigenen Handy „Ich versuche es“)" : ""}</p><div class="wer">${lebend.map((fid) => `<button class="btn ghost" data-wer="${fid}">${B.marke(fid, 28)} ${esc(F.FIGUREN[fid].name)} <small>${p.boni[fid] >= 0 ? "+" : ""}${p.boni[fid]}</small></button>`).join("")}</div>`;
+      const chance = (b) => Math.round(Math.max(5, Math.min(95, (21 - (p.sg - b)) * 5)));
+      const beste = Math.max(...lebend.map((f) => p.boni[f]));
+      h += `<p class="note">Wer versucht es?${live() ? " (oder auf dem eigenen Handy „Ich versuche es“)" : ""} Gebraucht wird ${esc(ATTR[p.attr] || "die passende Eigenschaft")}.</p><div class="wer">${lebend.map((fid) => `<button class="btn ghost wer-knopf ${p.boni[fid] === beste ? "beste" : ""}" data-wer="${fid}">${B.marke(fid, 28)} <span><b>${esc(F.FIGUREN[fid].name)}</b><small>Bonus ${p.boni[fid] >= 0 ? "+" : ""}${p.boni[fid]} · braucht ${Math.max(2, p.sg - p.boni[fid])}+ · ${chance(p.boni[fid])} %</small></span></button>`).join("")}</div>`;
       return h;
     }
     const offen = p.gruppe ? lebend.filter((f) => !p.wuerfe[f]) : [p.wer].filter((f) => !p.wuerfe[f]);
+    const letzte = Object.entries(p.wuerfe).pop();
+    if (letzte) h += `<div class="probe-wuerfel" data-wurf-key="${letzte[0]}-${letzte[1].w}-${letzte[1].gesamt}-${p.sg}"></div>`;
     h += `<ul class="wuerfe">${Object.entries(p.wuerfe).map(([fid, w]) => `<li class="${w.gesamt >= p.sg ? "gut" : "schlecht"}">${esc(F.FIGUREN[fid].name)}: W20 ${w.w} ${w.bonus >= 0 ? "+" : "−"} ${Math.abs(w.bonus)} = <b>${w.gesamt}</b></li>`).join("")}</ul>`;
     if (offen.length) h += `<div class="wer">${offen.map((fid) => `<button class="btn" data-wurf="${fid}">🎲 ${esc(F.FIGUREN[fid].name)} würfelt${live() && besitzer(fid) ? " (oder am Handy)" : ""}</button>`).join("")}</div>`;
     return h;
@@ -84,7 +114,11 @@
       const rast = s.rastErlaubt && A.schwierigkeit === "normal" && !A.merker["kurz_" + (s.abschnitt || 1)];
       return `<div class="knoepfe"><button class="btn" id="sz-weiter">Weiter</button>${rast ? `<button class="btn ghost" id="sz-rast" title="Halbe fehlende TP zurück. Die Glocke schlägt.">Kurze Rast (Glocke +1)</button>` : ""}</div>`;
     }
-    if (s.art === "gespraech") return `<div class="optionen-tisch">${v.optionen.map((o) => `<button class="btn ${o.weiter ? "" : "ghost"}" data-opt="${o.id}">${esc(o.text)}${o.probe ? " <small>Probe</small>" : ""}</button>`).join("")}</div>`;
+    if (s.art === "gespraech") {
+      const fragen = v.optionen.filter((o) => !o.weiter), weiter = v.optionen.filter((o) => o.weiter);
+      return `${fragen.length ? `<p class="akt-gruppe">Was wollt ihr tun?</p>` : ""}<div class="optionen-tisch">${fragen.map((o) => `<button class="btn ghost frage" data-opt="${o.id}"><span>${esc(o.text)}</span>${o.probe ? `<small>🎲 Probe: ${esc(ATTR[o.probe.attr] || "")} gegen SG ${o.probe.sg}</small>` : o.wer ? `<small>an ${esc(o.wer)}</small>` : ""}</button>`).join("")}</div>
+        ${weiter.length ? `<p class="akt-gruppe">Weitergehen</p><div class="optionen-tisch">${weiter.map((o) => `<button class="btn" data-opt="${o.id}">${esc(o.text)}</button>`).join("")}</div>` : ""}`;
+    }
     if (s.art === "wahl") {
       if (!live()) return `<div class="optionen-tisch">${v.optionen.map((o) => `<button class="btn ghost" data-opt="${o.id}">${esc(o.text)}</button>`).join("")}</div><p class="note">Besprecht es und tippt die Entscheidung an.</p>`;
       const n = Object.keys(A.stimmen).length, alle = S.lebende(A).length;
@@ -111,6 +145,7 @@
     el.querySelectorAll("[data-ersatz]").forEach((b) => { b.onclick = () => { const [alt, neu] = b.dataset.ersatz.split(":"); if (!S.ersatz(A, alt, neu).fehler) AB.besitzTauschen(alt, neu); nach(); }; });
     const rn = $("#rz-neu"); if (rn) rn.onclick = () => { S.raetselNeu(A); nach(); };
     const ra = $("#rz-auf"); if (ra) ra.onclick = () => { if (confirm("Das Rätsel aufgeben? Was im Joch verborgen ist, bleibt dort.")) { S.raetselAufgeben(A); nachSzene(); } };
+    const ha = $("#hilfe-aus"); if (ha) ha.onclick = () => { hilfeAn = false; try { localStorage.setItem("ab_hilfe", "aus"); } catch (e) { /* privat */ } render(); };
     const w = $("#sz-weiter"); if (w) w.onclick = () => { S.weiter(A); nachSzene(); };
     const r = $("#sz-rast"); if (r) r.onclick = () => { S.kurzeRast(A); nach(); };
     const au = $("#sz-auswerten"); if (au) au.onclick = () => { S.auswerten(A); nachSzene(); };

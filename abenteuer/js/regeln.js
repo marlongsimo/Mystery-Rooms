@@ -1131,6 +1131,57 @@
     if (!st.ende) zugEnde(st);
   }
 
+  /* ---------- Hilfen für die Oberfläche: Trefferchance, Vorschlag ---------- */
+  /**
+   * Wie wahrscheinlich gelingt eine Aktion gegen ein Ziel?
+   * Rückgabe { p (0–1), art: "treffer" | "rettung" | "sicher" | null, text }
+   */
+  function chance(st, aktionId, zielId) {
+    const f = aktiv(st), h = findeAktion(f, aktionId), z = fig(st, zielId);
+    if (!h || !z) return { p: null, art: null, text: "" };
+    const a = h.a, klemm = (x) => Math.max(0.05, Math.min(0.95, x));
+    if (a.art === "angriff") {
+      const bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") && f.stufe >= 2 ? 1 : 0);
+      const spec = { fern: Boolean(a.fern) || (a.wurfwaffe && abstand(f, z) > 1), ruecksichtslos: a.ruecksichtslos };
+      const v = vorteil(st, f, z, spec).v, rk = rkEff(st, z, f, spec);
+      let p = klemm((21 - (rk - bonus)) / 20);
+      if (v > 0) p = 1 - (1 - p) ** 2; else if (v < 0) p = p * p;
+      return { p, art: "treffer", text: `${Math.round(p * 100)} % Treffer${v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : ""}` };
+    }
+    if (a.art === "geschoss") return { p: 1, art: "sicher", text: "trifft sicher" };
+    if (a.rettung && a.attr) {
+      const p = klemm((SG(f, a.attr) - 1 - mod(z.werte[a.rettung])) / 20);
+      return { p, art: "rettung", text: `${Math.round(p * 100)} % wirkt` };
+    }
+    return { p: null, art: null, text: "" };
+  }
+  /** Ein sinnvoller nächster Schritt für die aktive Figur (für den Tipp-Knopf) */
+  function vorschlag(st) {
+    const f = aktiv(st); if (!f || f.seite !== "spieler" || st.ende || f.tp <= 0) return null;
+    const b = st.zug.aktion ? besteAktion(st, f, "aktion") : null, bo = st.zug.bonus ? besteAktion(st, f, "bonus") : null;
+    const wahl = b || bo;
+    if (!wahl) {
+      const angr = aktionenVon(f, st).filter((x) => x.art === "angriff" || x.art === "rettungswurf");
+      const reich = Math.max(1, ...angr.map((x) => x.reichweite || 1));
+      const gegner = gegnerFiguren(st).filter(lebt);
+      if ((st.zug.bewegung > 0 || st.zug.schritt > 0) && gegner.length && st.zug.aktion) {
+        let best = null;
+        for (const [k, c] of bewegungsfelder(st, f)) {
+          const [x, y] = k.split(",").map(Number), p = { x, y };
+          const erreicht = gegner.some((g) => abstand(p, g) <= reich && (reich === 1 || sicht(st, p, g)));
+          const neben = gegner.some((g) => abstand(p, g) <= 1);
+          const d = Math.min(...gegner.map((g) => abstand(p, g)));
+          const wert = (erreicht ? 0 : 100 + d) + (reich > 1 && neben ? 50 : 0) + (c === "schritt" ? 1 : c * 0.1);
+          if (!best || wert < best.wert) best = { x, y, wert, erreicht };
+        }
+        if (best && !(best.x === f.x && best.y === f.y)) return { feld: { x: best.x, y: best.y }, text: best.erreicht ? "Vorschlag: Zieh auf das markierte Feld. Von dort erreichst du einen Gegner." : "Vorschlag: Zieh auf das markierte Feld, näher an die Gegner heran." };
+      }
+      return { text: "Hier gibt es gerade nichts Sinnvolles mehr zu tun. Beende den Zug." };
+    }
+    const c = chance(st, wahl.a.id, wahl.z.id);
+    return { aktion: wahl.a.id, ziel: wahl.z.id, text: `Vorschlag: ${wahl.a.name}${wahl.z !== f ? " auf " + wahl.z.name : ""}${c.text ? " (" + c.text + ")" : ""}.` };
+  }
+
   /* ---------- Zwischen Kämpfen: Zustand mitnehmen, rasten ---------- */
   /** Zustand der Spielerfiguren nach einem Kampf (am Boden in Normal: 1 TP) */
   function nachKampf(st) {
@@ -1175,7 +1226,7 @@
     if (!st.ende && f.seite === "spieler" && f.tp > 0) {
       for (const a of aktionenVon(f, st)) {
         const g = grund(st, a.id);
-        optionen.push({ id: a.id, ok: !g, grund: g, rest: rest(f, a) === Infinity ? null : rest(f, a), ziele: g ? [] : ziele(st, a.id).map((z) => ({ id: z.id, name: z.name, tp: z.tp, tpMax: z.tpMax, seite: z.seite })) });
+        optionen.push({ id: a.id, ok: !g, grund: g, rest: rest(f, a) === Infinity ? null : rest(f, a), ziele: g ? [] : ziele(st, a.id).map((z) => ({ id: z.id, name: z.name, tp: z.tp, tpMax: z.tpMax, seite: z.seite, chance: chance(st, a.id, z.id).text })) });
       }
     }
     return {
@@ -1186,7 +1237,7 @@
     };
   }
 
-  const API = { BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
     findeAktion, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

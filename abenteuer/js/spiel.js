@@ -20,7 +20,7 @@
   const SPEICHER = "ab_tisch", SETUP_KEY = "ab_setup";
   const SELBST = new Set(["selbstheilung", "trank", "raserei", "finte", "gift", "verstecken", "rueckzug", "spurt", "schattenschritt", "spiegelbilder", "segen", "schutzkreis", "vertreiben", "bewahren", "massenheil", "rauch", "tatendrang"]);
   const BEGEGNUNGEN = R.BEGEGNUNGEN;
-  let st = null, wahl = null, gegnerTimer = null, letzterLog = 0, kampfEnde = null;
+  let st = null, wahl = null, gegnerTimer = null, letzterLog = 0, kampfEnde = null, tipp = null, letzteTP = {};
   let SETUP = { gruppe: [], stufe: 1, schwierigkeit: "normal", begegnung: "garten" };
   try { const s = JSON.parse(localStorage.getItem(SETUP_KEY) || "null"); if (s && Array.isArray(s.gruppe)) SETUP = Object.assign(SETUP, s, { gruppe: s.gruppe.filter((f) => F.FIGUREN[f]).slice(0, 6) }); } catch (e) { /* privat */ }
   const setupMerken = () => { try { localStorage.setItem(SETUP_KEY, JSON.stringify(SETUP)); } catch (e) { /* privat */ } };
@@ -273,6 +273,7 @@
     }
     for (const b of st.brand) o += `<rect x="${b.x * Z + 4}" y="${b.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#ff7a2a" fill-opacity=".35"/>`;
     for (const [kk, c] of reach) { const [x, y] = kk.split(",").map(Number); if (x === akt.x && y === akt.y) continue; o += `<rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${c === "schritt" ? "#b58cff" : "#7fb7ff"}" fill-opacity=".14" stroke="${c === "schritt" ? "#c9a8ff" : "#9cc8ff"}" stroke-opacity=".4"/>`; }
+    if (tipp && tipp.feld && spielerDran) o += `<rect class="tipp-ring" x="${tipp.feld.x * Z + 4}" y="${tipp.feld.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#f2d35a" fill-opacity=".18" stroke="#f2d35a" stroke-width="3"/>`;
     for (const [t, x, y] of k.hindernisse) o += hindernis(t, x, y);
     for (const f of st.figuren) {
       if (f.x < 0 || (f.z && f.z.verbannt)) continue;
@@ -280,7 +281,12 @@
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
       if (f.seite === "gegner" && unten) { o += `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
       if (f === akt && !st.ende) o += `<circle cx="${cx}" cy="${cy}" r="28" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>`;
-      if (zs.includes(f)) o += `<circle cx="${cx}" cy="${cy}" r="28" fill="${f.seite === "gegner" ? "#ff5a3a" : "#6fd06a"}" fill-opacity=".25" stroke="${f.seite === "gegner" ? "#ff7a5a" : "#7fe07a"}" stroke-width="3"/>`;
+      if (zs.includes(f)) {
+        o += `<circle cx="${cx}" cy="${cy}" r="28" fill="${f.seite === "gegner" ? "#ff5a3a" : "#6fd06a"}" fill-opacity=".25" stroke="${f.seite === "gegner" ? "#ff7a5a" : "#7fe07a"}" stroke-width="3"/>`;
+        const c = R.chance(st, wahl, f.id);
+        if (c.p != null && f !== akt) o += `<g transform="translate(${cx} ${cy - 34 < 12 ? cy + 42 : cy - 34})"><rect x="-26" y="-11" width="52" height="18" rx="9" fill="#1b1612" stroke="${c.p >= 0.6 ? "#7fe07a" : c.p >= 0.35 ? "#d6a23a" : "#ff7a5a"}" stroke-width="1.5"/><text y="3" text-anchor="middle" font-size="12" font-weight="700" fill="#ece4d4">${Math.round(c.p * 100)} %</text></g>`;
+      }
+      if (tipp && tipp.ziel === f.id && !wahl) o += `<circle class="tipp-ring" cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#f2d35a" stroke-width="3"/>`;
       if (f.seite === "gegner") {
         o += `<g transform="translate(${cx} ${cy})">${titel}${B.gegner(f.art)}</g>`;
         o += `<g transform="translate(${cx + 17} ${cy - 17})"><circle r="10" fill="#1b1612" stroke="#d79a7d" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#f0d0c0">${esc((f.name.match(/\d+$/) || [""])[0])}</text></g>`;
@@ -312,27 +318,50 @@
         const g = R.grund(st, a.id), r = R.rest(akt, a), typ = a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion";
         const kosten = a.platz ? ` · ${a.platz === 2 ? "Platz Grad 2" : "1 Platz"}` : "", rr = r !== Infinity ? ` · noch ${Math.max(0, r)}` : "";
         const wirk = a.schaden ? ` · ${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}` : a.heilung ? ` · heilt ${a.heilung}` : "";
-        return `<button class="btn ${wahl === a.id ? "gewaehlt" : ""}" data-a="${a.id}" ${g ? "disabled" : ""} title="${esc(g || a.text || "")}">${esc(a.name)}${a.art === "trank" ? ` (${R.trankZahl(akt)})` : ""}<small>${typ}${kosten}${rr}${wirk}</small></button>`;
+        return `<button class="akt ${wahl === a.id ? "gewaehlt" : ""} ${tipp && tipp.aktion === a.id ? "getippt" : ""}" data-a="${a.id}" ${g ? "disabled" : ""}><span class="akt-kopf"><b>${esc(a.name)}${a.art === "trank" ? ` (${R.trankZahl(akt)})` : ""}</b><small>${typ}${kosten}${rr}${wirk}</small></span><span class="akt-text">${esc(g && g !== "Kein gültiges Ziel." ? g : a.text || "")}${g === "Kein gültiges Ziel." ? ` <em>${["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite."}</em>` : ""}</span></button>`;
       };
-      const alle = R.aktionenVon(akt, st), knoepfe = alle.map(knopf).join("");
-      $("#aktionen").innerHTML = (b ? `<details class="uebernehmen"><summary>Aktionen hier am Tisch auslösen</summary><div class="aktionen">${knoepfe}</div></details>` : knoepfe) + `<button class="btn ghost" id="ende-zug">Zug beenden</button>`;
-      $("#hinweis").textContent = wahl ? "Leuchtendes Ziel antippen. Noch einmal auf die Aktion tippen bricht ab." : st.zug.bewegung || st.zug.schritt ? "Blaues Feld antippen, um dich zu bewegen, oder eine Aktion wählen." : "Wähle eine Aktion oder beende den Zug.";
+      const alle = R.aktionenVon(akt, st);
+      const gruppe = (typen, titel) => { const l = alle.filter((a) => typen.includes(a.typ || "aktion")); return l.length ? `<p class="akt-gruppe">${titel}</p>${l.map(knopf).join("")}` : ""; };
+      const knoepfe = gruppe(["aktion"], st.zug.aktion ? "Aktion – eine pro Zug" : "Aktion – schon verbraucht") + gruppe(["bonus", "frei"], st.zug.bonus ? "Bonusaktion – zusätzlich eine pro Zug" : "Bonusaktion – schon verbraucht");
+      const schritt = (an, fertig, t) => `<span class="${fertig ? "fertig" : an ? "an" : ""}">${t}</span>`;
+      const schritte = `<div class="schritte">${schritt(true, !(st.zug.bewegung || st.zug.schritt), `① Bewegen · ${st.zug.bewegung} Felder`)}${schritt(st.zug.aktion, !st.zug.aktion, "② Aktion")}${schritt(st.zug.bonus, !st.zug.bonus, "③ Bonusaktion")}${schritt(true, false, "④ Zug beenden")}</div>`;
+      $("#aktionen").innerHTML = schritte + (b ? `<details class="uebernehmen"><summary>Aktionen hier am Tisch auslösen</summary>${knoepfe}</details>` : knoepfe) + `<div class="knoepfe"><button class="btn ghost klein" id="tipp">💡 Tipp</button><button class="btn ghost" id="ende-zug">Zug beenden</button></div>`;
+      const gewaehlt = wahl && R.findeAktion(akt, wahl);
+      $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt. Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
     }
     $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("");
     zeigeWurf();
+    schwebeZahlen();
     zeichneLiveBar();
     if (st.ende) zeigeEnde(); else $("#ende").hidden = true;
   }
 
+  /** Schaden und Heilung als aufsteigende Zahlen über den Figuren */
+  function schwebeZahlen() {
+    const wrap = $(".karte-wrap"); if (!wrap || !st) return;
+    for (const f of st.figuren) {
+      const vor = letzteTP[f.id]; letzteTP[f.id] = f.tp;
+      if (vor == null || vor === f.tp || TEMPO === 0) continue;
+      const d = document.createElement("span"), diff = f.tp - vor;
+      d.className = "schwebe " + (diff < 0 ? "minus" : "plus"); d.textContent = (diff < 0 ? "−" : "+") + Math.abs(diff);
+      d.style.left = ((f.x + 0.5) / st.karte.b * 100) + "%"; d.style.top = ((f.y + 0.2) / st.karte.h * 100) + "%";
+      wrap.appendChild(d); setTimeout(() => d.remove(), 1500);
+    }
+  }
   /** Neue Würfe der Spielerfiguren groß einblenden */
   let wurfTimer = null;
   function zeigeWurf() {
     const neu = st.log.slice(letzterLog); letzterLog = st.log.length;
     const w = neu.filter((l) => l.art === "wurf" || (l.art === "gut" && / heilt /.test(l.t))).pop();
-    if (!w || TEMPO === 0) return;
-    const el = $("#wurf");
-    el.innerHTML = `${w.wurf ? `<b class="${w.wurf === 20 ? "krit" : w.wurf === 1 ? "patzer" : ""}">${w.wurf}</b>` : ""}<span>${esc(w.t)}</span>`;
-    el.classList.add("an"); clearTimeout(wurfTimer); wurfTimer = setTimeout(() => el.classList.remove("an"), 2600);
+    const g = neu.filter((l) => l.art === "gegner" && l.wurf).pop();
+    const zeig = w || g;
+    if (!zeig || TEMPO === 0) return;
+    const el = $("#wurf"), gegnerWurf = zeig === g && !w;
+    const gut = /verfehlt|widersteht|weicht/.test(zeig.t) ? gegnerWurf : /Treffer|Schaden|heilt/.test(zeig.t) ? !gegnerWurf : null;
+    if (zeig.wurf && window.ABW) window.ABW.rollen(el, zeig.wurf, zeig.t.replace(/^[^:]+: /, ""), { titel: zeig.t.split(":")[0], gut });
+    else el.innerHTML = `<div class="w20-erg da"><span>${esc(zeig.t)}</span></div>`;
+    el.classList.toggle("gegner", gegnerWurf);
+    el.classList.add("an"); clearTimeout(wurfTimer); wurfTimer = setTimeout(() => el.classList.remove("an"), 2800);
   }
 
   function zeigeEnde() {
@@ -374,10 +403,10 @@
     if (wahl) {
       const z = R.ziele(st, wahl).find((f) => f.x === x && f.y === y);
       if (!z) { $("#hinweis").textContent = "Dort ist kein gültiges Ziel."; return; }
-      R.handeln(st, wahl, z.id); wahl = null; render(); veroeffentlichen(); return;
+      R.handeln(st, wahl, z.id); wahl = null; tipp = null; render(); veroeffentlichen(); return;
     }
     const r = R.bewegen(st, x, y);
-    if (r.fehler) $("#hinweis").textContent = r.fehler; else { render(); veroeffentlichen(); }
+    if (r.fehler) $("#hinweis").textContent = r.fehler; else { tipp = null; render(); veroeffentlichen(); }
   }
 
   function zeigeSektion(id) { for (const x of ["intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
@@ -387,7 +416,7 @@
   function kampfStarten(opts, cb) {
     clearTimeout(gegnerTimer);
     st = R.neuesSpiel(Math.floor(Math.random() * 1e9), opts);
-    kampfEnde = cb; wahl = null; letzterLog = st.log.length; window.AB.st = st;
+    kampfEnde = cb; wahl = null; tipp = null; letzteTP = {}; letzterLog = st.log.length; window.AB.st = st;
     if (liveAn()) { LIVE.phase = "kampf"; LIVE.antwort = null; }
     zeigeSpiel(); render(); veroeffentlichen(); gegnerSchleife();
   }
@@ -396,7 +425,7 @@
     clearTimeout(gegnerTimer);
     if (SETUP.gruppe.length < 3) { zeigeSetup(); return; }
     st = R.neuesSpiel(seed, { figuren: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, begegnung: BEGEGNUNGEN[SETUP.begegnung] ? SETUP.begegnung : "garten" });
-    wahl = null; letzterLog = st.log.length;
+    wahl = null; tipp = null; letzteTP = {}; letzterLog = st.log.length;
     window.AB.st = st;
     if (liveAn()) { LIVE.phase = "kampf"; LIVE.antwort = null; }
     zeigeSpiel(); render(); veroeffentlichen(); gegnerSchleife();
@@ -405,7 +434,9 @@
   $("#karte").addEventListener("click", (ev) => { const t = ev.target.closest(".feld"); if (t) klickFeld(+t.dataset.x, +t.dataset.y); });
   $("#aktionen").addEventListener("click", (ev) => {
     const b = ev.target.closest("button"); if (!b || b.disabled || b.tagName !== "BUTTON") return;
-    if (b.id === "ende-zug") { wahl = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
+    if (b.id === "ende-zug") { wahl = null; tipp = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
+    if (b.id === "tipp") { tipp = R.vorschlag(st) || { text: "Gerade kein Vorschlag." }; wahl = null; render(); return; }
+    tipp = null;
     const id = b.dataset.a; if (!id) return;
     const akt = R.aktiv(st), h = R.findeAktion(akt, id);
     if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); return; }

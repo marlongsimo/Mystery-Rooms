@@ -100,6 +100,8 @@
     if (s.art === "gespraech") {
       A.gewaehlt[A.szene].push(o.id);
       A.antwort = typeof o.antwort === "function" ? o.antwort(A, hilfen) : o.antwort || null;
+      A.dialog = A.dialog || {}; A.dialog[A.szene] = A.dialog[A.szene] || [];
+      if (!o.weiter) A.dialog[A.szene].push({ frage: o.frage || o.text, wer: o.wer || null, antwort: A.antwort, probe: o.probe ? o.probe.name : null, offen: Boolean(o.probe) });
       wirke(A, o);
       if (o.probe) { A.zwischenprobe = { opt: o.id, wuerfe: {}, wer: null }; return { ok: true, probe: true }; }
       if (o.weiter) { A.antwort = null; ziel(A, o); }
@@ -180,6 +182,8 @@
     notiz(A, { erfolg: "Geschafft", knapp: "Knapp daneben", fehl: "Misslungen" }[stufe] + (t ? ": " + t : "."), stufe === "erfolg" ? "gut" : "schlecht");
     if (A.zwischenprobe) {
       A.antwort = t; wirke(A, e); A.zwischenprobe = null;
+      const d = A.dialog && A.dialog[A.szene] && A.dialog[A.szene][A.dialog[A.szene].length - 1];
+      if (d && d.offen) { d.offen = false; d.antwort = t; d.stufe = stufe; d.wurf = Object.values(pz.wuerfe)[0]; d.werWuerfelt = Object.keys(pz.wuerfe)[0]; d.sg = p.sg; }
       if (e.weiter) { A.antwort = null; ziel(A, e); }
     } else A.ergebnis = { stufe, text: t };
   }
@@ -290,9 +294,10 @@
   function ansicht(A) {
     const s = szene(A), pz = probeZustand(A), p = pz ? aktuelleProbe(A) : null;
     return {
+      dialog: (A.dialog && A.dialog[A.szene]) || [],
       szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || 1, text: text(A), antwort: A.antwort || null,
       glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit,
-      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, probe: Boolean(o.probe), weiter: Boolean(o.weiter) })),
+      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: o.probe.sg } : null, weiter: Boolean(o.weiter) })),
       stimmen: s.art === "wahl" ? A.stimmen : null,
       geheimFrage: s.art === "geheim" ? { frage: s.frage, antworten: s.antworten.map((a) => ({ id: a.id, text: a.text })), fertig: Object.keys(A.geheim) } : null,
       probe: p ? { name: p.name, attr: p.attr, sg: p.sg, wer: pz.wer, wuerfe: pz.wuerfe, gruppe: pz.wer === "gruppe",

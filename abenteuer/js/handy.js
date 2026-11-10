@@ -175,6 +175,8 @@
     else html += tabZug(s, fid, fd, dran, stufe);
     html += `</div></section>`;
     app.innerHTML = html;
+    const we = app.querySelector(".wuerfel-erg");
+    if (we && window.ABW) { const key = we.dataset.erg; window.ABW.rollen(we, +we.dataset.w, key.replace(/^[^:]+: /, ""), { titel: /verfehlt|widersteht/.test(key) ? "Daneben" : "Getroffen!", gut: !/verfehlt|widersteht/.test(key), sofort: H.letzterWurf === key }); H.letzterWurf = key; }
     app.querySelectorAll("[data-tab]").forEach((b) => { b.onclick = () => { H.tab = b.dataset.tab; render(); }; });
     app.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { H.sel = H.sel === b.dataset.opt ? null : b.dataset.opt; H.ziel = null; H.fehler = ""; render(); }; });
     app.querySelectorAll("[data-ziel]").forEach((b) => { b.onclick = () => { H.ziel = b.dataset.ziel; render(); }; });
@@ -235,8 +237,10 @@
       else if (p.gruppe || p.wer === fid) h += `<button class="btn breit wuerfel" id="probe-wurf" ${H.warte ? "disabled" : ""}>🎲 Würfeln</button>`;
       else if (!p.wer) h += `<button class="btn breit" id="probe-wer" ${H.warte ? "disabled" : ""}>Ich versuche es</button>`;
       else h += `<p class="note">${esc(F.FIGUREN[p.wer] ? F.FIGUREN[p.wer].name : "")} versucht es.</p>`;
-    } else h += `<div class="info">Der Tisch liest vor. Hört zu – oder lest mit:</div>`;
-    h += `<div class="erzaehlung">${ab.text.map((t) => `<p>${fett(t)}</p>`).join("")}</div>${ab.antwort ? `<div class="antwort">${fett(ab.antwort)}</div>` : ""}`;
+    } else h += `<div class="info">${{ gespraech: "Gespräch: Am Tisch wird gefragt und gehandelt. Sprecht mit, was ihr wissen wollt.", kampf: "Gleich beginnt ein Kampf. Wenn du dran bist, vibriert dein Handy.", lager: "Lagerfeuer: Alle ruhen, heilen und bekommen ihre Zauberplätze zurück.", ende: "Dieser Abschnitt ist zu Ende." }[ab.art] || "Der Tisch liest vor. Hört zu – oder lest mit:"}</div>`;
+    h += `<div class="erzaehlung">${ab.text.map((t) => `<p>${fett(t)}</p>`).join("")}</div>`;
+    if (ab.art === "gespraech" && ab.dialog && ab.dialog.length) h += `<div class="dialog">${ab.dialog.map((e) => `<div class="d-frage"><small>Ihr</small><p>${fett(e.frage)}</p></div>${e.antwort ? `<div class="d-antwort ${e.stufe || ""}"><small>${esc(e.probe ? "🎲 " + e.probe : e.wer || "")}</small><p>${fett(e.antwort)}</p></div>` : ""}`).join("")}</div>`;
+    else if (ab.antwort) h += `<div class="antwort">${fett(ab.antwort)}</div>`;
     if (H.fehler) h += `<p class="fb">${esc(H.fehler)}</p>`;
     return h + "</div>";
   }
@@ -253,17 +257,19 @@
       const a = figId(s.aktiv), b = a && a.fid && s.besitz && s.besitz[a.fid];
       h += `<div class="info">Am Zug: <b>${esc(a ? a.name : "…")}</b>${b && b !== ich() ? ` (📱 ${esc((s.namen || {})[b] || "")})` : a && a.seite === "spieler" ? " (am Tisch)" : ""}</div>`;
     } else {
-      h += `<div class="info dran"><b>Du bist dran!</b> Bewegen: Tippe am Tisch dein Zielfeld an (noch ${s.zug.bewegung} Felder${s.zug.schritt ? ", Schattenschritt " + s.zug.schritt : ""}).</div>`;
+      const sch = (an, fertig, t) => `<span class="${fertig ? "fertig" : an ? "an" : ""}">${t}</span>`;
+      h += `<div class="info dran"><b>Du bist dran!</b> Bewegen: Tippe am Tisch dein Zielfeld an (noch ${s.zug.bewegung} Felder${s.zug.schritt ? ", Schattenschritt " + s.zug.schritt : ""}). Dann hier eine Aktion wählen.</div>
+        <div class="schritte">${sch(true, !s.zug.bewegung, "① Bewegen (am Tisch)")}${sch(s.zug.aktion, !s.zug.aktion, "② Aktion")}${sch(s.zug.bonus, !s.zug.bonus, "③ Bonusaktion")}${sch(true, false, "④ Zug beenden")}</div>`;
       h += `<div class="optionen">`;
       for (const o of s.optionen || []) {
         const def = R.findeAktion({ fid, stufe, rucksack: fd.rucksack }, o.id); if (!def) continue;
         const a = def.a, gew = H.sel === o.id;
         const zahl = a.art === "trank" ? ` (${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n})` : o.rest != null && o.rest !== Infinity ? ` · noch ${Math.max(0, o.rest)}` : "";
-        h += `<button class="opt ${gew ? "gewaehlt" : ""} ${o.ok ? "" : "aus"}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}><b>${esc(a.name)}<span class="anzahl">${esc(zahl)}</span></b><small>${esc(aktionInfo(a, d, stufe))}</small>${o.ok ? "" : `<i>${esc(o.grund || "")}</i>`}</button>`;
+        h += `<button class="opt ${gew ? "gewaehlt" : ""} ${o.ok ? "" : "aus"}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}><b>${esc(a.name)}<span class="anzahl">${esc(zahl)}</span></b><small>${esc(aktionInfo(a, d, stufe))}</small>${!gew && a.text ? `<span class="opt-kurz">${esc(a.text)}</span>` : ""}${o.ok ? "" : `<i>${esc(o.grund === "Kein gültiges Ziel." ? (["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite.") : o.grund || "")}</i>`}</button>`;
         if (gew) {
           const selbst = SELBST.has(a.art);
           if (a.text) h += `<p class="opt-text">${esc(a.text)}</p>`;
-          if (!selbst) h += `<div class="ziele">${o.ziele.map((z) => `<button class="ziel ${z.seite === "spieler" ? "freund" : ""} ${H.ziel === z.id ? "gewaehlt" : ""}" data-ziel="${z.id}">${esc(z.name)}${z.seite === "spieler" ? ` <small>${z.tp}/${z.tpMax} TP</small>` : ""}</button>`).join("")}</div>`;
+          if (!selbst) h += `<div class="ziele">${o.ziele.map((z) => `<button class="ziel ${z.seite === "spieler" ? "freund" : ""} ${H.ziel === z.id ? "gewaehlt" : ""}" data-ziel="${z.id}">${esc(z.name)}${z.seite === "spieler" ? ` <small>${z.tp}/${z.tpMax} TP</small>` : z.chance ? ` <small>${esc(z.chance)}</small>` : ""}</button>`).join("")}</div>`;
           const bereit = selbst || H.ziel;
           h += `<button class="btn breit wuerfel" id="wuerfeln" ${bereit && !H.warte ? "" : "disabled"}>${H.warte ? "Der Tisch würfelt …" : bereit ? (a.schaden || a.rettung || a.art === "angriff" ? "🎲 Würfeln" : "Ausführen") : "Ziel wählen"}</button>`;
         }
@@ -271,7 +277,7 @@
       h += `</div><button class="btn ghost breit" id="zugende" ${H.warte ? "disabled" : ""}>Zug beenden</button>`;
     }
     if (H.fehler) h += `<p class="fb">${esc(H.fehler)}</p>`;
-    if (H.ergebnis && s.phase === "kampf") h += `<div class="ergebnis ${H.ergebnis.art || ""}">${H.ergebnis.wurf ? `<b class="${H.ergebnis.wurf === 20 ? "krit" : H.ergebnis.wurf === 1 ? "patzer" : ""}">${H.ergebnis.wurf}</b>` : ""}<span>${esc(H.ergebnis.t)}</span></div>`;
+    if (H.ergebnis && s.phase === "kampf") h += H.ergebnis.wurf ? `<div class="ergebnis wuerfel-erg" data-erg="${esc(H.ergebnis.t)}" data-w="${H.ergebnis.wurf}"></div>` : `<div class="ergebnis ${H.ergebnis.art || ""}"><span>${esc(H.ergebnis.t)}</span></div>`;
     if (s.phase === "kampf" && s.log && s.log.length) h += `<h3 class="klein">Zuletzt am Tisch · Runde ${s.runde}</h3><ol class="log kurz">${s.log.slice(-5).reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("")}</ol>`;
     return h;
   }

@@ -60,6 +60,7 @@
     if (!dran) { H.sel = null; H.ziel = null; }
     H.warDran = dran;
     if (H.wahlOffen && s.besitz && s.besitz[H.wahlOffen]) H.wahlOffen = null;
+    if (fid) H.fokus = null;
     render();
   }
 
@@ -123,20 +124,26 @@
   }
 
   function viewWahl(app) {
-    const s = H.spiel, gruppe = s.gruppe || [], kampf = s.phase === "kampf" || s.phase === "szene";
+    const s = H.spiel, gruppe = s.gruppe || [], laeuft = s.phase === "kampf" || s.phase === "szene", HL = window.ABH_HELDEN;
     let zuletzt = null; try { zuletzt = localStorage.getItem(FIGUR_KEY); } catch (e) { /* privat */ }
-    const liste = kampf ? gruppe : F.REIHE;
-    app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)} · Stufe ${s.stufe || 1}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p><h1>Wähle deine Figur</h1>
-      ${kampf ? `<p class="note">Der Kampf läuft schon. Du kannst eine Figur übernehmen, deren Handy die Runde verlassen hat.</p>` : `<p class="note">Jede Person spielt eine Figur. Es spielen nur die gewählten Figuren, mindestens 3.</p>`}
-      <div class="fkarten handy-karten">${liste.map((fid) => {
-        const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], uid = s.besitz && s.besitz[fid], frei = !uid;
-        const voll = !kampf && Object.keys(s.besitz || {}).length >= 6;
-        const status = H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : kampf ? "wartet auf jemanden" : voll ? "Gruppe voll" : "frei";
-        return `<button class="fkarte ${gruppe.includes(fid) ? "an" : ""} ${zuletzt === fid ? "zuletzt" : ""}" data-fid="${fid}" ${frei && !voll && !H.wahlOffen ? "" : "disabled"} style="--k:${k.farbe}">
-          <img src="${F.bild(fid)}" alt=""><span class="klasse">${esc(k.name)}</span><b>${esc(d.name)}</b><small>${esc(d.titel)}</small><em>${esc(status)}</em></button>`;
-      }).join("")}</div>
+    const liste = laeuft ? gruppe : F.REIHE;
+    const voll = !laeuft && Object.keys(s.besitz || {}).length >= 6;
+    const status = (fid) => { const uid = s.besitz && s.besitz[fid]; return H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : laeuft ? "wartet auf jemanden" : voll ? "Gruppe voll" : zuletzt === fid ? "zuletzt gespielt" : ""; };
+    const kopf = `<p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p>`;
+    if (H.fokus && liste.includes(H.fokus)) {
+      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !voll && !H.wahlOffen;
+      const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : voll ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
+      app.innerHTML = `<section class="karte-h">${kopf}<button class="btn ghost klein held-zurueck" id="f-zurueck">← Alle Helden</button>${HL.detail(fid, (s.abenteuer && s.abenteuer.stufe) || s.stufe || 1, knopf)}<p class="fb">${esc(H.fehler)}</p></section>`;
+      $("#f-zurueck").onclick = () => { H.fokus = null; render(); };
+      $("#f-spielen").onclick = () => waehle(fid);
+      return;
+    }
+    app.innerHTML = `<section class="karte-h">${kopf}<h1>Wähle deinen Helden</h1>
+      ${laeuft ? `<p class="note">Das Abenteuer läuft schon. Du kannst eine Figur übernehmen, deren Handy die Runde verlassen hat.</p>` : `<p class="note">Tippe einen Helden an, um ihn kennenzulernen. Jede Person spielt eine Figur, mindestens 3.</p>`}
+      ${gruppe.length ? HL.plaetze(gruppe, Object.fromEntries(Object.entries(s.besitz || {}).map(([f, u]) => [f, (s.namen || {})[u] || ""]))) : ""}
+      <div class="fkarten handy-karten">${liste.map((fid) => HL.kachel(fid, { an: gruppe.includes(fid), status: status(fid), statusArt: s.besitz && s.besitz[fid] ? "" : "tisch" })).join("")}</div>
       <p class="fb">${esc(H.fehler)}</p></section>`;
-    app.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => waehle(b.dataset.fid); });
+    app.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => { H.fokus = b.dataset.fid; render(); window.scrollTo(0, 0); }; });
   }
 
   function balken(tp, max) {

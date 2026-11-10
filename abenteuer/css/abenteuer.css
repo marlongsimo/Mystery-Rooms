@@ -214,3 +214,129 @@ img.marke { border-radius: 50%; border: 2px solid var(--gold); object-fit: cover
 .gruppe-leiste .tot { opacity: .45; }
 .handy-szene .erzaehlung p { font-size: 15px; }
 .handy-szene h2 { font: 600 20px Cinzel, serif; margin: 4px 0 8px; }
+
+/* ================= Einstieg: Titel, Einleitung, Kodex ================= */
+body:has(#intro:not([hidden])) .top { position: absolute; inset: 0 0 auto; z-index: 5; border: 0; background: linear-gradient(#0008, transparent); }
+.titel { position: relative; min-height: calc(100vh - 0px); margin: -16px; display: grid; place-items: center; overflow: hidden; text-align: center; }
+.titel-bild { position: absolute; inset: 0; width: 100%; height: 100%; }
+.titel-bild .licht { animation: flackern 3.2s infinite; }
+@keyframes flackern { 0%, 100% { opacity: .9 } 45% { opacity: .35 } 50% { opacity: 1 } 70% { opacity: .6 } }
+.titel-bild .wolken { animation: ziehen 60s linear infinite alternate; }
+@keyframes ziehen { from { transform: translateX(-40px) } to { transform: translateX(60px) } }
+.titel-bild .nebel { animation: nebel 26s ease-in-out infinite alternate; }
+.titel-bild .n2 { animation-duration: 38s; animation-direction: alternate-reverse; }
+@keyframes nebel { from { transform: translateX(-120px) } to { transform: translateX(120px) } }
+.regen { position: absolute; inset: -20%; pointer-events: none; opacity: .22;
+  background-image: repeating-linear-gradient(105deg, transparent 0 14px, rgba(200,210,230,.5) 14px 15px, transparent 15px 40px);
+  background-size: 120px 120px; animation: regen .5s linear infinite; }
+@keyframes regen { to { background-position: -40px 120px; } }
+.titel-inhalt { position: relative; z-index: 2; padding: 80px 16px 40px; max-width: 760px; }
+.titel-inhalt h1 { font: 600 clamp(36px, 7vw, 76px)/1.05 Cinzel, serif; margin: 10px 0 16px; text-shadow: 0 4px 30px #000, 0 0 2px #000; letter-spacing: .02em; animation: auftauchen 2.4s ease both; }
+.titel-inhalt .eyebrow { animation: auftauchen 1.6s ease both; }
+.titel-zeile { font-size: 18px; color: #d8cfbd; text-shadow: 0 2px 10px #000; animation: auftauchen 3s ease both; }
+.titel-inhalt .knoepfe { animation: auftauchen 3.6s ease both; margin-top: 26px; }
+.titel-fuss { margin-top: 28px; color: var(--muted); font-size: 13px; text-shadow: 0 1px 6px #000; }
+@keyframes auftauchen { from { opacity: 0; transform: translateY(12px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+.btn.gross { padding: 15px 26px; font-size: 17px; letter-spacing: .02em; box-shadow: 0 6px 24px rgba(201,162,74,.25); }
+.link { background: none; border: 0; color: var(--muted); font: inherit; cursor: pointer; text-decoration: underline; padding: 6px; }
+.einleitung, .kodex { max-width: 720px; margin: 0 auto; min-height: calc(100vh - 120px); display: flex; flex-direction: column; justify-content: center; padding: 24px 0; }
+.einleitung { background: radial-gradient(ellipse at top, #1d1912 0%, transparent 70%); }
+.seite h2 { font: 600 clamp(28px, 5vw, 44px)/1.15 Cinzel, serif; margin: 8px 0 18px; }
+.einleitung .seite p:not(.eyebrow) { font-size: 19px; line-height: 1.75; color: #e2dac8; }
+.seite.einblenden > * { animation: auftauchen 1s ease both; }
+.seite.einblenden > *:nth-child(2) { animation-delay: .25s; } .seite.einblenden > *:nth-child(3) { animation-delay: .6s; } .seite.einblenden > *:nth-child(4) { animation-delay: 1s; } .seite.einblenden > *:nth-child(5) { animation-delay: 1.3s; }
+.seiten-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+.punkte { display: inline-flex; gap: 8px; }
+.punkte i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.punkte i.an { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.kodex-kopf { margin-bottom: 6px; }
+.kodex .seite p { font-size: 17px; line-height: 1.65; }
+.kodex-liste { padding-left: 18px; font-size: 16px; line-height: 1.6; }
+.kodex-liste li { margin-bottom: 8px; }
+.tisch-bild { position: relative; height: 170px; margin: 10px 0 18px; }
+.tisch-bild .tablet { position: absolute; left: 50%; top: 30px; transform: translateX(-50%); width: 230px; height: 120px; border: 2px solid var(--gold); border-radius: 10px; display: grid; place-items: center; font-size: 13px; color: var(--muted); background: repeating-linear-gradient(0deg, #1d2a18 0 18px, #233220 18px 19px), #1d2a18; }
+.tisch-bild .handy { position: absolute; width: 46px; height: 80px; border: 2px solid #6a5a3a; border-radius: 8px; font-size: 10px; display: grid; place-items: center; color: var(--muted); background: var(--panel); }
+.tisch-bild .h1 { left: calc(50% - 200px); top: 50px; transform: rotate(-12deg); } .tisch-bild .h2 { left: calc(50% + 150px); top: 40px; transform: rotate(10deg); } .tisch-bild .h3 { left: calc(50% - 23px); top: 0; transform: rotate(180deg) translateY(-10px); display: none; }
+.kodex-wuerfel { display: flex; align-items: center; gap: 18px; margin: 6px 0 14px; }
+.w20 { width: 110px; height: 110px; background: none; border: 0; cursor: pointer; padding: 0; }
+.w20 svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 14px #000); }
+.w20.rollt svg { animation: rollen .6s ease; }
+@keyframes rollen { 0% { transform: rotate(0) scale(1); } 50% { transform: rotate(200deg) scale(.85); } 100% { transform: rotate(360deg) scale(1); } }
+.kodex-glocke, .glocke { display: flex; gap: 6px; margin: 8px 0 14px; }
+.kodex-glocke i { width: 22px; height: 26px; border-radius: 11px 11px 3px 3px; border: 1px solid #6a5a3a; }
+.kodex-glocke i.an { background: var(--gold); box-shadow: 0 0 10px rgba(201,162,74,.6); }
+.schwer-wahl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 6px 0 18px; }
+.schwer { text-align: left; background: var(--panel); border: 2px solid var(--line); border-radius: 8px; color: var(--text); padding: 14px; cursor: pointer; font: 14px/1.5 Inter, sans-serif; }
+.schwer b { display: block; font: 600 20px Cinzel, serif; margin-bottom: 4px; }
+.schwer span { color: var(--muted); }
+.schwer.an { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 8px 26px rgba(201,162,74,.15); }
+.schwer[data-schwer-wahl="hardcore"].an { border-color: var(--red); box-shadow: 0 0 0 1px var(--red), 0 8px 26px rgba(192,80,58,.2); }
+@media (max-width: 560px) { .schwer-wahl { grid-template-columns: 1fr; } .tisch-bild .h1 { left: 4px; } .tisch-bild .h2 { left: auto; right: 4px; } }
+
+/* ================= Heldenwahl ================= */
+.lobby { max-width: 1180px; }
+.wahl-kopf { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.wahl-kopf h1 { margin: 2px 0 0; font-size: clamp(28px, 4vw, 40px); }
+.plaetze { display: flex; gap: 8px; flex-wrap: wrap; }
+.platz { width: 74px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; cursor: pointer; }
+.platz img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 3px solid var(--k); box-shadow: 0 0 16px color-mix(in srgb, var(--k) 50%, transparent); animation: einrasten .4s ease; }
+@keyframes einrasten { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.platz b { font: 600 12px Cinzel, serif; } .platz small { color: var(--muted); font-size: 10px; line-height: 1.2; }
+.platz.leer { cursor: default; color: var(--muted); }
+.platz.leer i { width: 58px; height: 58px; border-radius: 50%; border: 2px dashed var(--line); display: grid; place-items: center; font-style: normal; font: 600 18px Cinzel, serif; }
+.platz.leer.pflicht i { border-color: #6a5a3a; color: var(--gold); }
+.wahl-body { display: grid; gap: 18px; }
+@media (min-width: 980px) { .wahl-body { grid-template-columns: minmax(0, 1fr) 470px; align-items: start; } .wahl-detail { position: sticky; top: 12px; } }
+.klassen-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.klassen-filter button { background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 16px; padding: 6px 12px; font: 600 13px Inter, sans-serif; cursor: pointer; }
+.klassen-filter button.an { border-color: var(--gold); color: var(--text); background: #2a2216; }
+.wahl-galerie .fkarten { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); }
+.fkarte { transition: transform .15s, box-shadow .15s; }
+.fkarte:hover { transform: translateY(-2px); }
+.fkarte.fokus { border-color: var(--k); box-shadow: 0 0 0 1px var(--k), 0 10px 28px color-mix(in srgb, var(--k) 35%, transparent); }
+.fkarte.fokus img { filter: none; }
+.held { display: grid; grid-template-columns: 170px 1fr; gap: 16px; background: linear-gradient(160deg, color-mix(in srgb, var(--k) 16%, var(--panel)) 0%, var(--panel) 55%); border: 1px solid color-mix(in srgb, var(--k) 45%, var(--line)); border-radius: 10px; padding: 16px; animation: auftauchen .4s ease; }
+@media (max-width: 560px) { .held { grid-template-columns: 1fr; } .held-bild { max-width: 220px; margin: 0 auto; } }
+.held-bild { position: relative; }
+.held-bild img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 2px solid var(--k); box-shadow: 0 10px 34px color-mix(in srgb, var(--k) 40%, transparent); }
+.held-klasse { position: absolute; left: 8px; bottom: 8px; background: var(--k); color: #fff; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; }
+.held h2 { font: 600 32px/1.05 Cinzel, serif; margin: 2px 0 0; }
+.held-titel { margin: 2px 0 8px; color: var(--muted); }
+.held blockquote { margin: 0 0 10px; font-style: italic; color: #e7dcc3; font-size: 15px; border-left: 2px solid var(--k); padding-left: 10px; }
+.held-spielweise { font-size: 14px; margin: 0 0 12px; }
+.held-achsen { display: grid; gap: 4px; margin-bottom: 12px; }
+.achse { display: grid; grid-template-columns: 108px 1fr; align-items: center; font-size: 12px; color: var(--muted); }
+.achse i { display: flex; gap: 3px; }
+.achse b { flex: 1; height: 7px; border-radius: 2px; background: #2a241c; }
+.achse b.an { background: var(--k); box-shadow: 0 0 6px color-mix(in srgb, var(--k) 60%, transparent); }
+.held-kern { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.held-kern span { flex: 1; min-width: 70px; background: #15120e; border: 1px solid var(--line); border-radius: 4px; padding: 6px; text-align: center; display: flex; flex-direction: column; }
+.held-kern b { font: 600 20px Cinzel, serif; } .held-kern small { font-size: 10px; color: var(--muted); }
+.held-werte { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 12px; }
+.held-werte span { text-align: center; background: #15120e; border: 1px solid var(--line); border-radius: 4px; padding: 4px 2px; display: flex; flex-direction: column; }
+.held-werte span.haupt { border-color: var(--k); }
+.held-werte small { font-size: 10px; color: var(--muted); letter-spacing: .08em; } .held-werte b { font-size: 16px; } .held-werte em { font-style: normal; font-size: 11px; color: var(--muted); }
+.held-knopf { width: 100%; margin: 4px 0 10px; }
+.held-hinweis { background: #15120e; border: 1px dashed var(--line); border-radius: 4px; padding: 10px; font-size: 14px; }
+.held-mehr summary { cursor: pointer; font: 600 13px Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin: 6px 0; }
+.held-faehig { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.held-faehig li { background: #15120e; border: 1px solid var(--line); border-radius: 4px; padding: 7px 9px; }
+.held-faehig li b { font-size: 14px; } .held-faehig .typ { float: right; font-size: 11px; color: var(--muted); }
+.held-faehig p { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+.held-spaeter, .held-aussen { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+.wahl-fuss { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
+.wahl-fuss .einstellungen { align-items: center; }
+.uebung { margin-top: 14px; }
+.uebung summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+.btn[aria-disabled="true"] { opacity: .5; }
+/* Handy: Heldenwahl */
+.handy .held { grid-template-columns: 1fr; padding: 12px; }
+.handy .held-bild { max-width: none; }
+.handy .held-bild img { aspect-ratio: 4 / 3; object-position: 50% 25%; }
+.handy .held h2 { font-size: 28px; }
+.held-zurueck { margin-bottom: 10px; }
+/* Feinschliff Einstieg */
+body { overflow-x: hidden; }
+.titel { width: 100vw; margin: -16px calc(50% - 50vw) 0; min-height: 100vh; place-items: end center; }
+.titel-inhalt { padding-bottom: 9vh; }
+main:has(#lobby:not([hidden])) { max-width: 1220px; }

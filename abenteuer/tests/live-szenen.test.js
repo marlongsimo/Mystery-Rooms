@@ -11,13 +11,22 @@ const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); let ok = true; const errs = [];
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
+
+  const einstieg = async (p, modus) => {
+    await p.click('#titel-start');
+    await p.waitForSelector('#einleitung:not([hidden])');
+    for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
+    for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
+    await p.click(modus === 'live' ? '#live' : '#start');
+  };
+  const nimm = async (p, fid) => { await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
   const page = async (vp, name) => { const p = await (await b.newContext({ viewport: vp })).newPage(); p.setDefaultTimeout(30000); p.on('pageerror', (e) => errs.push(name + ': ' + e.message)); p.on('dialog', (d) => d.accept()); return p; };
   const until = async (p, fn, arg, ms = 30000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(300); } return false; };
   const szene = (T) => T.evaluate(() => window.ABT.A() && window.ABT.A().szene);
 
   const T = await page({ width: 1024, height: 900 }, 'Tisch');
   await T.goto(BASE + '/abenteuer/index.html?schnell'); await T.evaluate(() => localStorage.clear()); await T.reload();
-  await T.click('#live');
+  await einstieg(T, 'live');
   await until(T, () => Boolean(document.querySelector('.beitritt .code')));
   const code = (await T.textContent('.beitritt .code')).trim();
   const H = {}, fids = { Anna: 'wildnislaeufer', Ben: 'inquisitor', Cara: 'trickser' };
@@ -26,7 +35,7 @@ const { chromium } = require('playwright');
     await P.goto(BASE + '/abenteuer/handy.html#' + code); await P.evaluate(() => localStorage.clear()); await P.goto(BASE + '/abenteuer/handy.html#' + code);
     await P.fill('#name', n); await P.click('#rein');
     await until(P, () => document.querySelectorAll('.fkarte').length === 15);
-    await P.click(`[data-fid="${fids[n]}"]`);
+    await P.click(`[data-fid="${fids[n]}"]`); await P.click('#f-spielen');
     await until(P, () => Boolean(document.querySelector('.bogen')));
   }
   check(await until(T, () => !document.querySelector('#abenteuer-los').disabled), 'Tisch: drei Handys, Kael, Seran und Silra, Abenteuer startbar');

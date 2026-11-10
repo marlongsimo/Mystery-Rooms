@@ -7,7 +7,7 @@
   <title>Das Siegel von Grauwacht – Abenteuer | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=5">
+  <link rel="stylesheet" href="css/abenteuer.css?v=6">
 </head>
 <body>
   <header class="top">
@@ -15,21 +15,124 @@
     <span class="brand">ABENTEUER</span>
   </header>
   <main id="app">
-    <section class="intro" id="intro">
-      <p class="eyebrow">Die Splitterlande · Abenteuer</p>
-      <h1>Das Siegel von Grauwacht</h1>
-      <p>Seit sieben Nächten läutet die Glocke der verlassenen Abtei Grauwacht. Die Brunnen von Halmbruck werden bitter, ein Junge ist verschwunden. Wählt 3 bis 6 der 15 Figuren und findet heraus, was unter der Abtei schläft. Eure Entscheidungen verändern den Verlauf.</p>
-      <ul class="howto">
-        <li><b>Bewegen:</b> Feld antippen (6 Felder pro Zug). Wer neben einem Gegner losläuft, riskiert einen Gelegenheitsangriff.</li>
-        <li><b>Handeln:</b> eine Aktion oder Bonusaktion wählen, dann ein leuchtendes Ziel antippen.</li>
-        <li><b>Zug beenden,</b> wenn die Figur fertig ist. Die Gegner ziehen selbst.</li>
-      </ul>
-      <div class="knoepfe">
-        <button class="btn" id="live">Mit Handys spielen</button>
-        <button class="btn ghost" id="start">Allein auf diesem Gerät</button>
+    <section class="titel" id="intro">
+      <svg class="titel-bild" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <radialGradient id="mond" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f3ead2"/><stop offset=".6" stop-color="#d8cba4"/><stop offset="1" stop-color="#d8cba4" stop-opacity="0"/></radialGradient>
+          <radialGradient id="schein" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d8cba4" stop-opacity=".25"/><stop offset="1" stop-color="#d8cba4" stop-opacity="0"/></radialGradient>
+          <linearGradient id="himmel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07090d"/><stop offset=".6" stop-color="#151a22"/><stop offset="1" stop-color="#1d1a16"/></linearGradient>
+          <linearGradient id="nebel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa3ad" stop-opacity="0"/><stop offset=".5" stop-color="#9aa3ad" stop-opacity=".16"/><stop offset="1" stop-color="#9aa3ad" stop-opacity="0"/></linearGradient>
+        </defs>
+        <rect width="1200" height="700" fill="url(#himmel)"/>
+        <circle cx="860" cy="170" r="190" fill="url(#schein)"/>
+        <circle cx="860" cy="170" r="62" fill="url(#mond)"/>
+        <g class="wolken" fill="#0c0f14" opacity=".85">
+          <path d="M600 150 q60 -40 120 -10 q50 -30 100 0 q70 -10 90 30 q-150 20 -310 -20z"/>
+          <path d="M880 210 q50 -30 110 -5 q40 -20 90 10 q-100 25 -200 -5z"/>
+        </g>
+        <path d="M0 520 Q200 430 420 450 Q560 360 700 370 Q860 380 980 450 Q1100 470 1200 440 V700 H0Z" fill="#0d0f12"/>
+        <g class="abtei" fill="#07080a" transform="translate(-228 -150) scale(1.35)">
+          <path d="M560 372 V300 h40 v-30 h20 v30 h40 v72z"/>
+          <path d="M640 372 V250 L655 220 L670 250 V372z"/>
+          <path d="M650 190 h10 v30 h-10z"/><path d="M646 186 L655 170 L664 186z"/>
+          <rect x="690" y="320" width="90" height="52"/><path d="M690 320 L735 290 L780 320z"/>
+          <rect x="520" y="335" width="40" height="37"/>
+          <rect x="651" y="232" width="8" height="12" fill="#e8b860" class="licht"/>
+        </g>
+        <path d="M0 600 Q300 540 600 570 Q900 600 1200 560 V700 H0Z" fill="#090a0c"/>
+        <g fill="#090a0c"><path d="M120 600 l10 -70 l10 70z"/><path d="M160 605 l14 -95 l14 95z"/><path d="M1020 590 l12 -80 l12 80z"/><path d="M1060 595 l9 -60 l9 60z"/></g>
+        <rect class="nebel n1" x="-200" y="430" width="1600" height="160" fill="url(#nebel)"/>
+        <rect class="nebel n2" x="-200" y="520" width="1600" height="160" fill="url(#nebel)"/>
+      </svg>
+      <div class="regen" aria-hidden="true"></div>
+      <div class="titel-inhalt">
+        <p class="eyebrow">Ein Abenteuer in den Splitterlanden</p>
+        <h1>Das Siegel von Grauwacht</h1>
+        <p class="titel-zeile">Seit sieben Nächten läutet die Glocke. Niemand lebt mehr in der Abtei.</p>
+        <div class="knoepfe mitte">
+          <button class="btn gross" id="titel-start">Neues Abenteuer</button>
+          <button class="btn ghost" id="titel-regeln">Regeln</button>
+        </div>
+        <p class="titel-fuss">3–6 Heldinnen und Helden · etwa 3 Stunden · ab 12 Jahren<br><button class="link" id="ton">🔔 Ton an</button></p>
       </div>
-      <p class="note"><b>Mit Handys:</b> Dieses Gerät (am besten ein Tablet) liegt als Spieltisch in der Mitte. Jede Person öffnet auf ihrem Handy ihren Charakterbogen mit Aktionen, Fähigkeiten und Rucksack. Figuren ohne Handy steuert ihr hier am Tisch.</p>
-      <p class="fb" id="intro-fehler"></p>
+    </section>
+
+    <section class="einleitung" id="einleitung" hidden>
+      <div class="seiten">
+        <article class="seite" data-seite="0">
+          <p class="eyebrow">I · Die Splitterlande</p>
+          <h2>Ein Land aus Scherben</h2>
+          <p>Vor dreihundert Jahren führten die Magier der alten Fürstentümer einen Krieg, den niemand gewann. Als er endete, war das Land zersplittert: in kleine Herrschaften, dichte Wälder und Moore, in denen niemand mehr wohnen will.</p>
+          <p>Überall liegen seitdem Siegel im Boden. Steinkreise, eingemauerte Türen, Glocken, die niemand läuten darf. Sie halten etwas fern. Die meisten Menschen haben vergessen, was.</p>
+        </article>
+        <article class="seite" data-seite="1" hidden>
+          <p class="eyebrow">II · Grauwacht</p>
+          <h2>Die Abtei auf dem Hügel</h2>
+          <p>Über dem Dorf Halmbruck steht die Abtei Grauwacht. Ihre Mönche waren berühmt für ihre Stille. Seit vierzig Jahren ist sie leer, bis auf einen alten Bruder, der im Dorf lebt und nicht über sie spricht.</p>
+          <p>Wer hinaufgeht, kommt mit seltsamen Träumen zurück. Manche kommen nicht zurück.</p>
+        </article>
+        <article class="seite" data-seite="2" hidden>
+          <p class="eyebrow">III · Die Glocke</p>
+          <h2>Sieben Nächte</h2>
+          <p>Vor sieben Nächten hat die Glocke von Grauwacht zum ersten Mal geläutet. Seitdem jede Nacht. Die Brunnen von Halmbruck schmecken bitter. Das Vieh steht mit dem Kopf zur Abtei und brüllt. Und Tam, der Sohn der Webers, ist fort.</p>
+          <p>Die Vorsteherin hat Boten in alle Richtungen geschickt. Ihr seid die Einzigen, die gekommen sind.</p>
+        </article>
+      </div>
+      <div class="seiten-nav"><span class="punkte" id="einl-punkte"></span><div class="knoepfe"><button class="btn ghost" id="einl-skip">Überspringen</button><button class="btn" id="einl-weiter">Weiter</button></div></div>
+    </section>
+
+    <section class="kodex" id="kodex" hidden>
+      <p class="eyebrow kodex-kopf">Der Kodex · Wie gespielt wird</p>
+      <div class="seiten">
+        <article class="seite" data-seite="0">
+          <h2>Euer Tisch</h2>
+          <div class="kodex-bild tisch-bild" aria-hidden="true"><span class="tablet">Karte · Erzählung · Würfel</span><span class="handy h1">Bogen</span><span class="handy h2">Bogen</span><span class="handy h3">Bogen</span></div>
+          <p>Ein Tablet liegt als <b>Spieltisch</b> in der Mitte: Es erzählt, zeigt die Karte und würfelt für die Welt. Jede Person öffnet auf ihrem <b>Handy</b> ihren Charakterbogen: Leben, Fähigkeiten, Rucksack, geheime Entscheidungen.</p>
+          <p class="note">Allein geht es auch: Dann steuert eine Person alle Figuren auf einem Gerät.</p>
+        </article>
+        <article class="seite" data-seite="1" hidden>
+          <h2>Der Würfel entscheidet</h2>
+          <div class="kodex-wuerfel"><button class="w20" id="w20" title="Würfeln"><svg viewBox="0 0 100 100"><polygon points="50,4 93,28 93,72 50,96 7,72 7,28" fill="#2a2216" stroke="#c9a24a" stroke-width="3"/><polygon points="50,18 80,64 20,64" fill="none" stroke="#6a5a3a" stroke-width="2"/><text x="50" y="58" text-anchor="middle" font-size="26" fill="#ece4d4" id="w20-zahl">20</text></svg></button><div id="w20-text" class="note">Tippe den Würfel an.</div></div>
+          <p>Wenn etwas schiefgehen kann, wird gewürfelt: <b>W20 + Bonus</b> der Figur gegen eine Schwierigkeit – leicht 10, mittel 13, schwer 16.</p>
+          <p>Eine <b>20</b> gelingt immer und trifft kritisch, eine <b>1</b> geht immer schief. Wer <b>knapp daneben</b> liegt, scheitert oft nicht ganz, sondern zahlt einen Preis.</p>
+        </article>
+        <article class="seite" data-seite="2" hidden>
+          <h2>Kampf</h2>
+          <ul class="kodex-liste">
+            <li><b>Reihenfolge:</b> Wer zuerst handelt, entscheidet die Initiative. Sie steht oben am Rand.</li>
+            <li><b>Ein Zug:</b> bis zu 6 Felder Bewegung, <b>eine Aktion</b> (Angriff, Zauber …) und oft <b>eine Bonusaktion</b>.</li>
+            <li><b>Vorteil und Nachteil:</b> zwei Würfel, der bessere oder der schlechtere zählt.</li>
+            <li><b>Vorsicht:</b> Wer neben einem Gegner losläuft, wird angegriffen. Deckung hinter Grabsteinen schützt vor Pfeilen.</li>
+            <li><b>Am Boden:</b> Bei 0 Trefferpunkten fällt eine Figur. Freunde können sie aufrichten oder heilen.</li>
+          </ul>
+        </article>
+        <article class="seite" data-seite="3" hidden>
+          <h2>Die Glocke</h2>
+          <div class="kodex-glocke" aria-hidden="true"><i class="an"></i><i class="an"></i><i class="an"></i><i></i><i></i><i></i><i></i></div>
+          <p>Jedes Mal, wenn ihr rastet, Alarm auslöst oder zu lange zögert, schlägt die Glocke von Grauwacht. <b>Sieben Schläge</b> hat sie.</p>
+          <p>Mit jedem Schlag wird das, was unter der Abtei schläft, wacher. Halmbruck zahlt dafür. Eine Rast kann Leben retten – und kostet trotzdem etwas.</p>
+        </article>
+        <article class="seite" data-seite="4" hidden>
+          <h2>Entscheidungen</h2>
+          <p>Ihr entscheidet als Gruppe, <b>geheim abgestimmt</b> auf den Handys. Manche Entscheidungen trifft jede Person ganz allein, und niemand erfährt davon.</p>
+          <p>Das Spiel merkt sich, wem ihr vertraut, wen ihr verschont und was ihr getrunken habt. Nicht jede Folge zeigt sich sofort. Jede Heldin und jeder Held hat eigene Momente in dieser Geschichte.</p>
+        </article>
+        <article class="seite" data-seite="5" hidden>
+          <h2>Wie hart soll es werden?</h2>
+          <div class="schwer-wahl">
+            <button class="schwer an" data-schwer-wahl="normal"><b>Normal</b><span>Am Boden ist das Schlimmste. Fällt die ganze Gruppe, zieht sie sich zum letzten Lagerfeuer zurück – und die Glocke schlägt.</span></button>
+            <button class="schwer" data-schwer-wahl="hardcore"><b>Hardcore</b><span>Wer fällt, würfelt um sein Leben. Der Tod ist endgültig. Keine kurzen Rasten.</span></button>
+          </div>
+          <h2 class="klein">Wie spielt ihr?</h2>
+          <div class="knoepfe">
+            <button class="btn gross" id="live">Mit Handys spielen</button>
+            <button class="btn ghost" id="start">Allein auf diesem Gerät</button>
+          </div>
+          <p class="note">Mit Handys: Dieses Gerät liegt als Spieltisch in der Mitte, jede Person tritt mit ihrem Handy bei und wählt dort ihre Figur.</p>
+          <p class="fb" id="intro-fehler"></p>
+        </article>
+      </div>
+      <div class="seiten-nav"><span class="punkte" id="kodex-punkte"></span><div class="knoepfe"><button class="btn ghost" id="kodex-zurueck">Zurück</button><button class="btn" id="kodex-weiter">Weiter</button></div></div>
     </section>
     <section class="lobby" id="lobby" hidden></section>
     <section class="szene" id="szene" hidden></section>
@@ -51,13 +154,15 @@
   <script src="js/figuren.js?v=2"></script>
   <script src="js/regeln.js?v=4"></script>
   <script src="js/bild.js?v=2"></script>
+  <script src="js/helden.js?v=1"></script>
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>
   <script src="../platform/multiplayer/mp-core.js?v=1"></script>
   <script src="vendor/qrcode-generator-1.4.4.js"></script>
   <script src="daten/grauwacht.js?v=1"></script>
   <script src="js/szenen.js?v=1"></script>
-  <script src="js/spiel.js?v=5"></script>
-  <script src="js/abenteuer-tisch.js?v=1"></script>
+  <script src="js/spiel.js?v=6"></script>
+  <script src="js/abenteuer-tisch.js?v=2"></script>
+  <script src="js/einstieg.js?v=1"></script>
 </body>
 </html>

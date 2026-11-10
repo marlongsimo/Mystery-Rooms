@@ -14,6 +14,15 @@ const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); let ok = true; const errs = [];
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
+
+  const einstieg = async (p, modus) => {
+    await p.click('#titel-start');
+    await p.waitForSelector('#einleitung:not([hidden])');
+    for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
+    for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
+    await p.click(modus === 'live' ? '#live' : '#start');
+  };
+  const nimm = async (p, fid) => { await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
   const page = async (vp, name) => { const ctx = await b.newContext({ viewport: vp, hasTouch: vp.width < 500 }); const p = await ctx.newPage(); p.setDefaultTimeout(30000); p.on('pageerror', (e) => errs.push(name + ': ' + e.message)); p.on('dialog', (d) => d.accept()); return p; };
   const until = async (p, fn, arg, ms = 30000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(300); } return false; };
 
@@ -21,7 +30,7 @@ const { chromium } = require('playwright');
   const T = await page({ width: 1024, height: 768 }, 'Tisch');
   await T.goto(BASE + '/abenteuer/index.html?seed=42&schnell' + Q);
   await T.evaluate(() => localStorage.clear()); await T.reload();
-  await T.click('#live');
+  await einstieg(T, 'live');
   check(await until(T, () => Boolean(document.querySelector('.beitritt .code'))), 'Tisch: Sitzung eröffnet, Gruppenwahl mit Code');
   const code = (await T.textContent('.beitritt .code')).trim();
   check(/^ABEN-|^KRIM-/.test(code) && await T.$('.beitritt .qr svg') !== null, `Tisch: QR-Code für ${code}`);
@@ -38,14 +47,17 @@ const { chromium } = require('playwright');
     check(await until(P, () => document.querySelectorAll('.fkarte').length === 15), `${n}: verbunden, 15 Figuren zur Wahl`);
   }
   if (SHOT) await A.screenshot({ path: SHOT + '/live-handy-wahl.png', fullPage: true });
-  await A.click('[data-fid="schildwaechter"]');
+  await A.click('[data-fid="schildwaechter"]'); await A.click('#f-spielen');
   check(await until(A, () => /Torvald/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Anna: Torvald gewählt, Charakterbogen offen');
-  check(await until(Bn, () => document.querySelector('[data-fid="schildwaechter"]')?.disabled === true), 'Ben: Torvald ist für ihn gesperrt');
-  await Bn.click('[data-fid="tiergefaehrte"]');
+  await until(Bn, () => /Anna/.test(document.querySelector('[data-fid="schildwaechter"]')?.textContent || ''));
+  await Bn.click('[data-fid="schildwaechter"]');
+  check(await until(Bn, () => document.querySelector('#f-spielen')?.disabled === true), 'Ben: Torvald ist für ihn gesperrt');
+  await Bn.click('#f-zurueck'); await Bn.click('[data-fid="tiergefaehrte"]'); await Bn.click('#f-spielen');
   check(await until(Bn, () => /Faye/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Ben: Faye gewählt');
   check(await until(T, () => document.querySelectorAll('.fkarte.an').length === 2 && document.querySelector('#los').disabled && /noch 1/.test(document.querySelector('#lobby').textContent)), 'Tisch: nur die 2 gewählten Figuren in der Gruppe, Start gesperrt (mindestens 3)');
-  check(await T.evaluate(() => [...document.querySelectorAll('.fkarte')].every((b) => b.disabled)), 'Tisch: Mit Handys kann der Tisch keine Figuren dazunehmen');
-  await C.click('[data-fid="gelehrter"]');
+  await T.click('[data-fid="berserker"]');
+  check(await T.evaluate(() => !document.querySelector('#f-waehlen') && document.querySelectorAll('.fkarte.an').length === 2), 'Tisch: Mit Handys kann der Tisch keine Figuren dazunehmen');
+  await C.click('[data-fid="gelehrter"]'); await C.click('#f-spielen');
   check(await until(C, () => /Lyra/.test(document.querySelector('.bogen h1')?.textContent || '')), 'Cara: Lyra gewählt');
   check(await until(T, () => { const t = document.querySelector('.fkarten').textContent; return /Anna/.test(t) && /Ben/.test(t) && /Cara/.test(t) && document.querySelectorAll('.fkarte.an').length === 3 && !document.querySelector('#los').disabled; }), 'Tisch: Gruppe = genau die 3 Figuren der Handys, Start frei');
   if (SHOT) await T.screenshot({ path: SHOT + '/live-lobby.png', fullPage: true });
@@ -67,7 +79,7 @@ const { chromium } = require('playwright');
   await A.click('[data-tab="zug"]');
   if (SHOT) await Bn.screenshot({ path: SHOT + '/live-handy-bogen.png', fullPage: true });
 
-  await T.click('#los');
+  await T.click('.uebung summary'); await T.click('#los');
   check(await until(A, () => window.ABH.H.spiel && window.ABH.H.spiel.phase === 'kampf'), 'Kampf beginnt, Anna bekommt den Stand');
   check(await T.evaluate(() => window.AB.st.figuren.some((f) => f.art === 'wolf') && window.AB.R.spielerFiguren(window.AB.st).map((f) => f.fid).sort().join() === 'gelehrter,schildwaechter,tiergefaehrte'), 'Im Kampf nur Torvald, Faye (mit Grau) und Lyra');
 

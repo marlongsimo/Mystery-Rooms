@@ -13,6 +13,15 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   let ok = true; const errs = [];
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
 
+  const einstieg = async (p, modus) => {
+    await p.click('#titel-start');
+    await p.waitForSelector('#einleitung:not([hidden])');
+    for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
+    for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
+    await p.click(modus === 'live' ? '#live' : '#start');
+  };
+  const nimm = async (p, fid) => { await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
+
   // 1. Alle Wege
   const besucht = new Set(), enden = {}; let fehler = 0, haenger = 0;
   function spiele(A, r) {
@@ -61,8 +70,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   await p.goto(BASE + '/abenteuer/index.html?schnell');
   await p.evaluate(() => localStorage.clear()); await p.reload();
   check(/Siegel von Grauwacht/.test(await p.textContent('h1')), 'Startseite: Das Siegel von Grauwacht');
-  await p.click('#start');
-  await p.click('[data-fid="trickser"]');
+  await einstieg(p, 'allein');
+  for (const f of ['schildwaechter', 'elementarist', 'lichtbringer', 'trickser']) await nimm(p, f);
   await p.click('#abenteuer-los');
   check(await p.isVisible('#szene') && /Halmbruck/.test(await p.textContent('#szene h1')), 'Abenteuer beginnt in Halmbruck');
   const gesehen = new Set(); let kaempfe = 0, neuGeladen = false, i = 0;

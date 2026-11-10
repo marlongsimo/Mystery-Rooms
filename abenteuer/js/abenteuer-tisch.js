@@ -39,6 +39,8 @@
   function render() {
     const el = $("#szene"); if (!el || !A) return;
     const v = S.ansicht(A), s = S.szene(A);
+    if (window.ABE && render.letzte != null && A.glocke > render.letzte) window.ABE.glocke(0.9);
+    render.letzte = A.glocke;
     let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}</div>
       <h1>${esc(v.titel)}</h1><div class="erzaehlung">${v.text.map((p) => `<p>${fett(p)}</p>`).join("")}</div>`;
     if (v.antwort) h += `<div class="antwort">${fett(v.antwort)}</div>`;

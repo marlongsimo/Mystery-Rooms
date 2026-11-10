@@ -67,8 +67,8 @@
    * Feinabstimmung nach Gruppengröße (Faktor auf die Gegner-TP), je Stufe der Figuren.
    * Mit tools/kalibrieren.js so bestimmt, dass Gruppen mit 3, 4, 5 und 6 Figuren gleich oft gewinnen.
    */
-  const SKALA = { 1: { 3: 1.04, 4: 1.06, 5: 1.16, 6: 1.07 }, 2: { 3: 0.84, 4: 1.16, 5: 1.07, 6: 1.12 }, 3: { 3: 0.8, 4: 0.94, 5: 0.89, 6: 0.8 } };
-  const SKALA_HARDCORE = { 1: { 3: 1, 4: 1, 5: 1, 6: 1 }, 2: { 3: 1, 4: 1, 5: 1, 6: 1 }, 3: { 3: 1, 4: 1, 5: 1, 6: 1 } };
+  const SKALA = { 1: { 3: 1.03, 4: 1.07, 5: 0.95, 6: 1.07 }, 2: { 3: 0.95, 4: 1.11, 5: 1.05, 6: 1.11 }, 3: { 3: 0.81, 4: 0.91, 5: 0.93, 6: 0.79 } };
+  const SKALA_HARDCORE = { 1: { 3: 1.16, 4: 1.11, 5: 1.11, 6: 1.09 }, 2: { 3: 0.89, 4: 1.03, 5: 0.89, 6: 0.91 }, 3: { 3: 0.81, 4: 0.81, 5: 0.81, 6: 0.73 } };
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
   function gegnerFuer(begId, n, stufe, skala, hardcore) {
     const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, s = stufe || b.stufe, tab = hardcore ? SKALA_HARDCORE : SKALA, k = skala != null ? skala : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;

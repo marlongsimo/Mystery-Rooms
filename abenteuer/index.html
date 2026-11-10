@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Abenteuer – Kampf-Prototyp | Case Unlocked</title>
+  <meta name="theme-color" content="#14110d">
+  <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/abenteuer.css?v=2">
+</head>
+<body>
+  <header class="top">
+    <a class="back" href="../index.html">← Case Unlocked</a>
+    <span class="brand">ABENTEUER · PROTOTYP</span>
+  </header>
+  <main id="app">
+    <section class="intro" id="intro">
+      <p class="eyebrow">Die Splitterlande · Kampf-Prototyp</p>
+      <h1>Der Klostergarten</h1>
+      <p>Zwischen den Grabsteinen der Abtei Grauwacht kriechen Rostkäfer aus dem Moos. Drei Figuren stellen sich ihnen: <b>Schildwächter</b>, <b>Elementarist</b> und <b>Lichtbringer</b>.</p>
+      <ul class="howto">
+        <li><b>Bewegen:</b> Feld antippen (bis zu 6 Felder pro Zug).</li>
+        <li><b>Handeln:</b> unten eine Aktion wählen, dann ein leuchtendes Ziel antippen.</li>
+        <li><b>Zug beenden,</b> wenn deine Figur fertig ist. Die Käfer ziehen selbst.</li>
+      </ul>
+      <button class="btn" id="start">Kampf beginnen</button>
+      <p class="note">Ein Prototyp für ein Gerät, ohne Speichern. Er zeigt nur den Kampf auf dem Raster.</p>
+    </section>
+    <section class="spiel" id="spiel" hidden>
+      <div class="reihe" id="reihe" aria-label="Zugreihenfolge"></div>
+      <div class="karte-wrap"><svg id="karte" role="img" aria-label="Kampfkarte"></svg></div>
+      <div class="panel">
+        <div class="aktiv" id="aktiv"></div>
+        <div class="aktionen" id="aktionen"></div>
+        <div class="hinweis" id="hinweis"></div>
+      </div>
+      <ol class="log" id="log" aria-live="polite"></ol>
+    </section>
+    <section class="ende" id="ende" hidden></section>
+  </main>
+  <script src="js/regeln.js?v=1"></script>
+  <script src="js/spiel.js?v=2"></script>
+</body>
+</html>

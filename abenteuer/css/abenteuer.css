@@ -1,0 +1,52 @@
+@font-face { font-family: "Cinzel"; src: url("../../portal/fonts/cinzel-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("../../portal/fonts/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("../../portal/fonts/inter-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+:root { --bg: #14110d; --panel: #1f1a14; --line: #3a3127; --gold: #c9a24a; --text: #ece4d4; --muted: #a99f8c; --red: #c0503a; --green: #6fa86a; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 Inter, system-ui, sans-serif; }
+.top { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+.brand { font: 600 13px Cinzel, serif; letter-spacing: .18em; color: var(--gold); }
+main { max-width: 980px; margin: 0 auto; padding: 16px; }
+.intro { max-width: 620px; margin: 24px auto; }
+.eyebrow { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin: 0; }
+h1 { font: 600 30px Cinzel, serif; margin: 6px 0 12px; }
+.howto { padding-left: 18px; color: var(--muted); }
+.note { color: var(--muted); font-size: 13px; }
+.btn { background: var(--gold); color: #1a140b; border: 0; padding: 12px 18px; font: 600 15px Inter, sans-serif; cursor: pointer; border-radius: 4px; }
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.btn:disabled { opacity: .35; cursor: default; }
+.spiel { display: grid; gap: 12px; }
+.reihe { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.reihe span { flex: none; font-size: 12px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); white-space: nowrap; }
+.reihe span.dran { border-color: var(--gold); color: var(--text); }
+.reihe span.down { text-decoration: line-through; opacity: .5; }
+.reihe span.g { color: #d79a7d; }
+.karte-wrap { width: 100%; }
+#karte { width: 100%; height: auto; display: block; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+#karte .feld { cursor: pointer; }
+.panel { background: var(--panel); border: 1px solid var(--line); padding: 12px; border-radius: 4px; }
+.aktiv { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.aktiv b { font: 600 17px Cinzel, serif; }
+.aktiv .werte { font-size: 13px; color: var(--muted); }
+.aktionen { display: flex; flex-wrap: wrap; gap: 8px; }
+.aktionen .btn { font-size: 14px; padding: 10px 12px; }
+.aktionen .btn.gewaehlt { outline: 2px solid #fff; }
+.aktionen small { display: block; font-weight: 400; font-size: 11px; opacity: .8; }
+.hinweis { margin-top: 8px; font-size: 13px; color: var(--muted); min-height: 1.2em; }
+.log { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; font-size: 13px; border-top: 1px solid var(--line); }
+.log li { padding: 6px 2px; border-bottom: 1px solid #241e17; color: var(--muted); }
+.log li.wurf { color: var(--text); }
+.log li.gegner { color: #d79a7d; }
+.log li.gut { color: var(--green); }
+.log li.schlecht { color: var(--red); }
+.log li.runde { color: var(--gold); text-align: center; }
+.log li.ende { color: var(--gold); font-weight: 600; }
+.ende { text-align: center; margin: 24px auto; max-width: 560px; }
+.ende h2 { font: 600 26px Cinzel, serif; }
+@media (min-width: 900px) {
+  .spiel { grid-template-columns: 1fr 300px; grid-template-rows: auto auto 1fr; align-items: start; }
+  .reihe { grid-column: 1 / -1; }
+  .karte-wrap { grid-row: 2 / span 2; }
+  .log { max-height: 420px; }
+}

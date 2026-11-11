@@ -28,11 +28,11 @@
   /* ---------- Verbindung ---------- */
   function client() {
     if (H.client) return H.client;
-    if (!window.MRMultiplayer) throw new Error("Die Live-Verbindung ist gerade nicht verfügbar.");
-    const c = H.client = window.MRMultiplayer.connect({ gameSlug: SLUG, maxPlayers: 7, storeKey: "ab_handy:" + SLUG });
+    if (!window.RPGNetz) throw new Error("Die Live-Verbindung ist gerade nicht verfügbar.");
+    const c = H.client = window.RPGNetz.connect({ gameSlug: SLUG, maxPlayers: 7, storeKey: "ab_handy:" + SLUG });
     c.on("state", (row) => { if (row.state_key === "spiel") { H.row = row; pruefe(); } });
     c.on("players", pruefe);
-    c.on("lost", (why) => { H.spiel = null; H.row = null; toast(why || "Verbindung beendet."); render(); });
+    c.on("lost", (why) => { const pause = H.spiel && H.spiel.phase === "pause"; H.spiel = null; H.row = null; toast(pause ? "Der Spieltisch hat die Runde pausiert. Zum Weiterspielen mit dem neuen Code beitreten." : why || "Verbindung beendet."); render(); });
     return c;
   }
   /** Stand nur übernehmen, wenn ihn der Spieltisch (Host) geschrieben hat */
@@ -101,11 +101,14 @@
     $("#verlassen").hidden = !drin;
     if (!drin) return viewBeitritt(app);
     if (!H.spiel) { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Einen Moment …</h1><p class="note">Der Spieltisch schickt gleich die Figuren.</p></section>`; return; }
+    if (H.spiel.phase === "pause") { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Pause</h1><p class="note">Der Spieltisch hat die Runde pausiert und gespeichert. Wenn sie fortgesetzt wird, zeigt der Tisch einen neuen Code – damit trittst du wieder bei.</p></section>`; return; }
     const fid = meineFid();
     if (!fid) return viewWahl(app);
     viewBogen(app, fid);
   }
 
+  // Neuer Code im Link (z. B. QR-Code einer fortgesetzten Kampagne), während die Seite offen ist: ins Codefeld übernehmen
+  window.addEventListener("hashchange", () => { if (H.client && H.client.session) return; const i = document.querySelector("#code"); if (i) { i.value = decodeURIComponent(location.hash.slice(1) || ""); H.fehler = ""; const fb = document.querySelector("#fb"); if (fb) fb.textContent = ""; } });
   function viewBeitritt(app) {
     const code = decodeURIComponent(location.hash.slice(1) || "");
     let name = ""; try { name = localStorage.getItem(NAME_KEY) || ""; } catch (e) { /* privat */ }
@@ -335,7 +338,7 @@
     render();
     try {
       let gespeichert = null; try { gespeichert = localStorage.getItem("ab_handy:" + SLUG); } catch (e) { /* privat */ }
-      if (!gespeichert || !window.MRMultiplayer) return;
+      if (!gespeichert || !window.RPGNetz) return;
       const s = await client().restore();
       if (s && !s.closed) { await H.client.fetchStates().catch(() => {}); wach(); }
       render();

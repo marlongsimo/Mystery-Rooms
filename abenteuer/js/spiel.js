@@ -48,6 +48,7 @@
 
   /** Öffentlichen Stand an alle Handys (immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig) */
   function veroeffentlichen() {
+    if (window.KAMPAGNE) window.KAMPAGNE.geaendert();
     if (!liveAn()) { soloMerken(); return; }
     if (!LIVE.client.session.is_host) return;
     speichern();
@@ -104,8 +105,8 @@
   }
   function liveClient() {
     if (LIVE.client) return LIVE.client;
-    if (!window.MRMultiplayer) throw new Error("Die Live-Verbindung ist gerade nicht verfügbar. Ihr könnt allein auf diesem Gerät spielen.");
-    const c = LIVE.client = window.MRMultiplayer.connect({ gameSlug: SLUG, maxPlayers: 7, storeKey: "ab_live:" + SLUG });
+    if (!window.RPGNetz) throw new Error("Die Live-Verbindung ist gerade nicht verfügbar. Ihr könnt allein auf diesem Gerät spielen.");
+    const c = LIVE.client = window.RPGNetz.connect({ gameSlug: SLUG, maxPlayers: 7, storeKey: "ab_live:" + SLUG });
     c.on("state", eintrag);
     c.on("players", () => {
       const da = new Set(c.players.map((p) => p.user_id)); let geaendert = false;
@@ -238,9 +239,51 @@
     const n = LIVE.client.players.filter((p) => !p.is_host).length;
     bar.hidden = false;
     bar.innerHTML = `<span class="dot"></span><b>LIVE</b> <span>${esc(LIVE.client.session.room_code)} · ${n} ${n === 1 ? "Handy" : "Handys"}</span><button class="btn ghost klein" id="qr-zeigen">Beitreten</button><button class="btn ghost klein" id="live-ende">Beenden</button>`;
-    $("#qr-zeigen").onclick = () => { const o = $("#qr-overlay"); o.innerHTML = `<div class="karte-box">${beitrittBox()}<button class="btn" id="qr-zu">Schließen</button></div>`; o.hidden = false; $("#qr-zu").onclick = () => { o.hidden = true; }; };
+    $("#qr-zeigen").onclick = qrZeigen;
     $("#live-ende").onclick = liveBeenden;
+    if (window.KAMPAGNE && window.KAMPAGNE.aktiv()) { const b = document.createElement("button"); b.className = "btn ghost klein"; b.id = "live-pause"; b.textContent = "Pausieren"; b.title = "Kampagne speichern und pausieren"; b.onclick = () => window.KAMPAGNE.pausieren(); bar.insertBefore(b, $("#live-ende")); }
   }
+  function qrZeigen() { const o = $("#qr-overlay"); o.innerHTML = `<div class="karte-box">${beitrittBox()}<button class="btn" id="qr-zu">Schließen</button></div>`; o.hidden = false; $("#qr-zu").onclick = () => { o.hidden = true; }; }
+
+  /* ---------- Kampagnen (abenteuer/js/kampagnen.js): Spielstand abgeben und übernehmen ---------- */
+  /** Gesamter Spielstand eines laufenden Abenteuers (allein oder live), oder null */
+  function spielstand() {
+    if (!window.ABT || !window.ABT.laeuft()) return null;
+    return { live: liveAn(), phase: liveAn() ? LIVE.phase : (st && kampfEnde ? "kampf" : "szene"), besitz: liveAn() ? LIVE.besitz : {}, setup: SETUP,
+      st: st && kampfEnde ? R.speichern(st) : null, abenteuer: window.ABT.speichern(), imAbenteuer: Boolean(st && kampfEnde) };
+  }
+  /** Gespeicherten Stand übernehmen: Abenteuer und ggf. laufenden Kampf (eine Live-Verbindung bleibt, wie sie ist) */
+  function spielstandUebernehmen(o) {
+    clearTimeout(gegnerTimer); wahl = null; tipp = null;
+    if (o.setup) SETUP = Object.assign({}, SETUP, o.setup);
+    window.ABT.uebernehmen(o.abenteuer);
+    if (o.st && o.imAbenteuer) {
+      st = R.laden(o.st); window.AB.st = st; letzterLog = st.log.length; letzteTP = {}; kampfEnde = window.ABT.kampfFertig;
+      if (liveAn()) { LIVE.phase = "kampf"; LIVE.antwort = null; }
+      zeigeSpiel(); render(); veroeffentlichen(); gegnerSchleife();
+    } else { st = null; window.AB.st = null; kampfEnde = null; window.ABT.zeige(); }
+  }
+  /** Neue Live-Runde für eine fortgesetzte Kampagne (neuer Code; die Handys wählen ihre Figur wieder) */
+  async function liveFuerKampagne() {
+    const c = liveClient();
+    if (c.session) { try { await c.leave(); } catch (e) { /* schon zu */ } }
+    try { await c.create("Spieltisch"); }
+    catch (e) { if (/Gruppengröße|max/i.test(e.message || "")) { c.maxPlayers = 4; await c.create("Spieltisch"); } else throw e; }
+    LIVE.phase = "szene"; LIVE.besitz = {}; LIVE.erledigt = {}; LIVE.antwort = null; LIVE.antworten = {};
+    wach(); zeichneLiveBar();
+    return c.session;
+  }
+  /** Live-Runde für eine Pause beenden: Handys sehen „pausiert“, dann wird die Sitzung geschlossen */
+  async function liveFuerPauseBeenden() {
+    if (!liveAn()) return;
+    clearTimeout(gegnerTimer);
+    try { await LIVE.client.writeOwn("spiel", { phase: "pause", gruppe: SETUP.gruppe, besitz: LIVE.besitz, at: Date.now() }); } catch (e) { /* weiter */ }
+    await new Promise((r) => setTimeout(r, 1500));
+    try { await LIVE.client.leave(); } catch (e) { /* schon zu */ }
+    LIVE.phase = null; vergessen(); zeichneLiveBar();
+  }
+  /** Alles Laufende auf diesem Gerät beenden (nach Pause, Löschen, Neu beginnen) */
+  function allesBeenden() { clearTimeout(gegnerTimer); st = null; window.AB.st = null; kampfEnde = null; wahl = null; tipp = null; try { localStorage.removeItem(SOLO); } catch (e) { /* privat */ } }
 
   /* ---------- Bildschirm wach halten ---------- */
   async function wach() {
@@ -577,7 +620,7 @@
     await bereit;
     let gespeichert = null;
     try { gespeichert = JSON.parse(localStorage.getItem(SPEICHER) || "null"); } catch (e) { /* defekt */ }
-    if (!gespeichert || !window.MRMultiplayer) { allein(); return; }
+    if (!gespeichert || !window.RPGNetz) { allein(); return; }
     try {
       const c = liveClient(), s = await c.restore();
       if (!s || s.closed || !s.is_host) { vergessen(); allein(); return; }
@@ -611,7 +654,7 @@
   }
 
   // Für automatische Tests
-  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
+  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, liveClient, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
     liveAn, besitzVon: (fid) => (liveAn() ? LIVE.besitz[fid] : null), spielerName,
     besitzTauschen(alt, neu) { const i = SETUP.gruppe.indexOf(alt); if (i >= 0) SETUP.gruppe[i] = neu; if (LIVE.besitz[alt]) { LIVE.besitz[neu] = LIVE.besitz[alt]; delete LIVE.besitz[alt]; } setupMerken(); },
     auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };

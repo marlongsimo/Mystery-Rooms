@@ -339,6 +339,7 @@
         o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="${anteil > .5 ? "#6fa86a" : anteil > .25 ? "#d6a23a" : "#c0503a"}"/>`;
       }
     }
+    if (RASTER) o += rasterEbene(k);
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect class="feld" data-x="${x}" data-y="${y}" x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="transparent"/>`;
     svg.innerHTML = o;
 
@@ -442,7 +443,7 @@
 
   function gegnerSchleife() {
     clearTimeout(gegnerTimer);
-    if (!st) return;
+    if (!st || RASTER) return;
     if (st.ende) { veroeffentlichen(); return; }
     const a = R.aktiv(st);
     if (a.seite === "gegner") gegnerTimer = setTimeout(() => { R.gegnerZug(st); render(); veroeffentlichen(); gegnerSchleife(); }, tempo());
@@ -466,6 +467,28 @@
   function zeigeSektion(id) { for (const x of ["intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
   function zeigeIntro() { zeigeSektion("intro"); }
   function zeigeSpiel() { zeigeSektion("spiel"); }
+  /* ---------- Karten-Prüfmodus (?raster): Koordinaten, Hindernisse und Startplätze sichtbar ---------- */
+  const RASTER = params.has("raster");
+  const RASTER_KARTEN = { GARTEN: "garten", TURM: "kobolde", GRUFT: "gruft", PILZE: "pilze", SCHACHT: "netz", HALLE: "halle", SIEGEL: "siegel" };
+  function rasterEbene(k) {
+    const FARBE = { X: "#e0434f", P: "#3d8fe0", Z: "#e8c46a" }; let o = "";
+    for (const [t, x, y] of k.hindernisse) o += `<rect x="${x * Z + 2}" y="${y * Z + 2}" width="${Z - 4}" height="${Z - 4}" fill="${FARBE[t] || "#e08a3a"}" fill-opacity=".22" stroke="${FARBE[t] || "#e08a3a"}" stroke-width="2"/>`;
+    for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="none" stroke="#fff" stroke-opacity=".35"/><text x="${x * Z + 3}" y="${y * Z + 11}" font-size="9" fill="#fff" stroke="#000" stroke-width="2.5" paint-order="stroke">${x},${y}</text>`;
+    const marke = (liste, buchstabe, farbe) => liste.map(([x, y], i) => `<text x="${x * Z + Z - 4}" y="${y * Z + Z - 5}" text-anchor="end" font-size="11" font-weight="700" fill="${farbe}" stroke="#000" stroke-width="3" paint-order="stroke">${buchstabe}${i + 1}</text>`).join("");
+    return o + marke(k.start.spieler, "H", "#7fd0ff") + marke(k.start.wolf, "W", "#8fe08a") + marke(k.start.gegner, "G", "#ff9a8a");
+  }
+  function rasterStart(name) {
+    const D = window.ABD, karte = name === "GARTEN" ? R.KARTE_GARTEN : D.KARTEN[name];
+    clearTimeout(gegnerTimer); kampfEnde = null; wahl = null; tipp = null;
+    st = R.neuesSpiel(1, { figuren: ["schildwaechter", "elementarist", "lichtbringer", "trickser", "tiergefaehrte", "kopfgeldjaeger"], stufe: 3, begegnung: RASTER_KARTEN[name], karte });
+    window.AB.st = st; letzterLog = st.log.length; zeigeSpiel(); render();
+    let bar = $("#rasterbar"); if (!bar) { bar = document.createElement("div"); bar.id = "rasterbar"; bar.className = "rasterbar"; $("#spiel").prepend(bar); }
+    bar.innerHTML = `<b>Kartenprüfung</b>${Object.keys(RASTER_KARTEN).map((n) => `<button class="btn ${n === name ? "" : "ghost"} klein" data-rkarte="${n}">${esc(n === "GARTEN" ? "Klostergarten" : D.KARTEN[n].name.replace(/^(Der|Die) /, ""))}</button>`).join("")}
+      <span class="note"><i style="background:#e0434f"></i>gesperrt <i style="background:#3d8fe0"></i>Grube (Sicht frei) <i style="background:#e8c46a"></i>Siegelstein · H = Helden, W = Wolf, G = Gegner (Startplätze). Die Figuren könnt ihr zum Ausprobieren bewegen; Gegner ziehen hier nicht.</span>`;
+    bar.querySelectorAll("[data-rkarte]").forEach((b) => { b.onclick = () => rasterStart(b.dataset.rkarte); });
+  }
+  if (RASTER) setTimeout(() => rasterStart((params.get("raster") || "GARTEN").toUpperCase() in RASTER_KARTEN ? params.get("raster").toUpperCase() : "GARTEN"), 50);
+
   /** Bekannte Eigenschaften der Gegner (für die Infokarte) */
   const GEGNER_INFO = {
     rost: "Rost: Treffer gegen Metallrüstung senken deren RK.",

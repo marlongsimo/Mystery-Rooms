@@ -18,7 +18,7 @@ Dieses Dokument beschreibt, *wie* das Fachkonzept umgesetzt wird: Reihenfolge, D
 | Wer wendet die Regeln an | Der **Spieltisch** bleibt die Instanz, die Regeln anwendet und den Spielstand fortschreibt. Der Server sichert die Reihenfolge: Speichern nur mit der erwarteten Versionsnummer (optimistische Sperre). Eine Regelprüfung auf dem Server ist für Schritt 1–3 nicht nötig und erst für Spieler gegen Spieler vorgesehen. |
 | Live-Verbindung | Bleibt technisch die bestehende Sitzungstechnik (`game_sessions` mit Spiel `abenteuer`, die das RPG heute schon allein nutzt). Neu ist die **dauerhafte Kampagne** daneben in eigenen `rpg_`-Tabellen. Bestehende Tabellen und Funktionen werden nicht verändert, nur gelesen. |
 
-**Vorgeschlagene Antworten auf die offenen Fragen (Fachkonzept Kapitel 12), bitte bestätigen:**
+**Antworten auf die offenen Fragen (Fachkonzept Kapitel 12), bestätigt im November 2026:**
 
 | Frage | Vorschlag |
 |---|---|
@@ -170,6 +170,8 @@ Dateien: `abenteuer/js/rpg-netz.js` (neu), `abenteuer/js/kampagnen.js` (neu: Bib
 
 ## 5. Bauabschnitt B: Konten und Profile (Entwurf)
 
+**Gestaltung der Anmeldung:** Startbildschirm „Mythara – Das digitale Rollenspiel“ nach Vorlage. Links „Als Spieler anmelden“ (E-Mail, Passwort, Passwort vergessen), rechts „Als Gast spielen“ (ohne Registrierung starten, mit Einladungscode beitreten, QR-Code scannen), darunter „Noch kein Konto? Jetzt registrieren“ und der Hinweis, dass ein Konto Charaktere, Kampagnen und Fortschritte dauerhaft speichert.
+
 - **Anmeldung:** E-Mail und Passwort mit Bestätigung, Passwort vergessen, Abmelden. Alles läuft nur im RPG-Bereich und über die eigene RPG-Verbindung.
 - **Gast wird Konto:** Der eingeloggte Gast hinterlegt E-Mail und Passwort (`auth.updateUser`). Die `user_id` bleibt gleich, alle Kampagnen bleiben erhalten (Szenario C).
 - **E-Mail gehört schon zu einem Konto:** kein stilles Zusammenführen.
@@ -263,4 +265,4 @@ Weil direkt in der echten Datenbank gebaut wird, gelten diese Schutzregeln:
 | `abenteuer/supabase/tests/pruefen.sh` | lokale Prüfung (Nachbildung, zweimal einspielen, 40 Prüfungen, Rückbau) |
 | `abenteuer/supabase/tests/supabase_nachbildung.sql`, `001_rpg_kampagnen_test.sql` | nur für lokale Tests, **nicht** in Supabase ausführen |
 
-**Nächster Schritt:** Wenn du die Entscheidungen in Abschnitt 1 bestätigst, spielst du `001_rpg_kampagnen.sql` ein. Danach prüfe ich die Datenbank und baue die Oberfläche (4.5–4.6) hinter dem Schalter `?kampagnen`.
+**Nächster Schritt:** Die Entscheidungen in Abschnitt 1 sind bestätigt. Als Nächstes spielst du `001_rpg_kampagnen.sql` ein. Danach prüfe ich die Datenbank und baue die Oberfläche (4.5–4.6) hinter dem Schalter `?kampagnen`.

@@ -130,7 +130,6 @@
       LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null; SETUP.gruppe = [];
       wach();
       // Mit Kampagnen: zuerst einladen (Freunde, Gäste-Code, Tisch-Gerät), dann Heldenwahl
-      if (window.KAMPAGNE && window.KAMPAGNE.liveGestartet) await window.KAMPAGNE.liveGestartet();
       if (window.KAMPAGNE && window.KAMPAGNE.einladen) { veroeffentlichen(); await window.KAMPAGNE.einladen(); }
       else { zeigeSetup(); veroeffentlichen(); }
     } catch (e) {
@@ -246,7 +245,8 @@
     bar.innerHTML = `<span class="dot"></span><b>LIVE</b> <span>${esc(LIVE.client.session.room_code)} · ${n} ${n === 1 ? "Handy" : "Handys"}</span><button class="btn ghost klein" id="qr-zeigen">Beitreten</button><button class="btn ghost klein" id="live-ende">Beenden</button>`;
     $("#qr-zeigen").onclick = qrZeigen;
     $("#live-ende").onclick = liveBeenden;
-    if (window.KAMPAGNE && window.KAMPAGNE.aktiv()) { const b = document.createElement("button"); b.className = "btn ghost klein"; b.id = "live-pause"; b.textContent = "Pausieren"; b.title = "Kampagne speichern und pausieren"; b.onclick = () => window.KAMPAGNE.pausieren(); bar.insertBefore(b, $("#live-ende")); }
+    if (window.KAMPAGNE && window.KAMPAGNE.aktiv()) { const b = document.createElement("button"); b.className = "btn ghost klein"; b.id = "live-pause"; b.textContent = "Pausieren"; b.title = "Kampagne speichern und pausieren"; b.onclick = () => window.KAMPAGNE.pausieren(); bar.insertBefore(b, $("#live-ende"));
+      const w = document.createElement("button"); w.className = "btn ghost klein"; w.id = "live-tisch"; w.textContent = "Tisch wechseln"; w.title = "Auf einem anderen Gerät als Spieltisch weiterspielen"; w.onclick = () => window.KAMPAGNE.tischWechseln(); bar.insertBefore(w, b); }
   }
   function qrZeigen() { const o = $("#qr-overlay"); o.innerHTML = `<div class="karte-box">${beitrittBox()}<button class="btn" id="qr-zu">Schließen</button></div>`; o.hidden = false; $("#qr-zu").onclick = () => { o.hidden = true; }; }
 

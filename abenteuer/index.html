@@ -7,7 +7,7 @@
   <title>Mythara – Das digitale Rollenspiel | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=32">
+  <link rel="stylesheet" href="css/abenteuer.css?v=33">
 </head>
 <body>
   <header class="top">
@@ -38,10 +38,10 @@
             <h2 id="my-gast-titel">Als Gast spielen</h2>
             <p class="my-gast-text">Ohne Registrierung sofort losspielen. Deine Kampagnen werden in diesem Browser gespeichert.</p>
             <button class="my-knopf rot" id="my-gast-start"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10a5 5 0 0 1 4.8 6.4l-1 3.4a2.6 2.6 0 0 1-4.4 1L14.6 16H9.4l-1.8 1.8a2.6 2.6 0 0 1-4.4-1l-1-3.4A5 5 0 0 1 7 7z"/><path d="M7 10v4M5 12h4" stroke="#0d0b08" stroke-width="1.6"/><circle cx="16" cy="11" r="1.1" fill="#0d0b08"/><circle cx="18" cy="13" r="1.1" fill="#0d0b08"/></svg></span>Als Gast spielen</button>
-            <p class="my-klein-wege">Mitspieler am Handy: <button class="my-link" id="my-code-zeigen">Mit Einladungscode beitreten</button> · <button class="my-link" id="my-qr">QR-Code scannen</button></p>
+            <p class="my-klein-wege">Mitspieler am Handy: <button class="my-link" id="my-code-zeigen">Mit Einladungscode beitreten</button> · <button class="my-link" id="my-qr">QR-Code scannen</button><br>Neues Gerät für die Mitte: <button class="my-link" id="my-tisch-zeigen">Als Spieltisch verbinden</button></p>
             <form class="my-code" id="my-code" hidden>
               <label for="my-code-feld">Einladungscode</label>
-              <input id="my-code-feld" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABEN-123456" maxlength="11">
+              <input id="my-code-feld" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABEN-123456" maxlength="14">
               <p class="my-fb" id="my-code-fb" role="status"></p>
             </form>
             <div class="my-scanner" id="my-scanner" hidden></div>
@@ -243,10 +243,10 @@
   <script src="vendor/qrcode-generator-1.4.4.js"></script>
   <script src="daten/grauwacht.js?v=14"></script>
   <script src="js/szenen.js?v=11"></script>
-  <script src="js/spiel.js?v=29"></script>
-  <script src="js/abenteuer-tisch.js?v=17"></script>
+  <script src="js/spiel.js?v=30"></script>
+  <script src="js/abenteuer-tisch.js?v=18"></script>
   <script src="js/einstieg.js?v=5"></script>
-  <script src="js/mythara.js?v=14"></script>
-  <script src="js/kampagnen.js?v=8"></script>
+  <script src="js/mythara.js?v=16"></script>
+  <script src="js/kampagnen.js?v=12"></script>
 </body>
 </html>

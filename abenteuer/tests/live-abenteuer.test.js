@@ -17,7 +17,7 @@ const { chromium } = require('playwright');
 
   const einstieg = async (p, modus) => {
     await p.click('#my-gast-start');
-    await p.click('.hub-kachel[data-hub="neu"]');
+    await p.click('.hub-kachel[data-hub="neu"]'); await p.click('[data-neu-abenteuer="grauwacht"]');
     await p.waitForSelector('#kodex:not([hidden])');
     for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click(modus === 'live' ? '#live' : '#start');

@@ -43,27 +43,30 @@ const { chromium } = require('playwright');
   await B.waitForSelector('[data-fa="ja"]'); await B.click('[data-fa="ja"]');
   check(await until(B, () => /Keine offenen Anfragen/.test(document.querySelector('.kampagnen').textContent)), 'B nimmt an, keine offenen Anfragen mehr');
 
-  // A startet eine neue Kampagne und lädt B ein
+  // A startet eine neue Kampagne: Abenteuer wählen → Regeln → Schwierigkeit → Spielweise: Tisch + Handys → Einladen
   await A.click('#fenster-zu');
   await A.click('.hub-kachel[data-hub="neu"]');
-  await A.waitForSelector('#f-titel'); await A.fill('#f-titel', 'Freundestest');
-  check(await A.evaluate((n) => [...document.querySelectorAll('.f-liste.wahl input')].some((i) => i.value === n), nB), 'Neue Kampagne: B steht zur Auswahl');
-  await A.check(`.f-liste.wahl input[value="${nB}"]`); await A.click('#f-neu .my-knopf');
-  check(await until(A, () => !document.querySelector('#kodex').hidden), 'Kampagne angelegt, der Start beginnt mit den Regeln');
+  check(await until(A, () => Boolean(document.querySelector('[data-neu-abenteuer="grauwacht"]')) && !document.querySelector('#f-titel')), 'Neue Kampagne: zuerst das Abenteuer wählen (ohne Freunde-Auswahl)');
+  await A.click('[data-neu-abenteuer="grauwacht"]');
+  check(await until(A, () => !document.querySelector('#kodex').hidden), 'Der Start beginnt mit den Regeln');
+  for (let i = 0; i < 6; i++) await A.click('#kodex-weiter');
+  await A.click('#live');
+  check(await until(A, (n) => Boolean(document.querySelector(`[data-ei-freund="${n}"]`)), nB), 'Einladen-Schritt: B steht zur Auswahl');
+  await A.fill('#ei-titel', 'Freundestest'); await A.press('#ei-titel', 'Tab');
+  await until(A, () => window.KAMPAGNE.aktuell().titel === 'Freundestest');
+  await A.click(`[data-ei-freund="${nB}"]`);
+  check(await until(A, () => /eingeladen ✓/.test(document.querySelector('.ei-freunde').textContent)), 'B eingeladen');
   const kid = await A.evaluate(() => window.KAMPAGNE.aktuell().id);
 
-  // B nimmt die Gruppenanfrage an
+  // B nimmt die Gruppenanfrage an und kommt direkt an den Tisch
   await B.click('#fenster-zu'); await B.evaluate(() => window.MYTHARA.zeigeHub());
   check(await until(B, () => { const z = document.querySelector('#hub-glocke .hub-zahl'); return z && !z.hidden; }), 'B: Glocke zeigt die Gruppenanfrage');
   await B.click('#hub-glocke'); await B.waitForSelector('[data-ka="ja"]');
   check(await B.evaluate(() => /Freundestest/.test(document.querySelector('.kampagnen').textContent)), 'Gruppenanfrage nennt die Kampagne „Freundestest“');
   await Promise.all([B.waitForURL(/handy\.html\?kampagne=/), B.click('[data-ka="ja"]')]);
-  check(await until(B, () => /Warte auf den Spieltisch/.test(document.body.textContent) && !document.querySelector('#code')), 'B nimmt an: direkt zum Spieltisch, ohne Code und ohne Namenseingabe (wartet, bis der Tisch bereit ist)');
-  // A startet den Spieltisch (Regeln → Schwierigkeit → Spielweise: Tisch + Handys) – B kommt von selbst dazu
-  for (let i = 0; i < 6; i++) await A.click('#kodex-weiter');
-  await A.click('#live');
-  check(await until(B, () => document.querySelectorAll('.banner[data-klasse]').length === 5, null, 40000), 'Tisch ist da: B tritt automatisch bei und wählt seinen Helden');
+  check(await until(B, () => document.querySelectorAll('.banner[data-klasse]').length === 5 && !document.querySelector('#code'), null, 40000), 'B nimmt an: direkt am Tisch bei der Heldenwahl, ohne Code und ohne Namenseingabe');
   check(await until(A, (n) => window.AB.LIVE.client.players.some((p) => p.player_name === n), nB), 'Tisch sieht B mit seinem Benutzernamen');
+  check(await until(A, (n) => document.querySelector('#ei-da').textContent.includes(n), nB, 10000), 'Einladen-Schritt: „Schon da“ nennt B');
   await A.evaluate(() => window.AB.LIVE.client.leave().catch(() => {}));
   await B.goto(BASE + '/abenteuer/index.html'); await until(B, () => !document.querySelector('#hub').hidden);
   check(await until(B, () => /Freundestest/.test(document.querySelector('#hub-aktuell').textContent) && /Mitspieler/.test(document.querySelector('#hub-aktuell').textContent)), 'B: „Freundestest“ unter Aktuelle Kampagnen als Mitspieler');

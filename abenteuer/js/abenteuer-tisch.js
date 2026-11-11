@@ -146,7 +146,7 @@
     render.antwort = v.antwort;
     if (window.ABE && render.letzte != null && A.glocke > render.letzte) window.ABE.glocke(0.9);
     render.letzte = A.glocke;
-    let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}<span class="kopf-links">${sprache ? `<button class="link" id="sz-vorlesen" title="Text vorlesen (Browserstimme) – noch einmal tippen zum Anhalten">🔊 Vorlesen</button>` : ""}${AB.liveAn() ? (window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-kpause" title="Kampagne speichern und pausieren – fortsetzen unter „Meine Kampagnen“">Pausieren</button>` : "") : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}</span></div>
+    let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}<span class="kopf-links">${sprache ? `<button class="link" id="sz-vorlesen" title="Text vorlesen (Browserstimme) – noch einmal tippen zum Anhalten">🔊 Vorlesen</button>` : ""}${AB.liveAn() ? (window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-kpause" title="Kampagne speichern und pausieren – fortsetzen unter „Meine Kampagnen“">Pausieren</button>` : "") : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}${window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-tisch" title="Auf einem anderen Gerät als Spieltisch weiterspielen">Tisch wechseln</button>` : ""}</span></div>
       <h1>${esc(v.titel)}</h1><div class="erzaehlung ${auftritt ? "auftritt" : ""}">${v.text.map((p, i) => `<p style="--i:${i}">${fett(p)}</p>`).join("")}</div>`;
     if (hilfeAn && HILFE[s.art] && !A.zwischenprobe) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE[s.art])}</p><button class="link" id="hilfe-aus">Hinweise ausblenden</button></div>`;
     if (A.zwischenprobe && hilfeAn) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE.probe)}</p></div>`;
@@ -298,6 +298,7 @@
     const k = $("#sz-kampf"); if (k) k.onclick = kampf;
     const pz = $("#sz-pause"); if (pz) pz.onclick = pause;
     const kp = $("#sz-kpause"); if (kp) kp.onclick = () => window.KAMPAGNE.pausieren();
+    const tw = $("#sz-tisch"); if (tw) tw.onclick = () => window.KAMPAGNE.tischWechseln();
     const e = $("#sz-schluss"); if (e) e.onclick = () => { try { localStorage.removeItem(KEY); localStorage.removeItem("ab_solo"); } catch (x) { /* privat */ } A = null; AB.zeigeSetup(); };
   }
   function nachSzene() { merken(); render(); AB.veroeffentlichen(); }

@@ -95,6 +95,7 @@
     H.busy = true; H.fehler = ""; render();
     try {
       try { localStorage.setItem(NAME_KEY, name); } catch (e) { /* privat */ }
+      if (kId && !code) { H.busy = false; H.kAktiv = true; kampagneWarten(name); return; }
       if (kCode()) {
         H.kName = name; H.kAktiv = true;
         const r = await client().rpc("rpg_join_as_guest", { p_token: kCode(), p_name: name });
@@ -146,7 +147,7 @@
     let name = ""; try { name = localStorage.getItem(NAME_KEY) || ""; } catch (e) { /* privat */ }
     if (H.wartet) { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Kampagne${H.kTitel ? " · " + esc(H.kTitel) : ""}</p><h1>Warte auf den Spieltisch …</h1><p class="note">Du bist dabei. Sobald der Spieltisch verbunden ist, geht es hier von selbst weiter – du kannst diese Seite einfach offen lassen.</p><p class="warte-punkte" aria-hidden="true"><i></i><i></i><i></i></p></section>`; return; }
     const a = document.activeElement; if (a && a.tagName === "INPUT" && app.contains(a)) { const fb = $("#fb"); if (fb) fb.textContent = H.fehler; return; }
-    const k = kCode();
+    const k = kCode() || kId;
     app.innerHTML = `<section class="karte-h"><p class="eyebrow">${k ? "Einladung zur Kampagne" : "Die Splitterlande"}</p><h1>${k ? "Mitspielen" : "Zum Spieltisch"}</h1>
       <p class="note">${k ? "Gib deinen Namen ein. Wenn der Spieltisch schon bereit ist, geht es sofort los – sonst wartest du kurz." : "Den Code zeigt der Spieltisch (das Tablet in der Mitte)."}</p>
       <label class="fld"${k && !code ? " hidden" : ""}>Code<input id="code" autocomplete="off" autocapitalize="characters" placeholder="ABEN-XXXXXX" value="${esc(code)}"></label>
@@ -155,7 +156,7 @@
       <p class="fb" id="fb">${esc(H.fehler)}</p></section>`;
     $("#rein").onclick = () => {
       const cd = $("#code").value.trim(), nm = $("#name").value.trim();
-      if (!nm || (!cd && !kCode())) { H.fehler = kCode() ? "Bitte deinen Namen eingeben." : "Bitte Code und Namen eingeben."; $("#fb").textContent = H.fehler; return; }
+      if (!nm || (!cd && !kCode() && !kId)) { H.fehler = kCode() || kId ? "Bitte deinen Namen eingeben." : "Bitte Code und Namen eingeben."; $("#fb").textContent = H.fehler; return; }
       document.activeElement && document.activeElement.blur();
       beitreten(cd, nm);
     };

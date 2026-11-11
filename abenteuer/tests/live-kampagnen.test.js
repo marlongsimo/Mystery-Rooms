@@ -17,10 +17,11 @@ const { chromium } = require('playwright');
   const zu = async (p, fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
   const nimm = async (p, fid) => { await zu(p, fid); await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
   const einstieg = async (p, modus) => {
-    await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
+    await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]'); await p.click('[data-neu-abenteuer="grauwacht"]');
     await p.waitForSelector('#kodex:not([hidden])');
     for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click(modus === 'live' ? '#live' : '#start');
+    if (modus === 'live') { await p.waitForSelector('#ei-weiter'); await p.click('#ei-weiter'); } // Einladen-Schritt: hier ohne Freunde weiter zur Heldenwahl
   };
   const K = (p) => p.evaluate(() => window.KAMPAGNE && window.KAMPAGNE.aktuell());
   const gespeichert = (p, v) => until(p, (x) => { const k = window.KAMPAGNE.aktuell(); return k && k.version >= x && document.querySelector('#kampagne-status') && /gespeichert · Stand/.test(document.querySelector('#kampagne-status').textContent); }, v);

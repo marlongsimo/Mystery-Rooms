@@ -170,10 +170,11 @@
       !fertig && c.version === 0 ? `<button class="btn klein" data-k="beginnen" data-id="${c.id}">Beginnen</button>` : "",
       c.version > 0 && c.status !== "archiviert" ? `<button class="btn ghost klein" data-k="neu" data-id="${c.id}">Neu beginnen</button>` : "",
       !fertig && window.MYTHARA && window.MYTHARA.istKonto() ? `<button class="btn ghost klein" data-k="einladen" data-id="${c.id}">Freunde einladen</button>` : "",
+      !fertig ? `<button class="btn ghost klein" data-k="tisch" data-id="${c.id}">Auf anderem Gerät spielen</button>` : "",
       c.status === "pausiert" || c.status === "abgeschlossen" ? `<button class="btn ghost klein" data-k="archiv" data-id="${c.id}">Archivieren</button>` : "",
       c.status === "archiviert" ? `<button class="btn ghost klein" data-k="zurueck" data-id="${c.id}">Wiederherstellen</button>` : "",
       `<button class="btn ghost klein gefahr" data-k="loeschen" data-id="${c.id}">Löschen</button>`].join("")
-      : c.role === "tisch" ? (!fertig && c.version > 0 ? `<button class="btn klein" data-k="handys" data-id="${c.id}">Mit Handys fortsetzen</button>` : "")
+      : c.role === "tisch" ? (!fertig && c.version > 0 ? `<button class="btn klein" data-k="handys" data-id="${c.id}">Mit Handys fortsetzen</button><button class="btn ghost klein" data-k="tisch" data-id="${c.id}">Auf anderem Gerät spielen</button>` : "")
       : `${!fertig ? `<button class="btn klein" data-k="mitspielen" data-id="${c.id}">Zum Spieltisch</button>` : ""}<button class="btn ghost klein" data-k="verlassen" data-id="${c.id}">Verlassen</button>`;
     return `<li class="k-eintrag" data-kampagne="${c.id}" data-status="${c.status}">
       <div class="k-text"><b>${esc(c.title)}</b><span class="k-status">${esc(STATUS[c.status] || c.status)}${c.laeuft ? " · gerade verbunden" : ""}${c.difficulty === "hardcore" ? " · Hardcore" : ""}</span>
@@ -201,6 +202,7 @@
       if (b) b.disabled = true;
       if (was === "handys" || was === "allein") return await fortsetzen(id, was === "handys");
       if (was === "beginnen") return beginnen(c);
+      if (was === "tisch") { if (b) b.disabled = false; return tischWechseln(id, c.title); }
       if (was === "mitspielen") { location.href = "handy.html?kampagne=" + encodeURIComponent(id); return; }
       if (was === "einladen") { if (b) b.disabled = false; return window.MYTHARA.freundeEinladen(id, c.title); }
       if (was === "neu") {
@@ -247,6 +249,165 @@
     else toast("Kampagne fortgesetzt.");
   }
 
+
+  /* ---------- Einladen: nach „Spieltisch + Handys“, vor der Heldenwahl ---------- */
+  // Freunde (Konto), Gäste per Kampagnen-Code (handy.html?k=…) und auf Wunsch ein anderes Gerät als Spieltisch (index.html?tisch=…)
+  let einl = null; // { gast, tisch, uhr, freunde, offen, mitglieder }
+  const linkUrl = (pfad) => new URL(pfad, location.href).href;
+  const codeBox = (url, code, titel, text) => `<div class="beitritt"><div class="qr">${window.AB.qrSvg(url)}</div><div>
+      <p class="eyebrow">${titel}</p><p class="code">${esc(code)}</p><p class="note">${text}</p></div></div>`;
+  const kurzUrl = (pfad) => linkUrl(pfad).replace(/[?#].*$/, "").replace(/^https?:\/\//, "");
+  function istHost() { return !K || K.rolle !== "tisch"; }
+  /** Gäste-Code: einmal je Kampagne erzeugen und auf diesem Gerät merken (7 Tage gültig; ein neuer macht den alten ungültig) */
+  async function gastCode() {
+    if (K.gast && K.gast.bis > Date.now()) return K.gast.code;
+    const code = await rpc("rpg_create_link", { p_campaign_id: K.id, p_art: "gast" });
+    K.gast = { code, bis: Date.now() + 6 * 864e5 }; merkeK(); return code;
+  }
+  /** Kampagne für diese Runde: eine schon angelegte leere weiterverwenden, sonst neu anlegen; dann mit dem Live-Raum verbinden */
+  async function kampagneFuerRunde() {
+    if (aktiv() && K.version === 0) { try { await sitzungStarten(); return; } catch (e) { /* gehört nicht (mehr) zu uns – neu anlegen */ } }
+    const setup = window.AB.SETUP(), titel = "Das Siegel von Grauwacht";
+    const id = await rpc("rpg_create_campaign", { p_title: titel, p_difficulty: setup.schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch" });
+    K = { id, version: 0, status: "geplant", titel }; merkeK(); letzteMeta = null; letzteMitglieder = "";
+    await sitzungStarten();
+  }
+  async function einladen() {
+    const el = $("#einladen"); window.AB.zeigeSektion("einladen");
+    el.innerHTML = `<p class="note">Kampagne wird vorbereitet …</p>`;
+    try { await kampagneFuerRunde(); }
+    catch (e) { toast("Kampagne konnte nicht angelegt werden: " + e.message); K = null; merkeK(); return window.AB.zeigeSetup(); }
+    einl = { gast: null, tisch: null, freunde: null, offen: [], mitglieder: [] };
+    try { einl.gast = await gastCode(); } catch (e) { einl.gastFehler = e.message; }
+    if (window.MYTHARA && window.MYTHARA.istKonto()) {
+      try {
+        const [f, o, d] = await Promise.all([rpc("rpg_my_friends", {}), rpc("rpg_campaign_open_invites", { p_campaign_id: K.id }), rpc("rpg_load_campaign", { p_campaign_id: K.id })]);
+        einl.freunde = f.freunde || []; einl.offen = o || []; einl.mitglieder = (d.members || []).map((m) => (m.handle || m.display_name || "").toLowerCase());
+      } catch (e) { einl.freunde = []; }
+    }
+    einladenZeichnen();
+    clearInterval(einl.uhr); einl.uhr = setInterval(einladenTakt, 3000);
+  }
+  function einladenZeichnen() {
+    const el = $("#einladen"); if (!einl || !K) return;
+    const c = window.AB.LIVE.client, handys = c && c.session ? c.players.filter((p) => !p.is_host) : [];
+    const freunde = einl.freunde === null
+      ? `<p class="note">Mit einem Spielerkonto lädst du Freunde direkt ein – sie sehen die Einladung in ihrer Glocke und kommen ohne Code an den Tisch.</p>`
+      : einl.freunde.length ? `<ul class="ei-freunde">${einl.freunde.map((f) => { const h = f.handle, dabei = einl.mitglieder.includes(h.toLowerCase()), eingeladen = einl.offen.includes(h);
+          return `<li><b>${esc(h)}</b>${dabei ? `<span class="ei-ok">dabei</span>` : eingeladen ? `<span class="ei-ok">eingeladen ✓</span>` : `<button class="btn ghost klein" data-ei-freund="${esc(h)}">Einladen</button>`}</li>`; }).join("")}</ul>`
+      : `<p class="note">Du hast noch keine Freunde. Füge sie auf der Spielerseite unter „Freunde“ hinzu.</p>`;
+    const gast = einl.gast
+      ? codeBox(linkUrl("handy.html?k=" + encodeURIComponent(einl.gast)), einl.gast, "Gäste einladen", `QR-Code mit dem Handy scannen – oder <b>${esc(kurzUrl("handy.html"))}</b> öffnen und den Code eingeben. Wer beitritt, gehört fest zur Kampagne, auch ohne Konto. Der Code gilt 7 Tage.`)
+      : `<p class="note">Gäste-Code gerade nicht verfügbar${einl.gastFehler ? ` (${esc(einl.gastFehler)})` : ""}. Gäste können bei der Heldenwahl über den Raum-Code beitreten.</p>`;
+    const tisch = einl.tisch
+      ? codeBox(linkUrl("index.html?tisch=" + encodeURIComponent(einl.tisch)), einl.tisch, "Code für das Tisch-Gerät", `Auf dem Gerät, das in der Mitte liegen soll, QR-Code scannen – oder <b>${esc(kurzUrl("index.html"))}</b> öffnen, „Als Spieltisch verbinden“ wählen und den Code eingeben. Der Code gilt einmal.`) + `<p class="note ei-warte">Warte auf das Tisch-Gerät …</p>`
+      : `<p class="note">Dieses Gerät ist der Spieltisch. Soll ein anderes Gerät (z. B. ein Tablet oder Fernseher) in der Mitte liegen, verbinde es mit einem Tisch-Code.</p>`;
+    el.innerHTML = `<div class="ei-kopf"><div><p class="eyebrow">Spieltisch + Handys</p><h1>Wer spielt mit?</h1></div>
+        ${istHost() ? `<label class="ei-titel">Name der Kampagne <input id="ei-titel" maxlength="80" value="${esc(K.titel || "")}"></label>` : `<p class="note">${esc(K.titel || "")}</p>`}</div>
+      <div class="ei-raster">
+        <section class="ei-karte"><h2>Freunde</h2>${freunde}</section>
+        <section class="ei-karte"><h2>Gäste</h2>${gast}</section>
+        <section class="ei-karte"><h2>Spieltisch</h2>
+          <div class="seg ei-tisch"><button data-ei-tisch="hier" class="${einl.tisch ? "" : "an"}">Dieses Gerät</button><button data-ei-tisch="anders" class="${einl.tisch ? "an" : ""}">Ein anderes Gerät</button></div>${tisch}</section>
+      </div>
+      <p class="note ei-da" id="ei-da">${handys.length ? `Schon da: ${handys.map((p) => esc(p.player_name)).join(", ")}` : "Noch niemand verbunden."}</p>
+      <div class="knoepfe"><button class="btn gross" id="ei-weiter">Weiter zur Heldenwahl</button></div>`;
+    const t = $("#ei-titel"); if (t) t.onchange = async () => {
+      const neu = t.value.trim(); if (!neu || neu === K.titel) return;
+      try { K.titel = await rpc("rpg_rename_campaign", { p_campaign_id: K.id, p_title: neu }); merkeK(); toast("Name gespeichert."); } catch (e) { toast(e.message); }
+    };
+    el.querySelectorAll("[data-ei-freund]").forEach((b) => { b.onclick = async () => {
+      b.disabled = true;
+      try { await rpc("rpg_invite_friend", { p_campaign_id: K.id, p_handle: b.dataset.eiFreund }); einl.offen.push(b.dataset.eiFreund); einladenZeichnen(); }
+      catch (e) { toast(e.message); b.disabled = false; }
+    }; });
+    el.querySelectorAll("[data-ei-tisch]").forEach((b) => { b.onclick = async () => {
+      if (b.dataset.eiTisch === "hier") { einl.tisch = null; return einladenZeichnen(); }
+      if (einl.tisch) return;
+      try { einl.tisch = await rpc("rpg_create_link", { p_campaign_id: K.id, p_art: "tisch" }); einladenZeichnen(); } catch (e) { toast(e.message); }
+    }; });
+    $("#ei-weiter").onclick = () => { if (einl) clearInterval(einl.uhr); einl = null; el.innerHTML = ""; window.AB.zeigeSetup(); };
+  }
+  /** Alle 3 Sekunden: Wer ist schon da? Hat das Tisch-Gerät übernommen? */
+  async function einladenTakt() {
+    if (!einl || $("#einladen").hidden) { if (einl) clearInterval(einl.uhr); einl = null; return; }
+    const c = window.AB.LIVE.client, da = $("#ei-da");
+    if (da && c && c.session) { const h = c.players.filter((p) => !p.is_host); da.textContent = h.length ? "Schon da: " + h.map((p) => p.player_name).join(", ") : "Noch niemand verbunden."; }
+    if (!einl.tisch) return;
+    let info; try { info = await rpc("rpg_link_info", { p_token: einl.tisch }); } catch (e) { return; }
+    if (info || !einl) return; // noch nicht übernommen
+    clearInterval(einl.uhr); einl = null;
+    await abgegeben();
+  }
+  /** Ein anderes Gerät ist jetzt der Spieltisch: hier die Runde beenden (die Handys verbinden sich selbst neu) */
+  async function abgegeben() {
+    const id = K && K.id, titel = K && K.titel;
+    clearTimeout(timer);
+    if (window.AB.liveAn()) await window.AB.liveFuerPauseBeenden();
+    window.AB.allesBeenden(); if (window.ABT) window.ABT.verwerfen();
+    K = null; merkeK(); zeigeStatus("");
+    const o = $("#qr-overlay");
+    o.innerHTML = `<div class="karte-box kampagnen" role="dialog"><div class="k-kopf"><h2>Spieltisch übergeben</h2></div>
+      <p class="note">„${esc(titel || "")}“ läuft jetzt auf dem anderen Gerät. Die Handys verbinden sich von selbst neu.</p>
+      <div class="knoepfe"><button class="btn" id="ab-mitspielen">Mit diesem Gerät mitspielen</button><button class="btn ghost" id="ab-zu">Zur Startseite</button></div></div>`;
+    o.hidden = false;
+    $("#ab-mitspielen").onclick = () => { location.href = "handy.html?kampagne=" + encodeURIComponent(id); };
+    $("#ab-zu").onclick = () => { o.hidden = true; window.AB.zeigeIntro(); };
+    window.AB.zeigeIntro();
+  }
+
+  /* ---------- Tisch wechseln: im Spiel und aus „Meine Kampagnen“ ---------- */
+  let wechselUhr = null;
+  async function tischWechseln(id, titel) {
+    id = id || (K && K.id); titel = titel || (K && K.titel) || "";
+    if (!id) return;
+    const hier = aktiv() && K.id === id;
+    const o = $("#qr-overlay");
+    const zu = () => { clearInterval(wechselUhr); wechselUhr = null; o.hidden = true; };
+    o.innerHTML = `<div class="karte-box kampagnen"><p class="note">Spielstand wird gesichert …</p></div>`; o.hidden = false;
+    let code;
+    try {
+      if (hier && window.ABT && window.ABT.laeuft()) { clearTimeout(timer); await speichern(); }
+      code = await rpc("rpg_create_link", { p_campaign_id: id, p_art: "tisch" });
+    } catch (e) { o.hidden = true; toast(e.message); return; }
+    o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-labelledby="tw-titel"><div class="k-kopf"><h2 id="tw-titel">Spieltisch wechseln</h2><button class="link" id="tw-zu">Abbrechen</button></div>
+      <p class="note">„${esc(titel)}“ auf einem anderen Gerät weiterspielen: Dort diesen QR-Code scannen – oder <b>${esc(kurzUrl("index.html"))}</b> öffnen, „Als Spieltisch verbinden“ wählen und den Code eingeben.</p>
+      ${codeBox(linkUrl("index.html?tisch=" + encodeURIComponent(code)), code, "Code für das neue Tisch-Gerät", "Der Code gilt einmal und 24 Stunden. Der Spielstand ist gesichert; sobald das neue Gerät verbunden ist, endet die Runde hier.")}
+      <p class="note ei-warte">Warte auf das neue Gerät …</p></div>`;
+    $("#tw-zu").onclick = zu;
+    clearInterval(wechselUhr);
+    wechselUhr = setInterval(async () => {
+      if (o.hidden) { clearInterval(wechselUhr); return; }
+      let info; try { info = await rpc("rpg_link_info", { p_token: code }); } catch (e) { return; }
+      if (info) return;
+      clearInterval(wechselUhr); wechselUhr = null;
+      if (hier && K && K.id === id) await abgegeben();
+      else { o.innerHTML = `<div class="karte-box kampagnen"><div class="k-kopf"><h2>Spieltisch übergeben</h2><button class="link" id="tw-zu">Schließen</button></div><p class="note">„${esc(titel)}“ läuft jetzt auf dem anderen Gerät.</p></div>`; $("#tw-zu").onclick = () => { o.hidden = true; }; }
+    }, 3000);
+  }
+  /** Dieses Gerät wird der Spieltisch einer Kampagne (Tisch-Code oder ?tisch=…) */
+  async function tischUebernehmen(code) {
+    const d = await rpc("rpg_claim_table", { p_token: code });
+    if (aktiv() && K.id !== d.campaign_id && window.ABT && window.ABT.laeuft()) { clearTimeout(timer); await speichern().catch(() => {}); }
+    if (Number(d.version) > 0) { await fortsetzen(d.campaign_id, true); K.rolle = "tisch"; merkeK(); return d; }
+    if (window.AB.liveAn()) await window.AB.liveFuerPauseBeenden();
+    window.AB.allesBeenden(); if (window.ABT) window.ABT.verwerfen();
+    K = { id: d.campaign_id, version: 0, status: d.status, titel: d.titel, rolle: "tisch" }; merkeK(); letzteMeta = null; letzteMitglieder = "";
+    await window.AB.liveFuerKampagne();
+    await sitzungStarten();
+    $("#qr-overlay").hidden = true;
+    window.AB.lobbyFuerKampagne(d.difficulty);
+    toast(`Dieses Gerät ist jetzt der Spieltisch von „${d.titel}“.`);
+    return d;
+  }
+  // Aufruf über den QR-Code: index.html?tisch=CODE
+  (() => {
+    const p = new URLSearchParams(location.search), code = p.get("tisch"); if (!code) return;
+    p.delete("tisch"); history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p : "") + location.hash);
+    const los = () => { toast("Verbinde als Spieltisch …"); tischUebernehmen(code).catch((e) => { toast(e.message); alert("Spieltisch verbinden: " + e.message); }); };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", los, { once: true }); else setTimeout(los, 0);
+  })();
+
   /* ---------- Einstiege ---------- */
   // Mythara: im Gastbereich · Grauwacht-Titel: im Menü
   const wege = document.querySelector(".my-wege");
@@ -254,5 +415,5 @@
   const menue = document.querySelector("#intro .titel-menue");
   if (menue) { const b = document.createElement("button"); b.className = "menue"; b.id = "titel-kampagnen"; b.dataset.kampagnen = ""; b.innerHTML = '<span class="m-sym" aria-hidden="true">❖</span>Meine Kampagnen'; b.onclick = bibliothek; const g = $("#titel-gruppe"); menue.insertBefore(b, g); }
 
-  window.KAMPAGNE = { liveGestartet, beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
+  window.KAMPAGNE = { vergessenWennLeer: () => { if (K && K.version === 0) { K = null; merkeK(); } }, einladen, tischWechseln, tischUebernehmen, beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
 })();

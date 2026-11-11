@@ -51,7 +51,7 @@ const R = require('../js/regeln.js'), F = R.FD;
     check(await p.isVisible('#my-name'), `${vp.width}px: Anmeldung sichtbar`);
     await p.click('#my-gast-start');
     check(await p.isVisible('#hub') && /Willkommen in Mythara/.test(await p.textContent('#hub-gruss')), `${vp.width}px: Als Gast → Spielerseite`);
-    await p.click('.hub-kachel[data-hub="neu"]');
+    await p.click('.hub-kachel[data-hub="neu"]'); await p.click('[data-neu-abenteuer="grauwacht"]');
     check(await p.isVisible('#kodex') && /Euer Tisch/.test(await p.textContent('#kodex .seite:not([hidden])')), `${vp.width}px: Kodex beginnt mit „Euer Tisch“`);
     await p.click('#kodex-weiter'); await p.click('#w20'); await p.waitForTimeout(800);
     check(/gegen SG 13|immer/.test(await p.textContent('#w20-text')), `${vp.width}px: Würfel im Kodex zum Ausprobieren`);

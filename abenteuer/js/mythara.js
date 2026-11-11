@@ -10,8 +10,21 @@
   const KONTEN = true; // Spielerkonten sind freigeschaltet
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const zeige = (id) => window.AB && window.AB.zeigeSektion ? window.AB.zeigeSektion(id) : null;
-  const sauber = (v) => String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10);
-  const huebsch = (v) => { const c = sauber(v); return c.length > 4 ? c.slice(0, 4) + "-" + c.slice(4) : c; };
+  // Raum-Codes haben 10 Zeichen (ABEN-123456), Kampagnen-Codes für Gäste und Tisch-Geräte 12 (K7QM-2XHP-9RTA)
+  const sauber = (v) => String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+  const huebsch = (v) => { const c = sauber(v); return c.length > 10 ? c.slice(0, 4) + "-" + c.slice(4, 8) + "-" + c.slice(8) : c.length > 4 ? c.slice(0, 4) + "-" + c.slice(4) : c; };
+  /** Code öffnen: Raum-Code → Handy; Kampagnen-Code → als Gast mitspielen (Handy) oder dieses Gerät wird der Spieltisch */
+  async function codeLos(code, fb) {
+    if (code.length === 10) { location.href = "handy.html#" + huebsch(code); return; }
+    if (code.length !== 12) return fb("Bitte den vollständigen Code eingeben – z. B. ABEN-123456 oder K7QM-2XHP-9RTA.");
+    fb("Code wird geprüft …"); code = huebsch(code); // immer als XXXX-XXXX-XXXX (so wurde er erzeugt)
+    let info; try { info = await netz().rpc("rpg_link_info", { p_token: code }); } catch (e) { return fb(e.message); }
+    if (!info) return fb("Dieser Code ist abgelaufen oder ungültig.");
+    if (info.art === "gast") { location.href = "handy.html?k=" + encodeURIComponent(code); return; }
+    if (!window.KAMPAGNE || !confirm(`Dieses Gerät wird der Spieltisch von „${info.titel}“. Weiter?`)) return fb("");
+    $("#qr-overlay").hidden = true; fb("");
+    try { await window.KAMPAGNE.tischUebernehmen(code); } catch (e) { fb(e.message); toast(e.message); }
+  }
 
   /* ---------- Konto: Benutzername und Passwort (Bauabschnitt B) ---------- */
   // Supabase braucht für Passwörter eine E-Mail: Jedes Konto hat eine interne Platzhalter-Adresse
@@ -143,13 +156,11 @@
   function beitreten() {
     const f = $("#my-code");
     if (f.hidden) { codeFeld(true); return; }
-    const code = sauber($("#my-code-feld").value);
-    if (code.length < 10) { $("#my-code-fb").textContent = "Bitte den vollständigen Code eingeben, z. B. ABEN-123456. Er steht am Spieltisch."; $("#my-code-feld").focus(); return; }
-    location.href = "handy.html#" + huebsch(code);
+    return codeLos(sauber($("#my-code-feld").value), (t) => { $("#my-code-fb").textContent = t; });
   }
   /** Code aus einem gescannten Link oder Text holen */
   function codeAus(text) {
-    try { const u = new URL(text, location.href); if (u.hash.length > 1) return sauber(decodeURIComponent(u.hash.slice(1))); } catch (e) { /* kein Link */ }
+    try { const u = new URL(text, location.href); const k = u.searchParams.get("k") || u.searchParams.get("tisch"); if (k) return sauber(k); if (u.hash.length > 1) return sauber(decodeURIComponent(u.hash.slice(1))); } catch (e) { /* kein Link */ }
     return sauber(text);
   }
   let strom = null;
@@ -171,7 +182,7 @@
       const det = new window.BarcodeDetector({ formats: ["qr_code"] });
       const suche = async () => {
         if (!strom) return;
-        try { const r = await det.detect(v); if (r.length) { const c = codeAus(r[0].rawValue); if (c.length >= 10) { scannerStopp(); location.href = "handy.html#" + huebsch(c); return; } } } catch (e) { /* weiter */ }
+        try { const r = await det.detect(v); if (r.length) { const c = codeAus(r[0].rawValue); if (c.length >= 10) { scannerStopp(); codeLos(c, toast); return; } } } catch (e) { /* weiter */ }
         requestAnimationFrame(suche);
       };
       suche();
@@ -362,25 +373,18 @@
       o.hidden = true; toast(`${n} ${n === 1 ? "Einladung" : "Einladungen"} gesendet.`);
     };
   }
-  /** Neue Kampagne: Titel und Freunde wählen, dann beginnt das Abenteuer in dieser Kampagne */
-  async function neueKampagne() {
-    if (!istKonto() || !window.KAMPAGNE) return neuesAbenteuer();
-    let freunde = []; try { freunde = (await netz().rpc("rpg_my_friends", {})).freunde; } catch (e) { /* ohne Freunde weiter */ }
-    const o = fenster("Neue Kampagne starten", `<form class="f-neu" id="f-neu"><label for="f-titel">Name der Kampagne</label><input id="f-titel" maxlength="80" value="Das Siegel von Grauwacht">
-      <p class="f-unter">Freunde einladen <small>(optional – nur Freunde, die deine Anfrage angenommen haben)</small></p>
-      ${freunde.length ? `<ul class="f-liste wahl">${freunde.map((f) => `<li><label><input type="checkbox" value="${esc(f.handle)}"> <span class="hub-avatar klein">${ava(f.avatar_key, f.handle)}</span><b>${esc(f.handle)}</b></label></li>`).join("")}</ul>` : `<p class="note">Noch keine Freunde – du kannst sie später aus „Meine Kampagnen“ einladen.</p>`}
-      <button class="my-knopf rot" type="submit">Kampagne starten</button></form>`);
-    $("#f-neu").onsubmit = async (e) => {
-      e.preventDefault(); const knopf = o.querySelector(".my-knopf"); knopf.disabled = true;
-      try {
-        const titel = $("#f-titel").value.trim() || "Das Siegel von Grauwacht";
-        const id = await netz().rpc("rpg_create_campaign", { p_title: titel, p_display_name: profil.handle });
-        const namen = [...o.querySelectorAll("input[type=checkbox]:checked")].map((i) => i.value);
-        for (const name of namen) { try { await netz().rpc("rpg_invite_friend", { p_campaign_id: id, p_handle: name }); } catch (err) { toast(err.message); } }
-        o.hidden = true;
-        if (namen.length) toast(`Kampagne angelegt, ${namen.length} ${namen.length === 1 ? "Einladung" : "Einladungen"} gesendet.`);
-        window.KAMPAGNE.beginnen({ id, status: "geplant", title: titel });
-      } catch (err) { toast(err.message); knopf.disabled = false; }
+  /** Neue Kampagne: zuerst das Abenteuer wählen. Name und Freunde kommen später im Einladen-Schritt (Spieltisch + Handys). */
+  function neueKampagne() {
+    const o = fenster("Neue Kampagne starten", `<p class="note">Welches Abenteuer wollt ihr spielen?</p>
+      <div class="hub-welt-liste neu-wahl">
+        <button class="hub-kachel welt" data-neu-abenteuer="grauwacht"><img src="img/mythara/karte-kampagnen.webp" alt=""><b>Das Siegel von Grauwacht</b><small>Eine alte Abtei, ein vergessenes Siegel und eine Glocke, die seit sieben Nächten läutet. Stufe 1–3 · 3–6 Helden.</small></button>
+        <div class="hub-kachel welt bald" aria-disabled="true"><b>Weitere Abenteuer</b><small>sind in Vorbereitung.</small></div>
+      </div>`);
+    o.querySelector("[data-neu-abenteuer]").onclick = () => {
+      o.hidden = true;
+      // eine angefangene, aber nie gespielte Kampagne nicht versehentlich weiterverwenden
+      if (window.KAMPAGNE && window.KAMPAGNE.vergessenWennLeer) window.KAMPAGNE.vergessenWennLeer();
+      neuesAbenteuer();
     };
   }
   function profilAktion(was) {
@@ -405,11 +409,11 @@
   function beitretenDialog() {
     const o = $("#qr-overlay");
     o.innerHTML = `<div class="karte-box kampagnen"><div class="k-kopf"><h2>Kampagne beitreten</h2><button class="link" id="bt-zu">Schließen</button></div>
-      <p class="note">Gib den Code ein, den der Spieltisch zeigt – oder scanne den QR-Code dort einfach mit der Kamera deines Handys.</p>
-      <form class="my-code" id="bt-form"><label for="bt-code">Einladungscode</label><input id="bt-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABEN-123456" maxlength="11"><p class="my-fb" id="bt-fb" role="status"></p><button class="my-knopf" type="submit">Beitreten</button></form></div>`;
+      <p class="note">Gib den Code ein, den der Spieltisch zeigt – oder scanne den QR-Code dort einfach mit der Kamera deines Handys. Ein Tisch-Code macht dieses Gerät zum Spieltisch der Kampagne.</p>
+      <form class="my-code" id="bt-form"><label for="bt-code">Einladungscode</label><input id="bt-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABEN-123456" maxlength="14"><p class="my-fb" id="bt-fb" role="status"></p><button class="my-knopf" type="submit">Beitreten</button></form></div>`;
     o.hidden = false; $("#bt-zu").onclick = () => { o.hidden = true; };
     $("#bt-code").addEventListener("input", (e) => { e.target.value = huebsch(e.target.value); $("#bt-fb").textContent = ""; });
-    $("#bt-form").onsubmit = (e) => { e.preventDefault(); const c = sauber($("#bt-code").value); if (c.length < 10) { $("#bt-fb").textContent = "Bitte den vollständigen Code eingeben, z. B. ABEN-123456."; return; } location.href = "handy.html#" + huebsch(c); };
+    $("#bt-form").onsubmit = (e) => { e.preventDefault(); codeLos(sauber($("#bt-code").value), (t) => { $("#bt-fb").textContent = t; }); };
     $("#bt-code").focus();
   }
   const neuesAbenteuer = () => { const b = $("#titel-start"); if (b) b.click(); };
@@ -460,6 +464,7 @@
   /* ---------- Verknüpfen ---------- */
   $("#my-gast-start").onclick = () => { profil = profil && profil.konto ? profil : null; try { sessionStorage.setItem(HUB, "gast"); } catch (e) { /* privat */ } zeigeHub(); };
   $("#my-code-zeigen").onclick = () => codeFeld($("#my-code").hidden);
+  const tz = $("#my-tisch-zeigen"); if (tz) tz.onclick = () => { codeFeld(true); $("#my-code-feld").placeholder = "XXXX-XXXX-XXXX"; $("#my-code-fb").textContent = "Tisch-Code eingeben, den der bisherige Spieltisch zeigt."; };
   $("#my-beitreten").onclick = beitreten;
   $("#my-qr").onclick = scannen;
   $("#my-code").onsubmit = (e) => { e.preventDefault(); beitreten(); };

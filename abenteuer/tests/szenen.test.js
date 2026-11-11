@@ -11,6 +11,7 @@ const { chromium } = require('playwright');
 const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = require('../daten/grauwacht.js'), F = R.FD;
 (async () => {
   let ok = true; const errs = [];
+  const until = async (p, fn, arg, ms = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(250); } return false; };
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
 
   const einstieg = async (p, modus) => {
@@ -120,7 +121,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
       if (await p.$('#sz-schluss')) break;
       // nach der ersten Kampfszene einmal neu laden und fortsetzen
       if (kaempfe === 1 && !neuGeladen) { const vorher = await p.evaluate(() => window.ABT.A().szene); await p.reload(); await p.waitForSelector('#szene:not([hidden])', { timeout: 15000 }).catch(async (e) => { console.log('NACH NEULADEN sichtbar:', await p.evaluate(() => ['intro','lobby','spiel','ende','szene'].filter((x) => !document.getElementById(x).hidden).join() + ' | solo=' + (localStorage.getItem('ab_solo') || '').slice(0, 120) + ' | tisch=' + Boolean(localStorage.getItem('ab_tisch')))); throw e; }); neuGeladen = await p.evaluate(() => window.ABT.A().szene) === vorher; check(neuGeladen, 'Neu laden: das Abenteuer geht von selbst an derselben Stelle weiter');
-        await p.click('#sz-pause'); await p.click('#hub-lokal-play'); check(await p.isVisible('#szene'), 'Pause → Spielerseite → „Abenteuer in diesem Browser“ fortsetzen'); continue; }
+        await p.click('#sz-pause'); await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); check(await until(p, () => !document.querySelector('#hub').hidden) && await p.evaluate(() => document.querySelector('#szene').hidden), 'Über die Website: Spielerseite statt automatisch ins Spiel'); await until(p, () => Boolean(document.querySelector('#hub-lokal-play'))); await p.click('#hub-lokal-play'); check(await p.isVisible('#szene'), 'Pause → Spielerseite → „Abenteuer in diesem Browser“ fortsetzen'); continue; }
       const klick = async (sel) => { const e = await p.$(sel); if (e && await e.isEnabled()) { await e.click(); return true; } return false; };
       if (await p.$('[data-beute-ding]')) { if (!gesehen.has('Beute')) { gesehen.add('Beute'); if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + '/beute.png', fullPage: true }); } if (!(await p.$('[data-beute]'))) await p.click('[data-beute-ding]'); if (!(await klick('[data-beute]:not([disabled])'))) { p.once('dialog', (d) => d.accept()); await p.click('#beute-lassen'); } beuteGenommen++; continue; }
       if (await p.$('.aufstieg') && !gesehen.has('Aufstieg')) gesehen.add('Aufstieg');

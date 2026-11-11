@@ -615,9 +615,12 @@
   $("#start").onclick = () => { if (!SETUP.gruppe.length) SETUP.gruppe = []; zeigeSetup(); };
   $("#live").onclick = liveStarten;
 
-  // Nach dem Neuladen: laufende Live-Sitzung und Kampf wiederherstellen
+  // Nach dem Neuladen: laufende Live-Sitzung und Kampf wiederherstellen.
+  // Nur beim Neuladen derselben Seite – wer über die Website kommt, landet auf der Start- bzw. Spielerseite.
+  const neuGeladen = (() => { try { const n = performance.getEntriesByType("navigation")[0]; return n ? n.type === "reload" : performance.navigation && performance.navigation.type === 1; } catch (e) { return false; } })();
   (async () => {
     await bereit;
+    if (!neuGeladen) return;
     let gespeichert = null;
     try { gespeichert = JSON.parse(localStorage.getItem(SPEICHER) || "null"); } catch (e) { /* defekt */ }
     if (!gespeichert || !window.RPGNetz) { allein(); return; }

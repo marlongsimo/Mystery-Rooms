@@ -190,7 +190,58 @@
     if (s < 90) return "gerade eben"; if (s < 3600) return `vor ${Math.round(s / 60)} Minuten`; if (s < 86400) return `vor ${Math.round(s / 3600)} Stunden`;
     const d = Math.round(s / 86400); return d === 1 ? "gestern" : d < 14 ? `vor ${d} Tagen` : `vor ${Math.round(d / 7)} Wochen`;
   };
+  /* ---------- Eigene Seiten der Spielerseite: Helden, Regeln, Kampagnenwelt (ohne Spielablauf) ---------- */
+  function seiteZeigen(name, html) {
+    const s = $("#hub-seite");
+    s.innerHTML = `<button class="hub-zurueck" data-hub="uebersicht">← Zur Übersicht</button>${html}`;
+    s.hidden = false; $("#hub-start").hidden = true; $("#hub").classList.add("seite-offen");
+    document.querySelectorAll(".hub-nav-punkt").forEach((b) => b.classList.toggle("an", b.dataset.hub === name));
+    s.scrollIntoView({ block: "start" }); window.scrollTo(0, 0);
+  }
+  function startseiteZeigen() {
+    const s = $("#hub-seite"); if (s) { s.hidden = true; s.innerHTML = ""; }
+    $("#hub-start").hidden = false; $("#hub").classList.remove("seite-offen");
+    document.querySelectorAll(".hub-nav-punkt").forEach((b) => b.classList.toggle("an", b.dataset.hub === "uebersicht"));
+  }
+  /** Kopie von Inhalten der Spielseiten ohne Knöpfe und ohne IDs (keine doppelten IDs, kein Spielstart) */
+  function kopie(sel) {
+    const t = document.createElement("div");
+    document.querySelectorAll(sel).forEach((a) => { const c = a.cloneNode(true); c.hidden = false; c.removeAttribute("hidden"); t.appendChild(c); });
+    t.querySelectorAll("button, .knoepfe, .fb, [id^=intro-]").forEach((x) => x.remove());
+    t.querySelectorAll("[id]").forEach((x) => x.removeAttribute("id"));
+    t.querySelectorAll("h2.klein").forEach((h) => { if (/Wie spielt ihr/.test(h.textContent)) { const n = h.nextElementSibling; h.remove(); if (n && n.classList.contains("note")) n.remove(); } });
+    t.querySelectorAll("p, div.note").forEach((n) => { if (/Mit Handys: Dieses Gerät liegt|Tippe den Würfel an/.test(n.textContent)) n.remove(); });
+    return t.innerHTML;
+  }
+  function heldenSeite(klasse, fid) {
+    const HL = window.ABH_HELDEN, F = window.ABF;
+    if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Die Helden</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p><div class="hub-helden" data-heldenseite>${HL.klassenWahl({})}</div>`); return; }
+    const helden = HL.vonKlasse(klasse); fid = fid || helden[0];
+    seiteZeigen("helden", `<div class="hub-helden" data-heldenseite>${HL.klassenLeiste(klasse).replace('id="klassen-zurueck"', 'data-held-klassen')}${HL.klassenKopf(klasse)}
+      <div class="hub-held-reihe">${helden.map((f) => HL.kachel(f, { an: f === fid })).join("")}</div>${HL.detail(fid, 1, "")}</div>`);
+  }
+  function regelnSeite() {
+    seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">So wird Mythara gespielt – zum Nachlesen.</p><div class="hub-text kodex">${kopie("#kodex .seite")}</div>`);
+  }
+  function weltSeite(abenteuer) {
+    if (!abenteuer) {
+      seiteZeigen("welt", `<h1 class="hub-gruss">Kampagnenwelt</h1><p class="hub-untertitel">Die Splitterlande – und die Abenteuer, die dort auf euch warten.</p>
+        <div class="hub-welt-liste">
+          <button class="hub-kachel welt" data-welt="grauwacht"><img src="img/mythara/karte-kampagnen.webp" alt=""><b>Das Siegel von Grauwacht</b><small>Eine alte Abtei, ein vergessenes Siegel und eine Glocke, die seit sieben Nächten läutet. Das erste Abenteuer in Mythara.</small><span class="hub-mehr">Zur Beschreibung →</span></button>
+          <div class="hub-kachel welt bald" aria-disabled="true"><b>Weitere Abenteuer</b><small>sind in Vorbereitung.</small></div>
+        </div>`);
+      return;
+    }
+    seiteZeigen("welt", `<button class="hub-zurueck klein" data-welt="">← Alle Abenteuer</button>
+      <h1 class="hub-gruss">Das Siegel von Grauwacht</h1><p class="hub-untertitel">Das erste Abenteuer in den Splitterlanden</p>
+      <img class="hub-welt-bild" src="img/mythara/karte-kampagnen.webp" alt="">
+      <ul class="hub-fakten"><li><b>3–6</b> Heldinnen und Helden</li><li>etwa <b>3 Stunden</b></li><li><b>3</b> Abschnitte</li><li><b>5</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
+      <div class="hub-text einleitung">${kopie("#einleitung .seite")}</div>
+      <button class="my-knopf rot hub-welt-start" data-hub="neu">Kampagne starten</button>`);
+  }
+
   function zeigeHub() {
+    startseiteZeigen();
     try { sessionStorage.setItem(HUB, profil && profil.konto ? "konto" : "gast"); } catch (e) { /* privat */ }
     const ep = $("#einst-panel"); if (ep && ep.parentElement !== document.body) document.body.appendChild(ep); // Einstellungen auch von hier aus
     scannerStopp(); zeige("hub"); hubKopf(); hubListen();
@@ -371,15 +422,23 @@
   }
   document.addEventListener("click", (e) => {
     const p = e.target.closest("[data-profil]"); if (p) return profilAktion(p.dataset.profil);
+    // Heldenseite: Klasse wählen, Held wählen, zurück zu allen Klassen
+    const hs = e.target.closest("[data-heldenseite]");
+    if (hs) {
+      if (e.target.closest("[data-held-klassen]")) return heldenSeite();
+      const k = e.target.closest("[data-klasse]"); if (k) return heldenSeite(k.dataset.klasse);
+      const f = e.target.closest("[data-fid]"); if (f) return heldenSeite(window.ABF.FIGUREN[f.dataset.fid].klasse, f.dataset.fid);
+    }
+    const w = e.target.closest("[data-welt]"); if (w) return weltSeite(w.dataset.welt || null);
     const h = e.target.closest("[data-hub]"); if (!h || $("#hub").hidden) { const m = $("#hub-menue"); if (m && !m.hidden && !e.target.closest(".hub-profil")) m.hidden = true; return; }
     const was = h.dataset.hub;
     if (was === "uebersicht") return zeigeHub();
     if (was === "kampagnen") return window.KAMPAGNE ? window.KAMPAGNE.bibliothek() : toast("Kampagnen sind gerade nicht verfügbar.");
-    if (was === "helden") return window.AB.zeigeSetup();
+    if (was === "helden") return heldenSeite();
     if (was === "neu") return neueKampagne();
     if (was === "freunde") return freundeZeigen();
-    if (was === "welt") return neuesAbenteuer();
-    if (was === "regeln") { const b = $("#titel-regeln"); if (b) b.click(); return; }
+    if (was === "welt") return weltSeite();
+    if (was === "regeln") return regelnSeite();
     if (was === "beitreten") return beitretenDialog();
   });
 

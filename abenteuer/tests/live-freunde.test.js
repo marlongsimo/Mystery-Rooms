@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
   const until = async (p, fn, arg, ms = 30000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(300); } return false; };
   const PW = 'Mythara-Test-1', N = () => 'Test_' + Math.random().toString(36).slice(2, 8);
   const registrieren = async (p, name) => {
-    await p.goto(BASE + '/abenteuer/index.html?testlauf'); await p.click('#my-reg');
+    await p.goto(BASE + '/abenteuer/index.html'); await p.click('#my-reg');
     await p.fill('#my-reg-name', name); await p.fill('#my-reg-pw', PW); await p.fill('#my-reg-pw2', PW); await p.click('#my-reg-form .my-knopf');
     return until(p, () => !document.querySelector('#hub').hidden);
   };

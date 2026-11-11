@@ -187,6 +187,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
 | **Kurzbogen** | 1 | Aktion · 16 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
 | **Rauchbombe** | 1 | Aktion · Radius 2 · 1× je Rast | 2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus. |
+| **Schattenwirbel** | 1 | Aktion · Nahkampf · Radius 1 · GES-Rettung SG 13 · 2W6 · 2× je Rast | Wirbel mit beiden Klingen um einen Gegner neben dir: er und alle direkt um ihn nehmen 2W6, GES-Rettung halbiert. Verbündete bleiben verschont. Zweimal je Rast. |
 | **Gerissener Spurt** | 1 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
 | **Verstecken** | 1 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
 | **Rückzug** | 1 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |

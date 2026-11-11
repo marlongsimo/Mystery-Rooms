@@ -144,6 +144,7 @@
         { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
         { id: "leiser_schritt", name: "Leiser Schritt", typ: "passiv", ab: 1, text: "Du kannst dich auch ohne Deckung verstecken, solange kein Gegner neben dir steht. Gerissene Aktion schon ab Stufe 1." },
         { id: "rauchbombe", name: "Rauchbombe", typ: "aktion", ab: 1, art: "rauch", radius: 2, dauer: 2, pro: { rast: 1 }, text: "2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus." },
+        { id: "schattenwirbel", name: "Schattenwirbel", typ: "aktion", ab: 1, art: "flaeche", form: "kreis", groesse: 1, reichweite: 1, schaden: "2W6", rettung: "GES", attr: "GES", halb: true, pro: { rast: 2 }, text: "Wirbel mit beiden Klingen um einen Gegner neben dir: er und alle direkt um ihn nehmen 2W6, GES-Rettung halbiert. Verbündete bleiben verschont. Zweimal je Rast." },
         { id: "kletterer", name: "Kletterer", typ: "passiv", ab: 2, text: "Wände und Schächte ohne Probe." },
         { id: "schattenstoss", name: "Schattenstoß", typ: "passiv", ab: 2, text: "Greifst du aus dem Versteck an, machst du 1W6 mehr Schaden und triffst schon bei 19 kritisch." },
         { id: "fallensteller", name: "Fallensteller", typ: "passiv", ab: 3, text: "Vor einem Kampf, den die Gruppe kommen sieht, legt er eine Falle." },

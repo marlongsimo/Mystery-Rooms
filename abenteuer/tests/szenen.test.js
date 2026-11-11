@@ -14,6 +14,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
 
   const einstieg = async (p, modus) => {
+    await p.click('#my-gast-start');
     await p.click('#titel-start');
     await p.waitForSelector('#einleitung:not([hidden])');
     for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
@@ -104,7 +105,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
   await p.goto(BASE + '/abenteuer/index.html?schnell');
   await p.evaluate(() => localStorage.clear()); await p.reload();
-  check(/Siegel von Grauwacht/.test(await p.textContent('h1')), 'Startseite: Das Siegel von Grauwacht');
+  check(/Siegel von Grauwacht/.test(await p.textContent('#intro h1')), 'Startseite: Das Siegel von Grauwacht (hinter Mythara)');
   await einstieg(p, 'allein');
   for (const f of ['schildwaechter', 'elementarist', 'lichtbringer', 'trickser']) await nimm(p, f);
   await p.click('#abenteuer-los');

@@ -765,3 +765,76 @@ body[data-abschnitt="3"] .szene h1 { text-shadow: 0 0 24px rgba(201, 72, 40, .25
 .held-stand p { margin: 0; } .held-stand .gefallen { color: #e8a49c; }
 .held-stand ul { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
 .held-stand li span { display: block; color: var(--muted); }
+
+/* ===================== Mythara: Startbildschirm ===================== */
+.mythara { position: relative; width: 100vw; margin: -16px calc(50% - 50vw) 0; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; overflow: hidden; padding: 24px 16px 32px; isolation: isolate; }
+.mythara[hidden] { display: none; }
+.my-hg, .my-hg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 30% 50%; z-index: -2; }
+.my-schleier { position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse 60% 55% at 50% 58%, rgba(6, 8, 12, .55), transparent 75%), linear-gradient(180deg, rgba(6, 8, 12, .35), rgba(6, 8, 12, .1) 30%, rgba(6, 8, 12, .55)); }
+.my-inhalt { width: min(1000px, 100%); display: grid; justify-items: center; gap: 10px; text-align: center; }
+.my-logo { margin: 0; line-height: 0; }
+.my-logo img { width: min(640px, 92vw); height: auto; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .7)); }
+.my-band { margin: -6px 0 0; padding: 6px 34px; font: 600 clamp(13px, 2.2vw, 18px) var(--schrift-titel); letter-spacing: .12em; text-transform: uppercase; color: #f6e2b0;
+  background: linear-gradient(180deg, #9b1f22, #6d1214); border-top: 1px solid #d7a64e; border-bottom: 1px solid #d7a64e; clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%); box-shadow: 0 6px 20px rgba(0, 0, 0, .5); }
+.my-motto { margin: 2px 0 8px; font: italic 400 clamp(19px, 3vw, 28px) var(--schrift-text); color: #e9c77e; text-shadow: 0 2px 8px rgba(0, 0, 0, .9); }
+.my-wahl { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; width: 100%; }
+.my-oder { align-self: center; font: 600 13px var(--schrift-titel); letter-spacing: .14em; text-transform: uppercase; color: #e9c77e; text-shadow: 0 2px 6px #000; }
+.my-karte { position: relative; display: grid; align-content: start; gap: 12px; padding: 34px 22px 22px; text-align: left; color: #efe6d4;
+  background: linear-gradient(180deg, rgba(14, 14, 16, .9), rgba(8, 8, 10, .92)); border: 1px solid #b08a45; border-radius: 6px;
+  box-shadow: inset 0 0 0 3px rgba(8, 8, 10, .9), inset 0 0 0 4px rgba(176, 138, 69, .55), 0 18px 40px rgba(0, 0, 0, .55); }
+.my-wappen { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; display: grid; place-items: center; font-size: 22px;
+  background: radial-gradient(circle, #2a2116, #0d0b08); border: 1px solid #c99a4b; border-radius: 50%; box-shadow: 0 0 14px rgba(233, 199, 126, .35); }
+.my-karte h2 { margin: 0 0 4px; text-align: center; font: 600 clamp(20px, 2.4vw, 26px) var(--schrift-titel); color: #f3e7cc; padding-bottom: 10px; border-bottom: 1px solid rgba(176, 138, 69, .35); }
+.my-wege { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.my-weg { display: flex; gap: 12px; align-items: center; width: 100%; padding: 8px 10px; background: none; border: 1px solid transparent; border-radius: 4px; color: #efe6d4; font: 400 19px var(--schrift-text); text-align: left; cursor: pointer; }
+.my-weg span { width: 26px; text-align: center; color: #e9b04e; font-size: 20px; }
+.my-weg:hover, .my-weg:focus-visible { border-color: rgba(201, 154, 75, .5); background: rgba(201, 154, 75, .08); outline: none; }
+.my-knopf { display: flex; gap: 12px; justify-content: center; align-items: center; width: 100%; padding: 12px 16px; font: 600 clamp(18px, 2vw, 22px) var(--schrift-titel); color: #f6ead0; cursor: pointer;
+  background: linear-gradient(180deg, #2a2a2e, #141416); border: 1px solid #c99a4b; border-radius: 6px; box-shadow: inset 0 0 0 2px #0b0b0c, inset 0 0 0 3px rgba(201, 154, 75, .45), 0 6px 16px rgba(0, 0, 0, .5); }
+.my-knopf span { color: #e9b04e; }
+.my-knopf.rot { background: linear-gradient(180deg, #a3191c, #6a0f12); color: #fff3dc; }
+.my-knopf:hover, .my-knopf:focus-visible { filter: brightness(1.12); outline: none; box-shadow: inset 0 0 0 2px #0b0b0c, inset 0 0 0 3px rgba(233, 199, 126, .8), 0 0 18px rgba(233, 199, 126, .35); }
+.my-anmelden { display: grid; gap: 10px; }
+.my-feld { display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid rgba(201, 154, 75, .55); border-radius: 6px; background: rgba(0, 0, 0, .45); }
+.my-feld > span { color: #e9b04e; width: 22px; text-align: center; }
+.my-feld input { flex: 1; min-width: 0; padding: 12px 0; background: none; border: 0; color: #f3e7cc; font: 400 18px var(--schrift-text); outline: none; }
+.my-feld input::placeholder { color: #bfb39c; }
+.my-feld:focus-within { border-color: #e9c77e; box-shadow: 0 0 0 2px rgba(233, 199, 126, .25); }
+.my-auge { background: none; border: 0; color: #e9c77e; cursor: pointer; font-size: 16px; }
+.my-link { justify-self: center; background: none; border: 0; color: #e9dcc0; text-decoration: underline; font: 400 17px var(--schrift-text); cursor: pointer; }
+.my-bald { margin: 0; font: 400 19px/1.45 var(--schrift-text); color: #e9dcc0; } .my-bald.klein { font-size: 16px; color: #b9ae99; }
+.my-code { display: grid; gap: 6px; }
+.my-code label { font: 600 11px var(--schrift-ui); letter-spacing: .14em; text-transform: uppercase; color: #e9c77e; }
+.my-code input { padding: 12px; font: 600 22px var(--schrift-ui); letter-spacing: .12em; text-align: center; color: #f3e7cc; background: rgba(0, 0, 0, .5); border: 1px solid rgba(201, 154, 75, .6); border-radius: 6px; }
+.my-fb { margin: 0; min-height: 1em; font: 400 15px var(--schrift-ui); color: #f0b8a8; }
+.my-scanner { display: grid; gap: 8px; }
+.my-scanner video { width: 100%; max-height: 260px; object-fit: cover; border: 1px solid #c99a4b; border-radius: 6px; background: #000; }
+.my-scan-tipp { margin: 0; font: 400 16px/1.4 var(--schrift-text); color: #e9dcc0; }
+.my-registrieren:empty { display: none; }
+.my-reg-knopf { display: flex; gap: 14px; align-items: center; padding: 12px 26px; font: 400 clamp(17px, 2vw, 22px) var(--schrift-text); color: #e9c77e; cursor: pointer;
+  background: linear-gradient(180deg, rgba(20, 18, 14, .92), rgba(8, 8, 10, .92)); border: 1px solid #b08a45; border-radius: 6px; box-shadow: inset 0 0 0 3px rgba(8, 8, 10, .9), inset 0 0 0 4px rgba(176, 138, 69, .5); }
+.my-reg-knopf b { font-family: var(--schrift-titel); color: #f3e7cc; }
+.my-hinweis { display: flex; gap: 12px; align-items: center; max-width: 620px; margin: 6px 0 0; text-align: left; font: 400 clamp(16px, 1.8vw, 19px)/1.35 var(--schrift-text); color: #efe6d4; text-shadow: 0 2px 6px #000; }
+.my-hinweis span { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #e9b04e; border-radius: 50%; color: #e9b04e; }
+@media (max-width: 760px) {
+  .mythara { place-items: start center; }
+  .my-wahl { grid-template-columns: 1fr; gap: 26px; }
+  .my-oder { justify-self: center; margin: -10px 0; }
+  .my-karte { padding: 30px 16px 16px; }
+}
+.my-ico { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none; color: #e9b04e; }
+.my-ico svg, .my-wappen svg { width: 100%; height: 100%; fill: currentColor; }
+.my-ico.gross { width: 32px; height: 32px; }
+.my-wappen { color: #e9b04e; padding: 9px; }
+.my-weg span.my-ico { width: 26px; font-size: 0; }
+.my-feld > .my-ico { width: 20px; height: 20px; }
+.my-auge .my-ico { width: 22px; height: 22px; color: #e9c77e; }
+.my-knopf .my-ico { width: 24px; height: 24px; }
+.my-pfeil { color: #e9b04e; font-size: 1.2em; }
+.my-hinweis span { font: italic 600 18px var(--schrift-text); }
+@media (max-width: 760px) {
+  .my-motto { margin-bottom: 22px; }
+  .my-wahl > .my-karte:first-child { order: 3; }
+  .my-oder { order: 2; margin: 0; } .my-wahl > .my-karte:last-child { order: 1; }
+  .my-wahl { gap: 34px; }
+}

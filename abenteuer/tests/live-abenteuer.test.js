@@ -16,6 +16,7 @@ const { chromium } = require('playwright');
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
 
   const einstieg = async (p, modus) => {
+    await p.click('#my-gast-start');
     await p.click('#titel-start');
     await p.waitForSelector('#einleitung:not([hidden])');
     for (let i = 0; i < 3; i++) await p.click('#einl-weiter');

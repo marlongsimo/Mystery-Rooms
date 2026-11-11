@@ -4,18 +4,57 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
-  <title>Das Siegel von Grauwacht – Abenteuer | Case Unlocked</title>
+  <title>Mythara – Das digitale Rollenspiel | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=24">
+  <link rel="stylesheet" href="css/abenteuer.css?v=26">
 </head>
 <body>
   <header class="top">
     <a class="back" href="../index.html">← Case Unlocked</a>
-    <span class="brand">ABENTEUER</span>
+    <span class="brand">MYTHARA</span>
   </header>
   <main id="app">
-    <section class="titel" id="intro">
+    <section class="mythara" id="mythara" aria-labelledby="my-titel">
+      <picture class="my-hg" aria-hidden="true">
+        <source media="(max-width: 700px) and (orientation: portrait)" srcset="img/mythara/hintergrund-hoch.webp">
+        <source media="(max-width: 1000px)" srcset="img/mythara/hintergrund-960.webp">
+        <img src="img/mythara/hintergrund-1536.webp" alt="" fetchpriority="high" decoding="async">
+      </picture>
+      <div class="my-schleier" aria-hidden="true"></div>
+      <div class="my-inhalt">
+        <h1 class="my-logo" id="my-titel"><img src="img/mythara/logo.webp" srcset="img/mythara/logo-700.webp 700w, img/mythara/logo.webp 1400w" sizes="(max-width: 700px) 92vw, 640px" alt="Case Unlocked präsentiert Mythara"></h1>
+        <p class="my-band">Das digitale Rollenspiel</p>
+        <p class="my-motto">Deine Welt. Deine Gefährten. Deine Legende.</p>
+        <div class="my-wahl">
+          <section class="my-karte" id="my-konto" aria-labelledby="my-konto-titel">
+            <span class="my-wappen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z"/></svg></span>
+            <h2 id="my-konto-titel">Als Spieler anmelden</h2>
+            <div class="my-konto-inhalt" id="my-konto-inhalt"></div>
+          </section>
+          <span class="my-oder" aria-hidden="true">oder</span>
+          <section class="my-karte" aria-labelledby="my-gast-titel">
+            <span class="my-wappen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><circle cx="5" cy="9" r="2.6"/><circle cx="19" cy="9" r="2.6"/><path d="M6 20c0-3.6 2.7-6.5 6-6.5s6 2.9 6 6.5z"/><path d="M0.5 19c0-2.8 2-5 4.5-5 1 0 1.9.3 2.6.9C6 16.2 5 18 5 20H.5z"/><path d="M23.5 19c0-2.8-2-5-4.5-5-1 0-1.9.3-2.6.9 1.6 1.3 2.6 3.1 2.6 5.1h4.5z"/></svg></span>
+            <h2 id="my-gast-titel">Als Gast spielen</h2>
+            <ul class="my-wege">
+              <li><button class="my-weg" id="my-gast-start"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10a5 5 0 0 1 4.8 6.4l-1 3.4a2.6 2.6 0 0 1-4.4 1L14.6 16H9.4l-1.8 1.8a2.6 2.6 0 0 1-4.4-1l-1-3.4A5 5 0 0 1 7 7z"/><path d="M7 10v4M5 12h4" stroke="#0d0b08" stroke-width="1.6"/><circle cx="16" cy="11" r="1.1" fill="#0d0b08"/><circle cx="18" cy="13" r="1.1" fill="#0d0b08"/></svg></span>Ohne Registrierung starten</button></li>
+              <li><button class="my-weg" id="my-code-zeigen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><circle cx="5" cy="9" r="2.6"/><circle cx="19" cy="9" r="2.6"/><path d="M6 20c0-3.6 2.7-6.5 6-6.5s6 2.9 6 6.5z"/><path d="M0.5 19c0-2.8 2-5 4.5-5 1 0 1.9.3 2.6.9C6 16.2 5 18 5 20H.5z"/><path d="M23.5 19c0-2.8-2-5-4.5-5-1 0-1.9.3-2.6.9 1.6 1.3 2.6 3.1 2.6 5.1h4.5z"/></svg></span>Mit Einladungscode beitreten</button></li>
+              <li><button class="my-weg" id="my-qr"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5.5 5.5h2v2h-2zM16.5 5.5h2v2h-2zM5.5 16.5h2v2h-2zM14 14h3v3h-3zM18 18h3v3h-3zM18 14h3v2h-3zM14 18h2v3h-2z"/></svg></span>Oder QR-Code scannen</button></li>
+            </ul>
+            <form class="my-code" id="my-code" hidden>
+              <label for="my-code-feld">Einladungscode</label>
+              <input id="my-code-feld" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABEN-123456" maxlength="11">
+              <p class="my-fb" id="my-code-fb" role="status"></p>
+            </form>
+            <div class="my-scanner" id="my-scanner" hidden></div>
+            <button class="my-knopf" id="my-beitreten"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/><path d="M7 12h10"/></svg></span>Spiel beitreten</button>
+          </section>
+        </div>
+        <div class="my-registrieren" id="my-registrieren"></div>
+        <p class="my-hinweis"><span aria-hidden="true">i</span>Mit einem Konto bleiben deine Charaktere, Kampagnen und Fortschritte dauerhaft gespeichert – spiele jederzeit weiter.</p>
+      </div>
+    </section>
+    <section class="titel" id="intro" hidden>
       <picture class="titel-hg" aria-hidden="true">
         <source media="(max-width: 900px)" srcset="img/welt/abtei-960.webp">
         <img src="img/welt/abtei-1672.webp" alt="" fetchpriority="high" decoding="async">
@@ -25,7 +64,7 @@
       <div class="nebel-schicht effekt n1" aria-hidden="true"></div>
       <div class="nebel-schicht effekt n2" aria-hidden="true"></div>
       <div class="titel-inhalt">
-        <p class="eyebrow">Ein interaktives Rollenspiel-Abenteuer</p>
+        <p class="eyebrow">Mythara · Das erste Abenteuer</p>
         <h1 class="titel-logo">Das Siegel von <span>Grauwacht</span></h1>
         <span class="titel-zier" aria-hidden="true"></span>
         <nav class="titel-menue knoepfe" aria-label="Hauptmenü">
@@ -33,7 +72,7 @@
           <button class="menue" id="titel-gruppe"><span class="m-sym" aria-hidden="true">⚔</span>Gruppe verwalten</button>
           <button class="menue" id="titel-regeln"><span class="m-sym" aria-hidden="true">❦</span>Regelwerk</button>
           <button class="menue" id="titel-einst"><span class="m-sym" aria-hidden="true">✦</span>Einstellungen</button>
-          <a class="menue" href="../index.html"><span class="m-sym" aria-hidden="true">←</span>Zurück zur Übersicht</a>
+          <button class="menue" id="titel-mythara"><span class="m-sym" aria-hidden="true">←</span>Zurück zum Start</button>
         </nav>
         <p class="titel-fuss">3–6 Heldinnen und Helden · etwa 3 Stunden · ab 12 Jahren<br><button class="link" id="ton">🔔 Ton an</button></p>
       </div>
@@ -162,8 +201,9 @@
   <script src="vendor/qrcode-generator-1.4.4.js"></script>
   <script src="daten/grauwacht.js?v=14"></script>
   <script src="js/szenen.js?v=11"></script>
-  <script src="js/spiel.js?v=22"></script>
+  <script src="js/spiel.js?v=23"></script>
   <script src="js/abenteuer-tisch.js?v=15"></script>
   <script src="js/einstieg.js?v=4"></script>
+  <script src="js/mythara.js?v=2"></script>
 </body>
 </html>

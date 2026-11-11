@@ -75,7 +75,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 |---|---|---|---|
 | **Großaxt** | 1 | Aktion · Nahkampf · Angriff +5 · 1W12 + 3 | Nahkampf. |
 | **Großaxt, rücksichtslos** | 1 | Aktion · Nahkampf · Angriff +5 · 1W12 + 3 | Vorteil auf deinen Angriff, aber Angriffe gegen dich haben Vorteil bis zu deinem nächsten Zug. |
-| **Raserei** | 1 | Bonusaktion · 1× je Rast | Bis Kampfende: Waffenschaden gegen dich halbiert, +2 Schaden. Heilung wirkt nur halb. |
+| **Raserei** | 1 | Bonusaktion · 1× je Rast | Bis Kampfende: Waffenschaden gegen dich halbiert, +1 Schaden. Heilung wirkt nur halb. |
 | **Zweiter Atem** | 1 | Bonusaktion · heilt 1W10 + Stufe · 1× je Rast | Heilt dich um 1W10 + Stufe. |
 | **Tatendrang** | 2 | frei · 1× je lange Rast | Eine zusätzliche Aktion in diesem Zug, einmal je lange Rast. |
 | **Blutrausch** | 1 | passiv | Unter halben TP: +1 Schaden und Vorteil auf Stärke-Proben. |
@@ -192,6 +192,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | **Rückzug** | 1 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
 | **Leiser Schritt** | 1 | passiv | Du kannst dich auch ohne Deckung verstecken, solange kein Gegner neben dir steht. Gerissene Aktion schon ab Stufe 1. |
 | **Kletterer** | 2 | passiv | Wände und Schächte ohne Probe. |
+| **Schattenstoß** | 2 | passiv | Greifst du aus dem Versteck an, machst du 1W6 mehr Schaden und triffst schon bei 19 kritisch. |
 | **Fallensteller** | 3 | passiv | Vor einem Kampf, den die Gruppe kommen sieht, legt er eine Falle. |
 | **Hinterhalt** | 1 | passiv | Einmal je Zug +1W6 (ab Stufe 2 +2W6), wenn du Vorteil hast oder ein Verbündeter neben dem Ziel steht. |
 | **Fallen und Schlösser** | – | außerhalb des Kampfes | Entdeckt und entschärft Fallen, öffnet Schlösser ohne Schlüssel. |
@@ -263,7 +264,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | **Untote vertreiben** | 2 | Aktion · 6 Felder · WEI-Rettung SG 13 · 1× je Rast | Göttliche Macht: Untote in 6 Feldern fliehen 2 Runden (WEI-Rettungswurf). |
 | **Schutzkreis** | 3 | Aktion · Platz vom 2. Grad | Verbündete in 2 Feldern um dich +2 RK, 3 Runden. |
 | **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
-| **Strahlende Aura** | 1 | passiv | Gegner neben dir nehmen zu Beginn ihres Zugs 2 gleißenden Schaden, Untote 3. |
+| **Strahlende Aura** | 1 | passiv | Gegner neben dir nehmen zu Beginn ihres Zugs 1 gleißenden Schaden, Untote 2. |
 | **Geweihtes Wissen** | – | außerhalb des Kampfes | Erkennt Flüche und Untote; bringt schwache Untote ohne Kampf zur Ruhe. |
 
 **Versuchung des Abts:** „Ich mache den Tod eines Unschuldigen rückgängig. Wähle.“ Wahr, aber ein anderer Unschuldiger nimmt seinen Platz.

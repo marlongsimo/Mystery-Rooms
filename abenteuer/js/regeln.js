@@ -559,7 +559,10 @@
     const fest = a.ohneMod ? 0 : mod(f.werte[a.attr]);
     const extra = [];
     let krit = 20, zusatz = "";
-    if (f.z.raserei && a.attr === "STR") extra.push("0W1+2");
+    if (f.z.raserei && a.attr === "STR") extra.push("0W1+1");
+    // Darian, Schattenstoß (ab Stufe 2): Angriff aus dem Versteck +1W6 und kritisch ab 19
+    const schattenstoss = istFig(f, "schattenlaeufer") && f.stufe >= 2 && f.z.versteckt;
+    if (schattenstoss) extra.push("1W6");
     if (istFig(f, "berserker") && f.tp < f.tpMax / 2) extra.push(f.stufe >= 3 ? "0W1+2" : "0W1+1");
     if (f.z.finte) extra.push("1W6");
     if (hatDing(f, "silberdolch") && GEGNER[z.art] && GEGNER[z.art].untot) extra.push("1W4");
@@ -572,6 +575,7 @@
     if (istFig(f, "assassine") && f.stufe >= 3 && z.tp < z.tpMax / 2) extra.push("1W6");
     if (istFig(f, "kopfgeldjaeger") && f.stufe >= 3 && z.z.mal_jaeger === f.id && z.tp < z.tpMax / 2 && !(f.genutzt.erlegen)) { extra.push("2W6"); f.genutzt.erlegen = 1; zusatz = " Erlegen!"; }
     if (istFig(f, "duellant") && f.stufe >= 3) krit = 19;
+    if (schattenstoss) krit = Math.min(krit, 19);
     if (hatDing(f, "wetzstein")) krit = Math.min(krit, 19);
     if (istFig(f, "kopfgeldjaeger") && z.z.mal_jaeger === f.id) krit = 19;
     const giftAktiv = Boolean(f.z.gift);
@@ -931,7 +935,7 @@
     }
     if (f.z.liegend && f.tp > 0 && st.zug.bewegung >= 3) { st.zug.bewegung -= 3; delete f.z.liegend; }
     // Strahlende Aura gegen Untote
-    if (f.seite === "gegner") for (const l of st.figuren) if (istFig(l, "lichtbringer") && lebt(l) && abstand(l, f) <= 1 && lebt(f)) { const n = GEGNER[f.art].untot ? 3 : 2; st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
+    if (f.seite === "gegner") for (const l of st.figuren) if (istFig(l, "lichtbringer") && lebt(l) && abstand(l, f) <= 1 && lebt(f)) { const n = GEGNER[f.art].untot ? 2 : 1; st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
     if (lebt(f)) brandFeld(st, f);
     if (st.ende) return;
     if (!lebt(f)) weiter(st);

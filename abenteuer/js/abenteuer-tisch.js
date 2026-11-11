@@ -82,7 +82,24 @@
     return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
       const dinge = (z.rucksack || []).filter((x) => R.GEGENSTAENDE[x.id] && x.n > 0).map((x) => `<i title="${esc(R.GEGENSTAENDE[x.id].name)}: ${esc(R.GEGENSTAENDE[x.id].text)}">${R.GEGENSTAENDE[x.id].sym}</i>`).join("");
       const rel = z.tot && S.reliquieTraeger(A) ? `<button class="btn klein reliquie-knopf" data-wiederbeleben="${fid}" title="Reliquie der Brüder nutzen">✝ Zurückholen</button>` : "";
-      return `<span class="${z.tot ? "tot" : ""}">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small>${rel}</span>`; }).join("")}</div>`;
+      return `<span class="${z.tot ? "tot" : ""}" data-held="${fid}" role="button" tabindex="0" title="${esc(d.name)} ansehen">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small>${rel}</span>`; }).join("")}</div>`;
+  }
+  /** Heldenansicht im Abenteuer: alle Einzelheiten wie bei der Auswahl, auf der aktuellen Stufe, mit aktuellem Stand */
+  function heldZeigen(fid) {
+    const HL = window.ABH_HELDEN; if (!HL || !A) return;
+    const z = A.zust[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
+    const dinge = (z.rucksack || []).filter((x) => x.n > 0).map((x) => { const g = R.GEGENSTAENDE[x.id], t = R.DINGE && R.DINGE[x.id]; const n = g ? `${g.sym} ${g.name}` : t ? t.name : x.id; return `<li><b>${esc(n)}${x.n > 1 ? ` ×${x.n}` : ""}</b>${g ? `<span>${esc(g.text)}</span>` : ""}</li>`; }).join("");
+    const stand = `<div class="held-stand"><p><b>Stufe ${A.stufe}</b> · ${z.tot ? "<span class=\"gefallen\">gefallen</span>" : `${z.tp}/${max} TP`}${b ? ` · 📱 ${esc(AB.spielerName(b))}` : ""}</p>${dinge ? `<ul>${dinge}</ul>` : `<p class="note">Keine Gegenstände.</p>`}</div>`;
+    let dlg = document.getElementById("held-dialog");
+    if (!dlg) {
+      dlg = document.createElement("dialog"); dlg.id = "held-dialog"; dlg.className = "held-dialog";
+      dlg.innerHTML = `<button class="held-dialog-zu" aria-label="Schließen">✕</button><div class="held-dialog-inhalt"></div>`;
+      document.body.appendChild(dlg);
+      dlg.querySelector(".held-dialog-zu").onclick = () => dlg.close();
+      dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+    }
+    dlg.querySelector(".held-dialog-inhalt").innerHTML = HL.detail(fid, A.stufe, stand);
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
   }
   /* ---------- Chronik: jedes beendete Abenteuer bleibt auf dem Gerät ---------- */
   const CHRONIK = "ab_chronik";
@@ -257,6 +274,10 @@
   function binde(el, v, s) {
     const nach = () => { merken(); render(); AB.veroeffentlichen(); };
     el.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { S.waehle(A, b.dataset.opt); nachSzene(); }; });
+    el.querySelectorAll("[data-held]").forEach((sp) => {
+      const auf = (e) => { if (e.target.closest("[data-wiederbeleben]")) return; heldZeigen(sp.dataset.held); };
+      sp.onclick = auf; sp.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); auf(e); } };
+    });
     el.querySelectorAll("[data-wiederbeleben]").forEach((b) => { b.onclick = () => { const fid = b.dataset.wiederbeleben; if (!confirm(`Die Reliquie der Brüder für ${F.FIGUREN[fid].name} nutzen? Sie ist danach verbraucht.`)) return; const r = S.wiederbeleben(A, fid); if (r.fehler) AB.toast(r.fehler); nach(); }; });
     el.querySelectorAll("[data-beute-ding]").forEach((b) => { b.onclick = () => { A.beuteWahl = b.dataset.beuteDing; render(); }; b.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); b.click(); } }; });
     el.querySelectorAll("[data-beute]").forEach((b) => { b.onclick = () => { const [ding, fid] = b.dataset.beute.split(":"); const r = S.beuteGeben(A, ding, fid); if (r.fehler) AB.toast(r.fehler); else A.beuteWahl = null; nach(); }; });

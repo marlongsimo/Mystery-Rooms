@@ -88,8 +88,9 @@
   /** Große Vorstellung einer Figur. knopf: HTML für die Aktion (wählen) */
   function detail(fid, stufe = 1, knopf = "") {
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], pr = PROFIL[fid];
-    const eigene = d.faehig.filter((a) => a.ab === 1), spaeter = d.faehig.filter((a) => a.ab > 1);
-    const kl = F.KLASSE_FAEHIG[d.klasse].filter((a) => a.ab === 1);
+    // Fähigkeiten passend zur Stufe: freigeschaltete in der Liste, spätere darunter
+    const eigene = d.faehig.filter((a) => a.ab <= stufe), spaeter = d.faehig.filter((a) => a.ab > stufe);
+    const kl = F.KLASSE_FAEHIG[d.klasse].filter((a) => a.ab <= stufe);
     const balken = ACHSEN.map((n, i) => `<div class="achse"><span>${n}</span><i>${Array.from({ length: 5 }, (_, j) => `<b class="${j < pr.p[i] ? "an" : ""}"></b>`).join("")}</i></div>`).join("");
     const werte = ["STR", "GES", "KON", "INT", "WEI", "CHA"].map((a) => `<span class="${d.werte[a] >= 16 ? "haupt" : ""}"><small>${a}</small><b>${d.werte[a]}</b><em>${vorz(R.mod(d.werte[a]))}</em></span>`).join("");
     const fae = (a) => `<li><b>${esc(a.name)}</b><span class="typ">${a.typ === "passiv" ? "immer" : a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion"}${(() => { const gz = R.grenze({ stufe }, a); return gz ? ` · ${gz.n}× je ${gz.je}` : ""; })()}</span><p>${esc(a.text)}</p></li>`;
@@ -107,7 +108,7 @@
         <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="werte">Attribute</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>
         <div class="held-tafel" data-tafel="faehig">
           <ul class="held-faehig">${k.merkmal ? (([n, ...t]) => `<li class="klassen-merkmal"><b>${esc(n)}</b><span class="typ">Klassenmerkmal · immer</span><p>${esc(t.join(": "))}</p></li>`)(k.merkmal.split(": ")) : ""}${eigene.map(fae).join("")}${kl.map(fae).join("")}</ul>
-          <p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${a.ab})`).join(" · ")}</p>
+          ${spaeter.length ? `<p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${a.ab})`).join(" · ")}</p>` : ""}
         </div>
         <div class="held-tafel" data-tafel="werte" hidden><ul class="held-attr">${["STR", "GES", "KON", "INT", "WEI", "CHA"].map((a) => `<li class="${d.werte[a] >= 16 ? "haupt" : ""}"><span>${ATTR_NAME[a]}</span><b>${d.werte[a]}</b><em>${vorz(R.mod(d.werte[a]))}</em></li>`).join("")}</ul>
           <p class="held-spaeter">Rettungswürfe der Klasse: ${k.rettung.map((a) => ATTR_NAME[a]).join(", ")} · Lebenswürfel W${k.wuerfel}</p></div>

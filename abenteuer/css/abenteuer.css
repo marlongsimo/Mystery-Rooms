@@ -753,3 +753,15 @@ body[data-abschnitt="3"] .szene h1 { text-shadow: 0 0 24px rgba(201, 72, 40, .25
 .held-faehig li.klassen-merkmal { border-color: var(--k); border-left: 3px solid var(--k); background: color-mix(in srgb, var(--k) 18%, rgba(8, 12, 18, .8)); }
 .held-faehig li.klassen-merkmal .typ { color: var(--pergament); }
 .faehig li.klassen-merkmal { border-color: var(--k); border-left: 3px solid var(--k); background: color-mix(in srgb, var(--k) 18%, var(--panel)); }
+
+/* Heldenansicht im Abenteuer (Klick auf eine Figur in der Gruppenleiste) */
+.gruppe-leiste [data-held] { cursor: pointer; border-radius: 4px; padding: 2px 6px 2px 2px; }
+.gruppe-leiste [data-held]:hover, .gruppe-leiste [data-held]:focus-visible { background: rgba(197, 162, 103, .12); outline: none; }
+.held-dialog { width: min(960px, calc(100% - 24px)); max-height: calc(100vh - 24px); padding: 0; border: 0; background: transparent; color: var(--text); overflow: auto; }
+.held-dialog::backdrop { background: rgba(4, 7, 12, .78); backdrop-filter: blur(2px); }
+.held-dialog-inhalt .held { background-color: #0f1722; }
+.held-dialog-zu { position: sticky; top: 8px; float: right; z-index: 2; margin: 8px 8px -44px 0; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: #0f1722; color: var(--pergament); font-size: 16px; cursor: pointer; }
+.held-stand { margin: 8px 0 4px; padding: 8px 10px; border: 1px solid color-mix(in srgb, var(--k) 50%, var(--line)); border-radius: 4px; background: rgba(8, 12, 18, .55); }
+.held-stand p { margin: 0; } .held-stand .gefallen { color: #e8a49c; }
+.held-stand ul { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.held-stand li span { display: block; color: var(--muted); }

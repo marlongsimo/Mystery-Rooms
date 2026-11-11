@@ -15,9 +15,8 @@ const { chromium } = require('playwright');
   const einstieg = async (p, modus) => {
     await p.click('#my-gast-start');
     await p.click('.hub-kachel[data-hub="neu"]');
-    await p.waitForSelector('#einleitung:not([hidden])');
-    for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
-    for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
+    await p.waitForSelector('#kodex:not([hidden])');
+    for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click(modus === 'live' ? '#live' : '#start');
   };
   const zu = async (p, fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
@@ -42,6 +41,8 @@ const { chromium } = require('playwright');
   }
   check(await until(T, () => !document.querySelector('#abenteuer-los').disabled), 'Tisch: drei Handys, Kael, Seran und Silra, Abenteuer startbar');
   await T.click('#abenteuer-los');
+  check(await T.isVisible('#einleitung') && /Splitterlande/.test(await T.textContent('#einleitung .seite:not([hidden])')), 'Nach der Heldenwahl: Intro der Kampagne');
+  await T.click('#einl-skip');
   check(await until(H.Anna, () => window.ABH.H.spiel && window.ABH.H.spiel.phase === 'szene' && /Halmbruck/.test(document.body.textContent)), 'Handys zeigen die erste Szene');
   await T.click('#sz-weiter');
   // Probe im Gespräch: Spuren untersuchen, Anna würfelt am Handy

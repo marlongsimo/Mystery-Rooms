@@ -18,9 +18,8 @@ const { chromium } = require('playwright');
   const nimm = async (p, fid) => { await zu(p, fid); await p.click(`[data-fid="${fid}"]`); await p.click('#f-waehlen'); };
   const einstieg = async (p, modus) => {
     await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
-    await p.waitForSelector('#einleitung:not([hidden])');
-    for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
-    for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
+    await p.waitForSelector('#kodex:not([hidden])');
+    for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click(modus === 'live' ? '#live' : '#start');
   };
   const K = (p) => p.evaluate(() => window.KAMPAGNE && window.KAMPAGNE.aktuell());
@@ -34,7 +33,7 @@ const { chromium } = require('playwright');
   check(await T.isVisible('#my-gast-start'), 'Startbildschirm mit „Als Gast spielen“');
   await einstieg(T, 'allein');
   for (const f of ['schildwaechter', 'lichtbringer', 'wildnislaeufer']) await nimm(T, f);
-  await T.click('#abenteuer-los');
+  await T.click('#abenteuer-los'); await T.click('#einl-skip');
   check(await gespeichert(T, 1), 'Abenteuer begonnen: Kampagne angelegt und gespeichert (Stand 1)');
   const k1 = await K(T);
   await T.click('#sz-weiter');
@@ -77,10 +76,10 @@ const { chromium } = require('playwright');
   await T.evaluate(() => window.KAMPAGNE.bibliothek());
   await until(T, (id) => Boolean(document.querySelector(`[data-k="neu"][data-id="${id}"]`)), k1.id);
   await T.click(`[data-k="neu"][data-id="${k1.id}"]`);
-  check(await until(T, () => !document.querySelector('#einleitung').hidden && !window.ABT.A()) && (await K(T)).version === 0, 'Neu beginnen: Spielstände gelöscht, das Abenteuer beginnt von vorn');
-  for (let i = 0; i < 3; i++) await T.click('#einl-weiter'); for (let i = 0; i < 5; i++) await T.click('#kodex-weiter'); await T.click('#start');
+  check(await until(T, () => !document.querySelector('#kodex').hidden && !window.ABT.A()) && (await K(T)).version === 0, 'Neu beginnen: Spielstände gelöscht, das Abenteuer beginnt von vorn');
+  for (let i = 0; i < 6; i++) await T.click('#kodex-weiter'); await T.click('#start');
   if (!(await T.evaluate(() => !document.querySelector('#abenteuer-los').disabled))) for (const f of ['schildwaechter', 'lichtbringer', 'wildnislaeufer']) await nimm(T, f);
-  await T.click('#abenteuer-los');
+  await T.click('#abenteuer-los'); await T.click('#einl-skip');
   check(await gespeichert(T, 1) && (await K(T)).id === k1.id, 'Neues Abenteuer wird in derselben Kampagne gespeichert (Stand 1)');
 
   // Fremder sieht nichts
@@ -108,7 +107,7 @@ const { chromium } = require('playwright');
     await until(P, () => Boolean(document.querySelector('.bogen')));
   }
   await until(L, () => !document.querySelector('#abenteuer-los').disabled);
-  await L.click('#abenteuer-los');
+  await L.click('#abenteuer-los'); await L.click('#einl-skip');
   check(await gespeichert(L, 1), 'Live: Kampagne angelegt und gespeichert');
   const kl = await K(L);
   check(await until(L, (id) => window.AB.liveClient().rpc('rpg_load_campaign', { p_campaign_id: id }).then((d) => d.members.filter((m) => m.role === 'spieler').length === 3), kl.id), 'Drei Handys als Mitspieler mit ihren Figuren übernommen');

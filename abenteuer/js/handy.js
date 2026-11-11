@@ -10,7 +10,15 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const params = new URLSearchParams(location.search);
   const SLUG = params.get("liveslug") || "abenteuer";
-  const NAME_KEY = "ab_name", FIGUR_KEY = "ab_meine_figur";
+  const NAME_KEY = "ab_name", FIGUR_KEY = "ab_meine_figur", KCODE_KEY = "ab_kampagnen_code";
+  // Kampagnen-Code aus dem Einladungs-Link (?k=…): macht dieses Handy zum Mitspieler der Kampagne und
+  // findet den Raum des Spieltischs von selbst – auch wenn der Tisch pausiert oder das Gerät wechselt.
+  const kAusLink = (new URLSearchParams(location.search).get("k") || "").trim();
+  // Mitspieler einer Kampagne (z. B. angenommene Einladung): ?kampagne=<id> – Beitritt mit dem Benutzernamen, ohne Code
+  const kId = (new URLSearchParams(location.search).get("kampagne") || "").trim();
+  if (kAusLink) { try { localStorage.setItem(KCODE_KEY, kAusLink); } catch (e) { /* privat */ } }
+  // Ein früher gespeicherter Code gilt nur zum Wiederverbinden einer Runde, die über ihn begonnen hat
+  const kCode = () => { if (kAusLink) return kAusLink; if (!H.kAktiv) return ""; try { return localStorage.getItem(KCODE_KEY) || ""; } catch (e) { return ""; } };
   const ATTR = { STR: "Stärke", GES: "Geschicklichkeit", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
   const SELBST = new Set(["selbstheilung", "trank", "raserei", "finte", "gift", "verstecken", "rueckzug", "spurt", "schattenschritt", "spiegelbilder", "segen", "schutzkreis", "vertreiben", "bewahren", "massenheil", "rauch", "tatendrang"]);
   const H = { client: null, row: null, spiel: null, tab: "zug", sel: null, ziel: null, warte: null, fehler: "", busy: false, warDran: false, ergebnis: null, wahlOffen: null, nLog: 0 };
@@ -32,7 +40,12 @@
     const c = H.client = window.RPGNetz.connect({ gameSlug: SLUG, maxPlayers: 7, storeKey: "ab_handy:" + SLUG });
     c.on("state", (row) => { if (row.state_key === "spiel") { H.row = row; pruefe(); } });
     c.on("players", pruefe);
-    c.on("lost", (why) => { const pause = H.spiel && H.spiel.phase === "pause"; H.spiel = null; H.row = null; toast(pause ? "Der Spieltisch hat die Runde pausiert. Zum Weiterspielen mit dem neuen Code beitreten." : why || "Verbindung beendet."); render(); });
+    c.on("lost", (why) => {
+      const pause = H.spiel && H.spiel.phase === "pause"; H.spiel = null; H.row = null;
+      if ((kCode() || kId) && H.kName) { toast(pause ? "Der Spieltisch hat pausiert. Du wirst automatisch wieder verbunden, sobald es weitergeht." : "Verbindung zum Spieltisch beendet – warte auf den Tisch …"); kampagneWarten(H.kName, c.session && c.session.room_code); }
+      else toast(pause ? "Der Spieltisch hat die Runde pausiert. Zum Weiterspielen mit dem neuen Code beitreten." : why || "Verbindung beendet.");
+      render();
+    });
     return c;
   }
   /** Stand nur übernehmen, wenn ihn der Spieltisch (Host) geschrieben hat */
@@ -65,10 +78,29 @@
     render();
   }
 
+  /** Mit Kampagnen-Code: Mitspieler werden und auf den Raum des Spieltischs warten (alle 4 Sekunden nachsehen) */
+  async function kampagneWarten(name, alterRaum) {
+    H.kName = name; clearTimeout(H.kTimer);
+    try {
+      const r = kId ? { raum: await client().rpc("rpg_campaign_room", { p_campaign_id: kId }), titel: H.kTitel } : await client().rpc("rpg_join_as_guest", { p_token: kCode(), p_name: name });
+      H.kTitel = r.titel;
+      if (r.raum && r.raum !== alterRaum && !(H.client && H.client.session)) { H.wartet = false; await client().join(r.raum, name); wach(); render(); return; }
+    } catch (e) {
+      if (/abgelaufen|ungültig|beendet|gehörst nicht/.test(e.message || "")) { try { localStorage.removeItem(KCODE_KEY); } catch (x) { /* privat */ } H.wartet = false; H.fehler = e.message; render(); return; }
+    }
+    H.wartet = true; render();
+    H.kTimer = setTimeout(() => { if (!(H.client && H.client.session)) kampagneWarten(name, alterRaum); }, 4000);
+  }
   async function beitreten(code, name) {
     H.busy = true; H.fehler = ""; render();
     try {
       try { localStorage.setItem(NAME_KEY, name); } catch (e) { /* privat */ }
+      if (kCode()) {
+        H.kName = name; H.kAktiv = true;
+        const r = await client().rpc("rpg_join_as_guest", { p_token: kCode(), p_name: name });
+        H.kTitel = r.titel; code = code || r.raum;
+        if (!code) { H.busy = false; kampagneWarten(name); return; }
+      }
       await client().join(code, name);
       wach();
     } catch (e) {
@@ -112,16 +144,18 @@
   function viewBeitritt(app) {
     const code = decodeURIComponent(location.hash.slice(1) || "");
     let name = ""; try { name = localStorage.getItem(NAME_KEY) || ""; } catch (e) { /* privat */ }
+    if (H.wartet) { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Kampagne${H.kTitel ? " · " + esc(H.kTitel) : ""}</p><h1>Warte auf den Spieltisch …</h1><p class="note">Du bist dabei. Sobald der Spieltisch verbunden ist, geht es hier von selbst weiter – du kannst diese Seite einfach offen lassen.</p><p class="warte-punkte" aria-hidden="true"><i></i><i></i><i></i></p></section>`; return; }
     const a = document.activeElement; if (a && a.tagName === "INPUT" && app.contains(a)) { const fb = $("#fb"); if (fb) fb.textContent = H.fehler; return; }
-    app.innerHTML = `<section class="karte-h"><p class="eyebrow">Die Splitterlande</p><h1>Zum Spieltisch</h1>
-      <p class="note">Den Code zeigt der Spieltisch (das Tablet in der Mitte).</p>
-      <label class="fld">Code<input id="code" autocomplete="off" autocapitalize="characters" placeholder="ABEN-XXXXXX" value="${esc(code)}"></label>
+    const k = kCode();
+    app.innerHTML = `<section class="karte-h"><p class="eyebrow">${k ? "Einladung zur Kampagne" : "Die Splitterlande"}</p><h1>${k ? "Mitspielen" : "Zum Spieltisch"}</h1>
+      <p class="note">${k ? "Gib deinen Namen ein. Wenn der Spieltisch schon bereit ist, geht es sofort los – sonst wartest du kurz." : "Den Code zeigt der Spieltisch (das Tablet in der Mitte)."}</p>
+      <label class="fld"${k && !code ? " hidden" : ""}>Code<input id="code" autocomplete="off" autocapitalize="characters" placeholder="ABEN-XXXXXX" value="${esc(code)}"></label>
       <label class="fld">Dein Name<input id="name" maxlength="24" autocomplete="off" value="${esc(name)}"></label>
       <button class="btn breit" id="rein" ${H.busy ? "disabled" : ""}>${H.busy ? "Verbinde …" : "Beitreten"}</button>
       <p class="fb" id="fb">${esc(H.fehler)}</p></section>`;
     $("#rein").onclick = () => {
       const cd = $("#code").value.trim(), nm = $("#name").value.trim();
-      if (!cd || !nm) { H.fehler = "Bitte Code und Namen eingeben."; $("#fb").textContent = H.fehler; return; }
+      if (!nm || (!cd && !kCode())) { H.fehler = kCode() ? "Bitte deinen Namen eingeben." : "Bitte Code und Namen eingeben."; $("#fb").textContent = H.fehler; return; }
       document.activeElement && document.activeElement.blur();
       beitreten(cd, nm);
     };
@@ -338,9 +372,15 @@
     render();
     try {
       let gespeichert = null; try { gespeichert = localStorage.getItem("ab_handy:" + SLUG); } catch (e) { /* privat */ }
-      if (!gespeichert || !window.RPGNetz) return;
-      const s = await client().restore();
-      if (s && !s.closed) { await H.client.fetchStates().catch(() => {}); wach(); }
+      if (!window.RPGNetz || (!gespeichert && !kId)) return;
+      const s = gespeichert ? await client().restore() : null;
+      if (kId && !(s && !s.closed)) {
+        // Als Mitspieler direkt zum Spieltisch: Name ist der Benutzername (sonst der zuletzt verwendete)
+        const p = await client().rpc("rpg_my_profile", {}).catch(() => null);
+        let n = p && p.handle; if (!n) { try { n = localStorage.getItem(NAME_KEY) || ""; } catch (e) { /* privat */ } }
+        if (n) { H.kAktiv = true; try { const l = await client().rpc("rpg_my_campaigns", {}); const c = l.find((x) => x.id === kId); if (c) H.kTitel = c.title; } catch (e) { /* ohne Titel */ } kampagneWarten(n); return; }
+      }
+      if (s && !s.closed) { await H.client.fetchStates().catch(() => {}); wach(); H.kAktiv = true; try { H.kName = localStorage.getItem(NAME_KEY) || ""; } catch (e) { /* privat */ } }
       render();
     } catch (e) { render(); }
   })();

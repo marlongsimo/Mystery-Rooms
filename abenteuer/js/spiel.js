@@ -128,7 +128,11 @@
       try { await c.create("Spieltisch"); }
       catch (e) { if (/Gruppengröße|max/i.test(e.message || "")) { c.maxPlayers = 4; await c.create("Spieltisch"); } else throw e; }
       LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null; SETUP.gruppe = [];
-      wach(); zeigeSetup(); veroeffentlichen();
+      wach();
+      // Mit Kampagnen: zuerst einladen (Freunde, Gäste-Code, Tisch-Gerät), dann Heldenwahl
+      if (window.KAMPAGNE && window.KAMPAGNE.liveGestartet) await window.KAMPAGNE.liveGestartet();
+      if (window.KAMPAGNE && window.KAMPAGNE.einladen) { veroeffentlichen(); await window.KAMPAGNE.einladen(); }
+      else { zeigeSetup(); veroeffentlichen(); }
     } catch (e) {
       fb.textContent = katalogFehler(e) ? "Das Spielen mit Handys ist für dieses Spiel noch nicht freigeschaltet. Ihr könnt allein auf diesem Gerät spielen." : (e.message || String(e));
     }
@@ -229,7 +233,8 @@
     el.querySelectorAll("[data-schwer]").forEach((b) => { b.onclick = () => { SETUP.schwierigkeit = b.dataset.schwer; setupMerken(); zeichneSetup(); veroeffentlichen(); }; });
     $("#begegnung").onchange = (e) => { SETUP.begegnung = e.target.value; setupMerken(); zeichneSetup(); };
     $("#los").onclick = () => start(params.has("seed") ? +params.get("seed") : Math.floor(Math.random() * 1e9));
-    $("#abenteuer-los").onclick = () => { if (window.ABT) { if (window.ABE) window.ABE.glocke(1); window.ABT.start(SETUP); } };
+    // Heldenwahl fertig → Intro der Kampagne → Abenteuer
+    $("#abenteuer-los").onclick = () => { if (!window.ABT) return; const los = () => { if (window.ABE) window.ABE.glocke(1); window.ABT.start(SETUP); }; if (window.ABE && window.ABE.intro) window.ABE.intro(los); else los(); };
     if ($("#lobby-ende")) $("#lobby-ende").onclick = liveBeenden;
     if ($("#zurueck")) $("#zurueck").onclick = () => zeigeSektion("kodex");
   }
@@ -281,6 +286,12 @@
     await new Promise((r) => setTimeout(r, 1500));
     try { await LIVE.client.leave(); } catch (e) { /* schon zu */ }
     LIVE.phase = null; vergessen(); zeichneLiveBar();
+  }
+  /** Neues Tisch-Gerät einer noch nicht begonnenen Kampagne: Heldenwahl mit Handys */
+  function lobbyFuerKampagne(schwierigkeit) {
+    SETUP.schwierigkeit = schwierigkeit === "hardcore" ? "hardcore" : "normal"; SETUP.gruppe = [];
+    LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; st = null; window.AB.st = null; kampfEnde = null;
+    zeigeSetup(); veroeffentlichen();
   }
   /** Alles Laufende auf diesem Gerät beenden (nach Pause, Löschen, Neu beginnen) */
   function allesBeenden() { clearTimeout(gegnerTimer); st = null; window.AB.st = null; kampfEnde = null; wahl = null; tipp = null; try { localStorage.removeItem(SOLO); } catch (e) { /* privat */ } }
@@ -509,7 +520,7 @@
     if (r.fehler) $("#hinweis").textContent = r.fehler; else { tipp = null; render(); veroeffentlichen(); }
   }
 
-  function zeigeSektion(id) { for (const x of ["mythara", "hub", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
+  function zeigeSektion(id) { for (const x of ["mythara", "hub", "einladen", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
   function zeigeIntro() { if (window.MYTHARA && window.MYTHARA.imHub()) window.MYTHARA.zeigeHub(); else zeigeSektion("intro"); }
   function zeigeSpiel() { zeigeSektion("spiel"); }
   /* ---------- Karten-Prüfmodus (?raster): Koordinaten, Hindernisse und Startplätze sichtbar ---------- */
@@ -657,7 +668,7 @@
   }
 
   // Für automatische Tests
-  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, liveClient, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
+  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, liveClient, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
     liveAn, besitzVon: (fid) => (liveAn() ? LIVE.besitz[fid] : null), spielerName,
     besitzTauschen(alt, neu) { const i = SETUP.gruppe.indexOf(alt); if (i >= 0) SETUP.gruppe[i] = neu; if (LIVE.besitz[alt]) { LIVE.besitz[neu] = LIVE.besitz[alt]; delete LIVE.besitz[alt]; } setupMerken(); },
     auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };

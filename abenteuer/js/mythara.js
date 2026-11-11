@@ -207,6 +207,8 @@
   function kopie(sel) {
     const t = document.createElement("div");
     document.querySelectorAll(sel).forEach((a) => { const c = a.cloneNode(true); c.hidden = false; c.removeAttribute("hidden"); t.appendChild(c); });
+    // Auswahlknöpfe mit Erklärung (Normal/Hardcore) als Text behalten, alle anderen Knöpfe entfernen
+    t.querySelectorAll("button.schwer").forEach((b) => { const d = document.createElement("div"); d.className = b.className.replace(/\ban\b/, "").trim() + " nur-text"; d.innerHTML = b.innerHTML; b.replaceWith(d); });
     t.querySelectorAll("button, .knoepfe, .fb, [id^=intro-]").forEach((x) => x.remove());
     t.querySelectorAll("[id]").forEach((x) => x.removeAttribute("id"));
     t.querySelectorAll("h2.klein").forEach((h) => { if (/Wie spielt ihr/.test(h.textContent)) { const n = h.nextElementSibling; h.remove(); if (n && n.classList.contains("note")) n.remove(); } });
@@ -221,7 +223,7 @@
       <div class="hub-held-reihe">${helden.map((f) => HL.kachel(f, { an: f === fid })).join("")}</div>${HL.detail(fid, 1, "")}</div>`);
   }
   function regelnSeite() {
-    seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">So wird Mythara gespielt – zum Nachlesen.</p><div class="hub-text kodex">${kopie("#kodex .seite")}</div>`);
+    seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">So wird Mythara gespielt – zum Nachlesen.</p><div class="hub-text kodex">${kopie('#kodex .seite:not([data-seite="6"])')}</div>`);
   }
   function weltSeite(abenteuer) {
     if (!abenteuer) {
@@ -289,9 +291,22 @@
     const f = inbox.freunde, k = inbox.kampagnen;
     const o = fenster("Anfragen", `${!f.length && !k.length ? `<p class="note">Keine offenen Anfragen.</p>` : ""}
       ${f.length ? `<h3 class="f-unter">Freundschaftsanfragen</h3><ul class="f-liste">${f.map((x) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.handle)}</span><b>${esc(x.handle)}</b><span class="f-knoepfe"><button class="btn klein" data-fa="ja" data-name="${esc(x.handle)}">Annehmen</button><button class="btn ghost klein" data-fa="nein" data-name="${esc(x.handle)}">Ablehnen</button></span></li>`).join("")}</ul>` : ""}
-      ${k.length ? `<h3 class="f-unter">Gruppenanfragen</h3><ul class="f-liste">${k.map((x) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.von)}</span><span><b>${esc(x.titel)}</b><small>Einladung von ${esc(x.von)}</small></span><span class="f-knoepfe"><button class="btn klein" data-ka="ja" data-id="${x.id}">Annehmen</button><button class="btn ghost klein" data-ka="nein" data-id="${x.id}">Ablehnen</button></span></li>`).join("")}</ul>` : ""}`);
+      ${k.length ? `<h3 class="f-unter">Gruppenanfragen</h3><ul class="f-liste">${k.map((x) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.von)}</span><span><b>${esc(x.titel)}</b><small>Einladung von ${esc(x.von)}</small></span><span class="f-knoepfe"><button class="btn klein" data-ka="ja" data-id="${x.id}" data-kid="${esc(x.campaign_id || "")}" data-titel="${esc(x.titel)}">Annehmen</button><button class="btn ghost klein" data-ka="nein" data-id="${x.id}">Ablehnen</button></span></li>`).join("")}</ul>` : ""}`);
     o.querySelectorAll("[data-fa]").forEach((b) => { b.onclick = async () => { b.disabled = true; try { await netz().rpc("rpg_answer_friend", { p_handle: b.dataset.name, p_accept: b.dataset.fa === "ja" }); toast(b.dataset.fa === "ja" ? `Du bist jetzt mit ${b.dataset.name} befreundet.` : "Anfrage abgelehnt."); } catch (e) { toast(e.message); } anfragenZeigen(); }; });
-    o.querySelectorAll("[data-ka]").forEach((b) => { b.onclick = async () => { b.disabled = true; try { await netz().rpc("rpg_answer_invite", { p_invite_id: b.dataset.id, p_accept: b.dataset.ka === "ja" }); toast(b.dataset.ka === "ja" ? "Du bist jetzt Mitspieler dieser Kampagne. Tritt am Spieltisch mit dem Code bei." : "Einladung abgelehnt."); } catch (e) { toast(e.message); } anfragenZeigen(); }; });
+    o.querySelectorAll("[data-ka]").forEach((b) => { b.onclick = async () => {
+      b.disabled = true;
+      try {
+        await netz().rpc("rpg_answer_invite", { p_invite_id: b.dataset.id, p_accept: b.dataset.ka === "ja" });
+        // Angenommen: direkt zum Spieltisch – mit dem Benutzernamen, ohne Code
+        if (b.dataset.ka === "ja") {
+          let kid = b.dataset.kid;
+          if (!kid) { const l = await netz().rpc("rpg_my_campaigns", {}).catch(() => []); const c = l.find((x) => x.role === "spieler" && x.title === b.dataset.titel); kid = c && c.id; } // ältere Datenbank ohne ID im Posteingang
+          if (kid) { location.href = "handy.html?kampagne=" + encodeURIComponent(kid); return; }
+        }
+        toast(b.dataset.ka === "ja" ? "Du bist jetzt Mitspieler dieser Kampagne." : "Einladung abgelehnt.");
+      } catch (e) { toast(e.message); }
+      anfragenZeigen();
+    }; });
   }
   async function freundeZeigen(suchErgebnis) {
     if (!istKonto()) { fenster("Freunde", `<p class="note">Freunde gibt es mit einem Spielerkonto: Dann kannst du andere über ihren Benutzernamen finden und zu deinen Kampagnen einladen.</p><button class="my-knopf rot" data-profil="registrieren">Konto erstellen</button>`); return; }
@@ -406,7 +421,7 @@
     const offen = liste.filter((c) => ["geplant", "aktiv", "pausiert"].includes(c.status)).slice(0, 4);
     const zuletzt = liste.filter((c) => c.version > 0).slice(0, 3);
     const zeile = (c, mitKnopf) => { const i = c.checkpoint || {}, host = c.role === "host";
-      return `<li><img src="${bildAbschnitt(i.abschnitt)}" alt=""><div><b>${esc(c.title)}</b><small>${mitKnopf ? (host ? "Host" : "Mitspieler") + (i.titel ? " · " + esc(i.titel) : "") : esc(vor(c.updated_at)) + (c.status === "abgeschlossen" ? " · abgeschlossen" : "")}</small></div>${mitKnopf ? `<button class="hub-play" data-play="${c.id}" aria-label="${esc(c.title)} ${host ? "fortsetzen" : "beitreten"}" title="${host ? (c.version ? "Fortsetzen" : "Beginnen") : "Am Spieltisch beitreten"}">▶</button>` : ""}</li>`; };
+      return `<li><img src="${bildAbschnitt(i.abschnitt)}" alt=""><div><b>${esc(c.title)}</b><small>${mitKnopf ? (host ? "Host" : c.role === "tisch" ? "Spieltisch" : "Mitspieler") + (i.titel ? " · " + esc(i.titel) : "") : esc(vor(c.updated_at)) + (c.status === "abgeschlossen" ? " · abgeschlossen" : "")}</small></div>${mitKnopf ? `<button class="hub-play" data-play="${c.id}" aria-label="${esc(c.title)} ${host ? "fortsetzen" : "beitreten"}" title="${host ? (c.version ? "Fortsetzen" : "Beginnen") : "Am Spieltisch beitreten"}">▶</button>` : ""}</li>`; };
     // Abenteuer, das nur in diesem Browser liegt (ohne Kampagne, z. B. vor der Einführung der Kampagnen)
     const lokal = window.ABT && window.ABT.gespeichert() && !(window.KAMPAGNE && window.KAMPAGNE.aktuell()) ? `<li id="hub-lokal"><img src="${bildAbschnitt(1)}" alt=""><div><b>Abenteuer in diesem Browser</b><small>Weiterspielen, wo ihr aufgehört habt</small></div><button class="hub-play" id="hub-lokal-play" aria-label="Abenteuer fortsetzen" title="Fortsetzen">▶</button></li>` : "";
     akt.innerHTML = lokal + (offen.length ? offen.map((c) => zeile(c, true)).join("") : lokal ? "" : `<li class="hub-leer">Noch keine laufende Kampagne. Starte eine neue!</li>`);
@@ -414,7 +429,7 @@
     zul.innerHTML = zuletzt.length ? zuletzt.map((c) => zeile(c, false)).join("") : `<li class="hub-leer">Noch nichts gespielt.</li>`;
     akt.querySelectorAll("[data-play]").forEach((b) => { b.onclick = async () => {
       const c = liste.find((x) => x.id === b.dataset.play);
-      if (c.role !== "host") return beitretenDialog();
+      if (c.role === "spieler") { location.href = "handy.html?kampagne=" + encodeURIComponent(c.id); return; } // Mitspieler: direkt zum Spieltisch
       b.disabled = true;
       try { if (c.version > 0) await window.KAMPAGNE.fortsetzen(c.id, Boolean(c.checkpoint && c.checkpoint.live)); else window.KAMPAGNE.beginnen(c); }
       catch (e) { toast(e.message); b.disabled = false; }

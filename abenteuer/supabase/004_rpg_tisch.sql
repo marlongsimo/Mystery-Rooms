@@ -292,6 +292,18 @@ begin
 end;
 $$;
 
+-- Posteingang (aus Migration 003) um die Kampagnen-ID ergänzt: Wer eine Einladung annimmt, kommt direkt zum Spieltisch
+create or replace function public.rpg_my_inbox()
+returns jsonb language sql stable security definer set search_path = public as $$
+  select jsonb_build_object(
+    'freunde', coalesce((select jsonb_agg(jsonb_build_object('handle', p.handle, 'avatar_key', p.avatar_key, 'seit', f.created_at) order by f.created_at desc)
+      from public.rpg_friendships f join public.rpg_profiles p on p.user_id = f.requester_id
+      where f.status = 'pending' and f.addressee_id = auth.uid()), '[]'::jsonb),
+    'kampagnen', coalesce((select jsonb_agg(jsonb_build_object('id', i.id, 'campaign_id', c.id, 'titel', c.title, 'von', p.handle, 'avatar_key', p.avatar_key, 'seit', i.created_at) order by i.created_at desc)
+      from public.rpg_campaign_invites i join public.rpg_campaigns c on c.id = i.campaign_id join public.rpg_profiles p on p.user_id = i.from_user
+      where i.to_user = auth.uid() and i.status = 'pending' and c.status not in ('abgeschlossen', 'archiviert')), '[]'::jsonb));
+$$;
+
 revoke all on function public.rpg_link_hash(text), public.rpg_neuer_code(), public.rpg_link_von(text), public.rpg_raum_von(uuid) from public, anon, authenticated;
 revoke all on function public.rpg_ist_tisch(uuid), public.rpg_rename_campaign(uuid, text), public.rpg_create_link(uuid, text), public.rpg_link_info(text),
   public.rpg_join_as_guest(text, text), public.rpg_claim_table(text), public.rpg_campaign_room(uuid) from public, anon;

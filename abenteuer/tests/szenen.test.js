@@ -17,9 +17,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const einstieg = async (p, modus) => {
     await p.click('#my-gast-start');
     await p.click('.hub-kachel[data-hub="neu"]');
-    await p.waitForSelector('#einleitung:not([hidden])');
-    for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
-    for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
+    await p.waitForSelector('#kodex:not([hidden])');
+    for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click(modus === 'live' ? '#live' : '#start');
   };
   const zu = async (p, fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
@@ -109,7 +108,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   check(/Siegel von Grauwacht/.test(await p.textContent('#intro h1')), 'Startseite: Das Siegel von Grauwacht (hinter Mythara)');
   await einstieg(p, 'allein');
   for (const f of ['schildwaechter', 'elementarist', 'lichtbringer', 'trickser']) await nimm(p, f);
-  await p.click('#abenteuer-los');
+  await p.click('#abenteuer-los'); await p.click('#einl-skip');
   check(await p.isVisible('#szene') && /Halmbruck/.test(await p.textContent('#szene h1')), 'Abenteuer beginnt in Halmbruck');
   const gesehen = new Set(); let kaempfe = 0, neuGeladen = false, i = 0;
   let raetselGeloest = false, beuteGenommen = 0;

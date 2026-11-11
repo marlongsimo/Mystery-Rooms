@@ -49,7 +49,7 @@ const { chromium } = require('playwright');
   await A.waitForSelector('#f-titel'); await A.fill('#f-titel', 'Freundestest');
   check(await A.evaluate((n) => [...document.querySelectorAll('.f-liste.wahl input')].some((i) => i.value === n), nB), 'Neue Kampagne: B steht zur Auswahl');
   await A.check(`.f-liste.wahl input[value="${nB}"]`); await A.click('#f-neu .my-knopf');
-  check(await until(A, () => !document.querySelector('#einleitung').hidden), 'Kampagne angelegt, das Abenteuer beginnt');
+  check(await until(A, () => !document.querySelector('#kodex').hidden), 'Kampagne angelegt, der Start beginnt mit den Regeln');
   const kid = await A.evaluate(() => window.KAMPAGNE.aktuell().id);
 
   // B nimmt die Gruppenanfrage an
@@ -57,8 +57,19 @@ const { chromium } = require('playwright');
   check(await until(B, () => { const z = document.querySelector('#hub-glocke .hub-zahl'); return z && !z.hidden; }), 'B: Glocke zeigt die Gruppenanfrage');
   await B.click('#hub-glocke'); await B.waitForSelector('[data-ka="ja"]');
   check(await B.evaluate(() => /Freundestest/.test(document.querySelector('.kampagnen').textContent)), 'Gruppenanfrage nennt die Kampagne „Freundestest“');
-  await B.click('[data-ka="ja"]'); await B.waitForTimeout(800); await B.click('#fenster-zu');
+  await Promise.all([B.waitForURL(/handy\.html\?kampagne=/), B.click('[data-ka="ja"]')]);
+  check(await until(B, () => /Warte auf den Spieltisch/.test(document.body.textContent) && !document.querySelector('#code')), 'B nimmt an: direkt zum Spieltisch, ohne Code und ohne Namenseingabe (wartet, bis der Tisch bereit ist)');
+  // A startet den Spieltisch (Regeln → Schwierigkeit → Spielweise: Tisch + Handys) – B kommt von selbst dazu
+  for (let i = 0; i < 6; i++) await A.click('#kodex-weiter');
+  await A.click('#live');
+  check(await until(B, () => document.querySelectorAll('.banner[data-klasse]').length === 5, null, 40000), 'Tisch ist da: B tritt automatisch bei und wählt seinen Helden');
+  check(await until(A, (n) => window.AB.LIVE.client.players.some((p) => p.player_name === n), nB), 'Tisch sieht B mit seinem Benutzernamen');
+  await A.evaluate(() => window.AB.LIVE.client.leave().catch(() => {}));
+  await B.goto(BASE + '/abenteuer/index.html'); await until(B, () => !document.querySelector('#hub').hidden);
   check(await until(B, () => /Freundestest/.test(document.querySelector('#hub-aktuell').textContent) && /Mitspieler/.test(document.querySelector('#hub-aktuell').textContent)), 'B: „Freundestest“ unter Aktuelle Kampagnen als Mitspieler');
+  await B.click('.hub-nav-punkt[data-hub="kampagnen"]');
+  check(await until(B, () => Boolean(document.querySelector('[data-k="mitspielen"]'))), 'B: In „Meine Kampagnen“ gibt es „Zum Spieltisch“');
+  await B.click('#k-zu');
   check(await A.evaluate((id) => window.AB.liveClient().rpc('rpg_load_campaign', { p_campaign_id: id }).then((d) => d.members.length === 2), kid), 'A: Kampagne hat jetzt zwei Mitglieder');
 
   // Aufräumen

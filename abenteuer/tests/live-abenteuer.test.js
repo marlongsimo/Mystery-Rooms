@@ -18,9 +18,8 @@ const { chromium } = require('playwright');
   const einstieg = async (p, modus) => {
     await p.click('#my-gast-start');
     await p.click('.hub-kachel[data-hub="neu"]');
-    await p.waitForSelector('#einleitung:not([hidden])');
-    for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
-    for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
+    await p.waitForSelector('#kodex:not([hidden])');
+    for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click(modus === 'live' ? '#live' : '#start');
   };
   const zu = async (p, fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };

@@ -7,7 +7,7 @@
   <title>Mythara – Das digitale Rollenspiel | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=31">
+  <link rel="stylesheet" href="css/abenteuer.css?v=32">
 </head>
 <body>
   <header class="top">
@@ -201,17 +201,19 @@
             <button class="schwer an" data-schwer-wahl="normal"><b>Normal</b><span>Am Boden ist das Schlimmste. Fällt die ganze Gruppe, zieht sie sich zum letzten Lagerfeuer zurück – und die Glocke schlägt.</span></button>
             <button class="schwer" data-schwer-wahl="hardcore"><b>Hardcore</b><span>Wer fällt, würfelt um sein Leben. Der Tod ist endgültig. Keine kurzen Rasten.</span></button>
           </div>
-          <h2 class="klein">Wie spielt ihr?</h2>
-          <div class="knoepfe">
-            <button class="btn gross" id="live">Mit Handys spielen</button>
-            <button class="btn ghost" id="start">Allein auf diesem Gerät</button>
+        </article>
+        <article class="seite" data-seite="6" hidden>
+          <h2>Wie spielt ihr?</h2>
+          <div class="schwer-wahl spielweise">
+            <button class="schwer" id="start"><b>Auf einem Gerät</b><span>Eine Person steuert alle Helden auf diesem Gerät – gut für allein oder zu zweit vor einem Bildschirm.</span></button>
+            <button class="schwer" id="live"><b>Spieltisch + Handys</b><span>Ein Gerät liegt als Spieltisch in der Mitte. Jede Person spielt ihren Helden auf dem eigenen Handy – mit Freunden und Gästen.</span></button>
           </div>
-          <p class="note">Mit Handys: Dieses Gerät liegt als Spieltisch in der Mitte, jede Person tritt mit ihrem Handy bei und wählt dort ihre Figur.</p>
           <p class="fb" id="intro-fehler"></p>
         </article>
       </div>
       <div class="seiten-nav"><span class="punkte" id="kodex-punkte"></span><div class="knoepfe"><button class="btn ghost" id="kodex-zurueck">Zurück</button><button class="btn" id="kodex-weiter">Weiter</button></div></div>
     </section>
+    <section class="einladen" id="einladen" hidden aria-label="Einladen"></section>
     <section class="lobby" id="lobby" hidden></section>
     <section class="szene" id="szene" hidden></section>
     <section class="spiel" id="spiel" hidden>
@@ -241,10 +243,10 @@
   <script src="vendor/qrcode-generator-1.4.4.js"></script>
   <script src="daten/grauwacht.js?v=14"></script>
   <script src="js/szenen.js?v=11"></script>
-  <script src="js/spiel.js?v=27"></script>
+  <script src="js/spiel.js?v=29"></script>
   <script src="js/abenteuer-tisch.js?v=17"></script>
-  <script src="js/einstieg.js?v=4"></script>
-  <script src="js/mythara.js?v=12"></script>
-  <script src="js/kampagnen.js?v=6"></script>
+  <script src="js/einstieg.js?v=5"></script>
+  <script src="js/mythara.js?v=14"></script>
+  <script src="js/kampagnen.js?v=8"></script>
 </body>
 </html>

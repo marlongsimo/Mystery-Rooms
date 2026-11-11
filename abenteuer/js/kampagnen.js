@@ -56,6 +56,9 @@
     })();
     angelegt.then(() => geaendert(true), () => {});
   }
+  /** Live-Tisch gestartet: eine schon angelegte (noch leere) Kampagne sofort mit diesem Raum verbinden,
+   *  damit eingeladene Mitspieler gleich beitreten und ihre Helden wählen können */
+  async function liveGestartet() { if (aktiv() && K.version === 0) await sitzungStarten().catch(() => {}); }
   async function sitzungStarten() {
     const live = window.AB.liveAn() && window.AB.LIVE.client.session;
     await rpc("rpg_start_session", { p_campaign_id: K.id, p_game_session_id: live ? live.session_id : null });
@@ -170,12 +173,13 @@
       c.status === "pausiert" || c.status === "abgeschlossen" ? `<button class="btn ghost klein" data-k="archiv" data-id="${c.id}">Archivieren</button>` : "",
       c.status === "archiviert" ? `<button class="btn ghost klein" data-k="zurueck" data-id="${c.id}">Wiederherstellen</button>` : "",
       `<button class="btn ghost klein gefahr" data-k="loeschen" data-id="${c.id}">Löschen</button>`].join("")
-      : `<button class="btn ghost klein" data-k="verlassen" data-id="${c.id}">Verlassen</button>`;
+      : c.role === "tisch" ? (!fertig && c.version > 0 ? `<button class="btn klein" data-k="handys" data-id="${c.id}">Mit Handys fortsetzen</button>` : "")
+      : `${!fertig ? `<button class="btn klein" data-k="mitspielen" data-id="${c.id}">Zum Spieltisch</button>` : ""}<button class="btn ghost klein" data-k="verlassen" data-id="${c.id}">Verlassen</button>`;
     return `<li class="k-eintrag" data-kampagne="${c.id}" data-status="${c.status}">
       <div class="k-text"><b>${esc(c.title)}</b><span class="k-status">${esc(STATUS[c.status] || c.status)}${c.laeuft ? " · gerade verbunden" : ""}${c.difficulty === "hardcore" ? " · Hardcore" : ""}</span>
         <small>${i.titel ? `${esc(i.titel)} · Abschnitt ${esc(i.abschnitt)} · Stufe ${esc(i.stufe)}` : "Noch kein Spielstand"} · ${esc(datum(c.updated_at))}</small>
         ${(i.gruppe || []).length ? `<small>Gruppe: ${esc(i.gruppe.join(", "))}${spieler.length ? ` · 📱 ${esc(spieler.map((m) => m.display_name).join(", "))}` : ""}</small>` : ""}
-        ${host ? "" : `<small>Du spielst mit${(c.members || []).find((m) => m.role === "host") ? "" : ""}. Fortsetzen kann nur der Spieltisch.</small>`}</div>
+        ${host || c.role === "tisch" ? "" : `<small>Du spielst mit. „Zum Spieltisch“ verbindet dich – läuft der Tisch noch nicht, wartest du dort, bis es losgeht.</small>`}</div>
       <div class="k-knoepfe">${knoepfe}</div></li>`;
   }
   async function bibliothek() {
@@ -188,7 +192,7 @@
     const o = box(`${lokal}
       ${offen.length ? `<ul class="k-liste">${offen.map(eintrag).join("")}</ul>` : `<p class="note">Noch keine Kampagne. Startet ein Abenteuer – es wird automatisch als Kampagne gespeichert.</p>`}
       ${archiv.length ? `<button class="link" id="k-archiv">${archivOffen ? "Archiv ausblenden" : `Archiv anzeigen (${archiv.length})`}</button>${archivOffen ? `<ul class="k-liste archiv">${archiv.map(eintrag).join("")}</ul>` : ""}` : ""}
-      <p class="note klein">Kampagnen gehören zu diesem Browser, solange es noch keine Spielerkonten gibt.</p>`);
+      <p class="note klein">${window.MYTHARA && window.MYTHARA.istKonto() ? "Deine Kampagnen sind mit deinem Konto verbunden." : "Als Gast gehören deine Kampagnen zu diesem Browser. Mit einem Konto hast du sie auf jedem Gerät."}</p>`);
     const a = $("#k-archiv"); if (a) a.onclick = () => { archivOffen = !archivOffen; bibliothek(); };
     o.querySelectorAll("[data-k]").forEach((b) => { b.onclick = () => aktion(b.dataset.k, b.dataset.id, liste.find((c) => c.id === b.dataset.id), b); });
   }
@@ -197,6 +201,7 @@
       if (b) b.disabled = true;
       if (was === "handys" || was === "allein") return await fortsetzen(id, was === "handys");
       if (was === "beginnen") return beginnen(c);
+      if (was === "mitspielen") { location.href = "handy.html?kampagne=" + encodeURIComponent(id); return; }
       if (was === "einladen") { if (b) b.disabled = false; return window.MYTHARA.freundeEinladen(id, c.title); }
       if (was === "neu") {
         if (!confirm(`„${c.title}“ neu beginnen? Alle Spielstände dieser Kampagne werden gelöscht. Die Kampagne und ihre Mitspieler bleiben.`)) { b.disabled = false; return; }
@@ -249,5 +254,5 @@
   const menue = document.querySelector("#intro .titel-menue");
   if (menue) { const b = document.createElement("button"); b.className = "menue"; b.id = "titel-kampagnen"; b.dataset.kampagnen = ""; b.innerHTML = '<span class="m-sym" aria-hidden="true">❖</span>Meine Kampagnen'; b.onclick = bibliothek; const g = $("#titel-gruppe"); menue.insertBefore(b, g); }
 
-  window.KAMPAGNE = { beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
+  window.KAMPAGNE = { liveGestartet, beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
 })();

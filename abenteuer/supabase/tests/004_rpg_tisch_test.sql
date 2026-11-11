@@ -71,6 +71,7 @@ select pg_temp.als('H'); select public.rpg_create_link(:'k', 'gast') as gast2 \g
 select pg_temp.als('F');
 select pg_temp.fehler(format('select public.rpg_join_as_guest(%L, %L)', :'gast', 'X'), 'abgelaufen oder ungültig', 'Alter Gast-Link ungültig');
 select pg_temp.ok((public.rpg_join_as_guest(:'gast2', 'Fred')->>'campaign_id')::uuid = :'k', 'Neuer Gast-Link funktioniert');
+select pg_temp.als('H'); select public.rpg_set_profile('Hosti');
 reset role;
 \o
 \echo 'ALLE PRÜFUNGEN BESTANDEN'

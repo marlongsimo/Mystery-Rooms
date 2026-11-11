@@ -42,13 +42,17 @@
       ende() { i = ss.length - 1; zeige(); },
     };
   }
-  const einl = seiten("#einleitung", "#einl-punkte", "#einl-weiter", null, () => { AB.zeigeSektion("kodex"); kodex.start(0); });
-  const kodex = seiten("#kodex", "#kodex-punkte", "#kodex-weiter", "#kodex-zurueck", (zurueckAmAnfang) => { if (zurueckAmAnfang === true) kodex.ende(); });
+  // Neuer Ablauf: Regeln (überspringbar) → Schwierigkeit → Spielweise → Heldenwahl → Intro (Einleitung) → Abenteuer
+  const SCHWER = 5; // Kodex-Seite „Wie hart soll es werden?“ (danach „Wie spielt ihr?“)
+  let nachIntro = null;
+  const introFertig = () => { const cb = nachIntro; nachIntro = null; if (cb) cb(); else AB.zeigeIntro(); };
+  const einl = seiten("#einleitung", "#einl-punkte", "#einl-weiter", null, introFertig);
+  const kodex = seiten("#kodex", "#kodex-punkte", "#kodex-weiter", "#kodex-zurueck", (zurueckAmAnfang) => { if (zurueckAmAnfang === true) kodex.start(SCHWER); });
 
-  $("#titel-start").onclick = () => { glocke(1); AB.zeigeSektion("einleitung"); einl.start(0); };
+  $("#titel-start").onclick = () => { glocke(1); AB.zeigeSektion("kodex"); kodex.start(0); };
   $("#titel-regeln").onclick = () => { AB.zeigeSektion("kodex"); kodex.start(0); };
   $("#einl-weiter").onclick = () => einl.vor();
-  $("#einl-skip").onclick = () => { AB.zeigeSektion("kodex"); kodex.start(0); };
+  $("#einl-skip").onclick = introFertig;
   $("#kodex-weiter").onclick = () => kodex.vor();
   $("#kodex-zurueck").onclick = () => kodex.zurueck();
   $("#ton").onclick = () => { tonAn = !tonAn; try { localStorage.setItem(TON_KEY, tonAn ? "an" : "aus"); } catch (e) { /* privat */ } zeigeTon(); if (tonAn) glocke(0.6); };
@@ -101,5 +105,7 @@
   });
   (() => { const s = AB.SETUP(); document.querySelectorAll("[data-schwer-wahl]").forEach((x) => x.classList.toggle("an", x.dataset.schwerWahl === s.schwierigkeit)); })();
 
-  window.ABE = { glocke };
+  /** Intro (Einleitung) zeigen und danach cb – kommt nach der Heldenwahl, direkt vor dem Abenteuer */
+  function intro(cb) { nachIntro = cb; glocke(0.8); AB.zeigeSektion("einleitung"); einl.start(0); }
+  window.ABE = { glocke, intro };
 })();

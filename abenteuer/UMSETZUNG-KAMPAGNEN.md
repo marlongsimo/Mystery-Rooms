@@ -168,31 +168,30 @@ Dateien: `abenteuer/js/rpg-netz.js` (neu), `abenteuer/js/kampagnen.js` (neu: Bib
 
 ---
 
-## 5. Bauabschnitt B: Konten und Profile (Entwurf)
+## 5. Bauabschnitt B: Konten und Profile
 
-**Gestaltung der Anmeldung:** Startbildschirm „Mythara – Das digitale Rollenspiel“ nach Vorlage. Links „Als Spieler anmelden“ (E-Mail, Passwort, Passwort vergessen), rechts „Als Gast spielen“ (ohne Registrierung starten, mit Einladungscode beitreten, QR-Code scannen), darunter „Noch kein Konto? Jetzt registrieren“ und der Hinweis, dass ein Konto Charaktere, Kampagnen und Fortschritte dauerhaft speichert.
+**Entscheidung (November 2026): Anmeldung nur mit Benutzername und Passwort, ohne E-Mail.** Eine E-Mail im Konto zu hinterlegen (für „Passwort vergessen“) folgt später. Einen Wiederherstellungscode gibt es vorerst nicht.
 
-- **Anmeldung:** E-Mail und Passwort mit Bestätigung, Passwort vergessen, Abmelden. Alles läuft nur im RPG-Bereich und über die eigene RPG-Verbindung.
-- **Gast wird Konto:** Der eingeloggte Gast hinterlegt E-Mail und Passwort (`auth.updateUser`). Die `user_id` bleibt gleich, alle Kampagnen bleiben erhalten (Szenario C).
-- **E-Mail gehört schon zu einem Konto:** kein stilles Zusammenführen.
-  1. Der Gast erzeugt einen **Übertragungscode** (`rpg_create_transfer`): einmalig nutzbar, 10 Minuten gültig, nur als Hash gespeichert.
-  2. Nach der Anmeldung mit dem bestehenden Konto löst er ihn ein (`rpg_redeem_transfer`). Plätze und Host-Rollen werden übertragen.
-  3. Gibt es in einer Kampagne Plätze von beiden Identitäten, wird nachgefragt.
-- **Tabelle `rpg_profiles`:** `user_id`, `handle` (eindeutig ohne Groß/Klein, 3–20 Zeichen `a-z0-9_`), `display_name`, `avatar_key` (Auswahl aus festen Bildern, kein Hochladen), Zeitstempel. Andere sehen nur `handle`, `display_name` und `avatar_key`.
-- **Host übergeben:** `rpg_transfer_host(p_campaign_id, p_user_id)`, nur an Mitglieder mit Konto.
-- **Konto löschen:** löscht Profil und RPG-Plätze. Kampagnen, in denen man Host ist, werden gelöscht oder vorher übergeben.
+**Gestaltung:** Startbildschirm „Mythara – Das digitale Rollenspiel“ nach Vorlage. Links Anmelden (Benutzername, Passwort, „Passwort vergessen?“ mit ehrlichem Hinweis) bzw. „Angemeldet als …“ mit Abmelden. Rechts „Als Gast spielen“, darunter „Noch kein Konto? Jetzt registrieren“.
 
-**Voraussetzungen außerhalb des Codes (vor Abschnitt B klären):**
-- Eigener **Mail-Dienst** (SMTP, zum Beispiel Brevo oder Resend), weil der eingebaute Supabase-Versand nur wenige Mails pro Stunde schickt.
-- **Bot-Schutz** bei der Registrierung, also ein Captcha, das Supabase unterstützt (hCaptcha oder Cloudflare Turnstile).
-- **Datenschutz:**
-  - Datenschutzerklärung erweitern.
-  - Verträge zur Auftragsverarbeitung mit Supabase und dem Mail-Dienst.
-  - Lösch- und Exportfunktion.
-  - **Altersgrenze:** Das Spiel ist „ab 12 Jahren“. Beruht ein Konto auf Einwilligung, brauchen unter 16-Jährige in Deutschland die Zustimmung der Eltern (Art. 8 DSGVO). Das sollte vor dem Start fachkundig geprüft werden.
-- Weiterleitungsadressen für die Bestätigungs-Mails im Supabase-Dashboard eintragen.
-
----
+- **Benutzername** (Migration `002_rpg_profile.sql`, Tabelle `rpg_profiles`):
+  - 3–20 Zeichen aus Buchstaben (auch ÄÖÜäöüß), Ziffern und `_`.
+  - Jeder Name nur einmal; Groß und Klein zählen beim Vergleich gleich. Reservierte Namen sind gesperrt.
+  - Sichtbar nur für Mitspieler gemeinsamer Kampagnen. In Kampagnen erscheint der Benutzername statt des Gerätenamens.
+- **Technik:** Supabase verlangt für Passwörter eine E-Mail. Jedes Konto bekommt deshalb intern die feste Platzhalter-Adresse `m<user_id>@spieler.case-unlocked.de`. Sie ist unsichtbar, und es werden keine Mails dorthin geschickt. Beim Anmelden liefert `rpg_login_email(name)` diese Adresse, aber nur für echte Konten.
+- **Registrieren:**
+  1. `rpg_set_profile(name)` reserviert den Namen für den Gast.
+  2. `auth.updateUser({ email: Platzhalter, password })` macht den Gast zum Konto. Die ID bleibt gleich, die Kampagnen bleiben erhalten.
+  3. Wer den Vorgang nicht abschließt, verliert die Reservierung nach 2 Tagen.
+- **Anmelden / Abmelden:** `signInWithPassword` bzw. `signOut`, danach wird die Seite neu geladen. Wer abmeldet, spielt als neuer Gast weiter.
+- **Voraussetzung im Dashboard:** Authentication → Sign In / Providers → Email an, **„Confirm email“ aus**. Ein Mail-Dienst ist nicht nötig.
+- **Später:**
+  - E-Mail hinterlegen (dann Mail-Dienst).
+  - Gast-Kampagnen von einem zweiten Gerät übertragen.
+  - Konto löschen, Host übergeben.
+  - Anmelden auf dem Handy.
+  - Bot-Schutz (Captcha) vor dem öffentlichen Start.
+  - Datenschutzerklärung für Konten.
 
 ## 6. Bauabschnitt C: Einladungen und Gastbeitritt (Entwurf)
 

@@ -70,10 +70,21 @@ select pg_temp.ok((select count(*) from public.rpg_profiles) = 2, 'Mitspieler se
 select pg_temp.ok((select jsonb_agg(m->>'display_name' order by m->>'display_name') from jsonb_array_elements(public.rpg_load_campaign(:'k')->'members') m) = '["Anna", "Bruno"]'::jsonb, 'Kampagne zeigt Benutzernamen statt Gerätenamen');
 select pg_temp.ok((select jsonb_agg(x->>'display_name') from jsonb_array_elements(public.rpg_my_campaigns()->0->'members') x) ? 'Anna', 'Bibliothek zeigt Benutzernamen');
 
+-- Anmeldung mit Benutzernamen
+select pg_temp.als('F');
+select pg_temp.ok(public.rpg_login_email('annA') = 'm000000000000000000000000000000a1@spieler.case-unlocked.de', 'Anmelde-Adresse zum Namen (Groß/Klein egal)');
+select pg_temp.ok(public.rpg_login_email('Gibtsnicht') is null, 'Unbekannter Name: keine Adresse');
+select pg_temp.als('G');
+select public.rpg_set_profile('Gasti');
+select pg_temp.ok(public.rpg_login_email('Gasti') is null, 'Gast (ohne Passwort): keine Adresse');
+select pg_temp.ok(public.rpg_set_profile('Gasti')->>'anmeldung' = 'm000000000000000000000000000000a2@spieler.case-unlocked.de', 'Registrierung liefert die eigene interne Adresse');
+select pg_temp.fehler('select public.rpg_anmelde_adresse(auth.uid())', 'permission denied', 'Adress-Funktion nicht direkt aufrufbar');
+
 -- Umbenennen
 select pg_temp.als('K');
 select pg_temp.ok(public.rpg_set_profile('Annika')->>'handle' = 'Annika', 'Umbenennen in Annika');
 select pg_temp.ok(public.rpg_handle_frei('Anna') = 'frei', 'Alter Name wieder frei');
+select pg_temp.ok(public.rpg_login_email('Annika') = 'm000000000000000000000000000000a1@spieler.case-unlocked.de', 'Nach dem Umbenennen gleiche Anmelde-Adresse');
 select pg_temp.ok((select display_name from public.rpg_campaign_members where user_id = auth.uid()) = 'Annika', 'Name in den Kampagnen angepasst');
 reset role;
 \echo 'ALLE PRÜFUNGEN BESTANDEN'

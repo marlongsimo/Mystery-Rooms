@@ -13,6 +13,13 @@
 --     E-Mail-Adressen werden nirgends herausgegeben
 --   • ändert keine Tabellen oder Daten der Escape Rooms und Krimidinner
 --
+-- Anmeldung mit BENUTZERNAME UND PASSWORT (ohne E-Mail):
+--   Supabase braucht für Passwörter eine E-Mail-Adresse. Jedes RPG-Konto bekommt deshalb eine
+--   interne Platzhalter-Adresse m<user_id ohne Bindestriche>@spieler.case-unlocked.de. Sie hängt
+--   nicht am Benutzernamen (Umbenennen ändert die Anmeldung nicht), ist für niemanden sichtbar,
+--   und es werden keine Mails dorthin geschickt. Voraussetzung im Dashboard:
+--   Authentication → Sign In / Providers → Email an, „Confirm email“ AUS.
+--
 -- Benutzernamen: 3–20 Zeichen, Buchstaben (auch ÄÖÜäöüß), Ziffern und _.
 -- Groß/klein zählt beim Vergleich gleich („Anna“ = „anna“), angezeigt wird die eigene Schreibweise.
 -- Ein Gast (noch nicht bestätigtes Konto) reserviert seinen Namen für 2 Tage; danach ist er wieder frei.
@@ -52,6 +59,12 @@ grant select (user_id, handle, avatar_key, created_at) on public.rpg_profiles to
 drop policy if exists rpg_profiles_lesen on public.rpg_profiles;
 create policy rpg_profiles_lesen on public.rpg_profiles
   for select to authenticated using (user_id = auth.uid() or public.rpg_teilt_kampagne(user_id));
+
+-- Interne Anmelde-Adresse eines Nutzers (Platzhalter, nie zugestellt)
+create or replace function public.rpg_anmelde_adresse(p_user_id uuid)
+returns text language sql immutable as $$
+  select 'm' || replace(p_user_id::text, '-', '') || '@spieler.case-unlocked.de';
+$$;
 
 -- Reservierte Namen
 create or replace function public.rpg_name_gesperrt(p_handle text)
@@ -95,8 +108,17 @@ begin
   end;
   -- In allen eigenen Kampagnen unter dem neuen Namen erscheinen
   update public.rpg_campaign_members set display_name = left(p_handle, 24) where user_id = auth.uid();
-  return jsonb_build_object('handle', v_p.handle, 'avatar_key', v_p.avatar_key, 'konto', public.rpg_ist_konto(auth.uid()));
+  return jsonb_build_object('handle', v_p.handle, 'avatar_key', v_p.avatar_key, 'konto', public.rpg_ist_konto(auth.uid()),
+    'anmeldung', public.rpg_anmelde_adresse(auth.uid()));
 end;
+$$;
+
+-- Anmelden: interne Adresse zu einem Benutzernamen – nur für bestätigte Konten (Gäste haben kein Passwort).
+-- Unbekannter Name oder Gast: null (das Formular meldet dann einheitlich „Benutzername oder Passwort falsch“).
+create or replace function public.rpg_login_email(p_handle text)
+returns text language sql stable security definer set search_path = public as $$
+  select public.rpg_anmelde_adresse(p.user_id) from public.rpg_profiles p
+  where lower(p.handle) = lower(p_handle) and public.rpg_ist_konto(p.user_id);
 $$;
 
 -- Eigenes Profil (null, wenn noch keins)
@@ -139,9 +161,9 @@ returns jsonb language sql stable security definer set search_path = public as $
   join public.rpg_campaign_members me on me.campaign_id = c.id and me.user_id = auth.uid() and me.member_status = 'aktiv';
 $$;
 
--- rpg_ist_konto und rpg_name_gesperrt werden nur intern genutzt und sind nicht aufrufbar
-revoke all on function public.rpg_ist_konto(uuid), public.rpg_name_gesperrt(text) from public, anon, authenticated;
-revoke all on function public.rpg_teilt_kampagne(uuid), public.rpg_handle_frei(text), public.rpg_set_profile(text, text), public.rpg_my_profile() from public, anon;
-grant execute on function public.rpg_teilt_kampagne(uuid), public.rpg_handle_frei(text), public.rpg_set_profile(text, text), public.rpg_my_profile() to authenticated;
+-- rpg_ist_konto, rpg_name_gesperrt und rpg_anmelde_adresse werden nur intern genutzt und sind nicht aufrufbar
+revoke all on function public.rpg_ist_konto(uuid), public.rpg_name_gesperrt(text), public.rpg_anmelde_adresse(uuid) from public, anon, authenticated;
+revoke all on function public.rpg_teilt_kampagne(uuid), public.rpg_handle_frei(text), public.rpg_set_profile(text, text), public.rpg_my_profile(), public.rpg_login_email(text) from public, anon;
+grant execute on function public.rpg_teilt_kampagne(uuid), public.rpg_handle_frei(text), public.rpg_set_profile(text, text), public.rpg_my_profile(), public.rpg_login_email(text) to authenticated;
 
 commit;

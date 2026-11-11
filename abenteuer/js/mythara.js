@@ -13,28 +13,125 @@
   const sauber = (v) => String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10);
   const huebsch = (v) => { const c = sauber(v); return c.length > 4 ? c.slice(0, 4) + "-" + c.slice(4) : c; };
 
-  /* ---------- Konto (Bauabschnitt B) ---------- */
+  /* ---------- Konto: Benutzername und Passwort (Bauabschnitt B) ---------- */
+  // Supabase braucht für Passwörter eine E-Mail: Jedes Konto hat eine interne Platzhalter-Adresse
+  // (siehe abenteuer/supabase/002_rpg_profile.sql), die niemand sieht und an die nie Mails gehen.
+  const ICO = {
+    person: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z"/></svg>',
+    schloss: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h14v11H5z"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    auge: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3.2" fill="#0d0b08"/></svg>',
+    neu: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7.5" r="4"/><path d="M1 21c0-4.4 3.6-8 8-8s8 3.6 8 8z"/><path d="M19 8v6M16 11h6" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  };
+  const NAME = /^[A-Za-z0-9_ÄÖÜäöüß]{3,20}$/;
+  const netz = () => window.AB.liveClient();
+  let profil = null, ansicht = "anmelden"; // anmelden | registrieren
+  const feld = (id, ico, typ, platz, auto, extra = "") => `<label class="my-feld"><span class="my-ico">${ICO[ico]}</span><input type="${typ}" id="${id}" autocomplete="${auto}" placeholder="${platz}" aria-label="${platz}" ${extra}>${typ === "password" ? `<button type="button" class="my-auge" data-auge="${id}" aria-label="Passwort anzeigen"><span class="my-ico">${ICO.auge}</span></button>` : ""}</label>`;
+  const fb = (t, art = "") => { const e = $("#my-konto-fb"); if (e) { e.textContent = t; e.dataset.art = art; } };
+
+  async function profilLaden() {
+    try { await netz().ensureUser(); profil = await netz().rpc("rpg_my_profile", {}); } catch (e) { profil = null; }
+    return profil;
+  }
   function kontoZeichnen() {
-    const el = $("#my-konto-inhalt"), reg = $("#my-registrieren");
+    const el = $("#my-konto-inhalt"), reg = $("#my-registrieren"), titel = $("#my-konto-titel");
     if (!KONTEN) {
       el.innerHTML = `<p class="my-bald">Spielerkonten kommen bald. Dann bleiben deine Charaktere und Kampagnen auf allen Geräten gespeichert.</p>
         <p class="my-bald klein">Bis dahin spielst du als Gast. Deine Kampagnen werden in diesem Browser gespeichert.</p>`;
       reg.innerHTML = "";
       return;
     }
-    el.innerHTML = `<form class="my-anmelden" id="my-anmelden" novalidate>
-        <label class="my-feld"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h20v14H2z"/><path d="M2 5l10 8 10-8" fill="none" stroke="#0d0b08" stroke-width="1.6"/></svg></span><input type="email" id="my-mail" autocomplete="email" placeholder="E-Mail-Adresse" aria-label="E-Mail-Adresse"></label>
-        <label class="my-feld"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h14v11H5z"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><input type="password" id="my-pw" autocomplete="current-password" placeholder="Passwort" aria-label="Passwort"><button type="button" class="my-auge" id="my-auge" aria-label="Passwort anzeigen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3.2" fill="#0d0b08"/></svg></span></button></label>
-        <button class="my-knopf rot" type="submit">Anmelden</button>
-        <button class="my-link" type="button" id="my-vergessen">Passwort vergessen?</button>
-        <p class="my-fb" id="my-konto-fb" role="status"></p>
-      </form>`;
-    reg.innerHTML = `<button class="my-reg-knopf" id="my-reg"><span class="my-ico gross"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7.5" r="4"/><path d="M1 21c0-4.4 3.6-8 8-8s8 3.6 8 8z"/><path d="M19 8v6M16 11h6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>Noch kein Konto? <b>Jetzt registrieren</b><span aria-hidden="true" class="my-pfeil">→</span></button>`;
-    const fb = (t) => { $("#my-konto-fb").textContent = t; };
-    $("#my-auge").onclick = () => { const i = $("#my-pw"); i.type = i.type === "password" ? "text" : "password"; };
-    $("#my-anmelden").onsubmit = (e) => { e.preventDefault(); fb("Die Anmeldung wird gerade gebaut (Bauabschnitt B) und ist noch nicht freigeschaltet."); };
-    $("#my-vergessen").onclick = () => fb("Passwort zurücksetzen folgt mit den Spielerkonten.");
-    $("#my-reg").onclick = () => fb("Die Registrierung folgt mit den Spielerkonten.");
+    if (profil && profil.konto) {
+      titel.textContent = "Willkommen zurück";
+      el.innerHTML = `<p class="my-angemeldet">Angemeldet als <b>${esc(profil.handle)}</b></p>
+        <p class="my-bald klein">Deine Kampagnen sind mit deinem Konto verbunden und auf jedem Gerät verfügbar, auf dem du dich anmeldest.</p>
+        <button class="my-knopf" type="button" id="my-abmelden">Abmelden</button>
+        <p class="my-fb" id="my-konto-fb" role="status"></p>`;
+      reg.innerHTML = "";
+      $("#my-abmelden").onclick = abmelden;
+      return;
+    }
+    if (ansicht === "registrieren") {
+      titel.textContent = "Konto erstellen";
+      el.innerHTML = `<form class="my-anmelden" id="my-reg-form" novalidate>
+          ${feld("my-reg-name", "person", "text", "Benutzername", "username", 'maxlength="20" autocapitalize="off" spellcheck="false"')}
+          <p class="my-name-info" id="my-name-info">3–20 Zeichen: Buchstaben, Ziffern oder _. Diesen Namen sehen deine Mitspieler.</p>
+          ${feld("my-reg-pw", "schloss", "password", "Passwort (mind. 8 Zeichen)", "new-password", 'minlength="8"')}
+          ${feld("my-reg-pw2", "schloss", "password", "Passwort wiederholen", "new-password")}
+          <p class="my-bald klein">Merke dir dein Passwort gut: Ohne hinterlegte E-Mail kann es nicht zurückgesetzt werden.${profil && profil.handle ? "" : ""}</p>
+          <button class="my-knopf rot" type="submit">Konto erstellen</button>
+          <button class="my-link" type="button" id="my-zur-anmeldung">Ich habe schon ein Konto</button>
+          <p class="my-fb" id="my-konto-fb" role="status"></p>
+        </form>`;
+      reg.innerHTML = "";
+      let pruefTimer = null;
+      $("#my-reg-name").addEventListener("input", (e) => {
+        const v = e.target.value.trim(), info = $("#my-name-info"); clearTimeout(pruefTimer);
+        if (!v) { info.textContent = "3–20 Zeichen: Buchstaben, Ziffern oder _. Diesen Namen sehen deine Mitspieler."; info.dataset.art = ""; return; }
+        if (!NAME.test(v)) { info.textContent = "Nur 3–20 Zeichen: Buchstaben, Ziffern oder _ (keine Leerzeichen)."; info.dataset.art = "fehler"; return; }
+        info.textContent = "Wird geprüft …"; info.dataset.art = "";
+        pruefTimer = setTimeout(async () => {
+          try {
+            const r = await netz().rpc("rpg_handle_frei", { p_handle: v });
+            if ($("#my-reg-name").value.trim() !== v) return;
+            info.textContent = r === "frei" ? `✓ „${v}“ ist frei.` : r === "gesperrt" ? "Dieser Name ist nicht erlaubt." : r === "vergeben" ? `„${v}“ ist schon vergeben.` : "Ungültiger Name.";
+            info.dataset.art = r === "frei" ? "ok" : "fehler";
+          } catch (err) { info.textContent = err.message; info.dataset.art = "fehler"; }
+        }, 350);
+      });
+      $("#my-reg-form").onsubmit = (e) => { e.preventDefault(); registrieren(); };
+      $("#my-zur-anmeldung").onclick = () => { ansicht = "anmelden"; kontoZeichnen(); };
+    } else {
+      titel.textContent = "Als Spieler anmelden";
+      el.innerHTML = `<form class="my-anmelden" id="my-anmelden" novalidate>
+          ${feld("my-name", "person", "text", "Benutzername", "username", 'maxlength="20" autocapitalize="off" spellcheck="false"')}
+          ${feld("my-pw", "schloss", "password", "Passwort", "current-password")}
+          <button class="my-knopf rot" type="submit">Anmelden</button>
+          <button class="my-link" type="button" id="my-vergessen">Passwort vergessen?</button>
+          <p class="my-fb" id="my-konto-fb" role="status"></p>
+        </form>`;
+      reg.innerHTML = `<button class="my-reg-knopf" id="my-reg"><span class="my-ico gross">${ICO.neu}</span>Noch kein Konto? <b>Jetzt registrieren</b><span aria-hidden="true" class="my-pfeil">→</span></button>`;
+      $("#my-anmelden").onsubmit = (e) => { e.preventDefault(); anmelden(); };
+      $("#my-vergessen").onclick = () => fb("Ohne hinterlegte E-Mail lässt sich das Passwort leider nicht zurücksetzen. Eine E-Mail im Konto zu hinterlegen, wird später möglich.");
+      $("#my-reg").onclick = () => { ansicht = "registrieren"; kontoZeichnen(); $("#my-reg-name").focus(); };
+    }
+    el.querySelectorAll("[data-auge]").forEach((b) => { b.onclick = () => { const i = $("#" + b.dataset.auge); i.type = i.type === "password" ? "text" : "password"; }; });
+  }
+  /** Nach An- oder Abmelden ist ein anderer Nutzer aktiv: Gerätebezogenes (aktive Kampagne) vergessen und neu laden */
+  function neuStarten() { try { localStorage.removeItem("ab_kampagne"); } catch (e) { /* privat */ } location.reload(); }
+
+  async function registrieren() {
+    const name = $("#my-reg-name").value.trim(), pw = $("#my-reg-pw").value, pw2 = $("#my-reg-pw2").value;
+    if (!NAME.test(name)) return fb("Bitte einen gültigen Benutzernamen wählen (3–20 Zeichen: Buchstaben, Ziffern oder _).", "fehler");
+    if (pw.length < 8) return fb("Das Passwort braucht mindestens 8 Zeichen.", "fehler");
+    if (pw !== pw2) return fb("Die beiden Passwörter stimmen nicht überein.", "fehler");
+    const knopf = $("#my-reg-form .my-knopf"); knopf.disabled = true; fb("Konto wird erstellt …");
+    try {
+      await netz().ensureUser();
+      const p = await netz().rpc("rpg_set_profile", { p_handle: name });            // reserviert den Namen für diesen Gast
+      const { error } = await netz().db.auth.updateUser({ email: p.anmeldung, password: pw }); // Gast wird Konto (gleiche ID, Kampagnen bleiben)
+      if (error) throw new Error(/password/i.test(error.message) && /weak|short|least/i.test(error.message) ? "Dieses Passwort ist zu schwach. Bitte ein längeres wählen." : error.message);
+      await profilLaden();
+      if (!profil || !profil.konto) throw new Error("Das Konto konnte nicht bestätigt werden. Ist in Supabase „Confirm email“ ausgeschaltet?");
+      kontoZeichnen(); fb(`Willkommen, ${profil.handle}! Dein Konto ist eingerichtet.`, "ok");
+    } catch (e) { fb(e.message, "fehler"); knopf.disabled = false; }
+  }
+  async function anmelden() {
+    const name = $("#my-name").value.trim(), pw = $("#my-pw").value;
+    if (!name || !pw) return fb("Bitte Benutzername und Passwort eingeben.", "fehler");
+    const knopf = $("#my-anmelden .my-knopf"); knopf.disabled = true; fb("Anmeldung …");
+    try {
+      await netz().ensureUser();
+      const adresse = NAME.test(name) ? await netz().rpc("rpg_login_email", { p_handle: name }) : null;
+      if (!adresse) throw new Error("Benutzername oder Passwort ist falsch.");
+      const { error } = await netz().db.auth.signInWithPassword({ email: adresse, password: pw });
+      if (error) throw new Error(/invalid/i.test(error.message) ? "Benutzername oder Passwort ist falsch." : error.message);
+      neuStarten();
+    } catch (e) { fb(e.message, "fehler"); knopf.disabled = false; }
+  }
+  async function abmelden() {
+    if (!confirm("Abmelden? Danach spielst du auf diesem Gerät als Gast weiter.")) return;
+    try { await netz().db.auth.signOut(); } catch (e) { /* trotzdem neu starten */ }
+    neuStarten();
   }
 
   /* ---------- Gast ---------- */
@@ -91,5 +188,6 @@
   $("#my-code-feld").addEventListener("input", (e) => { e.target.value = huebsch(e.target.value); $("#my-code-fb").textContent = ""; });
   const zurueck = $("#titel-mythara"); if (zurueck) zurueck.onclick = () => zeige("mythara");
   kontoZeichnen();
+  if (KONTEN) profilLaden().then(kontoZeichnen);
   window.MYTHARA = { KONTEN, zeige: () => zeige("mythara") };
 })();

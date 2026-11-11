@@ -34,13 +34,22 @@ const { chromium } = require('playwright');
   // QR: ohne Kamera-Unterstützung eine Erklärung
   await p.click('#my-qr');
   check(/Kamera deines Handys/.test(await p.textContent('#my-scanner')), 'QR-Code scannen: Hinweis zur Handy-Kamera');
-  // Testschalter Konten
+  // Testschalter Konten: Benutzername und Passwort
   await p.goto(BASE + '/abenteuer/index.html?konten');
-  check(await p.isVisible('#my-mail') && await p.isVisible('#my-pw') && await p.isVisible('#my-reg'), '?konten: Anmeldeformular und Registrieren sichtbar');
-  await p.click('#my-auge');
+  check(await p.isVisible('#my-name') && await p.isVisible('#my-pw') && await p.isVisible('#my-reg') && !(await p.$('#my-mail')), '?konten: Anmeldung mit Benutzername und Passwort (keine E-Mail)');
+  await p.click('[data-auge="my-pw"]');
   check(await p.getAttribute('#my-pw', 'type') === 'text', 'Passwort anzeigen');
-  await p.click('.my-anmelden .my-knopf');
-  check(/noch nicht freigeschaltet/.test(await p.textContent('#my-konto-fb')), 'Anmelden meldet ehrlich: noch nicht freigeschaltet');
+  await p.click('#my-vergessen');
+  check(/nicht zurücksetzen/.test(await p.textContent('#my-konto-fb')), 'Passwort vergessen: ehrlicher Hinweis');
+  await p.click('#my-reg');
+  check(await p.isVisible('#my-reg-name') && await p.isVisible('#my-reg-pw2'), 'Registrieren: Benutzername, Passwort, Wiederholung');
+  await p.fill('#my-reg-name', 'zwei worte');
+  check(/keine Leerzeichen/.test(await p.textContent('#my-name-info')), 'Ungültiger Name wird sofort gemeldet');
+  await p.fill('#my-reg-name', 'Gültig_1'); await p.fill('#my-reg-pw', 'kurz'); await p.fill('#my-reg-pw2', 'kurz');
+  await p.click('#my-reg-form .my-knopf');
+  check(/mindestens 8/.test(await p.textContent('#my-konto-fb')), 'Zu kurzes Passwort abgewiesen');
+  await p.fill('#my-reg-pw', 'langesPasswort1'); await p.fill('#my-reg-pw2', 'anderesPasswort1'); await p.click('#my-reg-form .my-knopf');
+  check(/stimmen nicht überein/.test(await p.textContent('#my-konto-fb')), 'Abweichende Wiederholung abgewiesen');
   // Handy
   const h = await neu({ width: 390, height: 844 });
   await h.goto(BASE + '/abenteuer/index.html');

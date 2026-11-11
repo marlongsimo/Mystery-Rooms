@@ -855,3 +855,7 @@ body[data-abschnitt="3"] .szene h1 { text-shadow: 0 0 24px rgba(201, 72, 40, .25
 .note.klein { font-size: 12px; }
 .kampagne-status { position: fixed; left: 12px; bottom: 12px; z-index: 25; padding: 6px 10px; font: 600 12px var(--schrift-ui); color: #e9dcc0; background: rgba(10, 10, 12, .88); border: 1px solid rgba(176, 138, 69, .5); border-radius: 4px; pointer-events: none; }
 .kampagne-status[hidden] { display: none; } .kampagne-status[data-art="fehler"] { color: #f0b8a8; border-color: #c96a6f; }
+.my-name-info { margin: -4px 0 0; font: 400 14px/1.35 var(--schrift-ui); color: #b9ae99; }
+.my-name-info[data-art="ok"] { color: #9fd3a8; } .my-name-info[data-art="fehler"], .my-fb[data-art="fehler"] { color: #f0b8a8; }
+.my-fb[data-art="ok"] { color: #9fd3a8; }
+.my-angemeldet { margin: 0; font: 400 21px var(--schrift-text); color: #efe6d4; } .my-angemeldet b { font-family: var(--schrift-titel); color: #e9c77e; }

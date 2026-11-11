@@ -30,10 +30,10 @@
   const KLASSE_ZEICHEN = { krieger: "⚔", zauberer: "✦", schurke: "◆", kleriker: "☀", waldlaeufer: "❦" };
   /** Kurze Angaben je Klasse für die Klassenwahl (Werte aus figuren.js, nur die Worte stehen hier) */
   const KLASSE_INFO = {
-    krieger: { kurz: "Meister des Nahkampfs und Schild der Gefährten.", stark: "Hält am meisten aus, steht vorn", platz: "vorn", wofuer: "Für alle, die mitten ins Getümmel wollen." },
-    zauberer: { kurz: "Hüter arkanen Wissens. Zerbrechlich, aber gefährlich.", stark: "Zauber auf Entfernung und auf mehrere Gegner, Runen lesen", platz: "hinten", wofuer: "Für alle, die gern planen und Wirkung sehen." },
+    krieger: { kurz: "Meister des Nahkampfs und Schild der Gefährten.", stark: "Hält am meisten aus, nagelt Gegner fest", platz: "vorn", wofuer: "Für alle, die mitten ins Getümmel wollen." },
+    zauberer: { kurz: "Hüter arkanen Wissens. Zerbrechlich, aber gefährlich.", stark: "Zauber auf mehrere Gegner, arkaner Schild, Runen lesen", platz: "hinten", wofuer: "Für alle, die gern planen und Wirkung sehen." },
     schurke: { kurz: "Meister der List, der Täuschung und der leisen Klinge.", stark: "Hinterhalt, Nachbluten, Fallen und Schlösser", platz: "Mitte", wofuer: "Für alle, die den richtigen Moment abpassen." },
-    kleriker: { kurz: "Heiler, Beschützer und Kämpfer gegen die Finsternis.", stark: "Heilen, segnen, Untote vertreiben", platz: "vorn oder Mitte", wofuer: "Für alle, die die Gruppe zusammenhalten." },
+    kleriker: { kurz: "Heiler, Beschützer und Kämpfer gegen die Finsternis.", stark: "Heilen, segnen, Beistand für Nachbarn", platz: "vorn oder Mitte", wofuer: "Für alle, die die Gruppe zusammenhalten." },
     waldlaeufer: { kurz: "Kundschafter, Jäger und Überlebenskünstler der Wildnis.", stark: "Fernkampf, Rüstung durchbrechen, Spuren lesen", platz: "hinten oder Mitte", wofuer: "Für alle, die aus sicherer Entfernung treffen." },
   };
   const ATTR_NAME = { STR: "Stärke", GES: "Geschick", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };

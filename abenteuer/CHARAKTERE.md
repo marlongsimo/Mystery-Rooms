@@ -31,10 +31,10 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Klasse | Würfel | Merkmal (alle drei Figuren) | ab Stufe 2 |
 |---|---|---|---|
-| **Krieger** | W10 | **Zweiter Atem:** Bonusaktion, heilt 1W10 + Stufe, 1× je Rast | **Tatendrang:** eine zusätzliche Aktion, 1× je lange Rast |
-| **Zauberer** | W8 | **Arkaner Schutz:** RK 11 + GES ohne Rüstung (13). **Arkane Wucht:** Zaubertricks + INT Schaden. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad | – |
+| **Krieger** | W10 | **Zweiter Atem:** Bonusaktion, heilt 1W10 + Stufe, 1× je Rast. **Festnageln:** Waffentreffer verlangsamen 1 Runde | **Tatendrang:** eine zusätzliche Aktion, 1× je lange Rast |
+| **Zauberer** | W8 | **Arkaner Schutz:** RK 11 + GES ohne Rüstung (13). **Arkane Wucht:** Zaubertricks + INT Schaden. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad. **Arkaner Schild:** 1× je Kampf +5 RK gegen einen Treffer | – |
 | **Schurke** | W8 | **Hinterhalt:** +1W6 (ab Stufe 2: +2W6) einmal je Zug, wenn mit Vorteil oder ein Verbündeter neben dem Ziel steht. **Nachbluten:** Waffentreffer lassen 3 Runden bluten (1W4 je Zug) | **Gerissene Aktion:** Bonusaktion Spurt, Verstecken oder Rückzug |
-| **Kleriker** | W8 | **Heilendes Wort:** Bonusaktion, Platz, 1W4 + WEI auf 6 Felder, auch am Boden. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad | **Göttliche Macht:** je Figur verschieden, 1× je Rast |
+| **Kleriker** | W8 | **Heilendes Wort:** Bonusaktion, Platz, 1W4 + WEI auf 6 Felder, auch am Boden. **Beistand:** Nachbarn +1 auf Rettungswürfe. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad | **Göttliche Macht:** je Figur verschieden, 1× je Rast |
 | **Waldläufer** | W10 | **Jägermal:** Bonusaktion, ein Ziel bis Kampfende markiert, +1W6 Schaden bei jedem Treffer, 2 / 3 / 3 je lange Rast. **Fährtenleser:** Vorteil auf Spuren und Wahrnehmung im Freien. **Durchbrechen:** Waffentreffer geben dem Ziel 3 Runden −2 RK | – |
 
 ---
@@ -43,6 +43,8 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 <!-- Dieser Teil wird von tools/charaktere-doc.js aus js/figuren.js erzeugt. Nicht von Hand ändern. -->
 
 ## 2 · Krieger
+
+**Klassenmerkmal:** Festnageln: Ein Waffentreffer verlangsamt den Gegner in seinem nächsten Zug (halbe Bewegung).
 
 ### Torvald – Der Schildwächter
 „Niemand fällt, solange ich stehe.“
@@ -108,6 +110,8 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 **Moment in Grauwacht:** Coldric: Sie kann ihn zum Ehrenduell fordern.
 
 ## 3 · Zauberer
+
+**Klassenmerkmal:** Arkaner Schild: Einmal je Kampf wendet ein Schild einen Treffer ab (+5 RK gegen diesen Angriff, automatisch).
 
 ### Lyra – Die Gelehrte
 „Alles hat eine Ordnung. Auch das hier.“
@@ -252,6 +256,8 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 **Moment in Grauwacht:** Glockenturm: Er schaltet den Kobold am Glockenseil lautlos aus.
 
 ## 5 · Kleriker
+
+**Klassenmerkmal:** Beistand: Verbündete direkt neben dir bekommen +1 auf Rettungswürfe.
 
 ### Elara – Die Lichtbringerin
 „Das Licht weicht nicht.“

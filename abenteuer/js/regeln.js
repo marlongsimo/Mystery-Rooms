@@ -422,7 +422,8 @@
     if (((attr === "STR" || attr === "KON") && hatDing(z, "baerenguertel")) || (attr === "GES" && hatDing(z, "katzenbrosche"))) v += 1;
     let { w } = w20(st, v);
     const bon = () => mod(z.werte[attr]) + (z.seite === "spieler" && z.klasse && FD.KLASSEN[z.klasse].rettung.includes(attr) ? UEBUNG : 0);
-    const glueck = hatDing(z, "gluecksbringer") ? 1 : 0;
+    // Klassenmerkmal Kleriker: Beistand – Verbündete direkt neben einem Kleriker +1
+    const glueck = (hatDing(z, "gluecksbringer") ? 1 : 0) + (z.seite === "spieler" && st.figuren.some((k) => k !== z && k.seite === "spieler" && lebt(k) && FD.KLASSEN[k.klasse] && FD.KLASSEN[k.klasse].beistand && abstand(k, z) <= 1) ? 1 : 0);
     let total = w + bon() + glueck + (z.z.segen ? W(st.r, 4) : 0);
     if (total < sg) { const g = gedankenstuetze(st, z, sg - total); if (g) { w = W(st.r, 20); total = w + bon() + (z.z.segen ? W(st.r, 4) : 0); st.log.push({ t: `${g.name}: Gedankenstütze – ${z.name} würfelt noch einmal.`, art: "gut" }); } }
     return { erfolg: total >= sg, w, total };
@@ -530,6 +531,12 @@
         st.log.push({ t: `${g.name} wirft eine Schutzglyphe vor ${z.name}: RK ${rk}.`, art: "gut" });
       }
     }
+    // Klassenmerkmal Zauberer: Arkaner Schild – einmal je Kampf, wenn er einen Treffer abwendet
+    const ks = z.seite === "spieler" && FD.KLASSEN[z.klasse] && FD.KLASSEN[z.klasse].arkanSchild;
+    if (ks && treffer && w < kritAb && a.seite === "gegner" && !z.arkanSchild && total < rk + ks) {
+      z.arkanSchild = true; rk += ks; treffer = false;
+      st.log.push({ t: `${z.name} reißt einen arkanen Schild hoch: RK ${rk}, der Angriff prallt ab.`, art: "gut" });
+    }
     const krit = treffer && w >= kritAb;
     const vtext = v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : "";
     let erg = { treffer, krit, w, total, schaden: 0 };
@@ -603,6 +610,7 @@
         if (a.brennt && !blockiert(st, z.x, z.y)) st.brand.push({ x: z.x, y: z.y, bis: st.runde + 1 });
         // Klassenmerkmale bei Waffentreffern: Schurken lassen bluten, Waldläufer brechen die Rüstung auf (frischt auf, stapelt nicht)
         if (waffe && kl.nachbluten && lebt(z) && z.seite === "gegner") { if (!z.z.blutung) st.log.push({ t: `${z.name} blutet.` }); z.z.blutung = { rest: 3, w: kl.nachbluten, von: f.name }; }
+        if (waffe && kl.festnageln && lebt(z) && z.seite === "gegner") { if (!z.z.verlangsamt) st.log.push({ t: `${f.name} nagelt ${z.name} fest: verlangsamt.` }); z.z.verlangsamt = Math.max(z.z.verlangsamt || 0, kl.festnageln); }
         if (waffe && kl.durchbrechen && lebt(z) && z.seite === "gegner") { if (!(z.z.bruch && z.z.bruch.bis > st.runde)) st.log.push({ t: `${f.name} bricht ${z.name}s Rüstung auf: −${kl.durchbrechen} RK.` }); z.z.bruch = { n: kl.durchbrechen, bis: st.runde + 3 }; }
       },
     };

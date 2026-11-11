@@ -166,6 +166,7 @@
       !fertig && c.version > 0 ? `<button class="btn ${i.live ? "ghost " : ""}klein" data-k="allein" data-id="${c.id}">${i.live ? "Allein fortsetzen" : "Fortsetzen"}</button>` : "",
       !fertig && c.version === 0 ? `<button class="btn klein" data-k="beginnen" data-id="${c.id}">Beginnen</button>` : "",
       c.version > 0 && c.status !== "archiviert" ? `<button class="btn ghost klein" data-k="neu" data-id="${c.id}">Neu beginnen</button>` : "",
+      !fertig && window.MYTHARA && window.MYTHARA.istKonto() ? `<button class="btn ghost klein" data-k="einladen" data-id="${c.id}">Freunde einladen</button>` : "",
       c.status === "pausiert" || c.status === "abgeschlossen" ? `<button class="btn ghost klein" data-k="archiv" data-id="${c.id}">Archivieren</button>` : "",
       c.status === "archiviert" ? `<button class="btn ghost klein" data-k="zurueck" data-id="${c.id}">Wiederherstellen</button>` : "",
       `<button class="btn ghost klein gefahr" data-k="loeschen" data-id="${c.id}">Löschen</button>`].join("")
@@ -196,6 +197,7 @@
       if (b) b.disabled = true;
       if (was === "handys" || was === "allein") return await fortsetzen(id, was === "handys");
       if (was === "beginnen") return beginnen(c);
+      if (was === "einladen") { if (b) b.disabled = false; return window.MYTHARA.freundeEinladen(id, c.title); }
       if (was === "neu") {
         if (!confirm(`„${c.title}“ neu beginnen? Alle Spielstände dieser Kampagne werden gelöscht. Die Kampagne und ihre Mitspieler bleiben.`)) { b.disabled = false; return; }
         await rpc("rpg_reset_campaign", { p_campaign_id: id });

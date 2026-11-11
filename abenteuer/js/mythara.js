@@ -205,13 +205,121 @@
     const gh = $("#hub-gast-hinweis"); gh.hidden = konto;
     if (!konto) gh.innerHTML = `<span>Du spielst als <b>Gast</b>. Deine Kampagnen sind an diesen Browser gebunden. Mit einem Konto hast du sie auf jedem Gerät.</span><span class="hub-gast-knoepfe"><button class="my-link" data-profil="registrieren">Konto erstellen</button><button class="my-link" data-profil="anmelden">Anmelden</button></span>`;
     $("#hub-profil").innerHTML = `<button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small>${konto ? "Spieler" : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
+      ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
       <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button><button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-einst").onclick = () => { const t = $("#titel-einst"); if (t) t.click(); };
+    const gl = $("#hub-glocke"); if (gl) gl.onclick = anfragenZeigen;
+    posteingang();
+  }
+
+  /* ---------- Freunde und Anfragen (Migration 003) ---------- */
+  let inbox = { freunde: [], kampagnen: [] };
+  const istKonto = () => Boolean(profil && profil.konto);
+  const ava = (k, name) => k && window.ABF.FIGUREN[k] ? `<img src="img/figuren/${k}.jpg" alt="">` : `<span>${esc((name || "?").slice(0, 1).toUpperCase())}</span>`;
+  /** Posteingang laden und Zähler (Glocke, „Freunde“) setzen */
+  async function posteingang() {
+    if (!istKonto()) return;
+    try { inbox = await netz().rpc("rpg_my_inbox", {}); } catch (e) { return; }
+    const n = { alle: inbox.freunde.length + inbox.kampagnen.length, freunde: inbox.freunde.length };
+    document.querySelectorAll("[data-zahl]").forEach((z) => { const v = n[z.dataset.zahl] || 0; z.hidden = !v; z.textContent = v > 9 ? "9+" : String(v); });
+    const gl = $("#hub-glocke"); if (gl) gl.classList.toggle("neu", n.alle > 0);
+  }
+  setInterval(() => { if (!document.hidden && !$("#hub").hidden) posteingang(); }, 30000);
+  function fenster(titel, inhalt) {
+    const o = $("#qr-overlay");
+    o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-label="${esc(titel)}"><div class="k-kopf"><h2>${esc(titel)}</h2><button class="link" id="fenster-zu">Schließen</button></div>${inhalt}</div>`;
+    o.hidden = false; $("#fenster-zu").onclick = () => { o.hidden = true; hubListen(); posteingang(); };
+    return o;
+  }
+  async function anfragenZeigen() {
+    await posteingang();
+    const f = inbox.freunde, k = inbox.kampagnen;
+    const o = fenster("Anfragen", `${!f.length && !k.length ? `<p class="note">Keine offenen Anfragen.</p>` : ""}
+      ${f.length ? `<h3 class="f-unter">Freundschaftsanfragen</h3><ul class="f-liste">${f.map((x) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.handle)}</span><b>${esc(x.handle)}</b><span class="f-knoepfe"><button class="btn klein" data-fa="ja" data-name="${esc(x.handle)}">Annehmen</button><button class="btn ghost klein" data-fa="nein" data-name="${esc(x.handle)}">Ablehnen</button></span></li>`).join("")}</ul>` : ""}
+      ${k.length ? `<h3 class="f-unter">Gruppenanfragen</h3><ul class="f-liste">${k.map((x) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.von)}</span><span><b>${esc(x.titel)}</b><small>Einladung von ${esc(x.von)}</small></span><span class="f-knoepfe"><button class="btn klein" data-ka="ja" data-id="${x.id}">Annehmen</button><button class="btn ghost klein" data-ka="nein" data-id="${x.id}">Ablehnen</button></span></li>`).join("")}</ul>` : ""}`);
+    o.querySelectorAll("[data-fa]").forEach((b) => { b.onclick = async () => { b.disabled = true; try { await netz().rpc("rpg_answer_friend", { p_handle: b.dataset.name, p_accept: b.dataset.fa === "ja" }); toast(b.dataset.fa === "ja" ? `Du bist jetzt mit ${b.dataset.name} befreundet.` : "Anfrage abgelehnt."); } catch (e) { toast(e.message); } anfragenZeigen(); }; });
+    o.querySelectorAll("[data-ka]").forEach((b) => { b.onclick = async () => { b.disabled = true; try { await netz().rpc("rpg_answer_invite", { p_invite_id: b.dataset.id, p_accept: b.dataset.ka === "ja" }); toast(b.dataset.ka === "ja" ? "Du bist jetzt Mitspieler dieser Kampagne. Tritt am Spieltisch mit dem Code bei." : "Einladung abgelehnt."); } catch (e) { toast(e.message); } anfragenZeigen(); }; });
+  }
+  async function freundeZeigen(suchErgebnis) {
+    if (!istKonto()) { fenster("Freunde", `<p class="note">Freunde gibt es mit einem Spielerkonto: Dann kannst du andere über ihren Benutzernamen finden und zu deinen Kampagnen einladen.</p><button class="my-knopf rot" data-profil="registrieren">Konto erstellen</button>`); return; }
+    let d; try { d = await netz().rpc("rpg_my_friends", {}); } catch (e) { fenster("Freunde", `<p class="fb">${esc(e.message)}</p>`); return; }
+    const zeile = (x, knoepfe) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.handle)}</span><b>${esc(x.handle)}</b><span class="f-knoepfe">${knoepfe}</span></li>`;
+    const s = suchErgebnis;
+    const sKnopf = !s ? "" : s.beziehung === "freund" ? `<span class="f-info">Ihr seid befreundet.</span>` : s.beziehung === "angefragt" ? `<span class="f-info">Anfrage gesendet.</span>` : s.beziehung === "anfrage_an_mich" ? `<button class="btn klein" data-f="annehmen" data-name="${esc(s.handle)}">Anfrage annehmen</button>` : s.beziehung === "blockiert" ? `<button class="btn ghost klein" data-f="entsperren" data-name="${esc(s.handle)}">Entsperren</button>` : `<button class="btn klein" data-f="anfragen" data-name="${esc(s.handle)}">Freundschaftsanfrage senden</button>`;
+    const o = fenster("Freunde", `<form class="f-suche" id="f-suche"><label for="f-name">Spieler finden</label><div><input id="f-name" placeholder="Genauer Benutzername" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn klein" type="submit">Suchen</button></div><p class="my-fb" id="f-fb" role="status"></p></form>
+      ${s ? `<ul class="f-liste treffer">${zeile(s, sKnopf)}</ul>` : ""}
+      ${d.an_mich.length ? `<h3 class="f-unter">Anfragen an dich</h3><ul class="f-liste">${d.an_mich.map((x) => zeile(x, `<button class="btn klein" data-f="annehmen" data-name="${esc(x.handle)}">Annehmen</button><button class="btn ghost klein" data-f="ablehnen" data-name="${esc(x.handle)}">Ablehnen</button>`)).join("")}</ul>` : ""}
+      <h3 class="f-unter">Deine Freunde (${d.freunde.length})</h3>
+      ${d.freunde.length ? `<ul class="f-liste">${d.freunde.map((x) => zeile(x, `<button class="btn ghost klein" data-f="entfernen" data-name="${esc(x.handle)}">Entfernen</button><button class="btn ghost klein gefahr" data-f="blockieren" data-name="${esc(x.handle)}">Blockieren</button>`)).join("")}</ul>` : `<p class="note">Noch keine Freunde. Suche oben nach dem genauen Benutzernamen.</p>`}
+      ${d.von_mir.length ? `<h3 class="f-unter">Gesendet</h3><ul class="f-liste">${d.von_mir.map((x) => zeile(x, `<button class="btn ghost klein" data-f="zurueck" data-name="${esc(x.handle)}">Zurückziehen</button>`)).join("")}</ul>` : ""}
+      ${d.blockiert.length ? `<h3 class="f-unter">Blockiert</h3><ul class="f-liste">${d.blockiert.map((x) => zeile(x, `<button class="btn ghost klein" data-f="entsperren" data-name="${esc(x.handle)}">Entsperren</button>`)).join("")}</ul>` : ""}`);
+    $("#f-suche").onsubmit = async (e) => {
+      e.preventDefault(); const n = $("#f-name").value.trim();
+      if (!NAME.test(n)) { $("#f-fb").textContent = "Bitte den genauen Benutzernamen eingeben (3–20 Zeichen)."; return; }
+      try { const r = await netz().rpc("rpg_find_player", { p_handle: n }); if (!r) { $("#f-fb").textContent = `Niemanden mit dem Namen „${n}“ gefunden.`; return; } freundeZeigen(r); }
+      catch (err) { $("#f-fb").textContent = err.message; }
+    };
+    o.querySelectorAll("[data-f]").forEach((b) => { b.onclick = async () => {
+      const n = b.dataset.name, was = b.dataset.f;
+      if ((was === "entfernen" || was === "blockieren") && !confirm(was === "blockieren" ? `${n} blockieren? Ihr seid dann nicht mehr befreundet, und ${n} kann dir keine Anfragen mehr schicken.` : `Freundschaft mit ${n} beenden?`)) return;
+      b.disabled = true;
+      try {
+        if (was === "anfragen") { const r = await netz().rpc("rpg_request_friend", { p_handle: n }); toast(r === "freund" ? `Du bist jetzt mit ${n} befreundet.` : `Anfrage an ${n} gesendet.`); }
+        if (was === "annehmen" || was === "ablehnen") await netz().rpc("rpg_answer_friend", { p_handle: n, p_accept: was === "annehmen" });
+        if (was === "entfernen" || was === "zurueck") await netz().rpc("rpg_remove_friend", { p_handle: n });
+        if (was === "blockieren") await netz().rpc("rpg_block", { p_handle: n });
+        if (was === "entsperren") await netz().rpc("rpg_unblock", { p_handle: n });
+      } catch (e) { toast(e.message); }
+      posteingang(); freundeZeigen();
+    }; });
+  }
+  /** Freunde zu einer Kampagne einladen (Host). Liefert die Liste der eingeladenen Namen. */
+  async function freundeEinladen(kampagnenId, titel) {
+    if (!istKonto()) return toast("Einladen geht mit einem Spielerkonto.");
+    let d, offen = [], mitglieder = [];
+    try {
+      [d, offen] = await Promise.all([netz().rpc("rpg_my_friends", {}), netz().rpc("rpg_campaign_open_invites", { p_campaign_id: kampagnenId })]);
+      mitglieder = ((await netz().rpc("rpg_load_campaign", { p_campaign_id: kampagnenId })).members || []).map((m) => (m.handle || m.display_name || "").toLowerCase());
+    } catch (e) { return toast(e.message); }
+    const waehlbar = d.freunde.filter((f) => !mitglieder.includes(f.handle.toLowerCase()) && !offen.includes(f.handle));
+    const o = fenster("Freunde einladen", `<p class="note">„${esc(titel)}“: Wer annimmt, wird Mitspieler dieser Kampagne.</p>
+      ${waehlbar.length ? `<ul class="f-liste wahl">${waehlbar.map((f) => `<li><label><input type="checkbox" value="${esc(f.handle)}"> <span class="hub-avatar klein">${ava(f.avatar_key, f.handle)}</span><b>${esc(f.handle)}</b></label></li>`).join("")}</ul><button class="my-knopf rot" id="f-einladen">Einladungen senden</button>`
+        : `<p class="note">${d.freunde.length ? "Alle deine Freunde sind schon dabei oder eingeladen." : "Du hast noch keine Freunde. Füge sie unter „Freunde“ hinzu."}</p>`}
+      ${offen.length ? `<p class="note klein">Schon eingeladen: ${esc(offen.join(", "))}</p>` : ""}`);
+    const k = $("#f-einladen");
+    if (k) k.onclick = async () => {
+      const namen = [...o.querySelectorAll("input:checked")].map((i) => i.value); if (!namen.length) return toast("Bitte mindestens einen Freund auswählen.");
+      k.disabled = true; let n = 0;
+      for (const name of namen) { try { await netz().rpc("rpg_invite_friend", { p_campaign_id: kampagnenId, p_handle: name }); n++; } catch (e) { toast(e.message); } }
+      o.hidden = true; toast(`${n} ${n === 1 ? "Einladung" : "Einladungen"} gesendet.`);
+    };
+  }
+  /** Neue Kampagne: Titel und Freunde wählen, dann beginnt das Abenteuer in dieser Kampagne */
+  async function neueKampagne() {
+    if (!istKonto() || !window.KAMPAGNE) return neuesAbenteuer();
+    let freunde = []; try { freunde = (await netz().rpc("rpg_my_friends", {})).freunde; } catch (e) { /* ohne Freunde weiter */ }
+    const o = fenster("Neue Kampagne starten", `<form class="f-neu" id="f-neu"><label for="f-titel">Name der Kampagne</label><input id="f-titel" maxlength="80" value="Das Siegel von Grauwacht">
+      <p class="f-unter">Freunde einladen <small>(optional – nur Freunde, die deine Anfrage angenommen haben)</small></p>
+      ${freunde.length ? `<ul class="f-liste wahl">${freunde.map((f) => `<li><label><input type="checkbox" value="${esc(f.handle)}"> <span class="hub-avatar klein">${ava(f.avatar_key, f.handle)}</span><b>${esc(f.handle)}</b></label></li>`).join("")}</ul>` : `<p class="note">Noch keine Freunde – du kannst sie später aus „Meine Kampagnen“ einladen.</p>`}
+      <button class="my-knopf rot" type="submit">Kampagne starten</button></form>`);
+    $("#f-neu").onsubmit = async (e) => {
+      e.preventDefault(); const knopf = o.querySelector(".my-knopf"); knopf.disabled = true;
+      try {
+        const titel = $("#f-titel").value.trim() || "Das Siegel von Grauwacht";
+        const id = await netz().rpc("rpg_create_campaign", { p_title: titel, p_display_name: profil.handle });
+        const namen = [...o.querySelectorAll("input[type=checkbox]:checked")].map((i) => i.value);
+        for (const name of namen) { try { await netz().rpc("rpg_invite_friend", { p_campaign_id: id, p_handle: name }); } catch (err) { toast(err.message); } }
+        o.hidden = true;
+        if (namen.length) toast(`Kampagne angelegt, ${namen.length} ${namen.length === 1 ? "Einladung" : "Einladungen"} gesendet.`);
+        window.KAMPAGNE.beginnen({ id, status: "geplant", title: titel });
+      } catch (err) { toast(err.message); knopf.disabled = false; }
+    };
   }
   function profilAktion(was) {
     const m = $("#hub-menue"); if (m) m.hidden = true;
+    $("#qr-overlay").hidden = true;
     if (was === "abmelden") return abmelden();
     if (was === "bild") return bildWaehlen();
     ansicht = was === "registrieren" ? "registrieren" : "anmelden";
@@ -268,7 +376,9 @@
     if (was === "uebersicht") return zeigeHub();
     if (was === "kampagnen") return window.KAMPAGNE ? window.KAMPAGNE.bibliothek() : toast("Kampagnen sind gerade nicht verfügbar.");
     if (was === "helden") return window.AB.zeigeSetup();
-    if (was === "welt" || was === "neu") return neuesAbenteuer();
+    if (was === "neu") return neueKampagne();
+    if (was === "freunde") return freundeZeigen();
+    if (was === "welt") return neuesAbenteuer();
     if (was === "regeln") { const b = $("#titel-regeln"); if (b) b.click(); return; }
     if (was === "beitreten") return beitretenDialog();
   });
@@ -285,5 +395,5 @@
   // Nur neu zeichnen, wenn ein Konto angemeldet ist – sonst bliebe Eingetipptes nicht erhalten.
   // Angemeldet (oder schon als Gast unterwegs) und nichts anderes läuft: gleich auf die Spielerseite.
   if (KONTEN) profilLaden().then(() => { if (profil && profil.konto) kontoZeichnen(); if (imHub() && !$("#mythara").hidden) zeigeHub(); });
-  window.MYTHARA = { KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub };
+  window.MYTHARA = { KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto() };
 })();

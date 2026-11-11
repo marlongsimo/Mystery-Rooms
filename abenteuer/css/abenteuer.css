@@ -931,3 +931,23 @@ body > .einst-panel { position: fixed; z-index: 40; }
   .hub-nav { display: flex; overflow-x: auto; padding: 6px; } .hub-nav-punkt { flex: none; font-size: 16px; padding: 8px 10px; border-bottom-color: transparent; }
   .hub-kacheln { grid-template-columns: 1fr; gap: 12px; } .hub-kachel { min-height: 200px; } .hub-kachel.klein { min-height: 140px; }
 }
+/* Mythara: Freunde, Anfragen, Glocke */
+.hub-rund { position: relative; }
+.hub-zahl { position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 5px; display: grid; place-items: center; border-radius: 10px; background: #c8262b; color: #fff; font: 700 11px var(--schrift-ui); border: 2px solid #0e0f12; }
+.hub-zahl[hidden] { display: none; }
+.hub-nav-punkt .hub-zahl { position: static; margin-left: auto; border: 0; }
+#hub-glocke.neu .my-ico { color: #f6d58a; animation: glocke-wackeln 2.4s ease-in-out infinite; transform-origin: 50% 10%; }
+@keyframes glocke-wackeln { 0%, 80%, 100% { transform: rotate(0); } 85% { transform: rotate(12deg); } 90% { transform: rotate(-10deg); } 95% { transform: rotate(6deg); } }
+@media (prefers-reduced-motion: reduce) { #hub-glocke.neu .my-ico { animation: none; } }
+.hub-avatar.klein { width: 34px; height: 34px; font-size: 15px; flex: none; }
+.f-unter { margin: 14px 0 6px; font: 600 15px var(--schrift-titel); color: #e9c77e; } .f-unter small { font: 400 13px var(--schrift-ui); color: var(--muted); }
+.f-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.f-liste li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 10px; background: rgba(20, 18, 14, .75); border: 1px solid rgba(176, 138, 69, .3); border-radius: 4px; }
+.f-liste li b { font: 400 17px var(--schrift-text); color: #f3e7cc; } .f-liste li small { display: block; color: var(--muted); font-size: 13px; }
+.f-liste.treffer li { border-color: #e9c77e; }
+.f-liste.wahl label { display: flex; align-items: center; gap: 10px; cursor: pointer; width: 100%; }
+.f-knoepfe { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; } .f-info { margin-left: auto; color: #9fd3a8; font-size: 14px; }
+.f-suche, .f-neu { display: grid; gap: 6px; }
+.f-suche label, .f-neu label { font: 600 11px var(--schrift-ui); letter-spacing: .14em; text-transform: uppercase; color: #e9c77e; }
+.f-suche div { display: flex; gap: 6px; }
+.f-suche input, .f-neu input:not([type]) , .f-neu #f-titel { flex: 1; padding: 10px 12px; font: 400 17px var(--schrift-text); color: #f3e7cc; background: rgba(0, 0, 0, .5); border: 1px solid rgba(201, 154, 75, .6); border-radius: 6px; }

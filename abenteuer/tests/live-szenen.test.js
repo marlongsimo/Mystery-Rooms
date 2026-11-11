@@ -27,7 +27,7 @@ const { chromium } = require('playwright');
   const szene = (T) => T.evaluate(() => window.ABT.A() && window.ABT.A().szene);
 
   const T = await page({ width: 1024, height: 900 }, 'Tisch');
-  await T.goto(BASE + '/abenteuer/index.html?schnell'); await T.evaluate(() => localStorage.clear()); await T.reload();
+  await T.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await T.evaluate(() => localStorage.clear()); await T.reload();
   await einstieg(T, 'live');
   await until(T, () => Boolean(document.querySelector('.beitritt .code')));
   const code = (await T.textContent('.beitritt .code')).trim();

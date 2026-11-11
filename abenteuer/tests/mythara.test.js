@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
   check(await p.isVisible('#mythara') && !(await p.isVisible('#intro')), 'Start: Mythara-Bildschirm, Abenteuer-Titel verborgen');
   check(await p.title() === 'Mythara – Das digitale Rollenspiel | Case Unlocked', 'Seitentitel Mythara');
   check(await p.evaluate(() => { const i = document.querySelector('.my-logo img'); return i.complete && i.naturalWidth > 0; }), 'Logo geladen');
-  check(!(await p.isVisible('#my-mail')) && /kommen bald/.test(await p.textContent('#my-konto')), 'Ohne ?konten: Konto-Hinweis statt Formular');
+  check(await p.isVisible('#my-name') && await p.isVisible('#my-kampagnen'), 'Anmeldung und „Meine Kampagnen“ ohne Testschalter sichtbar');
   // Einladungscode
   await p.click('#my-beitreten');
   check(await p.isVisible('#my-code-feld'), '„Spiel beitreten“ öffnet das Codefeld');
@@ -34,9 +34,9 @@ const { chromium } = require('playwright');
   // QR: ohne Kamera-Unterstützung eine Erklärung
   await p.click('#my-qr');
   check(/Kamera deines Handys/.test(await p.textContent('#my-scanner')), 'QR-Code scannen: Hinweis zur Handy-Kamera');
-  // Testschalter Konten: Benutzername und Passwort
-  await p.goto(BASE + '/abenteuer/index.html?konten');
-  check(await p.isVisible('#my-name') && await p.isVisible('#my-pw') && await p.isVisible('#my-reg') && !(await p.$('#my-mail')), '?konten: Anmeldung mit Benutzername und Passwort (keine E-Mail)');
+  // Konten: Benutzername und Passwort
+  await p.goto(BASE + '/abenteuer/index.html');
+  check(await p.isVisible('#my-name') && await p.isVisible('#my-pw') && await p.isVisible('#my-reg') && !(await p.$('#my-mail')), 'Anmeldung mit Benutzername und Passwort (keine E-Mail)');
   await p.click('[data-auge="my-pw"]');
   check(await p.getAttribute('#my-pw', 'type') === 'text', 'Passwort anzeigen');
   await p.click('#my-vergessen');

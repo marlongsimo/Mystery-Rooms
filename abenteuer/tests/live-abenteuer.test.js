@@ -30,7 +30,7 @@ const { chromium } = require('playwright');
 
   // Tisch
   const T = await page({ width: 1024, height: 768 }, 'Tisch');
-  await T.goto(BASE + '/abenteuer/index.html?seed=42&schnell' + Q);
+  await T.goto(BASE + '/abenteuer/index.html?seed=42&schnell&testlauf' + Q);
   await T.evaluate(() => localStorage.clear()); await T.reload();
   await einstieg(T, 'live');
   check(await until(T, () => Boolean(document.querySelector('.beitritt .code'))), 'Tisch: Sitzung eröffnet, Gruppenwahl mit Code');

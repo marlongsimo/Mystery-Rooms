@@ -6,21 +6,17 @@
  * erwarteter Version). Hat ein anderes Gerät inzwischen neuer gespeichert, wird nichts überschrieben,
  * sondern der neueste Stand geladen.
  *
- * Bis zur Freigabe nur sichtbar mit ?kampagnen (bleibt danach in diesem Browser an; ?kampagnen=aus schaltet ab).
+ * Für alle freigeschaltet: Jedes Abenteuer wird automatisch als Kampagne gespeichert.
  */
 (() => {
   "use strict";
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const F = window.ABF, S = window.ABS;
-  const params = new URLSearchParams(location.search);
-  const SCHALTER = "mr_kampagnen", ZEIGER = "ab_kampagne";
-  try {
-    if (params.get("kampagnen") === "aus") localStorage.removeItem(SCHALTER);
-    else if (params.has("kampagnen")) localStorage.setItem(SCHALTER, "an");
-  } catch (e) { /* privat */ }
-  let AN = false; try { AN = localStorage.getItem(SCHALTER) === "an"; } catch (e) { AN = params.has("kampagnen"); }
-  if (!AN) { window.KAMPAGNE = null; return; }
+  // Nur für automatische Tests: ?testlauf schaltet das Speichern in Supabase ab
+  if (new URLSearchParams(location.search).has("testlauf")) { window.KAMPAGNE = null; return; }
+  const ZEIGER = "ab_kampagne";
+  try { localStorage.removeItem("mr_kampagnen"); } catch (e) { /* alter Testschalter, nicht mehr nötig */ }
 
   /* ---------- Zustand ---------- */
   // K: aktive Kampagne auf diesem Gerät { id, version, status, titel }

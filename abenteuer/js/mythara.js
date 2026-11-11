@@ -1,13 +1,13 @@
 /*
  * Mythara – Startbildschirm des RPG: als Gast spielen (ohne Registrierung, mit Einladungscode, per QR-Code)
  * oder – später – als Spieler mit Konto anmelden.
- * Die Kontoseite ist bis zur Freigabe von Bauabschnitt B nur mit ?konten in der Adresse sichtbar.
+ * Spielerkonten mit Benutzername und Passwort (siehe abenteuer/UMSETZUNG-KAMPAGNEN.md, Bauabschnitt B).
  */
 (() => {
   "use strict";
   const $ = (s) => document.querySelector(s);
   const params = new URLSearchParams(location.search);
-  const KONTEN = params.has("konten"); // Testschalter für Bauabschnitt B (Konten)
+  const KONTEN = true; // Spielerkonten sind freigeschaltet
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const zeige = (id) => window.AB && window.AB.zeigeSektion ? window.AB.zeigeSektion(id) : null;
   const sauber = (v) => String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10);

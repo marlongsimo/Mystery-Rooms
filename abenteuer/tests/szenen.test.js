@@ -103,7 +103,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const b = await chromium.launch();
   const p = await (await b.newContext({ viewport: { width: 1024, height: 900 } })).newPage();
   p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
-  await p.goto(BASE + '/abenteuer/index.html?schnell');
+  await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf');
   await p.evaluate(() => localStorage.clear()); await p.reload();
   check(/Siegel von Grauwacht/.test(await p.textContent('#intro h1')), 'Startseite: Das Siegel von Grauwacht (hinter Mythara)');
   await einstieg(p, 'allein');

@@ -55,6 +55,7 @@
     heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
   const TIERE = new Set(["rostkaefer", "netzweber", "aschehund"]);
+  const GEGNER_TP = { wert: 1 };
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
   const RAUCH_DING = { id: "rauchbeutel", name: "Rauchbeutel werfen", typ: "aktion", art: "rauch", ding: "rauchbeutel", radius: 1, dauer: 2, text: GEGENSTAENDE.rauchbeutel.text };
@@ -246,7 +247,9 @@
     });
     // Gemischte Startplätze der Gegner (Abwechslung)
     if (opts.mischen) { const g = k.start.gegner.slice(); for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; } k = Object.assign({}, k, { start: Object.assign({}, k.start, { gegner: g }) }); }
-    const gruppen = (opts.gegner || gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore")).map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * (opts.skalaMal || 1) })).concat(opts.zusatz || []);
+    // Allgemeiner Faktor für das Leben aller Gegner (Ausgleich zur Klassenbalance)
+    const tpGlobal = opts.tpGlobal != null ? opts.tpGlobal : GEGNER_TP.wert;
+    const gruppen = (opts.gegner || gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore")).map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * (opts.skalaMal || 1) * tpGlobal })).concat(opts.zusatz || []);
     let gi = 0;
     for (const g of gruppen) for (let i = 0; i < g.anzahl; i++) {
       const d = GEGNER[g.art];
@@ -1395,7 +1398,7 @@
     };
   }
 
-  const API = { TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
     findeAktion, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

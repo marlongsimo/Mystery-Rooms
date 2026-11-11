@@ -15,6 +15,8 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const Z = 60; // Feldgröße im SVG
   const params = new URLSearchParams(location.search);
+  // Erst wenn alle Skripte geladen sind (sonst fehlt bei langsamem Laden noch die Abenteuer-Oberfläche und das Fortsetzen fällt aus)
+  const bereit = new Promise((r) => (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", r, { once: true }) : r()));
   // Tempo der Gegnerzüge (Einstellungen): langsam 2,4 s, normal 1,6 s, schnell 0,8 s; im Testmodus sofort
   const TEMPI = { langsam: 2400, normal: 1600, schnell: 800 };
   const tempo = () => { if (params.has("schnell")) return 0; let t = "normal"; try { t = localStorage.getItem("ab_tempo") || "normal"; } catch (e) { /* privat */ } return TEMPI[t] || TEMPI.normal; };
@@ -487,7 +489,7 @@
       <span class="note"><i style="background:#e0434f"></i>gesperrt <i style="background:#3d8fe0"></i>Grube (Sicht frei) <i style="background:#e8c46a"></i>Siegelstein · H = Helden, W = Wolf, G = Gegner (Startplätze). Die Figuren könnt ihr zum Ausprobieren bewegen; Gegner ziehen hier nicht.</span>`;
     bar.querySelectorAll("[data-rkarte]").forEach((b) => { b.onclick = () => rasterStart(b.dataset.rkarte); });
   }
-  if (RASTER) setTimeout(() => rasterStart((params.get("raster") || "GARTEN").toUpperCase() in RASTER_KARTEN ? params.get("raster").toUpperCase() : "GARTEN"), 50);
+  if (RASTER) bereit.then(() => rasterStart((params.get("raster") || "GARTEN").toUpperCase() in RASTER_KARTEN ? params.get("raster").toUpperCase() : "GARTEN"));
 
   /** Bekannte Eigenschaften der Gegner (für die Infokarte) */
   const GEGNER_INFO = {
@@ -572,12 +574,13 @@
 
   // Nach dem Neuladen: laufende Live-Sitzung und Kampf wiederherstellen
   (async () => {
+    await bereit;
     let gespeichert = null;
     try { gespeichert = JSON.parse(localStorage.getItem(SPEICHER) || "null"); } catch (e) { /* defekt */ }
-    if (!gespeichert || !window.MRMultiplayer) { setTimeout(allein, 0); return; }
+    if (!gespeichert || !window.MRMultiplayer) { allein(); return; }
     try {
       const c = liveClient(), s = await c.restore();
-      if (!s || s.closed || !s.is_host) { vergessen(); setTimeout(allein, 0); return; }
+      if (!s || s.closed || !s.is_host) { vergessen(); allein(); return; }
       LIVE.phase = gespeichert.phase; LIVE.besitz = gespeichert.besitz || {}; LIVE.erledigt = gespeichert.erledigt || {};
       if (gespeichert.setup) SETUP = gespeichert.setup;
       wach();
@@ -591,7 +594,7 @@
       else zeigeSetup();
       await c.fetchStates().catch(() => {});
       veroeffentlichen();
-    } catch (e) { vergessen(); setTimeout(allein, 0); }
+    } catch (e) { vergessen(); allein(); }
   })();
   /** Allein am Tisch: Abenteuer (und ggf. den laufenden Kampf) nach dem Neuladen direkt fortsetzen */
   function allein() {

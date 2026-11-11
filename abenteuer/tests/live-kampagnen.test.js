@@ -127,9 +127,10 @@ const { chromium } = require('playwright');
   check(code2 !== code, `Neuer Code ${code2}`);
   await H.Anna.goto(BASE + '/abenteuer/handy.html#' + code2);
   await H.Anna.fill('#name', 'Anna'); await H.Anna.click('#rein');
-  await until(H.Anna, () => Boolean(document.querySelector('[data-fid="wildnislaeufer"]')));
+  if (!(await until(H.Anna, () => Boolean(document.querySelector('[data-fid="wildnislaeufer"]'))))) console.log('DIAG Anna', JSON.stringify(await H.Anna.evaluate(() => [document.querySelector('#app').innerText.slice(0, 400), window.ABH.H.fehler, window.ABH.H.client && window.ABH.H.client.session, window.ABH.H.spiel && window.ABH.H.spiel.phase, location.hash])), JSON.stringify(await L.evaluate(() => [window.AB.LIVE.phase, window.AB.LIVE.client.players.map((p) => p.player_name), window.AB.LIVE.client.session && window.AB.LIVE.client.session.room_code])));
   await H.Anna.click('[data-fid="wildnislaeufer"]'); await H.Anna.click('#f-spielen', { timeout: 3000 }).catch(() => {});
   check(await until(H.Anna, () => { const sp = window.ABH.H.spiel; return sp && sp.phase === 'szene' && sp.besitz && sp.besitz.wildnislaeufer === window.ABH.H.client.user.id && Boolean(document.querySelector('.bogen')); }), 'Anna ist wieder dabei, spielt Kael und sieht ihren Bogen');
+  if (!ok) console.log('DIAG Anna', JSON.stringify(await H.Anna.evaluate(() => [document.querySelector('#app').innerText.slice(0, 400), window.ABH.H.spiel && window.ABH.H.spiel.phase, window.ABH.H.spiel && window.ABH.H.spiel.besitz, window.ABH.H.fehler])));
   check(await until(L, () => /Am Brunnen/.test(document.querySelector('#szene').textContent) && Object.values(window.AB.LIVE.besitz).length === 1), 'Tisch: Anna wieder zugeordnet, Szene am Brunnen');
 
   // Aufräumen: alle Testkampagnen löschen

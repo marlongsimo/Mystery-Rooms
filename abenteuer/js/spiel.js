@@ -72,14 +72,14 @@
       const fid = v.fid || null;
       if (fid && !F.FIGUREN[fid]) return;
       if (fid && LIVE.besitz[fid] && LIVE.besitz[fid] !== uid) { veroeffentlichen(); return; }
-      const kampf = LIVE.phase === "kampf";
-      // Im Kampf nur Figuren übernehmen, deren Handy weg ist; in der Lobby höchstens 6 Handys
-      if (fid && kampf && !SETUP.gruppe.includes(fid)) { veroeffentlichen(); return; }
-      if (fid && !kampf && !Object.values(LIVE.besitz).includes(uid) && Object.keys(LIVE.besitz).length >= 6) { veroeffentlichen(); return; }
-      if (kampf && !fid) { veroeffentlichen(); return; } // im Kampf behält man seine Figur
+      const laeuft = LIVE.phase === "kampf" || LIVE.phase === "szene";
+      // Läuft das Abenteuer (Szene oder Kampf), nur Figuren der Gruppe übernehmen; in der Lobby höchstens 6 Handys
+      if (fid && laeuft && !SETUP.gruppe.includes(fid)) { veroeffentlichen(); return; }
+      if (fid && !laeuft && !Object.values(LIVE.besitz).includes(uid) && Object.keys(LIVE.besitz).length >= 6) { veroeffentlichen(); return; }
+      if (laeuft && !fid) { veroeffentlichen(); return; } // im laufenden Abenteuer behält man seine Figur
       for (const f of Object.keys(LIVE.besitz)) if (LIVE.besitz[f] === uid) delete LIVE.besitz[f];
       if (fid) LIVE.besitz[fid] = uid;
-      if (!kampf) gruppeAusHandys();
+      if (!laeuft) gruppeAusHandys();
       zeichneSetup(); if (st) render(); veroeffentlichen();
       return;
     }
@@ -111,7 +111,7 @@
     c.on("players", () => {
       const da = new Set(c.players.map((p) => p.user_id)); let geaendert = false;
       for (const f of Object.keys(LIVE.besitz)) if (!da.has(LIVE.besitz[f])) { delete LIVE.besitz[f]; geaendert = true; }
-      if (LIVE.phase !== "kampf") gruppeAusHandys();
+      if (LIVE.phase === "lobby") gruppeAusHandys(); // nur bei der Heldenwahl: im laufenden Abenteuer bleibt die Gruppe fest
       zeichneSetup(); if (st) render();
       veroeffentlichen();
       if (geaendert && LIVE.phase === "kampf") toast("Ein Handy hat die Sitzung verlassen. Bis jemand die Figur übernimmt, steuert sie der Tisch.");

@@ -19,7 +19,8 @@ select public.rpg_create_campaign('Tischtest', 'hardcore') as k \gset
 select pg_temp.ok(public.rpg_rename_campaign(:'k', 'Grauwacht am Freitag') = 'Grauwacht am Freitag', 'Host benennt die Kampagne um');
 select public.rpg_create_link(:'k', 'gast') as gast \gset
 select public.rpg_create_link(:'k', 'tisch') as tisch \gset
-select pg_temp.ok(length(:'gast') = 64 and :'gast' <> :'tisch', 'Gast- und Tisch-Link erzeugt (64 Zeichen, verschieden)');
+select pg_temp.ok(:'gast' ~ '^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$' and :'gast' <> :'tisch', 'Gast- und Tisch-Code erzeugt (Format XXXX-XXXX-XXXX, verschieden)');
+select pg_temp.ok(public.rpg_link_info(lower(replace(:'gast', '-', ' '))) is not null, 'Code klein und mit Leerzeichen eingegeben: gilt trotzdem');
 reset role; select pg_temp.ok((select count(*) from public.rpg_links where token_hash = :'gast') = 0, 'In der Datenbank liegt nur der Hash'); set role authenticated;
 
 -- Fremde und falsche Links

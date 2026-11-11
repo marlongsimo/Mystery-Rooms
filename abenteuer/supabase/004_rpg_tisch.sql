@@ -9,8 +9,9 @@
 --   • Rolle „tisch“: ein Gerät, das als Spieltisch einer Kampagne spielt (auch ohne Konto).
 --     Es darf speichern, Sitzungen starten, Mitspieler übernehmen, pausieren und abschließen –
 --     aber nicht löschen, archivieren, neu beginnen oder einladen.
---   • Kampagnen-Links (Tabelle rpg_links): ein Link für Gäste (7 Tage gültig) und einer für das
---     Tisch-Gerät (24 Stunden), je Kampagne immer nur der neueste. In der Datenbank liegt nur ein Hash.
+--   • Kampagnen-Codes (Tabelle rpg_links): ein Code für Gäste (7 Tage gültig) und einer für das
+--     Tisch-Gerät (24 Stunden, einmal nutzbar), je Kampagne immer nur der neueste. Format K7QM-2XHP-9RTA.
+--     In der Datenbank liegt nur ein Hash.
 --   • Wer per Gast-Link beitritt, wird Mitspieler und findet den Raum des Spieltischs von selbst –
 --     auch wenn der Tisch später auf ein anderes Gerät wechselt.
 --   • Kampagne umbenennen (Host).
@@ -177,8 +178,19 @@ create index if not exists rpg_links_kampagne on public.rpg_links (campaign_id, 
 alter table public.rpg_links enable row level security;
 revoke all on public.rpg_links from anon, authenticated;
 
+-- Codes sind 12 Zeichen aus A–Z und 2–9 ohne verwechselbare Zeichen (z. B. K7QM-2XHP-9RTA, ~60 Bit Zufall).
+-- Groß/klein, Leerzeichen und Bindestriche spielen beim Eingeben keine Rolle.
 create or replace function public.rpg_link_hash(p_token text)
-returns text language sql immutable as $$ select encode(sha256(convert_to(coalesce(p_token, ''), 'UTF8')), 'hex'); $$;
+returns text language sql immutable as $$ select encode(sha256(convert_to(upper(regexp_replace(coalesce(p_token, ''), '[^A-Za-z0-9]', '', 'g')), 'UTF8')), 'hex'); $$;
+
+create or replace function public.rpg_neuer_code()
+returns text language plpgsql volatile as $$
+declare v_abc text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; v_b bytea := decode(md5(gen_random_uuid()::text || clock_timestamp()::text), 'hex'); v text := '';
+begin
+  for i in 0..11 loop v := v || substr(v_abc, get_byte(v_b, i) % 32 + 1, 1); end loop;
+  return substr(v, 1, 4) || '-' || substr(v, 5, 4) || '-' || substr(v, 9, 4);
+end;
+$$;
 
 -- Gültiger Link zu einem Token (oder nichts)
 create or replace function public.rpg_link_von(p_token text)
@@ -208,7 +220,7 @@ begin
     raise exception 'Zu viele neue Links in kurzer Zeit.';
   end if;
   update public.rpg_links set revoked_at = now() where campaign_id = p_campaign_id and art = p_art and revoked_at is null;
-  v_token := replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', '');
+  v_token := public.rpg_neuer_code();
   insert into public.rpg_links (campaign_id, art, token_hash, created_by, expires_at)
   values (p_campaign_id, p_art, public.rpg_link_hash(v_token), auth.uid(), now() + case when p_art = 'tisch' then interval '24 hours' else interval '7 days' end);
   return v_token;
@@ -280,7 +292,7 @@ begin
 end;
 $$;
 
-revoke all on function public.rpg_link_hash(text), public.rpg_link_von(text), public.rpg_raum_von(uuid) from public, anon, authenticated;
+revoke all on function public.rpg_link_hash(text), public.rpg_neuer_code(), public.rpg_link_von(text), public.rpg_raum_von(uuid) from public, anon, authenticated;
 revoke all on function public.rpg_ist_tisch(uuid), public.rpg_rename_campaign(uuid, text), public.rpg_create_link(uuid, text), public.rpg_link_info(text),
   public.rpg_join_as_guest(text, text), public.rpg_claim_table(text), public.rpg_campaign_room(uuid) from public, anon;
 grant execute on function public.rpg_ist_tisch(uuid), public.rpg_rename_campaign(uuid, text), public.rpg_create_link(uuid, text), public.rpg_link_info(text),

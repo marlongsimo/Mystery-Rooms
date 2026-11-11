@@ -13,6 +13,7 @@ drop function if exists public.rpg_create_link(uuid, text);
 drop function if exists public.rpg_raum_von(uuid);
 drop function if exists public.rpg_link_von(text);
 drop function if exists public.rpg_link_hash(text);
+drop function if exists public.rpg_neuer_code();
 drop table if exists public.rpg_links;
 drop function if exists public.rpg_rename_campaign(uuid, text);
 delete from public.rpg_campaign_members where role = 'tisch';

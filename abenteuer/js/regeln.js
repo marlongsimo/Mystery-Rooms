@@ -55,7 +55,7 @@
     heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
   const TIERE = new Set(["rostkaefer", "netzweber", "aschehund"]);
-  const GEGNER_TP = { wert: 1.05, zusatz: 1 }; // alle Gegner +5 % Leben, in jedem Kampf ein Gegner mehr
+  const GEGNER_TP = { wert: 1.05, zusatz: 1 }; // alle Gegner +5 % Leben; in Normal ein Gegner mehr je Kampf
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
   const RAUCH_DING = { id: "rauchbeutel", name: "Rauchbeutel werfen", typ: "aktion", art: "rauch", ding: "rauchbeutel", radius: 1, dauer: 2, text: GEGENSTAENDE.rauchbeutel.text };
@@ -251,7 +251,8 @@
     const tpGlobal = opts.tpGlobal != null ? opts.tpGlobal : GEGNER_TP.wert;
     // Ein zusätzlicher Gegner der häufigsten Art (nicht bei fest vorgegebenen Gegnern wie im Duell)
     const basis = opts.gegner ? opts.gegner : gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore").map((g) => Object.assign({}, g));
-    if (!opts.gegner && (opts.zusatzGegner != null ? opts.zusatzGegner : GEGNER_TP.zusatz)) { const h = basis.filter((g) => !GEGNER[g.art].boss).sort((a, b) => b.anzahl - a.anzahl)[0]; if (h) h.anzahl += opts.zusatzGegner != null ? opts.zusatzGegner : GEGNER_TP.zusatz; }
+    const zusatzN = opts.zusatzGegner != null ? opts.zusatzGegner : opts.schwierigkeit === "hardcore" ? 0 : GEGNER_TP.zusatz; // Zusatzgegner nur in Normal
+    if (!opts.gegner && zusatzN) { const h = basis.filter((g) => !GEGNER[g.art].boss).sort((a, b) => b.anzahl - a.anzahl)[0]; if (h) h.anzahl += zusatzN; }
     const gruppen = basis.map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * (opts.skalaMal || 1) * tpGlobal })).concat(opts.zusatz || []);
     let gi = 0;
     for (const g of gruppen) for (let i = 0; i < g.anzahl; i++) {
@@ -810,7 +811,7 @@
       case "spiegelbilder": f.z.spiegel = 3; st.log.push({ t: `${f.name} teilt sich in drei Spiegelbilder.`, art: "gut" }); break;
       case "segen": {
         const zs2 = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).sort((x, y) => abstand(f, x) - abstand(f, y)).slice(0, 3);
-        zs2.forEach((o) => { o.z.segen = f.id; });
+        zs2.forEach((o) => { o.z.segen = f.id; o.z.segenBis = st.runde + (a.dauer || 99); });
         st.log.push({ t: `${f.name} segnet ${zs2.map((o) => o.name).join(", ")}.`, art: "gut" }); break;
       }
       case "schutzkreis": f.z.schutzkreis = st.runde + a.dauer; st.log.push({ t: `${f.name} zieht einen Schutzkreis: Verbündete in 2 Feldern +2 RK.`, art: "gut" }); break;
@@ -964,6 +965,8 @@
       st.am = 0; st.runde++;
       st.zonen = st.zonen.filter((z) => z.bis > st.runde);
       st.brand = st.brand.filter((b) => b.bis > st.runde);
+      const verblasst = st.figuren.filter((g) => g.z && g.z.segen && g.z.segenBis <= st.runde);
+      if (verblasst.length) { verblasst.forEach((g) => { delete g.z.segen; delete g.z.segenBis; }); st.log.push({ t: `Der Segen verblasst bei ${verblasst.map((g) => g.name).join(", ")}.` }); }
       for (const g of st.figuren) if (g.seite === "gegner" && g.atemRunde && st.runde - g.atemRunde >= GEGNER[g.art].atem.alle) g.atemBereit = true;
       st.log.push({ t: `— Runde ${st.runde} —`, art: "runde" });
     }

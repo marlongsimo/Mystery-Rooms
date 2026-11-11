@@ -191,7 +191,7 @@
         { id: "heiliges_licht", name: "Heiliges Licht", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 12, rettung: "GES", attr: "WEI", schaden: "1W8", plusAttr: true, text: "Zaubertrick. GES-Rettungswurf, sonst 1W8 + WEI gleißender Schaden." },
         { id: "streitkolben", name: "Streitkolben", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W6", wucht: true, text: "Nahkampf." },
         { id: "aura", name: "Strahlende Aura", typ: "passiv", ab: 1, text: "Gegner neben dir nehmen zu Beginn ihres Zugs 1 gleißenden Schaden, Untote 2." },
-        { id: "segen", name: "Segen", typ: "aktion", ab: 1, art: "segen", reichweite: 6, platz: 1, text: "Bis Kampfende: 3 Verbündete in 6 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit." },
+        { id: "segen", name: "Segen", typ: "aktion", ab: 1, art: "segen", reichweite: 6, platz: 1, dauer: 3, text: "3 Runden lang: 3 Verbündete in 6 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit." },
         { id: "vertreiben", name: "Untote vertreiben", typ: "aktion", ab: 2, art: "vertreiben", reichweite: 6, rettung: "WEI", attr: "WEI", pro: { rast: 1 }, text: "Göttliche Macht: Untote in 6 Feldern fliehen 2 Runden (WEI-Rettungswurf)." },
         { id: "schutzkreis", name: "Schutzkreis", typ: "aktion", ab: 3, art: "schutzkreis", dauer: 3, platz: 2, text: "Verbündete in 2 Feldern um dich +2 RK, 3 Runden." },
       ],

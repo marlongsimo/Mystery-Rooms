@@ -261,7 +261,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 |---|---|---|---|
 | **Heiliges Licht** | 1 | Aktion · 12 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst 1W8 + WEI gleißender Schaden. |
 | **Streitkolben** | 1 | Aktion · Nahkampf · Angriff +3 · 1W6 + 1 | Nahkampf. |
-| **Segen** | 1 | Aktion · 6 Felder · 1 Zauberplatz | Bis Kampfende: 3 Verbündete in 6 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit. |
+| **Segen** | 1 | Aktion · 6 Felder · 1 Zauberplatz | 3 Runden lang: 3 Verbündete in 6 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit. |
 | **Untote vertreiben** | 2 | Aktion · 6 Felder · WEI-Rettung SG 13 · 1× je Rast | Göttliche Macht: Untote in 6 Feldern fliehen 2 Runden (WEI-Rettungswurf). |
 | **Schutzkreis** | 3 | Aktion · Platz vom 2. Grad | Verbündete in 2 Feldern um dich +2 RK, 3 Runden. |
 | **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |

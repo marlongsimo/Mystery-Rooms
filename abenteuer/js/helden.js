@@ -39,24 +39,30 @@
   const ATTR_NAME = { STR: "Stärke", GES: "Geschick", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
   const vonKlasse = (k) => F.REIHE.filter((fid) => F.FIGUREN[fid].klasse === k);
 
+  /** Klassenfähigkeiten hervorgehoben: Merkmal (Klassenfarbe) + Grundfähigkeiten als Marken, darunter die Wirkung des Merkmals */
+  function klassenFaehig(k, alle) {
+    const kl = F.KLASSEN[k], [mName, ...mText] = (kl.merkmal || "").split(": ");
+    const marken = (kl.merkmal ? [`<b class="marke merkmal">${esc(mName)}</b>`] : [])
+      .concat(F.KLASSE_FAEHIG[k].filter((a) => alle || a.ab === 1).map((a) => `<b class="marke">${esc(a.name)}${a.ab > 1 ? ` <small>ab Stufe ${a.ab}</small>` : ""}</b>`));
+    return `<span class="klassen-faehig" style="--k:${kl.farbe}"><i>Klassenfähigkeiten</i><span class="marken">${marken.join("")}</span>${kl.merkmal ? `<span class="merkmal-text"><b>${esc(mName)}:</b> ${esc(mText.join(": "))}</span>` : ""}</span>`;
+  }
   /** Schritt 1: fünf Klassenbanner mit kurzen Angaben. o.gruppe markiert, wer schon dabei ist */
   function klassenWahl(o = {}) {
     const gruppe = o.gruppe || [];
     return `<div class="klassen-banner">${Object.entries(F.KLASSEN).map(([k, kl]) => {
       const info = KLASSE_INFO[k], helden = vonKlasse(k), dabei = helden.filter((f) => gruppe.includes(f)).length;
-      const faehig = F.KLASSE_FAEHIG[k].filter((a) => a.ab === 1).map((a) => a.name).join(", ");
       return `<button class="banner" data-klasse="${k}" style="--k:${kl.farbe}" aria-label="${esc(kl.name)}: ${esc(info.kurz)}">
         <span class="banner-bild">${helden.map((f) => `<img src="${F.bild(f)}" alt="" decoding="async">`).join("")}</span>
         <span class="banner-zeichen" aria-hidden="true">${KLASSE_ZEICHEN[k]}</span>
         <b class="banner-name">${esc(kl.name)}</b>
         <span class="banner-kurz">${esc(info.kurz)}</span>
+        ${klassenFaehig(k, false)}
         <span class="banner-spec">
           <span><i>Stärke</i>${esc(info.stark)}</span>
           <span><i>Platz</i>${esc(info.platz)}</span>
           <span><i>Bewegung</i>${kl.bewegung || 6} Felder je Zug</span>
           <span><i>Lebenswürfel</i>W${kl.wuerfel}${kl.plaetze ? " · zaubert" : ""}</span>
           <span><i>Rettung</i>${kl.rettung.map((a) => ATTR_NAME[a]).join(", ")}</span>
-          <span><i>Klasse</i>${esc(faehig)}</span>
         </span>
         <span class="banner-fuss">${dabei ? `<em>${dabei} in der Gruppe</em>` : `3 Helden`}<span aria-hidden="true">→</span></span>
       </button>`;
@@ -69,7 +75,7 @@
   /** Kopf von Schritt 2: Klasse mit kurzer Beschreibung */
   function klassenKopf(k) {
     const kl = F.KLASSEN[k], info = KLASSE_INFO[k];
-    return `<div class="klassen-kopf" style="--k:${kl.farbe}"><span class="banner-zeichen" aria-hidden="true">${KLASSE_ZEICHEN[k]}</span><div><h2>${esc(kl.name)}</h2><p>${esc(info.kurz)} ${esc(info.wofuer)}</p>${kl.merkmal ? `<p class="klassen-merkmal">${esc(kl.merkmal)}</p>` : ""}</div></div>`;
+    return `<div class="klassen-kopf" style="--k:${kl.farbe}"><span class="banner-zeichen" aria-hidden="true">${KLASSE_ZEICHEN[k]}</span><div><h2>${esc(kl.name)}</h2><p>${esc(info.kurz)} ${esc(info.wofuer)}</p>${klassenFaehig(k, true)}</div></div>`;
   }
 
   /** Kachel in der Galerie */

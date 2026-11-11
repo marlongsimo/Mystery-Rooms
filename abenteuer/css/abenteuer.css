@@ -558,7 +558,7 @@ body.ruhig .titel-hg img { animation: none; }
 @media (max-width: 1100px) { .klassen-banner { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 700px) {
   .klassen-banner { grid-template-columns: 1fr; gap: 10px; }
-  .banner { min-height: 0; display: grid; grid-template-columns: 92px 1fr; grid-template-areas: "bild name" "bild kurz" "spec spec" "fuss fuss"; text-align: left; gap: 2px 12px; padding: 12px; clip-path: none; }
+  .banner { min-height: 0; display: grid; grid-template-columns: 92px 1fr; grid-template-areas: "bild name" "bild kurz" "faehig faehig" "spec spec" "fuss fuss"; text-align: left; gap: 2px 12px; padding: 12px; clip-path: none; }
   .banner::before { clip-path: none; }
   .banner-bild { grid-area: bild; width: 92px; height: 92px; margin: 0; border-radius: 3px; overflow: hidden; }
   .banner-bild img:not(:first-child) { display: none; }
@@ -566,7 +566,18 @@ body.ruhig .titel-hg img { animation: none; }
   .banner-name { grid-area: name; align-self: end; } .banner-kurz { grid-area: kurz; min-height: 0; font-size: 16px; }
   .banner-spec { grid-area: spec; grid-template-columns: 1fr 1fr; } .banner-spec > span:last-child { grid-column: 1 / -1; }
   .banner-fuss { grid-area: fuss; }
+  .banner .klassen-faehig { grid-area: faehig; }
 }
+/* Klassenfähigkeiten hervorgehoben (Banner und Kopf der Klasse) */
+.klassen-faehig { display: grid; gap: 6px; width: 100%; margin-top: 6px; padding: 8px 10px; text-align: left; border: 1px solid color-mix(in srgb, var(--k) 60%, var(--line)); border-left: 3px solid var(--k); border-radius: 3px; background: color-mix(in srgb, var(--k) 16%, rgba(8, 12, 18, .7)); }
+.klassen-faehig > i { font: normal 600 10px var(--schrift-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--altgold); }
+.klassen-faehig .marken { display: flex; flex-wrap: wrap; gap: 5px; }
+.klassen-faehig .marke { padding: 3px 8px; border: 1px solid rgba(197, 162, 103, .35); border-radius: 12px; font: 600 12px var(--schrift-ui); color: var(--pergament); background: rgba(8, 12, 18, .55); }
+.klassen-faehig .marke small { font-weight: 400; opacity: .7; }
+.klassen-faehig .marke.merkmal { border-color: var(--k); background: var(--k); color: #fff; box-shadow: 0 0 10px color-mix(in srgb, var(--k) 60%, transparent); }
+.klassen-faehig .merkmal-text { font: 400 13px/1.4 var(--schrift-text); color: #e3dccd; }
+.klassen-faehig .merkmal-text b { color: var(--pergament); }
+.klassen-kopf .klassen-faehig { margin-top: 8px; }
 .klassen-leiste { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 12px; }
 .klassen-leiste button:not(.link) { background: var(--stein); border: 1px solid var(--line); color: var(--muted); border-radius: 3px; padding: 7px 12px; font: 600 13px var(--schrift-ui); cursor: pointer; }
 .klassen-leiste button.an { color: var(--pergament); border-color: var(--k); background: linear-gradient(180deg, color-mix(in srgb, var(--k) 45%, #1a2533), #1a2533); }

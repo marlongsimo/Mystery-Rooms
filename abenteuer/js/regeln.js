@@ -271,6 +271,8 @@
     }
     // Anführer: der zäheste Gegner bekommt mehr Leben, bessere Rüstung und trifft besser
     if (opts.anfuehrer) { const a = gegnerFiguren(st).filter((g) => !GEGNER[g.art].boss).sort((x, y) => y.tpMax - x.tpMax)[0]; if (a) { a.tp = a.tpMax = Math.round(a.tpMax * (st.schwierigkeit === "hardcore" ? 1.4 : 1.6)); a.rk += 1; a.rkBasis += 1; a.anfuehrer = true; a.name = a.name.replace(/ \d+$/, "") + " (Anführer)"; st.log.push({ t: `Ein Anführer führt die Gegner: ${a.name}.`, art: "schlecht" }); } }
+    // Zauberer haben die Zeichen gelesen: ein Siegelstein leuchtet schon zu Kampfbeginn
+    if (opts.boss && opts.boss.stein && st.siegel && st.siegel.length) { const b = bossVon(st); if (b) { st.siegel[0].beruehrt = true; b.rk -= 2; st.log.push({ t: `Ein Siegelstein leuchtet schon: ${b.name} verliert 2 RK.`, art: "gut" }); } }
     // Überraschung: Gegner setzen die erste Runde aus. Läufer: ein Gegner rennt zu einem Feld (z. B. Glockenseil)
     if (opts.ueberraschung) for (const g of gegnerFiguren(st)) g.ueberrascht = true;
     if (opts.laeufer) {
@@ -348,7 +350,7 @@
   }
 
   /* ---------- Zustände ---------- */
-  const ZUSTAND_NAME = { verlangsamt: "verlangsamt", veraengstigt: "verängstigt", festgehalten: "festgehalten", geblendet: "geblendet", liegend: "liegt", vergiftet: "vergiftet", entwaffnet: "entwaffnet", zeitriss: "Zeitriss", verbannt: "verbannt", raserei: "Raserei", versteckt: "versteckt", segen: "gesegnet", schild: "Schild des Glaubens", spiegel: "Spiegelbilder", finte: "Finte", gift: "Gift bereit", spott: "verspottet", stich: "Schattenstich", ruecksichtslos: "rücksichtslos", rueckzug: "Rückzug" };
+  const ZUSTAND_NAME = { verlangsamt: "verlangsamt", veraengstigt: "verängstigt", festgehalten: "festgehalten", geblendet: "geblendet", liegend: "liegt", vergiftet: "vergiftet", entwaffnet: "entwaffnet", zeitriss: "Zeitriss", verbannt: "verbannt", raserei: "Raserei", versteckt: "versteckt", segen: "gesegnet", schild: "Schild des Glaubens", spiegel: "Spiegelbilder", finte: "Finte", gift: "Gift bereit", spott: "verspottet", stich: "Schattenstich", ruecksichtslos: "rücksichtslos", rueckzug: "Rückzug", blutung: "blutet", bruch: "Rüstung durchbrochen" };
   function zustaende(st, f) {
     const z = f.z || {}, out = [];
     for (const k of Object.keys(ZUSTAND_NAME)) if (z[k]) out.push(k === "spiegel" ? `${ZUSTAND_NAME[k]} (${z[k]})` : ZUSTAND_NAME[k]);
@@ -366,6 +368,7 @@
     if (z.seite === "spieler" && st.figuren.some((l) => istFig(l, "lichtbringer") && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2)) rk += 2;
     if (z.z.analyse === st.runde) rk -= 2;
     if (z.z.zeitriss) rk -= 2;
+    if (z.z.bruch && z.z.bruch.bis > st.runde) rk -= z.z.bruch.n; // Waldläufer: Durchbrechen
     if (z.seite === "gegner" && st.zonen.some((zo) => zo.art === "bann" && Math.max(Math.abs(zo.x - z.x), Math.abs(zo.y - z.y)) <= zo.radius)) rk -= 2;
     if (a && spec.fern && abstand(a, z) > 1 && !istFig(a, "wildnislaeufer") && deckung(st, a, z)) rk += 2;
     return rk;
@@ -598,6 +601,9 @@
         if (giftAktiv && lebt(z)) { z.z.vergiftet = 1; delete f.z.gift; }
         if (a.fesseln && lebt(z)) { const r = rettung(st, z, "STR", SG(f, "GES")); if (!r.erfolg) { z.z.festgehalten = { rest: 2, flucht: SG(f, "GES") }; st.log.push({ t: `${z.name} ist festgenagelt (Rettungswurf ${r.total}).` }); } }
         if (a.brennt && !blockiert(st, z.x, z.y)) st.brand.push({ x: z.x, y: z.y, bis: st.runde + 1 });
+        // Klassenmerkmale bei Waffentreffern: Schurken lassen bluten, Waldläufer brechen die Rüstung auf (frischt auf, stapelt nicht)
+        if (waffe && kl.nachbluten && lebt(z) && z.seite === "gegner") { if (!z.z.blutung) st.log.push({ t: `${z.name} blutet.` }); z.z.blutung = { rest: 3, w: kl.nachbluten, von: f.name }; }
+        if (waffe && kl.durchbrechen && lebt(z) && z.seite === "gegner") { if (!(z.z.bruch && z.z.bruch.bis > st.runde)) st.log.push({ t: `${f.name} bricht ${z.name}s Rüstung auf: −${kl.durchbrechen} RK.` }); z.z.bruch = { n: kl.durchbrechen, bis: st.runde + 3 }; }
       },
     };
     if (a.ruecksichtslos) f.z.ruecksichtslos = true;
@@ -794,6 +800,7 @@
       case "selbstheilung": heilen(st, f, roll(r, a.heilung).total + (a.plusStufe ? f.stufe : 0), `${f.name}: ${a.name}`); break;
       case "trank": f.rucksack.find((d) => d.id === (a.gross ? "grosser_trank" : "heiltrank")).n -= 1; heilen(st, f, roll(r, a.heilung).total, `${f.name}: ${a.gross ? "Großer Heiltrank" : "Heiltrank"}`); break;
       case "aufrichten": {
+        ziel.aufgerichtet = (ziel.aufgerichtet || 0) + 1;
         if (a.stabil && st.schwierigkeit === "hardcore") { ziel.stabil = true; st.log.push({ t: `${f.name} stabilisiert ${ziel.name}. Die Todeswürfe hören auf.`, art: "gut" }); }
         else { ziel.tp = 1; ziel.todes = { e: 0, f: 0 }; ziel.stabil = false; st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} steht mit 1 TP wieder auf.`, art: "gut" }); }
         break;
@@ -947,6 +954,8 @@
     if (f.z.liegend && f.tp > 0 && st.zug.bewegung >= 3) { st.zug.bewegung -= 3; delete f.z.liegend; }
     // Strahlende Aura gegen Untote
     if (f.seite === "gegner") for (const l of st.figuren) if (istFig(l, "lichtbringer") && lebt(l) && abstand(l, f) <= 1 && lebt(f)) { const n = GEGNER[f.art].untot ? 2 : 1; st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
+    if (f.z.blutung && lebt(f)) { const b = f.z.blutung, s2 = roll(st.r, b.w).total; b.rest--; if (b.rest <= 0) delete f.z.blutung; st.log.push({ t: `${f.name} blutet: ${s2} Schaden.` }); schaden(st, f, s2); }
+    if (f.z.bruch && f.z.bruch.bis <= st.runde) delete f.z.bruch;
     if (lebt(f)) brandFeld(st, f);
     if (st.ende) return;
     if (!lebt(f)) weiter(st);
@@ -1165,7 +1174,7 @@
       }
       case "stoss": case "entwaffnen": return z.tp > 8 ? 3.5 - begrenzt : -1;
       case "heilung": return z.tp <= 0 ? 15 : z.tp < z.tpMax * 0.45 ? Math.min(z.tpMax - z.tp, 7) - slot * 0.5 : -1;
-      case "aufrichten": return 15;
+      case "aufrichten": return (z.aufgerichtet || 0) >= 3 ? -1 : 15; // Automatik: nicht endlos dieselbe Figur aufrichten
       case "segen": { const n = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).slice(0, 3).length; return n >= 2 ? n * 2.4 * Math.max(1, 4 - st.runde) / 2 - slot : -1; }
       case "schutzkreis": return spielerFiguren(st).filter((o) => o.tp > 0 && abstand(o, f) <= 2).length * 2.5 - slot;
       case "spiegelbilder": return f.tp < f.tpMax && gegnerFiguren(st).some((g) => lebt(g) && abstand(g, f) <= 7) ? 6 - slot : -1;
@@ -1268,7 +1277,8 @@
     }
     // 4. Aktion: am Boden liegende Freunde zuerst
     const amBoden = freundeAmBoden();
-    if (amBoden.length) { if (!versuche(st, "lebenshauch", amBoden.find((o) => abstand(o, f) <= 6))) versuche(st, "stabilisieren", amBoden.find((o) => abstand(o, f) <= 1)); }
+    // (Automatik: dieselbe Figur höchstens dreimal aufrichten, sonst kann ein Kampf endlos kreisen)
+    if (amBoden.length) { if (!versuche(st, "lebenshauch", amBoden.find((o) => abstand(o, f) <= 6))) { const k = amBoden.find((o) => abstand(o, f) <= 1 && (o.aufgerichtet || 0) < 3); if (k) versuche(st, "stabilisieren", k); } }
     for (let runde = 0; runde < 2 && !st.ende; runde++) {
       if (st.zug.aktion) {
         const b = besteAktion(st, f, "aktion");
@@ -1350,10 +1360,13 @@
   }
 
   /* ---------- Zwischen Kämpfen: Zustand mitnehmen, rasten ---------- */
-  /** Zustand der Spielerfiguren nach einem Kampf (am Boden in Normal: 1 TP) */
+  /** Zustand der Spielerfiguren nach einem Kampf (am Boden in Normal: halbe TP) */
   function nachKampf(st) {
     const out = {};
-    for (const f of spielerFiguren(st)) out[f.fid] = { stufe: f.stufe, tp: f.tot ? 0 : Math.max(1, Math.min(f.tp, FD.tpVon(f.fid, f.stufe))), tot: Boolean(f.tot), plaetze: f.plaetze.slice(), genutzt: Object.assign({}, f.genutzt), rucksack: JSON.parse(JSON.stringify(f.rucksack)) };
+    for (const f of spielerFiguren(st)) {
+      const max = FD.tpVon(f.fid, f.stufe), amBoden = !f.tot && f.tp <= 0 && st.schwierigkeit !== "hardcore";
+      out[f.fid] = { stufe: f.stufe, tp: f.tot ? 0 : amBoden ? Math.ceil(max / 2) : Math.max(1, Math.min(f.tp, max)), tot: Boolean(f.tot), plaetze: f.plaetze.slice(), genutzt: Object.assign({}, f.genutzt), rucksack: JSON.parse(JSON.stringify(f.rucksack)) };
+    }
     return out;
   }
   /** Kurze Rast: halbe fehlende TP, „je Rast“ und „je Kampf“ kommen zurück */

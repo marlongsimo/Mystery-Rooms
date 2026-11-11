@@ -23,7 +23,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | **Angriff** | W20 + Modifikator + 2 gegen RK. Hauptwert 16 heißt immer **+5 zum Treffen**. |
 | **Schwierigkeit (SG)** eigener Zauber und Tricks | 8 + 2 + Modifikator = **13** bei Hauptwert 16 |
 | **TP** | Stufe 1: höchster Wert des Trefferwürfels + KON. Jede weitere Stufe: halber Würfel + 1 + KON. |
-| **Bewegung** | 6 Felder, schräg wie gerade |
+| **Bewegung** | Krieger 3, Zauberer und Kleriker 4, Schurke und Waldläufer 5 Felder, schräg wie gerade |
 | **Rast** | „je Rast“ heißt: kommt bei kurzer **und** langer Rast zurück. „je lange Rast“ heißt: nur am Lagerfeuer. Hardcore kennt keine kurze Rast (siehe Abenteuerbuch). |
 | **Zustände** | **verlangsamt** (halbe Bewegung, keine Reaktion) · **festgehalten** (Bewegung 0, Angriffe gegen das Ziel mit Vorteil) · **verängstigt** (muss sich entfernen, greift nicht an) · **geblendet** (Nachteil auf Angriffe, Angriffe gegen das Ziel mit Vorteil) · **liegend** (Nahangriffe gegen das Ziel mit Vorteil, Aufstehen kostet 3 Felder) · **vergiftet** (Nachteil auf Angriffe und Proben) |
 
@@ -33,9 +33,9 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 |---|---|---|---|
 | **Krieger** | W10 | **Zweiter Atem:** Bonusaktion, heilt 1W10 + Stufe, 1× je Rast | **Tatendrang:** eine zusätzliche Aktion, 1× je lange Rast |
 | **Zauberer** | W8 | **Arkaner Schutz:** RK 11 + GES ohne Rüstung (13). **Arkane Wucht:** Zaubertricks + INT Schaden. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad | – |
-| **Schurke** | W8 | **Hinterhalt:** +1W6 (ab Stufe 2: +2W6) einmal je Zug, wenn mit Vorteil oder ein Verbündeter neben dem Ziel steht | **Gerissene Aktion:** Bonusaktion Spurt, Verstecken oder Rückzug |
+| **Schurke** | W8 | **Hinterhalt:** +1W6 (ab Stufe 2: +2W6) einmal je Zug, wenn mit Vorteil oder ein Verbündeter neben dem Ziel steht. **Nachbluten:** Waffentreffer lassen 3 Runden bluten (1W4 je Zug) | **Gerissene Aktion:** Bonusaktion Spurt, Verstecken oder Rückzug |
 | **Kleriker** | W8 | **Heilendes Wort:** Bonusaktion, Platz, 1W4 + WEI auf 6 Felder, auch am Boden. **Zauberplätze** 3 / 4 / 5, ab Stufe 3 davon 2 vom 2. Grad | **Göttliche Macht:** je Figur verschieden, 1× je Rast |
-| **Waldläufer** | W10 | **Jägermal:** Bonusaktion, ein Ziel bis Kampfende markiert, +1W6 Schaden bei jedem Treffer, 2 / 3 / 3 je lange Rast. **Fährtenleser:** Vorteil auf Spuren und Wahrnehmung im Freien | – |
+| **Waldläufer** | W10 | **Jägermal:** Bonusaktion, ein Ziel bis Kampfende markiert, +1W6 Schaden bei jedem Treffer, 2 / 3 / 3 je lange Rast. **Fährtenleser:** Vorteil auf Spuren und Wahrnehmung im Freien. **Durchbrechen:** Waffentreffer geben dem Ziel 3 Runden −2 RK | – |
 
 ---
 
@@ -176,6 +176,8 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 ## 4 · Schurke
 
+**Klassenmerkmal:** Nachbluten: Ein Waffentreffer lässt den Gegner 3 Runden lang bluten (1W4 zu Beginn seines Zugs).
+
 ### Darian – Der Schattenläufer
 „Ich war nie hier.“
 
@@ -315,6 +317,8 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 **Moment in Grauwacht:** Das Flüstern: Er spürt, wer einen Pakt angenommen hat.
 
 ## 6 · Waldläufer
+
+**Klassenmerkmal:** Durchbrechen: Ein Waffentreffer reißt die Rüstung auf, das Ziel hat 3 Runden lang −2 RK gegen alle.
 
 ### Kael – Der Wildnisläufer
 „Ich sehe dich, lange bevor du mich siehst.“

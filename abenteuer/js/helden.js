@@ -31,10 +31,10 @@
   /** Kurze Angaben je Klasse für die Klassenwahl (Werte aus figuren.js, nur die Worte stehen hier) */
   const KLASSE_INFO = {
     krieger: { kurz: "Meister des Nahkampfs und Schild der Gefährten.", stark: "Hält am meisten aus, steht vorn", platz: "vorn", wofuer: "Für alle, die mitten ins Getümmel wollen." },
-    zauberer: { kurz: "Hüter arkanen Wissens. Zerbrechlich, aber gefährlich.", stark: "Zauber auf Entfernung und auf mehrere Gegner", platz: "hinten", wofuer: "Für alle, die gern planen und Wirkung sehen." },
-    schurke: { kurz: "Meister der List, der Täuschung und der leisen Klinge.", stark: "Hinterhalt, Bewegung, Fallen und Schlösser", platz: "Mitte", wofuer: "Für alle, die den richtigen Moment abpassen." },
+    zauberer: { kurz: "Hüter arkanen Wissens. Zerbrechlich, aber gefährlich.", stark: "Zauber auf Entfernung und auf mehrere Gegner, Runen lesen", platz: "hinten", wofuer: "Für alle, die gern planen und Wirkung sehen." },
+    schurke: { kurz: "Meister der List, der Täuschung und der leisen Klinge.", stark: "Hinterhalt, Nachbluten, Fallen und Schlösser", platz: "Mitte", wofuer: "Für alle, die den richtigen Moment abpassen." },
     kleriker: { kurz: "Heiler, Beschützer und Kämpfer gegen die Finsternis.", stark: "Heilen, segnen, Untote vertreiben", platz: "vorn oder Mitte", wofuer: "Für alle, die die Gruppe zusammenhalten." },
-    waldlaeufer: { kurz: "Kundschafter, Jäger und Überlebenskünstler der Wildnis.", stark: "Fernkampf, Spuren lesen, Ziele markieren", platz: "hinten oder Mitte", wofuer: "Für alle, die aus sicherer Entfernung treffen." },
+    waldlaeufer: { kurz: "Kundschafter, Jäger und Überlebenskünstler der Wildnis.", stark: "Fernkampf, Rüstung durchbrechen, Spuren lesen", platz: "hinten oder Mitte", wofuer: "Für alle, die aus sicherer Entfernung treffen." },
   };
   const ATTR_NAME = { STR: "Stärke", GES: "Geschick", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
   const vonKlasse = (k) => F.REIHE.filter((fid) => F.FIGUREN[fid].klasse === k);
@@ -69,7 +69,7 @@
   /** Kopf von Schritt 2: Klasse mit kurzer Beschreibung */
   function klassenKopf(k) {
     const kl = F.KLASSEN[k], info = KLASSE_INFO[k];
-    return `<div class="klassen-kopf" style="--k:${kl.farbe}"><span class="banner-zeichen" aria-hidden="true">${KLASSE_ZEICHEN[k]}</span><div><h2>${esc(kl.name)}</h2><p>${esc(info.kurz)} ${esc(info.wofuer)}</p></div></div>`;
+    return `<div class="klassen-kopf" style="--k:${kl.farbe}"><span class="banner-zeichen" aria-hidden="true">${KLASSE_ZEICHEN[k]}</span><div><h2>${esc(kl.name)}</h2><p>${esc(info.kurz)} ${esc(info.wofuer)}</p>${kl.merkmal ? `<p class="klassen-merkmal">${esc(kl.merkmal)}</p>` : ""}</div></div>`;
   }
 
   /** Kachel in der Galerie */

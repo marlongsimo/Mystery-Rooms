@@ -58,7 +58,9 @@
     A.erlebt.push(e.id); A.ereignisZiel = danach;
     return e.id;
   }
-  const hilfen = { hat, m, name, ereignis, lebende: (A) => lebende(A) };
+  /** Erste lebende Figur einer Klasse in der Gruppe (oder undefined) */
+  const klasse = (A, k) => A.gruppe.find((f) => hat(A, f) && F.FIGUREN[f].klasse === k);
+  const hilfen = { hat, m, name, ereignis, klasse, lebende: (A) => lebende(A) };
 
   function notiz(A, t, art) { A.protokoll.push({ t, art: art || "" }); if (A.protokoll.length > 200) A.protokoll.shift(); }
   /** Wirkung einer Option/eines Ergebnisses anwenden */

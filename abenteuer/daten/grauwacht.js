@@ -180,13 +180,14 @@
         "Der Pfad windet sich durch kahle Buchen den Hang hinauf. Anselm geht voraus, langsam, auf einen Stock gestützt. Niemand spricht.",
         "Am Tor der Abtei bleibt er stehen. Das Holz ist schwarz vor Alter, ein Flügel hängt schief in den Angeln. Dahinter: der Klostergarten, Grabsteine im hohen Gras.",
         A.merker.anselm_vertrauen > 0 ? "„Passt auf euch auf“, sagt er leise. „Und … verzeiht mir.“ Bevor ihr fragen könnt, was er meint, hat er sich umgedreht." : "„Bis hierhin“, sagt er. Er setzt sich auf einen Stein neben dem Tor und sieht euch nicht nach.",
+        h.klasse(A, "waldlaeufer") ? `${h.name(A, h.klasse(A, "waldlaeufer"))} hebt die Hand. Im Gras: Kriechspuren, breit wie ein Unterarm, und Rostflocken an den Halmen. „Sie liegen zwischen den Gräbern und warten. Wir kommen von der Seite.“` : "",
         "Im Gras raschelt es. Etwas Rostbraunes schiebt sich zwischen den Gräbern hervor.",
       ],
     },
     garten: {
       art: "kampf", abschnitt: 1, titel: "Der Klostergarten", ort: "Abtei Grauwacht",
       text: ["Rostkäfer, groß wie Hunde, kriechen aus dem Moos. Ihre Fühler zittern, als sie das Metall eurer Rüstungen riechen."],
-      kampf: (A) => ({ begegnung: "garten", sieg: { weiter: "garten_danach", tranke: Math.ceil(kurz(A) / 2) } }),
+      kampf: (A, h) => ({ begegnung: "garten", ueberraschung: Boolean(h.klasse(A, "waldlaeufer")), sieg: { weiter: "garten_danach", tranke: Math.ceil(kurz(A) / 2) } }),
     },
     garten_danach: {
       art: "erzaehlung", abschnitt: 1, titel: "Zwischen den Gräbern", ort: "Klostergarten", weiter: (A, h) => h.ereignis(A, 1, "turm"), rastErlaubt: true,
@@ -310,11 +311,12 @@
         "Die Abteikirche ist kalt. Durch die zerbrochenen Fenster fällt graues Morgenlicht auf Bänke, die niemand mehr benutzt. Hinter dem Altar führt eine Treppe nach unten. Von dort kommt ein Geruch nach nassem Stein und altem Wachs.",
         A.merker.nisk_dabei ? "Nisk zupft euch am Ärmel und zeigt auf einen Spalt in der Wand neben dem Altar, den ihr ohne ihn nie gesehen hättet. „Kurzer Weg“, flüstert er. „Kobold-Weg. Pilze. Aber keine toten Brüder.“" : "",
         !A.merker.nisk_dabei && h.hat(A, "schattenlaeufer") ? "Darian fährt mit der Hand über die Wand neben dem Altar. Ein kühler Luftzug. Hier ist ein Spalt, schmal, von Kobolden ausgetreten." : "",
+        !A.merker.nisk_dabei && !h.hat(A, "schattenlaeufer") && h.klasse(A, "waldlaeufer") ? `${h.name(A, h.klasse(A, "waldlaeufer"))} kniet am Altar. Kleine Fußspuren im Staub, viele, alle in dieselbe Richtung: in die Wand hinein. Dahinter ein Spalt, schmal, von Kobolden ausgetreten.` : "",
         "Welchen Weg nehmt ihr?",
       ],
       optionen: [
         { id: "treppe", text: "Die Treppe in die Gruft der Brüder", setzt: { weg_gruft: true }, weiter: "gruft" },
-        { id: "spalt", text: "Durch den Spalt, den Schmugglerpfad", wenn: (A, h) => A.merker.nisk_dabei || h.hat(A, "schattenlaeufer"), setzt: { weg_pfad: true }, weiter: "pfad" },
+        { id: "spalt", text: "Durch den Spalt, den Schmugglerpfad", wenn: (A, h) => A.merker.nisk_dabei || h.hat(A, "schattenlaeufer") || Boolean(h.klasse(A, "waldlaeufer")), setzt: { weg_pfad: true }, weiter: "pfad" },
       ],
     },
     /* ----- Weg A: Die Gruft der Brüder ----- */
@@ -350,10 +352,11 @@
     },
     gruft_raetsel: {
       art: "raetsel", abschnitt: 2, titel: "Das Glockenjoch", ort: "Gruft der Brüder",
-      text: (A) => [
+      text: (A, h) => [
         "Vier kleine Glocken hängen am Joch, jede mit einem Tier: Rabe, Lamm, Taube, Wolf. Darunter eine Inschrift: *Wer die Brüder ruft, ruft sie in ihrer Ordnung.*",
         "Die Grabplatten ringsum tragen Verse. Jede Person liest auf ihrem Handy, was ihre Figur auf ihrer Platte findet. Nur gemeinsam ergibt sich die Reihenfolge.",
         A.merker.gruft_raetsel_fehl ? "Die falschen Töne hallen noch nach. Irgendwo in den Nischen knirscht es." : "",
+        h.klasse(A, "zauberer") ? `${h.name(A, h.klasse(A, "zauberer"))} erkennt die Zeichen am Joch aus alten Ordensschriften: Der Rabe ist der Ruf des Vorstehers. Er beginnt immer.` : "",
       ],
       glocken: [{ id: "rabe", name: "Rabe" }, { id: "lamm", name: "Lamm" }, { id: "taube", name: "Taube" }, { id: "wolf", name: "Wolf" }],
       loesung: ["rabe", "lamm", "taube", "wolf"],
@@ -402,12 +405,12 @@
     },
     koboldlager: {
       art: "wahl", abschnitt: 2, titel: "Das Koboldlager", ort: "Schmugglerpfad",
-      beimEintritt: (A, h) => (h.hat(A, "schattenlaeufer") ? { setzt: { ring: true } } : null),
+      beimEintritt: (A, h) => (h.klasse(A, "schurke") ? { setzt: { ring: true } } : null),
       text: (A, h) => [
         "Hinter der Pilzkammer: ein verlassenes Lager. Lumpen, eine erkaltete Feuerstelle, Spielzeug aus Knochen. Die Kobolde sind tiefer geflohen, in aller Eile.",
         "In einer Kiste: drei Heiltränke, sorgfältig in Moos gewickelt, und ein Beutel Münzen.",
         A.merker.nisk_dabei ? "Nisk steht in der Mitte des Lagers und sagt nichts. Es ist sein Zuhause." : "",
-        h.hat(A, "schattenlaeufer") ? "Darian findet unter der Feuerstelle ein Geheimfach. Darin ein Ring aus dunklem Metall, kalt wie Wasser." : "",
+        h.hat(A, "schattenlaeufer") ? "Darian findet unter der Feuerstelle ein Geheimfach. Darin ein Ring aus dunklem Metall, kalt wie Wasser." : h.klasse(A, "schurke") ? `${h.name(A, h.klasse(A, "schurke"))} klopft die Steine der Feuerstelle ab. Einer klingt hohl. Darunter ein Geheimfach mit einem Ring aus dunklem Metall, kalt wie Wasser.` : "",
         "Nehmt ihr die Vorräte?",
       ],
       optionen: [
@@ -585,14 +588,16 @@
     },
     halle_danach: {
       art: "erzaehlung", abschnitt: 3, titel: "Vor der Eisentür", ort: "Halle der Asche", weiter: (A) => (A.merker.coldric_frieden && !A.merker.coldric_schild ? "coldric_schild" : "siegel_vor"), rastErlaubt: true,
-      text: (A) => {
+      text: (A, h) => {
         const m = A.merker;
-        if (m.halle_umgangen) return ["Die Eisentür fällt hinter euch ins Schloss. Ihr seid durch, ohne Kampf. Hinter euch steht Coldric noch immer und wacht über eine Halle, durch die gerade alle gegangen sind, die er aufhalten sollte."];
+        if (m.halle_umgangen) return ["Die Eisentür gleitet hinter euch zu. Ihr seid durch, ohne Kampf. Hinter euch steht Coldric noch immer und wacht über eine Halle, durch die gerade alle gegangen sind, die er aufhalten sollte.",
+          h.klasse(A, "schurke") ? `${h.name(A, h.klasse(A, "schurke"))} hält den Riegel fest, bis er lautlos einrastet. Wer unten wartet, hört euch nicht kommen.` : ""];
         return [
           m.coldric_frieden
             ? "Coldric zieht den Handschuh aus. Darunter ist keine Hand, nur Asche, die die Form einer Hand hält. „Er hat mich gerufen, als ich starb, und ich bin gekommen. Vierzig Jahre war ich sein Hund.“ Er sieht zur Eisentür. „Bindet ihn. Und dann lasst mich gehen.“ Er zerfällt, bevor ihr antworten könnt. In der Asche bleibt sein Schild zurück, schwarz und schwer, mit dem Zeichen der Abtei."
             : "Coldrics Rüstung fällt in sich zusammen. Darin ist nur Asche. Für einen Augenblick glaubt ihr, eine Stimme zu hören, erleichtert: „Endlich.“",
           "Hinter der Eisentür liegt eine Treppe, die letzte. Von unten kommt kein Licht. Nur ein Flüstern.",
+          h.klasse(A, "schurke") ? `${h.name(A, h.klasse(A, "schurke"))} ölt die Angeln der Eisentür mit Lampenfett und hält den Riegel, bis er lautlos zurückgleitet. Wer unten wartet, hört euch nicht kommen.` : "",
           A.schwierigkeit === "normal" ? "Wenn ihr Wunden verbinden wollt: Jetzt ist die letzte Gelegenheit." : "",
         ];
       },
@@ -604,10 +609,11 @@
     },
     siegel_vor: {
       art: "erzaehlung", abschnitt: 3, titel: "Die Siegelkammer", ort: "Die Siegelkammer", weiter: "fluestern",
-      text: (A) => [
+      text: (A, h) => [
         "Die Kammer ist rund und so hoch, dass die Fackeln die Decke nicht erreichen. In den Boden ist ein Kreis aus Silber eingelassen, und an vier Stellen ragen Steine auf, so hoch wie ein Mensch, bedeckt mit Zeichen, die schwach leuchten. Die **Siegelsteine**.",
         "In der Mitte des Kreises sitzt ein Mann auf einem Stuhl aus Stein. Er trägt die Kutte eines Abts. Er ist sehr alt und sehr dünn, und seine Augen sind offen. Er sieht euch an und lächelt.",
         A.merker.abt_name ? "„Valdric“, sagt jemand von euch, leise. Der Abt neigt den Kopf. „Ein Kind hat es euch verraten. Wie schön. Mich hat lange niemand mehr bei meinem Namen genannt.“" : "„Willkommen“, sagt er. „Ich habe die Glocke für euch geläutet. Nun ja. Nicht ich. Aber ich habe zugehört.“",
+        h.klasse(A, "zauberer") ? `${h.name(A, h.klasse(A, "zauberer"))} liest die Zeichen auf dem nächsten Stein, Silbe für Silbe, ohne den Mund zu bewegen. Als das letzte Zeichen gelesen ist, leuchtet der Stein auf. Valdrics Lächeln wird schmaler.` : "",
         "Dann spricht er nicht mehr laut. Er spricht in euren Köpfen. Jede und jeder von euch hört etwas anderes.",
       ],
     },
@@ -650,16 +656,17 @@
         "**Die vier Siegelsteine:** Wer neben einem steht, kann ihn mit einer Aktion berühren. Jeder Stein schwächt Valdric. Sind alle vier berührt, ist er gebunden.",
         A.merker.abt_name ? "Ihr kennt seinen wahren Namen. Einmal im Kampf könnt ihr ihn damit lähmen." : "",
         A.merker.silberglocke ? "Die silberne Glocke aus der Gruft: Ihr Klang zerbricht die Knochenwächter." : "",
-        A.merker.ring ? "Darians Ring wird eiskalt. Valdric sieht ihn und zuckt zurück: Es ist sein eigener." : "",
+        A.merker.ring ? "Der Ring aus dem Koboldlager wird eiskalt. Valdric sieht ihn und zuckt zurück: Es ist sein eigener." : "",
         A.glocke >= 5 ? "Die Glocke hat zu oft geschlagen. Er ist stärker, als er sein dürfte." : "",
       ],
-      kampf: (A) => {
+      kampf: (A, h) => {
         const m = A.merker, pakt = A.gruppe.filter((f) => m["pakt_" + f] && !A.zust[f].tot);
         let mal = A.schwierigkeit === "hardcore" ? 0.7 : 0.85; // langsamere Helden brauchen länger zu den Siegelsteinen
         if (m.ring) mal *= 0.9; if (A.glocke >= 7) mal *= 1.15;
         return { begegnung: "siegel", karte: KARTEN.SIEGEL, skalaMal: mal, namen: m.abt_name ? {} : { abt: "Der Abt" },
           ausruestung: m.coldric_schild && !A.zust[m.coldric_schild]?.tot ? { [m.coldric_schild]: { name: "Coldrics Schild", rk: 1 } } : {},
-          boss: { name: Boolean(m.abt_name), silber: Boolean(m.silberglocke), pakt },
+          boss: { name: Boolean(m.abt_name), silber: Boolean(m.silberglocke), pakt, stein: Boolean(h.klasse(A, "zauberer")) },
+          ueberraschung: Boolean(h.klasse(A, "schurke")),
           zusatz: A.glocke >= 5 ? [{ art: "knochenwaechter", anzahl: 1, tpFaktor: 1 }] : [],
           beute: false, sieg: { weiter: "abt_fall" } };
       },

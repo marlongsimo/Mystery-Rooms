@@ -29,6 +29,7 @@ let md = "";
 KLASSEN_REIHE.forEach((kl, i) => {
   const K = F.KLASSEN[kl];
   md += `## ${i + 2} · ${K.name}\n\n`;
+  if (K.merkmal) md += `**Klassenmerkmal:** ${K.merkmal}\n\n`;
   for (const fid of F.REIHE.filter((f) => F.FIGUREN[f].klasse === kl)) {
     const d = F.FIGUREN[fid];
     md += `### ${d.name} – ${d.titel}\n„${d.spruch}“\n\n`;

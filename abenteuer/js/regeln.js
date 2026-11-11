@@ -55,7 +55,7 @@
     heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
   const TIERE = new Set(["rostkaefer", "netzweber", "aschehund"]);
-  const GEGNER_TP = { wert: 1.1, zusatz: 1 }; // alle Gegner +10 % Leben, in jedem Kampf ein Gegner mehr
+  const GEGNER_TP = { wert: 1.05, zusatz: 1 }; // alle Gegner +5 % Leben, in jedem Kampf ein Gegner mehr
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
   const RAUCH_DING = { id: "rauchbeutel", name: "Rauchbeutel werfen", typ: "aktion", art: "rauch", ding: "rauchbeutel", radius: 1, dauer: 2, text: GEGENSTAENDE.rauchbeutel.text };

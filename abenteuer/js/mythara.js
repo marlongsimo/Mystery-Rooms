@@ -188,6 +188,7 @@
   $("#my-code-feld").addEventListener("input", (e) => { e.target.value = huebsch(e.target.value); $("#my-code-fb").textContent = ""; });
   const zurueck = $("#titel-mythara"); if (zurueck) zurueck.onclick = () => zeige("mythara");
   kontoZeichnen();
-  if (KONTEN) profilLaden().then(kontoZeichnen);
+  // Nur neu zeichnen, wenn ein Konto angemeldet ist – sonst bliebe Eingetipptes nicht erhalten
+  if (KONTEN) profilLaden().then(() => { if (profil && profil.konto) kontoZeichnen(); });
   window.MYTHARA = { KONTEN, zeige: () => zeige("mythara") };
 })();

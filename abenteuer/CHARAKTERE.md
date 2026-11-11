@@ -48,7 +48,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Niemand fällt, solange ich stehe.“
 
 **Rolle:** vorn, beschützt · **Werte:** STR 16 (+3) · GES 10 (+0) · KON 14 (+2) · INT 8 (-1) · WEI 13 (+1) · CHA 12 (+1)
-**TP** 12 / 20 / 28 · **RK** 18 (Kettenpanzer und Schild)
+**TP** 15 / 26 / 37 · **RK** 18 (Kettenpanzer und Schild)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
@@ -69,7 +69,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Je mehr es wehtut, desto klarer sehe ich.“
 
 **Rolle:** vorn, hoher Schaden · **Werte:** STR 16 (+3) · GES 13 (+1) · KON 14 (+2) · INT 8 (-1) · WEI 12 (+1) · CHA 10 (+0)
-**TP** 12 / 20 / 28 · **RK** 12 (Fell)
+**TP** 15 / 26 / 37 · **RK** 12 (Fell)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
@@ -90,7 +90,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Ein Fehler. Mehr brauche ich nicht.“
 
 **Rolle:** vorn, Einzelkampf · **Werte:** STR 10 (+0) · GES 16 (+3) · KON 14 (+2) · INT 8 (-1) · WEI 12 (+1) · CHA 13 (+1)
-**TP** 12 / 20 / 28 · **RK** 15 (beschlagenes Leder)
+**TP** 15 / 26 / 37 · **RK** 15 (beschlagenes Leder)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|

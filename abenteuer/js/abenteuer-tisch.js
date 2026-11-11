@@ -81,7 +81,8 @@
   function gruppeHtml() {
     return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
       const dinge = (z.rucksack || []).filter((x) => R.GEGENSTAENDE[x.id] && x.n > 0).map((x) => `<i title="${esc(R.GEGENSTAENDE[x.id].name)}: ${esc(R.GEGENSTAENDE[x.id].text)}">${R.GEGENSTAENDE[x.id].sym}</i>`).join("");
-      return `<span class="${z.tot ? "tot" : ""}">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small></span>`; }).join("")}</div>`;
+      const rel = z.tot && S.reliquieTraeger(A) ? `<button class="btn klein reliquie-knopf" data-wiederbeleben="${fid}" title="Reliquie der Brüder nutzen">✝ Zurückholen</button>` : "";
+      return `<span class="${z.tot ? "tot" : ""}">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small>${rel}</span>`; }).join("")}</div>`;
   }
   /* ---------- Chronik: jedes beendete Abenteuer bleibt auf dem Gerät ---------- */
   const CHRONIK = "ab_chronik";
@@ -240,6 +241,7 @@
   function binde(el, v, s) {
     const nach = () => { merken(); render(); AB.veroeffentlichen(); };
     el.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { S.waehle(A, b.dataset.opt); nachSzene(); }; });
+    el.querySelectorAll("[data-wiederbeleben]").forEach((b) => { b.onclick = () => { const fid = b.dataset.wiederbeleben; if (!confirm(`Die Reliquie der Brüder für ${F.FIGUREN[fid].name} nutzen? Sie ist danach verbraucht.`)) return; const r = S.wiederbeleben(A, fid); if (r.fehler) AB.toast(r.fehler); nach(); }; });
     el.querySelectorAll("[data-beute-ding]").forEach((b) => { b.onclick = () => { A.beuteWahl = b.dataset.beuteDing; render(); }; b.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); b.click(); } }; });
     el.querySelectorAll("[data-beute]").forEach((b) => { b.onclick = () => { const [ding, fid] = b.dataset.beute.split(":"); const r = S.beuteGeben(A, ding, fid); if (r.fehler) AB.toast(r.fehler); else A.beuteWahl = null; nach(); }; });
     const bl = $("#beute-lassen"); if (bl) bl.onclick = () => { if (confirm("Wirklich nichts mitnehmen?")) { S.beuteLassen(A); A.beuteWahl = null; nach(); } };

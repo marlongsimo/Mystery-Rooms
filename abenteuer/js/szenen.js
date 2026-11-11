@@ -312,8 +312,12 @@
     const vergeben = A.gruppe.flatMap((f) => getragen(A, f));
     // Was einmal gezeigt wurde, ist weg: liegen gelassene Dinge tauchen nicht wieder auf
     A.gezeigt = A.gezeigt || [];
-    const topf = Object.keys(R.GEGENSTAENDE).filter((id) => !A.gezeigt.includes(id) && !vergeben.includes(id)).filter((id) => lebende(A).some((f) => darfTragen(A, f, id)));
+    const hc = A.schwierigkeit === "hardcore";
+    const topf = Object.keys(R.GEGENSTAENDE).filter((id) => id !== "reliquie" && !A.gezeigt.includes(id) && !vergeben.includes(id)).filter((id) => lebende(A).some((f) => darfTragen(A, f, id)));
     const zug = [];
+    // Hardcore: Ist jemand gefallen und hat die Gruppe keine Reliquie, liegt sie sicher in der Beute
+    const reliquieDa = A.gruppe.some((f) => (A.zust[f].rucksack || []).some((d) => d.id === "reliquie" && d.n > 0));
+    if (hc && A.gefallen.some((f) => A.gruppe.includes(f) && A.zust[f].tot) && !reliquieDa) zug.push("reliquie");
     while (zug.length < 3 && topf.length) zug.push(topf.splice(Math.floor(A.r() * topf.length), 1)[0]);
     A.gezeigt.push(...zug);
     A.beute = zug.length ? { dinge: zug } : null;
@@ -328,6 +332,20 @@
     if (ding === "manastein" && A.zust[fid].plaetze) A.zust[fid].plaetze[0]++;
     notiz(A, `${name(A, fid)} nimmt ${R.GEGENSTAENDE[ding].name}.`, "gut");
     A.beute = null; return { ok: true };
+  }
+  /** Hardcore: Reliquie der Brüder – eine gefallene Figur kehrt nach dem Kampf zurück */
+  function reliquieTraeger(A) { return lebende(A).find((f) => (A.zust[f].rucksack || []).some((d) => d.id === "reliquie" && d.n > 0)) || null; }
+  function wiederbeleben(A, fid) {
+    const z = A.zust[fid], t = reliquieTraeger(A);
+    if (!z || !z.tot) return { fehler: "Diese Figur ist nicht gefallen." };
+    if (!t) return { fehler: "Niemand trägt eine Reliquie der Brüder." };
+    A.zust[t].rucksack.find((d) => d.id === "reliquie" && d.n > 0).n--;
+    z.tot = false; z.tp = Math.ceil(F.tpVon(fid, A.stufe) / 2);
+    A.gefallen = A.gefallen.filter((f) => f !== fid);
+    if (A.ersatzOffen) A.ersatzOffen = A.ersatzOffen.filter((f) => f !== fid);
+    if (A.lagerZust && A.lagerZust[fid]) A.lagerZust[fid] = JSON.parse(JSON.stringify(z));
+    notiz(A, `${name(A, t)} legt die Reliquie der Brüder auf ${name(A, fid)}. Ein Atemzug, dann noch einer: ${name(A, fid)} lebt.`, "gut");
+    return { ok: true };
   }
   function beuteLassen(A) { if (!A.beute) return { fehler: "Keine Beute." }; notiz(A, "Ihr lasst die Beute liegen."); A.beute = null; return { ok: true }; }
 
@@ -388,6 +406,7 @@
         boni: Object.fromEntries(lebende(A).map((f) => [f, bonus(A, f, p).wert])), ergebnis: A.ergebnis } : null,
       raetsel: s.art === "raetsel" ? { glocken: s.glocken, folge: A.raetsel.folge, fehl: A.merker[A.szene + "_fehl"] || 0, laenge: s.loesung.length, hinweise: raetselHinweise(A) } : null,
       ersatz: (A.ersatzOffen || []).length ? { offen: A.ersatzOffen, frei: freieFiguren(A) } : null,
+      reliquie: reliquieTraeger(A) ? { traeger: reliquieTraeger(A), gefallen: A.gruppe.filter((f) => A.zust[f].tot) } : null,
       beute: A.beute ? { dinge: A.beute.dinge.map((id) => Object.assign({ id }, R.GEGENSTAENDE[id])), max: MAX_GETRAGEN,
         helden: Object.fromEntries(lebende(A).map((f) => [f, { getragen: getragen(A, f), darf: Object.fromEntries(A.beute.dinge.map((id) => [id, darfTragen(A, f, id)])) }])) } : null,
       aufstieg: A.aufstieg || null,
@@ -397,7 +416,7 @@
   function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
   function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
 
-  const API = { beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

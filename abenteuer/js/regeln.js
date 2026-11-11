@@ -51,6 +51,7 @@
     schleifstein: { name: "Geschliffene Klinge", sym: "⚔", text: "+1 Schaden im Nahkampf." },
     eisenspitzen: { name: "Eisenspitzen", sym: "➹", text: "+1 Schaden auf Entfernung (Bogen, Wurf, Zauber)." },
     manastein: { name: "Manastein", sym: "💠", text: "+1 Zauberplatz, nach jeder langen Rast wieder voll.", nur: ["zauberer", "kleriker"] },
+    reliquie: { name: "Reliquie der Brüder", sym: "✝", verbrauch: true, nurHardcore: true, text: "Nach einem Kampf, nicht währenddessen: holt eine gefallene Figur mit halben Trefferpunkten zurück. Einmal." },
     heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
   const TIERE = new Set(["rostkaefer", "netzweber", "aschehund"]);
@@ -556,8 +557,11 @@
   function spielerAngriff(st, f, a, z, opt = {}) {
     let bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") && f.stufe >= 2 ? 1 : 0);
     bonus += abstand(f, z) <= 1 ? (hatDing(f, "ring") ? 1 : 0) : (hatDing(f, "feder") ? 1 : 0);
-    const fest = a.ohneMod ? 0 : mod(f.werte[a.attr]);
+    // Klassenregler für Waffenangriffe (Stärke oder Geschick): fester Bonus/Malus und Zusatzwürfel
+    const kl = FD.KLASSEN[f.klasse] || {}, waffe = a.attr === "STR" || a.attr === "GES";
+    const fest = (a.ohneMod ? 0 : mod(f.werte[a.attr])) + (waffe ? kl.waffenMod || 0 : 0);
     const extra = [];
+    if (waffe && kl.waffenExtra) extra.push(kl.waffenExtra);
     let krit = 20, zusatz = "";
     if (f.z.raserei && a.attr === "STR") extra.push("0W1+1");
     // Darian, Schattenstoß (ab Stufe 2): Angriff aus dem Versteck +1W6 und kritisch ab 19

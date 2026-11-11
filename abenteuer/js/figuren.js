@@ -284,7 +284,7 @@
   /** TP: Stufe 1 = Würfel + KON, je weitere Stufe halber Würfel + 1 + KON */
   function tpVon(fid, stufe) {
     const d = FIGUREN[fid], w = KLASSEN[d.klasse].wuerfel, kon = mod(d.werte.KON);
-    return w + kon + (stufe - 1) * (w / 2 + 1 + kon) - (d.tpMinus || 0);
+    return w + kon + (stufe - 1) * (w / 2 + 1 + kon) - (d.tpMinus || 0) + (KLASSEN[d.klasse].tpJeStufe || 0) * stufe;
   }
   /** Alle Fähigkeiten der Figur bis zur Stufe (Klasse + eigene), in Anzeige-Reihenfolge */
   function faehigVon(fid, stufe = 3) {

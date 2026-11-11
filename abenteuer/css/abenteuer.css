@@ -717,3 +717,6 @@ body[data-abschnitt="3"] .szene h1 { text-shadow: 0 0 24px rgba(201, 72, 40, .25
 
 .rasterbar { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 10px; border: 1px dashed var(--line-stark); border-radius: 3px; font-size: 13px; }
 .rasterbar .note { flex-basis: 100%; } .rasterbar .note i { display: inline-block; width: 10px; height: 10px; margin: 0 3px 0 8px; border-radius: 2px; }
+.gruppe-leiste .reliquie-knopf { grid-column: 1 / -1; margin-top: 4px; padding: 4px 8px; font-size: 12px; }
+.gruppe-leiste .tot .reliquie-knopf { opacity: 1; }
+.gruppe-leiste .tot { opacity: 1; } .gruppe-leiste .tot > :not(.reliquie-knopf) { opacity: .45; }

@@ -17,7 +17,7 @@ const { chromium } = require('playwright');
 
   const einstieg = async (p, modus) => {
     await p.click('#my-gast-start');
-    await p.click('#titel-start');
+    await p.click('.hub-kachel[data-hub="neu"]');
     await p.waitForSelector('#einleitung:not([hidden])');
     for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
     for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');

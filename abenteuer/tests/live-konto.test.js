@@ -35,7 +35,8 @@ const { chromium } = require('playwright');
   check(await until(B, () => /schon vergeben/.test(document.querySelector('#my-name-info').textContent)), 'Anderer Browser: Name (auch in Großbuchstaben) vergeben');
 
   // Abmelden, falsches Passwort, richtig anmelden
-  await A.click('#my-abmelden');
+  check(await until(A, (n) => !document.querySelector('#hub').hidden && new RegExp('Willkommen zurück, ' + n).test(document.querySelector('#hub-gruss').textContent), NAME), 'Nach der Registrierung: Spielerseite „Willkommen zurück, …“');
+  await A.click('#hub-profil-knopf'); await A.click('#hub-menue [data-profil="abmelden"]');
   check(await until(A, () => Boolean(document.querySelector('#my-name'))), 'Abgemeldet: wieder Anmeldeformular');
   await A.fill('#my-name', NAME); await A.fill('#my-pw', 'falsch-falsch'); await A.click('#my-anmelden .my-knopf');
   check(await until(A, () => /falsch/.test(document.querySelector('#my-konto-fb').textContent)), 'Falsches Passwort: „Benutzername oder Passwort ist falsch“');

@@ -509,8 +509,8 @@
     if (r.fehler) $("#hinweis").textContent = r.fehler; else { tipp = null; render(); veroeffentlichen(); }
   }
 
-  function zeigeSektion(id) { for (const x of ["mythara", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
-  function zeigeIntro() { zeigeSektion("intro"); }
+  function zeigeSektion(id) { for (const x of ["mythara", "hub", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
+  function zeigeIntro() { if (window.MYTHARA && window.MYTHARA.imHub()) window.MYTHARA.zeigeHub(); else zeigeSektion("intro"); }
   function zeigeSpiel() { zeigeSektion("spiel"); }
   /* ---------- Karten-Prüfmodus (?raster): Koordinaten, Hindernisse und Startplätze sichtbar ---------- */
   const RASTER = params.has("raster");

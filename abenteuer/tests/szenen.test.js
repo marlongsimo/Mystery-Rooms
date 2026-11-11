@@ -15,7 +15,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
 
   const einstieg = async (p, modus) => {
     await p.click('#my-gast-start');
-    await p.click('#titel-start');
+    await p.click('.hub-kachel[data-hub="neu"]');
     await p.waitForSelector('#einleitung:not([hidden])');
     for (let i = 0; i < 3; i++) await p.click('#einl-weiter');
     for (let i = 0; i < 5; i++) await p.click('#kodex-weiter');
@@ -120,7 +120,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
       if (await p.$('#sz-schluss')) break;
       // nach der ersten Kampfszene einmal neu laden und fortsetzen
       if (kaempfe === 1 && !neuGeladen) { const vorher = await p.evaluate(() => window.ABT.A().szene); await p.reload(); await p.waitForSelector('#szene:not([hidden])', { timeout: 15000 }).catch(async (e) => { console.log('NACH NEULADEN sichtbar:', await p.evaluate(() => ['intro','lobby','spiel','ende','szene'].filter((x) => !document.getElementById(x).hidden).join() + ' | solo=' + (localStorage.getItem('ab_solo') || '').slice(0, 120) + ' | tisch=' + Boolean(localStorage.getItem('ab_tisch')))); throw e; }); neuGeladen = await p.evaluate(() => window.ABT.A().szene) === vorher; check(neuGeladen, 'Neu laden: das Abenteuer geht von selbst an derselben Stelle weiter');
-        await p.click('#sz-pause'); await p.click('#fortsetzen'); check(await p.isVisible('#szene'), 'Pause → Titel → „Abenteuer fortsetzen“'); continue; }
+        await p.click('#sz-pause'); await p.click('#hub-lokal-play'); check(await p.isVisible('#szene'), 'Pause → Spielerseite → „Abenteuer in diesem Browser“ fortsetzen'); continue; }
       const klick = async (sel) => { const e = await p.$(sel); if (e && await e.isEnabled()) { await e.click(); return true; } return false; };
       if (await p.$('[data-beute-ding]')) { if (!gesehen.has('Beute')) { gesehen.add('Beute'); if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + '/beute.png', fullPage: true }); } if (!(await p.$('[data-beute]'))) await p.click('[data-beute-ding]'); if (!(await klick('[data-beute]:not([disabled])'))) { p.once('dialog', (d) => d.accept()); await p.click('#beute-lassen'); } beuteGenommen++; continue; }
       if (await p.$('.aufstieg') && !gesehen.has('Aufstieg')) gesehen.add('Aufstieg');

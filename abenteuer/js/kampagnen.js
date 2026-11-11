@@ -195,13 +195,13 @@
     try {
       if (b) b.disabled = true;
       if (was === "handys" || was === "allein") return await fortsetzen(id, was === "handys");
-      if (was === "beginnen") { K = { id, version: 0, status: c.status, titel: c.title }; merkeK(); $("#qr-overlay").hidden = true; window.AB.zeigeIntro(); toast("Startet das Abenteuer – es wird in dieser Kampagne gespeichert."); return; }
+      if (was === "beginnen") return beginnen(c);
       if (was === "neu") {
         if (!confirm(`„${c.title}“ neu beginnen? Alle Spielstände dieser Kampagne werden gelöscht. Die Kampagne und ihre Mitspieler bleiben.`)) { b.disabled = false; return; }
         await rpc("rpg_reset_campaign", { p_campaign_id: id });
         if (K && K.id === id) { window.AB.allesBeenden(); window.ABT.verwerfen(); }
         K = { id, version: 0, status: "aktiv", titel: c.title }; merkeK(); letzteMeta = null;
-        $("#qr-overlay").hidden = true; window.AB.zeigeIntro(); toast("Neuer Anfang: Startet das Abenteuer – es wird in dieser Kampagne gespeichert."); return;
+        $("#qr-overlay").hidden = true; neuesAbenteuer(); toast("Neuer Anfang: Das Abenteuer wird in dieser Kampagne gespeichert."); return;
       }
       if (was === "archiv" || was === "zurueck") { await rpc("rpg_set_campaign_status", { p_campaign_id: id, p_status: was === "archiv" ? "archiviert" : "pausiert" }); if (K && K.id === id) { K.status = was === "archiv" ? "archiviert" : "pausiert"; merkeK(); } return bibliothek(); }
       if (was === "loeschen") {
@@ -219,6 +219,9 @@
       }
     } catch (e) { toast(e.message); if (b) b.disabled = false; }
   }
+  /** Leere Kampagne beginnen: das Abenteuer startet und wird in dieser Kampagne gespeichert */
+  const neuesAbenteuer = () => { const b = $("#titel-start"); if (b) b.click(); };
+  function beginnen(c) { K = { id: c.id, version: 0, status: c.status, titel: c.title }; merkeK(); $("#qr-overlay").hidden = true; neuesAbenteuer(); }
   /** Kampagne fortsetzen: neuesten Stand laden, Sitzung starten, ggf. neue Live-Runde mit Code */
   async function fortsetzen(id, mitHandys) {
     const d = await rpc("rpg_load_campaign", { p_campaign_id: id });
@@ -244,5 +247,5 @@
   const menue = document.querySelector("#intro .titel-menue");
   if (menue) { const b = document.createElement("button"); b.className = "menue"; b.id = "titel-kampagnen"; b.dataset.kampagnen = ""; b.innerHTML = '<span class="m-sym" aria-hidden="true">❖</span>Meine Kampagnen'; b.onclick = bibliothek; const g = $("#titel-gruppe"); menue.insertBefore(b, g); }
 
-  window.KAMPAGNE = { aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
+  window.KAMPAGNE = { beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
 })();

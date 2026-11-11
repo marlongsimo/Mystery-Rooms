@@ -6,6 +6,7 @@ const BASE = process.env.BASE || 'http://localhost:8765';
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch(); let ok = true; const errs = [];
+  const until = async (p, fn, arg, ms = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(250); } return false; };
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
   const neu = async (vp) => { const p = await b.newPage({ viewport: vp }); p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); }); return p; };
 
@@ -14,10 +15,10 @@ const { chromium } = require('playwright');
   check(await p.isVisible('#mythara') && !(await p.isVisible('#intro')), 'Start: Mythara-Bildschirm, Abenteuer-Titel verborgen');
   check(await p.title() === 'Mythara – Das digitale Rollenspiel | Case Unlocked', 'Seitentitel Mythara');
   check(await p.evaluate(() => { const i = document.querySelector('.my-logo img'); return i.complete && i.naturalWidth > 0; }), 'Logo geladen');
-  check(await p.isVisible('#my-name') && await p.isVisible('#my-kampagnen'), 'Anmeldung und „Meine Kampagnen“ ohne Testschalter sichtbar');
+  check(await p.isVisible('#my-name') && await p.isVisible('#my-gast-start'), 'Anmeldung und „Als Gast spielen“ sichtbar');
   // Einladungscode
-  await p.click('#my-beitreten');
-  check(await p.isVisible('#my-code-feld'), '„Spiel beitreten“ öffnet das Codefeld');
+  await p.click('#my-code-zeigen');
+  check(await p.isVisible('#my-code-feld') && await p.isVisible('#my-beitreten'), '„Mit Einladungscode beitreten“ öffnet das Codefeld');
   await p.fill('#my-code-feld', 'aben12');
   check(await p.inputValue('#my-code-feld') === 'ABEN-12', 'Code wird formatiert (ABEN-12)');
   await p.click('#my-beitreten');
@@ -28,10 +29,22 @@ const { chromium } = require('playwright');
   // Gast ohne Registrierung und zurück
   await p.goto(BASE + '/abenteuer/index.html');
   await p.click('#my-gast-start');
-  check(await p.isVisible('#intro') && !(await p.isVisible('#mythara')), 'Ohne Registrierung starten → Abenteuer-Titel');
-  await p.click('#titel-mythara');
-  check(await p.isVisible('#mythara'), '„Zurück zum Start“ führt zu Mythara');
+  check(await p.isVisible('#hub') && !(await p.isVisible('#mythara')), 'Als Gast spielen → Spielerseite');
+  check(/Gast/.test(await p.textContent('#hub-profil')) && await p.isVisible('#hub-gast-hinweis'), 'Spielerseite zeigt „Gast“ und den Hinweis aufs Konto');
+  check(await until(p, () => /Noch keine laufende Kampagne/.test(document.querySelector('#hub-aktuell').textContent)), 'Aktuelle Kampagnen: leer für neuen Gast');
+  await p.reload();
+  check(await until(p, () => !document.querySelector('#hub').hidden), 'Neu laden: Gast bleibt in dieser Gerätesitzung auf der Spielerseite');
+  await p.click('.hub-kachel[data-hub="beitreten"]');
+  check(await p.isVisible('#bt-code'), 'Kampagne beitreten: Codefeld');
+  await p.click('#bt-zu');
+  await p.click('.hub-nav-punkt[data-hub="regeln"]');
+  check(await p.isVisible('#kodex'), 'Hilfe & Regeln öffnet das Regelwerk');
+  await p.goto(BASE + '/abenteuer/index.html');
+  await until(p, () => !document.querySelector('#hub').hidden);
+  await p.click('#hub-profil-knopf'); await p.click('#hub-menue [data-profil="anmelden"]');
+  check(await p.isVisible('#mythara') && await p.isVisible('#my-name'), 'Profilmenü → Anmelden führt zur Startseite');
   // QR: ohne Kamera-Unterstützung eine Erklärung
+  await p.evaluate(() => sessionStorage.clear()); await p.goto(BASE + '/abenteuer/index.html');
   await p.click('#my-qr');
   check(/Kamera deines Handys/.test(await p.textContent('#my-scanner')), 'QR-Code scannen: Hinweis zur Handy-Kamera');
   // Konten: Benutzername und Passwort

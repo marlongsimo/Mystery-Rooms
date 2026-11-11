@@ -111,7 +111,12 @@
     }
 
     /** Anonyme Anmeldung; die Sitzung bleibt im Browser gespeichert (Neuladen). */
-    async ensureUser() {
+    ensureUser() {
+      // Nur eine Anmeldung gleichzeitig: Zwei parallele anonyme Anmeldungen ergäben zwei verschiedene Gäste
+      if (!this._anmeldung) this._anmeldung = this._ensureUser().finally(() => { this._anmeldung = null; });
+      return this._anmeldung;
+    }
+    async _ensureUser() {
       const { data } = await this.db.auth.getSession();
       let s = data && data.session;
       if (!s) {

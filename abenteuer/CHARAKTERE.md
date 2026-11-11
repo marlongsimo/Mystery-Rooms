@@ -69,7 +69,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Je mehr es wehtut, desto klarer sehe ich.“
 
 **Rolle:** vorn, hoher Schaden · **Werte:** STR 16 (+3) · GES 13 (+1) · KON 14 (+2) · INT 8 (-1) · WEI 12 (+1) · CHA 10 (+0)
-**TP** 12 / 20 / 28 · **RK** 13 (Fell)
+**TP** 12 / 20 / 28 · **RK** 12 (Fell)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
@@ -180,14 +180,14 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Ich war nie hier.“
 
 **Rolle:** Mitte, Fallen, Bewegung · **Werte:** STR 8 (-1) · GES 16 (+3) · KON 14 (+2) · INT 13 (+1) · WEI 12 (+1) · CHA 10 (+0)
-**TP** 10 / 17 / 24 · **RK** 14 (Leder)
+**TP** 10 / 17 / 24 · **RK** 15 (Leder)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
 | **Kurzbogen** | 1 | Aktion · 16 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
 | **Rauchbombe** | 1 | Aktion · Radius 2 · 1× je Rast | 2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus. |
-| **Gerissener Spurt** | 1 | Bonusaktion | Gerissene Aktion: 6 Felder zusätzliche Bewegung. |
+| **Gerissener Spurt** | 1 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
 | **Verstecken** | 1 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
 | **Rückzug** | 1 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
 | **Leiser Schritt** | 1 | passiv | Du kannst dich auch ohne Deckung verstecken, solange kein Gegner neben dir steht. Gerissene Aktion schon ab Stufe 1. |
@@ -212,7 +212,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | **Zweiter Dolch** | 1 | Bonusaktion · 8 Felder · Angriff +5 · 1W4 | Nach einem Dolchangriff: ein zweiter Dolch, 1W4. |
 | **Schmutziger Trick** | 1 | Bonusaktion · Nahkampf · GES-Rettung SG 13 · 2/2/3× je Rast | Ein Gegner neben dir: GES-Rettungswurf, sonst 1 Runde geblendet. |
 | **Platztausch** | 1 | Bonusaktion · 6 Felder · 1× je Rast | Tausche den Platz mit einem Verbündeten in 6 Feldern. |
-| **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: 6 Felder zusätzliche Bewegung. |
+| **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
 | **Verstecken** | 2 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
 | **Rückzug** | 2 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
 | **Glückspilz** | 1 | passiv · 1× je Kampf | Automatisch, 1× je Kampf: einen knapp verfehlten eigenen Angriff wiederholen oder einen Gegner seinen Treffer gegen dich wiederholen lassen. |
@@ -235,7 +235,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | **Leichte Armbrust** | 1 | Aktion · 16 Felder · Angriff +5 · 1W8 + 3 | Fernkampf. |
 | **Gift** | 1 | Bonusaktion · 2× je Rast | Dein nächster Treffer macht +1W6 Gift (ab Stufe 2 +2W6), das Ziel ist 1 Runde vergiftet. |
 | **Aus dem Schatten** | 1 | Bonusaktion | Neben Deckung oder im Rauch: verstecken. |
-| **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: 6 Felder zusätzliche Bewegung. |
+| **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
 | **Verstecken** | 2 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
 | **Rückzug** | 2 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
 | **Todesstoß** | 1 | passiv | Vorteil gegen Gegner, die im Kampf noch nicht gehandelt haben. |

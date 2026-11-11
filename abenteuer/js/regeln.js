@@ -262,7 +262,7 @@
       gi++;
     }
     // Anführer: der zäheste Gegner bekommt mehr Leben, bessere Rüstung und trifft besser
-    if (opts.anfuehrer) { const a = gegnerFiguren(st).filter((g) => !GEGNER[g.art].boss).sort((x, y) => y.tpMax - x.tpMax)[0]; if (a) { a.tp = a.tpMax = Math.round(a.tpMax * 1.6); a.rk += 1; a.rkBasis += 1; a.anfuehrer = true; a.name = a.name.replace(/ \d+$/, "") + " (Anführer)"; st.log.push({ t: `Ein Anführer führt die Gegner: ${a.name}.`, art: "schlecht" }); } }
+    if (opts.anfuehrer) { const a = gegnerFiguren(st).filter((g) => !GEGNER[g.art].boss).sort((x, y) => y.tpMax - x.tpMax)[0]; if (a) { a.tp = a.tpMax = Math.round(a.tpMax * (st.schwierigkeit === "hardcore" ? 1.4 : 1.6)); a.rk += 1; a.rkBasis += 1; a.anfuehrer = true; a.name = a.name.replace(/ \d+$/, "") + " (Anführer)"; st.log.push({ t: `Ein Anführer führt die Gegner: ${a.name}.`, art: "schlecht" }); } }
     // Überraschung: Gegner setzen die erste Runde aus. Läufer: ein Gegner rennt zu einem Feld (z. B. Glockenseil)
     if (opts.ueberraschung) for (const g of gegnerFiguren(st)) g.ueberrascht = true;
     if (opts.laeufer) {

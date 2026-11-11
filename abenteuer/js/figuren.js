@@ -58,7 +58,7 @@
     },
     berserker: {
       name: "Ragnar", titel: "Der Berserker", klasse: "krieger", rolle: "vorn, hoher Schaden", spruch: "Je mehr es wehtut, desto klarer sehe ich.",
-      werte: { STR: 16, KON: 14, GES: 13, WEI: 12, CHA: 10, INT: 8 }, rk: [13, 13, 13], ruestung: "Fell", metall: false,
+      werte: { STR: 16, KON: 14, GES: 13, WEI: 12, CHA: 10, INT: 8 }, rk: [12, 12, 12], ruestung: "Fell", metall: false,
       faehig: [
         { id: "grossaxt", name: "Großaxt", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W12", text: "Nahkampf." },
         { id: "grossaxt_r", name: "Großaxt, rücksichtslos", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W12", ruecksichtslos: true, text: "Vorteil auf deinen Angriff, aber Angriffe gegen dich haben Vorteil bis zu deinem nächsten Zug." },
@@ -137,7 +137,7 @@
     /* ============ Schurken ============ */
     schattenlaeufer: {
       name: "Darian", titel: "Der Schattenläufer", klasse: "schurke", rolle: "Mitte, Fallen, Bewegung", spruch: "Ich war nie hier.",
-      werte: { GES: 16, KON: 14, INT: 13, WEI: 12, CHA: 10, STR: 8 }, rk: [14, 14, 14], ruestung: "Leder",
+      werte: { GES: 16, KON: 14, INT: 13, WEI: 12, CHA: 10, STR: 8 }, rk: [15, 15, 15], ruestung: "Leder",
       gerissenAb: 1,
       faehig: [
         { id: "kurzschwert", name: "Kurzschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W6", text: "Nahkampf." },

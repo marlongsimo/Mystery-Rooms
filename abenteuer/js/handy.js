@@ -314,7 +314,7 @@
     return `<div class="attr">${werte}</div>
       <p class="note">${esc(d.rolle)} · ${esc(d.ruestung)} · TP ${F.tpVon(fid, 1)} / ${F.tpVon(fid, 2)} / ${F.tpVon(fid, 3)}</p>
       <h3 class="klein">Im Kampf</h3><ul class="faehig">${alle.filter((a) => a.typ !== "passiv").map(li).join("")}</ul>
-      <h3 class="klein">Immer aktiv</h3><ul class="faehig">${alle.filter((a) => a.typ === "passiv").map(li).join("")}</ul>
+      <h3 class="klein">Immer aktiv</h3><ul class="faehig">${(() => { const m = F.KLASSEN[d.klasse].merkmal; if (!m) return ""; const [n, ...t] = m.split(": "); return `<li class="klassen-merkmal" style="--k:${F.KLASSEN[d.klasse].farbe}"><b>${esc(n)}</b><small>Klassenmerkmal</small><p>${esc(t.join(": "))}</p></li>`; })()}${alle.filter((a) => a.typ === "passiv").map(li).join("")}</ul>
       <h3 class="klein">Außerhalb des Kampfes</h3><ul class="faehig"><li><b>${esc(d.aussen.name)}</b><p>${esc(d.aussen.text)}</p></li><li><b>Bewegung</b><small>${F.KLASSEN[F.FIGUREN[fid].klasse].bewegung || 6} Felder pro Zug</small><p>Schräg zählt wie gerade. Wer neben einem Gegner losläuft, riskiert einen Gelegenheitsangriff.</p></li></ul>`;
   }
 

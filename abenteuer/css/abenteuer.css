@@ -731,3 +731,25 @@ body[data-abschnitt="3"] .szene h1 { text-shadow: 0 0 24px rgba(201, 72, 40, .25
 .gruppe-leiste .reliquie-knopf { grid-column: 1 / -1; margin-top: 4px; padding: 4px 8px; font-size: 12px; }
 .gruppe-leiste .tot .reliquie-knopf { opacity: 1; }
 .gruppe-leiste .tot { opacity: 1; } .gruppe-leiste .tot > :not(.reliquie-knopf) { opacity: .45; }
+
+/* Gegnervorschau vor dem Kampf */
+.vorschau { margin: 14px 0 6px; }
+.vorschau h3 { margin: 0 0 8px; font: 600 11px var(--schrift-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--altgold); }
+.vorschau-liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.vs-gegner { display: grid; gap: 7px; align-content: start; padding: 10px 12px; border: 1px solid rgba(168, 50, 42, .45); border-left: 3px solid #a8322a; border-radius: 3px; background: linear-gradient(180deg, rgba(60, 16, 14, .45), rgba(8, 12, 18, .7)); }
+.vs-gegner.boss { border-color: rgba(240, 212, 136, .6); border-left-color: #f0d488; box-shadow: 0 0 18px rgba(240, 212, 136, .12); }
+.vs-gegner header { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.vs-gegner header b { font: 600 18px var(--schrift-titel); color: var(--pergament); }
+.vs-anzahl { font: 700 14px var(--schrift-ui); color: #e8a49c; }
+.vs-boss { margin-left: auto; padding: 1px 7px; border: 1px solid #f0d488; border-radius: 10px; font: 600 10px var(--schrift-ui); letter-spacing: .1em; text-transform: uppercase; color: #f0d488; }
+.vs-werte { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 400 13px/1.35 var(--schrift-ui); color: #cfd5dc; }
+.vs-zeichen { display: flex; flex-wrap: wrap; gap: 5px; }
+.vs-zeichen span { padding: 2px 8px; border-radius: 10px; font: 600 11px var(--schrift-ui); color: #f3d6d2; background: rgba(168, 50, 42, .35); border: 1px solid rgba(168, 50, 42, .6); }
+.vs-wissen { display: flex; gap: 8px; align-items: flex-start; margin: 0; padding: 7px 9px; border-radius: 3px; font: 400 14px/1.4 var(--schrift-text); color: #e3dccd; background: rgba(197, 162, 103, .1); border: 1px solid rgba(197, 162, 103, .35); }
+.vs-wissen b { color: var(--pergament); }
+.vs-verdeckt { margin: 0; font: italic 400 15px/1.4 var(--schrift-text); color: #aab3bd; }
+.vs-hinweis { margin: 8px 0 0; font: 400 14px/1.4 var(--schrift-text); color: #e3dccd; }
+.vs-hinweis::before { content: "✦ "; color: var(--altgold); }
+.held-faehig li.klassen-merkmal { border-color: var(--k); border-left: 3px solid var(--k); background: color-mix(in srgb, var(--k) 18%, rgba(8, 12, 18, .8)); }
+.held-faehig li.klassen-merkmal .typ { color: var(--pergament); }
+.faehig li.klassen-merkmal { border-color: var(--k); border-left: 3px solid var(--k); background: color-mix(in srgb, var(--k) 18%, var(--panel)); }

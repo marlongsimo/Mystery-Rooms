@@ -206,6 +206,22 @@
       <b>${esc(F.FIGUREN[fid].name)}</b><span class="auf-werte">❤ ${h.tp[0]} → <b>${h.tp[1]}</b> Trefferpunkte${h.plaetze ? ` · Zauberplätze ${pl(h.plaetze[0])} → <b>${pl(h.plaetze[1])}</b>` : ""}</span>
       ${h.neu.length ? `<ul>${h.neu.map((n) => `<li><b>Neu: ${esc(n.name)}</b> – ${esc(n.text)}</li>`).join("")}</ul>` : `<p class="note">Keine neue Fähigkeit, aber manche werden stärker.</p>`}</div></div>`).join("")}</div></section>`;
   }
+  /** Gegnervorschau vor dem Kampf: sichtbare Werte grob, Schwächen nur, wenn eine passende Klasse sie erkennt */
+  function vorschauHtml(v) {
+    const vs = v.vorschau; if (!vs || !vs.arten.length) return "";
+    const leben = (tp) => (tp < 12 ? "schwach" : tp < 25 ? "kräftig" : tp < 50 ? "zäh" : "gewaltig");
+    const panzer = (rk) => (rk <= 10 ? "kaum gepanzert" : rk <= 13 ? "leicht gepanzert" : rk <= 15 ? "gepanzert" : "schwer gepanzert");
+    const hinweise = [vs.ueberraschung && "Ihr habt den Vorteil der Überraschung: Die Gegner setzen die erste Runde aus.", vs.anfuehrer && "Einer von ihnen wirkt zäher als die anderen.", vs.siegel && "Vier Siegelsteine stehen im Raum. Wer neben einem steht, kann ihn berühren."].filter(Boolean);
+    return `<section class="vorschau" aria-label="Gegner"><h3>Was euch erwartet</h3>
+      <div class="vorschau-liste">${vs.arten.map((a) => `<article class="vs-gegner${a.boss ? " boss" : ""}">
+        <header><b>${esc(a.name)}</b>${a.anzahl > 1 ? `<span class="vs-anzahl">×${a.anzahl}</span>` : ""}${a.boss ? `<span class="vs-boss">Endgegner</span>` : ""}</header>
+        <div class="vs-werte"><span title="Trefferpunkte">❤ ${leben(a.tp)}</span><span title="Rüstung">⛨ ${panzer(a.rk)}</span><span title="Bewegung">➜ ${a.bewegung ? a.bewegung + " Felder" : "steht still"}</span>${a.angriff ? `<span title="Angriff">⚔ ${esc(a.angriff.name)} ${esc(a.angriff.schaden)}${a.angriff.reichweite > 1 ? ` · ${a.angriff.reichweite} Felder` : ""}</span>` : ""}</div>
+        ${a.zeichen.length ? `<div class="vs-zeichen">${a.zeichen.map((z) => `<span>${esc(z)}</span>`).join("")}</div>` : ""}
+        ${a.wissen ? `<p class="vs-wissen">${B.marke(a.wissen.wer, 24)}<span><b>${esc(a.wissen.name)} erkennt:</b> ${esc(a.wissen.text)}</span></p>`
+          : a.verdeckt ? `<p class="vs-verdeckt">Schwäche unbekannt. ${esc(a.kenner.join(" oder "))} wüsste mehr.</p>` : ""}
+      </article>`).join("")}</div>
+      ${hinweise.map((h) => `<p class="vs-hinweis">${esc(h)}</p>`).join("")}</section>`;
+  }
   function interaktion(v, s) {
     if (v.beute) return beuteHtml(v);
     if (A.zwischenprobe || (s.art === "probe")) return probeHtml(v);
@@ -234,7 +250,7 @@
       if (!live()) return `${gleich ? `<p><b>${esc(q.frage)}</b></p>` : ""}${S.lebende(A).map((fid) => `${gleich ? "" : `<p class="geheim-frage"><b>${esc(F.FIGUREN[fid].name)}:</b> ${esc(pf(fid).frage)}</p>`}<div class="opt-zeile">${B.marke(fid, 28)} <span>${esc(F.FIGUREN[fid].name)}</span>${pf(fid).antworten.map((a) => `<button class="btn ${A.geheim[fid] === a.id ? "" : "ghost"} klein" data-geheim="${fid}:${a.id}">${esc(a.text)}</button>`).join("")}</div>`).join("")}<div class="knoepfe"><button class="btn" id="sz-weiter" ${S.alleGeheim(A) ? "" : "disabled"}>Weiter</button></div>`;
       return `<p><b>${esc(gleich ? q.frage : "Jede Person hört etwas anderes.")}</b></p><p class="note">Jede Person entscheidet auf ihrem Handy: <b>${q.fertig.length} von ${S.lebende(A).length}</b>. Niemand sieht, wie die anderen entschieden haben.</p>`;
     }
-    if (s.art === "kampf") return `<div class="knoepfe"><button class="btn" id="sz-kampf">Zum Kampf</button></div>`;
+    if (s.art === "kampf") return `${vorschauHtml(v)}<div class="knoepfe"><button class="btn" id="sz-kampf">Zum Kampf</button></div>`;
     if (s.art === "ende") return `<p class="note">Dieses Ende steht jetzt in eurer Chronik${A.merker.splitter ? ", zusammen mit dem Splitter von Grauwacht" : ""}. Ihr findet sie auf der Startseite.</p><div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
     return "";
   }

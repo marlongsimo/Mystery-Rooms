@@ -967,7 +967,18 @@
     { id: "e_falle", punkte: [2, 3] }, { id: "e_zweite_glocke", punkte: [1, 2, 3] }, { id: "e_schrein", punkte: [2, 3] }, { id: "e_holzpferd", punkte: [1, 2] },
     { id: "e_wand", punkte: [2, 3], wenn: (A) => !A.merker.abt_name }, { id: "e_bote", punkte: [1] },
   ].map((e) => Object.assign(e, { wenn: e.wenn || SZENEN[e.id].wenn }));
-  const API = { EREIGNISSE, START: "prolog", NIEDERLAGE: "grauwacht_behaelt", SZENEN, KARTEN };
+  /* Gegnervorschau: Wissen über Gegner, das nur bestimmte Klassen vor dem Kampf erkennen (Entwurf) */
+  const WISSEN = {
+    rostkaefer: { klassen: ["waldlaeufer", "zauberer"], text: "Frisst Metall: Jeder Biss lässt eine Metallrüstung rosten (−1 RK, höchstens −2). Leder und Stoff sind sicher." },
+    schattenkobold: { klassen: ["waldlaeufer", "schurke"], text: "Feige: Unter 3 Trefferpunkten flieht er. Wer ihn dabei im Blick hat, bekommt einen letzten Schuss." },
+    knochenwaechter: { klassen: ["kleriker", "zauberer"], text: "Knochen brechen unter Wucht: Streitkolben, Hämmer und Schildstöße machen anderthalbfachen Schaden." },
+    pilzbrut: { klassen: ["waldlaeufer", "zauberer"], text: "Kaum gepanzert. Wer am Zugende direkt daneben steht, atmet Sporen ein (KON-Rettung SG 12, sonst 1W8 und vergiftet): aus der Ferne angreifen." },
+    netzweber: { klassen: ["waldlaeufer"], text: "Ein Tier: Wolfszahn trifft ihn härter. Sein Netz spuckt er nur einmal, auf jemanden, der nicht direkt neben ihm steht." },
+    aschehund: { klassen: ["waldlaeufer"], text: "Ein Tier: Wolfszahn trifft ihn härter. Alle drei Runden speit er Glut in einem Kegel von 3 Feldern (3W6, GES-Rettung halbiert): nicht hintereinander stehen." },
+    grabritter: { klassen: ["kleriker", "zauberer"], text: "Untot: Strahlende Aura und Untote vertreiben wirken. Seine Rüstung ist schwer, Rettungswürfe treffen ihn leichter als Waffen." },
+    abt: { klassen: ["zauberer", "kleriker"], text: "Jeder berührte Siegelstein kostet ihn 2 RK und 2W6 Trefferpunkte. Sind alle vier berührt, ruft er keine Toten mehr. Ab halber Kraft wird er gefährlicher." },
+  };
+  const API = { EREIGNISSE, WISSEN, START: "prolog", NIEDERLAGE: "grauwacht_behaelt", SZENEN, KARTEN };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABD = API;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -95,6 +95,7 @@
     if (s.art === "probe") A.probe = { wer: s.probe.wer === "gruppe" ? "gruppe" : null, wuerfe: {} };
     if (s.art === "gespraech") A.gewaehlt[id] = A.gewaehlt[id] || [];
     if (s.art === "raetsel") A.raetsel = { folge: [] };
+    if (s.art === "kampf") anfuehrerFestlegen(A, typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf);
   }
   /** Optionen, die gerade sichtbar sind */
   function optionen(A) {
@@ -352,12 +353,39 @@
   function beuteLassen(A) { if (!A.beute) return { fehler: "Keine Beute." }; notiz(A, "Ihr lasst die Beute liegen."); A.beute = null; return { ok: true }; }
 
   /* ---------- Kampf ---------- */
+  /** Anführer je Kampfszene einmal festlegen (beim Betreten, damit die Vorschau ihn schon kennt) */
+  function anfuehrerFestlegen(A, k) {
+    if (k.gegner || k.boss) return false;
+    const key = "anfuehrer_" + A.szene; if (A.merker[key] == null) A.merker[key] = A.r() < 0.33;
+    return A.merker[key];
+  }
+  /** Gegnervorschau vor dem Kampf: ohne Nebenwirkungen, Schwächen nur mit der passenden Klasse */
+  function gegnerVorschau(A) {
+    const s = szene(A); if (s.art !== "kampf") return null;
+    const k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
+    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit }, k, { mischen: false, anfuehrer: false });
+    if (A.kampfMod) o.skalaMal = (o.skalaMal || 1) * A.kampfMod;
+    const st = R.neuesSpiel(1, o), arten = [], W = DATEN().WISSEN || {};
+    for (const g of R.gegnerFiguren(st)) {
+      let a = arten.find((x) => x.art === g.art);
+      if (!a) {
+        const d = R.GEGNER[g.art], w = W[g.art], wer = w && w.klassen.map((kl) => klasse(A, kl)).find(Boolean);
+        a = { art: g.art, name: g.name.replace(/\s+\d+$/, ""), anzahl: 0, tp: 0, rk: g.rk, bewegung: d.bewegung != null ? d.bewegung : 6, boss: Boolean(d.boss),
+          angriff: d.angriff ? { name: d.angriff.name, schaden: d.angriff.schaden, reichweite: d.angriff.reichweite || 1 } : null,
+          zeichen: [d.untot && "Untot", d.boss && "Ruft Tote herbei", d.sporen && "Sporen", d.netz && "Netz", d.atem && !d.boss && "Glutatem", d.bewegung === 0 && "Bewegt sich nicht"].filter(Boolean),
+          wissen: wer ? { wer, name: name(A, wer), text: w.text } : null, verdeckt: Boolean(w && !wer), kenner: w ? w.klassen.map((kl) => F.KLASSEN[kl].name) : [] };
+        arten.push(a);
+      }
+      a.anzahl++; a.tp = Math.max(a.tp, g.tpMax);
+    }
+    return { arten, anfuehrer: A.merker["anfuehrer_" + A.szene] === true, ueberraschung: Boolean(o.ueberraschung), siegel: Boolean(k.boss) };
+  }
   function kampfOptionen(A) {
     const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
     const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: A.stufe });
     const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher }, k);
     // Abwechslung: gemischte Startplätze, in etwa jedem dritten Kampf ein Anführer (nicht im Duell und nicht beim Endgegner)
-    if (!o.gegner && !o.boss) { o.mischen = true; const key = "anfuehrer_" + A.szene; if (A.merker[key] == null) A.merker[key] = A.r() < 0.33; o.anfuehrer = A.merker[key]; }
+    if (!o.gegner && !o.boss) { o.mischen = true; o.anfuehrer = anfuehrerFestlegen(A, k); }
     if (A.kampfMod) { o.skalaMal = (o.skalaMal || 1) * A.kampfMod; }
     return o;
   }
@@ -412,6 +440,7 @@
       beute: A.beute ? { dinge: A.beute.dinge.map((id) => Object.assign({ id }, R.GEGENSTAENDE[id])), max: MAX_GETRAGEN,
         helden: Object.fromEntries(lebende(A).map((f) => [f, { getragen: getragen(A, f), darf: Object.fromEntries(A.beute.dinge.map((id) => [id, darfTragen(A, f, id)])) }])) } : null,
       aufstieg: A.aufstieg || null,
+      vorschau: s.art === "kampf" ? gegnerVorschau(A) : null,
       zust: A.zust, gruppe: A.gruppe, gefallen: A.gefallen, protokoll: A.protokoll.slice(-6),
     };
   }
@@ -419,7 +448,7 @@
   function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
 
   const API = { wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
-    kampfOptionen, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
+    kampfOptionen, gegnerVorschau, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -106,7 +106,7 @@
         ${knopf}
         <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="werte">Attribute</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>
         <div class="held-tafel" data-tafel="faehig">
-          <ul class="held-faehig">${eigene.map(fae).join("")}${kl.map(fae).join("")}</ul>
+          <ul class="held-faehig">${k.merkmal ? (([n, ...t]) => `<li class="klassen-merkmal"><b>${esc(n)}</b><span class="typ">Klassenmerkmal · immer</span><p>${esc(t.join(": "))}</p></li>`)(k.merkmal.split(": ")) : ""}${eigene.map(fae).join("")}${kl.map(fae).join("")}</ul>
           <p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${a.ab})`).join(" · ")}</p>
         </div>
         <div class="held-tafel" data-tafel="werte" hidden><ul class="held-attr">${["STR", "GES", "KON", "INT", "WEI", "CHA"].map((a) => `<li class="${d.werte[a] >= 16 ? "haupt" : ""}"><span>${ATTR_NAME[a]}</span><b>${d.werte[a]}</b><em>${vorz(R.mod(d.werte[a]))}</em></li>`).join("")}</ul>

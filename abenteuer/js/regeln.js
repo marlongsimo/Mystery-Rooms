@@ -329,6 +329,13 @@
   }
   const trankZahl = (f) => { const t = (f.rucksack || []).find((d) => d.id === "heiltrank"); return t ? t.n : 0; };
   /** Wie oft eine Fähigkeit in diesem Kampf noch geht (Infinity = beliebig) */
+  /** Begrenzte Fähigkeit: wie oft insgesamt und wofür ({ n, je }) oder null */
+  function grenze(f, a) {
+    if (a.id === "raserei") return { n: 1, je: "Rast" };
+    if (!a.pro || a.id === "brandmal") return null;
+    const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange;
+    return { n: Array.isArray(v) ? v[(f.stufe || 1) - 1] : v, je: a.pro.kampf != null ? "Kampf" : a.pro.rast != null ? "Rast" : "lange Rast" };
+  }
   function rest(f, a) {
     const gen = (f.genutzt || {})[a.id] || 0;
     if (a.id === "raserei") return 1 - gen;
@@ -1427,7 +1434,7 @@
 
   const API = { GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
-    findeAktion, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
+    findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;
 })(typeof window !== "undefined" ? window : globalThis);

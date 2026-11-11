@@ -288,7 +288,7 @@
       for (const o of s.optionen || []) {
         const def = R.findeAktion({ fid, stufe, rucksack: fd.rucksack }, o.id); if (!def) continue;
         const a = def.a, gew = H.sel === o.id;
-        const zahl = a.art === "trank" && !a.gross ? ` (${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n})` : o.rest != null && o.rest !== Infinity ? ` · noch ${Math.max(0, o.rest)}` : "";
+        const zahl = a.art === "trank" && !a.gross ? ` (${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n})` : o.rest != null && o.rest !== Infinity ? ` · noch ${Math.max(0, o.rest)}${(() => { const gz = R.grenze({ stufe }, a); return gz ? ` von ${gz.n}` : ""; })()}` : "";
         h += `<button class="opt ${gew ? "gewaehlt" : ""} ${o.ok ? "" : "aus"}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}><b>${esc(a.name)}<span class="anzahl">${esc(zahl)}</span></b><small>${esc(aktionInfo(a, d, stufe))}</small>${!gew && a.text ? `<span class="opt-kurz">${esc(a.text)}</span>` : ""}${o.ok ? "" : `<i>${esc(o.grund === "Kein gültiges Ziel." ? (["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite.") : o.grund || "")}</i>`}</button>`;
         if (gew) {
           const selbst = SELBST.has(a.art);

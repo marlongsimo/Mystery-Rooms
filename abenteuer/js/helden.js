@@ -92,7 +92,7 @@
     const kl = F.KLASSE_FAEHIG[d.klasse].filter((a) => a.ab === 1);
     const balken = ACHSEN.map((n, i) => `<div class="achse"><span>${n}</span><i>${Array.from({ length: 5 }, (_, j) => `<b class="${j < pr.p[i] ? "an" : ""}"></b>`).join("")}</i></div>`).join("");
     const werte = ["STR", "GES", "KON", "INT", "WEI", "CHA"].map((a) => `<span class="${d.werte[a] >= 16 ? "haupt" : ""}"><small>${a}</small><b>${d.werte[a]}</b><em>${vorz(R.mod(d.werte[a]))}</em></span>`).join("");
-    const fae = (a) => `<li><b>${esc(a.name)}</b><span class="typ">${a.typ === "passiv" ? "immer" : a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion"}</span><p>${esc(a.text)}</p></li>`;
+    const fae = (a) => `<li><b>${esc(a.name)}</b><span class="typ">${a.typ === "passiv" ? "immer" : a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion"}${(() => { const gz = R.grenze({ stufe }, a); return gz ? ` · ${gz.n}× je ${gz.je}` : ""; })()}</span><p>${esc(a.text)}</p></li>`;
     return `<article class="held" style="--k:${k.farbe}">
       <div class="held-bild"><img src="${F.bild(fid)}" alt="${esc(d.name)}"><span class="held-klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span></div>
       <div class="held-text">

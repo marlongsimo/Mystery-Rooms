@@ -455,7 +455,7 @@
       try {
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
-      if (f.seite === "gegner" && unten) { o += `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
+      if (f.seite === "gegner" && unten) { o += B.gegnerBild(f.art) ? `<g transform="translate(${cx} ${cy}) scale(.8)" opacity=".45">${B.gegner(f.art, true)}</g>` : `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
       if (!unten) o += `<ellipse class="fig-schatten" cx="${cx}" cy="${cy + 22}" rx="24" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="27" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" stroke="${f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
       if (!unten && f.schild && f.schild.aktiv) o += `<circle class="schild-ring" cx="${cx}" cy="${cy}" r="33" fill="#8fd0ff" fill-opacity=".12" stroke="#8fd0ff" stroke-width="3" stroke-dasharray="5 3"><title>${esc(f.schild.text)}: fängt die Hälfte des Schadens ab</title></circle>`;
       if (f === akt && !st.ende) o += `<circle class="aktiv-ring" cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#C5A267" stroke-width="3.5"/><circle cx="${cx}" cy="${cy}" r="33" fill="none" stroke="#C5A267" stroke-opacity=".35" stroke-width="5"/>`;
@@ -468,7 +468,8 @@
       if (tipp && tipp.ziel === f.id && !wahl) o += `<circle class="tipp-ring" cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#f2d35a" stroke-width="3"/>`;
       if (f.seite === "gegner") {
         o += `<g transform="translate(${cx} ${cy})">${titel}${B.gegner(f.art)}</g>`;
-        o += `<g transform="translate(${cx + 17} ${cy - 17})"><circle r="10" fill="#1b1612" stroke="#d79a7d" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#f0d0c0">${esc((f.name.match(/\d+$/) || [""])[0])}</text></g>`;
+        const nr = (f.name.match(/\d+$/) || [""])[0];
+        if (nr) o += `<g transform="translate(${cx + 17} ${cy - 17})"><circle r="10" fill="#1b1612" stroke="#d79a7d" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#f0d0c0">${esc(nr)}</text></g>`;
       } else {
         if (f.art === "begleiter") {
           const visier = st.figuren.some((g) => g.seite === "gegner" && g.tp > 0 && g.visier === st.runde);

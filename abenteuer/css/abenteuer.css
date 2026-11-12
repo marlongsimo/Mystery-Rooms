@@ -1306,3 +1306,8 @@ html:has(body.handy) { background: #07080b; }
 .bogen.hz .log.kurz li { padding: 7px 0; font-size: 13px; color: #cfc6b4; border-bottom: 1px solid rgba(255,255,255,.06); }
 .bogen.hz .log.kurz li:last-child { border-bottom: 0; }
 .bogen.hz .log.kurz li:first-child { color: #fff; }
+.bk-bild { display: block; height: 150px; margin: -14px -14px 10px; background: #111 center 18%/cover; -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent); mask-image: linear-gradient(180deg, #000 60%, transparent); }
+.fx-intro-portraet { position: relative; z-index: 1; width: min(30vh, 260px); aspect-ratio: 3 / 4; margin: 0 auto 18px; border-radius: 18px; background: #111 center 15%/cover; box-shadow: 0 0 0 2px #d9b26a, 0 0 0 6px rgba(0,0,0,.6), 0 0 60px rgba(255,90,70,.45); transform: scale(.85); opacity: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1), opacity .6s; }
+.fx-intro.zeigen .fx-intro-portraet { transform: scale(1); opacity: 1; }
+.fx-intro:has(.fx-intro-portraet) { align-content: center; }
+.fx-intro-portraet + .fx-intro-text { margin-top: 0; }

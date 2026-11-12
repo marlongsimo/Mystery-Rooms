@@ -42,7 +42,15 @@
     eisenhirte: () => '<g><rect x="-20" y="-20" width="40" height="42" rx="6" fill="#5a5e66" stroke="#1c1e22" stroke-width="2.5"/><rect x="-12" y="-30" width="24" height="14" rx="3" fill="#6a6e76" stroke="#1c1e22" stroke-width="2"/><path d="M0 -10 L-6 0 L0 10 L6 0 Z" fill="#8fd0ff" stroke="#e8f6ff" stroke-width="1.5"/><circle cx="-5" cy="-23" r="2" fill="#8fd0ff"/><circle cx="5" cy="-23" r="2" fill="#8fd0ff"/></g>',
   };
   GEGNER.funkenhund = () => GEGNER.aschehund().replace('fill="#3a2a24"', 'fill="#4a2a1a"');
-  const gegner = (art) => (GEGNER[art] || kaefer)();
+  /** Gemalte Gegner-Porträts (img/gegner/<art>.jpg); ohne Bild bleibt das gezeichnete Symbol */
+  const BILDER = new Set("rostkaefer schattenkobold knochenwaechter pilzbrut netzweber aschehund grabritter abt irrlicht moorleiche schlammkroete alwine siegeljaeger jaegerschuetze wachkonstrukt jaegerhauptmann funkenhund fackelzehrer frostknecht eisgezeichneter glasschwaermer glasnest kaelterufer runenleser kettenbestie splitterbrutmutter eidwaechter frostmatrone eisenhirte koenig".split(" "));
+  const gegnerBild = (art) => (BILDER.has(art) ? `img/gegner/${art}.jpg` : null);
+  /** Gegner im SVG (Koordinaten -26…26): rundes Porträt mit rotem Rand, sonst Symbol */
+  const gegner = (art, grau) => {
+    const b = gegnerBild(art);
+    if (!b) return (GEGNER[art] || kaefer)();
+    return `<defs><clipPath id="gb-rund" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5"/></clipPath></defs><circle r="24.5" fill="#6a1a1a"/><image href="${b}" x="-22.5" y="-22.5" width="45" height="45" clip-path="url(#gb-rund)" preserveAspectRatio="xMidYMin slice"${grau ? ' style="filter:grayscale(1) brightness(.6)"' : ""}/>`;
+  };
   /** Begleiterin (Sera Venn): Mantel mit Kapuze, in den Händen der leuchtende Wachtfunke */
   const begleiter = (unten) => `<g${unten ? ' opacity=".55" transform="rotate(90)"' : ""}><circle r="25" fill="#e8c46a" fill-opacity=".14" stroke="#e8c46a" stroke-width="2.5"/><path d="M-14 20 Q-16 -2 -9 -12 Q0 -22 9 -12 Q16 -2 14 20 Z" fill="#3d4a5c" stroke="#141a22" stroke-width="2"/><circle cy="-8" r="6.5" fill="#e9d6bf" stroke="#141a22" stroke-width="1.5"/><path d="M-9 -10 Q0 -22 9 -10 Q6 -16 0 -17 Q-6 -16 -9 -10Z" fill="#2c3644"/><circle cy="7" r="5" fill="#fff4c8"/><circle cy="7" r="9" fill="#f2d35a" opacity=".35"/></g>`;
   /** Rundes Porträt im SVG (r = Radius). clipId muss eindeutig sein. */
@@ -51,5 +59,5 @@
   }
   /** Kleines Porträt als HTML (Lobby, Handy) */
   const marke = (fid, px = 40) => { const d = F().FIGUREN[fid], k = F().KLASSEN[d.klasse]; return `<img class="marke" src="${F().bild(fid)}" width="${px}" height="${px}" alt="" style="border-color:${k.farbe}">`; };
-  window.ABB = { begleiter, kaefer, gegner, portraet, marke };
+  window.ABB = { begleiter, kaefer, gegner, gegnerBild, portraet, marke };
 })();

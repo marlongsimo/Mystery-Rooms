@@ -1,6 +1,6 @@
 # Gegner-Porträts für Mythara (30 Bilder)
 
-Für Spielfiguren, Initiative-Leiste, Bosskarte und Gegner-Infos. Bis die Bilder da sind, bleiben die gezeichneten Symbole.
+Für Spielfiguren, Initiative-Leiste, Bosskarte und Gegner-Infos. **Stand: alle 30 Bilder eingebaut** (aus dem 6×5-Raster zugeschnitten). Ein Gegner ohne Bild zeigt weiter sein gezeichnetes Symbol.
 
 **Format für alle:** quadratisch, **1024 × 1024** (mind. 512 × 512), Brustbild oder Kopf und Schultern, Kopf in der oberen Bildhälfte mittig, gut erkennbare Silhouette.
 **Stil wie die Heldenporträts:** gemalte Dark-Fantasy-Illustration, filmisches Licht, gedeckte Farben, detailreich. Kein Text, kein Rahmen, kein Wasserzeichen.

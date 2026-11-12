@@ -234,7 +234,7 @@
   /** Bild einer Figur für Zielwahl und Initiative: Held als Porträt, Gegner als gezeichnetes Symbol */
   function bildVon(f) {
     if (!f) return `<span class="hz-bild"></span>`;
-    if (f.seite === "gegner") return `<span class="hz-bild feind"><svg viewBox="-26 -26 52 52">${B.gegner(f.art)}</svg></span>`;
+    if (f.seite === "gegner") return B.gegnerBild(f.art) ? `<span class="hz-bild feind" style="background-image:url('${B.gegnerBild(f.art)}');background-position:center 15%"></span>` : `<span class="hz-bild feind"><svg viewBox="-26 -26 52 52">${B.gegner(f.art)}</svg></span>`;
     if (f.art === "begleiter" && B.begleiter) return `<span class="hz-bild"><svg viewBox="-26 -26 52 52">${B.begleiter(false)}</svg></span>`;
     return f.fid ? `<span class="hz-bild" style="background-image:url('${F.bild(f.fid)}')"></span>` : `<span class="hz-bild"></span>`;
   }
@@ -291,7 +291,7 @@
     const we = app.querySelector(".wuerfel-erg");
     if (we && window.ABW) { const key = we.dataset.erg; window.ABW.rollen(we, +we.dataset.w, key.replace(/^[^:]+: /, ""), { titel: /verfehlt|widersteht/.test(key) ? "Daneben" : "Getroffen!", gut: !/verfehlt|widersteht/.test(key), sofort: H.letzterWurf === key }); H.letzterWurf = key; }
     app.querySelectorAll("[data-tab]").forEach((b) => { b.onclick = () => { H.tab = b.dataset.tab; render(); }; });
-    app.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { H.sel = H.sel === b.dataset.opt ? null : b.dataset.opt; H.ziel = null; H.fehler = ""; render(); const z = document.querySelector(".hz-ziele"); if (z && z.scrollIntoView) z.scrollIntoView({ block: "nearest", behavior: "smooth" }); }; });
+    app.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { H.sel = H.sel === b.dataset.opt ? null : b.dataset.opt; H.ziel = null; H.fehler = ""; render(); const z = document.querySelector(".hz-ziele"); if (z && z.scrollIntoView) z.scrollIntoView({ block: "nearest" }); }; });
     app.querySelectorAll("[data-ziel]").forEach((b) => { b.onclick = () => { H.ziel = b.dataset.ziel; render(); }; });
     const w = $("#wuerfeln"); if (w) w.onclick = () => senden({ typ: "aktion", aktion: H.sel, ziel: H.ziel || (fd && fd.id) });
     const e = $("#zugende"); if (e) e.onclick = () => senden({ typ: "ende" });

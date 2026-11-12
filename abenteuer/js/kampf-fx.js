@@ -92,10 +92,11 @@
   }
   function bossIntro(g) {
     const D = window.ABD_ALLE && window.ABD_ALLE[kampagne()], meta = D && D.META;
+    const eigen = window.ABB && window.ABB.gegnerBild && window.ABB.gegnerBild(g.art);
     const bild = meta && meta.abschnittBilder ? meta.abschnittBilder[3] || meta.abschnittBilder[2] || meta.bild : meta && meta.bild;
     let d = $("#fx-intro"); if (!d) { d = document.createElement("div"); d.id = "fx-intro"; document.body.appendChild(d); }
     d.className = "fx-intro"; const dd = (window.AB && window.AB.R && window.AB.R.GEGNER[g.art]) || {};
-    d.innerHTML = `<div class="fx-intro-bild" style="${bild ? `background-image:url('${bild}')` : ""}"></div><div class="fx-intro-text"><small>${dd.boss || dd.phasen ? "ENDGEGNER" : "ANFÜHRER"}</small><h1>${esc(g.name.replace(/ \d+$/, ""))}</h1></div>`;
+    d.innerHTML = `<div class="fx-intro-bild" style="${bild ? `background-image:url('${bild}')` : ""}"></div>${eigen ? `<div class="fx-intro-portraet" style="background-image:url('${eigen}')"></div>` : ""}<div class="fx-intro-text"><small>${dd.boss || dd.phasen ? "ENDGEGNER" : "ANFÜHRER"}</small><h1>${esc(g.name.replace(/ \d+$/, ""))}</h1></div>`;
     void d.offsetWidth; d.classList.add("zeigen"); d.onclick = () => d.classList.remove("zeigen");
     setTimeout(() => d.classList.remove("zeigen"), 3600);
   }
@@ -123,7 +124,8 @@
     if (!g) { el.hidden = true; el.innerHTML = ""; return; }
     const d = R.GEGNER[g.art] || {}, p = Math.max(0, g.tp) / g.tpMax * 100, ph = d.phasen ? d.phasen.length + 1 : 0, s = g.schild;
     el.hidden = false;
-    el.innerHTML = `<small>${d.boss || d.phasen ? "ENDGEGNER" : "ANFÜHRER"}</small><b>${esc(g.name.replace(/ \d+$/, ""))}</b>
+    const B = window.ABB;
+    el.innerHTML = `${B && B.gegnerBild(g.art) ? `<span class="bk-bild" style="background-image:url('${B.gegnerBild(g.art)}')"></span>` : ""}<small>${d.boss || d.phasen ? "ENDGEGNER" : "ANFÜHRER"}</small><b>${esc(g.name.replace(/ \d+$/, ""))}</b>
       <div class="gk-leben boss"><i class="wert" style="width:${p}%"></i><span>${g.tp} / ${g.tpMax}</span></div>
       ${s ? `<div class="bk-schild ${s.aktiv ? "" : "aus"}"><span>${esc(s.text)}</span><i style="width:${s.aktiv ? Math.max(0, s.rest) / s.halt * 100 : 0}%"></i></div>` : ""}
       ${ph ? `<div class="bk-phasen">${Array.from({ length: ph }, (_, i) => `<span class="${i <= (g.phase || 0) ? "an" : ""}">${["I", "II", "III", "IV"][i]}</span>`).join("")}</div>` : ""}`;

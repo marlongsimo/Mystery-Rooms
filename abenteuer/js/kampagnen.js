@@ -231,6 +231,17 @@
   /** Leere Kampagne beginnen: das Abenteuer startet und wird in dieser Kampagne gespeichert */
   const neuesAbenteuer = () => { const b = $("#titel-start"); if (b) b.click(); };
   function beginnen(c) { K = { id: c.id, version: 0, status: c.status, titel: c.title }; merkeK(); $("#qr-overlay").hidden = true; neuesAbenteuer(); }
+  /** Wer hat zuletzt welchen Helden gespielt? Aus dem Spielstand, ergänzt um die Figuren der Kampagnen-Mitglieder */
+  function fruehereHelden(d) {
+    const s = d.state || {}, m = Object.assign({}, s.frueher || {}, s.besitz || {}), gruppe = (s.setup && s.setup.gruppe) || [];
+    const vergeben = new Set(Object.values(m));
+    for (const x of d.members || []) {
+      const fid = x.character_id;
+      if (x.role !== "spieler" || x.member_status === "ausgetreten" || !fid || !gruppe.includes(fid) || m[fid] || vergeben.has(x.user_id)) continue;
+      m[fid] = x.user_id; vergeben.add(x.user_id);
+    }
+    return m;
+  }
   /** Kampagne fortsetzen: neuesten Stand laden, Sitzung starten, ggf. neue Live-Runde mit Code */
   async function fortsetzen(id, mitHandys) {
     const d = await rpc("rpg_load_campaign", { p_campaign_id: id });
@@ -244,8 +255,10 @@
     await sitzungStarten();
     $("#qr-overlay").hidden = true;
     window.AB.spielstandUebernehmen(Object.assign({}, d.state, { besitz: {} }));
+    // Wiedereinstieg: Wer zurückkommt, bekommt seinen Helden automatisch zurück
+    if (mitHandys) window.AB.frueherSetzen(fruehereHelden(d));
     zeigeStatus("ok");
-    if (mitHandys) { window.AB.qrZeigen(); toast("Kampagne fortgesetzt. Die Handys treten mit dem neuen Code bei und wählen ihre Figur."); }
+    if (mitHandys) { window.AB.qrZeigen(); toast("Kampagne fortgesetzt. Die Handys treten mit dem neuen Code bei – wer schon dabei war, bekommt seinen Helden automatisch zurück."); }
     else toast("Kampagne fortgesetzt.");
   }
 

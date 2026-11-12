@@ -32,14 +32,14 @@
   const setupMerken = () => { try { localStorage.setItem(SETUP_KEY, JSON.stringify(SETUP)); } catch (e) { /* privat */ } };
 
   /* ---------- Live-Zustand ---------- */
-  const LIVE = { client: null, phase: null, besitz: {}, erledigt: {}, antwort: null, schreibt: false, nochmal: false, sperre: null };
+  const LIVE = { client: null, phase: null, besitz: {}, frueher: {}, erledigt: {}, antwort: null, schreibt: false, nochmal: false, sperre: null };
   const liveAn = () => Boolean(LIVE.client && LIVE.client.session);
   const spielerName = (uid) => (LIVE.client && LIVE.client.playerName(uid)) || "Handy";
   const besitzerVon = (f) => (liveAn() && f && f.fid ? LIVE.besitz[f.fid] : null);
 
   function speichern() {
     if (!liveAn()) return;
-    try { localStorage.setItem(SPEICHER, JSON.stringify({ phase: LIVE.phase, besitz: LIVE.besitz, erledigt: LIVE.erledigt, setup: SETUP, st: st ? R.speichern(st) : null, abenteuer: window.ABT ? window.ABT.speichern() : null, imAbenteuer: Boolean(kampfEnde) })); } catch (e) { /* privat */ }
+    try { localStorage.setItem(SPEICHER, JSON.stringify({ phase: LIVE.phase, besitz: LIVE.besitz, frueher: LIVE.frueher, erledigt: LIVE.erledigt, setup: SETUP, st: st ? R.speichern(st) : null, abenteuer: window.ABT ? window.ABT.speichern() : null, imAbenteuer: Boolean(kampfEnde) })); } catch (e) { /* privat */ }
   }
   function vergessen() { try { localStorage.removeItem(SPEICHER); } catch (e) { /* privat */ } }
   /** Allein am Tisch: laufenden Kampf im Abenteuer merken, damit Neuladen nichts kostet */
@@ -51,6 +51,7 @@
     if (window.KAMPAGNE) window.KAMPAGNE.geaendert();
     if (!liveAn()) { soloMerken(); return; }
     if (!LIVE.client.session.is_host) return;
+    if (LIVE.phase === "szene" || LIVE.phase === "kampf") Object.assign(LIVE.frueher, LIVE.besitz); // für den Wiedereinstieg merken
     speichern();
     if (LIVE.schreibt) { LIVE.nochmal = true; return; }
     LIVE.schreibt = true; LIVE.nochmal = false;
@@ -78,7 +79,7 @@
       if (fid && !laeuft && !Object.values(LIVE.besitz).includes(uid) && Object.keys(LIVE.besitz).length >= 6) { veroeffentlichen(); return; }
       if (laeuft && !fid) { veroeffentlichen(); return; } // im laufenden Abenteuer behält man seine Figur
       for (const f of Object.keys(LIVE.besitz)) if (LIVE.besitz[f] === uid) delete LIVE.besitz[f];
-      if (fid) LIVE.besitz[fid] = uid;
+      if (fid) { LIVE.besitz[fid] = uid; if (laeuft) LIVE.frueher[fid] = uid; }
       if (!laeuft) gruppeAusHandys();
       zeichneSetup(); if (st) render(); veroeffentlichen();
       return;
@@ -98,6 +99,21 @@
     antwort("Unbekannter Wunsch."); veroeffentlichen();
   }
 
+  /** Wiedereinstieg: Wer im laufenden Abenteuer zurückkommt (Verbindung weg, neu geladen, Pause, neuer Tisch),
+   *  bekommt automatisch seinen Helden zurück – sofern ihn inzwischen niemand anderes übernommen hat. */
+  function zurueckgeben() {
+    if (!liveAn() || !(LIVE.phase === "szene" || LIVE.phase === "kampf")) return false;
+    const da = new Set(LIVE.client.players.filter((p) => !p.is_host).map((p) => p.user_id)), hat = new Set(Object.values(LIVE.besitz)); let n = 0;
+    for (const fid of SETUP.gruppe) {
+      const uid = LIVE.frueher[fid];
+      if (!uid || LIVE.besitz[fid] || !da.has(uid) || hat.has(uid)) continue;
+      LIVE.besitz[fid] = uid; hat.add(uid); n++;
+      toast(`${spielerName(uid)} ist zurück und spielt wieder ${F.FIGUREN[fid] ? F.FIGUREN[fid].name : fid}.`);
+    }
+    return n > 0;
+  }
+  /** Frühere Zuordnung (Held → Spieler) übernehmen, z. B. aus dem Kampagnenstand oder den Kampagnen-Mitgliedern */
+  function frueherSetzen(m) { LIVE.frueher = Object.assign({}, m || {}); if (zurueckgeben()) { zeichneSetup(); if (st) render(); veroeffentlichen(); } }
   /** Mit Handys spielen nur die Figuren, die jemand auf dem Handy gewählt hat */
   function gruppeAusHandys() {
     const alt = SETUP.gruppe.filter((f) => LIVE.besitz[f]);
@@ -112,6 +128,7 @@
       const da = new Set(c.players.map((p) => p.user_id)); let geaendert = false;
       for (const f of Object.keys(LIVE.besitz)) if (!da.has(LIVE.besitz[f])) { delete LIVE.besitz[f]; geaendert = true; }
       if (LIVE.phase === "lobby") gruppeAusHandys(); // nur bei der Heldenwahl: im laufenden Abenteuer bleibt die Gruppe fest
+      else zurueckgeben();
       zeichneSetup(); if (st) render();
       veroeffentlichen();
       if (geaendert && LIVE.phase === "kampf") toast("Ein Handy hat die Sitzung verlassen. Bis jemand die Figur übernimmt, steuert sie der Tisch.");
@@ -127,7 +144,7 @@
       const c = liveClient();
       try { await c.create("Spieltisch"); }
       catch (e) { if (/Gruppengröße|max/i.test(e.message || "")) { c.maxPlayers = 4; await c.create("Spieltisch"); } else throw e; }
-      LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null; SETUP.gruppe = [];
+      LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.frueher = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null; SETUP.gruppe = [];
       wach();
       // Mit Kampagnen: zuerst einladen (Freunde, Gäste-Code, Tisch-Gerät), dann Heldenwahl
       if (window.KAMPAGNE && window.KAMPAGNE.einladen) { veroeffentlichen(); await window.KAMPAGNE.einladen(); }
@@ -254,7 +271,7 @@
   /** Gesamter Spielstand eines laufenden Abenteuers (allein oder live), oder null */
   function spielstand() {
     if (!window.ABT || !window.ABT.laeuft()) return null;
-    return { live: liveAn(), phase: liveAn() ? LIVE.phase : (st && kampfEnde ? "kampf" : "szene"), besitz: liveAn() ? LIVE.besitz : {}, setup: SETUP,
+    return { live: liveAn(), phase: liveAn() ? LIVE.phase : (st && kampfEnde ? "kampf" : "szene"), besitz: liveAn() ? LIVE.besitz : {}, frueher: liveAn() ? Object.assign({}, LIVE.frueher, LIVE.besitz) : {}, setup: SETUP,
       st: st && kampfEnde ? R.speichern(st) : null, abenteuer: window.ABT.speichern(), imAbenteuer: Boolean(st && kampfEnde) };
   }
   /** Gespeicherten Stand übernehmen: Abenteuer und ggf. laufenden Kampf (eine Live-Verbindung bleibt, wie sie ist) */
@@ -290,7 +307,7 @@
   /** Neues Tisch-Gerät einer noch nicht begonnenen Kampagne: Heldenwahl mit Handys */
   function lobbyFuerKampagne(schwierigkeit) {
     SETUP.schwierigkeit = schwierigkeit === "hardcore" ? "hardcore" : "normal"; SETUP.gruppe = [];
-    LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.erledigt = {}; st = null; window.AB.st = null; kampfEnde = null;
+    LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.frueher = {}; LIVE.erledigt = {}; st = null; window.AB.st = null; kampfEnde = null;
     zeigeSetup(); veroeffentlichen();
   }
   /** Alles Laufende auf diesem Gerät beenden (nach Pause, Löschen, Neu beginnen) */
@@ -638,7 +655,7 @@
     try {
       const c = liveClient(), s = await c.restore();
       if (!s || s.closed || !s.is_host) { vergessen(); allein(); return; }
-      LIVE.phase = gespeichert.phase; LIVE.besitz = gespeichert.besitz || {}; LIVE.erledigt = gespeichert.erledigt || {};
+      LIVE.phase = gespeichert.phase; LIVE.besitz = gespeichert.besitz || {}; LIVE.frueher = gespeichert.frueher || {}; LIVE.erledigt = gespeichert.erledigt || {};
       if (gespeichert.setup) SETUP = gespeichert.setup;
       wach();
       if (gespeichert.abenteuer && window.ABT) window.ABT.laden(gespeichert.abenteuer);
@@ -668,8 +685,8 @@
   }
 
   // Für automatische Tests
-  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, liveClient, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
+  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, liveClient, frueherSetzen, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
     liveAn, besitzVon: (fid) => (liveAn() ? LIVE.besitz[fid] : null), spielerName,
-    besitzTauschen(alt, neu) { const i = SETUP.gruppe.indexOf(alt); if (i >= 0) SETUP.gruppe[i] = neu; if (LIVE.besitz[alt]) { LIVE.besitz[neu] = LIVE.besitz[alt]; delete LIVE.besitz[alt]; } setupMerken(); },
+    besitzTauschen(alt, neu) { const i = SETUP.gruppe.indexOf(alt); if (i >= 0) SETUP.gruppe[i] = neu; if (LIVE.besitz[alt]) { LIVE.besitz[neu] = LIVE.besitz[alt]; delete LIVE.besitz[alt]; } if (LIVE.frueher[alt]) { LIVE.frueher[neu] = LIVE.frueher[alt]; delete LIVE.frueher[alt]; } setupMerken(); },
     auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };
 })();

@@ -11,76 +11,78 @@
   const seraTP = (A, akt) => { const gross = A.gruppe.filter((f) => !A.zust[f].tot).length >= 5; return { 1: gross ? 18 : 14, 2: gross ? 28 : 22, 3: gross ? 40 : 30 }[akt]; };
 
   /* ---------- Karten (12 × 9) ---------- */
-  // Der Pass: ein schmaler Weg zwischen Felsen, links der Einstieg, rechts der Ausgang; oben und unten Felsnischen für den Hinterhalt
+  // Hindernisse nach den gemalten Bildern ausgerichtet (Raster 12 × 9, siehe BILDER-HOCHWACHT.md)
+  // Der Pass: ein Weg zwischen Felsen, links der Einstieg, rechts der Ausgang; oben zwei Felsnischen, unten eine Mulde für den Hinterhalt
   const PASS = {
-    name: "Der Pass", b: 12, h: 9, boden: "stein", bild: null,
+    name: "Der Pass", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/pass.webp",
     hindernisse: ausText([
       "MMMMMMMMMMMM",
-      "MM...MMM...M",
-      "M.......K..M",
+      "MMM..MMM.MMM",
+      "MMM..MMK.K.M",
+      "...........M",
       "............",
-      "............",
-      "....K.......",
-      "M..........M",
-      "MM...MMM...M",
+      ".KK.....K..M",
+      "M....M..MMMM",
+      "MMMM.MMMMMMM",
       "MMMMMMMMMMMM",
     ]),
-    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[0, 3], [0, 5], [2, 2], [2, 6]], begleiter: [0, 4],
-      gegner: [[9, 1], [9, 7], [10, 1], [10, 7], [8, 1], [8, 7], [11, 3], [11, 5], [10, 2], [10, 6], [9, 3], [9, 5]],
+    start: { spieler: [[1, 4], [1, 3], [2, 4], [2, 3], [3, 4], [3, 3]], wolf: [[0, 3], [0, 5], [3, 2], [2, 6]], begleiter: [0, 4],
+      gegner: [[8, 1], [10, 2], [10, 3], [10, 5], [9, 3], [9, 5], [11, 4], [10, 4], [7, 6], [9, 4], [6, 6], [8, 3]],
       // Jäger: zuerst am Ausgang, ab dem zweiten auch aus den Felsnischen hinter der Gruppe
-      jaeger: [[10, 4], [4, 1], [4, 7], [11, 4], [3, 1], [3, 7]] },
+      jaeger: [[10, 4], [4, 1], [4, 7], [11, 4], [3, 1], [4, 6]] },
     route: [[3, 4], [6, 4], [9, 4], [11, 4]],
   };
-  // Das Jägerlager (Rettung): eine Senke mit Zelten und Feuer, Sera gefesselt am Feuer; die Helden kommen von links
+  // Das Jägerlager (Rettung): eine Senke mit Zelten und Feuer, Sera gefesselt am Banner neben dem Feuer; die Helden kommen von links
   const LAGER = {
-    name: "Das Jägerlager", b: 12, h: 9, boden: "stein", bild: null,
+    name: "Das Jägerlager", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/lager.webp",
     hindernisse: ausText([
       "MMMMMMMMMMMM",
-      "M....TT....M",
-      "M..K....K..M",
-      "............",
-      "......MKM...",
-      "............",
-      "M..K....K..M",
-      "M....TT....M",
+      "MMMKMMMMKMMM",
+      "M..KKKM..K.M",
+      "MK.........M",
+      "MKK.....M.KM",
+      ".........KKM",
+      "M..KMMM.KMMM",
+      "M..KMMM.KMMM",
       "MMMMMMMMMMMM",
     ]),
-    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[0, 3], [0, 5], [2, 2], [2, 6]], begleiter: [10, 4],
-      gegner: [[9, 3], [9, 5], [11, 3], [11, 5], [9, 2], [9, 6], [10, 2], [10, 6], [7, 3], [7, 5], [6, 2], [6, 6]] },
+    start: { spieler: [[1, 5], [0, 5], [1, 6], [2, 6], [1, 2], [2, 2]], wolf: [[3, 4], [3, 3], [3, 5], [2, 3]], begleiter: [9, 4],
+      gegner: [[7, 3], [7, 4], [7, 5], [9, 3], [10, 3], [8, 5], [6, 3], [8, 3], [10, 2], [5, 4], [7, 2], [6, 5]] },
   };
   /* ----- Akt II ----- */
-  const sp = [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wo = [[3, 4], [3, 3], [3, 5], [2, 2]];
-  // Das Haupttor der Ruine: eine Mauer mit Durchgang in der Mitte, dahinter die Wächter aus Stein
-  const TOR = { name: "Das Haupttor", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M.....M....M", "M..K..M....M", "M..........M", "...........M", "M..........M", "M..K..M....M", "M.....M....M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: wo, gegner: [[9, 4], [8, 3], [8, 5], [10, 2], [10, 6], [9, 2], [9, 6], [10, 4]] } };
-  // Der Archivgang: drei Gänge zwischen eingestürzten Regalwänden
-  const ARCHIV = { name: "Der Archivgang", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M..K..K..K.M", "M..........M", "MM.MMM.MMM.M", "M...........", "M.MMM.MMM.MM", "M..........M", "M.K..K..K..M", "MMMMMMMMMMMM"]),
-    start: { spieler: [[1, 4], [1, 2], [1, 6], [2, 4], [2, 2], [2, 6]], wolf: [[3, 4], [3, 2], [3, 6], [2, 1]], gegner: [[10, 4], [11, 4], [10, 2], [10, 6], [10, 1], [10, 7], [8, 2], [8, 6], [9, 4], [7, 4]] } };
-  // Der Innenhof: das Signalgerät in der Mitte, Zugänge im Norden und Süden, Mauerreste als Deckung; die Gruppe kommt von Westen
-  const HOF = { name: "Der Innenhof", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMM..MMMMM", "M..........M", "M..K....K..M", "M..........M", "...........M", "M..........M", "M..K....K..M", "M..........M", "MMMMM..MMMMM"]),
-    start: { spieler: sp, wolf: wo, begleiter: [0, 4],
-      gegner: [[5, 1], [6, 1], [5, 7], [6, 7], [4, 1], [7, 1], [4, 7], [7, 7], [9, 1], [9, 7], [10, 3], [10, 5]],
-      jaeger: [[5, 0], [6, 8], [6, 0], [5, 8], [7, 1], [4, 7]] },
-    route: [[3, 4], [6, 4]] };
-  // Der Felsgrat: der Jägerhauptmann stellt sich auf einem schmalen Grat
-  const GRAT = { name: "Der Felsgrat", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "MMMM....MMMM", "MM........MM", "M..K....K..M", "............", "M....KK....M", "MM........MM", "MMMM....MMMM", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], begleiter: [10, 4], gegner: [[9, 4], [10, 3], [10, 5], [9, 2], [9, 6], [7, 3], [7, 5], [11, 4]] } };
+  const sp = [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]];
+  // Das Haupttor der Ruine: eine Mauer mit Tor in der Mitte, links der verschneite Hang, rechts der Vorhof mit zwei Säulen
+  const TOR = { name: "Das Haupttor", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/tor.webp",
+    hindernisse: ausText(["MM...MMMMMMM", "MM...MM..M.M", "MMK..MM..K.M", ".....MM.....", "............", ".....MM.....", "M.K..MM..K.M", "MM...MMMMMMM", "MMMMMMMMMMMM"]),
+    start: { spieler: sp, wolf: [[3, 4], [3, 3], [3, 5], [1, 6]], gegner: [[9, 4], [8, 3], [8, 5], [10, 2], [10, 6], [8, 2], [8, 6], [10, 4]] } };
+  // Der Archivgang: drei Gänge zwischen Regalwänden, in der Mitte durch Geröll verbunden
+  const ARCHIV = { name: "Der Archivgang", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/archiv.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "M.K........M", "M..........M", "M.MMM..MMM.M", "M..........M", "M.MMM..MMM.M", "M.MMM..MMM.M", "M..........M", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [2, 4], [1, 2], [2, 2], [1, 7], [2, 7]], wolf: [[3, 4], [3, 2], [3, 7], [1, 1]], gegner: [[9, 4], [9, 2], [9, 7], [10, 2], [10, 7], [10, 1], [8, 2], [8, 7], [8, 4], [7, 4]] } };
+  // Der Innenhof: das Signalgerät in der Mitte, Tore im Norden und Süden, Mauerreste als Deckung; die Gruppe kommt von Westen
+  const HOF = { name: "Der Innenhof", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/hof.webp",
+    hindernisse: ausText(["MMMMM..MMMMM", "MMMMM..MMMMM", "M..K....K.MM", "M.....M....M", "......M....M", "M..........M", "M..KK..KK.MM", "MMMMM..MMMMM", "MMMMM..MMMMM"]),
+    start: { spieler: sp, wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], begleiter: [0, 4],
+      gegner: [[5, 1], [6, 1], [5, 7], [6, 7], [5, 2], [6, 2], [5, 6], [6, 6], [9, 2], [9, 6], [10, 3], [10, 5]],
+      jaeger: [[5, 0], [6, 8], [6, 0], [5, 8], [6, 1], [5, 7]] },
+    route: [[3, 4], [5, 4]] };
+  // Der Felsgrat: der Jägerhauptmann stellt sich auf einem Grat, rechts sein Lager mit Feuer
+  const GRAT = { name: "Der Felsgrat", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/grat.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMMMMMMMMMMM", "MMMMMMMMMMMM", "MM.M....K.MM", "......M....M", "MM..K...M..M", "MMMMMM..M.MM", "MMMMMMMMMMMM", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [2, 4], [2, 3], [2, 5], [3, 4], [0, 4]], wolf: [[4, 4], [5, 4], [3, 5], [4, 3]], begleiter: [10, 4], gegner: [[9, 4], [9, 3], [10, 5], [8, 4], [9, 6], [7, 3], [7, 5], [9, 5]] } };
   /* ----- Akt III ----- */
-  // Der offene Wehrgang: ein langer Wehrgang zur Hochwarte, Treppen oben und unten, brüchige Brüstung als Deckung
-  const WEHRGANG = { name: "Der offene Wehrgang", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "MM..MMMM..MM", "MK.......K.M", "............", "....K....K..", "............", "MK.......K.M", "MM..MMMM..MM", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: wo, begleiter: [0, 4], gegner: [[11, 3], [11, 5], [10, 2], [10, 6], [8, 2], [8, 6], [11, 4], [7, 3], [7, 5], [9, 3]],
-      jaeger: [[11, 4], [2, 1], [9, 7], [3, 7], [8, 1], [11, 3]] },
+  // Der offene Wehrgang: ein breiter Wehrgang, je zwei Treppen oben und unten, rechts die Treppe zur Hochwarte
+  const WEHRGANG = { name: "Der offene Wehrgang", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/wehrgang.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MM.MMMMM.MMM", "MM.MMMMM.MMM", "...K..K..K.M", "............", "....K..K...M", "MM.MMMMM.MMM", "MM.MMMMM.MMM", "MMMMMMMMMMMM"]),
+    start: { spieler: sp, wolf: [[3, 4], [3, 5], [0, 3], [0, 5]], begleiter: [0, 4], gegner: [[10, 4], [10, 3], [10, 5], [8, 3], [8, 5], [9, 4], [8, 2], [8, 6], [7, 4], [11, 4]],
+      jaeger: [[11, 4], [2, 1], [8, 7], [2, 7], [8, 1], [10, 3]] },
     route: [[6, 4], [11, 4]] };
-  // Die Hochwarte: Plattform mit Säulen, rechts das Signalfeuer; die Gruppe kommt von links
-  const HOCHWARTE = { name: "Die Hochwarte", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M..........M", "M..M.M..M..M", "M..........M", "...........M", "M..........M", "M..M.M..M..M", "M..........M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: wo, begleiter: [0, 4], gegner: [[10, 4], [10, 2], [10, 6], [9, 3], [9, 5], [7, 1], [7, 7], [10, 1], [10, 7], [6, 3]],
-      jaeger: [[10, 4], [10, 2], [10, 6], [7, 1], [7, 7], [9, 3]] },
+  // Die Hochwarte: runde Plattform mit sechs Säulen, rechts das Signalfeuer; die Gruppe kommt von links über den Grat
+  const HOCHWARTE = { name: "Die Hochwarte", b: 12, h: 9, boden: "stein", bild: "img/hochwacht/hochwarte.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMM......MMM", "MMM.M.M.M.MM", "MMM........M", ".........M.M", "MMM........M", "MMM.M.M.M.MM", "MMMMMMMMMMMM", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [2, 4], [3, 4], [3, 3], [3, 6], [4, 4]], wolf: [[4, 3], [4, 5], [5, 4], [3, 1]], begleiter: [0, 4],
+      gegner: [[10, 4], [10, 3], [10, 5], [9, 3], [9, 5], [8, 1], [9, 6], [6, 1], [7, 6], [8, 3]],
+      jaeger: [[10, 4], [10, 3], [10, 5], [8, 1], [9, 6], [9, 3]] },
     route: [[4, 4], [8, 4]] };
   const KARTEN = { PASS, LAGER, TOR, ARCHIV, HOF, GRAT, WEHRGANG, HOCHWARTE };
   /** Epilog: Brann, Sera, Grauwacht */
@@ -375,7 +377,7 @@
       kampf: (A) => {
         const m = A.merker; let mal = 1;
         if (m.gletscherwasser) mal *= 0.85; if (m.hauptmann_besiegt) mal *= 0.9; if (m.jaeger_frueh) mal *= 1.1;
-        const b = m.sera_oben ? { name: "Sera Venn", titel: "gefesselt", tp: Math.ceil(seraTP(A, 3) / 2), start: [9, 4], route: [], ausgang: false, gefesselt: true }
+        const b = m.sera_oben ? { name: "Sera Venn", titel: "gefesselt", tp: Math.ceil(seraTP(A, 3) / 2), start: [8, 4], route: [], ausgang: false, gefesselt: true }
           : Object.assign(ESKORTE.finale.begleiter(seraTP(A, 3)), { titel: "Botin des Wachtordens" });
         return { begegnung: "finale", karte: HOCHWARTE, keinAnfuehrer: true, skalaMal: mal, beute: false, begleiter: b,
           sieg: { weiter: m.sera_oben ? "signal_nachher" : "signal_brennt" }, gefangen: { weiter: "nordwarte_verstummt" } };

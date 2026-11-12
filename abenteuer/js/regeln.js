@@ -150,17 +150,17 @@
     wehrgang: { name: "Der offene Wehrgang", stufe: 3, zusatzAb: 99, gegner: [["siegeljaeger", 0.6, 5, 0.5], ["jaegerschuetze", 0.3, 3], ["funkenhund", 0.4, 3, 0.5]], skala: { 2: 1.16, 3: 1.27, 4: 1.68, 5: 1.68, 6: 2.09 }, skalaHC: { 2: 1.21, 3: 1.27, 4: 1.68, 5: 1.54, 6: 2.01 } },
     finale: { name: "Das letzte Licht", stufe: 3, zusatzAb: 99, gegner: [["fackelzehrer", 0.1, 1, 0.6], ["funkenhund", 0.3, 3, 0.4], ["siegeljaeger", 0.45, 4, 0.3], ["jaegerschuetze", 0.15, 1]], skala: { 2: 0.51, 3: 0.88, 4: 1.13, 5: 1.74, 6: 2.06 }, skalaHC: { 2: 0.51, 3: 0.99, 4: 1.15, 5: 1.67, 6: 1.93 } },
     // Die Krone unter dem Eis, Akt I (Heldenstufe 1). Faktoren: tools/auswertung-krone.js --kalibrieren
-    k_grat: { name: "Jagd auf die Fackel", stufe: 1, zusatzAb: 99, gegner: [["jaegerhauptmann", 0.25, 1, 0], ["siegeljaeger", 0.35, 3, 0.3], ["jaegerschuetze", 0.3, 2], ["funkenhund", 0.2, 2]], skala: { 2: 0.33, 3: 0.33, 4: 0.83, 5: 1.06, 6: 1.49 }, skalaHC: { 2: 0.54, 3: 0.54, 4: 0.52, 5: 0.66, 6: 0.95 } },
-    k_stollen: { name: "Nest im Eis", stufe: 1, zusatzAb: 99, gegner: [["glasnest", 0, 2, 2], ["splitterbrutmutter", 0.25, 1, 0], ["glasschwaermer", 0.4, 3]], skala: { 2: 0.81, 3: 0.81, 4: 1.23, 5: 1.89, 6: 2.57 }, skalaHC: { 2: 0.87, 3: 0.87, 4: 0.85, 5: 1.66, 6: 2.3 } },
-    k_pilger: { name: "Die namenlosen Pilger", stufe: 1, zusatzAb: 99, gegner: [["eidwaechter", 0.25, 1, 0], ["kaelterufer", 0.25, 1, 0], ["eisgezeichneter", 0.8, 5, -1]], skala: { 2: 0.66, 3: 0.66, 4: 1.98, 5: 1.63, 6: 2.92 }, skalaHC: { 2: 0.71, 3: 0.71, 4: 0.87, 5: 1.18, 6: 1.74 } },
-    k_markt: { name: "Marktplatz der leeren Fenster", stufe: 1, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["jaegerschuetze", 0.2, 2, 0.6], ["frostknecht", 0.2, 2], ["eisgezeichneter", 0.7, 5]], skala: { 2: 0.43, 3: 0.43, 4: 0.87, 5: 1.18, 6: 1.34 }, skalaHC: { 2: 0.59, 3: 0.59, 4: 0.63, 5: 1.1, 6: 1.28 } },
-    k_kammern: { name: "Die Kammern der Verschleppten", stufe: 1, zusatzAb: 99, gegner: [["frostknecht", 0.25, 2, 0.25], ["glasschwaermer", 0.5, 5]], skala: { 2: 0.85, 3: 0.85, 4: 1.23, 5: 1.59, 6: 2.2 }, skalaHC: { 2: 1.03, 3: 1.03, 4: 1.26, 5: 1.37, 6: 2.2 } },
+    k_grat: { name: "Jagd auf die Fackel", stufe: 1, zusatzAb: 99, gegner: [["jaegerhauptmann", 0.25, 1, 0], ["siegeljaeger", 0.35, 3, 0.3], ["jaegerschuetze", 0.3, 2], ["funkenhund", 0.2, 2]], skala: { 2: 0.33, 3: 0.33, 4: 0.83, 5: 1.06, 6: 1.49 }, skalaHC: { 2: 0.28, 3: 0.28, 4: 0.52, 5: 0.89, 6: 1.37 } },
+    k_stollen: { name: "Nest im Eis", stufe: 1, zusatzAb: 99, gegner: [["glasnest", 0, 2, 2], ["splitterbrutmutter", 0.25, 1, 0], ["glasschwaermer", 0.4, 3]], skala: { 2: 1.06, 3: 1.06, 4: 1.43, 5: 2.4, 6: 3.05 }, skalaHC: { 2: 0.61, 3: 0.61, 4: 1.31, 5: 1.81, 6: 2.35 } },
+    k_pilger: { name: "Die namenlosen Pilger", stufe: 1, zusatzAb: 99, gegner: [["eidwaechter", 0.25, 1, 0], ["kaelterufer", 0.25, 1, 0], ["eisgezeichneter", 0.8, 5, -1]], skala: { 2: 2.02, 3: 2.02, 4: 2.92, 5: 2.8, 6: 3.96 }, skalaHC: { 2: 2.4, 3: 2.4, 4: 1.98, 5: 1.31, 6: 2.62 } },
+    k_markt: { name: "Marktplatz der leeren Fenster", stufe: 1, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["jaegerschuetze", 0.2, 2, 0.6], ["frostknecht", 0.2, 2], ["eisgezeichneter", 0.7, 5]], skala: { 2: 0.43, 3: 0.43, 4: 0.87, 5: 1.18, 6: 1.34 }, skalaHC: { 2: 0.36, 3: 0.36, 4: 0.7, 5: 1.03, 6: 1.1 } },
+    k_kammern: { name: "Die Kammern der Verschleppten", stufe: 1, zusatzAb: 99, gegner: [["frostknecht", 0.25, 2, 0.25], ["glasschwaermer", 0.5, 5]], skala: { 2: 0.89, 3: 0.89, 4: 1.63, 5: 2.16, 6: 2.92 }, skalaHC: { 2: 1.23, 3: 1.23, 4: 1.13, 5: 1.43, 6: 2.35 } },
     // Akt II (Heldenstufe 2) und III (Stufe 3)
-    k_bruecke: { name: "Die Brücke über den Gletscherbruch", stufe: 2, zusatzAb: 99, gegner: [["kettenbestie", 0.25, 1, 0], ["jaegerschuetze", 0.5, 4, 0.2], ["siegeljaeger", 0.45, 3]], skala: { 2: 0.56, 3: 0.56, 4: 0.91, 5: 2.07, 6: 2.62 }, skalaHC: { 2: 0.27, 3: 0.27, 4: 0.81, 5: 0.89, 6: 0.95 } },
-    k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.6, 4], ["jaegerschuetze", 0.25, 2, -0.5]], skala: { 2: 0.39, 3: 0.39, 4: 1.03, 5: 1.26, 6: 1.56 }, skalaHC: { 2: 0.36, 3: 0.36, 4: 0.81, 5: 1.08, 6: 1.13 } },
-    k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["frostknecht", 0.4, 3, -0.5], ["jaegerschuetze", 0.3, 2, -0.5], ["eisgezeichneter", 0.9, 6], ["glasschwaermer", 0.4, 3]], skala: { 2: 0.71, 3: 0.71, 4: 0.95, 5: 1.4, 6: 2.02 }, skalaHC: { 2: 0.25, 3: 0.25, 4: 0.83, 5: 0.99, 6: 1.85 } },
-    k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.8, 6], ["frostknecht", 0.4, 3, -0.5]], skala: { 2: 0.49, 3: 0.49, 4: 1.53, 5: 1.63, 6: 2.2 }, skalaHC: { 2: 0.71, 3: 0.71, 4: 1.23, 5: 1.59, 6: 1.89 } },
-    k_krone: { name: "Der Kronensaal", stufe: 3, zusatzAb: 99, gegner: [["koenig", 0.25, 1, 0], ["frostknecht", 0.5, 4, -1], ["jaegerschuetze", 0.3, 2, -0.5], ["kettenbestie", 0.5, 1, -2]], skala: { 2: 0.47, 3: 0.47, 4: 0.68, 5: 0.89, 6: 1.26 }, skalaHC: { 2: 0.29, 3: 0.29, 4: 0.67, 5: 0.58, 6: 1.15 } },
+    k_bruecke: { name: "Die Brücke über den Gletscherbruch", stufe: 2, zusatzAb: 99, gegner: [["kettenbestie", 0.25, 1, 0], ["jaegerschuetze", 0.5, 4, 0.2], ["siegeljaeger", 0.45, 3]], skala: { 2: 0.56, 3: 0.56, 4: 0.91, 5: 2.07, 6: 2.62 }, skalaHC: { 2: 0.25, 3: 0.25, 4: 0.71, 5: 1.46, 6: 1.34 } },
+    k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.6, 4], ["jaegerschuetze", 0.25, 2, -0.5]], skala: { 2: 0.49, 3: 0.49, 4: 1.15, 5: 0.93, 6: 1.43 }, skalaHC: { 2: 0.38, 3: 0.38, 4: 0.64, 5: 0.64, 6: 1.2 } },
+    k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["frostknecht", 0.4, 3, -0.5], ["jaegerschuetze", 0.3, 2, -0.5], ["eisgezeichneter", 0.9, 6], ["glasschwaermer", 0.4, 3]], skala: { 2: 0.93, 3: 0.93, 4: 1.23, 5: 1.94, 6: 2.57 }, skalaHC: { 2: 0.64, 3: 0.64, 4: 0.76, 5: 1.23, 6: 2.2 } },
+    k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.8, 6], ["frostknecht", 0.4, 3, -0.5]], skala: { 2: 0.51, 3: 0.51, 4: 1.15, 5: 1.59, 6: 2.3 }, skalaHC: { 2: 0.39, 3: 0.39, 4: 0.99, 5: 1.23, 6: 1.98 } },
+    k_krone: { name: "Der Kronensaal", stufe: 3, zusatzAb: 99, gegner: [["koenig", 0.25, 1, 0], ["frostknecht", 0.5, 4, -1], ["jaegerschuetze", 0.3, 2, -0.5], ["kettenbestie", 0.5, 1, -2]], skala: { 2: 0.68, 3: 0.68, 4: 0.93, 5: 0.8, 6: 1.1 }, skalaHC: { 2: 0.43, 3: 0.43, 4: 0.51, 5: 0.42, 6: 0.6 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -1259,7 +1259,7 @@
     if (abstand(g, ziel) > 1 && st.zug.bewegung > 0) {
       const m = erreichbar(st, g, st.zug.bewegung); let best = null;
       for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const dist = Math.min(...lebende.map((f) => abstand({ x, y }, f) + (g.z.spott === f.id ? -1 : 0))); if (!best || dist < best.dist || (dist === best.dist && c < best.c)) best = { x, y, dist, c }; }
-      if (st.mech && best && best.dist >= abstand(g, ziel) && best.dist > 1) { const w = naeherAufWeg(st, g, ziel, m); if (w) best = w; }
+      if (st.mech && best && best.dist > 1) best = wegKorrektur(st, g, ziel, best, m);
       if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
       if (!lebt(g)) { if (!st.ende) weiter(st); return; }
       lebende = zieleFuerGegner(st, g); ziel = naechste();
@@ -1542,6 +1542,14 @@
     for (const [k2, c] of felder) { if (c === "schritt") continue; const w = wk.get(k2); if (w == null || w >= jetzt) continue; if (!best || w < best.w || (w === best.w && c < best.c)) { const [x, y] = k2.split(",").map(Number); best = { x, y, w, c }; } }
     return best;
   }
+  /** Bringt das gewählte Feld f auf dem echten Weg näher an z? Wenn nicht, das beste Feld nach Weglänge (sonst pendeln Figuren in Sackgassen) */
+  function wegKorrektur(st, f, z, best, felder) {
+    if (!best || !z) return best;
+    const wk = wegKarte(st, z), jetzt = wk.has(key(f.x, f.y)) ? wk.get(key(f.x, f.y)) : Infinity, dort = wk.get(key(best.x, best.y));
+    if (dort != null && dort < jetzt) return best;
+    if (jetzt === 0) return best;
+    return naeherAufWeg(st, f, z, felder) || best;
+  }
   /** Sonderzüge der neuen Gegner. Gibt true zurück, wenn der Zug damit erledigt ist */
   function sonderZug(st, g, d) {
     const m = st.mech;
@@ -1750,7 +1758,7 @@
           if (abstand(f, meins) > 1) {
             let best = null;
             for (const [k2, c] of bf()) { if (c === "schritt") continue; const [x, y] = k2.split(",").map(Number), d = abstand({ x, y }, meins); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, c, d }; }
-            if (best && best.d > 1 && best.d >= abstand(f, meins)) { const w = naeherAufWeg(st, f, meins, bf()); if (w) best = w; }
+            if (best && best.d > 1) best = wegKorrektur(st, f, meins, best, bf());
             if (best && !(best.x === f.x && best.y === f.y)) bewegen(st, best.x, best.y);
             zielGemacht = true;
           }
@@ -1805,7 +1813,7 @@
       else if (abstand(f, ziel) > 1) {
         // nicht erreichbar: so nah wie möglich, ggf. Fernkampf
         let näher = null; for (const [k, c] of m) { if (c === "schritt") continue; const [x, y] = k.split(",").map(Number); const d = abstand({ x, y }, ziel); if (!näher || d < näher.d) näher = { x, y, d }; }
-        if (st.mech && (!näher || näher.d >= abstand(f, ziel))) { const w = naeherAufWeg(st, f, ziel, m); if (w) näher = w; }
+        if (st.mech) näher = wegKorrektur(st, f, ziel, näher || { x: f.x, y: f.y }, m);
         if (näher && !(näher.x === f.x && näher.y === f.y)) bewegen(st, näher.x, näher.y);
       }
     } else {

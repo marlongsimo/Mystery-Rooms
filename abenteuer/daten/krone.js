@@ -581,7 +581,8 @@
   const META = {
     id: "krone", schwierigkeit: 4, entwurf: true, titel: "Die Krone unter dem Eis", kurz: "Krone", untertitel: "Ein verzweigtes Abenteuer in der versunkenen Stadt Veyrholm (Entwurf)",
     kurztext: "Drei Wege führen in eine Stadt unter dem Gletscher – und zum Herzen der sieben Siegel.",
-    min: 3, max: 6, stufen: "1–3", dauer: "4–5 Stunden", abschnitte: 3, enden: 3, bild: null,
+    min: 3, max: 6, stufen: "1–3", dauer: "4–5 Stunden", abschnitte: 3, enden: 3,
+    bild: "img/krone/titel.webp", vorschau: "img/krone/vorschau.webp", abschnittBilder: { 1: "img/krone/abschnitt-1.webp", 2: "img/krone/abschnitt-2.webp", 3: "img/krone/abschnitt-3.webp" },
     uhr: { name: "Frost", max: 7, mehr: "Der Frost kriecht tiefer.", weniger: "Die Kälte lässt etwas nach.", unruhe: "der Frost lässt niemanden ganz schlafen", rueckzug: "Der Frost kriecht tiefer." },
     gruppe: "Die Eisgänger", aufbruch: "Hinab nach Veyrholm", niederlage: "Unter dem Eis", chronik: "Chronik von Veyrholm",
     abschnitte_namen: { 1: "Der Eintritt in die Stadt", 2: "Die Stadt erwacht", 3: "Das Herz der Siegel" },

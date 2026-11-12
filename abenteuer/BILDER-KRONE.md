@@ -4,17 +4,17 @@ Die Kampagne ist noch ein Entwurf (im Hub nur mit `?entwurf`). Bis Bilder da sin
 
 **Stil** (wie die anderen Kampagnen): gemalte Fantasy-Illustration, düster-atmosphärisch, gedeckte Farben, Ölmalerei-/Gouache-Anmutung. Kein Text, keine Schrift, keine Wasserzeichen, keine Rahmen. Leitfarben: gebrochenes Steinwerk, blauschwarzes Eis, matte Kristalle, verrostetes Metall, wenige warme Lichtquellen; im Finale ein kontrollierter Gold- und Weißglanz. Ablage: `abenteuer/img/krone/`.
 
-## 1. Titelbild – `titel`
+## 1. Titelbild – `titel` ✓ eingebaut
 (Querformat, mind. 1600 × 750) Erscheint bei „Neue Kampagne“ und in der Kampagnenwelt (Ausschnitt 640 × 300, die Mitte zählt).
 
 > A painted dark-fantasy illustration of an ancient city frozen inside a vast glacier, seen from the edge of a glacier plateau at night: towers, domes and rooftops trapped in deep blue ice like a city in glass, a faint golden light pulsing far below the palace at its centre. In the foreground a small group of travellers in fur cloaks with torches at the edge of the ice, looking down; three paths lead into the city: a windswept ridge, a dark mine entrance, and a long stairway lined with frozen figures. Cold blue-black palette with a single warm golden glow in the depths. Wide landscape composition, centre of interest in the middle. No text.
 
 ## 2. Abschnittsbilder – `abschnitt-1` bis `abschnitt-3` (Querformat 16:11, mind. 640 × 440)
-- **abschnitt-1 (Der Eintritt in die Stadt):**
+- **abschnitt-1 (Der Eintritt in die Stadt):** ✓ eingebaut
   > Painted dark-fantasy scene: a frozen market square in an ancient city under a glacier, house fronts with empty windows and pale figures of ice looking out, three tall glowing rune stones in the square, a robed figure with a frost-blue staff laying his hand on one of them. Cold blue light, eerie silence. No text.
-- **abschnitt-2 (Die Stadt erwacht):**
+- **abschnitt-2 (Die Stadt erwacht):** ✓ eingebaut
   > Painted dark-fantasy scene: a narrow bridge of stone and ice over a bottomless glacier crevasse, a huge beast in chains rising on the bridge, masked archers with hollow-crown masks on rocky platforms beyond, behind them the gate of a palace guarded by a giant iron and stone sentinel with a glowing rune on its chest. Wind, snow, moonlight. No text.
-- **abschnitt-3 (Das Herz der Siegel):**
+- **abschnitt-3 (Das Herz der Siegel):** ✓ eingebaut
   > Painted dark-fantasy scene: a vast pillared throne hall deep under the ice, in its centre a human-sized crystal heart with seven small lights pulsing inside, before it a ghostly king in cracked royal armour and a broken crown made of ice and light, raising a sword. Controlled golden and white radiance against deep blue darkness. No text.
 
 ## 3. Kampfkarten (Draufsicht, genau 4 : 3, mind. 1448 × 1086)

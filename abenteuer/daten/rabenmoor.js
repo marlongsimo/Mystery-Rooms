@@ -490,8 +490,8 @@
     kurztext: "Drei Kinder sind stummen Lichtern ins Moor gefolgt. Das Dorf will die Kräuterfrau verbrennen.",
     abschnitte_namen: { 1: "Rabenmoor", 2: "Das tiefe Moor" },
     min: 2, max: 6, stufen: "1–2", dauer: "1,5–2 Stunden", abschnitte: 2, enden: 4,
-    // Titelbild ist da; Abschnittsbilder fehlen noch (siehe BILDER-RABENMOOR.md) – bis dahin zeigt die Liste die Vorschau des Titelbilds
-    bild: "img/rabenmoor/titel.webp", vorschau: "img/rabenmoor/vorschau.webp", bilder: false,
+    // Bilder (siehe BILDER-RABENMOOR.md): fehlt ein Abschnittsbild, zeigt die Liste die Vorschau des Titelbilds
+    bild: "img/rabenmoor/titel.webp", vorschau: "img/rabenmoor/vorschau.webp", abschnittBilder: { 1: "img/rabenmoor/abschnitt-1.webp" },
     uhr: { name: "Lichter", symbol: "✦", klasse: "lichter", max: 7, mehr: "Ein weiteres Licht steigt über dem Moor auf.", weniger: "Ein Licht über dem Moor erlischt.", unruhe: "die Lichter lassen niemanden ganz schlafen", rueckzug: "Ein weiteres Licht steigt auf." },
     gruppe: "Die Retter von Rabenmoor", aufbruch: "Ins Schwarzmoor", niederlage: "Das Moor behält euch", chronik: "Chronik von Rabenmoor",
     einleitung: [

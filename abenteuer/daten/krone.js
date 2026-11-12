@@ -220,11 +220,15 @@
     },
     kampf_pilger: {
       art: "kampf", abschnitt: 1, titel: "Die namenlosen Pilger", ort: "Die Pilgerstraße",
-      text: ["Entzündet die drei Grablichter (je eine Aktion daneben) oder besiegt alle. Brennen alle drei, verliert der Eidwächter seinen Schutzkreis. Der Kälterufer bläst Lichter wieder aus – haltet ihn auf."],
-      kampf: () => ({ begegnung: "k_pilger", karte: PILGERSTRASSE, keinAnfuehrer: true, namen: NAMEN,
-        mechanik: { ziele: OBJEKTE.lichter, schild: { art: "eidwaechter", ziele: ["l1", "l2", "l3"], halt: 16, pause: 2, text: "Schutzkreis der Pilger" },
+      text: ["Entzündet die drei Grablichter (je eine Aktion daneben, bei großen Gruppen zwei in Ruhe) oder besiegt alle. Brennen alle drei, verliert der Eidwächter seinen Schutzkreis. Der Kälterufer bläst Lichter wieder aus – haltet ihn auf."],
+      kampf: (A) => {
+        // Große Gruppen zünden schneller: ab 5 Helden braucht jedes Licht zwei Aktionen in Ruhe
+        const gross = A.gruppe.filter((f) => !A.zust[f].tot).length >= 5, lichter = OBJEKTE.lichter.map((l) => Object.assign({}, l, gross ? { runden: 2, ruhe: true } : {}));
+        return { begegnung: "k_pilger", karte: PILGERSTRASSE, keinAnfuehrer: true, namen: NAMEN,
+        mechanik: { ziele: lichter, schild: { art: "eidwaechter", ziele: ["l1", "l2", "l3"], halt: 10, pause: 2, text: "Schutzkreis der Pilger" },
           sieg: { ziele: 3, art: "grablicht", text: "Drei Lichter brennen. Die Pilger legen sich nieder, einer nach dem anderen, und das Eis schließt sich über ihnen wie eine Decke." } },
-        sieg: { setzt: { s4_route_bonus: "pilgerzeichen" }, weiter: "pilger_nach" }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug" } }),
+        sieg: { setzt: { s4_route_bonus: "pilgerzeichen" }, weiter: "pilger_nach" }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug" } };
+      },
     },
     pilger_nach: {
       art: "erzaehlung", abschnitt: 1, titel: "Das Pilgerzeichen", ort: "Die Pilgerstraße", weiter: "markt_ankunft", rastErlaubt: true,

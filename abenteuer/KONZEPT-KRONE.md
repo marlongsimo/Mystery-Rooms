@@ -88,6 +88,11 @@ Umgesetzt in `js/regeln.js` (Abschnitt „Mechaniken“), eingeschaltet je Kampf
 
 Schon angelegte Gegner: Frostknecht, Eisgezeichneter, Glasschwärmer, Schwärmernest, Kälterufer, Runenleser, Kettenbestie, Eisenhirte. Ihre Werte sind vorläufig; das Balancing folgt mit den echten Kämpfen.
 
+### Stand Akt I (Entwurf, gebaut und getestet)
+`daten/krone.js`: Vorgeschichte (Grauwacht, Hochwacht) → Kaltbrunn (Ylva Hallgrim) → Routenwahl → je Weg Anmarsch (Probe), Wahl Kampf/Umgehen (ohne Belohnung) → Pfadkampf → Marktplatz (Hauptkampf 1) → Kammern der Verschleppten (optional) → Lager (Stufe 2) → Ende des Entwurfs.
+Pfadkämpfe: Sturmgrat (Jagdhorn sichern oder alle besiegen), Unterstollen (zwei Nester oder die Brutmutter, brüchiges Eis), Pilgerstraße (drei Grablichter brechen den Schutzkreis des Eidwächters; ab 5 Helden zwei Aktionen in Ruhe). Niederlagen führen weiter, nur ohne Belohnung.
+Siegquote Normal (Automatik, 120 Gruppen je Größe, 3–6 Helden): Pfadkämpfe 78–92 %, Marktplatz 72–86 % (6 Helden danach leicht entschärft), Kammern 85–93 % mit im Schnitt 2 von 3 Geretteten. Werkzeuge: `tools/auswertung-krone.js` (auch `--kalibrieren`), `tools/durchlauf-krone.js`; Test: `tests/krone.test.js`.
+
 ## K7. Enden und Marker
 **Enden:** Stabilisieren · Versiegeln · Umleiten, dazu die Niederlage. Jedes Ende öffnet Stufe 5 auf eigene Weise.
 

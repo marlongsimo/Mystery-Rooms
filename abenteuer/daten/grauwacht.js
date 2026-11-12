@@ -979,7 +979,7 @@
     abt: { klassen: ["zauberer", "kleriker"], text: "Jeder berührte Siegelstein kostet ihn 2 RK und 2W6 Trefferpunkte. Sind alle vier berührt, ruft er keine Toten mehr. Ab halber Kraft wird er gefährlicher." },
   };
   const META = {
-    id: "grauwacht", titel: "Das Siegel von Grauwacht", kurz: "Grauwacht", kurztext: "Eine alte Abtei, ein vergessenes Siegel und eine Glocke, die seit sieben Nächten läutet.", ort: "Halmbruck", min: 3, max: 6, stufen: "1–3", dauer: "etwa 3 Stunden",
+    id: "grauwacht", schwierigkeit: 2, titel: "Das Siegel von Grauwacht", kurz: "Grauwacht", kurztext: "Eine alte Abtei, ein vergessenes Siegel und eine Glocke, die seit sieben Nächten läutet.", ort: "Halmbruck", min: 3, max: 6, stufen: "1–3", dauer: "etwa 3 Stunden",
     uhr: { name: "Glocke", symbol: "🔔", max: 7, mehr: "Die Glocke schlägt.", weniger: "Die Glocke verstummt ein wenig.", unruhe: "das Flüstern lässt niemanden ganz schlafen", rueckzug: "Die Glocke schlägt." },
     gruppe: "Die Gemeinschaft von Grauwacht", aufbruch: "Aufbruch nach Halmbruck", niederlage: "Grauwacht behält euch", chronik: "Chronik von Grauwacht",
   };

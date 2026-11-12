@@ -522,7 +522,7 @@
     alwine: { klassen: ["kleriker", "zauberer", "waldlaeufer"], text: "Ihre kalte Hand reicht 4 Felder. Alle drei Runden stößt sie die Wehklage aus: Kälte im Kegel von 3 Feldern (3W6, WEI-Rettung halbiert). Nicht hintereinander stehen." },
   };
   const META = {
-    id: "rabenmoor", titel: "Das Moor der stummen Lichter", kurz: "Rabenmoor", untertitel: "Ein Abenteuer im Schwarzmoor, für kleine und große Gruppen",
+    id: "rabenmoor", schwierigkeit: 1, titel: "Das Moor der stummen Lichter", kurz: "Rabenmoor", untertitel: "Ein Abenteuer im Schwarzmoor, für kleine und große Gruppen",
     kurztext: "Drei Kinder sind stummen Lichtern ins Moor gefolgt. Das Dorf will die Kräuterfrau verbrennen.",
     abschnitte_namen: { 1: "Rabenmoor", 2: "Das tiefe Moor" },
     min: 2, max: 6, stufen: "1–2", dauer: "1,5–2 Stunden", abschnitte: 2, enden: 4,

@@ -195,7 +195,7 @@
   const HUB = "mythara_hub";
   const toast = (t) => window.AB && window.AB.toast(t);
   const imHub = () => { let g = null; try { g = sessionStorage.getItem(HUB); } catch (e) { /* privat */ } return Boolean((profil && profil.konto) || g); };
-  const bildAbschnitt = (n, ab) => (ab && ab !== "grauwacht" ? (window.ABS.metaVon(ab).bilder ? `img/${ab}/abschnitt-${[1, 2].includes(+n) ? +n : 1}.webp` : "img/mythara/karte-kampagnen.webp") : `img/mythara/abschnitt-${[1, 2, 3].includes(+n) ? +n : 1}.webp`);
+  const bildAbschnitt = (n, ab) => (ab && ab !== "grauwacht" ? (window.ABS.metaVon(ab).bilder ? `img/${ab}/abschnitt-${[1, 2].includes(+n) ? +n : 1}.webp` : window.ABS.metaVon(ab).vorschau || "img/mythara/karte-kampagnen.webp") : `img/mythara/abschnitt-${[1, 2, 3].includes(+n) ? +n : 1}.webp`);
   /** Bild mit Ersatz, solange für ein neues Abenteuer noch keine Bilder da sind */
   const BILD_ERSATZ = `onerror="this.onerror=null;this.src='img/mythara/karte-kampagnen.webp'"`;
   /** Alle Abenteuer (aus daten/*.js), Grauwacht zuerst */

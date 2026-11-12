@@ -8,7 +8,9 @@ Ablage später: `abenteuer/img/rabenmoor/` – Dateinamen siehe unten. PNG oder 
 
 ---
 
-## 1. Titelbild – `titel` (Querformat, mind. 1600 × 750)
+## 1. Titelbild – `titel` ✓ eingebaut
+
+(Querformat, mind. 1600 × 750)
 
 Erscheint auf der Spielerseite bei „Neue Kampagne“ und in der Kampagnenwelt (Ausschnitt 640 × 300, Mitte zählt).
 

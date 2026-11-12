@@ -59,6 +59,8 @@
 
   const live = () => AB.liveAn();
   const besitzer = (fid) => AB.besitzVon(fid);
+  /** Live: lebende Helden ohne Handy – für sie entscheidet der Tisch */
+  const tischHelden = () => (live() && A ? S.lebende(A).filter((f) => !besitzer(f)) : []);
   function merken() { try { if (A) localStorage.setItem(KEY, JSON.stringify(S.speichern(A))); } catch (e) { /* privat */ } }
   function phase(p) { if (live()) AB.LIVE.phase = p; }
 
@@ -195,7 +197,11 @@
     let h = `<div class="joch">${r.glocken.map((g) => `<button class="glockenknopf" data-glocke="${g.id}"><svg viewBox="0 0 60 70" aria-hidden="true"><path d="M30 6 C14 6 12 24 12 36 L8 52 H52 L48 36 C48 24 46 6 30 6Z" fill="#b08850" stroke="#5a4020" stroke-width="2"/><circle cx="30" cy="58" r="5" fill="#5a4020"/></svg><b>${esc(g.name)}</b></button>`).join("")}</div>`;
     h += `<p class="note">Angeschlagen: ${n ? r.folge.map((id) => `<b>${esc(r.glocken.find((g) => g.id === id).name)}</b>`).join(" → ") : "noch keine"} (${n} von ${r.laenge})${r.fehl ? ` · Fehlversuche: ${r.fehl}` : ""}</p>`;
     if (!live()) h += `<div class="platten">${Object.entries(r.hinweise).map(([fid, hs]) => hs.map((t) => `<blockquote class="platte"><small>${esc(F.FIGUREN[fid].name)} liest:</small>${fett(t)}</blockquote>`).join("")).join("")}</div>`;
-    else h += `<p class="note">Die Verse der Grabplatten stehen auf euren Handys. Lest sie einander vor.</p>`;
+    else {
+      h += `<p class="note">Die Verse der Grabplatten stehen auf euren Handys. Lest sie einander vor.</p>`;
+      const th = tischHelden().filter((f) => (r.hinweise[f] || []).length);
+      if (th.length) h += `<div class="platten">${th.map((fid) => r.hinweise[fid].map((t) => `<blockquote class="platte"><small>🎲 ${esc(F.FIGUREN[fid].name)} (Tisch) liest:</small>${fett(t)}</blockquote>`).join("")).join("")}</div>`;
+    }
     return h + `<div class="knoepfe"><button class="btn ghost" id="rz-neu" ${n ? "" : "disabled"}>Neu beginnen</button><button class="btn ghost" id="rz-auf">Aufgeben</button></div>`;
   }
   function ersatzHtml(v) {
@@ -261,13 +267,16 @@
       const n = Object.keys(A.stimmen).length, alle = S.lebende(A).length;
       return `<div class="optionen-tisch">${v.optionen.map((o) => `<div class="opt-zeile"><span>${esc(o.text)}</span></div>`).join("")}</div>
         <p class="note">Abstimmung auf den Handys: <b>${n} von ${alle}</b> haben abgestimmt (${S.lebende(A).map((f) => `${esc(F.FIGUREN[f].name)} ${A.stimmen[f] ? "✓" : "…"}`).join(" · ")}). Das Ergebnis erscheint, sobald alle abgestimmt haben.</p>
+        ${tischHelden().filter((f) => !A.stimmen[f]).map((fid) => `<div class="opt-zeile">${B.marke(fid, 28)} <span>🎲 ${esc(F.FIGUREN[fid].name)} (Tisch) stimmt:</span>${v.optionen.map((o) => `<button class="btn ghost klein" data-stimme="${fid}:${o.id}">${esc(o.text)}</button>`).join("")}</div>`).join("")}
         <div class="knoepfe"><button class="btn ghost" id="sz-auswerten" ${n ? "" : "disabled"}>Jetzt auswerten</button></div>`;
     }
     if (s.art === "geheim") {
       const q = v.geheimFrage;
       const pf = (fid) => (q.proFigur && q.proFigur[fid]) || q, gleich = S.lebende(A).every((fid) => pf(fid).frage === q.frage);
       if (!live()) return `${gleich ? `<p><b>${esc(q.frage)}</b></p>` : ""}${S.lebende(A).map((fid) => `${gleich ? "" : `<p class="geheim-frage"><b>${esc(F.FIGUREN[fid].name)}:</b> ${esc(pf(fid).frage)}</p>`}<div class="opt-zeile">${B.marke(fid, 28)} <span>${esc(F.FIGUREN[fid].name)}</span>${pf(fid).antworten.map((a) => `<button class="btn ${A.geheim[fid] === a.id ? "" : "ghost"} klein" data-geheim="${fid}:${a.id}">${esc(a.text)}</button>`).join("")}</div>`).join("")}<div class="knoepfe"><button class="btn" id="sz-weiter" ${S.alleGeheim(A) ? "" : "disabled"}>Weiter</button></div>`;
-      return `<p><b>${esc(gleich ? q.frage : "Jede Person hört etwas anderes.")}</b></p><p class="note">Jede Person entscheidet auf ihrem Handy: <b>${q.fertig.length} von ${S.lebende(A).length}</b>. Niemand sieht, wie die anderen entschieden haben.</p>`;
+      const th = tischHelden();
+      return `<p><b>${esc(gleich ? q.frage : "Jede Person hört etwas anderes.")}</b></p><p class="note">Jede Person entscheidet auf ihrem Handy: <b>${q.fertig.length} von ${S.lebende(A).length}</b>. Niemand sieht, wie die anderen entschieden haben.</p>
+        ${th.length ? `<p class="note">Für die Helden, die der Tisch steuert, entscheidet ihr hier gemeinsam:</p>${th.map((fid) => `${gleich ? "" : `<p class="geheim-frage"><b>${esc(F.FIGUREN[fid].name)}:</b> ${esc(pf(fid).frage)}</p>`}<div class="opt-zeile">${B.marke(fid, 28)} <span>🎲 ${esc(F.FIGUREN[fid].name)}</span>${pf(fid).antworten.map((a) => `<button class="btn ${A.geheim[fid] === a.id ? "" : "ghost"} klein" data-geheim="${fid}:${a.id}">${esc(a.text)}</button>`).join("")}</div>`).join("")}` : ""}`;
     }
     if (s.art === "kampf") return `${vorschauHtml(v)}<div class="knoepfe"><button class="btn" id="sz-kampf">Zum Kampf</button></div>`;
     if (s.art === "ende") return `<p class="note">Dieses Ende steht jetzt in eurer Chronik${A.merker.splitter ? ", zusammen mit dem Splitter von Grauwacht" : ""}. Ihr findet sie auf der Startseite.</p><div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
@@ -286,7 +295,7 @@
     const bl = $("#beute-lassen"); if (bl) bl.onclick = () => { if (confirm("Wirklich nichts mitnehmen?")) { S.beuteLassen(A); A.beuteWahl = null; nach(); } };
     el.querySelectorAll("[data-wer]").forEach((b) => { b.onclick = () => { S.probeWer(A, b.dataset.wer); nach(); }; });
     el.querySelectorAll("[data-wurf]").forEach((b) => { b.onclick = () => { S.probeWurf(A, b.dataset.wurf); nach(); }; });
-    el.querySelectorAll("[data-geheim]").forEach((b) => { b.onclick = () => { const [fid, a] = b.dataset.geheim.split(":"); S.geheim(A, fid, a); nach(); }; });
+    el.querySelectorAll("[data-geheim]").forEach((b) => { b.onclick = () => { const [fid, a] = b.dataset.geheim.split(":"); S.geheim(A, fid, a); if (live() && S.alleGeheim(A)) { S.weiter(A); nachSzene(); } else nach(); }; });
     el.querySelectorAll("[data-glocke]").forEach((b) => { b.onclick = () => { if (window.ABE) window.ABE.glocke(0.35); S.raetselTipp(A, b.dataset.glocke); nachSzene(); }; });
     el.querySelectorAll("[data-ersatz]").forEach((b) => { b.onclick = () => { const [alt, neu] = b.dataset.ersatz.split(":"); if (!S.ersatz(A, alt, neu).fehler) AB.besitzTauschen(alt, neu); nach(); }; });
     const rn = $("#rz-neu"); if (rn) rn.onclick = () => { S.raetselNeu(A); nach(); };
@@ -295,6 +304,7 @@
     const w = $("#sz-weiter"); if (w) w.onclick = () => { S.weiter(A); nachSzene(); };
     const r = $("#sz-rast"); if (r) r.onclick = () => { S.kurzeRast(A); nach(); };
     const au = $("#sz-auswerten"); if (au) au.onclick = () => { S.auswerten(A); nachSzene(); };
+    el.querySelectorAll("[data-stimme]").forEach((b) => { b.onclick = () => { const [fid, o] = b.dataset.stimme.split(":"); S.stimme(A, fid, o); if (S.lebende(A).every((f) => A.stimmen[f])) { S.auswerten(A); nachSzene(); } else nach(); }; });
     const k = $("#sz-kampf"); if (k) k.onclick = kampf;
     const pz = $("#sz-pause"); if (pz) pz.onclick = pause;
     const kp = $("#sz-kpause"); if (kp) kp.onclick = () => window.KAMPAGNE.pausieren();

@@ -166,22 +166,22 @@
     const s = H.spiel, gruppe = s.gruppe || [], laeuft = s.phase === "kampf" || s.phase === "szene", HL = window.ABH_HELDEN;
     let zuletzt = null; try { zuletzt = localStorage.getItem(FIGUR_KEY); } catch (e) { /* privat */ }
     const liste = laeuft ? gruppe : F.REIHE;
-    const voll = !laeuft && Object.keys(s.besitz || {}).length >= 6;
-    const status = (fid) => { const uid = s.besitz && s.besitz[fid]; return H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : laeuft ? "wartet auf jemanden" : voll ? "Gruppe voll" : zuletzt === fid ? "zuletzt gespielt" : ""; };
+    const voll = !laeuft && gruppe.length >= 6, istVoll = (fid) => voll && !gruppe.includes(fid);
+    const status = (fid) => { const uid = s.besitz && s.besitz[fid]; return H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : gruppe.includes(fid) ? "🎲 Tisch – übernehmbar" : laeuft ? "wartet auf jemanden" : voll ? "Gruppe voll" : zuletzt === fid ? "zuletzt gespielt" : ""; };
     const kopf = `<p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p>`;
     const plaetzeHtml = gruppe.length ? HL.plaetze(gruppe, Object.fromEntries(Object.entries(s.besitz || {}).map(([f, u]) => [f, (s.namen || {})[u] || ""]))) : "";
     if (!laeuft) {
       // Schritt 1: Klasse wählen · Schritt 2: die drei Helden der Klasse mit Vorstellung
       if (!H.klasse) {
-        app.innerHTML = `<section class="karte-h">${kopf}<h1>Wähle deine Klasse</h1><p class="note">Schritt 1 von 2. In jeder Klasse stellen sich dir drei Helden vor. Jede Person spielt eine Figur, mindestens 3.</p>
+        app.innerHTML = `<section class="karte-h">${kopf}<h1>Wähle deine Klasse</h1><p class="note">Schritt 1 von 2. In jeder Klasse stellen sich dir drei Helden vor. Jede Person spielt eine Figur. Zusammen mit den Helden, die der Tisch steuert, sind es mindestens 3.</p>
           ${plaetzeHtml}${HL.klassenWahl({ gruppe })}<p class="fb">${esc(H.fehler)}</p></section>`;
         app.querySelectorAll("[data-klasse]").forEach((b) => { b.onclick = () => { H.klasse = b.dataset.klasse; H.fokus = null; render(); window.scrollTo(0, 0); }; });
         return;
       }
       const helden = HL.vonKlasse(H.klasse);
       if (!H.fokus || !helden.includes(H.fokus)) H.fokus = helden.find((f) => zuletzt === f) || helden[0];
-      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !voll && !H.wahlOffen;
-      const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : voll ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
+      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !istVoll(fid) && !H.wahlOffen;
+      const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : istVoll(fid) ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
       app.innerHTML = `<section class="karte-h">${kopf}${HL.klassenLeiste(H.klasse)}${HL.klassenKopf(H.klasse)}
         <div class="fkarten handy-karten">${helden.map((f) => HL.kachel(f, { an: gruppe.includes(f), fokus: f === fid, status: status(f), statusArt: s.besitz && s.besitz[f] ? "" : "tisch" })).join("")}</div>
         ${HL.detail(fid, s.stufe || 1, knopf)}<p class="fb">${esc(H.fehler)}</p></section>`;
@@ -192,15 +192,15 @@
       return;
     }
     if (H.fokus && liste.includes(H.fokus)) {
-      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !voll && !H.wahlOffen;
-      const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : voll ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
+      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !istVoll(fid) && !H.wahlOffen;
+      const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : istVoll(fid) ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
       app.innerHTML = `<section class="karte-h">${kopf}<button class="btn ghost klein held-zurueck" id="f-zurueck">← Alle Helden</button>${HL.detail(fid, (s.abenteuer && s.abenteuer.stufe) || s.stufe || 1, knopf)}<p class="fb">${esc(H.fehler)}</p></section>`;
       $("#f-zurueck").onclick = () => { H.fokus = null; render(); };
       $("#f-spielen").onclick = () => waehle(fid);
       return;
     }
     app.innerHTML = `<section class="karte-h">${kopf}<h1>Wähle deinen Helden</h1>
-      ${laeuft ? `<p class="note">Das Abenteuer läuft schon. Du kannst eine Figur übernehmen, deren Handy die Runde verlassen hat.</p>` : `<p class="note">Tippe einen Helden an, um ihn kennenzulernen. Jede Person spielt eine Figur, mindestens 3.</p>`}
+      ${laeuft ? `<p class="note">Das Abenteuer läuft schon. Du kannst eine Figur übernehmen, deren Handy die Runde verlassen hat.</p>` : `<p class="note">Tippe einen Helden an, um ihn kennenzulernen. Jede Person spielt eine Figur. Zusammen mit den Helden, die der Tisch steuert, sind es mindestens 3.</p>`}
       ${gruppe.length ? HL.plaetze(gruppe, Object.fromEntries(Object.entries(s.besitz || {}).map(([f, u]) => [f, (s.namen || {})[u] || ""]))) : ""}
       <div class="fkarten handy-karten">${liste.map((fid) => HL.kachel(fid, { an: gruppe.includes(fid), status: status(fid), statusArt: s.besitz && s.besitz[fid] ? "" : "tisch" })).join("")}</div>
       <p class="fb">${esc(H.fehler)}</p></section>`;

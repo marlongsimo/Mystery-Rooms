@@ -76,7 +76,7 @@
       const laeuft = LIVE.phase === "kampf" || LIVE.phase === "szene";
       // Läuft das Abenteuer (Szene oder Kampf), nur Figuren der Gruppe übernehmen; in der Lobby höchstens 6 Handys
       if (fid && laeuft && !SETUP.gruppe.includes(fid)) { veroeffentlichen(); return; }
-      if (fid && !laeuft && !Object.values(LIVE.besitz).includes(uid) && Object.keys(LIVE.besitz).length >= 6) { veroeffentlichen(); return; }
+      if (fid && !laeuft && !SETUP.gruppe.includes(fid) && SETUP.gruppe.filter((f) => LIVE.besitz[f] !== uid).length >= 6) { veroeffentlichen(); return; }
       if (laeuft && !fid) { veroeffentlichen(); return; } // im laufenden Abenteuer behält man seine Figur
       for (const f of Object.keys(LIVE.besitz)) if (LIVE.besitz[f] === uid) delete LIVE.besitz[f];
       if (fid) { LIVE.besitz[fid] = uid; if (laeuft) LIVE.frueher[fid] = uid; }
@@ -116,8 +116,10 @@
   function frueherSetzen(m) { LIVE.frueher = Object.assign({}, m || {}); if (zurueckgeben()) { zeichneSetup(); if (st) render(); veroeffentlichen(); } }
   /** Mit Handys spielen nur die Figuren, die jemand auf dem Handy gewählt hat */
   function gruppeAusHandys() {
-    const alt = SETUP.gruppe.filter((f) => LIVE.besitz[f]);
-    SETUP.gruppe = alt.concat(Object.keys(LIVE.besitz).filter((f) => !alt.includes(f)));
+    // Handy-Helden und vom Tisch gesteuerte Helden (SETUP.tisch); übernimmt ein Handy einen Tisch-Helden, gehört er dem Handy
+    SETUP.tisch = (SETUP.tisch || []).filter((f) => F.FIGUREN[f] && !LIVE.besitz[f]);
+    const soll = Object.keys(LIVE.besitz).concat(SETUP.tisch), alt = SETUP.gruppe.filter((f) => soll.includes(f));
+    SETUP.gruppe = alt.concat(soll.filter((f) => !alt.includes(f))).slice(0, 6);
   }
   function liveClient() {
     if (LIVE.client) return LIVE.client;
@@ -144,7 +146,7 @@
       const c = liveClient();
       try { await c.create("Spieltisch"); }
       catch (e) { if (/Gruppengröße|max/i.test(e.message || "")) { c.maxPlayers = 4; await c.create("Spieltisch"); } else throw e; }
-      LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.frueher = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null; SETUP.gruppe = [];
+      LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.frueher = {}; LIVE.erledigt = {}; LIVE.antwort = null; st = null; SETUP.gruppe = []; SETUP.tisch = [];
       wach();
       // Mit Kampagnen: zuerst einladen (Freunde, Gäste-Code, Tisch-Gerät), dann Heldenwahl
       if (window.KAMPAGNE && window.KAMPAGNE.einladen) { veroeffentlichen(); await window.KAMPAGNE.einladen(); }
@@ -200,11 +202,13 @@
     }).join("");
     const an = SETUP.gruppe.includes(fokus), uidF = live ? LIVE.besitz[fokus] : null;
     const knopf = live
-      ? `<p class="held-hinweis">${uidF ? `📱 <b>${esc(spielerName(uidF))}</b> spielt ${esc(F.FIGUREN[fokus].name)}.` : "Wählt eure Figuren auf den Handys. Hier könnt ihr sie euch ansehen."}</p>`
+      ? (uidF ? `<p class="held-hinweis">📱 <b>${esc(spielerName(uidF))}</b> spielt ${esc(F.FIGUREN[fokus].name)}.</p>`
+        : `<button class="btn ${an ? "ghost " : ""}gross held-knopf" id="f-tisch" ${!an && n >= 6 ? "disabled" : ""}>${an ? "Nicht mehr vom Tisch spielen" : n >= 6 ? "Die Gruppe ist voll" : `${esc(F.FIGUREN[fokus].name)} vom Tisch spielen lassen`}</button>
+          <p class="held-hinweis">Wählt eure Figuren auf den Handys. Fehlt jemand, steuert der Tisch weitere Helden – ein Handy kann sie jederzeit übernehmen.</p>`)
       : `<button class="btn gross held-knopf" id="f-waehlen" ${!an && n >= 6 ? "disabled" : ""}>${an ? "Aus der Gruppe nehmen" : n >= 6 ? "Die Gruppe ist voll" : `${esc(F.FIGUREN[fokus].name)} in die Gruppe`}</button>`;
     const handys = live ? LIVE.client.players.filter((p) => !p.is_host) : [];
     const status = live
-      ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Es spielen nur die Figuren, die jemand auf dem Handy gewählt hat${n < 3 ? ` – mindestens 3, noch ${3 - n}` : ""}.`
+      ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Es spielen die Figuren der Handys${(SETUP.tisch || []).length ? ` und ${SETUP.tisch.length} vom Tisch gesteuerte` : ""}${n < 3 ? ` – mindestens 3, noch ${3 - n}. Zu wenige Handys? Lasst weitere Helden vom Tisch spielen` : ""}.`
       : n < 3 ? `Wählt mindestens 3 Figuren – noch ${3 - n}.` : "Eine Person steuert alle Figuren auf diesem Gerät.";
     const gegner = (() => { const g = R.gegnerFuer(SETUP.begegnung, Math.max(3, n), SETUP.stufe); return g.map((x) => `${x.anzahl} × ${R.GEGNER[x.art].name}${Math.abs(x.tpFaktor - 1) > 0.04 ? ` (${Math.round(R.GEGNER[x.art].tp * x.tpFaktor)} TP)` : ""}`).join(", "); })();
     el.innerHTML = `
@@ -236,6 +240,11 @@
     el.querySelectorAll("[data-platz]").forEach((b) => { b.onclick = () => { fokus = b.dataset.platz; klasseSicht = F.FIGUREN[fokus].klasse; zeichneSetup(); }; });
     el.querySelectorAll("[data-klasse]").forEach((b) => { b.onclick = () => { klasseSicht = b.dataset.klasse; fokus = null; zeichneSetup(); const k = $(".klassen-leiste"); if (k) k.scrollIntoView({ block: "nearest" }); }; });
     const kz = $("#klassen-zurueck"); if (kz) kz.onclick = () => { klasseSicht = null; zeichneSetup(); };
+    const ft = $("#f-tisch"); if (ft) ft.onclick = () => {
+      SETUP.tisch = SETUP.tisch || [];
+      if (SETUP.tisch.includes(fokus)) SETUP.tisch = SETUP.tisch.filter((f) => f !== fokus); else if (n < 6) { SETUP.tisch.push(fokus); if (window.ABE) window.ABE.glocke(0.25); }
+      gruppeAusHandys(); setupMerken(); zeichneSetup(); veroeffentlichen();
+    };
     const w = $("#f-waehlen"); if (w) w.onclick = () => {
       const i = SETUP.gruppe.indexOf(fokus);
       if (i >= 0) SETUP.gruppe.splice(i, 1); else if (SETUP.gruppe.length < 6) { SETUP.gruppe.push(fokus); if (window.ABE) window.ABE.glocke(0.25); }
@@ -306,7 +315,7 @@
   }
   /** Neues Tisch-Gerät einer noch nicht begonnenen Kampagne: Heldenwahl mit Handys */
   function lobbyFuerKampagne(schwierigkeit) {
-    SETUP.schwierigkeit = schwierigkeit === "hardcore" ? "hardcore" : "normal"; SETUP.gruppe = [];
+    SETUP.schwierigkeit = schwierigkeit === "hardcore" ? "hardcore" : "normal"; SETUP.gruppe = []; SETUP.tisch = [];
     LIVE.phase = "lobby"; LIVE.besitz = {}; LIVE.frueher = {}; LIVE.erledigt = {}; st = null; window.AB.st = null; kampfEnde = null;
     zeigeSetup(); veroeffentlichen();
   }

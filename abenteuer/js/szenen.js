@@ -397,7 +397,7 @@
     const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: A.stufe });
     const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher }, k);
     // Abwechslung: gemischte Startplätze, in etwa jedem dritten Kampf ein Anführer (nicht im Duell und nicht beim Endgegner)
-    if (!o.gegner && !o.boss) { o.mischen = true; o.anfuehrer = anfuehrerFestlegen(A, k); }
+    if (!o.gegner && !o.boss) { o.mischen = k.mischen !== false; o.anfuehrer = anfuehrerFestlegen(A, k); } // feste Plätze (z. B. Nester): mischen: false
     if (A.kampfMod) { o.skalaMal = (o.skalaMal || 1) * A.kampfMod; }
     return o;
   }
@@ -406,6 +406,8 @@
     const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
     for (const f of R.spielerFiguren(st)) if (f.tot && !A.gefallen.includes(f.fid)) { A.gefallen.push(f.fid); notiz(A, `${f.name} ist gefallen.`, "schlecht"); }
     if (st.ereignisse) for (const e of st.ereignisse) if (s.ereignisse && s.ereignisse[e]) wirke(A, s.ereignisse[e]);
+    // Ergebnis aus dem Kampf übernehmen (z. B. wie viele Gefangene gerettet wurden), egal wie er endet
+    if (typeof k.nachher === "function") wirke(A, k.nachher(st, A));
     if (st.ende === "sieg") {
       const nz = R.nachKampf(st);
       for (const fid of A.gruppe) if (nz[fid]) A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); else if (A.gefallen.includes(fid)) A.zust[fid].tot = true;

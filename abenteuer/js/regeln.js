@@ -103,6 +103,8 @@
     kaelterufer: { name: "Kälterufer", tp: 16, rk: 12, werte: { STR: 8, GES: 12, KON: 12, INT: 14, WEI: 14, CHA: 12 }, angriff: { name: "Frostlanze", bonus: 5, schaden: "1W8+2", reichweite: 6 }, rufer: { heilung: "1W8+2", reichweite: 6 }, bewegung: 5, xp: 150 },
     runenleser: { name: "Runenleser", tp: 24, rk: 13, werte: { STR: 9, GES: 12, KON: 12, INT: 16, WEI: 14, CHA: 10 }, angriff: { name: "Runenblitz", bonus: 5, schaden: "1W10+2", reichweite: 6 }, feldzauber: { name: "Runenlinie", anzahl: 3, dauer: 2, alle: 3, reichweite: 8 }, bewegung: 5, xp: 250 },
     kettenbestie: { name: "Kettenbestie", tp: 40, rk: 14, werte: { STR: 18, GES: 10, KON: 16, INT: 4, WEI: 10, CHA: 4 }, angriff: { name: "Kettenhieb", bonus: 6, schaden: "2W6+3" }, rueckstoss: { felder: 2, sg: 13 }, bewegung: 5, xp: 450 },
+    splitterbrutmutter: { name: "Splitterbrutmutter", tp: 40, rk: 13, werte: { STR: 16, GES: 12, KON: 15, INT: 4, WEI: 10, CHA: 4 }, angriff: { name: "Splitterbiss", bonus: 5, schaden: "2W6+2" }, brut: { art: "glasschwaermer", alle: 2, max: 4 }, bewegung: 4, xp: 450 },
+    eidwaechter: { name: "Eidwächter", tp: 40, rk: 15, werte: { STR: 17, GES: 9, KON: 16, INT: 8, WEI: 12, CHA: 8 }, angriff: { name: "Eidhammer", bonus: 5, schaden: "2W6+3" }, untot: true, bewegung: 4, xp: 450 },
     eisenhirte: { name: "Eisenhirte", tp: 70, rk: 16, werte: { STR: 20, GES: 8, KON: 18, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Steinfaust", bonus: 6, schaden: "2W8+3" }, bewegung: 3,
       flaeche: { name: "Bodenstoß", form: "ring", radius: 2, schaden: "3W6", sg: 13, rettung: "GES", alle: 3, liegend: true },
       phasen: [{ ab: 0.5, text: "Die Runen am Eisenhirten glühen weiß: Er stampft schneller und wilder.", rk: -1 }], xp: 1100 },
@@ -139,6 +141,12 @@
     hauptmann: { name: "Der Jägerhauptmann", stufe: 2, zusatzAb: 99, gegner: [["jaegerhauptmann", 0, 1, 1], ["siegeljaeger", 0.7, 5], ["jaegerschuetze", 0.35, 3]], skala: { 2: 1.07, 3: 2.16, 4: 3.27, 5: 3.99, 6: 4.76 }, skalaHC: { 2: 0.54, 3: 1.6, 4: 1.9, 5: 2.55, 6: 3.12 } },
     wehrgang: { name: "Der offene Wehrgang", stufe: 3, zusatzAb: 99, gegner: [["siegeljaeger", 0.6, 5, 0.5], ["jaegerschuetze", 0.3, 3], ["funkenhund", 0.4, 3, 0.5]], skala: { 2: 1.16, 3: 1.27, 4: 1.68, 5: 1.68, 6: 2.09 }, skalaHC: { 2: 1.21, 3: 1.27, 4: 1.68, 5: 1.54, 6: 2.01 } },
     finale: { name: "Das letzte Licht", stufe: 3, zusatzAb: 99, gegner: [["fackelzehrer", 0.1, 1, 0.6], ["funkenhund", 0.3, 3, 0.4], ["siegeljaeger", 0.45, 4, 0.3], ["jaegerschuetze", 0.15, 1]], skala: { 2: 0.51, 3: 0.88, 4: 1.13, 5: 1.74, 6: 2.06 }, skalaHC: { 2: 0.51, 3: 0.99, 4: 1.15, 5: 1.67, 6: 1.93 } },
+    // Die Krone unter dem Eis, Akt I (Heldenstufe 1). Faktoren: tools/auswertung-krone.js --kalibrieren
+    k_grat: { name: "Jagd auf die Fackel", stufe: 1, zusatzAb: 99, gegner: [["jaegerhauptmann", 0.25, 1, 0], ["siegeljaeger", 0.35, 3, 0.3], ["jaegerschuetze", 0.3, 2], ["funkenhund", 0.2, 2]], skala: { 2: 0.51, 3: 0.51, 4: 0.55, 5: 1.15, 6: 1.49 }, skalaHC: { 2: 0.54, 3: 0.54, 4: 0.52, 5: 0.66, 6: 0.95 } },
+    k_stollen: { name: "Nest im Eis", stufe: 1, zusatzAb: 99, gegner: [["glasnest", 0, 2, 2], ["splitterbrutmutter", 0.25, 1, 0], ["glasschwaermer", 0.4, 3]], skala: { 2: 0.81, 3: 0.81, 4: 1.23, 5: 1.89, 6: 2.57 }, skalaHC: { 2: 0.25, 3: 0.25, 4: 0.81, 5: 1.23, 6: 1.66 } },
+    k_pilger: { name: "Die namenlosen Pilger", stufe: 1, zusatzAb: 99, gegner: [["eidwaechter", 0.25, 1, 0], ["kaelterufer", 0.25, 1, 0], ["eisgezeichneter", 0.7, 5]], skala: { 2: 0.36, 3: 0.36, 4: 0.93, 5: 1.63, 6: 3.71 }, skalaHC: { 2: 0.25, 3: 0.25, 4: 0.44, 5: 1.53, 6: 2.8 } },
+    k_markt: { name: "Marktplatz der leeren Fenster", stufe: 1, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["jaegerschuetze", 0.2, 2, 0.6], ["frostknecht", 0.2, 2], ["eisgezeichneter", 0.7, 5]], skala: { 2: 0.76, 3: 0.76, 4: 0.8, 5: 1.2, 6: 1.53 }, skalaHC: { 2: 0.58, 3: 0.58, 4: 0.63, 5: 1.08, 6: 1.56 } },
+    k_kammern: { name: "Die Kammern der Verschleppten", stufe: 1, zusatzAb: 99, gegner: [["frostknecht", 0.25, 2, 0.25], ["glasschwaermer", 0.5, 5]], skala: { 2: 0.85, 3: 0.85, 4: 1.23, 5: 1.59, 6: 2.2 }, skalaHC: { 2: 1.03, 3: 1.03, 4: 1.26, 5: 1.37, 6: 2.2 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -330,7 +338,7 @@
     }
     // Mechaniken: Leben der Verstärkung wie die Begegnung; Gegner mit Sonderzügen brauchen den Mechanik-Zustand auch ohne Ziele
     const tpk = skalaK(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore") * (opts.skalaMal || 1) * tpGlobal;
-    if (!st.mech && gegnerFiguren(st).some((g) => { const d = GEGNER[g.art]; return d.flaeche || d.nest || d.feldzauber || d.rufer || d.phasen; })) mechanikStart(st, {}, tpk);
+    if (!st.mech && gegnerFiguren(st).some((g) => { const d = GEGNER[g.art]; return d.flaeche || d.nest || d.brut || d.feldzauber || d.rufer || d.phasen; })) mechanikStart(st, {}, tpk);
     if (st.mech) { st.mech.tpk = tpk; mechanikGegner(st); }
     // Anführer: der zäheste Gegner bekommt mehr Leben, bessere Rüstung und trifft besser
     if (opts.anfuehrer) { const a = gegnerFiguren(st).filter((g) => !GEGNER[g.art].boss).sort((x, y) => y.tpMax - x.tpMax)[0]; if (a) { a.tp = a.tpMax = Math.round(a.tpMax * (st.schwierigkeit === "hardcore" ? 1.4 : 1.6)); a.rk += 1; a.rkBasis += 1; a.anfuehrer = true; a.name = a.name.replace(/ \d+$/, "") + " (Anführer)"; st.log.push({ t: `Ein Anführer führt die Gegner: ${a.name}.`, art: "schlecht" }); } }
@@ -550,7 +558,8 @@
     const sp = spielerFiguren(st), ge = gegnerFiguren(st);
     // Eskorte mit „jaegerSieg“: Sind alle Jäger besiegt, ist die Begleiterin in Sicherheit
     const jaegerWeg = st.eskorte && st.eskorte.jaegerSieg && ge.some((f) => GEGNER[f.art].jaeger) && ge.filter((f) => GEGNER[f.art].jaeger).every((f) => f.tp <= 0);
-    if (ge.every((f) => f.tp <= 0) || jaegerWeg) {
+    const zieleOffen = st.mech && st.mech.zieleZuerst && st.mech.ziele.some(zielOffen);
+    if ((ge.every((f) => f.tp <= 0) && !zieleOffen) || jaegerWeg) {
       st.ende = "sieg"; st.xp = ge.reduce((a, g) => a + GEGNER[g.art].xp, 0);
       st.log.push({ t: `Sieg! Alle Gegner sind besiegt. Jede Figur erhält ${Math.floor(st.xp / sp.length)} EP.`, art: "ende" });
     } else if (sp.every((f) => f.tp <= 0)) {
@@ -1235,6 +1244,7 @@
     if (abstand(g, ziel) > 1 && st.zug.bewegung > 0) {
       const m = erreichbar(st, g, st.zug.bewegung); let best = null;
       for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const dist = Math.min(...lebende.map((f) => abstand({ x, y }, f) + (g.z.spott === f.id ? -1 : 0))); if (!best || dist < best.dist || (dist === best.dist && c < best.c)) best = { x, y, dist, c }; }
+      if (st.mech && best && best.dist >= abstand(g, ziel) && best.dist > 1) { const w = naeherAufWeg(st, g, ziel, m); if (w) best = w; }
       if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
       if (!lebt(g)) { if (!st.ende) weiter(st); return; }
       lebende = zieleFuerGegner(st, g); ziel = naechste();
@@ -1318,7 +1328,7 @@
   function mechanikStart(st, m, tpk) {
     st.karte.hindernisse = st.karte.hindernisse.slice();
     const mech = st.mech = { ziele: [], wellen: [], marken: [], wandel: [], wieder: [], gerettet: 0, stat: { getroffen: 0, ausgewichen: 0 }, tpk: tpk || 1, sieg: m.sieg || null, schild: m.schild || null, eis: null,
-      ausgang: m.ausgang ? { felder: m.ausgang.felder.map((p) => p.slice()), text: m.ausgang.text || null } : null };
+      ausgang: m.ausgang ? { felder: m.ausgang.felder.map((p) => p.slice()), text: m.ausgang.text || null } : null, zieleZuerst: Boolean(m.zieleZuerst) };
     for (const z of m.ziele || []) {
       mech.ziele.push({ id: z.id, name: z.name, art: z.art || "ziel", x: z.x, y: z.y, runden: z.runden || 1, fortschritt: 0, fertig: false, verloren: false, ruhe: Boolean(z.ruhe), frist: z.frist || null,
         umkehrbar: Boolean(z.umkehrbar), aktion: z.aktion || null, fertigText: z.fertigText || null, wirkung: z.wirkung || {} });
@@ -1389,6 +1399,7 @@
       if (wahl.length) { m.wandel.push({ felder: wahl, typ: "loch", runde: st.runde + 1, name: "Das Eis" }); st.log.push({ t: `Das Eis knackt! ${wahl.length === 1 ? "Ein Feld bricht" : `${wahl.length} Felder brechen`} zu Beginn der nächsten Runde ein.`, art: "schlecht" }); }
     }
     for (const z of m.ziele) if (zielOffen(z) && z.frist && st.runde > z.frist) { z.verloren = true; st.log.push({ t: `${z.name}: zu spät.${z.wirkung.verlorenText ? " " + z.wirkung.verlorenText : ""}`, art: "schlecht" }); }
+    if (m.zieleZuerst) { pruefeEnde(st); if (st.ende) return; }
     for (const w of m.wellen) {
       if (w.aus || w.gekommen >= w.max) continue;
       if (w.an && !gegnerFiguren(st).some((g) => lebt(g) && g.art === w.an)) { w.aus = true; st.log.push({ t: `${w.name}: Niemand ruft mehr Verstärkung.`, art: "gut" }); continue; }
@@ -1432,6 +1443,7 @@
     const w = z.wirkung;
     for (const id of [].concat(w.welleAus || [])) { const q = st.mech.wellen.find((x) => x.id === id); if (q && !q.aus) { q.aus = true; st.log.push({ t: `${q.name}: versiegt.`, art: "gut" }); } }
     if (w.gerettet) st.mech.gerettet++;
+    if (st.mech.zieleZuerst) pruefeEnde(st);
     if (w.schild) for (const g of gegnerFiguren(st)) if (g.schild && g.schild.ziele.includes(z.id) && g.schild.ziele.every((id) => (st.mech.ziele.find((x) => x.id === id) || {}).fertig)) {
       g.schild.aktiv = false; g.schild.dauerhaftAus = true; st.log.push({ t: `${g.name}: Das ${g.schild.text} erlischt endgültig.`, art: "gut" });
     }
@@ -1445,7 +1457,7 @@
   }
   function mechSiegPruefen(st) {
     const s = st.mech && st.mech.sieg; if (!s || st.ende) return;
-    const ok = (s.ziele && st.mech.ziele.filter((z) => z.fertig && (!s.art || z.art === s.art)).length >= s.ziele) || (s.besiegt && gegnerFiguren(st).filter((g) => g.art === s.besiegt.art && g.tp <= 0).length >= s.besiegt.n);
+    const ok = (s.ziele && st.mech.ziele.filter((z) => z.fertig && (!s.art || z.art === s.art)).length >= s.ziele) || [].concat(s.besiegt || []).some((b) => gegnerFiguren(st).filter((g) => g.art === b.art && g.tp <= 0).length >= b.n);
     if (!ok) return;
     st.ende = "sieg"; st.xp = gegnerFiguren(st).filter((g) => g.tp <= 0).reduce((a, g) => a + GEGNER[g.art].xp, 0);
     st.log.push({ t: s.text || "Ziel erreicht – der Weg ist frei!", art: "ende" });
@@ -1492,6 +1504,26 @@
     }
     if (n) { st.log.push({ t: `${g.name} stößt ${z.name} ${n === 1 ? "ein Feld" : n + " Felder"} zurück.`, art: "gegner" }); brandFeld(st, z); }
   }
+  /** Wegkarte: Schritte bis neben das Ziel, um Hindernisse herum (Figuren zählen nicht) */
+  function wegKarte(st, z) {
+    const d = new Map(), q = [];
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const x = z.x + dx, y = z.y + dy; if ((dx || dy) && !blockiert(st, x, y)) { d.set(key(x, y), 0); q.push([x, y]); } }
+    while (q.length) {
+      const [x, y] = q.shift(), c = d.get(key(x, y));
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+        const nx = x + dx, ny = y + dy, k2 = key(nx, ny);
+        if ((!dx && !dy) || blockiert(st, nx, ny) || d.has(k2) || (dx && dy && (blockiert(st, x + dx, y) || blockiert(st, x, y + dy)))) continue;
+        d.set(k2, c + 1); q.push([nx, ny]);
+      }
+    }
+    return d;
+  }
+  /** Ausweg aus Sackgassen (nur mit Mechaniken, weil dort Löcher und Eiswände Wege verändern): bestes Feld nach echter Weglänge */
+  function naeherAufWeg(st, f, z, felder) {
+    const wk = wegKarte(st, z), jetzt = wk.has(key(f.x, f.y)) ? wk.get(key(f.x, f.y)) : Infinity; let best = null;
+    for (const [k2, c] of felder) { if (c === "schritt") continue; const w = wk.get(k2); if (w == null || w >= jetzt) continue; if (!best || w < best.w || (w === best.w && c < best.c)) { const [x, y] = k2.split(",").map(Number); best = { x, y, w, c }; } }
+    return best;
+  }
   /** Sonderzüge der neuen Gegner. Gibt true zurück, wenn der Zug damit erledigt ist */
   function sonderZug(st, g, d) {
     const m = st.mech;
@@ -1514,6 +1546,11 @@
       const n = d.nest; g.nestN = g.nestN || 0;
       if (st.runde % n.alle === 0 && g.nestN < n.max) { const feld = freiesFeldNahe(st, [g.x, g.y], 2); if (feld) { const s = neuerGegner(st, n.art, feld, "geschlüpft"); g.nestN++; st.log.push({ t: `${g.name} bricht auf: ${s.name} kriecht heraus.`, art: "schlecht" }); } }
       weiter(st); return true;
+    }
+    // 2b. Brut: Die Mutter legt alle paar Runden einen Schwärmer neben sich und kämpft dann weiter
+    if (d.brut && st.runde % d.brut.alle === 0 && (g.brutN || 0) < d.brut.max && g.brutRunde !== st.runde) {
+      const feld = freiesFeldNahe(st, [g.x, g.y], 2); g.brutRunde = st.runde;
+      if (feld) { const s = neuerGegner(st, d.brut.art, feld, "Brut"); g.brutN = (g.brutN || 0) + 1; st.log.push({ t: `${g.name} würgt ${s.name} hervor.`, art: "schlecht" }); }
     }
     // 3. Rufer: erweckt erledigte Ziele wieder oder stärkt Verbündete
     if (d.rufer && ruferZug(st, g, d.rufer)) return true;
@@ -1558,7 +1595,8 @@
   }
   function ruferZug(st, g, rf) {
     const m = st.mech;
-    const z = m && m.ziele.filter((x) => x.umkehrbar && !x.verloren && (x.fertig || x.fortschritt > 0)).sort((a, b) => abstand(a, g) - abstand(b, g))[0];
+    const bereit = g.ruferRunde == null || st.runde - g.ruferRunde >= 2; // nur jede zweite Runde
+    const z = bereit && m && m.ziele.filter((x) => x.umkehrbar && !x.verloren && (x.fertig || x.fortschritt > 0)).sort((a, b) => abstand(a, g) - abstand(b, g))[0];
     if (z) {
       if (abstand(z, g) > 1 && st.zug.bewegung > 0) {
         const mm = erreichbar(st, g, st.zug.bewegung); let best = null;
@@ -1566,7 +1604,7 @@
         if (best) { const sx = g.x, sy = g.y; g.x = best.x; g.y = best.y; brandFeld(st, g); fangschuss(st, g, sx, sy); }
       }
       if (lebt(g) && !st.ende && abstand(z, g) <= 1) {
-        const war = z.fertig; z.fertig = false; z.fortschritt = Math.max(0, (war ? z.runden : z.fortschritt) - 1);
+        const war = z.fertig; z.fertig = false; g.ruferRunde = st.runde; z.fortschritt = Math.max(0, (war ? z.runden : z.fortschritt) - 1);
         st.log.push({ t: `${g.name} legt die Hand auf ${z.name}: ${war ? "Er erwacht wieder" : "Der Fortschritt schwindet"} (${z.fortschritt}/${z.runden}).`, art: "schlecht" });
         if (war) zielZurueck(st, z);
         if (!st.ende) weiter(st); return true;
@@ -1667,7 +1705,7 @@
     // Rufer (erwecken Ziele, rufen Verstärkung) haben Vorrang
     const vorrang = (g) => (GEGNER[g.art].rufer || (st.mech && st.mech.wellen.some((w) => !w.aus && w.an === g.art)) ? -0.6 : 0);
     const zielWahl = () => gegner().sort((a, b) => (a.tp / a.tpMax + abstand(f, a) * 0.08 + vorrang(a)) - (b.tp / b.tpMax + abstand(f, b) * 0.08 + vorrang(b)))[0];
-    let ziel = zielWahl(); if (!ziel) return zugEnde(st);
+    let ziel = zielWahl(); if (!ziel && !(st.mech && st.mech.ziele.some(zielOffen))) return zugEnde(st);
     if (kann("raserei") && gegner().some((g) => abstand(g, f) <= 8)) handeln(st, "raserei", f.id);
     // Endkampf: freie Siegelsteine berühren, wenn erreichbar
     if (st.siegel && st.siegel.some((z) => !z.beruehrt) && bossVon(st) && !imPakt(st, f) && st.zug.aktion) {
@@ -1684,8 +1722,9 @@
     if (st.mech && st.zug.aktion) {
       const offen = st.mech.ziele.filter(zielOffen);
       if (offen.length) {
-        const helden = spielerFiguren(st).filter(lebt), plaetze = Math.max(1, Math.ceil(helden.length / 2)), paare = [], zu = new Map(), vergeben = new Set();
-        for (const z of offen) for (const h of helden) paare.push({ z, h, d: abstand(z, h) - (z.frist ? 2 : 0) });
+        const helden = spielerFiguren(st).filter(lebt), plaetze = gegner().length ? Math.max(1, Math.ceil(helden.length / 2)) : helden.length, paare = [], zu = new Map(), vergeben = new Set();
+        const ruferDran = (z) => z.umkehrbar && gegner().some((g) => GEGNER[g.art].rufer && abstand(g, z) <= 2);
+        for (const z of offen) if (!ruferDran(z)) for (const h of helden) paare.push({ z, h, d: abstand(z, h) - (z.frist ? 2 : 0) });
         paare.sort((x, y) => x.d - y.d);
         for (const p of paare) { if (zu.size >= plaetze) break; if (zu.has(p.h) || vergeben.has(p.z)) continue; zu.set(p.h, p.z); vergeben.add(p.z); }
         const meins = zu.get(f);
@@ -1693,6 +1732,7 @@
           if (abstand(f, meins) > 1) {
             let best = null;
             for (const [k2, c] of bf()) { if (c === "schritt") continue; const [x, y] = k2.split(",").map(Number), d = abstand({ x, y }, meins); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, c, d }; }
+            if (best && best.d > 1 && best.d >= abstand(f, meins)) { const w = naeherAufWeg(st, f, meins, bf()); if (w) best = w; }
             if (best && !(best.x === f.x && best.y === f.y)) bewegen(st, best.x, best.y);
             zielGemacht = true;
           }
@@ -1713,6 +1753,7 @@
         if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
       }
     }
+    if (!ziel) { if (!st.ende) zugEnde(st); return; } // keine Gegner mehr, nur noch Ziele: wer keins hat, wartet
     // Eskorte: Wer Sera am nächsten ist, kümmert sich um sie – am Boden stabilisieren, sonst bei nahem Jäger neben sie stellen
     const sera = st.eskorte && begleiterVon(st);
     if (sera && st.zug.aktion) {
@@ -1746,6 +1787,7 @@
       else if (abstand(f, ziel) > 1) {
         // nicht erreichbar: so nah wie möglich, ggf. Fernkampf
         let näher = null; for (const [k, c] of m) { if (c === "schritt") continue; const [x, y] = k.split(",").map(Number); const d = abstand({ x, y }, ziel); if (!näher || d < näher.d) näher = { x, y, d }; }
+        if (st.mech && (!näher || näher.d >= abstand(f, ziel))) { const w = naeherAufWeg(st, f, ziel, m); if (w) näher = w; }
         if (näher && !(näher.x === f.x && näher.y === f.y)) bewegen(st, näher.x, näher.y);
       }
     } else {

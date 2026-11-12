@@ -7,7 +7,7 @@
   <title>Mythara – Das digitale Rollenspiel | Case Unlocked</title>
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/abenteuer.css?v=36">
+  <link rel="stylesheet" href="css/abenteuer.css?v=37">
 </head>
 <body>
   <header class="top">
@@ -218,9 +218,11 @@
     <section class="szene" id="szene" hidden></section>
     <section class="spiel" id="spiel" hidden>
       <div class="livebar" id="livebar" hidden></div>
+      <aside class="gruppe-kampf" id="gruppe-kampf" aria-label="Die Gruppe"></aside>
       <div class="reihe" id="reihe" aria-label="Zugreihenfolge"></div>
       <div class="karte-wrap"><svg id="karte" role="img" aria-label="Kampfkarte"></svg><div class="leiste" id="leiste"></div></div>
       <div class="panel">
+        <div class="boss-karte" id="boss-karte" hidden></div>
         <div class="gegner-info" id="gegner-info" hidden></div>
         <div class="aktiv" id="aktiv"></div>
         <div class="aktionen" id="aktionen"></div>
@@ -246,7 +248,8 @@
   <script src="daten/hochwacht.js?v=8"></script>
   <script src="daten/krone.js?v=7"></script>
   <script src="js/szenen.js?v=14"></script>
-  <script src="js/spiel.js?v=40"></script>
+  <script src="js/kampf-fx.js?v=1"></script>
+  <script src="js/spiel.js?v=41"></script>
   <script src="js/abenteuer-tisch.js?v=22"></script>
   <script src="js/einstieg.js?v=6"></script>
   <script src="js/mythara.js?v=23"></script>

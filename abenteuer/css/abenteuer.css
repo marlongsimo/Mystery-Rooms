@@ -1008,3 +1008,115 @@ body > .einst-panel { position: fixed; z-index: 40; }
 .kodex-glocke.lichter i { width: 22px; height: 22px; }
 .glocke.lichter i.an, .kodex-glocke.lichter i.an { background: #dff3b8; border-color: #dff3b8; box-shadow: 0 0 10px rgba(210,240,170,.75); }
 .hub-schwer { color: #e8c46a; white-space: nowrap; }
+
+
+/* ================= 05 · Kampfbühne (High-End, Etappe 1) ================= */
+/* Gruppe und Bosskarte gibt es auf allen Größen; die Bühne mit drei Spalten ab 1200 px */
+.gruppe-kampf { display: none; }
+.boss-karte { margin: -12px -12px 12px; padding: 14px; background: linear-gradient(180deg, rgba(60,90,120,.35), rgba(16,20,28,.2)); border-bottom: 1px solid rgba(143,208,255,.45); }
+.boss-karte small { font: 600 11px var(--schrift-titel); letter-spacing: .3em; color: #8fd0ff; }
+.boss-karte b { display: block; font: 600 20px var(--schrift-titel); color: #fff; margin: 2px 0 8px; }
+.gk-leben { position: relative; height: 16px; border-radius: 8px; background: #2a0d10; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6); }
+.gk-leben i { position: absolute; inset: 0 auto 0 0; border-radius: 8px; }
+.gk-leben .rest { background: #f4e2b8; transition: width .9s cubic-bezier(.3,.7,.2,1) .3s; }
+.gk-leben .wert { background: linear-gradient(180deg, #ff6b60, #b3262f 60%, #7c1219); box-shadow: inset 0 1px 0 rgba(255,255,255,.3); transition: width .25s; }
+.gk-leben.heil .rest { background: #9ff0b0; }
+.gk-leben span { position: relative; z-index: 1; display: grid; place-items: center; height: 100%; font: 600 11px var(--schrift-ui); color: #fff; text-shadow: 0 1px 2px #000; }
+.gk-leben.boss { height: 20px; }
+.bk-schild { position: relative; display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 12px; color: #d8f1ff; }
+.bk-schild i { flex: 1; height: 7px; border-radius: 4px; background: linear-gradient(90deg, #4aa6e8, #d8f1ff); box-shadow: 0 0 10px rgba(143,208,255,.7); max-width: 60%; }
+.bk-schild.aus { opacity: .5; } .bk-schild.aus i { background: #3a4a58; box-shadow: none; }
+.bk-phasen { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 5px; margin-top: 10px; }
+.bk-phasen span { text-align: center; padding: 4px 0; border-radius: 6px; font: 600 12px var(--schrift-titel); color: var(--muted); background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.bk-phasen span.an { color: #fff; background: linear-gradient(180deg, rgba(143,208,255,.35), rgba(60,120,180,.2)); box-shadow: inset 0 0 0 1px rgba(143,208,255,.7); }
+
+/* Spielfiguren und Effekte (immer) */
+#karte .fig { transform-box: fill-box; }
+#karte .aktiv-licht { animation: flackern 2.4s infinite; pointer-events: none; }
+@keyframes flackern { 0%, 100% { opacity: .9; } 30% { opacity: 1; } 55% { opacity: .7; } 70% { opacity: .95; } }
+#karte .fig.fx-treffer { animation: fx-treffer .45s; }
+@keyframes fx-treffer { 15% { filter: brightness(2.2) sepia(1) hue-rotate(-50deg) saturate(5); } 0%, 100% { filter: none; } }
+.karte-wrap .leiste { position: relative; z-index: 3; }
+.fx-kanal { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+.fx-zahl { position: absolute; z-index: 6; pointer-events: none; transform: translate(-50%, -50%); font: 600 34px var(--schrift-titel); color: #fff; text-shadow: 0 0 2px #000, 0 2px 0 #5a0d12, 0 0 18px rgba(255,60,50,.85); animation: fx-steigen 1.6s cubic-bezier(.2,.8,.3,1) forwards; }
+.fx-zahl.wunde { color: #ffd6d0; }
+.fx-zahl.krit { font-size: 54px; color: #ffe9a8; text-shadow: 0 0 2px #000, 0 3px 0 #7a4a10, 0 0 34px rgba(255,200,80,1); }
+.fx-zahl.krit::before { content: "KRITISCH"; position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 13px; letter-spacing: .3em; color: #f6dc9c; }
+.fx-zahl.heil { color: #d9ffe2; text-shadow: 0 0 2px #000, 0 2px 0 #1d5a2a, 0 0 18px rgba(80,230,120,.9); }
+@keyframes fx-steigen { 0% { opacity: 0; transform: translate(-50%, -20%) scale(.4); } 15% { opacity: 1; transform: translate(-50%, -60%) scale(1.25); } 30% { transform: translate(-50%, -70%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -190%) scale(.95); } }
+.fx-blitz { position: absolute; inset: 0; z-index: 7; pointer-events: none; animation: fx-blitz .9s ease-out forwards; }
+.fx-blitz.gold { background: radial-gradient(circle at 50% 50%, rgba(255,230,160,.7), rgba(255,180,60,.2) 35%, transparent 65%); }
+.fx-blitz.eis { background: radial-gradient(circle at 50% 50%, rgba(200,235,255,.6), rgba(120,190,255,.2) 35%, transparent 65%); }
+@keyframes fx-blitz { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+.karte-wrap.fx-beben { animation: fx-beben .5s; }
+@keyframes fx-beben { 20% { transform: translate(-6px, 3px); } 40% { transform: translate(5px, -4px); } 60% { transform: translate(-4px, 2px); } 80% { transform: translate(2px, -1px); } }
+.fx-banner { position: fixed; left: 0; right: 0; top: 38%; z-index: 60; pointer-events: none; opacity: 0; display: grid; place-items: center; }
+.fx-banner.zeigen { animation: fx-banner 1.9s cubic-bezier(.2,.8,.3,1) both; }
+.fx-band { width: 100%; padding: 14px 0 18px; text-align: center; background: linear-gradient(90deg, transparent, rgba(8,8,12,.88) 20%, rgba(8,8,12,.88) 80%, transparent); }
+.fx-band::before, .fx-band::after { content: ""; display: block; height: 1px; margin: 0 22%; background: linear-gradient(90deg, transparent, #d9b26a, transparent); }
+.fx-band h2 { margin: 8px 0 0; font: 600 54px var(--schrift-titel); letter-spacing: .12em; background: linear-gradient(180deg, #fff3cf, #d9a64a 60%, #8a5d1e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.fx-band p { margin: 2px 0 8px; font: italic 400 22px var(--schrift-text); color: var(--pergament); }
+.fx-banner.phase h2 { background: linear-gradient(180deg, #fff, #cfe9ff 50%, #6aa8d8); -webkit-background-clip: text; background-clip: text; }
+.fx-banner.runde h2 { font-size: 44px; }
+@keyframes fx-banner { 0% { opacity: 0; transform: scaleY(.2); } 12% { opacity: 1; transform: scaleY(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.fx-zug { position: fixed; left: 50%; top: 90px; z-index: 60; pointer-events: none; opacity: 0; display: flex; align-items: center; gap: 14px; padding: 8px 26px 8px 8px; border-radius: 50px;
+  background: linear-gradient(90deg, rgba(40,30,12,.96), rgba(14,12,8,.96)); box-shadow: 0 0 0 2px #d9b26a, 0 0 40px rgba(246,200,110,.4); transform: translateX(-50%); }
+.fx-zug.zeigen { animation: fx-zug 1.9s cubic-bezier(.2,.8,.3,1) both; }
+.fx-zug-bild { width: 56px; height: 56px; border-radius: 50%; background-size: cover; background-position: center 20%; box-shadow: 0 0 0 3px #f6dc9c; }
+.fx-zug small { display: block; font: 600 11px var(--schrift-titel); letter-spacing: .3em; color: #d9b26a; }
+.fx-zug b { font: 600 26px var(--schrift-titel); color: #fff; }
+@keyframes fx-zug { 0% { opacity: 0; transform: translate(-50%, -24px); } 15% { opacity: 1; transform: translate(-50%, 0); } 82% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -10px); } }
+.fx-intro { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: #000; opacity: 0; pointer-events: none; transition: opacity .6s; }
+.fx-intro.zeigen { opacity: 1; pointer-events: auto; cursor: pointer; }
+.fx-intro-bild { position: absolute; inset: 0; background-size: cover; background-position: center 30%; transform: scale(1.15); transition: transform 4s linear; }
+.fx-intro.zeigen .fx-intro-bild { transform: scale(1); }
+.fx-intro-bild::after { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 70% at 50% 40%, transparent, rgba(0,0,0,.85)), linear-gradient(180deg, transparent 50%, #000); }
+.fx-intro-text { position: relative; text-align: center; margin-top: 34vh; padding: 0 16px; }
+.fx-intro-text small { font: 600 15px var(--schrift-titel); letter-spacing: .5em; color: #8fd0ff; }
+.fx-intro-text h1 { margin: 6px 0 0; font: 600 clamp(36px, 6vw, 84px) var(--schrift-titel); letter-spacing: .05em; background: linear-gradient(180deg, #fff, #f6dc9c 55%, #b07c2c); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 24px rgba(246,200,110,.4)); }
+
+/* ---------- Bühne ab 1200 px: Gruppe | Karte | Aktionen und Chronik, Initiative unten ---------- */
+@media (min-width: 1200px) {
+  body.im-kampf main { max-width: none; padding: 14px 22px 22px; }
+  body.im-kampf { background: radial-gradient(120% 90% at 50% 30%, #18202e 0%, #0b0e14 55%, #050608 100%); }
+  .spiel { grid-template-columns: 270px minmax(0, 1fr) 340px; grid-template-rows: auto auto 1fr; gap: 16px 20px; align-items: start; }
+  .livebar { grid-column: 1 / -1; grid-row: 1; }
+  .gruppe-kampf { display: grid; gap: 12px; grid-column: 1; grid-row: 2 / span 2; align-content: start; }
+  .karte-wrap { grid-column: 2; grid-row: 2; }
+  .reihe { grid-column: 2; grid-row: 3; }
+  .panel { grid-column: 3; grid-row: 2; }
+  .log { grid-column: 3; grid-row: 3; max-height: 360px; }
+  .gruppe-kampf h3 { margin: 0 0 2px; font: 600 13px var(--schrift-titel); letter-spacing: .28em; color: #d9b26a; }
+  .gk-held { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; padding: 10px; border-radius: 14px; transition: .35s;
+    background: linear-gradient(135deg, rgba(30,33,44,.94), rgba(14,15,20,.94)); box-shadow: 0 0 0 1px rgba(217,178,106,.22), 0 10px 24px rgba(0,0,0,.45); }
+  .gk-held.dran { box-shadow: 0 0 0 2px #d9b26a, 0 0 30px rgba(246,200,110,.32), 0 10px 24px rgba(0,0,0,.45); transform: translateX(6px); }
+  .gk-held.unten { opacity: .6; filter: grayscale(.6); } .gk-held.tot { opacity: .35; }
+  .gk-bild { width: 64px; height: 64px; border-radius: 12px; background: #10161e center 20% / cover; box-shadow: 0 0 0 2px #6e4e1c, 0 0 0 4px rgba(0,0,0,.6); display: grid; place-items: center; color: #f6dc9c; font-size: 26px; }
+  .gk-info b { display: block; font: 600 17px var(--schrift-titel); color: #fff; }
+  .gk-info small { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gk-werte { display: flex; gap: 10px; margin-top: 6px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .gk-werte em { font-style: normal; color: #f6dc9c; font-weight: 600; }
+  .gk-zust { color: #c9a8ff; }
+  /* Das Brett: Goldrahmen, Tiefe, Vignette */
+  .karte-wrap { border: 0; border-radius: 14px; box-shadow: 0 0 0 2px rgba(217,178,106,.5), 0 0 0 8px rgba(10,10,14,.9), 0 0 0 10px rgba(217,178,106,.22), 0 40px 70px rgba(0,0,0,.7); }
+  .karte-wrap::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1; border-radius: 14px; background: radial-gradient(85% 80% at 50% 45%, transparent 55%, rgba(0,0,0,.55)); }
+  /* Initiative als Porträtleiste */
+  .reihe { justify-content: center; gap: 10px; padding: 12px 14px; border-radius: 16px; background: linear-gradient(180deg, rgba(24,26,34,.92), rgba(10,11,15,.95)); box-shadow: 0 0 0 1px rgba(217,178,106,.28); flex-wrap: wrap; }
+  .reihe span { flex-direction: column; gap: 4px; padding: 0; border: 0; background: none; font-size: 11px; max-width: 76px; text-align: center; white-space: normal; color: var(--muted); }
+  .reihe span.runde { align-self: center; padding: 6px 12px; border-radius: 16px; box-shadow: inset 0 0 0 1px rgba(217,178,106,.4); }
+  .reihe .mini { width: 52px; height: 52px; border-radius: 12px; border-width: 2px; transition: .35s; }
+  .reihe svg.mini { padding: 4px; }
+  .reihe span.dran { box-shadow: none; color: #fff; }
+  .reihe span.dran .mini { width: 66px; height: 66px; box-shadow: 0 0 0 2px #f6dc9c, 0 0 22px rgba(246,200,110,.6); }
+  /* Rechte Spalte: Karte des Aktiven, Aktionen, Chronik */
+  .panel { border-radius: 16px; border: 0; background: linear-gradient(180deg, rgba(28,30,40,.94), rgba(12,13,18,.94)); box-shadow: 0 0 0 1px rgba(217,178,106,.25), 0 10px 26px rgba(0,0,0,.5); overflow: hidden; }
+  .log { padding: 14px 16px; border-radius: 16px; border: 0; background: linear-gradient(180deg, rgba(28,30,40,.94), rgba(12,13,18,.94)); box-shadow: 0 0 0 1px rgba(217,178,106,.25); }
+  .log::before { content: "CHRONIK DES KAMPFES"; display: block; margin-bottom: 8px; font: 600 12px var(--schrift-titel); letter-spacing: .24em; color: #d9b26a; }
+  .log li { border-bottom: 0; border-left: 2px solid rgba(217,178,106,.35); padding: 5px 0 5px 10px; margin-bottom: 4px; color: #d9d0bf; }
+  .log li.gut { border-left-color: #6fe08a; } .log li.schlecht, .log li.gegner { border-left-color: #ff6a5a; } .log li.runde { border-left: 0; text-align: center; color: #d9b26a; font: 600 12px var(--schrift-titel); letter-spacing: .2em; }
+  .meldungen { display: none; }
+  body.im-kampf .wurf { bottom: auto; top: 50%; transform: translate(-50%, -40%) scale(.9); }
+  body.im-kampf .wurf.an { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 1px rgba(217,178,106,.5), 0 30px 60px rgba(0,0,0,.7), 0 0 40px rgba(246,200,110,.25); }
+}
+/* Auf dem gemalten Brett ruhen die Effekte über den Feldern, die Zahlen und Banner über allem */
+body.fx-an .karte-wrap .meldungen { display: none; }

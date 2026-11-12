@@ -345,8 +345,37 @@
     if (t === "Q") return `<g><rect x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="#14262a"/><path d="M${x * Z + 8} ${y * Z + 20} q8 -5 16 0 t16 0 M${x * Z + 14} ${y * Z + 40} q8 -5 16 0 t16 0" stroke="#3f6f78" stroke-width="2" fill="none" opacity=".7"/></g>`;
     if (t === "T") return `<g transform="translate(${cx} ${cy})"><ellipse cy="20" rx="20" ry="6" fill="#000" opacity=".3"/><path d="M-3 22 L-2 -6 L-14 -18 M-2 -2 L10 -20 M0 -10 L4 -26" stroke="#3b3326" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M-2 22 L-2 -6" stroke="#2a2418" stroke-width="7"/></g>`;
     if (t === "K") return `<g><rect x="${x * Z + 8}" y="${y * Z + 8}" width="${Z - 16}" height="${Z - 16}" fill="#6a4e30" stroke="#2e2014" stroke-width="2"/><path d="M${x * Z + 8} ${y * Z + 8}L${x * Z + Z - 8} ${y * Z + Z - 8}M${x * Z + Z - 8} ${y * Z + 8}L${x * Z + 8} ${y * Z + Z - 8}" stroke="#2e2014" stroke-width="2"/></g>`;
+    // Krone: eingebrochenes Eis (Loch, man sieht hinüber) und gewachsene Eiswand
+    if (t === "L") return `<g><rect x="${x * Z + 2}" y="${y * Z + 2}" width="${Z - 4}" height="${Z - 4}" rx="10" fill="#071a24"/><path d="M${x * Z + 6} ${y * Z + 14} l12 8 l-4 12 l14 6 M${x * Z + Z - 8} ${y * Z + 10} l-10 10 l6 10 M${x * Z + 10} ${y * Z + Z - 8} l14 -8 l12 4" stroke="#9fd8ff" stroke-width="1.6" fill="none" opacity=".6"/><ellipse cx="${cx}" cy="${cy + 4}" rx="16" ry="9" fill="#123a4c" opacity=".8"/></g>`;
+    if (t === "E") return `<g><path d="M${x * Z + 6} ${y * Z + Z - 4} L${x * Z + 10} ${y * Z + 14} L${cx - 6} ${y * Z + 4} L${cx + 8} ${y * Z + 10} L${x * Z + Z - 6} ${y * Z + 6} L${x * Z + Z - 4} ${y * Z + Z - 4} Z" fill="#bfe6f7" fill-opacity=".85" stroke="#6fb4d4" stroke-width="2"/><path d="M${cx - 6} ${y * Z + 12} L${cx - 2} ${y * Z + Z - 10} M${cx + 8} ${y * Z + 16} L${cx + 6} ${y * Z + Z - 14}" stroke="#ffffff" stroke-opacity=".7" stroke-width="2"/></g>`;
     if (t === "R") return `<g transform="translate(${cx} ${cy})"><path d="M-22 -22 Q0 -34 22 -22 L18 4 L-18 4 Z" fill="#8a6a2a" stroke="#3a2a10" stroke-width="2"/><path d="M0 4 V26" stroke="#b08850" stroke-width="4"/><circle cy="27" r="3" fill="#b08850"/></g>`;
     return `<g transform="translate(${cx} ${cy})"><circle r="24" fill="#6f6a60" stroke="#3b3a35" stroke-width="3"/><circle r="15" fill="#10161a"/><path d="M-10 -4 Q0 -10 10 -4" stroke="#3d5a6a" stroke-width="2" fill="none"/></g>`;
+  }
+  /** Krone: Ziel-Objekte, angekündigte Flächen, knackendes Eis, Verstärkung an den Zugängen, Ausgang */
+  function mechanikEbene() {
+    const m = st.mech, mitte = (x, y) => [x * Z + Z / 2, y * Z + Z / 2]; let o = "";
+    const schrift = (x, y, t, farbe = "#f0e2c0") => `<text x="${x}" y="${y}" text-anchor="middle" font-size="12" font-weight="700" fill="${farbe}" stroke="#000" stroke-width="3" paint-order="stroke">${esc(t)}</text>`;
+    if (m.eis && m.eis.bekannt) for (const [x, y] of m.eis.felder) if (!st.karte.block.has(x + "," + y)) o += `<path d="M${x * Z + 10} ${y * Z + 16} l10 8 l-3 10 l12 6 M${x * Z + Z - 12} ${y * Z + 12} l-8 9" stroke="#9fd8ff" stroke-opacity=".55" stroke-width="1.5" fill="none"><title>Brüchiges Eis</title></path>`;
+    if (m.ausgang) for (const [x, y] of m.ausgang.felder) o += `<rect x="${x * Z + 4}" y="${y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#e8c46a" fill-opacity=".12" stroke="#e8c46a" stroke-width="2.5" stroke-dasharray="6 4"><title>Ausgang: Alle Helden hierher</title></rect>`;
+    for (const c of m.wandel) for (const [x, y] of c.felder) o += `<g class="gefahr-eis"><rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${c.typ === "loch" ? "#1c5a78" : "#bfe6f7"}" fill-opacity=".35" stroke="#9fd8ff" stroke-width="2.5" stroke-dasharray="4 3"/><path d="M${x * Z + 12} ${y * Z + 14} l10 10 l-4 10 l12 8" stroke="#e8f6ff" stroke-width="2" fill="none"/><title>${c.typ === "loch" ? "Bricht ein" : "Hier wächst Eis"}</title></g>`;
+    for (const mk of m.marken) {
+      for (const [x, y] of mk.felder) o += `<rect class="gefahr-feld" x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="#d0343e" fill-opacity=".28" stroke="#ff6a5a" stroke-width="2.5" stroke-dasharray="6 3"><title>${esc(mk.name)}: trifft beim nächsten Zug</title></rect>`;
+      const [x0, y0] = mk.felder[0] || [0, 0]; o += schrift(x0 * Z + Z / 2, y0 * Z + 13, mk.name, "#ffb0a0");
+    }
+    for (const w of m.wellen) if (!w.aus && w.gekommen < w.max && st.runde === w.naechste - 1) for (const [x, y] of w.quellen) { const [cx, cy] = mitte(x, y); o += `<g class="welle-kommt"><circle cx="${cx}" cy="${cy}" r="${Z * 0.45}" fill="#ff9a3a" fill-opacity=".2" stroke="#ffb35a" stroke-width="3" stroke-dasharray="7 4"/>${schrift(cx, cy - Z * 0.5 < 12 ? cy + Z * 0.62 : cy - Z * 0.5, "Verstärkung!", "#ffd08a")}</g>`; }
+    for (const z of m.ziele) {
+      const [cx, cy] = mitte(z.x, z.y), an = z.fertig, weg = z.verloren;
+      const kern = z.art === "saeule" ? `<rect x="-11" y="-26" width="22" height="48" rx="3" fill="${an ? "#3a3d44" : "#5a6474"}" stroke="#1c1e22" stroke-width="2"/><path d="M0 -16 L-6 -4 L4 2 L-2 14" stroke="${an ? "#4a5060" : "#8fd0ff"}" stroke-width="3" fill="none"/>`
+        : z.art === "eisblock" ? `<rect x="-20" y="-22" width="40" height="44" rx="5" fill="${weg ? "#5a6670" : an ? "#2a3a44" : "#bfe6f7"}" fill-opacity="${an ? ".5" : ".85"}" stroke="#6fb4d4" stroke-width="2"/><circle cy="-6" r="6" fill="#3a4a58" opacity="${an ? 0 : 0.7}"/><path d="M-8 18 Q0 2 8 18" fill="#3a4a58" opacity="${an ? 0 : 0.7}"/>`
+        : z.art === "tafel" ? `<path d="M-15 22 V-14 Q0 -28 15 -14 V22 Z" fill="${an ? "#8a7a52" : "#6a6862"}" stroke="#2a2824" stroke-width="2"/><path d="M-8 -6 H8 M-8 2 H8 M-8 10 H4" stroke="#2a2824" stroke-width="2"/>`
+        : z.art === "grablicht" ? `<rect x="-9" y="-6" width="18" height="26" rx="2" fill="#4a4842" stroke="#24231f" stroke-width="2"/><circle cy="-12" r="${an ? 9 : 5}" fill="${an ? "#ffd27a" : "#3a3a3a"}" opacity="${an ? 0.9 : 1}"/>`
+        : `<ellipse cy="24" rx="20" ry="5" fill="#000" opacity=".35"/><path d="M-13 24 L-16 -14 L0 -27 L16 -14 L13 24 Z" fill="${an ? "#4a4842" : "#6a7488"}" stroke="#24231f" stroke-width="2.5"/><path d="M0 -16 V12 M-7 -6 L7 2 M7 -6 L-7 2" stroke="${an ? "#5a5a5a" : "#cfe6ff"}" stroke-width="2.4" stroke-linecap="round"/>`;
+      const glanz = an ? `<circle r="${Z * 0.46}" fill="#e8c46a" fill-opacity=".18" stroke="#e8c46a" stroke-width="2.5"/>` : weg ? "" : `<circle r="${Z * 0.46}" fill="none" stroke="#cfe6ff" stroke-opacity=".5" stroke-width="2" stroke-dasharray="5 4"/>`;
+      o += `<g transform="translate(${cx} ${cy})" class="ziel-objekt${an ? " fertig" : ""}${weg ? " verloren" : ""}">${glanz}${kern}<title>${esc(z.name)}${an ? " – erledigt" : weg ? " – verloren" : z.runden > 1 ? ` – ${z.fortschritt}/${z.runden}` : ""}${z.ruhe ? " · nur ohne Gegner daneben" : ""}</title></g>`;
+      const info = weg ? "verloren" : an ? "✓" : [z.runden > 1 ? `${z.fortschritt}/${z.runden}` : "", z.frist ? `noch ${Math.max(0, z.frist - st.runde + 1)} R.` : ""].filter(Boolean).join(" · ");
+      if (info) o += schrift(cx, cy - Z * 0.5 < 12 ? cy + Z * 0.62 : cy - Z * 0.5, info, an ? "#f0d488" : weg ? "#b0a8a0" : "#cfe6ff");
+    }
+    return o;
   }
   const farbeVon = (f) => (f.art === "wolf" ? "#3f7a3a" : F.KLASSEN[f.klasse].farbe);
 
@@ -390,7 +419,8 @@
     if (tipp && tipp.feld && spielerDran) o += `<rect class="tipp-ring" x="${tipp.feld.x * Z + 4}" y="${tipp.feld.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#f2d35a" fill-opacity=".18" stroke="#f2d35a" stroke-width="3"/>`;
     // Auf gemalten Karten ist alles im Bild; nur berührte Siegelsteine leuchten zusätzlich auf
     for (const [t, x, y] of k.hindernisse) {
-      if (t === "X") continue;
+      if (t === "X" || t === "O") continue; // Ziel-Objekte zeichnet die Mechanik-Ebene
+      if (t === "L" || t === "E") { o += hindernis(t, x, y); continue; } // entstehen erst im Kampf, also nie im Bild
       if (k.bild) { if (t === "Z" && st.siegel && (st.siegel.find((z) => z.x === x && z.y === y) || {}).beruehrt) o += `<circle cx="${x * Z + Z / 2}" cy="${y * Z + Z / 2}" r="${Z * 0.48}" fill="#f0d488" fill-opacity=".28" stroke="#f0d488" stroke-width="3"/>`; continue; }
       o += hindernis(t, x, y);
     }
@@ -405,6 +435,7 @@
         ? `<g transform="translate(${x * Z + Z / 2} ${y * Z + Z / 2})" class="ausgang"><circle r="${Z * 0.42}" fill="#e8c46a" fill-opacity=".14" stroke="#e8c46a" stroke-width="2.5" stroke-dasharray="6 4"/><path d="M-6 16V-16L12 -9L-6 -2" fill="#e8c46a" stroke="#6a4e1e" stroke-width="1.5"/></g>`
         : `<circle cx="${x * Z + Z / 2}" cy="${y * Z + Z / 2}" r="6" fill="${fertig ? "#6a6250" : "#e8c46a"}" fill-opacity=".7"/>`; });
     }
+    if (st.mech) o += mechanikEbene();
     // Wer am Boden liegt, wird zuerst gezeichnet, damit stehende Figuren darüber sichtbar bleiben
     for (const f of st.figuren.slice().sort((a, b) => (a.tp > 0) - (b.tp > 0))) {
       if (f.x < 0 || (f.z && f.z.verbannt)) continue;
@@ -412,6 +443,7 @@
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
       if (f.seite === "gegner" && unten) { o += `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
       if (!unten) o += `<ellipse cx="${cx}" cy="${cy + 6}" rx="27" ry="24" fill="${f.seite === "gegner" ? "#7B2932" : "#1d3c4a"}" fill-opacity=".45" stroke="${f.seite === "gegner" ? "#d0545e" : f.art === "wolf" ? "#6fbf8a" : "#4D9DB6"}" stroke-width="2.5"/>`;
+      if (!unten && f.schild && f.schild.aktiv) o += `<circle class="schild-ring" cx="${cx}" cy="${cy}" r="33" fill="#8fd0ff" fill-opacity=".12" stroke="#8fd0ff" stroke-width="3" stroke-dasharray="5 3"><title>${esc(f.schild.text)}: fängt die Hälfte des Schadens ab</title></circle>`;
       if (f === akt && !st.ende) o += `<circle class="aktiv-ring" cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#C5A267" stroke-width="3.5"/><circle cx="${cx}" cy="${cy}" r="33" fill="none" stroke="#C5A267" stroke-opacity=".35" stroke-width="5"/>`;
       if (gegnerInfo === f.id) o += `<circle cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#e8dcc0" stroke-width="2" stroke-dasharray="4 3"/>`;
       if (zs.includes(f)) {

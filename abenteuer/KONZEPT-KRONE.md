@@ -70,6 +70,24 @@ Neu: Frostknecht (Nahkampf, blockiert Engstellen), Eisgezeichneter (untoter Mob,
 | Rückstoß | neu | um 1–2 Felder schieben; an Abgrund oder brüchigem Eis gefährlich |
 | Eisenhirte „frontal gepanzert“ | Die Engine kennt keine Blickrichtung | ersetzt durch den Runenkern-Schild |
 
+### Stand der Bausteine (umgesetzt und getestet)
+Umgesetzt in `js/regeln.js` (Abschnitt „Mechaniken“), eingeschaltet je Kampf über `mechanik` in `neuesSpiel`. Ohne `mechanik` laufen alle bisherigen Kämpfe Zug für Zug gleich (280 Vergleichskämpfe). Darstellung in `js/spiel.js` (`mechanikEbene`), Gegnerbilder in `js/bild.js`. Tests: `tests/mechanik.test.js` (Regeln und Browser). Probekämpfe: `tools/mechanik-sim.js`.
+
+| Baustein | Umsetzung |
+|---|---|
+| Ziel-Objekte | Aktion „Ziel bedienen“ (auf dem Handy mit eigenem Namen); `runden` (mehrere Aktionen), `ruhe` (kein Gegner daneben), `frist` (danach verloren), `umkehrbar` (ein Rufer weckt es wieder). Wirkungen: Welle aus, Schild aus, Gerettete zählen. Sieg über Ziele möglich |
+| Verstärkungswellen | Eine Runde vorher angekündigt (Zugang leuchtet „Verstärkung!“), mit Obergrenze. Endet, wenn ihr Träger (`an`) besiegt oder ein Ziel erledigt ist. Gegnerzahl und Leben wachsen mit der Gruppe |
+| Angekündigte Flächen | Gegner mit `flaeche` (Kreis, Linie, Ring um sich): Die Felder werden rot markiert und treffen beim nächsten Zug des Gegners. Die Automatik weicht aus (Probe: 401 ausgewichen, 48 getroffen) |
+| Gelände | Brüchiges Eis: knackt angekündigt, bricht eine Runde später ein (Loch, Sturz 2W6 bei misslungener GES-Rettung, begrenzt auf die Hälfte der Felder). Eiswände (`feldzauber`): trennen Helden, entstehen beim nächsten Zug des Zaubernden, tauen nach 2 Runden |
+| Rückstoß | `rueckstoss`: STR-Rettung, sonst bis zu 2 Felder weg; an Abgrund oder Loch Sturz (2W6, liegt), an der Wand Aufprall (1W6) |
+| Boss-Phasen | `phasen` nach TP-Schwellen: Text, RK, Welle starten, Gelände verwandeln, Schild erneuern |
+| Schutzfeld | fängt die Hälfte ab, bricht nach genug Schaden für 2 Runden, erlischt endgültig, wenn seine Ziele (Runensäulen) erledigt sind |
+| Rufer | `rufer`: weckt erledigte Ziele wieder oder heilt Verbündete. Die Automatik greift Rufer zuerst an |
+| Nester | `nest`: unbewegliche Gegnerfigur, lässt alle 2 Runden einen Schwärmer schlüpfen (höchstens 3) |
+| Durchbruch | `ausgang`: Stehen alle Helden auf den Ausgangsfeldern, ist der Kampf gewonnen |
+
+Schon angelegte Gegner: Frostknecht, Eisgezeichneter, Glasschwärmer, Schwärmernest, Kälterufer, Runenleser, Kettenbestie, Eisenhirte. Ihre Werte sind vorläufig; das Balancing folgt mit den echten Kämpfen.
+
 ## K7. Enden und Marker
 **Enden:** Stabilisieren · Versiegeln · Umleiten, dazu die Niederlage. Jedes Ende öffnet Stufe 5 auf eigene Weise.
 

@@ -95,6 +95,17 @@
     jaegerhauptmann: { name: "Jägerhauptmann", tp: 34, rk: 15, werte: { STR: 16, GES: 13, KON: 14, INT: 12, WEI: 12, CHA: 14 }, angriff: { name: "Kriegsaxt", bonus: 5, schaden: "1W12+3" }, jaeger: true, xp: 200 },
     funkenhund: { name: "Funkenhund", tp: 22, rk: 13, werte: { STR: 17, GES: 12, KON: 14, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Biss", bonus: 5, schaden: "1W8+3" }, atem: { schaden: "3W6", sg: 12, alle: 3 }, jaeger: true, xp: 200 },
     fackelzehrer: { name: "Fackelzehrer", tp: 75, rk: 15, werte: { STR: 18, GES: 12, KON: 18, INT: 10, WEI: 14, CHA: 12 }, angriff: { name: "Glutklaue", bonus: 6, schaden: "2W8+3" }, atem: { name: "Aschesturm", schaden: "3W6", sg: 13, alle: 3, rettung: "WEI" }, jaeger: "wechsel", bewegung: 5, xp: 1100 },
+    // Die Krone unter dem Eis: Rollen statt Lebenspunkte (Mechaniken siehe KONZEPT-KRONE.md K6)
+    frostknecht: { name: "Frostknecht", tp: 18, rk: 15, werte: { STR: 16, GES: 9, KON: 15, INT: 5, WEI: 9, CHA: 5 }, angriff: { name: "Eisaxt", bonus: 4, schaden: "1W8+2" }, bewegung: 4, xp: 100 },
+    eisgezeichneter: { name: "Eisgezeichneter", tp: 9, rk: 11, werte: { STR: 12, GES: 10, KON: 12, INT: 4, WEI: 8, CHA: 4 }, angriff: { name: "Klammergriff", bonus: 3, schaden: "1W6+1" }, untot: true, bewegung: 5, xp: 50 },
+    glasschwaermer: { name: "Glasschwärmer", tp: 5, rk: 12, werte: { STR: 6, GES: 15, KON: 8, INT: 2, WEI: 10, CHA: 2 }, angriff: { name: "Splitter", bonus: 4, schaden: "1W4+2" }, bewegung: 6, xp: 25 },
+    glasnest: { name: "Schwärmernest", tp: 16, rk: 10, werte: { STR: 1, GES: 1, KON: 14, INT: 1, WEI: 1, CHA: 1 }, nest: { art: "glasschwaermer", alle: 2, max: 3 }, bewegung: 0, xp: 100 },
+    kaelterufer: { name: "Kälterufer", tp: 16, rk: 12, werte: { STR: 8, GES: 12, KON: 12, INT: 14, WEI: 14, CHA: 12 }, angriff: { name: "Frostlanze", bonus: 5, schaden: "1W8+2", reichweite: 6 }, rufer: { heilung: "1W8+2", reichweite: 6 }, bewegung: 5, xp: 150 },
+    runenleser: { name: "Runenleser", tp: 24, rk: 13, werte: { STR: 9, GES: 12, KON: 12, INT: 16, WEI: 14, CHA: 10 }, angriff: { name: "Runenblitz", bonus: 5, schaden: "1W10+2", reichweite: 6 }, feldzauber: { name: "Runenlinie", anzahl: 3, dauer: 2, alle: 3, reichweite: 8 }, bewegung: 5, xp: 250 },
+    kettenbestie: { name: "Kettenbestie", tp: 40, rk: 14, werte: { STR: 18, GES: 10, KON: 16, INT: 4, WEI: 10, CHA: 4 }, angriff: { name: "Kettenhieb", bonus: 6, schaden: "2W6+3" }, rueckstoss: { felder: 2, sg: 13 }, bewegung: 5, xp: 450 },
+    eisenhirte: { name: "Eisenhirte", tp: 70, rk: 16, werte: { STR: 20, GES: 8, KON: 18, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Steinfaust", bonus: 6, schaden: "2W8+3" }, bewegung: 3,
+      flaeche: { name: "Bodenstoß", form: "ring", radius: 2, schaden: "3W6", sg: 13, rettung: "GES", alle: 3, liegend: true },
+      phasen: [{ ab: 0.5, text: "Die Runen am Eisenhirten glühen weiß: Er stampft schneller und wilder.", rk: -1 }], xp: 1100 },
     grabritter: { name: "Grabritter", tp: 45, rk: 17, werte: { STR: 18, GES: 11, KON: 16, INT: 10, WEI: 12, CHA: 12 }, angriff: { name: "Zweihänder", bonus: 6, schaden: "2W6+4" }, untot: true, xp: 450 },
   };
   const WOLF_WERTE = { STR: 12, GES: 15, KON: 12, INT: 3, WEI: 12, CHA: 6 };
@@ -137,12 +148,16 @@
   const SKALA = { 1: { 3: 1.03, 4: 1.07, 5: 0.95, 6: 1.07 }, 2: { 3: 0.95, 4: 1.11, 5: 1.05, 6: 1.11 }, 3: { 3: 0.81, 4: 0.91, 5: 0.93, 6: 0.79 } };
   const SKALA_HARDCORE = { 1: { 3: 1.16, 4: 1.11, 5: 1.11, 6: 1.09 }, 2: { 3: 0.89, 4: 1.03, 5: 0.89, 6: 0.91 }, 3: { 3: 0.81, 4: 0.81, 5: 0.81, 6: 0.73 } };
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
-  function gegnerFuer(begId, n, stufe, skala, hardcore) {
+  function skalaK(begId, n, stufe, skala, hardcore) {
     const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, s = stufe || b.stufe, tab = hardcore ? SKALA_HARDCORE : SKALA;
     // Begegnungen mit eigener Tabelle (z. B. im Moor, spielbar ab 2 Helden): Faktor je Gruppengröße 2–6
     const eigen = hardcore ? b.skalaHC || b.skala : b.skala;
     let k = skala != null ? skala : eigen ? eigen[Math.max(2, Math.min(6, n))] || 1 : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
     if (b.faktor) k *= b.faktor[Math.max(3, Math.min(6, n))] || 1;
+    return k;
+  }
+  function gegnerFuer(begId, n, stufe, skala, hardcore) {
+    const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, k = skalaK(begId, n, stufe, skala, hardcore);
     // [Art, Anzahl je Figur, höchstens, Grundwert]: z. B. genau eine Alwine, deren Leben nur leicht mit der Gruppe wächst (Grundwert + je Figur)
     return b.gegner.map(([art, je, max, basis]) => { const soll = (basis || 0) + je * n, anzahl = Math.min(max || Infinity, Math.max(1, Math.round(soll))); return { art, anzahl, tpFaktor: k * soll / anzahl }; });
   }
@@ -256,7 +271,8 @@
     zufall(st);
     const r = st.r; let k = opts.karte || KARTE_GARTEN;
     st.siegel = k.hindernisse.filter(([t]) => t === "Z").map(([, x, y]) => ({ x, y, beruehrt: false }));
-    st.karte = { name: k.name, boden: k.boden || null, b: k.b, h: k.h, bild: k.bild || null, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P" || t === "Q").map(([, x, y]) => key(x, y))) };
+    st.karte = { name: k.name, boden: k.boden || null, b: k.b, h: k.h, bild: k.bild || null, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P" || t === "Q" || t === "L").map(([, x, y]) => key(x, y))) };
+    if (opts.mechanik) mechanikStart(st, opts.mechanik, 1);
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
     fids.forEach((fid, i) => {
       const [x, y] = k.start.spieler[i];
@@ -312,6 +328,10 @@
       st.figuren.push({ id: "g" + gi, seite: "gegner", art: g.art, name: ((opts.namen && opts.namen[g.art]) || g.name || d.name) + nr, x, y, tp: gtp, tpMax: gtp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true });
       gi++;
     }
+    // Mechaniken: Leben der Verstärkung wie die Begegnung; Gegner mit Sonderzügen brauchen den Mechanik-Zustand auch ohne Ziele
+    const tpk = skalaK(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore") * (opts.skalaMal || 1) * tpGlobal;
+    if (!st.mech && gegnerFiguren(st).some((g) => { const d = GEGNER[g.art]; return d.flaeche || d.nest || d.feldzauber || d.rufer || d.phasen; })) mechanikStart(st, {}, tpk);
+    if (st.mech) { st.mech.tpk = tpk; mechanikGegner(st); }
     // Anführer: der zäheste Gegner bekommt mehr Leben, bessere Rüstung und trifft besser
     if (opts.anfuehrer) { const a = gegnerFiguren(st).filter((g) => !GEGNER[g.art].boss).sort((x, y) => y.tpMax - x.tpMax)[0]; if (a) { a.tp = a.tpMax = Math.round(a.tpMax * (st.schwierigkeit === "hardcore" ? 1.4 : 1.6)); a.rk += 1; a.rkBasis += 1; a.anfuehrer = true; a.name = a.name.replace(/ \d+$/, "") + " (Anführer)"; st.log.push({ t: `Ein Anführer führt die Gegner: ${a.name}.`, art: "schlecht" }); } }
     // Zauberer haben die Zeichen gelesen: ein Siegelstein leuchtet schon zu Kampfbeginn
@@ -349,6 +369,7 @@
     if (id === "stabilisieren") return { a: STABIL, typ: "aktion" };
     if (id === "spurt_aktion") return { a: SPURT, typ: "aktion" };
     if (id === "siegelstein") return { a: SIEGEL_A, typ: "aktion" };
+    if (id === "ziel") return { a: ZIEL_A, typ: "aktion" };
     if (id === "wahrer_name") return { a: NAME_A, typ: "aktion" };
     if (id === "silberglocke") return { a: SILBER_A, typ: "bonus" };
     if (id === "grosser_trank") return { a: GROSS_TRANK, typ: "bonus" };
@@ -365,6 +386,7 @@
     if (hatDing(f, "rauchbeutel")) liste.push(RAUCH_DING);
     if (!st || st.figuren.some((o) => o.seite === "spieler" && o.art !== "wolf" && o.tp <= 0 && !o.tot)) liste.push(STABIL);
     if (st && st.siegel && st.siegel.some((z) => !z.beruehrt) && !imPakt(st, f)) liste.push(SIEGEL_A);
+    if (st && st.mech && st.mech.ziele.some(zielOffen)) { const zn = zielNeben(st, f); liste.push(zn && zn.aktion ? Object.assign({}, ZIEL_A, { name: zn.aktion }) : ZIEL_A); }
     if (st && st.boss && st.boss.name && !st.boss.nameGenutzt) liste.push(NAME_A);
     if (st && st.boss && st.boss.silber && !st.boss.silberGenutzt) liste.push(SILBER_A);
     liste.push(SPURT);
@@ -482,6 +504,7 @@
   /* ---------- Schaden, Heilung, Ende ---------- */
   function schaden(st, z, n, opts = {}) {
     if (z.tot) return;
+    if (z.seite === "gegner" && z.schild) n = schildAbfangen(st, z, n);
     if (z.seite === "spieler" && z.tp <= 0) {
       if (st.schwierigkeit === "hardcore" && z.art !== "wolf" && z.art !== "begleiter" && n > 0) {
         z.todes.f += opts.krit ? 2 : 1;
@@ -505,6 +528,7 @@
       }
       for (const f of spielerFiguren(st)) if (f.malZiel === z.id) f.malFrei = true; // Jägermal darf weiter
     }
+    if (z.seite === "gegner" && z.tp > 0 && GEGNER[z.art] && GEGNER[z.art].phasen) phasenPruefen(st, z);
     pruefeEnde(st);
   }
   function stirbt(st, z) {
@@ -522,6 +546,7 @@
   }
   function pruefeEnde(st) {
     if (st.ende) return st.ende;
+    if (st.mech) { mechSiegPruefen(st); if (st.ende) return st.ende; }
     const sp = spielerFiguren(st), ge = gegnerFiguren(st);
     // Eskorte mit „jaegerSieg“: Sind alle Jäger besiegt, ist die Begleiterin in Sicherheit
     const jaegerWeg = st.eskorte && st.eskorte.jaegerSieg && ge.some((f) => GEGNER[f.art].jaeger) && ge.filter((f) => GEGNER[f.art].jaeger).every((f) => f.tp <= 0);
@@ -734,6 +759,7 @@
       case "rauch": case "spurt": return [f];
       case "tatendrang": return !st.zug.aktion && !st.zug.tatendrang ? [f] : [];
       case "siegel": return !imPakt(st, f) && st.siegel.some((z) => !z.beruehrt && abstand(z, f) <= 1) && bossVon(st) ? [f] : [];
+      case "ziel": return zielNeben(st, f) ? [f] : [];
       case "name": { const b = bossVon(st); return b && !st.boss.nameGenutzt && abstand(f, b) <= 12 && sicht(st, f, b) ? [b] : []; }
       case "silber": return !st.boss.silberGenutzt && gegnerFiguren(st).some((g) => lebt(g) && g.art === "knochenwaechter" && abstand(g, f) <= 6) ? [f] : [];
       default: return [];
@@ -916,6 +942,7 @@
         if (st.siegel.every((x) => x.beruehrt) && lebt(b)) { b.gebunden = true; st.log.push({ t: `Alle vier Steine leuchten. ${b.name} ist gebunden und kann keine Toten mehr rufen.${(st.boss.pakt || []).length ? " Und er weiß, wer ihn verraten hat." : ""}`, art: "gut" }); }
         break;
       }
+      case "ziel": zielBedienen(st, f); break;
       case "name": ziel.z.betaeubt = 1; ziel.rk -= 2; st.boss.nameGenutzt = true; st.log.push({ t: `${f.name} ruft: „Valdric!“ Der Abt erstarrt. Zum ersten Mal seit dreihundert Jahren hört er seinen Namen.`, art: "gut" }); break;
       case "silber": {
         st.boss.silberGenutzt = true; st.log.push({ t: `${f.name} läutet die silberne Glocke. Ein reiner Ton füllt die Kammer.`, art: "gut" });
@@ -967,6 +994,7 @@
     if (schritt) { st.zug.schritt = 0; } else { st.zug.bewegung -= c; st.zug.leicht = Math.max(0, (st.zug.leicht || 0) - c); }
     f.x = x; f.y = y;
     brandFeld(st, f);
+    if (st.mech && st.mech.ausgang) ausgangPruefen(st);
     return { ok: true };
   }
   function brandFeld(st, f) {
@@ -1039,6 +1067,7 @@
       if (verblasst.length) { verblasst.forEach((g) => { delete g.z.segen; delete g.z.segenBis; }); st.log.push({ t: `Der Segen verblasst bei ${verblasst.map((g) => g.name).join(", ")}.` }); }
       for (const g of st.figuren) if (g.seite === "gegner" && g.atemRunde && st.runde - g.atemRunde >= GEGNER[g.art].atem.alle) g.atemBereit = true;
       st.log.push({ t: `— Runde ${st.runde} —`, art: "runde" });
+      if (st.mech) { mechanikRunde(st); if (st.ende) return; }
       if (st.eskorte) begleiterPhase(st);
     }
     if (!st.ende) beginneZug(st);
@@ -1063,7 +1092,7 @@
     const metallVorher = z.rk;
     return angriffswurf(st, g, z, {
       name: d.angriff.name, bonus: d.angriff.bonus + (g.anfuehrer ? 1 : 0), schaden: d.angriff.schaden.replace(/[+-]\d+$/, ""), fest: parse(d.angriff.schaden).b, nah: abstand(g, z) <= 1, magisch: Boolean(d.boss),
-      nachTreffer: () => { if (d.rost && z.metall && z.rk > z.rkBasis - 2 && metallVorher === z.rk) { z.rk -= 1; st.log.push({ t: `Die Rüstung von ${z.name} rostet: RK ${z.rk}.` }); } },
+      nachTreffer: () => { if (d.rost && z.metall && z.rk > z.rkBasis - 2 && metallVorher === z.rk) { z.rk -= 1; st.log.push({ t: `Die Rüstung von ${z.name} rostet: RK ${z.rk}.` }); } if (d.rueckstoss) rueckstoss(st, g, z, d.rueckstoss); },
     });
   }
   /* ---------- Eskorte: Begleiterin ---------- */
@@ -1128,6 +1157,7 @@
       if (best) { g.x = best.x; g.y = best.y; }
     };
     if (d.boss) { bossZug(st, g); return; }
+    if (st.mech && sonderZug(st, g, d)) return;
     // Verängstigt: weg, kein Angriff
     if (g.z.veraengstigt) { flieheVon(); st.log.push({ t: `${g.name} weicht ängstlich zurück.`, art: "gegner" }); fangschuss(st, g, startX, startY); if (!st.ende) weiter(st); return; }
     // Im Netz: befreien
@@ -1264,6 +1294,292 @@
     spielerAngriff(st, k, findeAktion(k, "armbrust").a, g, { reaktion: true });
   }
 
+  /* ---------- Mechaniken (Die Krone unter dem Eis): Ziel-Objekte, Verstärkungswellen, angekündigte Flächen, Gelände, Rückstoß, Phasen, Schild ----------
+   * Eingeschaltet über opts.mechanik in neuesSpiel (siehe KONZEPT-KRONE.md K6). Ohne sie bleibt jeder Kampf wie bisher.
+   * ziele:   [{ id, name, art, x, y, runden, ruhe, frist, umkehrbar, aktion, wirkung: { welleAus, schild, gerettet, verlorenText } }]
+   * wellen:  [{ id, name, kurz, quellen: [[x, y]], gegner: [[art, je, max, basis]], alle, ab, max, an, aus, text }]
+   * eis:     { felder: [[x, y]], proRunde, ab, bekannt }   ·   schild: { art, ziele, halt, pause, text }
+   * sieg:    { ziele, art, besiegt: { art, n }, text }    ·   ausgang: { felder: [[x, y]], text }
+   */
+  const ZIEL_A = { id: "ziel", name: "Ziel bedienen", typ: "aktion", art: "ziel", text: "Arbeite an einem Ziel direkt neben dir (Siegelstein, Runensäule, Eisblock …). Manche brauchen mehrere Aktionen, manche gehen nur, wenn kein Gegner neben dir steht." };
+  const zielOffen = (z) => !z.fertig && !z.verloren;
+  function zielNeben(st, f) {
+    if (!st.mech || !f) return null;
+    const bedraengt = gegnerFiguren(st).some((g) => lebt(g) && abstand(g, f) <= 1);
+    return st.mech.ziele.filter((z) => zielOffen(z) && abstand(z, f) <= 1 && !(z.ruhe && bedraengt)).sort((a, b) => b.fortschritt - a.fortschritt)[0] || null;
+  }
+  /** Felder, die im nächsten gegnerischen Zug getroffen werden oder sich verwandeln – Helden und Begleiter meiden sie */
+  function gefahrFelder(st) {
+    const s = new Set(); if (!st.mech) return s;
+    for (const m of st.mech.marken) for (const [x, y] of m.felder) s.add(key(x, y));
+    for (const c of st.mech.wandel) for (const [x, y] of c.felder) s.add(key(x, y));
+    return s;
+  }
+  function mechanikStart(st, m, tpk) {
+    st.karte.hindernisse = st.karte.hindernisse.slice();
+    const mech = st.mech = { ziele: [], wellen: [], marken: [], wandel: [], wieder: [], gerettet: 0, stat: { getroffen: 0, ausgewichen: 0 }, tpk: tpk || 1, sieg: m.sieg || null, schild: m.schild || null, eis: null,
+      ausgang: m.ausgang ? { felder: m.ausgang.felder.map((p) => p.slice()), text: m.ausgang.text || null } : null };
+    for (const z of m.ziele || []) {
+      mech.ziele.push({ id: z.id, name: z.name, art: z.art || "ziel", x: z.x, y: z.y, runden: z.runden || 1, fortschritt: 0, fertig: false, verloren: false, ruhe: Boolean(z.ruhe), frist: z.frist || null,
+        umkehrbar: Boolean(z.umkehrbar), aktion: z.aktion || null, fertigText: z.fertigText || null, wirkung: z.wirkung || {} });
+      st.karte.hindernisse.push(["O", z.x, z.y]); st.karte.block.add(key(z.x, z.y));
+    }
+    for (const w of m.wellen || []) mech.wellen.push({ id: w.id, name: w.name, kurz: w.kurz || "Verstärkung", quellen: w.quellen.map((p) => p.slice()), gegner: w.gegner, alle: w.alle || 3, naechste: w.ab != null ? w.ab : 3,
+      max: w.max != null ? w.max : 3, an: w.an || null, aus: Boolean(w.aus), gekommen: 0, text: w.text || null });
+    if (m.eis) mech.eis = { felder: m.eis.felder.map((p) => p.slice()), proRunde: m.eis.proRunde || 2, ab: m.eis.ab || 2, bekannt: Boolean(m.eis.bekannt), max: m.eis.max != null ? m.eis.max : Math.ceil(m.eis.felder.length / 2), gebrochen: 0 };
+  }
+  /** Nach dem Aufstellen der Gegner: Schutzfelder verteilen */
+  function mechanikGegner(st) {
+    const s = st.mech.schild; if (!s) return;
+    for (const g of gegnerFiguren(st)) if (g.art === s.art) {
+      const halt = Math.max(4, Math.round((s.halt || 20) * st.mech.tpk));
+      g.schild = { aktiv: true, ziele: (s.ziele || []).slice(), halt, rest: halt, pause: s.pause || 2, wieder: null, dauerhaftAus: false, text: s.text || "Schutzfeld" };
+      st.log.push({ t: `${g.name} ist von einem ${g.schild.text} umgeben: Es fängt die Hälfte des Schadens ab.`, art: "schlecht" });
+    }
+  }
+  function freiesFeldNahe(st, [qx, qy], max = 3) {
+    for (let r2 = 0; r2 <= max; r2++) for (let dx = -r2; dx <= r2; dx++) for (let dy = -r2; dy <= r2; dy++) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) !== r2) continue;
+      const x = qx + dx, y = qy + dy; if (!blockiert(st, x, y) && !belegt(st, x, y)) return { x, y };
+    }
+    return null;
+  }
+  function neuerGegner(st, art, feld, zusatz) {
+    const d = GEGNER[art]; st.gerufen = (st.gerufen || 0) + 1;
+    const tp = Math.max(1, Math.round(d.tp * ((st.mech && st.mech.tpk) || 1)));
+    const g = { id: "r" + st.gerufen, seite: "gegner", art, name: d.name + (zusatz ? ` (${zusatz})` : ""), x: feld.x, y: feld.y, tp, tpMax: tp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true, ini: 0 };
+    st.figuren.push(g); st.reihe.push(g.id);
+    return g;
+  }
+  function welleKommt(st, w) {
+    const n = spielerFiguren(st).filter((f) => !f.tot).length, neu = [];
+    for (const [art, je, max, basis] of w.gegner) {
+      const anzahl = Math.min(max || Infinity, Math.max(1, Math.round((basis || 0) + je * n)));
+      for (let i = 0; i < anzahl; i++) { const feld = freiesFeldNahe(st, w.quellen[(neu.length + w.gekommen) % w.quellen.length]); if (feld) neu.push(neuerGegner(st, art, feld, w.kurz).name); }
+    }
+    w.gekommen++; w.naechste = st.runde + w.alle;
+    st.log.push({ t: `${w.name}: ${neu.length ? `${neu.join(", ")} ${neu.length === 1 ? "kommt" : "kommen"} hinzu` : "kein Platz – niemand kommt durch"}.`, art: "schlecht" });
+  }
+  function kreisFelder(st, cx, cy, r) {
+    const f = []; for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) { const x = cx + dx, y = cy + dy; if (!blockiert(st, x, y)) f.push([x, y]); }
+    return f;
+  }
+  function linienFelder(st, a, b, laenge) {
+    const f = [], n = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)) || 1, sx = (b.x - a.x) / n, sy = (b.y - a.y) / n;
+    for (let i = 1; i <= laenge; i++) { const x = Math.round(a.x + sx * i), y = Math.round(a.y + sy * i); if (blockiert(st, x, y)) break; if (!f.some(([p, q]) => p === x && q === y)) f.push([x, y]); }
+    return f;
+  }
+  /** Zu Beginn jeder Runde: Gelände verwandeln, Eis knacken lassen, Fristen, Wellen ankündigen und schicken, Schilde aufladen */
+  function mechanikRunde(st) {
+    const m = st.mech;
+    m.marken = m.marken.filter((x) => { const g = fig(st, x.von); return g && lebt(g); });
+    for (const w of m.wieder.filter((w) => w.bis <= st.runde)) feldZurueck(st, w);
+    m.wieder = m.wieder.filter((w) => w.bis > st.runde);
+    // Was ein Gegner angekündigt hat, entsteht bei seinem nächsten Zug (siehe sonderZug); stirbt er vorher, verfällt es
+    m.wandel = m.wandel.filter((c) => !c.von || lebt(fig(st, c.von) || { tp: 0 }));
+    const jetzt = m.wandel.filter((c) => !c.von && c.runde <= st.runde); m.wandel = m.wandel.filter((c) => c.von || c.runde > st.runde);
+    for (const c of jetzt) { feldWandeln(st, c); if (st.ende) return; }
+    if (m.eis && st.runde >= m.eis.ab && m.eis.gebrochen < m.eis.max) {
+      const helden = spielerFiguren(st).filter(lebt), zuf = new Map();
+      const kand = m.eis.felder.filter(([x, y]) => !st.karte.block.has(key(x, y)) && !m.wandel.some((c) => c.felder.some(([a, b]) => a === x && b === y)));
+      for (const p of kand) zuf.set(p, st.r());
+      const nah = (p) => Math.min(9, ...helden.map((h) => abstand(h, { x: p[0], y: p[1] })));
+      kand.sort((a, b) => nah(a) - nah(b) || zuf.get(a) - zuf.get(b));
+      const wahl = kand.slice(0, Math.min(m.eis.proRunde, m.eis.max - m.eis.gebrochen)); m.eis.gebrochen += wahl.length;
+      if (wahl.length) { m.wandel.push({ felder: wahl, typ: "loch", runde: st.runde + 1, name: "Das Eis" }); st.log.push({ t: `Das Eis knackt! ${wahl.length === 1 ? "Ein Feld bricht" : `${wahl.length} Felder brechen`} zu Beginn der nächsten Runde ein.`, art: "schlecht" }); }
+    }
+    for (const z of m.ziele) if (zielOffen(z) && z.frist && st.runde > z.frist) { z.verloren = true; st.log.push({ t: `${z.name}: zu spät.${z.wirkung.verlorenText ? " " + z.wirkung.verlorenText : ""}`, art: "schlecht" }); }
+    for (const w of m.wellen) {
+      if (w.aus || w.gekommen >= w.max) continue;
+      if (w.an && !gegnerFiguren(st).some((g) => lebt(g) && g.art === w.an)) { w.aus = true; st.log.push({ t: `${w.name}: Niemand ruft mehr Verstärkung.`, art: "gut" }); continue; }
+      if (st.runde >= w.naechste) welleKommt(st, w);
+      else if (st.runde === w.naechste - 1) st.log.push({ t: `${w.name}: ${w.text || "Es regt sich etwas"} – nächste Runde kommt Verstärkung.`, art: "schlecht" });
+    }
+    for (const g of gegnerFiguren(st)) {
+      const s = g.schild;
+      if (s && !s.aktiv && !s.dauerhaftAus && s.wieder && st.runde >= s.wieder && lebt(g)) { s.aktiv = true; s.rest = s.halt; s.wieder = null; st.log.push({ t: `${g.name}: Das ${s.text} baut sich wieder auf.`, art: "schlecht" }); }
+    }
+  }
+  /** Angekündigte Felder verwandeln sich: „loch“ (bricht ein, versperrt den Weg, nicht die Sicht) oder „wand“ (Eis, versperrt beides; mit dauer nur für einige Runden) */
+  function feldWandeln(st, c) {
+    const t = c.typ === "loch" ? "L" : "E"; let n = 0;
+    for (const [x, y] of c.felder) {
+      if (st.karte.block.has(key(x, y))) continue;
+      st.karte.hindernisse.push([t, x, y]); st.karte.block.add(key(x, y)); if (t === "L") st.karte.offen.add(key(x, y)); n++;
+      if (c.dauer) st.mech.wieder.push({ t, x, y, bis: st.runde + c.dauer });
+      for (const f of st.figuren.filter((o) => !o.tot && o.x === x && o.y === y)) { verdraengen(st, f, t === "L"); if (st.ende) return; }
+    }
+    if (n) st.log.push({ t: t === "L" ? `${c.name || "Das Eis"} bricht ein.` : `${c.name || "Eis"} wächst aus dem Boden${c.dauer ? ` (${c.dauer} Runden)` : ""}.`, art: "schlecht" });
+  }
+  function feldZurueck(st, w) {
+    const i = st.karte.hindernisse.findIndex(([t, x, y]) => t === w.t && x === w.x && y === w.y); if (i < 0) return;
+    st.karte.hindernisse.splice(i, 1); st.karte.block.delete(key(w.x, w.y)); st.karte.offen.delete(key(w.x, w.y));
+  }
+  function verdraengen(st, f, fallen) {
+    const feld = freiesFeldNahe(st, [f.x, f.y]);
+    if (fallen && f.tp > 0) {
+      const rw = rettung(st, f, "GES", 12);
+      if (rw.erfolg) st.log.push({ t: `${f.name} springt rechtzeitig zur Seite.` });
+      else { const s = roll(st.r, "2W6").total; f.z.liegend = true; st.log.push({ t: `${f.name} stürzt ins Eiswasser und zieht sich heraus: ${s} Schaden, liegt.`, art: "schlecht" }); if (feld) { f.x = feld.x; f.y = feld.y; } schaden(st, f, s); return; }
+    }
+    if (feld) { f.x = feld.x; f.y = feld.y; }
+  }
+  function zielBedienen(st, f) {
+    const z = zielNeben(st, f); if (!z) return;
+    z.fortschritt++;
+    if (z.fortschritt < z.runden) { st.log.push({ t: `${f.name} arbeitet an ${z.name} (${z.fortschritt}/${z.runden}).`, art: "gut" }); return; }
+    z.fertig = true; st.log.push({ t: `${f.name}: ${z.name} – ${z.fertigText || "geschafft"}.`, art: "gut" });
+    const w = z.wirkung;
+    for (const id of [].concat(w.welleAus || [])) { const q = st.mech.wellen.find((x) => x.id === id); if (q && !q.aus) { q.aus = true; st.log.push({ t: `${q.name}: versiegt.`, art: "gut" }); } }
+    if (w.gerettet) st.mech.gerettet++;
+    if (w.schild) for (const g of gegnerFiguren(st)) if (g.schild && g.schild.ziele.includes(z.id) && g.schild.ziele.every((id) => (st.mech.ziele.find((x) => x.id === id) || {}).fertig)) {
+      g.schild.aktiv = false; g.schild.dauerhaftAus = true; st.log.push({ t: `${g.name}: Das ${g.schild.text} erlischt endgültig.`, art: "gut" });
+    }
+    mechSiegPruefen(st);
+  }
+  /** Ein Rufer kehrt ein Ziel um: Welle wieder an, Schild wieder an */
+  function zielZurueck(st, z) {
+    const w = z.wirkung;
+    for (const id of [].concat(w.welleAus || [])) { const q = st.mech.wellen.find((x) => x.id === id); if (q && q.aus && q.gekommen < q.max) { q.aus = false; q.naechste = Math.max(q.naechste, st.runde + 2); } }
+    if (w.schild) for (const g of gegnerFiguren(st)) if (g.schild && g.schild.ziele.includes(z.id) && g.schild.dauerhaftAus) { g.schild.dauerhaftAus = false; g.schild.aktiv = true; g.schild.rest = g.schild.halt; }
+  }
+  function mechSiegPruefen(st) {
+    const s = st.mech && st.mech.sieg; if (!s || st.ende) return;
+    const ok = (s.ziele && st.mech.ziele.filter((z) => z.fertig && (!s.art || z.art === s.art)).length >= s.ziele) || (s.besiegt && gegnerFiguren(st).filter((g) => g.art === s.besiegt.art && g.tp <= 0).length >= s.besiegt.n);
+    if (!ok) return;
+    st.ende = "sieg"; st.xp = gegnerFiguren(st).filter((g) => g.tp <= 0).reduce((a, g) => a + GEGNER[g.art].xp, 0);
+    st.log.push({ t: s.text || "Ziel erreicht – der Weg ist frei!", art: "ende" });
+  }
+  /** Durchbruch: Stehen alle Helden, die nicht tot sind, auf den Ausgangsfeldern (und liegt niemand am Boden), ist der Kampf gewonnen */
+  function ausgangPruefen(st) {
+    const a = st.mech && st.mech.ausgang; if (!a || st.ende) return;
+    const sp = spielerFiguren(st).filter((f) => !f.tot);
+    if (!sp.length || !sp.every((f) => f.tp > 0 && a.felder.some(([x, y]) => x === f.x && y === f.y))) return;
+    st.ende = "sieg"; st.xp = gegnerFiguren(st).filter((g) => g.tp <= 0).reduce((s, g) => s + GEGNER[g.art].xp, 0);
+    st.log.push({ t: a.text || "Ihr seid durch!", art: "ende" });
+  }
+  /** Schutzfeld: fängt die Hälfte ab, bis es erschöpft ist; danach Pause, bis es sich wieder aufbaut (es sei denn, seine Ziele sind erledigt) */
+  function schildAbfangen(st, z, n) {
+    const s = z.schild; if (!s || !s.aktiv || n <= 0) return n;
+    const ab = Math.ceil(n / 2); s.rest -= ab;
+    if (s.rest <= 0) { s.aktiv = false; s.wieder = st.runde + s.pause + 1; st.log.push({ t: `${z.name}: Das ${s.text} bricht zusammen! Für ${s.pause} Runden ist ${z.name} ungeschützt.`, art: "gut" }); }
+    return n - ab;
+  }
+  /** Boss-Phasen nach TP-Schwellen: [{ ab: 0.66, text, rk, welle, feld: { felder, typ, name, dauer }, schild }] */
+  function phasenPruefen(st, g) {
+    const ph = GEGNER[g.art].phasen; if (!ph || !lebt(g)) return;
+    g.phase = g.phase || 0;
+    while (g.phase < ph.length && g.tp <= g.tpMax * ph[g.phase].ab) {
+      const p = ph[g.phase]; g.phase++;
+      st.log.push({ t: p.text, art: "schlecht" });
+      if (p.rk) { g.rk += p.rk; g.rkBasis += p.rk; }
+      if (p.welle && st.mech) { const w = st.mech.wellen.find((x) => x.id === p.welle); if (w && w.aus) { w.aus = false; w.naechste = st.runde + 2; } }
+      if (p.feld && st.mech) st.mech.wandel.push({ felder: p.feld.felder.map((q) => q.slice()), typ: p.feld.typ || "loch", von: g.id, name: p.feld.name || null, dauer: p.feld.dauer || null });
+      if (p.schild && g.schild) { g.schild.aktiv = true; g.schild.rest = g.schild.halt; g.schild.dauerhaftAus = false; }
+    }
+  }
+  /** Rückstoß nach einem Treffer: STR-Rettung, sonst bis zu n Felder weg vom Angreifer; an Abgrund oder Loch: Sturz, an der Wand: Aufprall */
+  function rueckstoss(st, g, z, rs) {
+    if (!lebt(z)) return;
+    const rw = rettung(st, z, "STR", rs.sg); if (rw.erfolg) { st.log.push({ t: `${z.name} stemmt sich gegen den Stoß.` }); return; }
+    const dx = Math.sign(z.x - g.x), dy = Math.sign(z.y - g.y); let n = 0;
+    for (; n < rs.felder; n++) {
+      const x = z.x + dx, y = z.y + dy, k = key(x, y);
+      if (st.karte.block.has(k) && st.karte.offen.has(k)) { const s = roll(st.r, "2W6").total; z.z.liegend = true; st.log.push({ t: `${g.name} stößt ${z.name} an die Kante – ${z.name} stürzt halb hinab und zieht sich hoch: ${s} Schaden, liegt.`, art: "schlecht" }); schaden(st, z, s); return; }
+      if (blockiert(st, x, y)) { const s = W(st.r, 6); st.log.push({ t: `${g.name} schleudert ${z.name} gegen das Gestein: ${s} Schaden.`, art: "schlecht" }); schaden(st, z, s); return; }
+      if (belegt(st, x, y, z)) break;
+      z.x = x; z.y = y;
+    }
+    if (n) { st.log.push({ t: `${g.name} stößt ${z.name} ${n === 1 ? "ein Feld" : n + " Felder"} zurück.`, art: "gegner" }); brandFeld(st, z); }
+  }
+  /** Sonderzüge der neuen Gegner. Gibt true zurück, wenn der Zug damit erledigt ist */
+  function sonderZug(st, g, d) {
+    const m = st.mech;
+    // 1. Was dieser Gegner angekündigt hat, geschieht jetzt: Eis wächst, die Fläche trifft (danach handelt er normal weiter)
+    if (m) {
+      const wd = m.wandel.filter((c) => c.von === g.id);
+      if (wd.length) { m.wandel = m.wandel.filter((c) => c.von !== g.id); for (const c of wd) { feldWandeln(st, c); if (st.ende) return true; } if (!lebt(g)) { weiter(st); return true; } }
+      const mk = m.marken.find((x) => x.von === g.id);
+      if (mk) {
+        m.marken = m.marken.filter((x) => x !== mk);
+        const getroffen = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && mk.felder.some(([x, y]) => x === f.x && y === f.y)), teile = [];
+        for (const f of getroffen) { const rw = rettung(st, f, mk.rettung, mk.sg); let s = roll(st.r, mk.schaden).total; if (rw.erfolg) s = Math.floor(s / 2); else if (mk.liegend) f.z.liegend = true; teile.push(`${f.name} ${s}`); schaden(st, f, s); if (st.ende) return true; }
+        m.stat.getroffen += teile.length; m.stat.ausgewichen += Math.max(0, (mk.n || 0) - teile.length);
+        st.log.push({ t: `${g.name}: ${mk.name} – ${teile.length ? teile.join(", ") : "alle sind ausgewichen"}.`, art: teile.length ? "gegner" : "gut" });
+        if (!lebt(g)) { weiter(st); return true; }
+      }
+    }
+    // 2. Nest: bewegt sich nicht, lässt in festen Abständen Schwärmer schlüpfen
+    if (d.nest) {
+      const n = d.nest; g.nestN = g.nestN || 0;
+      if (st.runde % n.alle === 0 && g.nestN < n.max) { const feld = freiesFeldNahe(st, [g.x, g.y], 2); if (feld) { const s = neuerGegner(st, n.art, feld, "geschlüpft"); g.nestN++; st.log.push({ t: `${g.name} bricht auf: ${s.name} kriecht heraus.`, art: "schlecht" }); } }
+      weiter(st); return true;
+    }
+    // 3. Rufer: erweckt erledigte Ziele wieder oder stärkt Verbündete
+    if (d.rufer && ruferZug(st, g, d.rufer)) return true;
+    // 4. Fläche ankündigen (nicht, solange schon eine Marke dieses Gegners liegt)
+    const fl = d.flaeche;
+    if (m && fl && (g.phase || 0) >= (fl.phase || 0) && (g.flaecheRunde == null || st.runde - g.flaecheRunde >= fl.alle) && !m.marken.some((x) => x.von === g.id)) { if (flaecheAnkuendigen(st, g, fl)) { weiter(st); return true; } }
+    // 5. Feldzauber: Eiswände trennen eine Heldengruppe
+    const fz = d.feldzauber;
+    if (m && fz && (g.feldRunde == null || st.runde - g.feldRunde >= fz.alle) && !m.wandel.some((c) => c.von === g.id)) { if (feldzauber(st, g, fz)) { weiter(st); return true; } }
+    return false;
+  }
+  function flaecheAnkuendigen(st, g, fl) {
+    const ziele = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && !f.z.versteckt), drin = (felder) => ziele.filter((f) => felder.some(([x, y]) => x === f.x && y === f.y)).length;
+    let best = null;
+    if (fl.form === "ring") { const felder = kreisFelder(st, g.x, g.y, fl.radius || 1).filter(([x, y]) => x !== g.x || y !== g.y); best = { felder, n: drin(felder) }; }
+    else for (const z of ziele) {
+      if (abstand(g, z) > (fl.reichweite || 6) || !sicht(st, g, z)) continue;
+      const felder = fl.form === "linie" ? linienFelder(st, g, z, fl.reichweite || 6) : kreisFelder(st, z.x, z.y, fl.radius || 1), n = drin(felder);
+      if (!best || n > best.n) best = { felder, n };
+    }
+    if (!best || best.n < (fl.mindestens || 1)) return false;
+    st.mech.marken.push({ von: g.id, n: best.n, felder: best.felder, name: fl.name, schaden: fl.schaden, sg: fl.sg, rettung: fl.rettung || "GES", liegend: Boolean(fl.liegend) });
+    g.flaecheRunde = st.runde;
+    st.log.push({ t: `${g.name} holt aus: ${fl.name}! ${best.felder.length} Felder leuchten auf – wer bei seinem nächsten Zug dort steht, wird getroffen.`, art: "schlecht" });
+    return true;
+  }
+  /** Eiswand: Die Felder neben dem Helden, der am dichtesten bei seinen Freunden steht, frieren zu (angekündigt, für einige Runden) */
+  function feldzauber(st, g, fz) {
+    const helden = spielerFiguren(st).filter((h) => lebt(h) && abstand(h, g) <= (fz.reichweite || 8) && sicht(st, g, h)); let best = null;
+    for (const h of helden) {
+      const freunde = helden.filter((o) => o !== h && abstand(o, h) <= 3).length; if (!freunde) continue;
+      const felder = [];
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const x = h.x + dx, y = h.y + dy; if ((dx || dy) && !blockiert(st, x, y) && !belegt(st, x, y) && !gefahrFelder(st).has(key(x, y))) felder.push([x, y]); }
+      felder.sort((a, b) => helden.filter((o) => o !== h && abstand(o, { x: b[0], y: b[1] }) <= 2).length - helden.filter((o) => o !== h && abstand(o, { x: a[0], y: a[1] }) <= 2).length);
+      if (felder.length && (!best || freunde > best.freunde)) best = { felder: felder.slice(0, fz.anzahl || 3), freunde, h };
+    }
+    if (!best) return false;
+    st.mech.wandel.push({ felder: best.felder, typ: "wand", von: g.id, name: fz.name || "Eis", dauer: fz.dauer || 2 });
+    g.feldRunde = st.runde;
+    st.log.push({ t: `${g.name}: ${fz.name || "Eiswand"} – neben ${best.h.name} beginnt der Boden zu gefrieren. Bei ${g.name}s nächstem Zug wächst dort Eis.`, art: "schlecht" });
+    return true;
+  }
+  function ruferZug(st, g, rf) {
+    const m = st.mech;
+    const z = m && m.ziele.filter((x) => x.umkehrbar && !x.verloren && (x.fertig || x.fortschritt > 0)).sort((a, b) => abstand(a, g) - abstand(b, g))[0];
+    if (z) {
+      if (abstand(z, g) > 1 && st.zug.bewegung > 0) {
+        const mm = erreichbar(st, g, st.zug.bewegung); let best = null;
+        for (const [k2, c] of mm) { const [x, y] = k2.split(",").map(Number), dd = abstand({ x, y }, z); if (!best || dd < best.d || (dd === best.d && c < best.c)) best = { x, y, d: dd, c }; }
+        if (best) { const sx = g.x, sy = g.y; g.x = best.x; g.y = best.y; brandFeld(st, g); fangschuss(st, g, sx, sy); }
+      }
+      if (lebt(g) && !st.ende && abstand(z, g) <= 1) {
+        const war = z.fertig; z.fertig = false; z.fortschritt = Math.max(0, (war ? z.runden : z.fortschritt) - 1);
+        st.log.push({ t: `${g.name} legt die Hand auf ${z.name}: ${war ? "Er erwacht wieder" : "Der Fortschritt schwindet"} (${z.fortschritt}/${z.runden}).`, art: "schlecht" });
+        if (war) zielZurueck(st, z);
+        if (!st.ende) weiter(st); return true;
+      }
+      if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return true; }
+    }
+    if (rf.heilung) {
+      const v = gegnerFiguren(st).filter((o) => lebt(o) && o !== g && o.tp < o.tpMax * 0.6 && abstand(o, g) <= (rf.reichweite || 6)).sort((a, b) => a.tp / a.tpMax - b.tp / b.tpMax)[0];
+      if (v) { const n = roll(st.r, rf.heilung).total, vor = v.tp; v.tp = Math.min(v.tpMax, v.tp + n); st.log.push({ t: `${g.name} haucht Kälte über ${v.name}: +${v.tp - vor} TP.`, art: "gegner" }); weiter(st); return true; }
+    }
+    return false;
+  }
+
   /* ---------- Steuerung ohne Spieler (Tests, „Tisch steuert“) ---------- */
   function erwarteterSchaden(st, f, a, z) {
     if (a.art === "angriff") {
@@ -1311,6 +1627,7 @@
       case "bannkreis": return gegnerFiguren(st).filter((o) => lebt(o) && abstand(o, z) <= 2).length * 3 - slot;
       case "rauch": return -1;
       case "siegel": return 9;
+      case "ziel": return 8;
       case "name": return 12;
       case "silber": return gegnerFiguren(st).filter((g) => lebt(g) && g.art === "knochenwaechter" && abstand(g, f) <= 6).length * 4;
       default: return -1;
@@ -1337,8 +1654,19 @@
     for (const id of ["heilendes_wort", "massenheilwort"]) { const zs = kann(id) ? ziele(st, id) : []; const z = zs.find((o) => o.tp <= 0) || zs.find((o) => o.tp < o.tpMax * 0.35); if (z) handeln(st, id, z.id); }
     if (f.tp < f.tpMax * 0.4) { if (!versuche(st, "zweiter_atem")) versuche(st, "heiltrank"); }
     if (st.ende) return;
+    // Angekündigte Flächen und knackendes Eis meiden: Wer auf so einem Feld steht, geht zuerst herunter
+    const gefahr = gefahrFelder(st);
+    const bf = () => { const m0 = bewegungsfelder(st, f); return gefahr.size ? new Map([...m0].filter(([k2]) => !gefahr.has(k2))) : m0; };
+    if (gefahr.has(key(f.x, f.y))) {
+      let b = null;
+      for (const [k2, c] of bf()) { if (c === "schritt") continue; const [x, y] = k2.split(",").map(Number), gg = gegner().some((g) => abstand(g, { x, y }) <= 1) ? 1 : 0; if (!b || gg < b.gg || (gg === b.gg && c < b.c)) b = { x, y, c, gg }; }
+      if (b) bewegen(st, b.x, b.y);
+      if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
+    }
     // Ziel wählen: angeschlagen und nah
-    const zielWahl = () => gegner().sort((a, b) => (a.tp / a.tpMax + abstand(f, a) * 0.08) - (b.tp / b.tpMax + abstand(f, b) * 0.08))[0];
+    // Rufer (erwecken Ziele, rufen Verstärkung) haben Vorrang
+    const vorrang = (g) => (GEGNER[g.art].rufer || (st.mech && st.mech.wellen.some((w) => !w.aus && w.an === g.art)) ? -0.6 : 0);
+    const zielWahl = () => gegner().sort((a, b) => (a.tp / a.tpMax + abstand(f, a) * 0.08 + vorrang(a)) - (b.tp / b.tpMax + abstand(f, b) * 0.08 + vorrang(b)))[0];
     let ziel = zielWahl(); if (!ziel) return zugEnde(st);
     if (kann("raserei") && gegner().some((g) => abstand(g, f) <= 8)) handeln(st, "raserei", f.id);
     // Endkampf: freie Siegelsteine berühren, wenn erreichbar
@@ -1346,16 +1674,50 @@
       if (kann("siegelstein")) { handeln(st, "siegelstein", f.id); }
       else if (!gegner().some((g) => abstand(g, f) <= 1)) {
         let best = null;
-        for (const [k, c] of bewegungsfelder(st, f)) { const [x, y] = k.split(",").map(Number); if (st.siegel.some((z) => !z.beruehrt && abstand(z, { x, y }) <= 1) && (!best || (c === "schritt" ? 0 : c) < best.c)) best = { x, y, c: c === "schritt" ? 0 : c }; }
+        for (const [k, c] of bf()) { const [x, y] = k.split(",").map(Number); if (st.siegel.some((z) => !z.beruehrt && abstand(z, { x, y }) <= 1) && (!best || (c === "schritt" ? 0 : c) < best.c)) best = { x, y, c: c === "schritt" ? 0 : c }; }
         if (best) { bewegen(st, best.x, best.y); if (lebt(f) && kann("siegelstein")) handeln(st, "siegelstein", f.id); }
       }
       if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
+    }
+    // Ziele (Siegelsteine, Runensäulen, Eisblöcke …): Je offenes Ziel kümmert sich die nächste Figur darum – höchstens die Hälfte der Gruppe, die anderen kämpfen
+    let zielGemacht = false, ausgangGemacht = false;
+    if (st.mech && st.zug.aktion) {
+      const offen = st.mech.ziele.filter(zielOffen);
+      if (offen.length) {
+        const helden = spielerFiguren(st).filter(lebt), plaetze = Math.max(1, Math.ceil(helden.length / 2)), paare = [], zu = new Map(), vergeben = new Set();
+        for (const z of offen) for (const h of helden) paare.push({ z, h, d: abstand(z, h) - (z.frist ? 2 : 0) });
+        paare.sort((x, y) => x.d - y.d);
+        for (const p of paare) { if (zu.size >= plaetze) break; if (zu.has(p.h) || vergeben.has(p.z)) continue; zu.set(p.h, p.z); vergeben.add(p.z); }
+        const meins = zu.get(f);
+        if (meins) {
+          if (abstand(f, meins) > 1) {
+            let best = null;
+            for (const [k2, c] of bf()) { if (c === "schritt") continue; const [x, y] = k2.split(",").map(Number), d = abstand({ x, y }, meins); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, c, d }; }
+            if (best && !(best.x === f.x && best.y === f.y)) bewegen(st, best.x, best.y);
+            zielGemacht = true;
+          }
+          if (lebt(f) && !st.ende && kann("ziel")) { handeln(st, "ziel", f.id); zielGemacht = true; }
+          if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
+        }
+      }
+    }
+    // Durchbruch: alle zum Ausgang – solange niemand am Boden liegt
+    const aus = st.mech && st.mech.ausgang;
+    if (aus && !zielGemacht && !freundeAmBoden().length) {
+      if (aus.felder.some(([x, y]) => x === f.x && y === f.y)) ausgangGemacht = true;
+      else {
+        const frei = aus.felder.filter(([x, y]) => !belegt(st, x, y, f)); let best = null;
+        for (const [k2, c] of bf()) { if (c === "schritt") continue; const [x, y] = k2.split(",").map(Number), d = Math.min(99, ...frei.map(([a2, b2]) => abstand({ x, y }, { x: a2, y: b2 }))); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, d, c }; }
+        if (best && !(best.x === f.x && best.y === f.y)) bewegen(st, best.x, best.y);
+        ausgangGemacht = true;
+        if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
+      }
     }
     // Eskorte: Wer Sera am nächsten ist, kümmert sich um sie – am Boden stabilisieren, sonst bei nahem Jäger neben sie stellen
     const sera = st.eskorte && begleiterVon(st);
     if (sera && st.zug.aktion) {
       const helden = spielerFiguren(st).filter(lebt), naechster = helden.sort((a, b) => abstand(a, sera) - abstand(b, sera))[0];
-      const neben = () => { if (abstand(f, sera) <= 1) return true; let best = null; for (const [k, c] of bewegungsfelder(st, f)) { if (c === "schritt") continue; const [x, y] = k.split(",").map(Number); if (abstand({ x, y }, sera) <= 1 && (!best || c < best.c)) best = { x, y, c }; } if (best) bewegen(st, best.x, best.y); return lebt(f) && abstand(f, sera) <= 1; };
+      const neben = () => { if (abstand(f, sera) <= 1) return true; let best = null; for (const [k, c] of bf()) { if (c === "schritt") continue; const [x, y] = k.split(",").map(Number); if (abstand({ x, y }, sera) <= 1 && (!best || c < best.c)) best = { x, y, c }; } if (best) bewegen(st, best.x, best.y); return lebt(f) && abstand(f, sera) <= 1; };
       if (sera.tp <= 0 && !sera.stabil && naechster === f) { if (neben() && kann("stabilisieren")) handeln(st, "stabilisieren", sera.id); if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; } }
       else if (lebt(sera) && naechster === f && !helden.some((h) => h !== f && abstand(h, sera) <= 1) && gegner().some((g) => GEGNER[g.art].jaeger && abstand(g, sera) <= 6)) {
         neben(); if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
@@ -1369,9 +1731,10 @@
     }
     // 2. Bewegen
     const nah = Boolean(nahAngriff) && (!fernAngriff || ["krieger"].includes(f.klasse) || ["inquisitor", "assassine", "schattenlaeufer", "tiergefaehrte"].includes(f.fid));
-    const m = bewegungsfelder(st, f);
+    const m = bf();
     const nebenGegner = (x, y) => gegner().some((g) => abstand(g, { x, y }) <= 1);
-    if (nah) {
+    if (zielGemacht || ausgangGemacht) { /* schon gezogen: am Ziel oder am Ausgang bleiben */ }
+    else if (nah) {
       // zum besten erreichbaren Gegner
       let best = null;
       for (const g of gegner()) for (const [k, c] of m) {
@@ -1390,7 +1753,7 @@
       const gut = (x, y) => !nebenGegner(x, y) && gegner().some((g) => abstand(g, { x, y }) <= fernR && sicht(st, { x, y }, g));
       if (!gut(f.x, f.y) || nebenGegner(f.x, f.y)) {
         if (nebenGegner(f.x, f.y)) versuche(st, "rueckzug") || versuche(st, "schattenschritt");
-        const m2 = bewegungsfelder(st, f); let best = null;
+        const m2 = bf(); let best = null;
         for (const [k, c] of m2) {
           const [x, y] = k.split(",").map(Number); if (!gut(x, y)) continue;
           const dmin = Math.min(...gegner().map((g) => abstand(g, { x, y })));
@@ -1427,9 +1790,9 @@
       if (st.zug.aktion) {
         const b = besteAktion(st, f, "aktion");
         if (b) handeln(st, b.a.id, b.z.id);
-        else if (nah && !gegner().some((g) => abstand(g, f) <= 1) && kann("spurt_aktion")) {
+        else if (nah && !zielGemacht && !ausgangGemacht && !gegner().some((g) => abstand(g, f) <= 1) && kann("spurt_aktion")) {
           handeln(st, "spurt_aktion", f.id);
-          const m3 = bewegungsfelder(st, f); let best = null;
+          const m3 = bf(); let best = null;
           for (const [k, c] of m3) { if (c === "schritt") continue; const [x, y] = k.split(",").map(Number); const d = Math.min(...gegner().map((g) => abstand(g, { x, y }))); if (!best || d < best.d) best = { x, y, d }; }
           if (best && !(best.x === f.x && best.y === f.y)) bewegen(st, best.x, best.y);
         }
@@ -1444,8 +1807,8 @@
     for (const id of ["heilendes_wort", "massenheilwort"]) { const zs = kann(id) ? ziele(st, id) : []; const z = zs.find((o) => o.tp <= 0 || o.tp < o.tpMax * 0.4); if (z) handeln(st, id, z.id); }
     if (kann("aus_dem_schatten")) versuche(st, "aus_dem_schatten"); else if (kann("verstecken")) versuche(st, "verstecken");
     // 6. Fernkämpfer: nach dem Schuss leichtfüßig weg
-    if (!nah && lebt(f) && nebenGegner(f.x, f.y) && (st.zug.leicht > 0 || f.z.rueckzug)) {
-      const m4 = bewegungsfelder(st, f); let best = null;
+    if (!nah && !ausgangGemacht && lebt(f) && nebenGegner(f.x, f.y) && (st.zug.leicht > 0 || f.z.rueckzug)) {
+      const m4 = bf(); let best = null;
       for (const [k, c] of m4) { if (c === "schritt" || c > Math.max(st.zug.leicht, f.z.rueckzug ? 99 : 0)) continue; const [x, y] = k.split(",").map(Number); if (!nebenGegner(x, y) && (!best || c < best.c)) best = { x, y, c }; }
       if (best) bewegen(st, best.x, best.y);
     }
@@ -1540,7 +1903,7 @@
   function laden(o) {
     const st = JSON.parse(JSON.stringify(o));
     st.karte.block = new Set(st.karte.hindernisse.map(([, x, y]) => key(x, y)));
-    st.karte.offen = new Set(st.karte.hindernisse.filter(([t]) => t === "P" || t === "Q").map(([, x, y]) => key(x, y)));
+    st.karte.offen = new Set(st.karte.hindernisse.filter(([t]) => t === "P" || t === "Q" || t === "L").map(([, x, y]) => key(x, y)));
     st.zonen = st.zonen || []; st.brand = st.brand || [];
     return zufall(st);
   }
@@ -1550,7 +1913,7 @@
     if (!st.ende && f.seite === "spieler" && f.tp > 0) {
       for (const a of aktionenVon(f, st)) {
         const g = grund(st, a.id);
-        optionen.push({ id: a.id, ok: !g, grund: g, rest: rest(f, a) === Infinity ? null : rest(f, a), ziele: g ? [] : ziele(st, a.id).map((z) => ({ id: z.id, name: z.name, tp: z.tp, tpMax: z.tpMax, seite: z.seite, chance: chance(st, a.id, z.id).text })) });
+        optionen.push({ id: a.id, name: a.name, ok: !g, grund: g, rest: rest(f, a) === Infinity ? null : rest(f, a), ziele: g ? [] : ziele(st, a.id).map((z) => ({ id: z.id, name: z.name, tp: z.tp, tpMax: z.tpMax, seite: z.seite, chance: chance(st, a.id, z.id).text })) });
       }
     }
     return {
@@ -1563,7 +1926,7 @@
 
   const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
-    findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
+    zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;
 })(typeof window !== "undefined" ? window : globalThis);

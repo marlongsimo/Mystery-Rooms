@@ -42,6 +42,9 @@ const R = require('../js/regeln.js'), D = require('../daten/hochwacht.js'), P = 
   const m = R.neuesSpiel(7, { figuren: ['schildwaechter', 'lichtbringer'], stufe: 1, begegnung: 'moor_rand', karte: require('../daten/rabenmoor.js').KARTEN.BOHLENWEG });
   check(!R.begleiterVon(m) && !m.eskorte, 'Moor-Kampf: keine Begleiterin, keine Eskorte');
 
+  // Durchlauf aller bisherigen Szenen (Akt I inkl. Rettungsweg)
+  try { const out = require('child_process').execFileSync('node', [__dirname + '/../tools/durchlauf-hochwacht.js', '80'], { encoding: 'utf8' }); check(/Alle Szenen erreicht/.test(out), 'Akt I: 80 Durchläufe ohne Fehler, alle Szenen erreicht (auch die Rettung)'); }
+  catch (e) { check(false, 'Durchlauf: ' + (e.stdout || e.message).slice(0, 300)); }
   // 8. Browser
   const b = await chromium.launch(), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   p.setDefaultTimeout(20000); p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());
@@ -56,7 +59,12 @@ const R = require('../js/regeln.js'), D = require('../daten/hochwacht.js'), P = 
     const zu = async (fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
     for (const f of ['schildwaechter', 'lichtbringer', 'kopfgeldjaeger', 'elementarist']) { await zu(f); await p.click(`[data-fid="${f}"]`); await p.click('#f-waehlen'); }
     await p.click('#abenteuer-los'); await p.click('#einl-skip');
-    for (let i = 0; i < 3 && !(await p.$('#sz-kampf')); i++) { await p.waitForTimeout(400); const w = await p.$('#sz-weiter'); if (w) await w.click(); }
+    // Akt I bis zum Kampf: Vorgeschichte → Wegstation → Weg hinauf (Probe) → Kampf
+    for (let i = 0; i < 40 && !(await p.$('#sz-kampf')); i++) {
+      await p.waitForTimeout(250);
+      const k = async (sel) => { const e = await p.$(sel); if (e && await e.isEnabled()) { await e.click(); return true; } return false; };
+      if (await k('[data-opt="nicht"]') || await k('[data-opt="los"]') || await k('[data-wer]') || await k('[data-wurf]') || await k('#sz-weiter')) continue;
+    }
     await p.click('#sz-kampf');
     check(await p.evaluate(() => Boolean(document.querySelector('#karte .ausgang')) && window.AB.st.figuren.some((f) => f.art === 'begleiter')), 'Kampf am Pass: Sera, Weg und Ausgang auf der Karte');
     for (let i = 0; i < 3000; i++) {
@@ -65,7 +73,7 @@ const R = require('../js/regeln.js'), D = require('../daten/hochwacht.js'), P = 
       if (s === 'spieler') await p.evaluate(() => window.AB.auto()); else await p.waitForTimeout(30);
     }
     const ende = await p.evaluate(() => window.ABT.A() && window.ABT.A().szene);
-    check(['nach_pass', 'verschleppt', 'kampf_pass'].includes(ende), `Kampf zu Ende, die Geschichte geht weiter: „${ende}“ (bei Rückzug: derselbe Kampf neu)`);
+    check(['wachmann', 'verschleppt', 'kampf_pass'].includes(ende), `Kampf zu Ende, die Geschichte geht weiter: „${ende}“ (bei Rückzug: derselbe Kampf neu)`);
   } catch (e) { check(false, 'Browser: ' + e.message); }
   check(!errs.length, 'keine Seitenfehler' + (errs.length ? ': ' + errs.join(' | ') : ''));
   await b.close(); console.log(ok ? '\nHOCHWACHT IN ORDNUNG' : '\nHOCHWACHT FEHLER'); process.exit(ok ? 0 : 1);

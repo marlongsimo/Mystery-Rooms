@@ -117,7 +117,7 @@
     moor_tote: { name: "Die Ertrunkenen", zusatzAb: 3, stufe: 2, gegner: [["moorleiche", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.82, 3: 1.57, 4: 2.58, 5: 2.85, 6: 3.23 }, skalaHC: { 2: 1.65, 3: 1.82, 4: 2.34, 5: 2.71, 6: 2.99 } },
     moor_schrein: { name: "Alwine, die Stumme", zusatzAb: 3, stufe: 2, gegner: [["alwine", 0.1, 1, 0.6], ["moorleiche", 0.5], ["irrlicht", 0.5]], skala: { 2: 0.75, 3: 0.84, 4: 1.78, 5: 2.45, 6: 3.23 }, skalaHC: { 2: 0.5, 3: 1, 4: 1.61, 5: 1.96, 6: 2.34 } },
     // Die letzte Fackel von Hochwacht (Prototyp): genau ein bis zwei Jäger, dazu Kobolde; Tabelle per tools/eskorte-sim.js
-    pass: { name: "Hinterhalt am Pass", stufe: 1, zusatzAb: 99, gegner: [["siegeljaeger", 0.25, 3, 0.25], ["jaegerschuetze", 0.15, 2, 0.4], ["schattenkobold", 0.55]], skala: { 2: 2.38, 3: 3.15, 4: 4.36, 5: 4.56, 6: 5.66 }, skalaHC: { 2: 2.28, 3: 3.08, 4: 4.18, 5: 4.46, 6: 5.3 } },
+    pass: { name: "Hinterhalt am Pass", stufe: 1, zusatzAb: 99, gegner: [["siegeljaeger", 0.5, 4], ["jaegerschuetze", 0.2, 2], ["schattenkobold", 0.8]], skala: { 2: 2.71, 3: 2.28, 4: 2.23, 5: 2.28, 6: 2.65 }, skalaHC: { 2: 2.59, 3: 2.09, 4: 2.23, 5: 2.18, 6: 2.38 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -269,9 +269,9 @@
     if (opts.begleiter) {
       const b = opts.begleiter;
       st.figuren.push({ id: "b0", seite: "spieler", art: "begleiter", name: b.name, titel: b.titel || "Begleiterin", x: b.start[0], y: b.start[1], tp: b.tp, tpMax: b.tp, rk: b.rk || 12, rkBasis: b.rk || 12,
-        werte: b.werte || { STR: 8, GES: 12, KON: 10, INT: 13, WEI: 14, CHA: 13 }, z: {}, reaktion: 0, genutzt: {}, rucksack: [], todes: { e: 0, f: 0 } });
+        werte: b.werte || { STR: 8, GES: 12, KON: 10, INT: 13, WEI: 14, CHA: 13 }, z: {}, reaktion: 0, genutzt: {}, rucksack: [], todes: { e: 0, f: 0 }, gefesselt: Boolean(b.gefesselt) });
       st.eskorte = { route: b.route.map((p) => p.slice()), schritt: 0, ausgang: b.ausgang !== false, jaegerSieg: Boolean(b.jaegerSieg), schrittweite: b.schrittweite || 2, warten: b.warten || 3, unten: null };
-      st.log.push({ t: `${b.name} ist bei euch. Bringt sie zum Ausgang – manche Gegner haben es auf sie abgesehen.`, art: "gut" });
+      st.log.push(b.gefesselt ? { t: `${b.name} liegt gefesselt bei den Jägern. Besiegt sie, um sie zu befreien.`, art: "gut" } : { t: `${b.name} ist bei euch. Bringt sie zum Ausgang – manche Gegner haben es auf sie abgesehen.`, art: "gut" });
     }
     // Gemischte Startplätze der Gegner (Abwechslung)
     if (opts.mischen) { const g = k.start.gegner.slice(); for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; } k = Object.assign({}, k, { start: Object.assign({}, k.start, { gegner: g }) }); }
@@ -284,11 +284,14 @@
     const begZ = BEGEGNUNGEN[opts.begegnung || "garten"] || {};
     if (!opts.gegner && zusatzN && !(begZ.zusatzAb && fids.length < begZ.zusatzAb)) { const h = basis.filter((g) => !GEGNER[g.art].boss).sort((a, b) => b.anzahl - a.anzahl)[0]; if (h) h.anzahl += zusatzN; }
     const gruppen = basis.map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * (opts.skalaMal || 1) * tpGlobal })).concat(opts.zusatz || []);
-    let gi = 0;
+    let gi = 0, ji = 0;
     for (const g of gruppen) for (let i = 0; i < g.anzahl; i++) {
       const d = GEGNER[g.art];
       let [x, y] = k.start.gegner[gi % k.start.gegner.length];
-      if (gi >= k.start.gegner.length || belegt(st, x, y) || blockiert(st, x, y)) {
+      // Eskorte: Jäger haben eigene Startplätze (z. B. auch hinter der Gruppe), damit große Gruppen von mehreren Seiten gefordert werden
+      const jp = d.jaeger && k.start.jaeger && k.start.jaeger.find((p, n) => n >= ji && !belegt(st, p[0], p[1]));
+      if (jp) { [x, y] = jp; ji = k.start.jaeger.indexOf(jp) + 1; }
+      if (!jp && (gi >= k.start.gegner.length || belegt(st, x, y) || blockiert(st, x, y))) {
         // nächstes freies Feld auf der Gegnerseite
         let best = null;
         for (let yy = 0; yy < k.h; yy++) for (let xx = Math.floor(k.b * 0.6); xx < k.b; xx++) { if (blockiert(st, xx, yy) || belegt(st, xx, yy)) continue; const dd = Math.abs(xx - x) + Math.abs(yy - y) + (k.b - 1 - xx) * 0.1; if (!best || dd < best.dd) best = { xx, yy, dd }; }
@@ -1056,7 +1059,7 @@
   /* ---------- Eskorte: Begleiterin ---------- */
   /** Zu Beginn jeder Runde: Die Begleiterin geht bis zu 2 Felder ihren Weg entlang – nicht in bedrohte Felder, nicht ohne die Gruppe */
   function begleiterPhase(st) {
-    const s = begleiterVon(st), e = st.eskorte; if (!s || st.ende) return;
+    const s = begleiterVon(st), e = st.eskorte; if (!s || st.ende || s.gefesselt) return;
     // Rettungsfenster abgelaufen: verschleppt
     if (s.tp <= 0) {
       if (!s.stabil && e.unten != null && st.runde >= e.unten + 2) { st.ende = "gefangen"; st.log.push({ t: `Die Jäger packen ${s.name} und verschwinden mit ihr. Ihr müsst sie zurückholen.`, art: "ende" }); }
@@ -1087,7 +1090,7 @@
   function zieleFuerGegner(st, g) {
     // Jäger: die Begleiterin hat Vorrang, wenn sie steht und sichtbar ist
     const s = GEGNER[g.art].jaeger && begleiterVon(st);
-    if (s && lebt(s) && sicht(st, g, s)) { if (g.visier !== st.runde) { g.visier = st.runde; st.log.push({ t: `${g.name} nimmt ${s.name} ins Visier.`, art: "gegner" }); } return [s]; }
+    if (s && lebt(s) && !s.gefesselt && sicht(st, g, s)) { if (g.visier !== st.runde) { g.visier = st.runde; st.log.push({ t: `${g.name} nimmt ${s.name} ins Visier.`, art: "gegner" }); } return [s]; }
     const alle = st.figuren.filter((f) => f.seite === "spieler" && lebt(f));
     const sichtbar = alle.filter((f) => !f.z.versteckt);
     return sichtbar.length ? sichtbar : alle;

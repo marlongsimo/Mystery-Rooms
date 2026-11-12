@@ -151,10 +151,10 @@
     k_markt: { name: "Marktplatz der leeren Fenster", stufe: 1, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["jaegerschuetze", 0.2, 2, 0.6], ["frostknecht", 0.2, 2], ["eisgezeichneter", 0.7, 5]], skala: { 2: 0.76, 3: 0.76, 4: 0.8, 5: 1.2, 6: 1.35 }, skalaHC: { 2: 0.59, 3: 0.59, 4: 0.63, 5: 1.1, 6: 1.28 } },
     k_kammern: { name: "Die Kammern der Verschleppten", stufe: 1, zusatzAb: 99, gegner: [["frostknecht", 0.25, 2, 0.25], ["glasschwaermer", 0.5, 5]], skala: { 2: 0.85, 3: 0.85, 4: 1.23, 5: 1.59, 6: 2.2 }, skalaHC: { 2: 1.03, 3: 1.03, 4: 1.26, 5: 1.37, 6: 2.2 } },
     // Akt II (Heldenstufe 2) und III (Stufe 3)
-    k_bruecke: { name: "Die Brücke über den Gletscherbruch", stufe: 2, zusatzAb: 99, gegner: [["kettenbestie", 0.25, 1, 0], ["jaegerschuetze", 0.35, 3, 0.4], ["siegeljaeger", 0.3, 2]], skala: { 2: 0.83, 3: 0.83, 4: 1.13, 5: 1.98, 6: 3.79 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
-    k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.35, 3]], skala: { 2: 1.23, 3: 1.23, 4: 3.96, 5: 3.96, 6: 3.96 }, skalaHC: { 2: 0.63, 3: 0.63, 4: 1.37, 5: 3.19, 6: 3.96 } },
-    k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["eisgezeichneter", 0.6, 4], ["glasschwaermer", 0.3, 2]], skala: { 2: 1.81, 3: 1.81, 4: 2.51, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
-    k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.3, 3]], skala: { 2: 1.37, 3: 1.37, 4: 2.74, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    k_bruecke: { name: "Die Brücke über den Gletscherbruch", stufe: 2, zusatzAb: 99, gegner: [["kettenbestie", 0.25, 1, 0], ["jaegerschuetze", 0.5, 4, 0.2], ["siegeljaeger", 0.45, 3]], skala: { 2: 0.83, 3: 0.83, 4: 1.13, 5: 1.98, 6: 3.79 }, skalaHC: { 2: 0.59, 3: 0.59, 4: 0.83, 5: 1.23, 6: 2.02 } },
+    k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.6, 4], ["jaegerschuetze", 0.25, 2, -0.5]], skala: { 2: 1.23, 3: 1.23, 4: 3.96, 5: 3.96, 6: 3.96 }, skalaHC: { 2: 0.63, 3: 0.63, 4: 1.37, 5: 3.19, 6: 3.96 } },
+    k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["eisgezeichneter", 0.9, 6], ["glasschwaermer", 0.4, 3]], skala: { 2: 1.81, 3: 1.81, 4: 2.51, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 2.2, 3: 2.2, 4: 2.25, 5: 3.79, 6: 3.96 } },
+    k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.6, 5], ["frostknecht", 0.3, 2, -0.5]], skala: { 2: 1.37, 3: 1.37, 4: 2.74, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 1.23, 3: 1.23, 4: 1.98, 5: 2.92, 6: 3.96 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -1471,11 +1471,11 @@
     st.ende = "sieg"; st.xp = gegnerFiguren(st).filter((g) => g.tp <= 0).reduce((a, g) => a + GEGNER[g.art].xp, 0);
     st.log.push({ t: s.text || "Ziel erreicht – der Weg ist frei!", art: "ende" });
   }
-  /** Durchbruch: Stehen alle Helden, die nicht tot sind, auf den Ausgangsfeldern (und liegt niemand am Boden), ist der Kampf gewonnen */
+  /** Durchbruch: Stehen alle stehenden Helden auf den Ausgangsfeldern, ist der Kampf gewonnen (Verwundete werden mitgetragen) */
   function ausgangPruefen(st) {
     const a = st.mech && st.mech.ausgang; if (!a || st.ende) return;
-    const sp = spielerFiguren(st).filter((f) => !f.tot);
-    if (!sp.length || !sp.every((f) => f.tp > 0 && a.felder.some(([x, y]) => x === f.x && y === f.y))) return;
+    const sp = spielerFiguren(st).filter((f) => !f.tot && f.tp > 0); // wer am Boden liegt, wird mitgetragen
+    if (!sp.length || !sp.every((f) => a.felder.some(([x, y]) => x === f.x && y === f.y))) return;
     st.ende = "sieg"; st.xp = gegnerFiguren(st).filter((g) => g.tp <= 0).reduce((s, g) => s + GEGNER[g.art].xp, 0);
     st.log.push({ t: a.text || "Ihr seid durch!", art: "ende" });
   }

@@ -40,7 +40,7 @@
   // Das Tor der Kronenwache: Vorhof vor dem Palast, zwei Runensäulen an den Seiten
   const TOR = { name: "Das Tor der Kronenwache", b: 12, h: 9, boden: "stein", bild: null,
     hindernisse: ausText(["MMMMMMMMMMMM", "M...M..M...M", "M..........M", "M..K....K..M", "............", "M..K....K..M", "M..........M", "M...M..M...M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], gegner: [[8, 4], [9, 3], [9, 5], [10, 4], [10, 2], [10, 6], [7, 2], [7, 6]] } };
+    start: { spieler: sp, wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], gegner: [[8, 4], [9, 2], [9, 6], [10, 1], [10, 7], [10, 4], [7, 2], [7, 6], [8, 1], [8, 7]] } };
   // Das Archiv der Namen: Regalgänge, drei Schrifttafeln, Schriftkapseln in den Wänden
   const ARCHIV = { name: "Das Archiv der Namen", b: 12, h: 9, boden: "stein", bild: null,
     hindernisse: ausText(["MMMMMMMMMMMM", "M.M.M..M.M.M", "M..........M", "M.MM.MM.MM.M", "............", "M.MM.MM.MM.M", "M..........M", "M.M.M..M.M.M", "MMMMMMMMMMMM"]),
@@ -66,9 +66,9 @@
   OBJEKTE.gitter = [3, 4, 5].map((y, i) => ({ id: "g" + (i + 1), name: "Eisgitter", art: "gitter", x: 10, y, runden: 2, aktion: "Eisgitter aufschlagen", fertigText: "Das Gitter zerspringt", wirkung: { oeffnet: true } }));
   OBJEKTE.saeulen = [{ id: "r1", name: "Runensäule Nord", art: "saeule", x: 9, y: 1, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" },
     { id: "r2", name: "Runensäule Süd", art: "saeule", x: 9, y: 7, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" }];
-  OBJEKTE.tafeln = [{ id: "t1", name: "Tafel der Gründer", art: "tafel", x: 6, y: 1, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
-    { id: "t2", name: "Tafel der Wächter", art: "tafel", x: 6, y: 7, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
-    { id: "t3", name: "Tafel des Herzens", art: "tafel", x: 11, y: 4, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } }];
+  OBJEKTE.tafeln = [{ id: "t1", name: "Tafel der Gründer", art: "tafel", x: 6, y: 1, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
+    { id: "t2", name: "Tafel der Wächter", art: "tafel", x: 6, y: 7, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
+    { id: "t3", name: "Tafel des Herzens", art: "tafel", x: 11, y: 4, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } }];
   const NAMEN = { siegeljaeger: "Maskierter Jäger", jaegerschuetze: "Maskierter Schütze", funkenhund: "Fährtenhund", jaegerhauptmann: "Jägerhauptmann Varrek", eisgezeichneter: "Verlorener Pilger" };
   const bonusName = { signalhorn: "das Signalhorn", kernsplitter: "den Kernsplitter", pilgerzeichen: "das Pilgerzeichen" };
 
@@ -388,7 +388,7 @@
       art: "kampf", abschnitt: 2, stufe: 2, titel: "Das Tor der Kronenwache", ort: "Vor dem Palast",
       text: ["Der Eisenhirte trägt ein Runenschild (halber Schaden, bricht nach genug Treffern für zwei Runden). Alle drei Runden kündigt er einen Bodenstoß an: Wer im Umkreis von zwei Feldern bleibt, wird getroffen. Schaltet die beiden Runensäulen ab (je zwei Aktionen in Ruhe) – dann erstarrt er. Oder besiegt ihn."],
       kampf: (A) => ({ begegnung: "k_tor", karte: TOR, keinAnfuehrer: true, mischen: false, skalaMal: A.merker.zeit_verloren ? 1.1 : 1,
-        mechanik: { ziele: OBJEKTE.saeulen.map((z) => Object.assign({}, z, A.merker.s4_verschleppte >= 3 && z.id === "r1" ? { start: 1 } : {})),
+        mechanik: { ziele: OBJEKTE.saeulen.map((z) => Object.assign({}, z, A.gruppe.filter((f) => !A.zust[f].tot).length >= 5 ? { runden: 3 } : {}, A.merker.s4_verschleppte >= 3 && z.id === "r1" ? { start: 1 } : {})),
           schild: { art: "eisenhirte", ziele: ["r1", "r2"], halt: 18, pause: 2, text: "Runenschild" },
           sieg: { ziele: 2, art: "saeule", besiegt: { art: "eisenhirte", n: 1 }, text: "Der Eisenhirte erstarrt. Langsam, mit einem Knirschen wie Gletschereis, tritt er beiseite. Das Tor ist frei." } },
         sieg: { weiter: "tor_nach" } }),
@@ -422,7 +422,7 @@
     },
     kampf_archiv: {
       art: "kampf", abschnitt: 3, stufe: 3, titel: "Das Archiv der Namen", ort: "Unter dem Palast",
-      text: (A) => [`Sichert die drei Tafeln (je zwei Aktionen daneben), bevor die Namen verblassen – ihr habt bis Runde 8. Der Kälterufer löscht, was ihr gesichert habt, wenn er herankommt. Der Runenleser lässt Eis zwischen euch wachsen. Aus den Schriftkapseln brechen Glasschwärmer.${A.merker.s4_route_bonus === "signalhorn" ? " Das Signalhorn hält die Schwärmer eine Weile zurück." : ""}`],
+      text: (A) => [`Sichert die drei Tafeln (je zwei Aktionen daneben), bevor die Namen verblassen – ihr habt bis Runde 6. Der Kälterufer löscht, was ihr gesichert habt, wenn er herankommt. Der Runenleser lässt Eis zwischen euch wachsen. Aus den Schriftkapseln brechen Glasschwärmer.${A.merker.s4_route_bonus === "signalhorn" ? " Das Signalhorn hält die Schwärmer eine Weile zurück." : ""}`],
       kampf: (A) => ({ begegnung: "k_archiv", karte: ARCHIV, keinAnfuehrer: true, namen: NAMEN,
         mechanik: { ziele: OBJEKTE.tafeln, zieleZuerst: true, sieg: { ziele: 3, art: "tafel", text: "Alle drei Tafeln sind gesichert. Der Runenleser flucht und verschwindet in den Gängen." },
           wellen: [{ id: "kapseln", name: "Die Schriftkapseln", kurz: "aus den Kapseln", quellen: [[3, 1], [8, 1], [3, 7], [8, 7]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 3, ab: A.merker.s4_route_bonus === "signalhorn" ? 5 : 3, max: 2, text: "In den Wänden klirrt Glas" }] },

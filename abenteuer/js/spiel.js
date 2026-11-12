@@ -552,7 +552,13 @@
     if (r.fehler) $("#hinweis").textContent = r.fehler; else { tipp = null; render(); veroeffentlichen(); }
   }
 
-  function zeigeSektion(id) { for (const x of ["mythara", "hub", "einladen", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; } }
+  function zeigeSektion(id) {
+    for (const x of ["mythara", "hub", "einladen", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; }
+    // Für das Neuladen merken, ob man gerade im Spiel war (nur dann wird automatisch fortgesetzt)
+    try { sessionStorage.setItem("ab_ansicht", id); } catch (e) { /* privat */ }
+  }
+  /** War vor dem Neuladen ein Spielbildschirm offen (Szene, Kampf, Heldenwahl …)? Ohne Angabe: ja (ältere Stände) */
+  const imSpielGewesen = () => { let a = null; try { a = sessionStorage.getItem("ab_ansicht"); } catch (e) { /* privat */ } return !a || ["szene", "spiel", "ende", "lobby", "einleitung", "einladen"].includes(a); };
   function zeigeIntro() { if (window.MYTHARA && window.MYTHARA.imHub()) window.MYTHARA.zeigeHub(); else zeigeSektion("intro"); }
   function zeigeSpiel() { zeigeSektion("spiel"); }
   /* ---------- Karten-Prüfmodus (?raster): Koordinaten, Hindernisse und Startplätze sichtbar ---------- */
@@ -663,7 +669,7 @@
   const neuGeladen = (() => { try { const n = performance.getEntriesByType("navigation")[0]; return n ? n.type === "reload" : performance.navigation && performance.navigation.type === 1; } catch (e) { return false; } })();
   (async () => {
     await bereit;
-    if (!neuGeladen) return;
+    if (!neuGeladen || !imSpielGewesen()) return; // auf der Start- oder Spielerseite neu geladen: dort bleiben
     let gespeichert = null;
     try { gespeichert = JSON.parse(localStorage.getItem(SPEICHER) || "null"); } catch (e) { /* defekt */ }
     if (!gespeichert || !window.RPGNetz) { allein(); return; }
@@ -703,6 +709,7 @@
   window.AB = { st: null, R, LIVE, SETUP: () => SETUP, META, liveClient, frueherSetzen,
     /** Neues Abenteuer wählen (Spielerseite → Neue Kampagne): Daten, Mindestgröße und Texte für Einleitung und Kodex */
     abenteuerWaehlen(id) { SETUP.abenteuer = id || "grauwacht"; setupMerken(); if (window.ABE && window.ABE.abenteuerTexte) window.ABE.abenteuerTexte(META()); }, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
+    liveBeenden: async () => { try { await LIVE.client.leave(); } catch (e) { /* schon zu */ } LIVE.phase = null; vergessen(); zeichneLiveBar(); },
     liveAn, besitzVon: (fid) => (liveAn() ? LIVE.besitz[fid] : null), spielerName,
     besitzTauschen(alt, neu) { const i = SETUP.gruppe.indexOf(alt); if (i >= 0) SETUP.gruppe[i] = neu; if (LIVE.besitz[alt]) { LIVE.besitz[neu] = LIVE.besitz[alt]; delete LIVE.besitz[alt]; } if (LIVE.frueher[alt]) { LIVE.frueher[neu] = LIVE.frueher[alt]; delete LIVE.frueher[alt]; } setupMerken(); },
     auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };

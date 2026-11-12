@@ -365,7 +365,7 @@
   /** Pause: zurück zum Titel, der Spielstand bleibt erhalten */
   function pause() { merken(); fortsetzenKnopf(); AB.zeigeIntro(); if (window.KAMPAGNE) window.KAMPAGNE.pausieren({ allein: true }); }
 
-  window.ABT = { vorlesen: (an) => { vorlesenAn = an; if (!an) verstummen(); }, hilfe: (v) => { hilfeAn = v; if (A) render(); }, start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
+  window.ABT = { pause, vorlesen: (an) => { vorlesenAn = an; if (!an) verstummen(); }, hilfe: (v) => { hilfeAn = v; if (A) render(); }, start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
     speichern: () => (A ? S.speichern(A) : null), laden: (o) => { A = S.laden(o); },
     /** Stand aus einer Kampagne übernehmen und im Browser merken */
     uebernehmen: (o) => { A = S.laden(o); merken(); },

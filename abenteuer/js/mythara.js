@@ -476,6 +476,26 @@
     if (was === "beitreten") return beitretenDialog();
   });
 
+  /* ---------- Zur Startseite (MYTHARA oben rechts und das Logo) ---------- */
+  const SPIELANSICHT = ["szene", "spiel", "ende", "lobby", "einleitung", "einladen", "kodex", "intro"];
+  async function nachHause() {
+    const offen = SPIELANSICHT.find((id) => { const el = $("#" + id); return el && !el.hidden; });
+    const laeuft = window.ABT && window.ABT.laeuft && window.ABT.laeuft(), live = window.AB.liveAn && window.AB.liveAn();
+    if (offen && (laeuft || live)) {
+      // Kampagne mit Handys: speichern, pausieren, Handys trennen (fragt selbst nach; Abbrechen = bleiben)
+      if (live && window.KAMPAGNE && window.KAMPAGNE.aktiv()) { await window.KAMPAGNE.pausieren(); if (window.AB.liveAn()) return; }
+      else {
+        if (!confirm(live ? "Zur Startseite? Die Live-Runde wird beendet, die Handys werden getrennt. Das Abenteuer bleibt gespeichert." : "Zur Startseite? Euer Abenteuer bleibt gespeichert und kann fortgesetzt werden.")) return;
+        if (live) await window.AB.liveBeenden();
+        if (laeuft && window.ABT.pause) window.ABT.pause();
+      }
+    }
+    $("#qr-overlay").hidden = true;
+    if (imHub()) zeigeHub(); else { zeige("mythara"); window.scrollTo(0, 0); }
+  }
+  const heim = $("#brand-heim"); if (heim) heim.onclick = nachHause;
+  document.querySelectorAll(".hub-logo, .my-logo").forEach((l) => { l.style.cursor = "pointer"; l.title = "Zur Startseite"; l.addEventListener("click", nachHause); });
+
   /* ---------- Verknüpfen ---------- */
   $("#my-gast-start").onclick = () => { profil = profil && profil.konto ? profil : null; try { sessionStorage.setItem(HUB, "gast"); } catch (e) { /* privat */ } zeigeHub(); };
   $("#my-code-zeigen").onclick = () => codeFeld($("#my-code").hidden);

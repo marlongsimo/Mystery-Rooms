@@ -140,6 +140,22 @@
       <div class="kk-rechts">${uhr && i ? `<div class="kk-uhr"><small>${esc(uhr.name || "").toUpperCase()}</small><div>${Array.from({ length: max }, (_, n) => `<i class="${n < g ? "an" : ""}"></i>`).join("")}</div></div>` : ""}
         <div class="kk-chip">Runde <b>${st.runde}</b></div><div class="kk-chip">Stufe ${st.stufe} · ${st.schwierigkeit === "hardcore" ? "Hardcore" : "Normal"}</div></div>`;
   }
+  /** Kürzester Weg auf dem Raster (8 Richtungen, keine Ecken durch Hindernisse) – nur für die Darstellung */
+  function weg(st, von, nach) {
+    const k = st.karte, frei = (x, y) => x >= 0 && y >= 0 && x < k.b && y < k.h && !k.block.has(x + "," + y), key = (x, y) => x + "," + y;
+    const vor = new Map([[key(...von), null]]), q = [von];
+    while (q.length) {
+      const [x, y] = q.shift(); if (x === nach[0] && y === nach[1]) break;
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+        const nx = x + dx, ny = y + dy, kk = key(nx, ny);
+        if ((!dx && !dy) || vor.has(kk) || !(frei(nx, ny) || (nx === nach[0] && ny === nach[1])) || (dx && dy && (!frei(x + dx, y) || !frei(x, y + dy)))) continue;
+        vor.set(kk, [x, y]); q.push([nx, ny]);
+      }
+    }
+    if (!vor.has(key(...nach))) return [von, nach]; // Sprung (z. B. Rückstoß, Schattenschritt): direkt
+    const p = []; for (let c = nach; c; c = vor.get(key(...c))) p.unshift(c);
+    return p;
+  }
   /* ---------- Nach jedem Zeichnen ---------- */
   function nach(st, R) {
     if (!st) return;
@@ -162,12 +178,13 @@
       else banner("Kampf", st.karte.name || "");
       return;
     }
-    // Bewegung: Figuren gleiten vom alten Feld zum neuen (FLIP)
+    // Bewegung: Figuren gehen Feld für Feld den kürzesten Weg (um Hindernisse herum) vom alten Feld zum neuen
     for (const f of st.figuren) {
       const a = vorher.pos[f.id]; if (!a || (a[0] === f.x && a[1] === f.y) || f.x < 0 || a[0] < 0) continue;
       const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (!g || !g.animate) continue;
-      const dx = (a[0] - f.x) * Z, dy = (a[1] - f.y) * Z, weg = Math.max(Math.abs(a[0] - f.x), Math.abs(a[1] - f.y));
-      g.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0, 0)" }], { duration: Math.min(900, 160 + weg * 110), easing: "cubic-bezier(.3,.7,.2,1)" });
+      const pfad = weg(st, a, [f.x, f.y]), schritt = 150, n = pfad.length - 1;
+      const bilder = pfad.map(([x, y], i) => ({ transform: `translate(${(x - f.x) * Z}px, ${(y - f.y) * Z}px)`, offset: n ? i / n : 1, easing: "ease-in-out" }));
+      g.animate(bilder, { duration: Math.max(220, n * schritt) });
     }
     // Leben: Zahlen, Treffer, Heilung
     const logNeu = st.log.slice(vorher.log), krit = logNeu.some((l) => /kritischer Treffer|kritisch/i.test(l.t) && l.art !== "gegner");

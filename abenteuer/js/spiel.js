@@ -381,6 +381,11 @@
     }
     return o;
   }
+  /** Schatten bleibt am Boden, der Rest der Figur kommt in eine eigene Ebene, die schweben darf (ohne SVG-Positionen zu überschreiben) */
+  function figSchweben(teil) {
+    const m = teil.match(/<ellipse class="fig-schatten"[^>]*\/>/);
+    return (m ? m[0] : "") + `<g class="fig-schweb">${m ? teil.replace(m[0], "") : teil}</g>`;
+  }
   const farbeVon = (f) => (f.art === "wolf" ? "#3f7a3a" : F.KLASSEN[f.klasse].farbe);
 
   function render() {
@@ -451,7 +456,7 @@
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
       if (f.seite === "gegner" && unten) { o += `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
-      if (!unten) o += `<ellipse cx="${cx}" cy="${cy + 22}" rx="24" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="27" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" stroke="${f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
+      if (!unten) o += `<ellipse class="fig-schatten" cx="${cx}" cy="${cy + 22}" rx="24" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="27" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" stroke="${f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
       if (!unten && f.schild && f.schild.aktiv) o += `<circle class="schild-ring" cx="${cx}" cy="${cy}" r="33" fill="#8fd0ff" fill-opacity=".12" stroke="#8fd0ff" stroke-width="3" stroke-dasharray="5 3"><title>${esc(f.schild.text)}: fängt die Hälfte des Schadens ab</title></circle>`;
       if (f === akt && !st.ende) o += `<circle class="aktiv-ring" cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#C5A267" stroke-width="3.5"/><circle cx="${cx}" cy="${cy}" r="33" fill="none" stroke="#C5A267" stroke-opacity=".35" stroke-width="5"/>`;
       if (gegnerInfo === f.id) o += `<circle cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#e8dcc0" stroke-width="2" stroke-dasharray="4 3"/>`;
@@ -485,7 +490,7 @@
         const w = 44, anteil = Math.max(0, f.tp / f.tpMax);
         o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="${anteil > .5 ? "#6fa86a" : anteil > .25 ? "#d6a23a" : "#c0503a"}"/>`;
       }
-      } finally { o = o.slice(0, vorFig) + `<g class="fig ${f.seite === "gegner" ? "feind" : "held"}" data-id="${f.id}">` + o.slice(vorFig) + "</g>"; }
+      } finally { o = o.slice(0, vorFig) + `<g class="fig ${f.seite === "gegner" ? "feind" : "held"} ${f.tp > 0 && !f.tot ? "steht" : "liegt"}" data-id="${f.id}" style="--v:${-(((Date.now() / 1000) + (st.figuren.indexOf(f) % 5) * 0.6) % 3).toFixed(2)}s"><g class="fig-k">` + figSchweben(o.slice(vorFig)) + "</g></g>"; }
     }
     if (RASTER) o += rasterEbene(k);
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect class="feld" data-x="${x}" data-y="${y}" x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="transparent"/>`;

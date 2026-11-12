@@ -1154,7 +1154,7 @@ body.fx-an .karte-wrap .meldungen { display: none; }
     box-shadow: 0 0 0 2px rgba(217,178,106,.55), 0 0 0 7px rgba(10,10,14,.92), 0 0 0 9px rgba(217,178,106,.28), 0 50px 80px rgba(0,0,0,.75); background: #0b0e14; }
   .karte-wrap .leiste { margin-top: -26px; border-radius: 14px; box-shadow: 0 0 0 1px rgba(217,178,106,.3), 0 14px 30px rgba(0,0,0,.5); }
   /* Spielfiguren stehen auf: die Kippung wird je Figur ausgeglichen, Fuß bleibt auf dem Feld */
-  #karte .fig { transform-box: fill-box; transform-origin: 50% 85%; transform: scaleY(1.22); }
+  #karte .fig-k { transform-box: fill-box; transform-origin: 50% 85%; transform: scaleY(1.22); }
   .fx-kanal { inset: 0; }
 }
 @media (min-width: 1200px) {
@@ -1176,3 +1176,9 @@ body.fx-an .karte-wrap .meldungen { display: none; }
   .panel { max-height: calc(58vh - 40px); }
   .log { max-height: calc(42vh - 120px); }
 }
+
+/* Schwebende Spielfiguren: der Körper hebt und senkt sich, der Schatten bleibt am Boden und atmet mit */
+body.fx-an #karte .fig.steht .fig-schweb { animation: fig-schweben 3s ease-in-out infinite; animation-delay: var(--v, 0s); }
+body.fx-an #karte .fig.steht .fig-schatten { transform-box: fill-box; transform-origin: 50% 50%; animation: fig-schatten 3s ease-in-out infinite; animation-delay: var(--v, 0s); }
+@keyframes fig-schweben { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(-9px); } }
+@keyframes fig-schatten { 0%, 100% { transform: scale(1); opacity: .55; } 50% { transform: scale(.82); opacity: .38; } }

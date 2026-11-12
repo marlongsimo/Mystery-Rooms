@@ -109,6 +109,10 @@
       feldzauber: { name: "Eiskorridor", anzahl: 3, dauer: 2, alle: 4, reichweite: 9 }, brut: { art: "glasschwaermer", alle: 2, max: 5 }, bewegung: 4,
       flaeche: { name: "Frostwelle", form: "kreis", radius: 1, schaden: "3W6", sg: 14, rettung: "KON", alle: 3, reichweite: 7 },
       phasen: [{ ab: 0.5, text: "Die Frostmatrone kreischt. Der Boden der Kammer überzieht sich mit Raureif, und die Nester glühen auf.", rk: 1 }], xp: 1100 },
+    koenig: { name: "Der König unter dem Eis", tp: 90, rk: 16, werte: { STR: 20, GES: 10, KON: 18, INT: 14, WEI: 16, CHA: 18 }, angriff: { name: "Kronenschwert", bonus: 7, schaden: "2W8+4" }, rueckstoss: { felder: 1, sg: 14 }, bewegung: 4,
+      flaeche: { name: "Kronenschlag", form: "linie", reichweite: 5, schaden: "4W6", sg: 14, rettung: "GES", alle: 3, phase: 1 },
+      phasen: [{ ab: 0.66, text: "Die Krone des Königs bricht. Das Kronenherz öffnet drei Runenpunkte, und aus den Seitengängen tritt seine Ehrengarde. Phase II: Die gebrochene Krone.", welle: "garde" },
+        { ab: 0.33, text: "Die Rüstung des Königs zerfällt zu Eis und Licht. Was bleibt, ist ein Schemen um einen pulsierenden Kern. Der Boden des Saals reißt auf. Phase III: Das Herz.", rk: -2, feld: { felder: [[5, 3], [5, 5], [7, 2], [7, 6], [3, 4]], typ: "loch", name: "Der Boden des Saals" } }], xp: 2000 },
     eisenhirte: { name: "Eisenhirte", tp: 70, rk: 16, werte: { STR: 20, GES: 8, KON: 18, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Steinfaust", bonus: 6, schaden: "2W8+3" }, bewegung: 3,
       flaeche: { name: "Bodenstoß", form: "ring", radius: 2, schaden: "3W6", sg: 13, rettung: "GES", alle: 3, liegend: true },
       phasen: [{ ab: 0.5, text: "Die Runen am Eisenhirten glühen weiß: Er stampft schneller und wilder.", rk: -1 }], xp: 1100 },
@@ -156,6 +160,7 @@
     k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.6, 4], ["jaegerschuetze", 0.25, 2, -0.5]], skala: { 2: 0.39, 3: 0.39, 4: 1.03, 5: 1.26, 6: 1.56 }, skalaHC: { 2: 0.36, 3: 0.36, 4: 0.81, 5: 1.08, 6: 1.13 } },
     k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["frostknecht", 0.4, 3, -0.5], ["jaegerschuetze", 0.3, 2, -0.5], ["eisgezeichneter", 0.9, 6], ["glasschwaermer", 0.4, 3]], skala: { 2: 0.71, 3: 0.71, 4: 0.95, 5: 1.4, 6: 2.02 }, skalaHC: { 2: 0.25, 3: 0.25, 4: 0.83, 5: 0.99, 6: 1.85 } },
     k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.8, 6], ["frostknecht", 0.4, 3, -0.5]], skala: { 2: 0.49, 3: 0.49, 4: 1.53, 5: 1.63, 6: 2.2 }, skalaHC: { 2: 0.71, 3: 0.71, 4: 1.23, 5: 1.59, 6: 1.89 } },
+    k_krone: { name: "Der Kronensaal", stufe: 3, zusatzAb: 99, gegner: [["koenig", 0.25, 1, 0], ["frostknecht", 0.5, 4, -1], ["jaegerschuetze", 0.3, 2, -0.5], ["kettenbestie", 0.5, 1, -2]], skala: { 2: 0.47, 3: 0.47, 4: 0.68, 5: 0.89, 6: 1.26 }, skalaHC: { 2: 0.29, 3: 0.29, 4: 0.67, 5: 0.58, 6: 1.15 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -1353,8 +1358,8 @@
     const s = st.mech.schild; if (!s) return;
     for (const g of gegnerFiguren(st)) if (g.art === s.art) {
       const halt = Math.max(4, Math.round((s.halt || 20) * st.mech.tpk));
-      g.schild = { aktiv: true, ziele: (s.ziele || []).slice(), halt, rest: halt, pause: s.pause || 2, wieder: null, dauerhaftAus: false, text: s.text || "Schutzfeld" };
-      st.log.push({ t: `${g.name} ist von einem ${g.schild.text} umgeben: Es fängt die Hälfte des Schadens ab.`, art: "schlecht" });
+      g.schild = { aktiv: !s.startAus, ziele: (s.ziele || []).slice(), halt, rest: halt, pause: s.pause || 2, wieder: s.startAus ? st.runde + s.startAus : null, dauerhaftAus: false, text: s.text || "Schutzfeld" };
+      st.log.push(s.startAus ? { t: `${g.name}s ${g.schild.text} ist gebrochen – für ${s.startAus} Runden ist er ungeschützt.`, art: "gut" } : { t: `${g.name} ist von einem ${g.schild.text} umgeben: Es fängt die Hälfte des Schadens ab.`, art: "schlecht" });
     }
   }
   function freiesFeldNahe(st, [qx, qy], max = 3) {
@@ -1452,6 +1457,8 @@
     z.fertig = true; st.log.push({ t: `${f.name}: ${z.name} – ${z.fertigText || "geschafft"}.`, art: "gut" });
     const w = z.wirkung;
     for (const id of [].concat(w.welleAus || [])) { const q = st.mech.wellen.find((x) => x.id === id); if (q && !q.aus) { q.aus = true; st.log.push({ t: `${q.name}: versiegt.`, art: "gut" }); } }
+    // Welle endet erst, wenn alle Ziele dieser Art erledigt sind (z. B. drei Runenpunkte)
+    if (w.welleAusAlle && st.mech.ziele.filter((x) => x.art === z.art).every((x) => x.fertig)) { const q = st.mech.wellen.find((x) => x.id === w.welleAusAlle); if (q && !q.aus) { q.aus = true; st.log.push({ t: `${q.name}: versiegt.`, art: "gut" }); } }
     if (w.gerettet) st.mech.gerettet++;
     if (w.oeffnet) { feldZurueck(st, { t: "O", x: z.x, y: z.y }); st.log.push({ t: `${z.name}: Der Weg ist frei.`, art: "gut" }); } // Tür, Gitter: das Feld wird begehbar
     if (st.mech.zieleZuerst) pruefeEnde(st);

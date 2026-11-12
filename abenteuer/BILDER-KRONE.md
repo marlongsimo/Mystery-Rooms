@@ -1,10 +1,23 @@
-# Bilder für „Die Krone unter dem Eis“ (Sammlung, wird mit jedem Akt ergänzt)
+# Bilder für „Die Krone unter dem Eis“ (vollständige Sammlung – 14 Bilder)
 
 Die Kampagne ist noch ein Entwurf (im Hub nur mit `?entwurf`). Bis Bilder da sind, werden die Karten gezeichnet. **Die Prompts gebe ich gesammelt am Ende der Kampagne.** Danach baue ich sie ein und richte die unsichtbaren Hindernisse am Bild aus.
 
 **Stil** (wie die anderen Kampagnen): gemalte Fantasy-Illustration, düster-atmosphärisch, gedeckte Farben, Ölmalerei-/Gouache-Anmutung. Kein Text, keine Schrift, keine Wasserzeichen, keine Rahmen. Leitfarben: gebrochenes Steinwerk, blauschwarzes Eis, matte Kristalle, verrostetes Metall, wenige warme Lichtquellen; im Finale ein kontrollierter Gold- und Weißglanz. Ablage: `abenteuer/img/krone/`.
 
-## Kampfkarten (Draufsicht, genau 4 : 3, mind. 1448 × 1086)
+## 1. Titelbild – `titel`
+(Querformat, mind. 1600 × 750) Erscheint bei „Neue Kampagne“ und in der Kampagnenwelt (Ausschnitt 640 × 300, die Mitte zählt).
+
+> A painted dark-fantasy illustration of an ancient city frozen inside a vast glacier, seen from the edge of a glacier plateau at night: towers, domes and rooftops trapped in deep blue ice like a city in glass, a faint golden light pulsing far below the palace at its centre. In the foreground a small group of travellers in fur cloaks with torches at the edge of the ice, looking down; three paths lead into the city: a windswept ridge, a dark mine entrance, and a long stairway lined with frozen figures. Cold blue-black palette with a single warm golden glow in the depths. Wide landscape composition, centre of interest in the middle. No text.
+
+## 2. Abschnittsbilder – `abschnitt-1` bis `abschnitt-3` (Querformat 16:11, mind. 640 × 440)
+- **abschnitt-1 (Der Eintritt in die Stadt):**
+  > Painted dark-fantasy scene: a frozen market square in an ancient city under a glacier, house fronts with empty windows and pale figures of ice looking out, three tall glowing rune stones in the square, a robed figure with a frost-blue staff laying his hand on one of them. Cold blue light, eerie silence. No text.
+- **abschnitt-2 (Die Stadt erwacht):**
+  > Painted dark-fantasy scene: a narrow bridge of stone and ice over a bottomless glacier crevasse, a huge beast in chains rising on the bridge, masked archers with hollow-crown masks on rocky platforms beyond, behind them the gate of a palace guarded by a giant iron and stone sentinel with a glowing rune on its chest. Wind, snow, moonlight. No text.
+- **abschnitt-3 (Das Herz der Siegel):**
+  > Painted dark-fantasy scene: a vast pillared throne hall deep under the ice, in its centre a human-sized crystal heart with seven small lights pulsing inside, before it a ghostly king in cracked royal armour and a broken crown made of ice and light, raising a sword. Controlled golden and white radiance against deep blue darkness. No text.
+
+## 3. Kampfkarten (Draufsicht, genau 4 : 3, mind. 1448 × 1086)
 - **Senkrechte Draufsicht** wie ein Spielbrett, keine Perspektive, kein Horizont.
 - **Raster:** 12 × 9 Felder, aber kein Raster, keine Figuren und kein Text im Bild.
 
@@ -145,5 +158,18 @@ Die Kampagne ist noch ein Entwurf (im Hub nur mit `?entwurf`). Bis Bilder da sin
   8  S S S S S S S S S S S S
 ```
 
-## Später
-Titelbild, drei Abschnittsbilder und die Karte für den Kronensaal (Finale) kommen mit dem letzten Teil.
+### `kronensaal` – Der König unter dem Eis (Finale)
+> Top-down orthographic battle map, painted fantasy style, 4:3. A grand pillared throne hall deep beneath a glacier: polished dark stone floor with frost patterns, four broken statues as low cover, side corridors opening at the top and bottom, three glowing rune circles on the floor (top middle, bottom middle, upper right), on the right side a human-sized crystal heart on a dais pulsing with golden and white light, the entrance on the left. Controlled gold and white glow against blue-black ice. No characters, no grid, no text.
+```
+     0 1 2 3 4 5 6 7 8 91011
+  0  S S S S S S S S S S S S
+  1  S . . . S . P S . . . S
+  2  S . W . . . . . . W P S
+  3  S h h . . . . . . . . S
+  4  . h h . . . . . . K H S
+  5  S h h . . . . . . . . S
+  6  S . W . . . . . . W . S
+  7  S . . . S . P S . . . S
+  8  S S S S S S S S S S S S
+```
+(`P` Runenpunkt · `H` Kronenherz · `K` Startplatz des Königs)

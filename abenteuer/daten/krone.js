@@ -1,7 +1,7 @@
 /*
  * Die Krone unter dem Eis – ENTWURF (Schwierigkeit 4, siehe KONZEPT-KRONE.md)
  * Akt I: Vorgeschichte, drei Wege nach Veyrholm (je ein Pfadkampf), Marktplatz der leeren Fenster, Kammern der Verschleppten.
- * Akt II: Brücke über den Gletscherbruch, Tor der Kronenwache. Akt III bisher: Archiv der Namen, Frostkammer (der Kronensaal folgt).
+ * Akt II: Brücke über den Gletscherbruch, Tor der Kronenwache. Akt III: Archiv der Namen, Frostkammer, Kronensaal, drei Enden.
  * Die Kämpfe nutzen die Mechaniken aus regeln.js (Ziel-Objekte, Wellen, Eis, Schutzfeld, Rufer, Nester).
  * Karten ohne Bild: M Fels/Mauer, K niedriger Wall (Deckung), Q Abgrund oder Wasser (versperrt den Weg, nicht die Sicht).
  */
@@ -49,7 +49,11 @@
   const FROSTKAMMER = { name: "Die Frostkammer", b: 12, h: 9, boden: "stein", bild: null,
     hindernisse: ausText(["MMMMMMMMMMMM", "M....MM....M", "M.MM....MM.M", "M..........M", "............", "M..........M", "M.MM....MM.M", "M....MM....M", "MMMMMMMMMMMM"]),
     start: { spieler: sp, wolf: [[3, 4], [3, 3], [3, 5], [1, 3]], gegner: [[9, 4], [10, 1], [10, 7], [8, 3], [8, 5], [10, 3], [10, 5], [7, 4]] } };
-  const KARTEN = { STURMGRAT, UNTERSTOLLEN, PILGERSTRASSE, MARKT, KAMMERN, BRUECKE, TOR, ARCHIV, FROSTKAMMER };
+  // Der Kronensaal: Säulenhalle, rechts das Kronenherz, drei Runenpunkte, Seitengänge für die Ehrengarde
+  const KRONENSAAL = { name: "Der Kronensaal", b: 12, h: 9, boden: "stein", bild: null,
+    hindernisse: ausText(["MMMMMMMMMMMM", "M...M..M...M", "M.K......K.M", "M..........M", "...........M", "M..........M", "M.K......K.M", "M...M..M...M", "MMMMMMMMMMMM"]),
+    start: { spieler: sp, wolf: [[3, 4], [3, 3], [3, 5], [1, 2]], gegner: [[9, 4], [8, 2], [8, 6], [9, 3], [9, 5], [10, 1], [10, 7], [8, 4]] } };
+  const KARTEN = { STURMGRAT, UNTERSTOLLEN, PILGERSTRASSE, MARKT, KAMMERN, BRUECKE, TOR, ARCHIV, FROSTKAMMER, KRONENSAAL };
   // Ziel-Objekte und Mechaniken je Kampf (Felder müssen frei sein, siehe tests/krone.test.js)
   const OBJEKTE = {
     horn: { id: "horn", name: "Das Jagdhorn", art: "horn", x: 10, y: 3, runden: 2, ruhe: true, aktion: "Jagdhorn sichern", fertigText: "Ihr reißt das Horn vom Pfahl. Die Jäger hören auf zu blasen" },
@@ -69,6 +73,8 @@
   OBJEKTE.tafeln = [{ id: "t1", name: "Tafel der Gründer", art: "tafel", x: 6, y: 1, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
     { id: "t2", name: "Tafel der Wächter", art: "tafel", x: 6, y: 7, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
     { id: "t3", name: "Tafel des Herzens", art: "tafel", x: 11, y: 4, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } }];
+  OBJEKTE.runen = [[6, 1], [6, 7], [10, 2]].map(([x, y], i) => ({ id: "p" + (i + 1), name: ["Runenpunkt Nord", "Runenpunkt Süd", "Runenpunkt am Herzen"][i], art: "rune", x, y, runden: 2, ruhe: true, aktion: "Runenpunkt schließen", fertigText: "Die Rune verlischt", wirkung: { schild: true, welleAusAlle: "garde" } }));
+  OBJEKTE.herz = { id: "herz", name: "Das Kronenherz", art: "herz", x: 10, y: 4, runden: 3, ruhe: true, aktion: "Das Kronenherz berühren", fertigText: "Eure Hände liegen auf dem Herzen der Siegel. Der König hält inne" };
   const NAMEN = { siegeljaeger: "Maskierter Jäger", jaegerschuetze: "Maskierter Schütze", funkenhund: "Fährtenhund", jaegerhauptmann: "Jägerhauptmann Varrek", eisgezeichneter: "Verlorener Pilger" };
   const bonusName = { signalhorn: "das Signalhorn", kernsplitter: "den Kernsplitter", pilgerzeichen: "das Pilgerzeichen" };
 
@@ -443,7 +449,7 @@
       text: (A) => ["Zwischen zwei Regalen zieht es eiskalt. Dahinter könnte ein Gang liegen. Eine Person sucht.", A.merker.s4_route_bonus === "pilgerzeichen" ? "Das Pilgerzeichen zeigt euch die Stelle: Vorteil." : ""],
       probe: { name: "Suchen", attr: "WEI", sg: 13, geuebt: ["schurke", "waldlaeufer"], vorteil: (A) => (A.merker.s4_route_bonus === "pilgerzeichen" ? 1 : 0),
         erfolg: { text: "Hinter dem Regal: eine Tür aus Eis, und dahinter eine Halle voller Säulen. In der Mitte, auf einem Thron aus Kristall, sitzt eine Frau aus Raureif. Die Frostmatrone. Sie herrscht über die Schwärmer – auch über die im Kronensaal.", weiter: "frost_wahl" },
-        fehl: { text: "Ihr findet nichts als kalte Steine. Was immer dort zieht, bleibt euch verborgen.", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "akt3_entwurf" } },
+        fehl: { text: "Ihr findet nichts als kalte Steine. Was immer dort zieht, bleibt euch verborgen.", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "vor_kronensaal" } },
     },
     frost_wahl: {
       art: "wahl", abschnitt: 3, titel: "Die Frostmatrone", ort: "Die Frostkammer",
@@ -451,15 +457,15 @@
       optionen: [
         { id: "kampf", text: "Die Frostmatrone herausfordern", weiter: "kampf_frost" },
         { id: "reden", text: "Mit ihr reden", weiter: "frost_reden" },
-        { id: "gehen", text: "Leise wieder gehen", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "akt3_entwurf" },
+        { id: "gehen", text: "Leise wieder gehen", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "vor_kronensaal" },
       ],
     },
     frost_reden: {
       art: "probe", abschnitt: 3, titel: "Ein Handel im Eis", ort: "Die Frostkammer",
       text: ["„Ihr wollt zum Herzen“, sagt sie, und ihre Stimme klingt wie Eis, das bricht. „Was gebt ihr mir, wenn ich meine Kinder zurückhalte?“ Eine Person verhandelt."],
       probe: { name: "Verhandeln", attr: "CHA", sg: 15, geuebt: ["kleriker", "schurke"], knapp: true,
-        erfolg: { text: "Ihr versprecht ihr die Kammer, für immer, ohne Krone und ohne Bund. Sie neigt den Kopf. „Dann schweigen meine Kinder im Saal.“", setzt: { s4_frostmatrone: "verschont" }, weiter: "akt3_entwurf" },
-        knapp: { text: "Sie lacht. „Ein Teil meiner Kinder. Nicht alle.“", setzt: { s4_frostmatrone: "verschont", matrone_halb: true }, weiter: "akt3_entwurf" },
+        erfolg: { text: "Ihr versprecht ihr die Kammer, für immer, ohne Krone und ohne Bund. Sie neigt den Kopf. „Dann schweigen meine Kinder im Saal.“", setzt: { s4_frostmatrone: "verschont" }, weiter: "vor_kronensaal" },
+        knapp: { text: "Sie lacht. „Ein Teil meiner Kinder. Nicht alle.“", setzt: { s4_frostmatrone: "verschont", matrone_halb: true }, weiter: "vor_kronensaal" },
         fehl: { text: "„Ihr habt nichts, was ich will.“ Die Nester glühen auf.", weiter: "kampf_frost" } },
     },
     kampf_frost: {
@@ -467,20 +473,95 @@
       text: ["Besiegt die Frostmatrone. Sie greift auf zwei Felder Entfernung, lässt Eiskorridore zwischen euch wachsen und speit Brut. Zwei Nester lassen Schwärmer schlüpfen."],
       kampf: () => ({ begegnung: "k_frost", karte: FROSTKAMMER, keinAnfuehrer: true, mischen: false,
         mechanik: { sieg: { besiegt: { art: "frostmatrone", n: 1 }, text: "Die Frostmatrone zerspringt wie ein Spiegel. Die Nester verstummen." } },
-        sieg: { setzt: { s4_frostmatrone: "besiegt" }, weiter: "frost_nach" }, verloren: { setzt: { s4_frostmatrone: "nicht_gefunden" }, glocke: 1, weiter: "akt3_entwurf" } }),
+        sieg: { setzt: { s4_frostmatrone: "besiegt" }, weiter: "frost_nach" }, verloren: { setzt: { s4_frostmatrone: "nicht_gefunden" }, glocke: 1, weiter: "vor_kronensaal" } }),
     },
     frost_nach: {
-      art: "erzaehlung", abschnitt: 3, titel: "Stille in der Kammer", ort: "Die Frostkammer", weiter: "akt3_entwurf", rastErlaubt: true,
+      art: "erzaehlung", abschnitt: 3, titel: "Stille in der Kammer", ort: "Die Frostkammer", weiter: "vor_kronensaal", rastErlaubt: true,
       text: ["Wo die Frostmatrone saß, liegt ein Häufchen Raureif, und darin ein Ring aus blauem Kristall. Er ist kalt, aber er schützt: Wer ihn trägt, friert nicht. Im Kronensaal werden keine Schwärmer auf euch warten."],
     },
-    akt3_entwurf: {
-      art: "ende", abschnitt: 3, titel: "Fortsetzung folgt", ort: "Vor dem Kronensaal",
-      text: ["Hier endet der Entwurf. Als Nächstes: der Kronensaal, der König unter dem Eis und die Entscheidung über das Kronenherz."],
+    vor_kronensaal: {
+      art: "gespraech", abschnitt: 3, titel: "Vor dem Kronensaal", ort: "Tief unter dem Palast",
+      text: (A) => [
+        "Eine Treppe führt tiefer, als der Gletscher dick sein kann. Unten eine Tür aus Gold und Eis, und dahinter ein Puls, langsam und schwer, der durch eure Stiefel in die Knochen geht. Das Kronenherz.",
+        A.merker.anselm_spur ? "Vor der Tür steht ein Mann in grauer Kutte, die Hände auf dem Rücken. Anselm, der Abt aus Grauwacht. Er sieht älter aus. Und zufrieden." : "",
+        A.merker.s4_verschleppte >= 3 ? "Der gerettete Wachmann ist euch gefolgt. „Ich halte die Seitengänge“, sagt er. „Solange ich kann.“" : "",
+      ],
+      optionen: [
+        { id: "anselm", text: "Anselm zur Rede stellen", wenn: (A) => Boolean(A.merker.anselm_spur), wer: "Anselm", frage: "„Was tut Ihr hier?“",
+          antwort: (A) => (A.merker.grauwacht === "verrat"
+            ? "„Was ich in Grauwacht begonnen habe.“ Er lächelt. „Der Bund will das Herz brechen. Ich will es besitzen. Ihr werdet es für mich öffnen, ob ihr wollt oder nicht.“ Dann ist er fort, als hätte es ihn nie gegeben."
+            : "„Ich warte.“ Er weicht eurem Blick aus. „Darauf, dass jemand die richtige Entscheidung trifft. Ich habe es nicht gekonnt.“ Er tritt beiseite und verschwindet die Treppe hinauf."),
+          setzt: (A) => (A.merker.grauwacht === "verrat" ? { anselm_gegner: true } : { anselm_gegangen: true }) },
+        { id: "splitter", text: "Den Kernsplitter an die Tür halten", wenn: (A) => A.merker.s4_route_bonus === "kernsplitter", wer: "Der Kernsplitter", frage: "Der Splitter zieht zur Tür.",
+          antwort: "Er pulsiert im Takt des Herzens. Wenn ihr ihn im Saal in die Höhe haltet, wird der Kristallschutz des Königs brechen. Für eine Weile." },
+        { id: "los", text: "Den Kronensaal betreten", weiter: "kampf_krone" },
+      ],
+    },
+    kampf_krone: {
+      art: "kampf", abschnitt: 3, stufe: 3, titel: "Der König unter dem Eis", ort: "Der Kronensaal",
+      text: (A) => [
+        "Der König ist nicht der König, sondern die Erinnerung, die das Herz an ihn bewahrt. Ein Kristallschutz fängt die Hälfte des Schadens ab. Alle drei Runden kündigt er einen Kronenschlag in einer Linie an.",
+        "Phase II (unter zwei Dritteln): Die Ehrengarde kommt aus den Seitengängen, bis alle drei Runenpunkte geschlossen sind (je zwei Aktionen in Ruhe) – das bricht auch den Kristallschutz. Phase III (unter einem Drittel): Der Boden reißt auf.",
+        "Besiegt ihn – oder legt die Hände auf das Kronenherz (drei Aktionen in Ruhe).",
+        A.merker.s4_route_bonus === "kernsplitter" ? "Der Kernsplitter bricht den Kristallschutz für die ersten drei Runden." : "",
+        A.merker.s4_frostmatrone === "besiegt" ? "Keine Schwärmer: Die Frostmatrone ist tot." : A.merker.s4_frostmatrone === "verschont" ? "Die Frostmatrone hält ihr Wort – fast alle Schwärmer bleiben in den Nestern." : "Aus den Nestern hinter euch kriechen Glasschwärmer.",
+      ],
+      kampf: (A) => {
+        const m = A.merker; let mal = 1; if (m.archiv_wahrheit) mal *= 0.95; if (m.anselm_gegner) mal *= 1.05;
+        const wellen = [{ id: "garde", name: "Die Ehrengarde", kurz: "Ehrengarde", quellen: [[5, 1], [5, 7], [10, 7]], gegner: [["eisgezeichneter", 0.4, 3, 0.5]], alle: 2, max: m.s4_verschleppte >= 3 ? 2 : 3, aus: true, text: "In den Seitengängen klirren Rüstungen" }];
+        if (m.s4_frostmatrone !== "besiegt") wellen.push({ id: "brut", name: "Die Nester", kurz: "aus den Nestern", quellen: [[1, 1], [1, 7]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 3, ab: 3, max: m.s4_frostmatrone === "verschont" ? (m.matrone_halb ? 2 : 1) : 3, text: "Hinter euch klirrt Glas" });
+        return { begegnung: "k_krone", karte: KRONENSAAL, keinAnfuehrer: true, mischen: false, skalaMal: mal, beute: false,
+          mechanik: { ziele: OBJEKTE.runen.concat([OBJEKTE.herz]), wellen,
+            schild: { art: "koenig", ziele: ["p1", "p2", "p3"], halt: 22, pause: 2, text: "Kristallschutz", startAus: m.s4_route_bonus === "kernsplitter" ? 3 : 0 },
+            sieg: { ziele: 1, art: "herz", besiegt: { art: "koenig", n: 1 }, text: "Der König sinkt auf die Knie, und das Licht in ihm wird ruhig. Vor euch pulsiert das Kronenherz. Es wartet." } },
+          sieg: { weiter: "herz_entscheidung" } };
+      },
+    },
+    herz_entscheidung: {
+      art: "wahl", abschnitt: 3, titel: "Das Herz der Siegel", ort: "Der Kronensaal",
+      text: (A) => [
+        "Das Kronenherz ist ein Kristall, groß wie ein Mensch, und in ihm schlagen sieben Lichter, jedes für ein Siegel. Eines flackert, wo Grauwacht liegt. Eines brennt hell, wo Hochwacht ist. Ihr könnt es berühren. Ihr könnt es verändern.",
+        A.merker.archiv_wahrheit ? "Ihr wisst, was die Tafeln sagen: Wer das Herz hält, kann jedes Siegel öffnen. Die letzten Könige haben es versucht. Dann kam das Eis." : "Was die Gründer mit dem Herzen wollten, wisst ihr nicht. Ihr müsst euch auf euer Gefühl verlassen.",
+        "Stimmt ab.",
+      ],
+      optionen: [
+        { id: "stabil", text: "Stabilisieren: Das Herz beruhigen, die Siegel halten – die Bedrohung bleibt", setzt: { s4_kronenherz: "stabilisiert" }, weiter: "ende_stabil" },
+        { id: "siegel", text: "Versiegeln: Den Saal verschließen, niemand kommt mehr an das Herz – auch ihr nicht", setzt: { s4_kronenherz: "versiegelt" }, weiter: "ende_versiegelt" },
+        { id: "umleiten", text: "Umleiten: Die Kraft eines Siegels nutzen, um eine Gefahr abzuwenden – ein anderes gerät unter Druck", setzt: { s4_kronenherz: "umgeleitet" }, weiter: "ende_umgeleitet" },
+      ],
+    },
+    ende_stabil: {
+      art: "ende", abschnitt: 3, titel: "Das Herz schlägt ruhig", ort: "Veyrholm",
+      text: (A) => ["Ihr legt die Hände auf den Kristall, und das Flackern wird ruhig. Sieben Lichter, gleichmäßig wie Atem. Über euch knirscht der Gletscher, aber er hält.", ...epilog(A), "Die Siegel halten. Aber der Bund der Hohlkrone weiß jetzt, wo das Herz liegt. Er wird wiederkommen."],
+    },
+    ende_versiegelt: {
+      art: "ende", abschnitt: 3, titel: "Die Stadt schläft", ort: "Veyrholm",
+      text: (A) => ["Ihr zieht die Tür aus Gold und Eis hinter euch zu, und der Gletscher schließt sich darüber wie eine Hand. Niemand wird das Herz je wieder berühren.", ...epilog(A), "Veyrholm bleibt verborgen. Wer das Netz der Siegel verstehen will, muss einen anderen Weg finden."],
+    },
+    ende_umgeleitet: {
+      art: "ende", abschnitt: 3, titel: "Ein Siegel entlastet, ein anderes bebt", ort: "Veyrholm",
+      text: (A) => [`Ihr lenkt die Kraft um. Das flackernde Licht ${A.merker.grauwacht === "gebrochen" ? "von Grauwacht" : "im Osten"} wird hell und ruhig. Dafür beginnt ein anderes zu zittern, weit im Süden, wo ihr noch nie wart.`, ...epilog(A), "Irgendwo im Süden bebt ein Siegel. Die nächste Krise hat schon begonnen."],
     },
     krone_verloren: { art: "ende", abschnitt: 0, titel: "Unter dem Eis", ort: "", text: ["Das Eis schließt sich über euch. Irgendwann wird jemand durch die Fenster schauen und euch sehen, wie Fische im Winterteich."] },
   };
 
+  /** Epilog: Geschichte der Gruppe, je nach Weg und Entscheidungen */
+  function epilog(A) {
+    const m = A.merker, t = [];
+    const weg = { sturmgrat: "über den Sturmgrat", stollen: "durch die Unterstollen", pilgerweg: "über die Pilgerstraße" }[m.s4_route];
+    if (weg) t.push(`Ihr seid ${weg} gekommen${m.s4_route_bonus && m.s4_route_bonus !== "keiner" ? `, und ${bonusName[m.s4_route_bonus]} hat euch begleitet` : ""}.`);
+    if (m.s4_verschleppte > 0) t.push(m.s4_verschleppte >= 3 ? "Die drei Geretteten gehen mit euch hinauf ans Licht. Das Kind fragt, ob es den Himmel noch gibt." : "Die Geretteten aus den Kammern warten oben am Feuer. Sie sind die ersten Bewohner Veyrholms seit dreihundert Jahren, die die Sonne sehen.");
+    else if (m.s4_verschleppte === 0) t.push("An die Eisblöcke unter dem Marktplatz denkt ihr noch lange.");
+    if (m.s4_frostmatrone === "verschont") t.push("Die Frostmatrone bleibt in ihrer Kammer. Sie hat ihr Wort gehalten. Ob sie es immer halten wird?");
+    if (m.anselm_gegner) t.push("Von Anselm findet ihr nur Fußspuren im Schnee, die nach Süden führen.");
+    else if (m.anselm_gegangen) t.push("Anselm wartet oben an der Treppe. Er fragt nicht, was ihr entschieden habt. Er sieht es in euren Gesichtern.");
+    if (m.hochwacht === "fackel") t.push("Als ihr Kaltbrunn erreicht, brennt im Süden ein Licht auf der Hochwarte. Sera weiß es schon.");
+    if (A.gefallen.length) t.push(`Am Rand des Gletschers schichtet ihr Steine für ${A.gefallen.map((f) => (FIG() ? FIG().FIGUREN[f].name : f)).join(", ")}.`);
+    return t;
+  }
+  const FIG = () => root.ABF || (typeof require === "function" ? require("../js/figuren.js") : null);
   const WISSEN = {
+    koenig: { klassen: ["krieger", "kleriker", "zauberer"], text: "Drei Phasen. Kristallschutz halbiert den Schaden, bis er bricht oder alle drei Runenpunkte geschlossen sind. Kronenschlag in einer Linie wird angekündigt – zur Seite treten. Wer drei Runden in Ruhe am Kronenherz steht, beendet den Kampf." },
     siegeljaeger: { klassen: ["schurke", "waldlaeufer"], text: "Maskierte Jäger des Bundes der Hohlkrone: flink (6 Felder), aber leicht gepanzert." },
     jaegerschuetze: { klassen: ["waldlaeufer"], text: "Schießt aus 6 Feldern. Deckung hilft, oder ihr geht nah heran." },
     funkenhund: { klassen: ["waldlaeufer"], text: "Fährtenhund: alle drei Runden Glutatem im Kegel von 3 Feldern (3W6, GES-Rettung halbiert). Nicht zusammenstehen." },

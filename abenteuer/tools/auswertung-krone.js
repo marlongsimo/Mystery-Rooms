@@ -10,7 +10,7 @@ const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith("--" + n
 const N = +process.argv.find((a) => /^\d+$/.test(a)) || 150, HARD = process.argv.includes("--hardcore"), KAL = process.argv.includes("--kalibrieren");
 const NUR = arg("nur", "").split(",").filter(Boolean);
 // Zielquote je Kampf (Sieg in %): Pfad- und Nebenkämpfe etwas leichter als Hauptkämpfe
-const KAEMPFE = { kampf_grat: 0.85, kampf_stollen: 0.85, kampf_pilger: 0.85, kampf_markt: 0.8, kampf_kammern: 0.88, kampf_bruecke: 0.8, kampf_tor: 0.8, kampf_archiv: 0.8, kampf_frost: 0.85 };
+const KAEMPFE = { kampf_grat: 0.85, kampf_stollen: 0.85, kampf_pilger: 0.85, kampf_markt: 0.8, kampf_kammern: 0.88, kampf_bruecke: 0.8, kampf_tor: 0.8, kampf_archiv: 0.8, kampf_frost: 0.85, kampf_krone: 0.78 };
 const GR = [3, 4, 5, 6];
 function kampf(id, n, i, skala) {
   const r = R.rng(id.length * 7919 + n * 104729 + i), gruppe = F.REIHE.slice().sort(() => r() - 0.5).slice(0, n);

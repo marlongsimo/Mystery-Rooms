@@ -98,6 +98,9 @@ Brücke (Durchbruch: Eisgitter aufschlagen, alle Stehenden auf die andere Seite;
 Neu in der Engine: Ziel-Wirkung „öffnet“ (Gitter, Türen), angefangene Ziele (`start`), Gegner mit negativem Grundwert kommen erst ab einer Gruppengröße.
 Siegquote Normal (Automatik): Brücke 81–88 %, Tor 76–85 %, Archiv 78–88 %, Frostkammer 73–91 %. Lang: Archiv und Frostkammer mit 5–6 Helden (12–16 Runden).
 
+### Stand Finale (Entwurf, gebaut und getestet)
+Vor dem Kronensaal: Anselm (bei Verrat in Grauwacht Gegenspieler, sonst geht er), Kernsplitter, Wachmann. Kronensaal: Der König unter dem Eis mit Kristallschutz (Kernsplitter bricht ihn für 3 Runden), Kronenschlag in einer Linie (angekündigt), Rückstoß; Phase II (2/3): Ehrengarde aus den Seitengängen, bis alle drei Runenpunkte geschlossen sind (bricht auch den Schutz); Phase III (1/3): RK −2, der Boden reißt auf. Sieg: König besiegt oder drei Aktionen in Ruhe am Kronenherz. Schwärmer je nach Frostmatrone (besiegt: keine, verschont: 1–2 Wellen, sonst 3). Danach Entscheidung: stabilisieren, versiegeln, umleiten – jeweils mit Epilog (Weg, Gerettete, Frostmatrone, Anselm, Sera, Gefallene). Siegquote Normal 76–86 %.
+
 ## K7. Enden und Marker
 **Enden:** Stabilisieren · Versiegeln · Umleiten, dazu die Niederlage. Jedes Ende öffnet Stufe 5 auf eigene Weise.
 

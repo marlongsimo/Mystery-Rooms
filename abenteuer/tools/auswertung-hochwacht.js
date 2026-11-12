@@ -3,7 +3,7 @@
  * 1. Siegchance und übriges Leben je Kampf und Gruppengröße (frischer Kampf, Stufe der Begegnung, eingebaute KI, mit Sera)
  *    Niederlage = Rückzug oder Sera verschleppt
  * 2. Helden-Ranking: Siegquote, übriges Leben und wie oft die Figur zu Boden ging – über alle Kämpfe und Größen
- * Aufruf: node abenteuer/tools/auswertung-hochwacht.js [N=150] [--hardcore]
+ * Aufruf: node abenteuer/tools/auswertung-hochwacht.js [N=150] [--hardcore] [--nur=archiv,hauptmann]
  */
 "use strict";
 const R = require("../js/regeln.js"), F = R.FD, D = require("../daten/hochwacht.js"), K = D.KARTEN;
@@ -21,10 +21,11 @@ const KAMPF = [
   ["wehrgang", "3 · Der offene Wehrgang (Haupt)", K.WEHRGANG, esk("wehrgang")],
   ["finale", "4 · Das letzte Licht (Haupt)", K.HOCHWARTE, esk("finale")],
 ];
-const GR = [3, 4, 5, 6];
+const GR = [3, 4, 5, 6], NUR = ((process.argv.find((a) => a.startsWith("--nur=")) || "").slice(6)).split(",").filter(Boolean);
 const held = {}; for (const f of F.REIHE) held[f] = { k: 0, s: 0, tp: 0, boden: 0 };
 const zeilen = [];
 for (const [beg, name, karte, beg2] of KAMPF) {
+  if (NUR.length && !NUR.includes(beg)) continue;
   const z = [name];
   for (const n of GR) {
     const r = R.rng(name.length * 1000 + n); let s = 0, leben = 0;

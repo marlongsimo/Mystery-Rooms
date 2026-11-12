@@ -21,7 +21,7 @@ Ablage: `abenteuer/img/hochwacht/`. PNG oder JPG in hoher Auflösung genügt, ic
 
 ---
 
-## 1. Titelbild – `titel`
+## 1. Titelbild – `titel` ✓ eingebaut
 
 (Querformat, mind. 1600 × 750) Erscheint bei „Neue Kampagne“ und in der Kampagnenwelt (Ausschnitt 640 × 300, die Mitte zählt).
 
@@ -31,11 +31,11 @@ Ablage: `abenteuer/img/hochwacht/`. PNG oder JPG in hoher Auflösung genügt, ic
 
 Kleine Vorschaubilder in „Aktuelle Kampagnen“.
 
-- **abschnitt-1 (Der Überfall am Pass):**
+- **abschnitt-1 (Der Überfall am Pass):** ✓ eingebaut
   > Painted dark-fantasy scene: a small stone waystation hut in a snowy mountain pass at dusk, warm light in its window; outside, a young woman in a grey cloak with a faint glowing ember in a small lantern, a wounded old soldier in a worn order's coat leaning on a spear. Far up the pass, dark silhouettes of hunters with torches. No text.
-- **abschnitt-2 (Die stumme Wacht):**
+- **abschnitt-2 (Die stumme Wacht):** ✓ eingebaut
   > Painted dark-fantasy scene: the snowy inner courtyard of a ruined mountain monastery, in its centre a tall dormant signal device of brass and crystal on a round stone base, frost on the crystal; from the gates hunters in dark furs with sigil-marked masks approach; a massive old stone guardian construct with a cracked rune on its chest stands half-buried in snow. Cold grey light. No text.
-- **abschnitt-3 (Das letzte Licht):**
+- **abschnitt-3 (Das letzte Licht):** ✓ eingebaut
   > Painted dark-fantasy scene: a stone platform with pillars on the highest crag of a mountain at night, a big iron fire basket full of grey ash; rising from the ash a tall humanoid figure made of glowing embers and smoke, where it looks the light grows darker; in front of it a young woman in a grey cloak holds a small bright ember up to the basket. Snowstorm, deep blue night against fierce orange glow. No text.
 
 ## 3. Kampfkarten (Draufsicht, genau 4 : 3, mind. 1448 × 1086)

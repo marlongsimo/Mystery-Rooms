@@ -280,7 +280,15 @@
   }
   /** Kampagne für diese Runde: eine schon angelegte leere weiterverwenden, sonst neu anlegen; dann mit dem Live-Raum verbinden */
   async function kampagneFuerRunde() {
-    if (aktiv() && K.version === 0) { try { await sitzungStarten(); return; } catch (e) { /* gehört nicht (mehr) zu uns – neu anlegen */ } }
+    if (aktiv() && K.version === 0) {
+      try {
+        // Eine leere Kampagne von vorhin gehört evtl. zu einem anderen Abenteuer (z. B. Moor statt Hochwacht): Namen angleichen,
+        // denn ein zweites Gerät als Spieltisch erkennt das Abenteuer am Namen
+        const soll = window.AB.SETUP().abenteuer || "grauwacht";
+        if (abenteuerAusTitel(K.titel) !== soll && meta().titel) { K.titel = await rpc("rpg_rename_campaign", { p_campaign_id: K.id, p_title: meta().titel }); merkeK(); }
+        await sitzungStarten(); return;
+      } catch (e) { /* gehört nicht (mehr) zu uns – neu anlegen */ }
+    }
     const setup = window.AB.SETUP(), titel = meta().titel || "Das Siegel von Grauwacht";
     const id = await rpc("rpg_create_campaign", { p_title: titel, p_difficulty: setup.schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch" });
     K = { id, version: 0, status: "geplant", titel }; merkeK(); letzteMeta = null; letzteMitglieder = "";
@@ -314,7 +322,7 @@
       ? codeBox(linkUrl("handy.html?k=" + encodeURIComponent(einl.gast)), einl.gast, "Gäste einladen", `QR-Code mit dem Handy scannen – oder <b>${esc(kurzUrl("handy.html"))}</b> öffnen und den Code eingeben. Wer beitritt, gehört fest zur Kampagne, auch ohne Konto. Der Code gilt 7 Tage.`)
       : `<p class="note">Gäste-Code gerade nicht verfügbar${einl.gastFehler ? ` (${esc(einl.gastFehler)})` : ""}. Gäste können bei der Heldenwahl über den Raum-Code beitreten.</p>`;
     const tisch = einl.tisch
-      ? codeBox(linkUrl("index.html?tisch=" + encodeURIComponent(einl.tisch)), einl.tisch, "Code für das Tisch-Gerät", `Auf dem Gerät, das in der Mitte liegen soll, QR-Code scannen – oder <b>${esc(kurzUrl("index.html"))}</b> öffnen, „Als Spieltisch verbinden“ wählen und den Code eingeben. Der Code gilt einmal.`) + `<p class="note ei-warte">Warte auf das Tisch-Gerät …</p>`
+      ? codeBox(linkUrl("index.html?tisch=" + encodeURIComponent(einl.tisch) + "&ab=" + encodeURIComponent(window.AB.SETUP().abenteuer || "grauwacht")), einl.tisch, "Code für das Tisch-Gerät", `Auf dem Gerät, das in der Mitte liegen soll, QR-Code scannen – oder <b>${esc(kurzUrl("index.html"))}</b> öffnen, „Als Spieltisch verbinden“ wählen und den Code eingeben. Der Code gilt einmal.`) + `<p class="note ei-warte">Warte auf das Tisch-Gerät …</p>`
       : `<p class="note">Dieses Gerät ist der Spieltisch. Soll ein anderes Gerät (z. B. ein Tablet oder Fernseher) in der Mitte liegen, verbinde es mit einem Tisch-Code.</p>`;
     el.innerHTML = `<div class="ei-kopf"><div><p class="eyebrow">Spieltisch + Handys</p><h1>Wer spielt mit?</h1></div>
         ${istHost() ? `<label class="ei-titel">Name der Kampagne <input id="ei-titel" maxlength="80" value="${esc(K.titel || "")}"></label>` : `<p class="note">${esc(K.titel || "")}</p>`}</div>
@@ -399,8 +407,18 @@
       else { o.innerHTML = `<div class="karte-box kampagnen"><div class="k-kopf"><h2>Spieltisch übergeben</h2><button class="link" id="tw-zu">Schließen</button></div><p class="note">„${esc(titel)}“ läuft jetzt auf dem anderen Gerät.</p></div>`; $("#tw-zu").onclick = () => { o.hidden = true; }; }
     }, 3000);
   }
+  /** Welches Abenteuer zu einer Kampagne gehört, steht vor dem ersten Speichern nur im Titel („Moor · 12.11. 22:20“ oder der volle Titel) */
+  function abenteuerAusTitel(t) {
+    t = String(t || "").trim();
+    for (const D of Object.values(window.ABD_ALLE || {})) {
+      const m = D.META || {}; if (!m.id) continue;
+      const kopf = t.split(" ·")[0].trim();
+      if ((m.kurz && (t === m.kurz || kopf === m.kurz)) || (m.titel && t.startsWith(m.titel)) || (kopf.length >= 4 && m.titel && m.titel.split(/\s+/).includes(kopf))) return m.id;
+    }
+    return null;
+  }
   /** Dieses Gerät wird der Spieltisch einer Kampagne (Tisch-Code oder ?tisch=…) */
-  async function tischUebernehmen(code) {
+  async function tischUebernehmen(code, abenteuer) {
     const d = await rpc("rpg_claim_table", { p_token: code });
     if (aktiv() && K.id !== d.campaign_id && window.ABT && window.ABT.laeuft()) { clearTimeout(timer); await speichern().catch(() => {}); }
     if (Number(d.version) > 0) { await fortsetzen(d.campaign_id, true); K.rolle = "tisch"; merkeK(); return d; }
@@ -410,15 +428,19 @@
     await window.AB.liveFuerKampagne();
     await sitzungStarten();
     $("#qr-overlay").hidden = true;
+    // Das Abenteuer der Kampagne übernehmen, sonst zeigt der Tisch das zuletzt hier gewählte (z. B. Grauwacht statt Moor)
+    // Vorrang hat das Abenteuer aus dem QR-Link (&ab=…), sonst der Name der Kampagne
+    const bekannt = abenteuer && window.ABD_ALLE && window.ABD_ALLE[abenteuer] ? abenteuer : null;
+    const ab = bekannt || abenteuerAusTitel(d.titel); if (ab && window.AB.abenteuerWaehlen) window.AB.abenteuerWaehlen(ab);
     window.AB.lobbyFuerKampagne(d.difficulty);
     toast(`Dieses Gerät ist jetzt der Spieltisch von „${d.titel}“.`);
     return d;
   }
   // Aufruf über den QR-Code: index.html?tisch=CODE
   (() => {
-    const p = new URLSearchParams(location.search), code = p.get("tisch"); if (!code) return;
-    p.delete("tisch"); history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p : "") + location.hash);
-    const los = () => { toast("Verbinde als Spieltisch …"); tischUebernehmen(code).catch((e) => { toast(e.message); alert("Spieltisch verbinden: " + e.message); }); };
+    const p = new URLSearchParams(location.search), code = p.get("tisch"), ab = p.get("ab"); if (!code) return;
+    p.delete("tisch"); p.delete("ab"); history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p : "") + location.hash);
+    const los = () => { toast("Verbinde als Spieltisch …"); tischUebernehmen(code, ab).catch((e) => { toast(e.message); alert("Spieltisch verbinden: " + e.message); }); };
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", los, { once: true }); else setTimeout(los, 0);
   })();
 
@@ -429,5 +451,5 @@
   const menue = document.querySelector("#intro .titel-menue");
   if (menue) { const b = document.createElement("button"); b.className = "menue"; b.id = "titel-kampagnen"; b.dataset.kampagnen = ""; b.innerHTML = '<span class="m-sym" aria-hidden="true">❖</span>Meine Kampagnen'; b.onclick = bibliothek; const g = $("#titel-gruppe"); menue.insertBefore(b, g); }
 
-  window.KAMPAGNE = { vergessenWennLeer: () => { if (K && K.version === 0) { K = null; merkeK(); } }, einladen, tischWechseln, tischUebernehmen, beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
+  window.KAMPAGNE = { abenteuerAusTitel, vergessenWennLeer: () => { if (K && K.version === 0) { K = null; merkeK(); } }, einladen, tischWechseln, tischUebernehmen, beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
 })();

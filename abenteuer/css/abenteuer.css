@@ -1120,3 +1120,59 @@ body > .einst-panel { position: fixed; z-index: 40; }
 }
 /* Auf dem gemalten Brett ruhen die Effekte über den Feldern, die Zahlen und Banner über allem */
 body.fx-an .karte-wrap .meldungen { display: none; }
+
+/* ================= 06 · Schräges Spielbrett und Kopfleiste (wie im Prototyp) ================= */
+.kampf-kopf { display: none; }
+@media (min-width: 1200px) {
+  body.im-kampf > header, body.im-kampf .topbar { display: none; }
+  .spiel { grid-template-rows: auto auto auto 1fr; }
+  .kampf-kopf { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: center; gap: 22px; height: 76px; padding: 0 24px; border-radius: 18px;
+    background: linear-gradient(180deg, rgba(28,30,40,.92), rgba(14,15,20,.92)); box-shadow: 0 0 0 1px rgba(217,178,106,.35), 0 0 0 4px rgba(0,0,0,.6), 0 18px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,236,190,.12); }
+  .livebar { grid-row: 2; }
+  .gruppe-kampf { grid-row: 3 / span 2; }
+  .karte-wrap { grid-row: 3; }
+  .reihe { grid-row: 4; }
+  .panel { grid-row: 3; }
+  .log { grid-row: 4; }
+  .kk-logo { font: 600 30px var(--schrift-titel); letter-spacing: .08em; background: linear-gradient(180deg, #fff1c8, #d9a64a 55%, #8a5d1e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .kk-trenner { width: 1px; height: 42px; background: linear-gradient(180deg, transparent, rgba(217,178,106,.6), transparent); }
+  .kk-titel b { display: block; font: 600 21px var(--schrift-titel); color: #f6dc9c; letter-spacing: .03em; }
+  .kk-titel span { font: italic 400 17px var(--schrift-text); color: var(--muted); }
+  .kk-rechts { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+  .kk-uhr { width: 210px; } .kk-uhr small { font: 600 12px var(--schrift-titel); letter-spacing: .14em; color: #d8f1ff; }
+  .kk-uhr div { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 5px; }
+  .kk-uhr i { height: 8px; border-radius: 3px; background: rgba(143,208,255,.12); box-shadow: inset 0 0 0 1px rgba(143,208,255,.25); }
+  .kk-uhr i.an { background: linear-gradient(90deg, #4aa6e8, #bfe9ff); box-shadow: 0 0 10px rgba(143,208,255,.7); }
+  body[data-stimmung="glut"] .kk-uhr i.an, body[data-stimmung="nebel"] .kk-uhr i.an { background: linear-gradient(90deg, #b8742a, #ffd27a); box-shadow: 0 0 10px rgba(255,190,90,.6); }
+  body[data-stimmung="glut"] .kk-uhr small, body[data-stimmung="nebel"] .kk-uhr small { color: #f6dc9c; }
+  .kk-chip { display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 21px; font: 600 15px var(--schrift-titel); color: #f6dc9c; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px rgba(217,178,106,.35); }
+  .kk-chip b { font-size: 22px; color: #fff; text-shadow: 0 0 12px rgba(255,200,110,.6); }
+  /* Das Brett: nach hinten gekippt, mit Goldrahmen; die Leiste darunter bleibt gerade */
+  .karte-wrap { overflow: visible; border-radius: 0; box-shadow: none; background: none; perspective: 1600px; perspective-origin: 50% 0; }
+  .karte-wrap::after { display: none; }
+  #karte { transform-origin: 50% 0; transform: rotateX(22deg) scale(.94); border-radius: 12px;
+    box-shadow: 0 0 0 2px rgba(217,178,106,.55), 0 0 0 7px rgba(10,10,14,.92), 0 0 0 9px rgba(217,178,106,.28), 0 50px 80px rgba(0,0,0,.75); background: #0b0e14; }
+  .karte-wrap .leiste { margin-top: -26px; border-radius: 14px; box-shadow: 0 0 0 1px rgba(217,178,106,.3), 0 14px 30px rgba(0,0,0,.5); }
+  /* Spielfiguren stehen auf: die Kippung wird je Figur ausgeglichen, Fuß bleibt auf dem Feld */
+  #karte .fig { transform-box: fill-box; transform-origin: 50% 85%; transform: scaleY(1.22); }
+  .fx-kanal { inset: 0; }
+}
+@media (min-width: 1200px) {
+  /* Brett so groß, dass Kopf, Brett, Aktionsleiste und Initiative auf einen Bildschirm passen; gekippt bleibt es in seiner Spalte */
+  .spiel { grid-template-columns: 270px minmax(0, 1fr) 330px; }
+  #karte { width: min(100%, calc((100vh - 330px) * 4 / 3)); margin: 0 auto; transform: rotateX(22deg) scale(.86); }
+  .karte-wrap .leiste { margin-top: -70px; }
+  .panel { max-height: calc(100vh - 140px); overflow-y: auto; scrollbar-width: thin; }
+  body.im-kampf main { padding-top: 10px; }
+}
+@media (min-width: 1200px) {
+  /* Was das gekippte Brett an Höhe verliert, nicht als Leerraum stehen lassen */
+  #karte { margin-bottom: calc(min(100%, (100vh - 330px) * 4 / 3) * -0.15); }
+  .karte-wrap .leiste { margin-top: 0; }
+  .reihe { margin-top: -4px; }
+}
+@media (min-width: 1200px) {
+  #karte { margin-bottom: calc(min(100%, (100vh - 330px) * 4 / 3) * -0.1); }
+  .panel { max-height: calc(58vh - 40px); }
+  .log { max-height: calc(42vh - 120px); }
+}

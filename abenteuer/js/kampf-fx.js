@@ -113,7 +113,7 @@
         <span class="gk-bild" style="${bild ? `background-image:url('${bild}')` : ""}">${f.art === "begleiter" ? "✦" : ""}</span>
         <div class="gk-info"><b>${esc(f.name)}</b><small>${esc(f.titel || (f.art === "begleiter" ? "Begleiterin" : ""))}${f.stufe ? ` · Stufe ${f.stufe}` : ""}</small>
           <div class="gk-leben ${p > vorher ? "heil" : ""}"><i class="rest" style="width:${Math.max(p, vorher)}%" data-ziel="${p}"></i><i class="wert" style="width:${p}%"></i><span>${f.tot ? "gefallen" : f.tp <= 0 ? "am Boden" : `${f.tp} / ${f.tpMax}`}</span></div>
-          <div class="gk-werte"><span>RK <em>${f.rk}</em></span>${f.rucksack ? `<span>Tränke <em>${R.trankZahl(f)}</em></span>` : ""}${z.length ? `<span class="gk-zust">${esc(z.slice(0, 2).join(" · "))}</span>` : ""}</div></div></div>`;
+          <div class="gk-werte"><span>RK <em>${f.rk}</em></span>${f.rucksack && f.art !== "begleiter" ? `<span>Tränke <em>${R.trankZahl(f)}</em></span>` : ""}${z.length ? `<span class="gk-zust">${esc(z.slice(0, 2).join(" · "))}</span>` : ""}</div></div></div>`;
     }).join("");
     requestAnimationFrame(() => el.querySelectorAll(".rest").forEach((r) => { r.style.width = r.dataset.ziel + "%"; }));
   }
@@ -129,11 +129,23 @@
       ${ph ? `<div class="bk-phasen">${Array.from({ length: ph }, (_, i) => `<span class="${i <= (g.phase || 0) ? "an" : ""}">${["I", "II", "III", "IV"][i]}</span>`).join("")}</div>` : ""}`;
   }
 
+  /** Kopfleiste: Kampagne, Kapitel, Uhr (Glocke/Kälte/Frost …), Runde, Stufe */
+  function kopf(st) {
+    const el = $("#kampf-kopf"); if (!el) return;
+    const D = window.ABD_ALLE && window.ABD_ALLE[kampagne()], m = (D && D.META) || {}, i = window.ABT && window.ABT.info ? window.ABT.info() : null;
+    const kap = i && m.abschnitte_namen ? m.abschnitte_namen[i.abschnitt] : "", rom = ["", "I", "II", "III", "IV"][i ? i.abschnitt : 0] || "";
+    const uhr = m.uhr, g = i ? i.glocke || 0 : 0, max = (uhr && uhr.max) || 7;
+    el.innerHTML = `<div class="kk-logo">MYTHARA</div><div class="kk-trenner"></div>
+      <div class="kk-titel"><b>${esc(m.titel || "Übungskampf")}</b><span>${i ? `Kapitel ${rom}${kap ? " · " + esc(kap) : ""}` : esc(st.karte.name || "")}${i && i.titel && i.titel !== kap ? " · " + esc(i.titel) : ""}</span></div>
+      <div class="kk-rechts">${uhr && i ? `<div class="kk-uhr"><small>${esc(uhr.name || "").toUpperCase()}</small><div>${Array.from({ length: max }, (_, n) => `<i class="${n < g ? "an" : ""}"></i>`).join("")}</div></div>` : ""}
+        <div class="kk-chip">Runde <b>${st.runde}</b></div><div class="kk-chip">Stufe ${st.stufe} · ${st.schwierigkeit === "hardcore" ? "Hardcore" : "Normal"}</div></div>`;
+  }
   /* ---------- Nach jedem Zeichnen ---------- */
   function nach(st, R) {
     if (!st) return;
     document.body.classList.toggle("fx-an", !ruhig());
-    gruppe(st, R); bossKarte(st, R);
+    gruppe(st, R); bossKarte(st, R); kopf(st);
+    document.body.dataset.stimmung = STIMMUNG[kampagne()] || "glut";
     const neu = { pos: {}, tp: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
     for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; }
     const wrap = $(".karte-wrap"); if (wrap) wrap.classList.toggle("mit-bild", Boolean(st.karte.bild));

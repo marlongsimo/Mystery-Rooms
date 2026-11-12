@@ -49,7 +49,7 @@
       try {
         if (!leer) {
           const setup = window.AB.SETUP();
-          const id = await rpc("rpg_create_campaign", { p_title: titelVorschlag(), p_difficulty: setup.schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch" });
+          const id = await rpc("rpg_create_campaign", { p_title: titelVorschlag(), p_difficulty: setup.schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch", p_adventure: window.AB.SETUP().abenteuer || "grauwacht" });
           K = { id, version: 0, status: "geplant", titel: titelVorschlag() }; merkeK();
         }
         await sitzungStarten();
@@ -223,7 +223,7 @@
       if (was === "verlassen") { if (!confirm(`„${c.title}“ verlassen?`)) { b.disabled = false; return; } await rpc("rpg_leave_campaign", { p_campaign_id: id }); return bibliothek(); }
       if (was === "uebernehmen") {
         window.ABT.fortsetzen();
-        const id2 = await rpc("rpg_create_campaign", { p_title: titelVorschlag(), p_difficulty: (window.ABT.info() || {}).schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch" });
+        const id2 = await rpc("rpg_create_campaign", { p_title: titelVorschlag(), p_difficulty: (window.ABT.info() || {}).schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch", p_adventure: window.AB.SETUP().abenteuer || "grauwacht" });
         K = { id: id2, version: 0, status: "geplant", titel: titelVorschlag() }; merkeK();
         await sitzungStarten(); await speichern(); $("#qr-overlay").hidden = true; toast("Das Abenteuer ist jetzt als Kampagne gespeichert."); return;
       }
@@ -286,11 +286,12 @@
         // denn ein zweites Gerät als Spieltisch erkennt das Abenteuer am Namen
         const soll = window.AB.SETUP().abenteuer || "grauwacht";
         if (abenteuerAusTitel(K.titel) !== soll && meta().titel) { K.titel = await rpc("rpg_rename_campaign", { p_campaign_id: K.id, p_title: meta().titel }); merkeK(); }
+        try { await rpc("rpg_set_adventure", { p_campaign_id: K.id, p_adventure: soll }); } catch (e) { /* vor Migration 005 gibt es das noch nicht */ }
         await sitzungStarten(); return;
       } catch (e) { /* gehört nicht (mehr) zu uns – neu anlegen */ }
     }
     const setup = window.AB.SETUP(), titel = meta().titel || "Das Siegel von Grauwacht";
-    const id = await rpc("rpg_create_campaign", { p_title: titel, p_difficulty: setup.schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch" });
+    const id = await rpc("rpg_create_campaign", { p_title: titel, p_difficulty: setup.schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch", p_adventure: window.AB.SETUP().abenteuer || "grauwacht" });
     K = { id, version: 0, status: "geplant", titel }; merkeK(); letzteMeta = null; letzteMitglieder = "";
     await sitzungStarten();
   }
@@ -431,7 +432,9 @@
     // Das Abenteuer der Kampagne übernehmen, sonst zeigt der Tisch das zuletzt hier gewählte (z. B. Grauwacht statt Moor)
     // Vorrang hat das Abenteuer aus dem QR-Link (&ab=…), sonst der Name der Kampagne
     const bekannt = abenteuer && window.ABD_ALLE && window.ABD_ALLE[abenteuer] ? abenteuer : null;
-    const ab = bekannt || abenteuerAusTitel(d.titel); if (ab && window.AB.abenteuerWaehlen) window.AB.abenteuerWaehlen(ab);
+    // Danach die Datenbank (ab Migration 005; alte Kampagnen stehen dort pauschal auf „grauwacht“), zuletzt der Name
+    const ausTitel = abenteuerAusTitel(d.titel), db = d.abenteuer && window.ABD_ALLE && window.ABD_ALLE[d.abenteuer] && !(d.abenteuer === "grauwacht" && ausTitel && ausTitel !== "grauwacht") ? d.abenteuer : null;
+    const ab = bekannt || db || ausTitel; if (ab && window.AB.abenteuerWaehlen) window.AB.abenteuerWaehlen(ab);
     window.AB.lobbyFuerKampagne(d.difficulty);
     toast(`Dieses Gerät ist jetzt der Spieltisch von „${d.titel}“.`);
     return d;

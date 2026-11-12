@@ -93,6 +93,11 @@ Schon angelegte Gegner: Frostknecht, Eisgezeichneter, Glasschwärmer, Schwärmer
 Pfadkämpfe: Sturmgrat (Jagdhorn sichern oder alle besiegen), Unterstollen (zwei Nester oder die Brutmutter, brüchiges Eis), Pilgerstraße (drei Grablichter brechen den Schutzkreis des Eidwächters; ab 5 Helden zwei Aktionen in Ruhe). Niederlagen führen weiter, nur ohne Belohnung.
 Siegquote Normal (Automatik, 120 Gruppen je Größe, 3–6 Helden): Pfadkämpfe 78–92 %, Marktplatz 72–86 % (6 Helden danach leicht entschärft), Kammern 85–93 % mit im Schnitt 2 von 3 Geretteten. Werkzeuge: `tools/auswertung-krone.js` (auch `--kalibrieren`), `tools/durchlauf-krone.js`; Test: `tests/krone.test.js`.
 
+### Stand Akt II und Archiv/Frostkammer (Entwurf, gebaut und getestet)
+Brücke (Durchbruch: Eisgitter aufschlagen, alle Stehenden auf die andere Seite; Verwundete werden mitgetragen; brüchige Felder sichtbar mit 2+ Geretteten) → Tor der Kronenwache (Eisenhirte mit Runenschild und Bodenstoß; zwei Runensäulen lassen ihn erstarren, ab 5 Helden drei Aktionen je Säule; der gerettete Wachmann hilft) → Lager (Stufe 3) → Archiv der Namen (drei Tafeln bis Runde 6, Kälterufer löscht, Runenleser, Schwärmer aus Kapseln; 2+ Tafeln = die Wahrheit über das Kronenherz) → Frostkammer (finden, herausfordern, verhandeln oder gehen; Frostmatrone mit Frostwelle, Eiskorridoren und Brut) → Ende des Entwurfs vor dem Kronensaal.
+Neu in der Engine: Ziel-Wirkung „öffnet“ (Gitter, Türen), angefangene Ziele (`start`), Gegner mit negativem Grundwert kommen erst ab einer Gruppengröße.
+Siegquote Normal (Automatik): Brücke 81–88 %, Tor 76–85 %, Archiv 78–88 %, Frostkammer 73–91 %. Lang: Archiv und Frostkammer mit 5–6 Helden (12–16 Runden).
+
 ## K7. Enden und Marker
 **Enden:** Stabilisieren · Versiegeln · Umleiten, dazu die Niederlage. Jedes Ende öffnet Stufe 5 auf eigene Weise.
 

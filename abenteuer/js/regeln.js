@@ -106,7 +106,8 @@
     splitterbrutmutter: { name: "Splitterbrutmutter", tp: 40, rk: 13, werte: { STR: 16, GES: 12, KON: 15, INT: 4, WEI: 10, CHA: 4 }, angriff: { name: "Splitterbiss", bonus: 5, schaden: "2W6+2" }, brut: { art: "glasschwaermer", alle: 2, max: 4 }, bewegung: 4, xp: 450 },
     eidwaechter: { name: "Eidwächter", tp: 40, rk: 15, werte: { STR: 17, GES: 9, KON: 16, INT: 8, WEI: 12, CHA: 8 }, angriff: { name: "Eidhammer", bonus: 5, schaden: "2W6+3" }, untot: true, bewegung: 4, xp: 450 },
     frostmatrone: { name: "Frostmatrone", tp: 60, rk: 14, werte: { STR: 14, GES: 12, KON: 16, INT: 14, WEI: 16, CHA: 14 }, angriff: { name: "Frostgriff", bonus: 6, schaden: "2W8+2", reichweite: 2 },
-      feldzauber: { name: "Eiskorridor", anzahl: 3, dauer: 2, alle: 3, reichweite: 9 }, brut: { art: "glasschwaermer", alle: 3, max: 3 }, bewegung: 4,
+      feldzauber: { name: "Eiskorridor", anzahl: 3, dauer: 2, alle: 4, reichweite: 9 }, brut: { art: "glasschwaermer", alle: 2, max: 5 }, bewegung: 4,
+      flaeche: { name: "Frostwelle", form: "kreis", radius: 1, schaden: "3W6", sg: 14, rettung: "KON", alle: 3, reichweite: 7 },
       phasen: [{ ab: 0.5, text: "Die Frostmatrone kreischt. Der Boden der Kammer überzieht sich mit Raureif, und die Nester glühen auf.", rk: 1 }], xp: 1100 },
     eisenhirte: { name: "Eisenhirte", tp: 70, rk: 16, werte: { STR: 20, GES: 8, KON: 18, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Steinfaust", bonus: 6, schaden: "2W8+3" }, bewegung: 3,
       flaeche: { name: "Bodenstoß", form: "ring", radius: 2, schaden: "3W6", sg: 13, rettung: "GES", alle: 3, liegend: true },
@@ -151,10 +152,10 @@
     k_markt: { name: "Marktplatz der leeren Fenster", stufe: 1, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["jaegerschuetze", 0.2, 2, 0.6], ["frostknecht", 0.2, 2], ["eisgezeichneter", 0.7, 5]], skala: { 2: 0.76, 3: 0.76, 4: 0.8, 5: 1.2, 6: 1.35 }, skalaHC: { 2: 0.59, 3: 0.59, 4: 0.63, 5: 1.1, 6: 1.28 } },
     k_kammern: { name: "Die Kammern der Verschleppten", stufe: 1, zusatzAb: 99, gegner: [["frostknecht", 0.25, 2, 0.25], ["glasschwaermer", 0.5, 5]], skala: { 2: 0.85, 3: 0.85, 4: 1.23, 5: 1.59, 6: 2.2 }, skalaHC: { 2: 1.03, 3: 1.03, 4: 1.26, 5: 1.37, 6: 2.2 } },
     // Akt II (Heldenstufe 2) und III (Stufe 3)
-    k_bruecke: { name: "Die Brücke über den Gletscherbruch", stufe: 2, zusatzAb: 99, gegner: [["kettenbestie", 0.25, 1, 0], ["jaegerschuetze", 0.5, 4, 0.2], ["siegeljaeger", 0.45, 3]], skala: { 2: 0.83, 3: 0.83, 4: 1.13, 5: 1.98, 6: 3.79 }, skalaHC: { 2: 0.59, 3: 0.59, 4: 0.83, 5: 1.23, 6: 2.02 } },
-    k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.6, 4], ["jaegerschuetze", 0.25, 2, -0.5]], skala: { 2: 1.23, 3: 1.23, 4: 3.96, 5: 3.96, 6: 3.96 }, skalaHC: { 2: 0.63, 3: 0.63, 4: 1.37, 5: 3.19, 6: 3.96 } },
-    k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["eisgezeichneter", 0.9, 6], ["glasschwaermer", 0.4, 3]], skala: { 2: 1.81, 3: 1.81, 4: 2.51, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 2.2, 3: 2.2, 4: 2.25, 5: 3.79, 6: 3.96 } },
-    k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.6, 5], ["frostknecht", 0.3, 2, -0.5]], skala: { 2: 1.37, 3: 1.37, 4: 2.74, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 1.23, 3: 1.23, 4: 1.98, 5: 2.92, 6: 3.96 } },
+    k_bruecke: { name: "Die Brücke über den Gletscherbruch", stufe: 2, zusatzAb: 99, gegner: [["kettenbestie", 0.25, 1, 0], ["jaegerschuetze", 0.5, 4, 0.2], ["siegeljaeger", 0.45, 3]], skala: { 2: 0.71, 3: 0.71, 4: 0.83, 5: 1.13, 6: 2.07 }, skalaHC: { 2: 0.27, 3: 0.27, 4: 0.81, 5: 0.89, 6: 0.95 } },
+    k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.6, 4], ["jaegerschuetze", 0.25, 2, -0.5]], skala: { 2: 0.39, 3: 0.39, 4: 1.03, 5: 1.26, 6: 1.56 }, skalaHC: { 2: 0.36, 3: 0.36, 4: 0.81, 5: 1.08, 6: 1.13 } },
+    k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["frostknecht", 0.4, 3, -0.5], ["jaegerschuetze", 0.3, 2, -0.5], ["eisgezeichneter", 0.9, 6], ["glasschwaermer", 0.4, 3]], skala: { 2: 0.71, 3: 0.71, 4: 0.95, 5: 1.4, 6: 2.02 }, skalaHC: { 2: 0.25, 3: 0.25, 4: 0.83, 5: 0.99, 6: 1.85 } },
+    k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.8, 6], ["frostknecht", 0.4, 3, -0.5]], skala: { 2: 0.49, 3: 0.49, 4: 1.53, 5: 1.63, 6: 2.2 }, skalaHC: { 2: 0.71, 3: 0.71, 4: 1.23, 5: 1.59, 6: 1.89 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -175,7 +176,8 @@
   function gegnerFuer(begId, n, stufe, skala, hardcore) {
     const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, k = skalaK(begId, n, stufe, skala, hardcore);
     // [Art, Anzahl je Figur, höchstens, Grundwert]: z. B. genau eine Alwine, deren Leben nur leicht mit der Gruppe wächst (Grundwert + je Figur)
-    return b.gegner.map(([art, je, max, basis]) => { const soll = (basis || 0) + je * n, anzahl = Math.min(max || Infinity, Math.max(1, Math.round(soll))); return { art, anzahl, tpFaktor: k * soll / anzahl }; });
+    // Negativer Grundwert: Diese Art kommt erst ab einer gewissen Gruppengröße (sonst gar nicht)
+    return b.gegner.map(([art, je, max, basis]) => { const soll = (basis || 0) + je * n, anzahl = Math.min(max || Infinity, Math.max(basis < 0 ? 0 : 1, Math.round(soll))); return { art, anzahl, tpFaktor: anzahl ? k * soll / anzahl : k }; }).filter((g) => g.anzahl > 0);
   }
 
   /* ---------- Karte ---------- */

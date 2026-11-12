@@ -207,9 +207,55 @@
     app.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => { H.fokus = b.dataset.fid; render(); window.scrollTo(0, 0); }; });
   }
 
-  function balken(tp, max) {
-    const a = Math.max(0, tp / max);
-    return `<div class="tpbalken"><i style="width:${a * 100}%;background:${a > .5 ? "#6fa86a" : a > .25 ? "#d6a23a" : "#c0503a"}"></i><span>${tp} / ${max} TP</span></div>`;
+  /* ---------- Kampf im Prototyp-Stil: Zug-Kasten, Aktionskarten, Zielwahl, Initiative ---------- */
+  const SYM = {
+    schwert: '<path d="M19 4 9.5 13.5M15 4h4v4M7 11.5l5.5 5.5M8.5 15.5 4.5 19.5"/>',
+    bogen: '<path d="M5 19C5 9 9 5 19 5"/><path d="M5 19 19 5"/><path d="M15 5h4v4"/>',
+    feuer: '<path d="M12 21c-4 0-6.5-2.7-6.5-6 0-4 4-6 4-10.5 3 2 5.5 5 5.5 8.5 1-.7 1.8-1.8 2-3.5 1.6 1.7 2.5 3.6 2.5 5.5 0 3.3-3 6-7.5 6z"/>',
+    heil: '<path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z"/>',
+    trank: '<path d="M9 3h6M10 3v5l-4 7a5 5 0 0 0 4.5 6h3A5 5 0 0 0 18 15l-4-7V3"/><path d="M8 15h8"/>',
+    schild: '<path d="M12 3l8 3v6c0 5-3.6 8-8 9-4.4-1-8-4-8-9V6z"/>',
+    schatten: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    mal: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+    blitz: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  };
+  function symVon(a) {
+    const art = a.art || "";
+    if (art === "trank") return ["trank", "heil"];
+    if (/heil|aufrichten|segen|bewahren/.test(art)) return ["heil", "heil"];
+    if (art === "angriff") return a.bogen || a.fern ? ["bogen", ""] : ["schwert", ""];
+    if (/flaeche|geschoss|rettungswurf|albtraum|bann/.test(art) || a.rettung) return ["feuer", "feuer"];
+    if (/schild|schutzkreis|spiegelbilder|vertreiben|siegel/.test(art)) return ["schild", "eis"];
+    if (/verstecken|rauch|schattenschritt|rueckzug|finte|gift/.test(art)) return ["schatten", "schatten"];
+    if (/mal|kontrolle|analyse|spott|entwaffnen/.test(art)) return ["mal", ""];
+    return ["blitz", ""];
+  }
+  const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${SYM[k] || SYM.blitz}</svg>`;
+  /** Bild einer Figur für Zielwahl und Initiative: Held als Porträt, Gegner als gezeichnetes Symbol */
+  function bildVon(f) {
+    if (!f) return `<span class="hz-bild"></span>`;
+    if (f.seite === "gegner") return `<span class="hz-bild feind"><svg viewBox="-26 -26 52 52">${B.gegner(f.art)}</svg></span>`;
+    if (f.art === "begleiter" && B.begleiter) return `<span class="hz-bild"><svg viewBox="-26 -26 52 52">${B.begleiter(false)}</svg></span>`;
+    return f.fid ? `<span class="hz-bild" style="background-image:url('${F.bild(f.fid)}')"></span>` : `<span class="hz-bild"></span>`;
+  }
+  function dranBox(s, d) {
+    const z = s.zug || {}, st = (an, rest, t, u) => `<span class="${an ? "" : "weg"}">${t}<small>${u}</small></span>`;
+    return `<section class="hz-dran" style="--d:-${((Date.now() % 4000) / 1000).toFixed(2)}s"><small>DEIN ZUG · RUNDE ${s.runde || 1}</small><h2>Du bist dran!</h2>
+      <div class="schritte">${st(z.bewegung > 0, z.bewegung, "Bewegen", z.bewegung > 0 ? `noch ${z.bewegung} · am Tisch${z.schritt ? " · Schatten " + z.schritt : ""}` : "erledigt")}${st(z.aktion, 0, "Aktion", z.aktion ? "bereit" : "genutzt")}${st(z.bonus, 0, "Bonus", z.bonus ? "bereit" : "genutzt")}</div>
+      <p class="hz-tipp">Zielfeld am Tisch antippen, dann hier eine Karte wählen.</p></section>`;
+  }
+  function ring(chance, seite) {
+    if (seite === "spieler") return "";
+    const m = /(\d+)\s*%/.exec(chance || ""), p = m ? +m[1] : /sicher/.test(chance || "") ? 100 : null;
+    if (p == null) return chance ? `<span class="hz-chance text"><small>${esc(chance)}</small></span>` : "";
+    const u = 2 * Math.PI * 24, farbe = p >= 65 ? "#7fe07a" : p >= 40 ? "#f6dc9c" : "#ff8a6a";
+    return `<span class="hz-chance"><svg viewBox="0 0 58 58"><circle cx="29" cy="29" r="24" stroke="rgba(255,255,255,.1)" stroke-width="5" fill="none"/><circle cx="29" cy="29" r="24" stroke="${farbe}" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="${(u * p / 100).toFixed(1)} ${u.toFixed(1)}"/></svg><b>${p}%</b>${/Vorteil/.test(chance) ? "<small>VORTEIL</small>" : /Nachteil/.test(chance) ? "<small>NACHTEIL</small>" : ""}</span>`;
+  }
+  function initiative(s, fd) {
+    const reihe = (s.reihe || []).map(figId).filter((f) => f && !f.tot && (f.seite !== "gegner" || f.tp > 0));
+    if (reihe.length < 2) return "";
+    const am = Math.max(0, reihe.findIndex((f) => f.id === s.aktiv)), folge = reihe.slice(am).concat(reihe.slice(0, am));
+    return `<div class="hz-ini" aria-label="Zugreihenfolge">${folge.map((f) => `<span class="${f.seite === "gegner" ? "feind" : ""} ${f.id === s.aktiv ? "dran" : ""} ${f.id === fd.id ? "ich" : ""} ${f.tp <= 0 ? "liegt" : ""}" title="${esc(f.name)}">${bildVon(f)}</span>`).join("")}</div>`;
   }
 
   function viewBogen(app, fid) {
@@ -220,25 +266,32 @@
     const dran = Boolean(fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0);
     const meinName = (s.namen || {})[ich()] || "";
     const zust = fd ? fd.zustaende || [] : [];
-    const platzText = plMax[0] + plMax[1] ? `<span><b>${"●".repeat(pl[0])}${"○".repeat(Math.max(0, plMax[0] - pl[0]))}${plMax[1] ? " " + "◆".repeat(pl[1]) + "◇".repeat(Math.max(0, plMax[1] - pl[1])) : ""}</b>Zauberplätze</span>` : "";
-    let html = `<section class="bogen ${dran ? "ist-dran" : ""}" style="--k:${k.farbe}">
-      <div class="kopf"><img class="portraet" src="${F.bild(fid)}" alt=""><div><h1>${esc(d.name)}</h1><p>${esc(d.titel)} · ${esc(k.name)} · Stufe ${stufe}${meinName ? " · " + esc(meinName) : ""}</p><p class="spruch">„${esc(d.spruch)}“</p></div></div>
-      ${balken(tp, tpMax)}
+    const traenke = ((fd ? fd.rucksack : az ? az.rucksack : []) || []).filter((x) => /trank/.test(x.id)).reduce((n, x) => n + (x.n || 0), 0);
+    const anteil = Math.max(0, Math.min(1, tp / Math.max(1, tpMax)));
+    const platzChip = plMax[0] + plMax[1] ? `<span>ZAUBER<b>${pl[0]}${plMax[1] ? "·" + pl[1] : ""}</b></span>` : "";
+    let html = `<section class="bogen hz ${dran ? "ist-dran" : ""}" style="--k:${k.farbe}">
+      <div class="hz-held"><img class="portraet" src="${F.bild(fid)}" alt="">
+        <div class="hz-held-text"><h1>${esc(d.name)}</h1><p class="hz-klasse">${esc(k.name)} · Stufe ${stufe}${meinName ? " · " + esc(meinName) : ""}</p>
+          <div class="tpbalken hz-leben ${anteil <= .25 ? "kritisch" : ""}"><i style="width:${anteil * 100}%"></i><span>${tp} / ${tpMax}</span></div>
+          <div class="hz-werte"><span>RK<b>${rk}</b></span><span>TEMPO<b>${dran ? s.zug.bewegung : (k.bewegung || 6)}</b></span>${platzChip || `<span>TRÄNKE<b>${traenke}</b></span>`}</div>
+        </div>
+      </div>
+      <p class="spruch hz-spruch">„${esc(d.spruch)}“</p>
       ${fd && fd.tot ? `<div class="info schlecht">${esc(d.name)} ist tot.</div>` : fd && fd.tp <= 0 && s.schwierigkeit === "hardcore" ? `<div class="info schlecht">Todeswürfe: ${"✓".repeat(fd.todes.e)}${"·".repeat(3 - fd.todes.e)} | ${"✗".repeat(fd.todes.f)}${"·".repeat(Math.max(0, 3 - fd.todes.f))}${fd.stabil ? " · stabil" : ""}</div>` : ""}
-      <div class="werte-zeile"><span><b>${rk}</b>RK</span>${platzText}<span><b>${dran ? s.zug.bewegung : (k.bewegung || 6)}</b>Felder</span></div>
       ${zust.length ? `<p class="zustaende">${zust.map((z) => `<span>${esc(z)}</span>`).join("")}</p>` : ""}
-      <nav class="tabs">${[["zug", s.phase === "szene" ? "Szene" : "Zug"], ["faehig", "Fähigkeiten"], ["rucksack", "Rucksack"]].map(([id, t]) => `<button data-tab="${id}" class="${H.tab === id ? "an" : ""}">${t}${id === "zug" && (dran || szeneWartet(s, fid)) ? " ●" : ""}</button>`).join("")}</nav>
+      ${dran && H.tab === "zug" ? dranBox(s, d) : ""}
+      <nav class="tabs hz-reiter">${[["zug", s.phase === "szene" ? "Szene" : "Aktionen"], ["faehig", "Fähigkeiten"], ["rucksack", "Inventar"]].map(([id, t]) => `<button data-tab="${id}" class="${H.tab === id ? "an" : ""}">${t}${id === "zug" && (dran || szeneWartet(s, fid)) ? " ●" : ""}</button>`).join("")}</nav>
       <div class="tabinhalt">`;
     if (H.tab === "faehig") html += tabFaehig(fid, stufe);
     else if (H.tab === "rucksack") html += tabRucksack(fd ? fd.rucksack : az ? az.rucksack : [{ id: "heiltrank", n: 1 }], fid);
     else if (s.phase === "szene" && ab) html += tabSzene(ab, fid);
     else html += tabZug(s, fid, fd, dran, stufe);
-    html += `</div></section>`;
+    html += `</div>${s.phase === "kampf" && !s.ende && fd ? initiative(s, fd) : ""}${dran && H.tab === "zug" ? `<div class="hz-ende"><button class="btn breit" id="zugende" ${H.warte ? "disabled" : ""}>Zug beenden</button></div>` : ""}</section>`;
     app.innerHTML = html;
     const we = app.querySelector(".wuerfel-erg");
     if (we && window.ABW) { const key = we.dataset.erg; window.ABW.rollen(we, +we.dataset.w, key.replace(/^[^:]+: /, ""), { titel: /verfehlt|widersteht/.test(key) ? "Daneben" : "Getroffen!", gut: !/verfehlt|widersteht/.test(key), sofort: H.letzterWurf === key }); H.letzterWurf = key; }
     app.querySelectorAll("[data-tab]").forEach((b) => { b.onclick = () => { H.tab = b.dataset.tab; render(); }; });
-    app.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { H.sel = H.sel === b.dataset.opt ? null : b.dataset.opt; H.ziel = null; H.fehler = ""; render(); }; });
+    app.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { H.sel = H.sel === b.dataset.opt ? null : b.dataset.opt; H.ziel = null; H.fehler = ""; render(); const z = document.querySelector(".hz-ziele"); if (z && z.scrollIntoView) z.scrollIntoView({ block: "nearest", behavior: "smooth" }); }; });
     app.querySelectorAll("[data-ziel]").forEach((b) => { b.onclick = () => { H.ziel = b.dataset.ziel; render(); }; });
     const w = $("#wuerfeln"); if (w) w.onclick = () => senden({ typ: "aktion", aktion: H.sel, ziel: H.ziel || (fd && fd.id) });
     const e = $("#zugende"); if (e) e.onclick = () => senden({ typ: "ende" });
@@ -311,32 +364,35 @@
     const d = F.FIGUREN[fid];
     let h = "";
     if (s.phase !== "kampf") h += `<div class="info">Gleich geht's los. Der Tisch stellt die Gruppe zusammen und startet den Kampf.</div><button class="btn ghost breit" id="andere">Andere Figur wählen</button>`;
-    else if (s.ende) h += `<div class="info gross">${s.ende === "sieg" ? "Sieg!" : s.ende === "niederlage" ? (s.abenteuer && s.abenteuer.abenteuer === "rabenmoor" ? "Das Moor behält euch." : "Grauwacht behält euch.") : "Rückzug. Ihr versucht es noch einmal."}</div>`;
+    else if (s.ende) h += `<div class="info gross">${s.ende === "sieg" ? "Sieg!" : s.ende === "niederlage" ? ({ rabenmoor: "Das Moor behält euch.", hochwacht: "Die letzte Fackel erlischt.", krone: "Das Eis behält euch." }[s.abenteuer && s.abenteuer.abenteuer] || "Grauwacht behält euch.") : "Rückzug. Ihr versucht es noch einmal."}</div>`;
     else if (!fd) h += `<div class="info">Deine Figur ist in diesem Kampf nicht dabei.</div>`;
     else if (fd.tot) h += `<div class="info schlecht">${esc(d.name)} ist gefallen.</div>`;
     else if (fd.tp <= 0) h += `<div class="info schlecht">Du liegst am Boden. ${s.schwierigkeit === "hardcore" ? "Zu Beginn deines Zugs würfelt der Tisch deinen Todeswurf. " : ""}Nur Heilung oder Stabilisieren bringt dich zurück.</div>`;
     else if (!dran) {
       const a = figId(s.aktiv), b = a && a.fid && s.besitz && s.besitz[a.fid];
-      h += `<div class="info">Am Zug: <b>${esc(a ? a.name : "…")}</b>${b && b !== ich() ? ` (📱 ${esc((s.namen || {})[b] || "")})` : a && a.seite === "spieler" ? " (am Tisch)" : ""}</div>`;
+      h += `<div class="info hz-warte ${a && a.seite === "gegner" ? "feind" : ""}">${bildVon(a)}<span><small>AM ZUG · RUNDE ${s.runde || 1}</small><b>${esc(a ? a.name : "…")}</b>${b && b !== ich() ? `<em>📱 ${esc((s.namen || {})[b] || "")}</em>` : a && a.seite === "spieler" ? "<em>am Tisch</em>" : a && a.seite === "gegner" ? "<em>Gegner handelt …</em>" : ""}</span></div>`;
     } else {
-      const sch = (an, fertig, t) => `<span class="${fertig ? "fertig" : an ? "an" : ""}">${t}</span>`;
-      h += `<div class="info dran"><b>Du bist dran!</b> Bewegen: Tippe am Tisch dein Zielfeld an (noch ${s.zug.bewegung} Felder${s.zug.schritt ? ", Schattenschritt " + s.zug.schritt : ""}). Dann hier eine Aktion wählen.</div>
-        <div class="schritte">${sch(true, !s.zug.bewegung, "① Bewegen (am Tisch)")}${sch(s.zug.aktion, !s.zug.aktion, "② Aktion")}${sch(s.zug.bonus, !s.zug.bonus, "③ Bonusaktion")}${sch(true, false, "④ Zug beenden")}</div>`;
-      h += `<div class="optionen">`;
-      for (const o of s.optionen || []) {
-        const def = R.findeAktion({ fid, stufe, rucksack: fd.rucksack }, o.id); if (!def) continue;
-        const a = def.a, gew = H.sel === o.id;
-        const zahl = a.art === "trank" && !a.gross ? ` (${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n})` : o.rest != null && o.rest !== Infinity ? ` · noch ${Math.max(0, o.rest)}${(() => { const gz = R.grenze({ stufe }, a); return gz ? ` von ${gz.n}` : ""; })()}` : "";
-        h += `<button class="opt ${gew ? "gewaehlt" : ""} ${o.ok ? "" : "aus"}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}><b>${esc(o.name || a.name)}<span class="anzahl">${esc(zahl)}</span></b><small>${esc(aktionInfo(a, d, stufe))}</small>${!gew && a.text ? `<span class="opt-kurz">${esc(a.text)}</span>` : ""}${o.ok ? "" : `<i>${esc(o.grund === "Kein gültiges Ziel." ? (["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite.") : o.grund || "")}</i>`}</button>`;
-        if (gew) {
-          const selbst = SELBST.has(a.art);
-          if (a.text) h += `<p class="opt-text">${esc(a.text)}</p>`;
-          if (!selbst) h += `<div class="ziele">${o.ziele.map((z) => `<button class="ziel ${z.seite === "spieler" ? "freund" : ""} ${H.ziel === z.id ? "gewaehlt" : ""}" data-ziel="${z.id}">${esc(z.name)}${z.seite === "spieler" ? ` <small>${z.tp}/${z.tpMax} TP</small>` : z.chance ? ` <small>${esc(z.chance)}</small>` : ""}</button>`).join("")}</div>`;
-          const bereit = selbst || H.ziel;
-          h += `<button class="btn breit wuerfel" id="wuerfeln" ${bereit && !H.warte ? "" : "disabled"}>${H.warte ? "Der Tisch würfelt …" : bereit ? (a.schaden || a.rettung || a.art === "angriff" ? "🎲 Würfeln" : "Ausführen") : "Ziel wählen"}</button>`;
-        }
+      const offen = (s.optionen || []).map((o) => ({ o, def: R.findeAktion({ fid, stufe, rucksack: fd.rucksack }, o.id) })).filter((x) => x.def);
+      h += `<div class="hz-titelzeile"><h3>WAS TUST DU?</h3><span>Tippe eine Karte an</span></div><div class="hz-karten optionen">`;
+      let gewaehlt = null;
+      for (const { o, def } of offen) {
+        const a = def.a, gew = H.sel === o.id, [sym, ton] = symVon(a);
+        if (gew) gewaehlt = { o, a };
+        const anz = a.art === "trank" && !a.gross ? `×${(fd.rucksack.find((x) => x.id === "heiltrank") || { n: 0 }).n}` : o.rest != null && o.rest !== Infinity ? `${Math.max(0, o.rest)}${(() => { const gz = R.grenze({ stufe }, a); return gz ? `/${gz.n}` : ""; })()}` : "";
+        const grund = o.ok ? "" : o.grund === "Kein gültiges Ziel." ? (["trank", "selbstheilung"].includes(a.art) ? "Du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Kein Ziel in Reichweite.") : o.grund || "";
+        const typ = a.typ === "bonus" ? `<span class="art bonus">BONUS</span>` : a.typ === "reaktion" ? `<span class="art">REAKTION</span>` : `<span class="art">AKTION</span>`;
+        h += `<button class="opt hz-karte ${ton} ${gew ? "gewaehlt" : ""} ${o.ok ? "" : "aus"}" data-opt="${o.id}" ${o.ok && !H.warte ? "" : "disabled"}>${typ}<span class="sym">${svg(sym)}</span><b>${esc(o.name || a.name)}</b><small>${esc(aktionInfo(a, d, stufe).replace(/^(Aktion|Bonusaktion|Reaktion)( · |$)/, "") || a.text || "")}</small>${grund ? `<i>${esc(grund)}</i>` : ""}${anz ? `<span class="anz">${esc(anz)}</span>` : ""}</button>`;
       }
-      h += `</div><button class="btn ghost breit" id="zugende" ${H.warte ? "disabled" : ""}>Zug beenden</button>`;
+      h += `</div>`;
+      if (!gewaehlt) H.zieleAuf = null;
+      if (gewaehlt) {
+        const { o, a } = gewaehlt, selbst = SELBST.has(a.art);
+        const neu = H.zieleAuf !== o.id; H.zieleAuf = o.id;
+        h += `<section class="hz-ziele ${neu ? "neu" : ""}">${a.text ? `<p class="opt-text">${esc(a.text)}</p>` : ""}`;
+        if (!selbst) h += `<h4>ZIEL WÄHLEN</h4><div class="ziele">${o.ziele.map((z) => { const f = figId(z.id), q = z.tpMax ? Math.max(0, z.tp / z.tpMax) : 1; return `<button class="ziel ${z.seite === "spieler" ? "freund" : ""} ${H.ziel === z.id ? "gewaehlt" : ""}" data-ziel="${z.id}">${bildVon(f)}<span class="hz-ziel-text"><b>${esc(z.name)}</b><small>${z.seite === "spieler" ? `${z.tp}/${z.tpMax} TP` : q >= 1 ? "unverletzt" : q > .5 ? "angeschlagen" : q > .25 ? "schwer verletzt" : "fast besiegt"}</small><span class="mini ${z.seite === "spieler" ? "freund" : ""}"><i style="width:${q * 100}%"></i></span></span>${ring(z.chance, z.seite)}</button>`; }).join("")}</div>`;
+        const bereit = selbst || H.ziel;
+        h += `<button class="btn breit wuerfel hz-los" id="wuerfeln" ${bereit && !H.warte ? "" : "disabled"}>${H.warte ? "Der Tisch würfelt …" : bereit ? (a.schaden || a.rettung || a.art === "angriff" ? "🎲 Würfeln" : "Ausführen") : "Ziel wählen"}</button></section>`;
+      }
     }
     if (H.fehler) h += `<p class="fb">${esc(H.fehler)}</p>`;
     if (H.ergebnis && s.phase === "kampf") h += H.ergebnis.wurf ? `<div class="ergebnis wuerfel-erg" data-erg="${esc(H.ergebnis.t)}" data-w="${H.ergebnis.wurf}"></div>` : `<div class="ergebnis ${H.ergebnis.art || ""}"><span>${esc(H.ergebnis.t)}</span></div>`;

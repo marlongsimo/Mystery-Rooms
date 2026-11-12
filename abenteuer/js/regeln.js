@@ -126,8 +126,8 @@
     archiv: { name: "Jäger im Archiv", stufe: 2, zusatzAb: 99, gegner: [["siegeljaeger", 0.6, 4], ["jaegerschuetze", 0.2, 2], ["schattenkobold", 0.8]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
     wacht: { name: "Die stumme Wacht", stufe: 2, zusatzAb: 99, gegner: [["siegeljaeger", 0.7, 5, 0.5], ["jaegerschuetze", 0.3, 3], ["wachkonstrukt", 0.15, 1, 0.3], ["schattenkobold", 0.6]], skala: { 2: 3.22, 3: 3.08, 4: 4.76, 5: 5.66, 6: 7.34 }, skalaHC: { 2: 2.77, 3: 2.83, 4: 4.46, 5: 5.54, 6: 6.58 } },
     hauptmann: { name: "Der Jägerhauptmann", stufe: 2, zusatzAb: 99, gegner: [["jaegerhauptmann", 0, 1, 1], ["siegeljaeger", 0.6, 4], ["jaegerschuetze", 0.25, 2]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
-    wehrgang: { name: "Der offene Wehrgang", stufe: 3, zusatzAb: 99, gegner: [["siegeljaeger", 0.6, 5, 0.5], ["jaegerschuetze", 0.3, 3], ["funkenhund", 0.4, 3, 0.5]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
-    finale: { name: "Das letzte Licht", stufe: 3, zusatzAb: 99, gegner: [["fackelzehrer", 0.1, 1, 0.6], ["funkenhund", 0.3, 3, 0.4], ["siegeljaeger", 0.45, 4, 0.3], ["jaegerschuetze", 0.15, 1]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    wehrgang: { name: "Der offene Wehrgang", stufe: 3, zusatzAb: 99, gegner: [["siegeljaeger", 0.6, 5, 0.5], ["jaegerschuetze", 0.3, 3], ["funkenhund", 0.4, 3, 0.5]], skala: { 2: 1, 3: 1.02, 4: 1.35, 5: 1.35, 6: 1.68 }, skalaHC: { 2: 1.04, 3: 1.02, 4: 1.35, 5: 1.24, 6: 1.61 } },
+    finale: { name: "Das letzte Licht", stufe: 3, zusatzAb: 99, gegner: [["fackelzehrer", 0.1, 1, 0.6], ["funkenhund", 0.3, 3, 0.4], ["siegeljaeger", 0.45, 4, 0.3], ["jaegerschuetze", 0.15, 1]], skala: { 2: 0.51, 3: 0.63, 4: 0.81, 5: 1.51, 6: 1.79 }, skalaHC: { 2: 0.51, 3: 0.71, 4: 0.82, 5: 1.45, 6: 1.68 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**

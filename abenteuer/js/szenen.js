@@ -18,7 +18,16 @@
   "use strict";
   const R = root.ABR || (typeof require === "function" ? require("./regeln.js") : null);
   const F = R.FD;
-  const DATEN = () => root.ABD || (typeof require === "function" ? require("../daten/grauwacht.js") : null);
+  // Abenteuerdaten je Abenteuer (daten/<id>.js registriert sich in ABD_ALLE); ohne Angabe: Grauwacht
+  const ALLE = () => root.ABD_ALLE || {};
+  function datenVon(id) {
+    id = id || "grauwacht";
+    if (!ALLE()[id] && typeof require === "function") { try { require("../daten/" + id + ".js"); } catch (e) { /* unbekannt */ } }
+    return ALLE()[id] || ALLE().grauwacht || root.ABD;
+  }
+  const DATEN = (A) => datenVon(A && A.abenteuer);
+  /** Kenndaten eines Abenteuers: Titel, Gruppengröße, „Uhr“ (Glocke, Lichter …), Texte für Tisch und Handy */
+  const metaVon = (id) => Object.assign({ id: id || "grauwacht", min: 3, max: 6, uhr: { name: "Glocke", max: 7, mehr: "Die Glocke schlägt.", weniger: "Die Glocke verstummt ein wenig." } }, (datenVon(id) || {}).META || {});
 
   /* ---------- Hilfen für die Daten ---------- */
   const hat = (A, fid) => A.gruppe.includes(fid) && !(A.zust && A.zust[fid] && A.zust[fid].tot);
@@ -27,14 +36,14 @@
 
   function neu(seed, opts = {}) {
     const A = {
-      seed, rs: seed >>> 0 || 1, szene: null, merker: {}, glocke: 0, stufe: 1,
+      seed, rs: seed >>> 0 || 1, abenteuer: opts.abenteuer || "grauwacht", szene: null, merker: {}, glocke: 0, stufe: 1,
       schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal",
       gruppe: (opts.gruppe || []).slice(0, 6), zust: null, lagerZust: null, lagerSzene: null,
       gewaehlt: {}, stimmen: {}, geheim: {}, probe: null, ergebnis: null, protokoll: [], gefallen: [],
     };
     R.zufall(A);
     A.zust = startZustand(A);
-    geheZu(A, DATEN().START);
+    geheZu(A, DATEN(A).START);
     return A;
   }
   function startZustand(A) {
@@ -46,11 +55,11 @@
     const k = F.KLASSEN[F.FIGUREN[fid].klasse];
     return { stufe, tp: F.tpVon(fid, stufe), tot: false, plaetze: k.plaetze ? F.PLAETZE[stufe].slice() : [0, 0], genutzt: {}, rucksack: [{ id: "heiltrank", n: 1 }] };
   }
-  const szene = (A) => DATEN().SZENEN[A.szene];
+  const szene = (A) => DATEN(A).SZENEN[A.szene];
   const text = (A, s = szene(A)) => (typeof s.text === "function" ? s.text(A, hilfen) : s.text || []).filter(Boolean);
   /** Zieht ein noch nicht erlebtes Ereignis für diesen Haltepunkt; danach geht es zu „danach“ weiter */
   function ereignis(A, punkt, danach) {
-    const E = DATEN().EREIGNISSE || [];
+    const E = DATEN(A).EREIGNISSE || [];
     A.erlebt = A.erlebt || [];
     const moegl = E.filter((e) => e.punkte.includes(punkt) && !A.erlebt.includes(e.id) && (!e.wenn || e.wenn(A, hilfen)));
     if (!moegl.length) return danach;
@@ -83,10 +92,11 @@
   }
   function glocke(A, n) {
     A.glocke = Math.max(0, Math.min(7, A.glocke + n));
-    notiz(A, n > 0 ? `Die Glocke schlägt. (${A.glocke} von 7)` : `Die Glocke verstummt ein wenig. (${A.glocke} von 7)`, n > 0 ? "schlecht" : "gut");
+    const u = metaVon(A.abenteuer).uhr;
+    notiz(A, `${n > 0 ? u.mehr : u.weniger} (${A.glocke} von 7)`, n > 0 ? "schlecht" : "gut");
   }
   function geheZu(A, id) {
-    if (!DATEN().SZENEN[id]) throw new Error("Unbekannte Szene: " + id);
+    if (!DATEN(A).SZENEN[id]) throw new Error("Unbekannte Szene: " + id);
     A.szene = id; A.gewaehlt = A.gewaehlt || {}; A.stimmen = {}; A.geheim = {}; A.probe = null; A.ergebnis = null;
     const s = szene(A);
     if (s.abschnitt) A.abschnitt = s.abschnitt;
@@ -167,7 +177,9 @@
     const geuebt = (p.geuebt || []).some((x) => x === fid || x === d.klasse) ? 2 : 0;
     return { attr, wert: R.mod(d.werte[attr]) + geuebt, geuebt: Boolean(geuebt) };
   }
-  const aktuelleProbe = (A) => (A.zwischenprobe ? szene(A).optionen.find((o) => o.id === A.zwischenprobe.opt).probe : szene(A).probe);
+  // Die Schwierigkeit (sg) darf eine Funktion sein: z. B. leichter, je mehr die Gruppe vorher erreicht hat
+  const sgVon = (A, p) => (typeof p.sg === "function" ? p.sg(A, hilfen) : p.sg);
+  const aktuelleProbe = (A) => { const p = A.zwischenprobe ? szene(A).optionen.find((o) => o.id === A.zwischenprobe.opt).probe : szene(A).probe; return p && Object.assign({}, p, { sg: sgVon(A, p) }); };
   const probeZustand = (A) => A.zwischenprobe || A.probe;
   /** Wer würfelt (nur bei Proben für eine Figur) */
   function probeWer(A, fid) {
@@ -255,7 +267,7 @@
     A.lagerZust = JSON.parse(JSON.stringify(A.zust)); A.lagerSzene = A.szene;
     // Hardcore: Wer gefallen ist, wählt am Lagerfeuer eine neue Figur
     A.ersatzOffen = A.gruppe.filter((f) => A.zust[f].tot);
-    notiz(A, `Lagerfeuer: lange Rast${A.glocke >= 3 ? " (das Flüstern lässt niemanden ganz schlafen: TP bis ¾)" : ""}. Gespeichert.`, "gut");
+    notiz(A, `Lagerfeuer: lange Rast${A.glocke >= 3 ? ` (${metaVon(A.abenteuer).uhr.unruhe || "das Flüstern lässt niemanden ganz schlafen"}: TP bis ¾)` : ""}. Gespeichert.`, "gut");
   }
   /** Kurze Rast zwischen Kämpfen (nur Normal): halbe fehlende TP, Glocke schlägt */
   function kurzeRast(A) {
@@ -280,7 +292,7 @@
     const s = szene(A); if (s.art !== "raetsel") return { fehler: "Hier gibt es kein Rätsel." };
     if (!s.glocken.some((g) => g.id === glockeId)) return { fehler: "Diese Glocke gibt es nicht." };
     A.raetsel.folge.push(glockeId);
-    notiz(A, `Ihr schlagt die Glocke „${s.glocken.find((g) => g.id === glockeId).name}“.`);
+    notiz(A, `${s.tippText || "Ihr schlagt die Glocke"} „${s.glocken.find((g) => g.id === glockeId).name}“.`);
     if (A.raetsel.folge.length < s.loesung.length) return { ok: true };
     if (A.raetsel.folge.join() === s.loesung.join()) { notiz(A, s.richtig, "gut"); wirke(A, s.erfolg); ziel(A, s.erfolg); return { ok: true, geloest: true }; }
     A.merker[A.szene + "_fehl"] = (A.merker[A.szene + "_fehl"] || 0) + 1; A.raetsel.folge = [];
@@ -355,7 +367,7 @@
   /* ---------- Kampf ---------- */
   /** Anführer je Kampfszene einmal festlegen (beim Betreten, damit die Vorschau ihn schon kennt) */
   function anfuehrerFestlegen(A, k) {
-    if (k.gegner || k.boss) return false;
+    if (k.gegner || k.boss || k.keinAnfuehrer) return false;
     const key = "anfuehrer_" + A.szene; if (A.merker[key] == null) A.merker[key] = A.r() < 0.33;
     return A.merker[key];
   }
@@ -365,7 +377,7 @@
     const k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
     const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit }, k, { mischen: false, anfuehrer: false });
     if (A.kampfMod) o.skalaMal = (o.skalaMal || 1) * A.kampfMod;
-    const st = R.neuesSpiel(1, o), arten = [], W = DATEN().WISSEN || {};
+    const st = R.neuesSpiel(1, o), arten = [], W = DATEN(A).WISSEN || {};
     for (const g of R.gegnerFiguren(st)) {
       let a = arten.find((x) => x.art === g.art);
       if (!a) {
@@ -417,7 +429,7 @@
       return { ok: true, ergebnis: "rueckzug" }; // gleiche Szene beginnt neu
     }
     for (const fid of A.gruppe) A.zust[fid].tot = true;
-    geheZu(A, DATEN().NIEDERLAGE);
+    geheZu(A, DATEN(A).NIEDERLAGE);
     return { ok: true, ergebnis: "niederlage" };
   }
 
@@ -427,14 +439,14 @@
     return {
       dialog: (A.dialog && A.dialog[A.szene]) || [],
       szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || A.abschnitt || 1, text: text(A), antwort: A.antwort || null,
-      glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit,
-      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: o.probe.sg } : null, weiter: Boolean(o.weiter) })),
+      glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
+      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: sgVon(A, o.probe) } : null, weiter: Boolean(o.weiter) })),
       stimmen: s.art === "wahl" ? A.stimmen : null,
       geheimFrage: s.art === "geheim" ? { frage: typeof s.frage === "string" ? s.frage : "Jede Person entscheidet für sich.", antworten: Array.isArray(s.antworten) ? s.antworten.map((a) => ({ id: a.id, text: a.text })) : [],
         proFigur: Object.fromEntries(lebende(A).map((f) => { const q = geheimFuer(A, f); return [f, { frage: q.frage, antworten: q.antworten.map((a) => ({ id: a.id, text: a.text })) }]; })), fertig: Object.keys(A.geheim) } : null,
       probe: p ? { name: p.name, attr: p.attr, sg: p.sg, wer: pz.wer, wuerfe: pz.wuerfe, gruppe: pz.wer === "gruppe",
         boni: Object.fromEntries(lebende(A).map((f) => [f, bonus(A, f, p).wert])), ergebnis: A.ergebnis } : null,
-      raetsel: s.art === "raetsel" ? { glocken: s.glocken, folge: A.raetsel.folge, fehl: A.merker[A.szene + "_fehl"] || 0, laenge: s.loesung.length, hinweise: raetselHinweise(A) } : null,
+      raetsel: s.art === "raetsel" ? { symbol: s.symbol || "glocke", hinweisName: s.hinweisName || "Grabplatte", glocken: s.glocken, folge: A.raetsel.folge, fehl: A.merker[A.szene + "_fehl"] || 0, laenge: s.loesung.length, hinweise: raetselHinweise(A) } : null,
       ersatz: (A.ersatzOffen || []).length ? { offen: A.ersatzOffen, frei: freieFiguren(A) } : null,
       reliquie: reliquieTraeger(A) ? { traeger: reliquieTraeger(A), gefallen: A.gruppe.filter((f) => A.zust[f].tot) } : null,
       beute: A.beute ? { dinge: A.beute.dinge.map((id) => Object.assign({ id }, R.GEGENSTAENDE[id])), max: MAX_GETRAGEN,
@@ -447,7 +459,7 @@
   function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
   function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
 
-  const API = { wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { metaVon, datenVon, wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, gegnerVorschau, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

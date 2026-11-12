@@ -46,7 +46,18 @@
   const SCHWER = 5; // Kodex-Seite „Wie hart soll es werden?“ (danach „Wie spielt ihr?“)
   let nachIntro = null;
   const introFertig = () => { const cb = nachIntro; nachIntro = null; if (cb) cb(); else AB.zeigeIntro(); };
-  const einl = seiten("#einleitung", "#einl-punkte", "#einl-weiter", null, introFertig);
+  let einl = seiten("#einleitung", "#einl-punkte", "#einl-weiter", null, introFertig);
+  // Texte je Abenteuer: Einleitung und die Kodex-Seite zur „Uhr“ (Glocke, Lichter …). Grauwacht steht im HTML und bleibt als Vorlage erhalten.
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const EINL_ORIG = $("#einleitung .seiten").innerHTML, uhrSeite = $('#kodex .seite[data-seite="3"]'), UHR_ORIG = uhrSeite ? uhrSeite.innerHTML : "";
+  (() => { const v = document.createElement("div"); v.id = "einl-grauwacht"; v.hidden = true; v.innerHTML = EINL_ORIG; document.body.appendChild(v); })();
+  function abenteuerTexte(m) {
+    const e = $("#einleitung .seiten");
+    e.innerHTML = m && m.einleitung ? m.einleitung.map((p, i) => `<article class="seite" data-seite="${i}"${i ? " hidden" : ""}><p class="eyebrow">${esc(p.eyebrow || "")}</p><h2>${esc(p.titel)}</h2>${p.text.map((t) => `<p>${esc(t)}</p>`).join("")}</article>`).join("") : EINL_ORIG;
+    einl = seiten("#einleitung", "#einl-punkte", "#einl-weiter", null, introFertig);
+    if (uhrSeite) uhrSeite.innerHTML = m && m.kodexUhr ? `<h2>${esc(m.kodexUhr.titel)}</h2><div class="kodex-glocke${m.uhr && m.uhr.klasse ? " " + m.uhr.klasse : ""}" aria-hidden="true"><i class="an"></i><i class="an"></i><i class="an"></i><i></i><i></i><i></i><i></i></div>${m.kodexUhr.text.map((t) => `<p>${t}</p>`).join("")}` : UHR_ORIG;
+  }
+  if (AB.META && AB.SETUP().abenteuer && AB.SETUP().abenteuer !== "grauwacht") abenteuerTexte(AB.META());
   const kodex = seiten("#kodex", "#kodex-punkte", "#kodex-weiter", "#kodex-zurueck", (zurueckAmAnfang) => { if (zurueckAmAnfang === true) kodex.start(SCHWER); });
 
   $("#titel-start").onclick = () => { glocke(1); AB.zeigeSektion("kodex"); kodex.start(0); };
@@ -107,5 +118,5 @@
 
   /** Intro (Einleitung) zeigen und danach cb – kommt nach der Heldenwahl, direkt vor dem Abenteuer */
   function intro(cb) { nachIntro = cb; glocke(0.8); AB.zeigeSektion("einleitung"); einl.start(0); }
-  window.ABE = { glocke, intro };
+  window.ABE = { glocke, intro, abenteuerTexte };
 })();

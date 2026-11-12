@@ -38,7 +38,7 @@
   /* ---------- Titelkarte beim Wechsel in einen neuen Abschnitt ---------- */
   function titelkarte(n, fertig) {
     const el = document.createElement("div"); el.className = "titelkarte"; el.setAttribute("role", "presentation");
-    el.innerHTML = `<div><p class="eyebrow">Abschnitt ${n}</p><h2>${esc(ABSCHNITTE[n] || "")}</h2><span class="titel-zier" aria-hidden="true"></span></div>`;
+    el.innerHTML = `<div><p class="eyebrow">Abschnitt ${n}</p><h2>${esc(((A && S.metaVon(A.abenteuer).abschnitte_namen) || ABSCHNITTE)[n] || "")}</h2><span class="titel-zier" aria-hidden="true"></span></div>`;
     document.body.appendChild(el);
     if (window.ABE) window.ABE.glocke(n === 3 ? 1 : 0.7);
     let weg = false; const schliessen = () => { if (weg) return; weg = true; el.classList.add("aus"); setTimeout(() => { el.remove(); if (fertig) fertig(); }, 700); };
@@ -54,7 +54,7 @@
     geheim: "Geheime Entscheidung: Jede Person entscheidet ganz allein. Niemand am Tisch erfährt, wie die anderen entschieden haben.",
     kampf: "Kampf: Gleich wechselt ihr auf die Karte. Wer dran ist, läuft so weit, wie die Figur kann (Krieger 3, Zauberer und Kleriker 4, Schurken und Waldläufer 5 Felder), macht eine Aktion und eine Bonusaktion, dann „Zug beenden“. Der Knopf „💡 Tipp“ schlägt einen sinnvollen Zug vor.",
     lager: "Lagerfeuer: Ihr ruht, heilt vollständig und bekommt eure Zauberplätze zurück. Das Spiel speichert hier.",
-    raetsel: "Rätsel: Lest euch gegenseitig vor, was auf euren Handys steht. Dann schlagt die Glocken am Tisch in der richtigen Reihenfolge an. Jeder falsche Versuch lässt die Glocke von Grauwacht schlagen.",
+    raetsel: "Rätsel: Lest euch gegenseitig vor, was auf euren Handys steht. Dann tippt am Tisch die richtige Reihenfolge an. Jeder falsche Versuch kostet Zeit: Die Uhr des Abenteuers (Glocke, Lichter) rückt vor.",
   };
 
   const live = () => AB.liveAn();
@@ -65,8 +65,9 @@
   function phase(p) { if (live()) AB.LIVE.phase = p; }
 
   function start(setup) {
-    if (setup.gruppe.length < 3) return;
-    A = S.neu(Math.floor(Math.random() * 1e9), { gruppe: setup.gruppe, schwierigkeit: setup.schwierigkeit });
+    const id = setup.abenteuer || "grauwacht";
+    if (setup.gruppe.length < S.metaVon(id).min) return;
+    A = S.neu(Math.floor(Math.random() * 1e9), { gruppe: setup.gruppe, schwierigkeit: setup.schwierigkeit, abenteuer: id });
     merken();
     if (window.KAMPAGNE) window.KAMPAGNE.abenteuerBegonnen();
     zeige();
@@ -81,7 +82,7 @@
   }
 
   /* ---------- Darstellung ---------- */
-  function glockeHtml(n) { return `<span class="glocke" title="Die Glocke hat ${n}× geschlagen">${Array.from({ length: 7 }, (_, i) => `<i class="${i < n ? "an" : ""}"></i>`).join("")}<small>Glocke ${n}/7</small></span>`; }
+  function glockeHtml(n) { const u = A ? S.metaVon(A.abenteuer).uhr : { name: "Glocke" }; return `<span class="glocke${u.klasse ? " " + u.klasse : ""}" title="${esc(u.name)}: ${n} von 7">${Array.from({ length: 7 }, (_, i) => `<i class="${i < n ? "an" : ""}"></i>`).join("")}<small>${esc(u.name)} ${n}/7</small></span>`; }
   function gruppeHtml() {
     return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
       const dinge = (z.rucksack || []).filter((x) => R.GEGENSTAENDE[x.id] && x.n > 0).map((x) => `<i title="${esc(R.GEGENSTAENDE[x.id].name)}: ${esc(R.GEGENSTAENDE[x.id].text)}">${R.GEGENSTAENDE[x.id].sym}</i>`).join("");
@@ -111,7 +112,7 @@
   function chronikSchreiben(s) {
     if (A.chronik) return; A.chronik = true; merken();
     const n = (fid) => (F.FIGUREN[fid] ? F.FIGUREN[fid].name : fid), m = A.merker;
-    const e = { zeit: Date.now(), ende: s.titel, szene: A.szene, schwierigkeit: A.schwierigkeit, glocke: A.glocke,
+    const e = { zeit: Date.now(), abenteuer: A.abenteuer || "grauwacht", ende: s.titel, szene: A.szene, schwierigkeit: A.schwierigkeit, glocke: A.glocke,
       gruppe: A.gruppe.map(n), gefallen: A.gefallen.map(n), hueter: m.hueter ? n(m.hueter) : m.verrat_opfer ? n(m.verrat_opfer) : A.szene === "ende_kobold" ? "Nisk" : A.szene === "ende_waechter" ? "Anselm" : null,
       splitter: Boolean(m.splitter), tam: Boolean(m.tam_gerettet) };
     const c = chronik(); c.unshift(e); try { localStorage.setItem(CHRONIK, JSON.stringify(c.slice(0, 50))); } catch (x) { /* privat */ }
@@ -124,9 +125,9 @@
   }
   function chronikZeigen() {
     const o = $("#qr-overlay"), c = chronik();
-    const zeile = (e) => `<li><b>${esc(e.ende)}</b> <span class="note">${new Date(e.zeit).toLocaleDateString("de-DE")} · ${e.schwierigkeit === "hardcore" ? "Hardcore" : "Normal"} · Glocke ${e.glocke}/7</span><br>
+    const zeile = (e) => `<li><b>${esc(e.ende)}</b> <span class="note">${new Date(e.zeit).toLocaleDateString("de-DE")} · ${e.schwierigkeit === "hardcore" ? "Hardcore" : "Normal"}${e.abenteuer && e.abenteuer !== "grauwacht" ? "" : ` · Glocke ${e.glocke}/7`}</span><br>
       ${esc(e.gruppe.join(", "))}${e.gefallen.length ? `<br><span class="schlecht">Gefallen: ${esc(e.gefallen.join(", "))}</span>` : ""}${e.hueter ? `<br>Hüter von Grauwacht: ${esc(e.hueter)}` : ""}${e.splitter ? "<br>✦ Splitter von Grauwacht im Gepäck" : ""}${e.tam ? "<br>Tam kam nach Hause." : ""}</li>`;
-    o.innerHTML = `<div class="karte-box chronik"><h2>Chronik von Grauwacht</h2><ol>${c.map(zeile).join("")}</ol><button class="btn" id="chronik-zu">Schließen</button></div>`;
+    o.innerHTML = `<div class="karte-box chronik"><h2>Chronik</h2><ol>${c.map(zeile).join("")}</ol><button class="btn" id="chronik-zu">Schließen</button></div>`;
     o.hidden = false; $("#chronik-zu").onclick = () => { o.hidden = true; };
   }
 
@@ -194,7 +195,7 @@
   }
   function raetselHtml(v) {
     const r = v.raetsel, n = r.folge.length;
-    let h = `<div class="joch">${r.glocken.map((g) => `<button class="glockenknopf" data-glocke="${g.id}"><svg viewBox="0 0 60 70" aria-hidden="true"><path d="M30 6 C14 6 12 24 12 36 L8 52 H52 L48 36 C48 24 46 6 30 6Z" fill="#b08850" stroke="#5a4020" stroke-width="2"/><circle cx="30" cy="58" r="5" fill="#5a4020"/></svg><b>${esc(g.name)}</b></button>`).join("")}</div>`;
+    let h = `<div class="joch">${r.glocken.map((g) => `<button class="glockenknopf" data-glocke="${g.id}"><svg viewBox="0 0 60 70" aria-hidden="true">${r.symbol === "laterne" ? `<path d="M22 10 H38 L42 18 H18 Z" fill="#3a3326" stroke="#1c180f" stroke-width="2"/><rect x="18" y="18" width="24" height="34" rx="4" fill="${g.farbe || "#cfe8a8"}" fill-opacity=".85" stroke="#3a3326" stroke-width="3"/><path d="M30 24 Q24 34 30 44 Q36 34 30 24Z" fill="#fff8d0" opacity=".9"/><rect x="16" y="52" width="28" height="6" rx="2" fill="#3a3326"/><path d="M30 4 V10" stroke="#3a3326" stroke-width="3"/>` : `<path d="M30 6 C14 6 12 24 12 36 L8 52 H52 L48 36 C48 24 46 6 30 6Z" fill="#b08850" stroke="#5a4020" stroke-width="2"/><circle cx="30" cy="58" r="5" fill="#5a4020"/>`}</svg><b>${esc(g.name)}</b></button>`).join("")}</div>`;
     h += `<p class="note">Angeschlagen: ${n ? r.folge.map((id) => `<b>${esc(r.glocken.find((g) => g.id === id).name)}</b>`).join(" → ") : "noch keine"} (${n} von ${r.laenge})${r.fehl ? ` · Fehlversuche: ${r.fehl}` : ""}</p>`;
     if (!live()) h += `<div class="platten">${Object.entries(r.hinweise).map(([fid, hs]) => hs.map((t) => `<blockquote class="platte"><small>${esc(F.FIGUREN[fid].name)} liest:</small>${fett(t)}</blockquote>`).join("")).join("")}</div>`;
     else {
@@ -255,7 +256,7 @@
     if (s.art === "lager" && v.aufstieg) return aufstiegHtml(v) + interaktion(Object.assign({}, v, { aufstieg: null }), s);
     if (s.art === "erzaehlung" || s.art === "lager") {
       const rast = s.rastErlaubt && A.schwierigkeit === "normal" && !A.merker["kurz_" + (s.abschnitt || 1)];
-      return `<div class="knoepfe"><button class="btn" id="sz-weiter">Weiter</button>${rast ? `<button class="btn ghost" id="sz-rast" title="Halbe fehlende TP zurück. Die Glocke schlägt.">Kurze Rast (Glocke +1)</button>` : ""}</div>`;
+      return `<div class="knoepfe"><button class="btn" id="sz-weiter">Weiter</button>${rast ? `<button class="btn ghost" id="sz-rast" title="Halbe fehlende TP zurück. ${esc(S.metaVon(A.abenteuer).uhr.mehr)}">Kurze Rast (${esc(S.metaVon(A.abenteuer).uhr.name)} +1)</button>` : ""}</div>`;
     }
     if (s.art === "gespraech") {
       const fragen = v.optionen.filter((o) => !o.weiter), weiter = v.optionen.filter((o) => o.weiter);
@@ -279,7 +280,7 @@
         ${th.length ? `<p class="note">Für die Helden, die der Tisch steuert, entscheidet ihr hier gemeinsam:</p>${th.map((fid) => `${gleich ? "" : `<p class="geheim-frage"><b>${esc(F.FIGUREN[fid].name)}:</b> ${esc(pf(fid).frage)}</p>`}<div class="opt-zeile">${B.marke(fid, 28)} <span>🎲 ${esc(F.FIGUREN[fid].name)}</span>${pf(fid).antworten.map((a) => `<button class="btn ${A.geheim[fid] === a.id ? "" : "ghost"} klein" data-geheim="${fid}:${a.id}">${esc(a.text)}</button>`).join("")}</div>`).join("")}` : ""}`;
     }
     if (s.art === "kampf") return `${vorschauHtml(v)}<div class="knoepfe"><button class="btn" id="sz-kampf">Zum Kampf</button></div>`;
-    if (s.art === "ende") return `<p class="note">Dieses Ende steht jetzt in eurer Chronik${A.merker.splitter ? ", zusammen mit dem Splitter von Grauwacht" : ""}. Ihr findet sie auf der Startseite.</p><div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
+    if (s.art === "ende") return `<p class="note">Dieses Ende steht jetzt in eurer Chronik${A.merker.splitter && A.abenteuer !== "rabenmoor" ? ", zusammen mit dem Splitter von Grauwacht" : ""}. Ihr findet sie auf der Startseite.</p><div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
     return "";
   }
   function binde(el, v, s) {
@@ -322,7 +323,7 @@
   function kampfFertig(st) {
     const e = S.kampfEnde(A, st);
     merken();
-    if (e.ergebnis === "rueckzug") AB.toast("Rückzug zum Lagerfeuer. Die Glocke schlägt.");
+    if (e.ergebnis === "rueckzug") AB.toast("Rückzug zum Lagerfeuer. " + (S.metaVon(A.abenteuer).uhr.rueckzug || ""));
     zeige();
   }
 
@@ -371,5 +372,5 @@
     /** Abenteuer auf diesem Gerät vergessen */
     verwerfen: () => { A = null; verstummen(); try { localStorage.removeItem(KEY); } catch (e) { /* privat */ } },
     /** Kurzinfo für die Kampagnen-Bibliothek */
-    info: () => { if (!A) return null; const s = S.szene(A); return { titel: s.titel, szene: A.szene, art: s.art, abschnitt: s.abschnitt || A.abschnitt || 1, stufe: A.stufe, schwierigkeit: A.schwierigkeit, glocke: A.glocke, gruppe: A.gruppe.slice() }; } };
+    info: () => { if (!A) return null; const s = S.szene(A); return { abenteuer: A.abenteuer || "grauwacht", titel: s.titel, szene: A.szene, art: s.art, abschnitt: s.abschnitt || A.abschnitt || 1, stufe: A.stufe, schwierigkeit: A.schwierigkeit, glocke: A.glocke, gruppe: A.gruppe.slice() }; } };
 })();

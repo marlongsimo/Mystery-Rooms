@@ -195,7 +195,13 @@
   const HUB = "mythara_hub";
   const toast = (t) => window.AB && window.AB.toast(t);
   const imHub = () => { let g = null; try { g = sessionStorage.getItem(HUB); } catch (e) { /* privat */ } return Boolean((profil && profil.konto) || g); };
-  const bildAbschnitt = (n) => `img/mythara/abschnitt-${[1, 2, 3].includes(+n) ? +n : 1}.webp`;
+  const bildAbschnitt = (n, ab) => (ab && ab !== "grauwacht" ? (window.ABS.metaVon(ab).bilder ? `img/${ab}/abschnitt-${[1, 2].includes(+n) ? +n : 1}.webp` : "img/mythara/karte-kampagnen.webp") : `img/mythara/abschnitt-${[1, 2, 3].includes(+n) ? +n : 1}.webp`);
+  /** Bild mit Ersatz, solange für ein neues Abenteuer noch keine Bilder da sind */
+  const BILD_ERSATZ = `onerror="this.onerror=null;this.src='img/mythara/karte-kampagnen.webp'"`;
+  /** Alle Abenteuer (aus daten/*.js), Grauwacht zuerst */
+  const ABENTEUER = () => Object.values(window.ABD_ALLE || {}).map((d) => window.ABS.metaVon(d.META ? d.META.id : "grauwacht")).sort((a, b) => (a.id === "grauwacht" ? -1 : b.id === "grauwacht" ? 1 : 0));
+  const titelbild = (m) => (m.bild || "img/mythara/karte-kampagnen.webp");
+  const abenteuerKachel = (m, attr) => `<button class="hub-kachel welt" ${attr}="${m.id}"><img src="${titelbild(m)}" alt="" ${BILD_ERSATZ}><b>${esc(m.titel)}</b><small>${esc(m.kurztext || "")} Stufe ${esc(m.stufen || "1–3")} · ${m.min}–${m.max} Helden.</small>${attr === "data-welt" ? `<span class="hub-mehr">Zur Beschreibung →</span>` : ""}</button>`;
   const vor = (t) => {
     const s = Math.max(0, (Date.now() - new Date(t).getTime()) / 1000);
     if (s < 90) return "gerade eben"; if (s < 3600) return `vor ${Math.round(s / 60)} Minuten`; if (s < 86400) return `vor ${Math.round(s / 3600)} Stunden`;
@@ -240,17 +246,27 @@
     if (!abenteuer) {
       seiteZeigen("welt", `<h1 class="hub-gruss">Kampagnenwelt</h1><p class="hub-untertitel">Die Splitterlande – und die Abenteuer, die dort auf euch warten.</p>
         <div class="hub-welt-liste">
-          <button class="hub-kachel welt" data-welt="grauwacht"><img src="img/mythara/karte-kampagnen.webp" alt=""><b>Das Siegel von Grauwacht</b><small>Eine alte Abtei, ein vergessenes Siegel und eine Glocke, die seit sieben Nächten läutet. Das erste Abenteuer in Mythara.</small><span class="hub-mehr">Zur Beschreibung →</span></button>
+          ${ABENTEUER().map((m) => abenteuerKachel(m, "data-welt")).join("")}
           <div class="hub-kachel welt bald" aria-disabled="true"><b>Weitere Abenteuer</b><small>sind in Vorbereitung.</small></div>
         </div>`);
+      return;
+    }
+    if (abenteuer !== "grauwacht") {
+      const m = window.ABS.metaVon(abenteuer);
+      seiteZeigen("welt", `<button class="hub-zurueck klein" data-welt="">← Alle Abenteuer</button>
+        <h1 class="hub-gruss">${esc(m.titel)}</h1><p class="hub-untertitel">${esc(m.untertitel || "")}</p>
+        <img class="hub-welt-bild" src="${titelbild(m)}" alt="" ${BILD_ERSATZ}>
+        <ul class="hub-fakten"><li><b>${m.min}–${m.max}</b> Heldinnen und Helden</li><li><b>${esc(m.dauer || "")}</b></li><li><b>${esc(m.abschnitte || 2)}</b> Abschnitte</li><li><b>${esc(m.enden || 4)}</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
+        <div class="hub-text einleitung">${(m.einleitung || []).map((p) => `<article class="seite"><p class="eyebrow">${esc(p.eyebrow || "")}</p><h2>${esc(p.titel)}</h2>${p.text.map((t) => `<p>${esc(t)}</p>`).join("")}</article>`).join("")}</div>
+        <button class="my-knopf rot hub-welt-start" data-neu-start="${m.id}">Kampagne starten</button>`);
       return;
     }
     seiteZeigen("welt", `<button class="hub-zurueck klein" data-welt="">← Alle Abenteuer</button>
       <h1 class="hub-gruss">Das Siegel von Grauwacht</h1><p class="hub-untertitel">Das erste Abenteuer in den Splitterlanden</p>
       <img class="hub-welt-bild" src="img/mythara/karte-kampagnen.webp" alt="">
       <ul class="hub-fakten"><li><b>3–6</b> Heldinnen und Helden</li><li>etwa <b>3 Stunden</b></li><li><b>3</b> Abschnitte</li><li><b>5</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
-      <div class="hub-text einleitung">${kopie("#einleitung .seite")}</div>
-      <button class="my-knopf rot hub-welt-start" data-hub="neu">Kampagne starten</button>`);
+      <div class="hub-text einleitung">${kopie("#einl-grauwacht .seite")}</div>
+      <button class="my-knopf rot hub-welt-start" data-neu-start="grauwacht">Kampagne starten</button>`);
   }
 
   function zeigeHub() {
@@ -376,16 +392,14 @@
   /** Neue Kampagne: zuerst das Abenteuer wählen. Name und Freunde kommen später im Einladen-Schritt (Spieltisch + Handys). */
   function neueKampagne() {
     const o = fenster("Neue Kampagne starten", `<p class="note">Welches Abenteuer wollt ihr spielen?</p>
-      <div class="hub-welt-liste neu-wahl">
-        <button class="hub-kachel welt" data-neu-abenteuer="grauwacht"><img src="img/mythara/karte-kampagnen.webp" alt=""><b>Das Siegel von Grauwacht</b><small>Eine alte Abtei, ein vergessenes Siegel und eine Glocke, die seit sieben Nächten läutet. Stufe 1–3 · 3–6 Helden.</small></button>
-        <div class="hub-kachel welt bald" aria-disabled="true"><b>Weitere Abenteuer</b><small>sind in Vorbereitung.</small></div>
-      </div>`);
-    o.querySelector("[data-neu-abenteuer]").onclick = () => {
-      o.hidden = true;
-      // eine angefangene, aber nie gespielte Kampagne nicht versehentlich weiterverwenden
-      if (window.KAMPAGNE && window.KAMPAGNE.vergessenWennLeer) window.KAMPAGNE.vergessenWennLeer();
-      neuesAbenteuer();
-    };
+      <div class="hub-welt-liste neu-wahl">${ABENTEUER().map((m) => abenteuerKachel(m, "data-neu-abenteuer")).join("")}</div>`);
+    o.querySelectorAll("[data-neu-abenteuer]").forEach((b) => { b.onclick = () => { o.hidden = true; abenteuerStarten(b.dataset.neuAbenteuer); }; });
+  }
+  function abenteuerStarten(id) {
+    // eine angefangene, aber nie gespielte Kampagne nicht versehentlich weiterverwenden
+    if (window.KAMPAGNE && window.KAMPAGNE.vergessenWennLeer) window.KAMPAGNE.vergessenWennLeer();
+    if (window.AB.abenteuerWaehlen) window.AB.abenteuerWaehlen(id);
+    neuesAbenteuer();
   }
   function profilAktion(was) {
     const m = $("#hub-menue"); if (m) m.hidden = true;
@@ -425,7 +439,7 @@
     const offen = liste.filter((c) => ["geplant", "aktiv", "pausiert"].includes(c.status)).slice(0, 4);
     const zuletzt = liste.filter((c) => c.version > 0).slice(0, 3);
     const zeile = (c, mitKnopf) => { const i = c.checkpoint || {}, host = c.role === "host";
-      return `<li><img src="${bildAbschnitt(i.abschnitt)}" alt=""><div><b>${esc(c.title)}</b><small>${mitKnopf ? (host ? "Host" : c.role === "tisch" ? "Spieltisch" : "Mitspieler") + (i.titel ? " · " + esc(i.titel) : "") : esc(vor(c.updated_at)) + (c.status === "abgeschlossen" ? " · abgeschlossen" : "")}</small></div>${mitKnopf ? `<button class="hub-play" data-play="${c.id}" aria-label="${esc(c.title)} ${host ? "fortsetzen" : "beitreten"}" title="${host ? (c.version ? "Fortsetzen" : "Beginnen") : "Am Spieltisch beitreten"}">▶</button>` : ""}</li>`; };
+      return `<li><img src="${bildAbschnitt(i.abschnitt, i.abenteuer)}" alt="" ${BILD_ERSATZ}><div><b>${esc(c.title)}</b><small>${mitKnopf ? (host ? "Host" : c.role === "tisch" ? "Spieltisch" : "Mitspieler") + (i.titel ? " · " + esc(i.titel) : "") : esc(vor(c.updated_at)) + (c.status === "abgeschlossen" ? " · abgeschlossen" : "")}</small></div>${mitKnopf ? `<button class="hub-play" data-play="${c.id}" aria-label="${esc(c.title)} ${host ? "fortsetzen" : "beitreten"}" title="${host ? (c.version ? "Fortsetzen" : "Beginnen") : "Am Spieltisch beitreten"}">▶</button>` : ""}</li>`; };
     // Abenteuer, das nur in diesem Browser liegt (ohne Kampagne, z. B. vor der Einführung der Kampagnen)
     const lokal = window.ABT && window.ABT.gespeichert() && !(window.KAMPAGNE && window.KAMPAGNE.aktuell()) ? `<li id="hub-lokal"><img src="${bildAbschnitt(1)}" alt=""><div><b>Abenteuer in diesem Browser</b><small>Weiterspielen, wo ihr aufgehört habt</small></div><button class="hub-play" id="hub-lokal-play" aria-label="Abenteuer fortsetzen" title="Fortsetzen">▶</button></li>` : "";
     akt.innerHTML = lokal + (offen.length ? offen.map((c) => zeile(c, true)).join("") : lokal ? "" : `<li class="hub-leer">Noch keine laufende Kampagne. Starte eine neue!</li>`);
@@ -449,6 +463,7 @@
       const f = e.target.closest("[data-fid]"); if (f) return heldenSeite(window.ABF.FIGUREN[f.dataset.fid].klasse, f.dataset.fid);
     }
     const w = e.target.closest("[data-welt]"); if (w) return weltSeite(w.dataset.welt || null);
+    const ns = e.target.closest("[data-neu-start]"); if (ns) return abenteuerStarten(ns.dataset.neuStart);
     const h = e.target.closest("[data-hub]"); if (!h || $("#hub").hidden) { const m = $("#hub-menue"); if (m && !m.hidden && !e.target.closest(".hub-profil")) m.hidden = true; return; }
     const was = h.dataset.hub;
     if (was === "uebersicht") return zeigeHub();

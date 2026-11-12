@@ -27,7 +27,8 @@
   const rpc = (name, args) => window.AB.liveClient().rpc(name, args);
   const aktiv = () => Boolean(K && K.id && K.status !== "abgeschlossen" && K.status !== "archiviert");
   const toast = (t) => window.AB && window.AB.toast(t);
-  const titelVorschlag = () => { const d = new Date(); return `Grauwacht · ${d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })} ${d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}`; };
+  const meta = () => (window.AB.META ? window.AB.META() : { titel: "Das Siegel von Grauwacht", kurz: "Grauwacht" });
+  const titelVorschlag = () => { const d = new Date(); return `${meta().kurz || "Grauwacht"} · ${d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })} ${d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}`; };
 
   /* ---------- Statusanzeige ---------- */
   function zeigeStatus(art) {
@@ -68,7 +69,7 @@
   /* ---------- Speichern ---------- */
   function kurzinfo() {
     const i = window.ABT.info() || {};
-    return { titel: i.titel, szene: i.szene, abschnitt: i.abschnitt, stufe: i.stufe, schwierigkeit: i.schwierigkeit, glocke: i.glocke,
+    return { abenteuer: i.abenteuer || "grauwacht", titel: i.titel, szene: i.szene, abschnitt: i.abschnitt, stufe: i.stufe, schwierigkeit: i.schwierigkeit, glocke: i.glocke,
       gruppe: (i.gruppe || []).map((f) => (F.FIGUREN[f] || {}).name || f), live: window.AB.liveAn(), kampf: Boolean(window.AB.st) };
   }
   function art(meta) {
@@ -280,7 +281,7 @@
   /** Kampagne für diese Runde: eine schon angelegte leere weiterverwenden, sonst neu anlegen; dann mit dem Live-Raum verbinden */
   async function kampagneFuerRunde() {
     if (aktiv() && K.version === 0) { try { await sitzungStarten(); return; } catch (e) { /* gehört nicht (mehr) zu uns – neu anlegen */ } }
-    const setup = window.AB.SETUP(), titel = "Das Siegel von Grauwacht";
+    const setup = window.AB.SETUP(), titel = meta().titel || "Das Siegel von Grauwacht";
     const id = await rpc("rpg_create_campaign", { p_title: titel, p_difficulty: setup.schwierigkeit === "hardcore" ? "hardcore" : "normal", p_display_name: "Spieltisch" });
     K = { id, version: 0, status: "geplant", titel }; merkeK(); letzteMeta = null; letzteMitglieder = "";
     await sitzungStarten();

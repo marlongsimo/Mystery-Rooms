@@ -275,7 +275,7 @@
   }
   function tabSzene(ab, fid) {
     const fett = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
-    let h = `<div class="handy-szene"><p class="eyebrow">Abschnitt ${ab.abschnitt} · ${esc(ab.ort)} · Glocke ${ab.glocke}/7</p><h2>${esc(ab.titel)}</h2>`;
+    let h = `<div class="handy-szene"><p class="eyebrow">Abschnitt ${ab.abschnitt} · ${esc(ab.ort)} · ${esc((ab.uhr || {}).name || "Glocke")} ${ab.glocke}/7</p><h2>${esc(ab.titel)}</h2>`;
     const tot = ab.zust && ab.zust[fid] && ab.zust[fid].tot;
     if (ab.beute) return h + `<div class="info dran"><b>Beute!</b> Am Tisch entscheidet ihr gemeinsam, wer welchen Gegenstand bekommt:</div><ul class="faehig">${ab.beute.dinge.map((g) => `<li><b>${g.sym} ${esc(g.name)}</b><p>${esc(g.text)}</p></li>`).join("")}</ul></div>`;
     if (ab.aufstieg && ab.aufstieg.helden[fid]) { const a = ab.aufstieg.helden[fid]; h += `<div class="info dran"><b>Stufe ${ab.aufstieg.auf}!</b> ❤ ${a.tp[0]} → ${a.tp[1]} Trefferpunkte${a.neu.length ? "<br>Neu: " + a.neu.map((n) => esc(n.name)).join(", ") + " – siehe Fähigkeiten" : ""}</div>`; }
@@ -290,7 +290,7 @@
       h += `<div class="info dran"><b>${esc(q.frage)}</b><br><small>Nur du siehst deine Antwort.</small></div><div class="optionen">${q.antworten.map((a) => `<button class="opt ${meins === a.id ? "gewaehlt" : ""}" data-gantwort="${a.id}" ${H.warte ? "disabled" : ""}><b>${esc(a.text)}</b></button>`).join("")}</div>`;
     } else if (ab.raetsel) {
       const meine = (ab.raetsel.hinweise || {})[fid] || [];
-      h += `<div class="info dran"><b>Deine Grabplatte.</b> Lies sie den anderen vor. Am Tisch werden die Glocken angeschlagen.</div>${meine.map((t) => `<blockquote class="platte">${fett(t)}</blockquote>`).join("")}<p class="note">Angeschlagen: ${ab.raetsel.folge.length} von ${ab.raetsel.laenge}</p>`;
+      h += `<div class="info dran"><b>Dein Hinweis (${esc(ab.raetsel.hinweisName || "Grabplatte")}).</b> Lies ihn den anderen vor. Am Tisch wird die Reihenfolge angetippt.</div>${meine.map((t) => `<blockquote class="platte">${fett(t)}</blockquote>`).join("")}<p class="note">Angeschlagen: ${ab.raetsel.folge.length} von ${ab.raetsel.laenge}</p>`;
     } else if (ab.probe) {
       const p = ab.probe, b = p.boni[fid];
       h += `<div class="info"><b>${esc(p.name)}</b> gegen SG ${p.sg}${p.gruppe ? " · alle würfeln" : ""}. Dein Bonus: ${b >= 0 ? "+" : ""}${b}</div>`;
@@ -311,7 +311,7 @@
     const d = F.FIGUREN[fid];
     let h = "";
     if (s.phase !== "kampf") h += `<div class="info">Gleich geht's los. Der Tisch stellt die Gruppe zusammen und startet den Kampf.</div><button class="btn ghost breit" id="andere">Andere Figur wählen</button>`;
-    else if (s.ende) h += `<div class="info gross">${s.ende === "sieg" ? "Sieg!" : s.ende === "niederlage" ? "Grauwacht behält euch." : "Rückzug. Ihr versucht es noch einmal."}</div>`;
+    else if (s.ende) h += `<div class="info gross">${s.ende === "sieg" ? "Sieg!" : s.ende === "niederlage" ? (s.abenteuer && s.abenteuer.abenteuer === "rabenmoor" ? "Das Moor behält euch." : "Grauwacht behält euch.") : "Rückzug. Ihr versucht es noch einmal."}</div>`;
     else if (!fd) h += `<div class="info">Deine Figur ist in diesem Kampf nicht dabei.</div>`;
     else if (fd.tot) h += `<div class="info schlecht">${esc(d.name)} ist gefallen.</div>`;
     else if (fd.tp <= 0) h += `<div class="info schlecht">Du liegst am Boden. ${s.schwierigkeit === "hardcore" ? "Zu Beginn deines Zugs würfelt der Tisch deinen Todeswurf. " : ""}Nur Heilung oder Stabilisieren bringt dich zurück.</div>`;

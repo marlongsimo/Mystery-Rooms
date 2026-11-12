@@ -27,7 +27,9 @@
   const BEGEGNUNGEN = R.BEGEGNUNGEN;
   let gegnerInfo = null; // id des angetippten Gegners (Infokarte)
   let st = null, wahl = null, gegnerTimer = null, letzterLog = 0, kampfEnde = null, tipp = null, letzteTP = {};
-  let SETUP = { gruppe: [], stufe: 1, schwierigkeit: "normal", begegnung: "garten" };
+  let SETUP = { gruppe: [], stufe: 1, schwierigkeit: "normal", begegnung: "garten", abenteuer: "grauwacht" };
+  /** Kenndaten des gewählten Abenteuers (Titel, Mindestgröße der Gruppe, Texte) */
+  const META = () => (window.ABS && window.ABS.metaVon ? window.ABS.metaVon(SETUP.abenteuer) : { min: 3, gruppe: "Die Gemeinschaft von Grauwacht", aufbruch: "Aufbruch nach Halmbruck", niederlage: "Grauwacht behält euch", uhr: { rueckzug: "Die Glocke schlägt." } });
   try { const s = JSON.parse(localStorage.getItem(SETUP_KEY) || "null"); if (s && Array.isArray(s.gruppe)) SETUP = Object.assign(SETUP, s, { gruppe: s.gruppe.filter((f) => F.FIGUREN[f]).slice(0, 6) }); } catch (e) { /* privat */ }
   const setupMerken = () => { try { localStorage.setItem(SETUP_KEY, JSON.stringify(SETUP)); } catch (e) { /* privat */ } };
 
@@ -191,7 +193,7 @@
   /** Heldenwahl wie in einem Spiel: Gruppenplätze, Galerie mit Klassenfilter, große Vorstellung */
   function zeichneSetup() {
     const el = $("#lobby"); if (el.hidden) return;
-    const HL = window.ABH_HELDEN, n = SETUP.gruppe.length, live = liveAn();
+    const HL = window.ABH_HELDEN, n = SETUP.gruppe.length, live = liveAn(), MIN = META().min || 3;
     if (klasseSicht && (!fokus || !F.FIGUREN[fokus] || F.FIGUREN[fokus].klasse !== klasseSicht)) fokus = HL.vonKlasse(klasseSicht).find((f) => SETUP.gruppe.includes(f)) || HL.vonKlasse(klasseSicht)[0];
     if (!fokus || !F.FIGUREN[fokus]) fokus = SETUP.gruppe[n - 1] || F.REIHE[0];
     const namen = {}; if (live) for (const [fid, uid] of Object.entries(LIVE.besitz)) namen[fid] = spielerName(uid);
@@ -208,11 +210,11 @@
       : `<button class="btn gross held-knopf" id="f-waehlen" ${!an && n >= 6 ? "disabled" : ""}>${an ? "Aus der Gruppe nehmen" : n >= 6 ? "Die Gruppe ist voll" : `${esc(F.FIGUREN[fokus].name)} in die Gruppe`}</button>`;
     const handys = live ? LIVE.client.players.filter((p) => !p.is_host) : [];
     const status = live
-      ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Es spielen die Figuren der Handys${(SETUP.tisch || []).length ? ` und ${SETUP.tisch.length} vom Tisch gesteuerte` : ""}${n < 3 ? ` – mindestens 3, noch ${3 - n}. Zu wenige Handys? Lasst weitere Helden vom Tisch spielen` : ""}.`
-      : n < 3 ? `Wählt mindestens 3 Figuren – noch ${3 - n}.` : "Eine Person steuert alle Figuren auf diesem Gerät.";
+      ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Es spielen die Figuren der Handys${(SETUP.tisch || []).length ? ` und ${SETUP.tisch.length} vom Tisch gesteuerte` : ""}${n < MIN ? ` – mindestens ${MIN}, noch ${MIN - n}. Zu wenige Handys? Lasst weitere Helden vom Tisch spielen` : ""}.`
+      : n < MIN ? `Wählt mindestens ${MIN} Figuren – noch ${MIN - n}.` : "Eine Person steuert alle Figuren auf diesem Gerät.";
     const gegner = (() => { const g = R.gegnerFuer(SETUP.begegnung, Math.max(3, n), SETUP.stufe); return g.map((x) => `${x.anzahl} × ${R.GEGNER[x.art].name}${Math.abs(x.tpFaktor - 1) > 0.04 ? ` (${Math.round(R.GEGNER[x.art].tp * x.tpFaktor)} TP)` : ""}`).join(", "); })();
     el.innerHTML = `
-      <div class="wahl-kopf"><div><p class="eyebrow">Die Gemeinschaft von Grauwacht</p><h1>Wählt eure Helden</h1></div>${HL.plaetze(SETUP.gruppe, namen)}</div>
+      <div class="wahl-kopf"><div><p class="eyebrow">${esc(META().gruppe || META().titel)}</p><h1>Wählt eure Helden</h1></div>${HL.plaetze(SETUP.gruppe, namen)}</div>
       ${live ? beitrittBox() : ""}
       ${klasseSicht ? `${HL.klassenLeiste(klasseSicht)}
       <div class="wahl-body stufe2">
@@ -220,16 +222,16 @@
         <div class="wahl-detail">${HL.detail(fokus, 1, knopf)}</div>
       </div>` : `<p class="wahl-schritt"><b>Schritt 1 von 2:</b> Wählt eine Klasse. Darin stellen sich euch je drei Helden vor.</p>${HL.klassenWahl({ gruppe: SETUP.gruppe })}`}
       <div class="wahl-fuss">
-        <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (3–6)` : `Gruppe · ${n} von 3–6 Figuren`}</h2>
+        <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (${MIN}–6)` : `Gruppe · ${n} von ${MIN}–6 Figuren`}</h2>
         <p class="note">${status}</p>
         <div class="einstellungen"><div><span class="eyebrow">Schwierigkeit</span><div class="seg">${[["normal", "Normal"], ["hardcore", "Hardcore"]].map(([v, t]) => `<button data-schwer="${v}" class="${SETUP.schwierigkeit === v ? "an" : ""}">${t}</button>`).join("")}</div></div>
           <p class="note">${SETUP.schwierigkeit === "hardcore" ? "<b>Hardcore:</b> Wer fällt, würfelt um sein Leben. Tote bleiben tot." : "<b>Normal:</b> Am Boden ist das Schlimmste, was passieren kann."}</p></div>
-        <div class="knoepfe"><button class="btn gross" id="abenteuer-los" ${n < 3 ? "disabled" : ""}>Aufbruch nach Halmbruck</button>${live ? `<button class="btn ghost" id="lobby-ende">Sitzung beenden</button>` : `<button class="btn ghost" id="zurueck">Zurück</button>`}</div>
+        <div class="knoepfe"><button class="btn gross" id="abenteuer-los" ${n < MIN ? "disabled" : ""}>${esc(META().aufbruch || "Aufbrechen")}</button>${live ? `<button class="btn ghost" id="lobby-ende">Sitzung beenden</button>` : `<button class="btn ghost" id="zurueck">Zurück</button>`}</div>
         <details class="uebung"><summary>Übungskampf ohne Geschichte</summary>
           <div class="einstellungen">
             <div><span class="eyebrow">Stufe</span><div class="seg">${[1, 2, 3].map((s) => `<button data-stufe="${s}" class="${SETUP.stufe === s ? "an" : ""}">${s}</button>`).join("")}</div></div>
             <div><span class="eyebrow">Gegner</span><select id="begegnung">${Object.entries(BEGEGNUNGEN).map(([id, b]) => `<option value="${id}" ${SETUP.begegnung === id ? "selected" : ""}>${esc(b.name)} (Stufe ${b.stufe})</option>`).join("")}</select></div>
-            <button class="btn ghost" id="los" ${n < 3 ? "disabled" : ""}>Übungskampf beginnen</button>
+            <button class="btn ghost" id="los" ${n < MIN ? "disabled" : ""}>Übungskampf beginnen</button>
           </div>
           <p class="note">Gegner bei ${Math.max(3, n)} Figuren: ${gegner}. Die Gegner passen sich an die Gruppengröße an.</p>
         </details>
@@ -339,6 +341,9 @@
       const an = st && st.siegel && (st.siegel.find((z) => z.x === x && z.y === y) || {}).beruehrt;
       return `<g transform="translate(${cx} ${cy})" class="siegelstein${an ? " an" : ""}"><ellipse cy="24" rx="20" ry="5" fill="#000" opacity=".35"/>${an ? `<circle r="27" fill="#e8c46a" opacity=".22"/>` : ""}<path d="M-13 24 L-16 -14 L0 -27 L16 -14 L13 24 Z" fill="${an ? "#8a7a52" : "#4a4842"}" stroke="${an ? "#f0d488" : "#24231f"}" stroke-width="2.5"/><path d="M0 -16 V12 M-7 -6 L7 2 M7 -6 L-7 2" stroke="${an ? "#fff2c4" : "#8a96a8"}" stroke-opacity="${an ? 1 : 0.45}" stroke-width="2.4" stroke-linecap="round"/></g>`;
     }
+    // Moor: Wasser (versperrt den Weg, nicht die Sicht) und tote Bäume / Schilf (versperren beides)
+    if (t === "Q") return `<g><rect x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="#14262a"/><path d="M${x * Z + 8} ${y * Z + 20} q8 -5 16 0 t16 0 M${x * Z + 14} ${y * Z + 40} q8 -5 16 0 t16 0" stroke="#3f6f78" stroke-width="2" fill="none" opacity=".7"/></g>`;
+    if (t === "T") return `<g transform="translate(${cx} ${cy})"><ellipse cy="20" rx="20" ry="6" fill="#000" opacity=".3"/><path d="M-3 22 L-2 -6 L-14 -18 M-2 -2 L10 -20 M0 -10 L4 -26" stroke="#3b3326" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M-2 22 L-2 -6" stroke="#2a2418" stroke-width="7"/></g>`;
     if (t === "K") return `<g><rect x="${x * Z + 8}" y="${y * Z + 8}" width="${Z - 16}" height="${Z - 16}" fill="#6a4e30" stroke="#2e2014" stroke-width="2"/><path d="M${x * Z + 8} ${y * Z + 8}L${x * Z + Z - 8} ${y * Z + Z - 8}M${x * Z + Z - 8} ${y * Z + 8}L${x * Z + 8} ${y * Z + Z - 8}" stroke="#2e2014" stroke-width="2"/></g>`;
     if (t === "R") return `<g transform="translate(${cx} ${cy})"><path d="M-22 -22 Q0 -34 22 -22 L18 4 L-18 4 Z" fill="#8a6a2a" stroke="#3a2a10" stroke-width="2"/><path d="M0 4 V26" stroke="#b08850" stroke-width="4"/><circle cy="27" r="3" fill="#b08850"/></g>`;
     return `<g transform="translate(${cx} ${cy})"><circle r="24" fill="#6f6a60" stroke="#3b3a35" stroke-width="3"/><circle r="15" fill="#10161a"/><path d="M-10 -4 Q0 -10 10 -4" stroke="#3d5a6a" stroke-width="2" fill="none"/></g>`;
@@ -353,8 +358,8 @@
     const zs = spielerDran && wahl ? R.ziele(st, wahl) : [];
     let o = "";
     // Boden je Ort: Garten, Holzboden im Turm, Stein in Gruft und Schacht, Pilzkammer, Asche mit Glut
-    const n = k.name || "", boden = !n || /Garten/i.test(n) ? "garten" : /Turm/i.test(n) ? "holz" : /Pilz/i.test(n) ? "pilz" : /Asche/i.test(n) ? "asche" : "stein";
-    const farbe = (v) => ({ garten: `hsl(${95 + v * 60} 22% ${20 + v * 18}%)`, holz: `hsl(${26 + v * 30} 32% ${17 + v * 12}%)`, pilz: `hsl(${165 + v * 40} 20% ${12 + v * 12}%)`, asche: `hsl(${12 + v * 20} 7% ${12 + v * 12}%)`, stein: `hsl(${215 + v * 20} 7% ${16 + v * 14}%)` }[boden]);
+    const n = k.name || "", boden = k.boden ? k.boden : !n || /Garten/i.test(n) ? "garten" : /Turm/i.test(n) ? "holz" : /Pilz/i.test(n) ? "pilz" : /Asche/i.test(n) ? "asche" : "stein";
+    const farbe = (v) => ({ garten: `hsl(${95 + v * 60} 22% ${20 + v * 18}%)`, holz: `hsl(${26 + v * 30} 32% ${17 + v * 12}%)`, pilz: `hsl(${165 + v * 40} 20% ${12 + v * 12}%)`, asche: `hsl(${12 + v * 20} 7% ${12 + v * 12}%)`, stein: `hsl(${215 + v * 20} 7% ${16 + v * 14}%)`, moor: `hsl(${70 + v * 50} 24% ${15 + v * 14}%)` }[boden]);
     if (k.bild) {
       // Gemalte Karte: Bild als Boden, Raster nur auf begehbaren Feldern, leichte Vignette
       o += `<defs><radialGradient id="vignette" cx="50%" cy="50%" r="72%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient></defs>`;
@@ -367,6 +372,7 @@
       o += `<rect x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="${farbe(v)}"/>`;
       if (boden === "holz") o += `<path d="M${x * Z} ${y * Z + Z / 2}h${Z}" stroke="#000" stroke-opacity=".18"/>`;
       if (boden === "asche" && (x * 5 + y * 3) % 7 === 0) o += `<circle cx="${x * Z + 14 + (y % 3) * 9}" cy="${y * Z + 18 + (x % 3) * 8}" r="4" fill="#ff7a2a" opacity=".45"/>`;
+      if (boden === "moor" && (x * 5 + y * 7) % 6 === 0) o += `<path d="M${x * Z + 14 + (y % 3) * 8} ${y * Z + 46} q3 -12 1 -24 M${x * Z + 20 + (y % 3) * 8} ${y * Z + 46} q-2 -10 2 -18" stroke="#8a9a5a" stroke-width="2" fill="none" opacity=".5"/>`;
       if (boden === "pilz" && (x * 3 + y * 5) % 9 === 0) o += `<circle cx="${x * Z + 20}" cy="${y * Z + 34}" r="3" fill="#7fe0c0" opacity=".35"/>`;
     }
     if (/Siegel/i.test(n) && !k.bild) o += `<circle cx="${k.b * Z / 2}" cy="${k.h * Z / 2}" r="${Z * 3.2}" fill="none" stroke="#c8ccd8" stroke-opacity=".35" stroke-width="5"/><circle cx="${k.b * Z / 2}" cy="${k.h * Z / 2}" r="${Z * 2.9}" fill="none" stroke="#c8ccd8" stroke-opacity=".15" stroke-width="2"/>`;
@@ -505,10 +511,10 @@
     const text = st.ende === "sieg"
       ? `<h2>Sieg</h2><p>Die Gegner sind besiegt, nach ${st.runde} Runden.${tote.length ? ` Gefallen: ${tote.map((f) => esc(f.name)).join(", ")}.` : ""}</p>`
       : st.ende === "niederlage"
-        ? `<h2>Grauwacht behält euch</h2><p>Niemand ist mehr auf den Beinen. ${tote.length ? `Gefallen: ${tote.map((f) => esc(f.name)).join(", ")}.` : ""}</p>`
+        ? `<h2>${esc(META().niederlage || "Niederlage")}</h2><p>Niemand ist mehr auf den Beinen. ${tote.length ? `Gefallen: ${tote.map((f) => esc(f.name)).join(", ")}.` : ""}</p>`
         : `<h2>Rückzug</h2><p>Die Gruppe liegt am Boden und zieht sich zum Lagerfeuer zurück. Im echten Abenteuer verliert ihr nichts, ihr versucht es einfach noch einmal.</p>`;
     if (kampfEnde) {
-      const t2 = st.ende === "rueckzug" ? `<h2>Rückzug</h2><p>Die Gruppe schleppt sich zum letzten Lagerfeuer zurück. Die Glocke schlägt. Ihr versucht es noch einmal.</p>` : text;
+      const t2 = st.ende === "rueckzug" ? `<h2>Rückzug</h2><p>Die Gruppe schleppt sich zum letzten Lagerfeuer zurück. ${esc((META().uhr || {}).rueckzug || "")} Ihr versucht es noch einmal.</p>` : text;
       e.innerHTML = t2 + `<div class="knoepfe mitte"><button class="btn" id="weiter-abenteuer">Weiter</button></div>`;
       $("#weiter-abenteuer").onclick = () => { const cb = kampfEnde; kampfEnde = null; const s2 = st; st = null; window.AB.st = null; cb(s2); };
       return;
@@ -617,7 +623,7 @@
 
   function start(seed) {
     clearTimeout(gegnerTimer);
-    if (SETUP.gruppe.length < 3) { zeigeSetup(); return; }
+    if (SETUP.gruppe.length < Math.min(3, META().min)) { zeigeSetup(); return; }
     st = R.neuesSpiel(seed, { figuren: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, begegnung: BEGEGNUNGEN[SETUP.begegnung] ? SETUP.begegnung : "garten" });
     wahl = null; tipp = null; letzteTP = {}; letzterLog = st.log.length;
     window.AB.st = st;
@@ -694,7 +700,9 @@
   }
 
   // Für automatische Tests
-  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, liveClient, frueherSetzen, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
+  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, META, liveClient, frueherSetzen,
+    /** Neues Abenteuer wählen (Spielerseite → Neue Kampagne): Daten, Mindestgröße und Texte für Einleitung und Kodex */
+    abenteuerWaehlen(id) { SETUP.abenteuer = id || "grauwacht"; setupMerken(); if (window.ABE && window.ABE.abenteuerTexte) window.ABE.abenteuerTexte(META()); }, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
     liveAn, besitzVon: (fid) => (liveAn() ? LIVE.besitz[fid] : null), spielerName,
     besitzTauschen(alt, neu) { const i = SETUP.gruppe.indexOf(alt); if (i >= 0) SETUP.gruppe[i] = neu; if (LIVE.besitz[alt]) { LIVE.besitz[neu] = LIVE.besitz[alt]; delete LIVE.besitz[alt]; } if (LIVE.frueher[alt]) { LIVE.frueher[neu] = LIVE.frueher[alt]; delete LIVE.frueher[alt]; } setupMerken(); },
     auto() { if (st && !st.ende && R.aktiv(st).seite === "spieler") { R.autoZug(st); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); } } };

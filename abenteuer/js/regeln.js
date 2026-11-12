@@ -54,7 +54,7 @@
     reliquie: { name: "Reliquie der Brüder", sym: "✝", verbrauch: true, nurHardcore: true, text: "Nach einem Kampf, nicht währenddessen: holt eine gefallene Figur mit halben Trefferpunkten zurück. Einmal." },
     heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
-  const TIERE = new Set(["rostkaefer", "netzweber", "aschehund"]);
+  const TIERE = new Set(["rostkaefer", "netzweber", "aschehund", "schlammkroete"]);
   const GEGNER_TP = { wert: 1.05, zusatz: 1 }; // alle Gegner +5 % Leben; in Normal ein Gegner mehr je Kampf
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
@@ -83,6 +83,11 @@
     netzweber: { name: "Netzweber", tp: 26, rk: 14, werte: { STR: 14, GES: 16, KON: 12, INT: 2, WEI: 11, CHA: 4 }, angriff: { name: "Biss", bonus: 5, schaden: "1W10+3" }, netz: { bonus: 5, sg: 12, reichweite: 6 }, xp: 200 },
     aschehund: { name: "Aschehund", tp: 22, rk: 13, werte: { STR: 17, GES: 12, KON: 14, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Biss", bonus: 5, schaden: "1W8+3" }, atem: { schaden: "3W6", sg: 12, alle: 3 }, xp: 200 },
     abt: { name: "Valdric", tp: 70, rk: 14, werte: { STR: 14, GES: 12, KON: 16, INT: 18, WEI: 16, CHA: 18 }, angriff: { name: "Fluchhand", bonus: 6, schaden: "2W8", reichweite: 6 }, boss: true, bewegung: 3, atem: { schaden: "3W6", sg: 14, alle: 2 }, xp: 1100 },
+    // Das Moor der stummen Lichter
+    irrlicht: { name: "Irrlicht", tp: 6, rk: 14, werte: { STR: 1, GES: 18, KON: 10, INT: 6, WEI: 12, CHA: 10 }, angriff: { name: "Kalter Funke", bonus: 4, schaden: "1W6+1", reichweite: 4 }, bewegung: 6, xp: 25 },
+    moorleiche: { name: "Moorleiche", tp: 16, rk: 10, werte: { STR: 14, GES: 7, KON: 15, INT: 3, WEI: 6, CHA: 3 }, angriff: { name: "Nasser Griff", bonus: 4, schaden: "1W8+2" }, untot: true, bewegung: 4, xp: 50 },
+    schlammkroete: { name: "Schlammkröte", tp: 18, rk: 11, werte: { STR: 15, GES: 12, KON: 14, INT: 2, WEI: 10, CHA: 3 }, angriff: { name: "Zunge", bonus: 4, schaden: "1W8+2", reichweite: 2 }, xp: 50 },
+    alwine: { name: "Alwine", tp: 52, rk: 13, werte: { STR: 8, GES: 14, KON: 14, INT: 12, WEI: 16, CHA: 18 }, angriff: { name: "Kalte Hand", bonus: 5, schaden: "2W6+2", reichweite: 4 }, atem: { name: "Wehklage", schaden: "3W6", sg: 13, alle: 3, rettung: "WEI" }, bewegung: 5, xp: 700 },
     grabritter: { name: "Grabritter", tp: 45, rk: 17, werte: { STR: 18, GES: 11, KON: 16, INT: 10, WEI: 12, CHA: 12 }, angriff: { name: "Zweihänder", bonus: 6, schaden: "2W6+4" }, untot: true, xp: 450 },
   };
   const WOLF_WERTE = { STR: 12, GES: 15, KON: 12, INT: 3, WEI: 12, CHA: 6 };
@@ -102,6 +107,12 @@
     // Finale: eigener Faktor je Gruppengröße (mit tools/simulation kalibriert: Halle ≈ 85 %, Endkampf ≈ 65 % Sieg)
     halle: { name: "Coldric und die Aschehunde", stufe: 3, gegner: [["grabritter", 0.25], ["aschehund", 0.5]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
     halle_asche: { name: "Die Aschehunde", stufe: 3, gegner: [["aschehund", 0.75]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
+    // Das Moor der stummen Lichter (ab 2 Helden): eigene Tabelle je Gruppengröße, mit tools/kalibrieren-moor.js bestimmt
+    moor_rand: { name: "Kröten und Irrlichter", stufe: 1, gegner: [["schlammkroete", 0.5], ["irrlicht", 0.75]], skala: { 2: 0.37, 3: 1.14, 4: 2.16, 5: 2.2, 6: 2.78 }, skalaHC: { 2: 1.33, 3: 1.38, 4: 1.64, 5: 1.61, 6: 1.88 } },
+    moor_kroeten: { name: "Schlammkröten", stufe: 1, gegner: [["schlammkroete", 0.85]], skala: { 2: 0.87, 3: 1.23, 4: 2.33, 5: 2.94, 6: 2.89 }, skalaHC: { 2: 0.94, 3: 1.49, 4: 2.38, 5: 2.78, 6: 2.83 } },
+    moor_kroeten2: { name: "Schlammkröten im Ried", stufe: 2, gegner: [["schlammkroete", 1.0], ["irrlicht", 0.5]], skala: { 2: 0.74, 3: 0.94, 4: 1.68, 5: 1.85, 6: 2.03 }, skalaHC: { 2: 0.59, 3: 0.69, 4: 1.38, 5: 1.18, 6: 1.88 } },
+    moor_tote: { name: "Die Ertrunkenen", stufe: 2, gegner: [["moorleiche", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.09, 3: 1.28, 4: 2.12, 5: 2.2, 6: 2.94 }, skalaHC: { 2: 1.68, 3: 1.58, 4: 2.16, 5: 2.33, 6: 2.62 } },
+    moor_schrein: { name: "Alwine, die Stumme", stufe: 2, gegner: [["alwine", 0.25], ["moorleiche", 0.5], ["irrlicht", 0.5]], skala: { 2: 0.32, 3: 0.97, 4: 1.81, 5: 2.2, 6: 1.74 }, skalaHC: { 2: 0.69, 3: 1.05, 4: 1.88, 5: 2.12, 6: 1.68 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -113,7 +124,9 @@
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
   function gegnerFuer(begId, n, stufe, skala, hardcore) {
     const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, s = stufe || b.stufe, tab = hardcore ? SKALA_HARDCORE : SKALA;
-    let k = skala != null ? skala : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
+    // Begegnungen mit eigener Tabelle (z. B. im Moor, spielbar ab 2 Helden): Faktor je Gruppengröße 2–6
+    const eigen = hardcore ? b.skalaHC || b.skala : b.skala;
+    let k = skala != null ? skala : eigen ? eigen[Math.max(2, Math.min(6, n))] || 1 : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
     if (b.faktor) k *= b.faktor[Math.max(3, Math.min(6, n))] || 1;
     return b.gegner.map(([art, je]) => { const soll = je * n, anzahl = Math.max(1, Math.round(soll)); return { art, anzahl, tpFaktor: k * soll / anzahl }; });
   }
@@ -226,7 +239,7 @@
     zufall(st);
     const r = st.r; let k = opts.karte || KARTE_GARTEN;
     st.siegel = k.hindernisse.filter(([t]) => t === "Z").map(([, x, y]) => ({ x, y, beruehrt: false }));
-    st.karte = { name: k.name, b: k.b, h: k.h, bild: k.bild || null, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y))) };
+    st.karte = { name: k.name, boden: k.boden || null, b: k.b, h: k.h, bild: k.bild || null, hindernisse: k.hindernisse, start: k.start, block: new Set(k.hindernisse.map(([, x, y]) => key(x, y))), offen: new Set(k.hindernisse.filter(([t]) => t === "P" || t === "Q").map(([, x, y]) => key(x, y))) };
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
     fids.forEach((fid, i) => {
       const [x, y] = k.start.spieler[i];
@@ -1078,9 +1091,9 @@
     if (d.atem && g.atemBereit && abstand(g, ziel) <= 3) {
       const betroffen = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && abstand(g, f) <= 3 && abstand(g, f) >= 1 && (() => { const vx = ziel.x - g.x, vy = ziel.y - g.y, fx = f.x - g.x, fy = f.y - g.y; return (vx * fx + vy * fy) / (Math.hypot(vx, vy) * Math.hypot(fx, fy) || 1) >= 0.7; })());
       const teile = [];
-      for (const f of betroffen) { const rw = rettung(st, f, "GES", d.atem.sg); let s = roll(st.r, d.atem.schaden).total; if (rw.erfolg) s = Math.floor(s / 2); teile.push(`${f.name} ${s}`); schaden(st, f, s); }
+      for (const f of betroffen) { const rw = rettung(st, f, d.atem.rettung || "GES", d.atem.sg); let s = roll(st.r, d.atem.schaden).total; if (rw.erfolg) s = Math.floor(s / 2); teile.push(`${f.name} ${s}`); schaden(st, f, s); }
       g.atemBereit = false; g.atemRunde = st.runde;
-      st.log.push({ t: `${g.name}: Glutatem – ${teile.join(", ")}.`, art: "gegner" });
+      st.log.push({ t: `${g.name}: ${d.atem.name || "Glutatem"} – ${teile.join(", ") || "niemand getroffen"}.`, art: "gegner" });
       if (!st.ende) weiter(st); return;
     }
     // Netzweber: Netz auf Entfernung
@@ -1088,6 +1101,26 @@
       g.netzGenutzt = true;
       const erg = angriffswurf(st, g, ziel, { name: "Netz", bonus: d.netz.bonus, schaden: "0W1", fest: 0, nah: false, nachTreffer: () => { ziel.z.festgehalten = { netz: true, flucht: d.netz.sg }; st.log.push({ t: `${ziel.name} hängt im Netz.`, art: "gegner" }); } });
       if (erg && !st.ende) weiter(st); return;
+    }
+    // Fernkämpfer (Irrlicht, Kröte, Alwine): auf Reichweite gehen, mit Sicht angreifen, nicht unnötig nah heran
+    const rw = d.angriff && d.angriff.reichweite > 1 ? d.angriff.reichweite : 0;
+    if (rw) {
+      const trifft = (pos, f) => abstand(pos, f) <= rw && sicht(st, Object.assign({}, g, pos), f);
+      if (!trifft(g, ziel) && st.zug.bewegung > 0) {
+        const m = erreichbar(st, g, st.zug.bewegung); let best = null;
+        for (const [k, c] of m) {
+          const [x, y] = k.split(",").map(Number), p = { x, y }, z2 = lebende.filter((f) => trifft(p, f)).sort((a, b) => a.tp - b.tp)[0];
+          const wert = z2 ? 100 + abstand(p, z2) * 2 - c * 0.1 : -Math.min(...lebende.map((f) => abstand(p, f))) - c * 0.1;
+          if (!best || wert > best.wert) best = { x, y, wert };
+        }
+        if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
+        fangschuss(st, g, startX, startY);
+        if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return; }
+        lebende = zieleFuerGegner(st, g);
+      }
+      const z = lebende.filter((f) => trifft(g, f)).sort((a, b) => (g.z.spott === b.id) - (g.z.spott === a.id) || a.tp - b.tp)[0];
+      if (z) gegnerAngriff(st, g, z);
+      if (!st.ende) weiter(st); return;
     }
     // Bewegen und angreifen
     if (abstand(g, ziel) > 1 && st.zug.bewegung > 0) {
@@ -1411,7 +1444,7 @@
   function laden(o) {
     const st = JSON.parse(JSON.stringify(o));
     st.karte.block = new Set(st.karte.hindernisse.map(([, x, y]) => key(x, y)));
-    st.karte.offen = new Set(st.karte.hindernisse.filter(([t]) => t === "P").map(([, x, y]) => key(x, y)));
+    st.karte.offen = new Set(st.karte.hindernisse.filter(([t]) => t === "P" || t === "Q").map(([, x, y]) => key(x, y)));
     st.zonen = st.zonen || []; st.brand = st.brand || [];
     return zufall(st);
   }

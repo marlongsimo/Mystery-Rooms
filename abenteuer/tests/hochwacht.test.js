@@ -51,8 +51,8 @@ const R = require('../js/regeln.js'), D = require('../daten/hochwacht.js'), P = 
   try {
     await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await p.reload();
     await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
-    check(!(await p.$('[data-neu-abenteuer="hochwacht"]')), 'Ohne ?entwurf ist Hochwacht im Hub nicht zu sehen');
-    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf&entwurf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
+    check(Boolean(await p.$('[data-neu-abenteuer="hochwacht"]')), 'Hochwacht ist im Hub regulär zu sehen (Stufe 3)');
+    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
     await p.click('[data-neu-abenteuer="hochwacht"]');
     await p.waitForSelector('#kodex:not([hidden])'); for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click('#start');

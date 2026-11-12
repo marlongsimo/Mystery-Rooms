@@ -1,7 +1,7 @@
 /*
  * Die letzte Fackel von Hochwacht – ENTWURF (Prototyp der Eskorte, siehe KONZEPT-HOCHWACHT.md)
  * Bisher nur Akt I bis zum ersten Kampf: Sera Venn wird gefunden, Hinterhalt am Pass.
- * Im Hub nur sichtbar mit ?entwurf in der Adresse. Karten ohne Bild: M Fels, K niedriger Wall (Deckung), T Baum, Q Wasser.
+ * Karten ohne Bild: M Fels, K niedriger Wall (Deckung), T Baum, Q Wasser.
  */
 (function (root) {
   "use strict";
@@ -429,7 +429,7 @@
     jaegerschuetze: { klassen: ["waldlaeufer"], text: "Schießt aus 6 Feldern bevorzugt auf Sera. Deckung oder ein Held neben ihr (Abfangen) schützt sie." },
   };
   const META = {
-    id: "hochwacht", schwierigkeit: 3, entwurf: true, titel: "Die letzte Fackel von Hochwacht", kurz: "Hochwacht", untertitel: "Ein Eskorte-Abenteuer im Norden (Entwurf)",
+    id: "hochwacht", schwierigkeit: 3, titel: "Die letzte Fackel von Hochwacht", kurz: "Hochwacht", untertitel: "Ein Eskorte-Abenteuer im Norden",
     kurztext: "Bringt die Botin Sera Venn durch einen belagerten Pass zur Hochwarte.",
     min: 3, max: 6, stufen: "1–3", dauer: "3–4 Stunden", abschnitte: 3, enden: 3,
     bild: "img/hochwacht/titel.webp", vorschau: "img/hochwacht/vorschau.webp", abschnittBilder: { 1: "img/hochwacht/abschnitt-1.webp", 2: "img/hochwacht/abschnitt-2.webp", 3: "img/hochwacht/abschnitt-3.webp" },

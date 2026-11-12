@@ -91,6 +91,10 @@
     // Die letzte Fackel von Hochwacht: Jäger haben es auf die Begleiterin abgesehen (jaeger: true)
     siegeljaeger: { name: "Siegeljäger", tp: 12, rk: 13, werte: { STR: 13, GES: 14, KON: 12, INT: 10, WEI: 12, CHA: 8 }, angriff: { name: "Hakenschwert", bonus: 4, schaden: "1W6+2" }, jaeger: true, bewegung: 6, xp: 50 },
     jaegerschuetze: { name: "Siegeljäger-Schütze", tp: 9, rk: 12, werte: { STR: 10, GES: 15, KON: 11, INT: 10, WEI: 13, CHA: 8 }, angriff: { name: "Kurzbogen", bonus: 4, schaden: "1W6+2", reichweite: 6 }, jaeger: true, xp: 50 },
+    wachkonstrukt: { name: "Wachkonstrukt", tp: 30, rk: 16, werte: { STR: 18, GES: 8, KON: 16, INT: 3, WEI: 10, CHA: 1 }, angriff: { name: "Steinfaust", bonus: 5, schaden: "1W10+3" }, bewegung: 4, anfaellig: "wucht", xp: 200 },
+    jaegerhauptmann: { name: "Jägerhauptmann", tp: 34, rk: 15, werte: { STR: 16, GES: 13, KON: 14, INT: 12, WEI: 12, CHA: 14 }, angriff: { name: "Kriegsaxt", bonus: 5, schaden: "1W12+3" }, jaeger: true, xp: 200 },
+    funkenhund: { name: "Funkenhund", tp: 22, rk: 13, werte: { STR: 17, GES: 12, KON: 14, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Biss", bonus: 5, schaden: "1W8+3" }, atem: { schaden: "3W6", sg: 12, alle: 3 }, jaeger: true, xp: 200 },
+    fackelzehrer: { name: "Fackelzehrer", tp: 75, rk: 15, werte: { STR: 18, GES: 12, KON: 18, INT: 10, WEI: 14, CHA: 12 }, angriff: { name: "Glutklaue", bonus: 6, schaden: "2W8+3" }, atem: { name: "Aschesturm", schaden: "3W6", sg: 13, alle: 3, rettung: "WEI" }, jaeger: "wechsel", bewegung: 5, xp: 1100 },
     grabritter: { name: "Grabritter", tp: 45, rk: 17, werte: { STR: 18, GES: 11, KON: 16, INT: 10, WEI: 12, CHA: 12 }, angriff: { name: "Zweihänder", bonus: 6, schaden: "2W6+4" }, untot: true, xp: 450 },
   };
   const WOLF_WERTE = { STR: 12, GES: 15, KON: 12, INT: 3, WEI: 12, CHA: 6 };
@@ -118,6 +122,12 @@
     moor_schrein: { name: "Alwine, die Stumme", zusatzAb: 3, stufe: 2, gegner: [["alwine", 0.1, 1, 0.6], ["moorleiche", 0.5], ["irrlicht", 0.5]], skala: { 2: 0.75, 3: 0.84, 4: 1.78, 5: 2.45, 6: 3.23 }, skalaHC: { 2: 0.5, 3: 1, 4: 1.61, 5: 1.96, 6: 2.34 } },
     // Die letzte Fackel von Hochwacht (Prototyp): genau ein bis zwei Jäger, dazu Kobolde; Tabelle per tools/eskorte-sim.js
     pass: { name: "Hinterhalt am Pass", stufe: 1, zusatzAb: 99, gegner: [["siegeljaeger", 0.5, 4], ["jaegerschuetze", 0.2, 2], ["schattenkobold", 0.8]], skala: { 2: 2.71, 3: 2.28, 4: 2.23, 5: 2.28, 6: 2.65 }, skalaHC: { 2: 2.59, 3: 2.09, 4: 2.23, 5: 2.18, 6: 2.38 } },
+    tor: { name: "Die Wächter aus Stein", stufe: 2, zusatzAb: 99, gegner: [["wachkonstrukt", 0.45, 4, 0.2], ["schattenkobold", 0.5]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    archiv: { name: "Jäger im Archiv", stufe: 2, zusatzAb: 99, gegner: [["siegeljaeger", 0.6, 4], ["jaegerschuetze", 0.2, 2], ["schattenkobold", 0.8]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    wacht: { name: "Die stumme Wacht", stufe: 2, zusatzAb: 99, gegner: [["siegeljaeger", 0.7, 5, 0.5], ["jaegerschuetze", 0.3, 3], ["wachkonstrukt", 0.15, 1, 0.3], ["schattenkobold", 0.6]], skala: { 2: 3.22, 3: 3.08, 4: 4.76, 5: 5.66, 6: 7.34 }, skalaHC: { 2: 2.77, 3: 2.83, 4: 4.46, 5: 5.54, 6: 6.58 } },
+    hauptmann: { name: "Der Jägerhauptmann", stufe: 2, zusatzAb: 99, gegner: [["jaegerhauptmann", 0, 1, 1], ["siegeljaeger", 0.6, 4], ["jaegerschuetze", 0.25, 2]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    wehrgang: { name: "Der offene Wehrgang", stufe: 3, zusatzAb: 99, gegner: [["siegeljaeger", 0.6, 5, 0.5], ["jaegerschuetze", 0.3, 3], ["funkenhund", 0.4, 3, 0.5]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    finale: { name: "Das letzte Licht", stufe: 3, zusatzAb: 99, gegner: [["fackelzehrer", 0.1, 1, 0.6], ["funkenhund", 0.3, 3, 0.4], ["siegeljaeger", 0.45, 4, 0.3], ["jaegerschuetze", 0.15, 1]], skala: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -270,7 +280,7 @@
       const b = opts.begleiter;
       st.figuren.push({ id: "b0", seite: "spieler", art: "begleiter", name: b.name, titel: b.titel || "Begleiterin", x: b.start[0], y: b.start[1], tp: b.tp, tpMax: b.tp, rk: b.rk || 12, rkBasis: b.rk || 12,
         werte: b.werte || { STR: 8, GES: 12, KON: 10, INT: 13, WEI: 14, CHA: 13 }, z: {}, reaktion: 0, genutzt: {}, rucksack: [], todes: { e: 0, f: 0 }, gefesselt: Boolean(b.gefesselt) });
-      st.eskorte = { route: b.route.map((p) => p.slice()), schritt: 0, ausgang: b.ausgang !== false, jaegerSieg: Boolean(b.jaegerSieg), schrittweite: b.schrittweite || 2, warten: b.warten || 3, unten: null };
+      st.eskorte = { route: b.route.map((p) => p.slice()), schritt: 0, ausgang: b.ausgang !== false && !b.aktivierung, aktivierung: b.aktivierung ? { runden: b.aktivierung.runden || 2, name: b.aktivierung.name || "das Gerät", fortschritt: 0, ununterbrochen: Boolean(b.aktivierung.ununterbrochen) } : null, jaegerSieg: Boolean(b.jaegerSieg), schrittweite: b.schrittweite || 2, warten: b.warten || 3, unten: null };
       st.log.push(b.gefesselt ? { t: `${b.name} liegt gefesselt bei den Jägern. Besiegt sie, um sie zu befreien.`, art: "gut" } : { t: `${b.name} ist bei euch. Bringt sie zum Ausgang – manche Gegner haben es auf sie abgesehen.`, art: "gut" });
     }
     // Gemischte Startplätze der Gegner (Abwechslung)
@@ -1068,6 +1078,15 @@
     const feinde = gegnerFiguren(st).filter(lebt), bedroht = (p) => feinde.some((g) => abstand(g, p) <= 1);
     const helden = spielerFiguren(st).filter(lebt);
     while (e.schritt < e.route.length && s.x === e.route[e.schritt][0] && s.y === e.route[e.schritt][1]) e.schritt++;
+    // Am Ziel: ein Gerät bedienen – eine Runde Fortschritt, solange kein Gegner direkt neben ihr steht
+    if (e.schritt >= e.route.length && e.aktivierung) {
+      const a = e.aktivierung;
+      if (bedroht(s)) { if (a.ununterbrochen) a.fortschritt = 0; st.log.push({ t: `${s.name} wird gestört – ${a.ununterbrochen ? `${a.name} erlischt, sie muss neu beginnen` : `${a.name} kommt nicht voran`} (${a.fortschritt}/${a.runden}).`, art: "schlecht" }); return; }
+      a.fortschritt++;
+      if (a.fortschritt >= a.runden) { st.ende = "sieg"; st.xp = gegnerFiguren(st).filter((g) => g.tp <= 0).reduce((x, g) => x + GEGNER[g.art].xp, 0); st.log.push({ t: `${s.name} vollendet ${a.name}. Geschafft!`, art: "ende" }); }
+      else st.log.push({ t: `${s.name} arbeitet an ${a.name} (${a.fortschritt}/${a.runden}).`, art: "gut" });
+      return;
+    }
     if (e.schritt >= e.route.length) return;
     if (!helden.some((h) => abstand(h, s) <= e.warten)) { st.log.push({ t: `${s.name} wartet auf euch.` }); return; }
     const ziel = { x: e.route[e.schritt][0], y: e.route[e.schritt][1] };
@@ -1089,7 +1108,7 @@
   }
   function zieleFuerGegner(st, g) {
     // Jäger: die Begleiterin hat Vorrang, wenn sie steht und sichtbar ist
-    const s = GEGNER[g.art].jaeger && begleiterVon(st);
+    const j = GEGNER[g.art].jaeger, s = j && (j !== "wechsel" || st.runde % 2 === 0) && begleiterVon(st);
     if (s && lebt(s) && !s.gefesselt && sicht(st, g, s)) { if (g.visier !== st.runde) { g.visier = st.runde; st.log.push({ t: `${g.name} nimmt ${s.name} ins Visier.`, art: "gegner" }); } return [s]; }
     const alle = st.figuren.filter((f) => f.seite === "spieler" && lebt(f));
     const sichtbar = alle.filter((f) => !f.z.versteckt);

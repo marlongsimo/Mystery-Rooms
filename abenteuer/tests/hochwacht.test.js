@@ -43,7 +43,7 @@ const R = require('../js/regeln.js'), D = require('../daten/hochwacht.js'), P = 
   check(!R.begleiterVon(m) && !m.eskorte, 'Moor-Kampf: keine Begleiterin, keine Eskorte');
 
   // Durchlauf aller bisherigen Szenen (Akt I inkl. Rettungsweg)
-  try { const out = require('child_process').execFileSync('node', [__dirname + '/../tools/durchlauf-hochwacht.js', '80'], { encoding: 'utf8' }); check(/Alle Szenen erreicht/.test(out), 'Akt I: 80 Durchläufe ohne Fehler, alle Szenen erreicht (auch die Rettung)'); }
+  try { const out = require('child_process').execFileSync('node', [__dirname + '/../tools/durchlauf-hochwacht.js', '120'], { encoding: 'utf8' }); check(/Alle Szenen erreicht/.test(out), 'Akt I–III: 120 Durchläufe ohne Fehler, alle Szenen und alle Enden erreicht (auch die Rettungen)'); }
   catch (e) { check(false, 'Durchlauf: ' + (e.stdout || e.message).slice(0, 300)); }
   // 8. Browser
   const b = await chromium.launch(), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();

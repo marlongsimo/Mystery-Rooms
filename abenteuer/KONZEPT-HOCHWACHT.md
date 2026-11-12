@@ -220,3 +220,21 @@ Jedes Abenteuer ist eine eigene Kampagne. Grauwacht-Enden liegen in einer andere
 - Gleicher Wegpunktpfad für alle Gruppen oder eine Abstimmung über den sicheren Weg.
 - Welche Grauwacht-Merker aus Konto oder Chronik vorausgewählt werden (B4).
 - Ob die Heldenfreischaltung direkt nach dem Abschluss angeboten wird oder im Hub (abhängig von KONZEPT-HELDENFREISCHALTUNG.md).
+
+### B9. Kampfstruktur: 4 Hauptkämpfe, 3–4 Nebenkämpfe (festgelegt)
+Jede Gruppe muss durch **vier Hauptkämpfe**, egal wie sie entscheidet. Dazu kommen **Nebenkämpfe**, die je nach Entscheidung zusätzlich auftreten. Sie sind kürzer und bringen Vorteile oder Folgen für später.
+
+| Akt | Hauptkampf (immer) | Nebenkampf (je nach Entscheidung) | Auslöser |
+|---|---|---|---|
+| I | 1. Hinterhalt am Pass (Eskorte zum Ausgang) | Das Jägerlager (Sera gefesselt) | Sera wurde am Pass verschleppt |
+| II | 2. Die stumme Wacht (Sera bedient 2 Runden das Signalgerät) | Die Wächter aus Stein | Haupttor ohne Brann, Mechanismus misslingt |
+| II | | Im Archivgang (bringt das Wachtbuch: Schwäche des Fackelzehrers) | Weg durch den Archivgang gewählt |
+| II | | Der Jägerhauptmann (fehlt dann im Finale) | Verfolgung gewählt – oder Pflicht, wenn Sera in der Wacht verschleppt wurde |
+| III | 3. Der offene Wehrgang (Eskorte über die Mauer zur Treppe) | – | |
+| III | 4. Finale: Das letzte Licht (Fackelzehrer; Sera braucht 2 Runden **am Stück** am Signalfeuer, Störung = Neubeginn) | – | Wurde Sera am Wehrgang verschleppt, wird das Finale zur Befreiung (Sera gefesselt, alle Gegner besiegen) |
+
+Eine Gruppe erlebt so je nach Weg 4 bis 7 Kämpfe.
+
+**Vorteile aus Entscheidungen für Akt III (umgesetzt):** Wachtbuch → Gletscherwasser holen (Fackelzehrer schwächer, kostet Kälte) · Hauptmann besiegt → weniger Jäger am Wehrgang und im Finale · Brann dabei → „Haltet die Treppen“ (Wehrgang leichter) · Seil → Sera gesichert (höhere Rüstung am Wehrgang) · Jäger früh gewarnt (Verrat in der Vorgeschichte) → beide Kämpfe härter.
+
+**Enden:** Die Fackel bewahrt (Funke bleibt im Feuer) · Der Funke im Gepäck (zeigt das nächste Siegel, Jäger folgen) · Die Nordwarte verstummt (Funke gelöscht, oder Niederlage im Finale). Der Epilog erwähnt Brann, Sera, Grauwacht und die Gefallenen. Die Entscheidungen vor den Kämpfen (Barrikade, Fallen, Brann am Tor, Überblick von der Mauer) machen die Hauptkämpfe leichter.

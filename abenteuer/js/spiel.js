@@ -396,10 +396,12 @@
     }
     // Ziel eines Läufers (Glockenseil) markieren, solange er unterwegs ist
     for (const g of st.figuren) if (g.laeufer && g.tp > 0) { const L = g.laeufer, lx = L.x * Z + Z / 2, ly = L.y * Z + Z / 2; o += `<g class="seil-ziel"><circle cx="${lx}" cy="${ly}" r="${Z * 0.44}" fill="#C5A267" fill-opacity="${L.da ? ".35" : ".12"}" stroke="#f0d488" stroke-width="2.5" stroke-dasharray="6 4"/><text x="${lx}" y="${ly - Z * 0.5}" text-anchor="middle" font-size="12" font-weight="700" fill="#f0d488" stroke="#000" stroke-width="3" paint-order="stroke">${L.da ? "Er zieht gleich!" : "Glockenseil"}</text></g>`; }
-    // Eskorte: Seras Weg (Punkte) und der Ausgang (Fahne)
+    // Eskorte: Seras Weg (Punkte) und der Ausgang (Fahne) bzw. das Gerät mit Fortschritt
     if (st.eskorte) {
-      const r = st.eskorte.route;
-      r.forEach(([x, y], i) => { const fertig = i < st.eskorte.schritt, letzter = i === r.length - 1; o += letzter
+      const r = st.eskorte.route, ak = st.eskorte.aktivierung;
+      if (ak && r.length) { const [x, y] = r[r.length - 1]; o += `<g transform="translate(${x * Z + Z / 2} ${y * Z + Z / 2})" class="geraet"><circle r="${Z * 0.46}" fill="#8fd0ff" fill-opacity="${0.1 + 0.25 * ak.fortschritt / ak.runden}" stroke="#8fd0ff" stroke-width="2.5" stroke-dasharray="6 4"/><text y="${-Z * 0.52}" text-anchor="middle" font-size="13" font-weight="700" fill="#cfeaff" stroke="#000" stroke-width="3" paint-order="stroke">${ak.fortschritt}/${ak.runden}</text></g>`; }
+      if (ak) r.slice(0, -1).forEach(([x, y], i) => { o += `<circle cx="${x * Z + Z / 2}" cy="${y * Z + Z / 2}" r="6" fill="${i < st.eskorte.schritt ? "#6a6250" : "#e8c46a"}" fill-opacity=".7"/>`; });
+      else r.forEach(([x, y], i) => { const fertig = i < st.eskorte.schritt, letzter = i === r.length - 1; o += letzter
         ? `<g transform="translate(${x * Z + Z / 2} ${y * Z + Z / 2})" class="ausgang"><circle r="${Z * 0.42}" fill="#e8c46a" fill-opacity=".14" stroke="#e8c46a" stroke-width="2.5" stroke-dasharray="6 4"/><path d="M-6 16V-16L12 -9L-6 -2" fill="#e8c46a" stroke="#6a4e1e" stroke-width="1.5"/></g>`
         : `<circle cx="${x * Z + Z / 2}" cy="${y * Z + Z / 2}" r="6" fill="${fertig ? "#6a6250" : "#e8c46a"}" fill-opacity=".7"/>`; });
     }

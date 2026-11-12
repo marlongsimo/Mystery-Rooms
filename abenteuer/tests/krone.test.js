@@ -41,8 +41,8 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   try {
     await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await p.reload();
     await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
-    check(!(await p.$('[data-neu-abenteuer="krone"]')), 'Ohne ?entwurf ist die Krone im Hub nicht zu sehen');
-    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf&entwurf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
+    check(Boolean(await p.$('[data-neu-abenteuer="krone"]')), 'Die Krone ist im Hub regulär zu sehen (Stufe 4)');
+    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
     await p.click('[data-neu-abenteuer="krone"]');
     await p.waitForSelector('#kodex:not([hidden])'); for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click('#start');

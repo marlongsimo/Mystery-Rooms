@@ -1,5 +1,5 @@
 /*
- * Die Krone unter dem Eis – ENTWURF (Schwierigkeit 4, siehe KONZEPT-KRONE.md)
+ * Die Krone unter dem Eis (Schwierigkeit 4, siehe KONZEPT-KRONE.md)
  * Akt I: Vorgeschichte, drei Wege nach Veyrholm (je ein Pfadkampf), Marktplatz der leeren Fenster, Kammern der Verschleppten.
  * Akt II: Brücke über den Gletscherbruch, Tor der Kronenwache. Akt III: Archiv der Namen, Frostkammer, Kronensaal, drei Enden.
  * Die Kämpfe nutzen die Mechaniken aus regeln.js (Ziel-Objekte, Wellen, Eis, Schutzfeld, Rufer, Nester).
@@ -43,7 +43,7 @@
     start: { spieler: [[1, 4], [1, 3], [0, 4], [2, 4], [2, 3], [2, 5]], wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], gegner: [[8, 4], [9, 2], [10, 5], [10, 3], [8, 6], [10, 4], [8, 3], [7, 6], [8, 2], [8, 5]] } };
   // Das Archiv der Namen: Regalgänge, drei Schrifttafeln, Schriftkapseln in den Wänden
   const ARCHIV = { name: "Das Archiv der Namen", b: 12, h: 9, boden: "stein", bild: "img/krone/archiv.webp",
-    hindernisse: ausText(["MMMMMMMMMMMM", "MMMMMM.MMMMM", "M.MMM..MMM.M", "..MMM..MMM.M", "............", "M.MMM..MMM.M", "M.MMM..MMM.M", "MMMMMM.MMMMM", "MMMMMMMMMMMM"]),
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMMMMM.MMMMM", "M.MMM..MMM.M", "...........M", "............", "M.MMM..MMM.M", "M..........M", "MMMMMM.MMMMM", "MMMMMMMMMMMM"]),
     start: { spieler: [[1, 4], [2, 4], [0, 4], [1, 2], [1, 6], [1, 3]], wolf: [[3, 4], [4, 4], [1, 5], [0, 3]], gegner: [[9, 4], [10, 3], [10, 6], [10, 2], [10, 5], [7, 4], [10, 4], [5, 2], [5, 6], [8, 4]] } };
   // Die Frostkammer: Säulenhalle mit zwei Nestern, in der Mitte die Frostmatrone
   const FROSTKAMMER = { name: "Die Frostkammer", b: 12, h: 9, boden: "stein", bild: "img/krone/frostkammer.webp",
@@ -70,9 +70,9 @@
   OBJEKTE.gitter = [3, 4, 5].map((y, i) => ({ id: "g" + (i + 1), name: "Eisgitter", art: "gitter", x: 10, y, runden: 2, aktion: "Eisgitter aufschlagen", fertigText: "Das Gitter zerspringt", wirkung: { oeffnet: true } }));
   OBJEKTE.saeulen = [{ id: "r1", name: "Runensäule Nord", art: "saeule", x: 9, y: 1, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" },
     { id: "r2", name: "Runensäule Süd", art: "saeule", x: 9, y: 6, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" }];
-  OBJEKTE.tafeln = [{ id: "t1", name: "Tafel der Gründer", art: "tafel", x: 6, y: 1, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
-    { id: "t2", name: "Tafel der Wächter", art: "tafel", x: 6, y: 7, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
-    { id: "t3", name: "Tafel des Herzens", art: "tafel", x: 11, y: 4, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } }];
+  OBJEKTE.tafeln = [{ id: "t1", name: "Tafel der Gründer", art: "tafel", x: 6, y: 1, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
+    { id: "t2", name: "Tafel der Wächter", art: "tafel", x: 6, y: 7, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
+    { id: "t3", name: "Tafel des Herzens", art: "tafel", x: 11, y: 4, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } }];
   OBJEKTE.runen = [[6, 1], [6, 7], [10, 2]].map(([x, y], i) => ({ id: "p" + (i + 1), name: ["Runenpunkt Nord", "Runenpunkt Süd", "Runenpunkt am Herzen"][i], art: "rune", x, y, runden: 2, ruhe: true, aktion: "Runenpunkt schließen", fertigText: "Die Rune verlischt", wirkung: { schild: true, welleAusAlle: "garde" } }));
   OBJEKTE.herz = { id: "herz", name: "Das Kronenherz", art: "herz", x: 10, y: 4, runden: 3, ruhe: true, aktion: "Das Kronenherz berühren", fertigText: "Eure Hände liegen auf dem Herzen der Siegel. Der König hält inne" };
   const NAMEN = { siegeljaeger: "Maskierter Jäger", jaegerschuetze: "Maskierter Schütze", funkenhund: "Fährtenhund", jaegerhauptmann: "Jägerhauptmann Varrek", eisgezeichneter: "Verlorener Pilger" };
@@ -428,9 +428,9 @@
     },
     kampf_archiv: {
       art: "kampf", abschnitt: 3, stufe: 3, titel: "Das Archiv der Namen", ort: "Unter dem Palast",
-      text: (A) => [`Sichert die drei Tafeln (je zwei Aktionen daneben), bevor die Namen verblassen – ihr habt bis Runde 6. Der Kälterufer löscht, was ihr gesichert habt, wenn er herankommt. Der Runenleser lässt Eis zwischen euch wachsen. Aus den Schriftkapseln brechen Glasschwärmer.${A.merker.s4_route_bonus === "signalhorn" ? " Das Signalhorn hält die Schwärmer eine Weile zurück." : ""}`],
+      text: (A) => [`Sichert zwei der drei Tafeln (je zwei Aktionen daneben), bevor die Namen verblassen – ihr habt bis Runde 8. Der Kälterufer löscht, was ihr gesichert habt, wenn er herankommt. Der Runenleser lässt Eis zwischen euch wachsen. Aus den Schriftkapseln brechen Glasschwärmer.${A.merker.s4_route_bonus === "signalhorn" ? " Das Signalhorn hält die Schwärmer eine Weile zurück." : ""}`],
       kampf: (A) => ({ begegnung: "k_archiv", karte: ARCHIV, keinAnfuehrer: true, namen: NAMEN,
-        mechanik: { ziele: OBJEKTE.tafeln, zieleZuerst: true, sieg: { ziele: 3, art: "tafel", text: "Alle drei Tafeln sind gesichert. Der Runenleser flucht und verschwindet in den Gängen." },
+        mechanik: { ziele: OBJEKTE.tafeln, sieg: { ziele: 2, art: "tafel", text: "Zwei Tafeln sind gesichert. Der Runenleser flucht und verschwindet in den Gängen." },
           wellen: [{ id: "kapseln", name: "Die Schriftkapseln", kurz: "aus den Kapseln", quellen: [[3, 1], [8, 1], [3, 7], [8, 7]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 3, ab: A.merker.s4_route_bonus === "signalhorn" ? 5 : 3, max: 2, text: "In den Wänden klirrt Glas" }] },
         nachher: (st) => ({ setzt: { tafeln: st.mech ? st.mech.ziele.filter((z) => z.fertig).length : 0 } }),
         sieg: { weiter: "archiv_nach" }, verloren: { glocke: 1, weiter: "archiv_nach" } }),
@@ -579,7 +579,7 @@
     eidwaechter: { klassen: ["kleriker", "krieger"], text: "Schwer (RK 15, Eidhammer 2W6+3). Sein Schutzkreis fängt die Hälfte des Schadens ab, bis alle drei Grablichter brennen." },
   };
   const META = {
-    id: "krone", schwierigkeit: 4, entwurf: true, titel: "Die Krone unter dem Eis", kurz: "Krone", untertitel: "Ein verzweigtes Abenteuer in der versunkenen Stadt Veyrholm (Entwurf)",
+    id: "krone", schwierigkeit: 4, titel: "Die Krone unter dem Eis", kurz: "Krone", untertitel: "Ein verzweigtes Abenteuer in der versunkenen Stadt Veyrholm",
     kurztext: "Drei Wege führen in eine Stadt unter dem Gletscher – und zum Herzen der sieben Siegel.",
     min: 3, max: 6, stufen: "1–3", dauer: "4–5 Stunden", abschnitte: 3, enden: 3,
     bild: "img/krone/titel.webp", vorschau: "img/krone/vorschau.webp", abschnittBilder: { 1: "img/krone/abschnitt-1.webp", 2: "img/krone/abschnitt-2.webp", 3: "img/krone/abschnitt-3.webp" },

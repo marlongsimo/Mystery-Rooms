@@ -112,7 +112,7 @@
     koenig: { name: "Der König unter dem Eis", tp: 90, rk: 16, werte: { STR: 20, GES: 10, KON: 18, INT: 14, WEI: 16, CHA: 18 }, angriff: { name: "Kronenschwert", bonus: 7, schaden: "2W8+4" }, rueckstoss: { felder: 1, sg: 14 }, bewegung: 4,
       flaeche: { name: "Kronenschlag", form: "linie", reichweite: 5, schaden: "4W6", sg: 14, rettung: "GES", alle: 3, phase: 1 },
       phasen: [{ ab: 0.66, text: "Die Krone des Königs bricht. Das Kronenherz öffnet drei Runenpunkte, und aus den Seitengängen tritt seine Ehrengarde. Phase II: Die gebrochene Krone.", welle: "garde" },
-        { ab: 0.33, text: "Die Rüstung des Königs zerfällt zu Eis und Licht. Was bleibt, ist ein Schemen um einen pulsierenden Kern. Der Boden des Saals reißt auf. Phase III: Das Herz.", rk: -2, feld: { felder: [[5, 3], [5, 5], [7, 2], [7, 6], [3, 4]], typ: "loch", name: "Der Boden des Saals" } }], xp: 2000 },
+        { ab: 0.33, text: "Die Rüstung des Königs zerfällt zu Eis und Licht. Was bleibt, ist ein Schemen um einen pulsierenden Kern. Der Boden des Saals reißt auf. Phase III: Das Herz.", rk: -2, feld: { felder: [[5, 3], [5, 5], [7, 2], [7, 6], [6, 4]], typ: "loch", name: "Der Boden des Saals" } }], xp: 2000 },
     eisenhirte: { name: "Eisenhirte", tp: 70, rk: 16, werte: { STR: 20, GES: 8, KON: 18, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Steinfaust", bonus: 6, schaden: "2W8+3" }, bewegung: 3,
       flaeche: { name: "Bodenstoß", form: "ring", radius: 2, schaden: "3W6", sg: 13, rettung: "GES", alle: 3, liegend: true },
       phasen: [{ ab: 0.5, text: "Die Runen am Eisenhirten glühen weiß: Er stampft schneller und wilder.", rk: -1 }], xp: 1100 },

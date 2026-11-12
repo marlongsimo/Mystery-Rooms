@@ -13,63 +13,63 @@
 
   /* ---------- Karten (12 × 9) ---------- */
   // A · Sturmgrat: ein Grat über dem Abgrund, Windschutzmauern, rechts auf einem Felsen das Jagdhorn
-  const STURMGRAT = { name: "Der Sturmgrat", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["QQQQQQQQQQQQ", "QQQ...QQQ..Q", "Q.....K....Q", "....K.......", "............", "....K...K...", "Q.....K....Q", "QQQ..QQQ...Q", "QQQQQQQQQQQQ"]),
-    start: { spieler: sp, wolf: wo, gegner: [[10, 4], [9, 3], [9, 5], [10, 2], [10, 6], [8, 4], [11, 5], [7, 2], [7, 6], [4, 1], [4, 7], [11, 3]] } };
+  const STURMGRAT = { name: "Der Sturmgrat", b: 12, h: 9, boden: "stein", bild: "img/krone/sturmgrat.webp",
+    hindernisse: ausText(["MMMQQQQQQQQQ", "MM.QQQQQQQQQ", "MM...M......", "...KK..KKMM.", "............", "....KK...KK.", "QQQQQQ.M...Q", "QQQQQQQQQQQQ", "MMMQQQQQQQQQ"]),
+    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[3, 4], [2, 2], [3, 5], [2, 1]], gegner: [[10, 4], [9, 2], [10, 6], [11, 2], [11, 5], [8, 4], [11, 4], [7, 2], [8, 6], [4, 2], [6, 5], [11, 3]] } };
   // B · Unterstollen: ein eingestürzter Bergwerksstollen, zwei Schwärmernester in Seitennischen, brüchiges Eis in der Mitte
-  const UNTERSTOLLEN = { name: "Die Unterstollen", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M...MM....MM", "M.M....MM..M", "....MM......", "............", "...M....MM..", "M.....MM...M", "MM..M......M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [3, 3], [0, 4], [2, 1]], gegner: [[9, 1], [9, 7], [10, 4], [9, 3], [10, 5], [10, 2], [10, 6], [8, 4], [11, 3], [11, 5]] } };
+  const UNTERSTOLLEN = { name: "Die Unterstollen", b: 12, h: 9, boden: "stein", bild: "img/krone/unterstollen.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MM..MM..M..M", "MM..MM...M.M", "M.M......M.M", "M..........M", "....MM.....M", "M...MM.MM..M", "MM...M.M...M", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 2], [2, 5]], wolf: [[3, 4], [3, 3], [0, 5], [2, 1]], gegner: [[9, 1], [9, 7], [10, 4], [10, 3], [10, 5], [10, 2], [10, 6], [8, 4], [10, 1], [10, 7]] } };
   // C · Pilgerstraße: ein Treppenweg zwischen Grabnischen, drei erloschene Grablichter
-  const PILGERSTRASSE = { name: "Die Pilgerstraße", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M.M..M..M..M", "M..........M", "M...K..K...M", "............", "M...K..K...M", "M..........M", "M.M..M..M..M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: wo, gegner: [[9, 4], [10, 4], [8, 2], [8, 6], [9, 3], [9, 5], [10, 2], [10, 6], [7, 4], [11, 4]] } };
+  const PILGERSTRASSE = { name: "Die Pilgerstraße", b: 12, h: 9, boden: "stein", bild: "img/krone/pilgerstrasse.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMMMMMMMMMMM", "..KK...KK..M", "...........M", "...........M", "..KK...KK..M", "M..........M", "MMMMMMMMMMMM", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [1, 6]], wolf: [[3, 4], [3, 3], [2, 6], [1, 2]], gegner: [[9, 4], [10, 4], [9, 2], [8, 6], [9, 3], [9, 5], [10, 2], [10, 6], [7, 4], [10, 3]] } };
   // Marktplatz der leeren Fenster: drei Siegelsteine, Hauszugänge oben und unten
-  const MARKT = { name: "Marktplatz der leeren Fenster", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMM.MMM.MMM", "M..........M", "M.K......K.M", "M..........M", "...........M", "M..........M", "M.K......K.M", "M..........M", "MMMM.MMM.MMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [3, 3], [3, 5], [1, 2]], gegner: [[10, 4], [9, 3], [9, 5], [10, 2], [10, 6], [7, 1], [7, 7], [10, 1], [10, 7], [9, 4], [5, 1], [5, 7]] } };
+  const MARKT = { name: "Marktplatz der leeren Fenster", b: 12, h: 9, boden: "stein", bild: "img/krone/marktplatz.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMM.MMMMM.MM", "M...K..K..MM", "...........M", "............", "MM.K....K..M", "MM.........M", "MMM.MMMMM.MM", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [0, 4], [2, 4], [1, 2], [2, 5]], wolf: [[3, 4], [3, 3], [2, 6], [0, 3]], gegner: [[10, 4], [10, 3], [9, 5], [9, 2], [10, 6], [8, 2], [8, 6], [9, 1], [9, 7], [9, 4], [6, 2], [6, 6]] } };
   // Die Kammern der Verschleppten: ein Gewölbe mit drei Eisblöcken, Risse in den Wänden
-  const KAMMERN = { name: "Die Kammern der Verschleppten", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M....MM....M", "M..........M", "M..MM..MM..M", "...........M", "M..MM..MM..M", "M..........M", "M....MM....M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [2, 3], [2, 5], [1, 2]], gegner: [[8, 4], [9, 2], [9, 6], [7, 2], [7, 6], [10, 4]] } };
+  const KAMMERN = { name: "Die Kammern der Verschleppten", b: 12, h: 9, boden: "stein", bild: "img/krone/kammern.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MM..M.M.MMMM", "M..KK...K..M", "M..K.......M", ".....M.M..MM", "M..K.MMM.K.M", "M..KKK.KKKMM", "M..........M", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[3, 4], [1, 2], [1, 6], [2, 2]], gegner: [[7, 3], [6, 2], [10, 7], [6, 3], [8, 7], [9, 7]] } };
   /* ----- Akt II und III ----- */
   // Die Brücke über den Gletscherbruch: drei Felder breit über dem Abgrund, Felsplattformen an beiden Enden, rechts der Ausgang
-  const BRUECKE = { name: "Die Brücke über den Gletscherbruch", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M...QQQQ...M", "M..QQQQQQ..M", "............", "............", "............", "M..QQQQQQ..M", "M...QQQQ...M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[0, 3], [0, 5], [0, 4], [2, 2]], gegner: [[9, 4], [9, 1], [10, 2], [9, 7], [10, 6], [9, 3], [9, 5], [10, 1], [10, 7], [8, 4]] } };
+  const BRUECKE = { name: "Die Brücke über den Gletscherbruch", b: 12, h: 9, boden: "stein", bild: "img/krone/bruecke.webp",
+    hindernisse: ausText(["MMQQQQQQQQMM", "MMQQQQQQQ..M", "MKQQQQQQQK.M", "............", "............", "............", ".KQQQQQQQK.M", "MMQQQQQQQ..M", "MMQQQQQQQMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[0, 3], [0, 5], [0, 4], [3, 3]], gegner: [[9, 4], [9, 3], [8, 3], [9, 5], [8, 5], [8, 4], [7, 4], [7, 3], [7, 5], [6, 5]] } };
   // Das Tor der Kronenwache: Vorhof vor dem Palast, zwei Runensäulen an den Seiten
-  const TOR = { name: "Das Tor der Kronenwache", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M...M..M...M", "M..........M", "M..K....K..M", "............", "M..K....K..M", "M..........M", "M...M..M...M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], gegner: [[8, 4], [9, 2], [9, 6], [10, 1], [10, 7], [10, 4], [7, 2], [7, 6], [8, 1], [8, 7]] } };
+  const TOR = { name: "Das Tor der Kronenwache", b: 12, h: 9, boden: "stein", bild: "img/krone/tor.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMMMMMMMM.MM", "MM.KK..K..MM", "...........M", "...........M", "MM.KK..K.M.M", "MM........MM", "MMMMMMMMMMMM", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [0, 4], [2, 4], [2, 3], [2, 5]], wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], gegner: [[8, 4], [9, 2], [10, 5], [10, 3], [8, 6], [10, 4], [8, 3], [7, 6], [8, 2], [8, 5]] } };
   // Das Archiv der Namen: Regalgänge, drei Schrifttafeln, Schriftkapseln in den Wänden
-  const ARCHIV = { name: "Das Archiv der Namen", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M.M.M..M.M.M", "M..........M", "M.MM.MM.MM.M", "............", "M.MM.MM.MM.M", "M..........M", "M.M.M..M.M.M", "MMMMMMMMMMMM"]),
-    start: { spieler: [[1, 4], [2, 4], [0, 4], [1, 2], [1, 6], [2, 2]], wolf: [[3, 4], [3, 2], [3, 6], [2, 6]], gegner: [[9, 4], [8, 2], [8, 6], [10, 2], [10, 6], [7, 4], [10, 3], [5, 2], [5, 6], [9, 2]] } };
+  const ARCHIV = { name: "Das Archiv der Namen", b: 12, h: 9, boden: "stein", bild: "img/krone/archiv.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMMMMM.MMMMM", "M.MMM..MMM.M", "..MMM..MMM.M", "............", "M.MMM..MMM.M", "M.MMM..MMM.M", "MMMMMM.MMMMM", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [2, 4], [0, 4], [1, 2], [1, 6], [1, 3]], wolf: [[3, 4], [4, 4], [1, 5], [0, 3]], gegner: [[9, 4], [10, 3], [10, 6], [10, 2], [10, 5], [7, 4], [10, 4], [5, 2], [5, 6], [8, 4]] } };
   // Die Frostkammer: Säulenhalle mit zwei Nestern, in der Mitte die Frostmatrone
-  const FROSTKAMMER = { name: "Die Frostkammer", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M....MM....M", "M.MM....MM.M", "M..........M", "............", "M..........M", "M.MM....MM.M", "M....MM....M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [3, 3], [3, 5], [1, 3]], gegner: [[9, 4], [10, 1], [10, 7], [8, 3], [8, 5], [10, 3], [10, 5], [7, 4]] } };
+  const FROSTKAMMER = { name: "Die Frostkammer", b: 12, h: 9, boden: "stein", bild: "img/krone/frostkammer.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "M..M.M.M.M.M", "M..M.M.M...M", "..........MM", "..........MM", "...M.M.M...M", "M..M.M.M.M.M", "M..M.M.M.M.M", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[3, 4], [3, 3], [2, 6], [0, 4]], gegner: [[9, 4], [9, 3], [8, 6], [8, 3], [8, 5], [8, 2], [8, 4], [7, 4]] } };
   // Der Kronensaal: Säulenhalle, rechts das Kronenherz, drei Runenpunkte, Seitengänge für die Ehrengarde
-  const KRONENSAAL = { name: "Der Kronensaal", b: 12, h: 9, boden: "stein", bild: null,
-    hindernisse: ausText(["MMMMMMMMMMMM", "M...M..M...M", "M.K......K.M", "M..........M", "...........M", "M..........M", "M.K......K.M", "M...M..M...M", "MMMMMMMMMMMM"]),
-    start: { spieler: sp, wolf: [[3, 4], [3, 3], [3, 5], [1, 2]], gegner: [[9, 4], [8, 2], [8, 6], [9, 3], [9, 5], [10, 1], [10, 7], [8, 4]] } };
+  const KRONENSAAL = { name: "Der Kronensaal", b: 12, h: 9, boden: "stein", bild: "img/krone/kronensaal.webp",
+    hindernisse: ausText(["MMMMMMMMMMMM", "MMMMM..MMMMM", "M..M....M..M", "M..K....K..M", "...........M", "M..K....K..M", "M.MMM...MM.M", "MMMMM..MMMMM", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[3, 4], [2, 2], [4, 5], [1, 2]], gegner: [[9, 4], [9, 2], [9, 5], [9, 3], [10, 6], [10, 3], [10, 5], [8, 4]] } };
   const KARTEN = { STURMGRAT, UNTERSTOLLEN, PILGERSTRASSE, MARKT, KAMMERN, BRUECKE, TOR, ARCHIV, FROSTKAMMER, KRONENSAAL };
   // Ziel-Objekte und Mechaniken je Kampf (Felder müssen frei sein, siehe tests/krone.test.js)
   const OBJEKTE = {
-    horn: { id: "horn", name: "Das Jagdhorn", art: "horn", x: 10, y: 3, runden: 2, ruhe: true, aktion: "Jagdhorn sichern", fertigText: "Ihr reißt das Horn vom Pfahl. Die Jäger hören auf zu blasen" },
-    lichter: [{ id: "l1", name: "Grablicht am Treppenfuß", art: "grablicht", x: 3, y: 2, umkehrbar: true, aktion: "Grablicht entzünden", fertigText: "Eine kleine Flamme, warm wie Atem", wirkung: { schild: true } },
-      { id: "l2", name: "Grablicht im Schrein", art: "grablicht", x: 6, y: 6, umkehrbar: true, aktion: "Grablicht entzünden", fertigText: "Eine kleine Flamme, warm wie Atem", wirkung: { schild: true } },
-      { id: "l3", name: "Grablicht am Tor", art: "grablicht", x: 9, y: 1, umkehrbar: true, aktion: "Grablicht entzünden", fertigText: "Eine kleine Flamme, warm wie Atem", wirkung: { schild: true } }],
-    steine: [{ id: "s1", name: "Siegelstein Nord", art: "siegelstein", x: 6, y: 2, runden: 2, ruhe: true, umkehrbar: true, aktion: "Siegelstein abschalten", fertigText: "Das Licht im Stein erlischt" },
-      { id: "s2", name: "Siegelstein Mitte", art: "siegelstein", x: 8, y: 4, runden: 2, ruhe: true, umkehrbar: true, aktion: "Siegelstein abschalten", fertigText: "Das Licht im Stein erlischt" },
-      { id: "s3", name: "Siegelstein Süd", art: "siegelstein", x: 6, y: 6, runden: 2, ruhe: true, umkehrbar: true, aktion: "Siegelstein abschalten", fertigText: "Das Licht im Stein erlischt" }],
-    bloecke: [{ id: "b1", name: "Eisblock mit einem Kind", art: "eisblock", x: 10, y: 1, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis springt, ein Kind fällt euch hustend in die Arme", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } },
-      { id: "b2", name: "Eisblock mit einer alten Frau", art: "eisblock", x: 5, y: 4, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis bricht, eine alte Frau atmet zum ersten Mal seit Jahren", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } },
-      { id: "b3", name: "Eisblock mit einem Wachmann", art: "eisblock", x: 10, y: 7, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis platzt, ein Mann in alter Rüstung sinkt auf die Knie", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } }],
+    horn: { id: "horn", name: "Das Jagdhorn", art: "horn", x: 10, y: 2, runden: 2, ruhe: true, aktion: "Jagdhorn sichern", fertigText: "Ihr reißt das Horn vom Pfahl. Die Jäger hören auf zu blasen" },
+    lichter: [{ id: "l1", name: "Oberes Grablicht", art: "grablicht", x: 5, y: 2, umkehrbar: true, aktion: "Grablicht entzünden", fertigText: "Eine kleine Flamme, warm wie Atem", wirkung: { schild: true } },
+      { id: "l2", name: "Mittleres Grablicht", art: "grablicht", x: 5, y: 4, umkehrbar: true, aktion: "Grablicht entzünden", fertigText: "Eine kleine Flamme, warm wie Atem", wirkung: { schild: true } },
+      { id: "l3", name: "Unteres Grablicht", art: "grablicht", x: 5, y: 6, umkehrbar: true, aktion: "Grablicht entzünden", fertigText: "Eine kleine Flamme, warm wie Atem", wirkung: { schild: true } }],
+    steine: [{ id: "s1", name: "Siegelstein West", art: "siegelstein", x: 2, y: 3, runden: 2, ruhe: true, umkehrbar: true, aktion: "Siegelstein abschalten", fertigText: "Das Licht im Stein erlischt" },
+      { id: "s2", name: "Siegelstein Mitte", art: "siegelstein", x: 6, y: 4, runden: 2, ruhe: true, umkehrbar: true, aktion: "Siegelstein abschalten", fertigText: "Das Licht im Stein erlischt" },
+      { id: "s3", name: "Siegelstein Ost", art: "siegelstein", x: 9, y: 3, runden: 2, ruhe: true, umkehrbar: true, aktion: "Siegelstein abschalten", fertigText: "Das Licht im Stein erlischt" }],
+    bloecke: [{ id: "b1", name: "Eisblock mit einem Kind", art: "eisblock", x: 3, y: 1, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis springt, ein Kind fällt euch hustend in die Arme", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } },
+      { id: "b2", name: "Eisblock mit einer alten Frau", art: "eisblock", x: 6, y: 4, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis bricht, eine alte Frau atmet zum ersten Mal seit Jahren", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } },
+      { id: "b3", name: "Eisblock mit einem Wachmann", art: "eisblock", x: 10, y: 5, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis platzt, ein Mann in alter Rüstung sinkt auf die Knie", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } }],
   };
   OBJEKTE.gitter = [3, 4, 5].map((y, i) => ({ id: "g" + (i + 1), name: "Eisgitter", art: "gitter", x: 10, y, runden: 2, aktion: "Eisgitter aufschlagen", fertigText: "Das Gitter zerspringt", wirkung: { oeffnet: true } }));
   OBJEKTE.saeulen = [{ id: "r1", name: "Runensäule Nord", art: "saeule", x: 9, y: 1, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" },
-    { id: "r2", name: "Runensäule Süd", art: "saeule", x: 9, y: 7, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" }];
+    { id: "r2", name: "Runensäule Süd", art: "saeule", x: 9, y: 6, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" }];
   OBJEKTE.tafeln = [{ id: "t1", name: "Tafel der Gründer", art: "tafel", x: 6, y: 1, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
     { id: "t2", name: "Tafel der Wächter", art: "tafel", x: 6, y: 7, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
     { id: "t3", name: "Tafel des Herzens", art: "tafel", x: 11, y: 4, runden: 2, frist: 6, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } }];
@@ -213,7 +213,7 @@
       art: "kampf", abschnitt: 1, titel: "Nest im Eis", ort: "Die Unterstollen",
       text: ["Zwei Schwärmernester in den Nischen oben und unten, dazwischen die Splitterbrutmutter, die alle zwei Runden eine Brut ausspeit. Zerstört beide Nester oder besiegt die Mutter. Das Eis in der Mitte knackt."],
       kampf: (A) => {
-        const eis = []; for (let x = 4; x <= 7; x++) eis.push([x, 4]);
+        const eis = []; for (let x = 4; x <= 7; x++) eis.push([x, 4]); // das Eisband in der Mitte des Stollens
         return { begegnung: "k_stollen", karte: UNTERSTOLLEN, keinAnfuehrer: true, mischen: false,
           mechanik: { eis: { felder: eis, proRunde: 1, ab: 3, bekannt: Boolean(A.merker.stollen_bekannt) }, sieg: { besiegt: [{ art: "glasnest", n: 2 }, { art: "splitterbrutmutter", n: 1 }], text: "Das Summen bricht ab. Die Nesthalle ist still." } },
           sieg: { setzt: { s4_route_bonus: "kernsplitter" }, weiter: "stollen_nach" }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug" } };
@@ -289,7 +289,7 @@
       text: (A) => [`Schaltet zwei der drei Siegelsteine ab (je zwei Aktionen daneben, ohne Gegner neben euch). Aus den Hauszugängen oben und unten drängen Eisgezeichnete nach, solange der Kälterufer lebt – er weckt auch abgeschaltete Steine wieder.${A.merker.s4_route_bonus === "signalhorn" ? " Das Signalhorn hält die erste Welle zurück." : ""}`],
       kampf: (A) => ({ begegnung: "k_markt", karte: MARKT, keinAnfuehrer: true, namen: NAMEN, skalaMal: A.merker.bund_gewarnt ? 1.1 : 1,
         mechanik: { ziele: OBJEKTE.steine, sieg: { ziele: 2, art: "siegelstein", text: "Zwei Steine schweigen. Hinter den Fenstern erstarren die Gestalten wieder." },
-          wellen: [{ id: "haeuser", name: "Die Hauszugänge", kurz: "aus den Häusern", quellen: [[4, 0], [8, 0], [4, 8], [8, 8]], gegner: [["eisgezeichneter", 0.35, 3, 0.5]], alle: 2, ab: A.merker.s4_route_bonus === "signalhorn" ? 5 : 3, max: 3, an: "kaelterufer", text: "Hinter den Türen kratzt Eis über Stein" }] },
+          wellen: [{ id: "haeuser", name: "Die Hauszugänge", kurz: "aus den Häusern", quellen: [[3, 1], [9, 1], [3, 7], [9, 7]], gegner: [["eisgezeichneter", 0.35, 3, 0.5]], alle: 2, ab: A.merker.s4_route_bonus === "signalhorn" ? 5 : 3, max: 3, an: "kaelterufer", text: "Hinter den Türen kratzt Eis über Stein" }] },
         sieg: { weiter: "markt_nach" }, verloren: { setzt: { markt_verloren: true }, glocke: 1, weiter: "markt_flucht" } }),
     },
     markt_nach: {
@@ -313,7 +313,7 @@
       art: "kampf", abschnitt: 1, titel: "Die Kammern der Verschleppten", ort: "Unter dem Marktplatz",
       text: ["Drei Menschen stecken in Eisblöcken, und sie leben noch. Schlagt das Eis auf (je zwei Aktionen direkt daneben), bevor sie erfrieren – ihr habt 6 Runden. Glasschwärmer kriechen aus den Rissen in den Wänden, ein Frostknecht hält den Gang."],
       kampf: () => ({ begegnung: "k_kammern", karte: KAMMERN, keinAnfuehrer: true, mischen: false,
-        mechanik: { ziele: OBJEKTE.bloecke, zieleZuerst: true, wellen: [{ id: "risse", name: "Die Risse in den Wänden", kurz: "aus der Wand", quellen: [[6, 2], [6, 6], [9, 4]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 2, ab: 2, max: 3, text: "Es klirrt in den Wänden" }] },
+        mechanik: { ziele: OBJEKTE.bloecke, zieleZuerst: true, wellen: [{ id: "risse", name: "Die Risse in den Wänden", kurz: "aus der Wand", quellen: [[6, 1], [1, 1], [11, 2]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 2, ab: 2, max: 3, text: "Es klirrt in den Wänden" }] },
         nachher: (st) => ({ setzt: { s4_verschleppte: st.mech ? st.mech.gerettet : 0 } }),
         sieg: { weiter: "kammern_nach" }, verloren: { glocke: 1, weiter: "kammern_nach" } }),
     },

@@ -48,6 +48,14 @@ console.log('Ziel-Objekte');
   check(st.mech.ziele[0].verloren && /Eisblock: zu spät\. Das Eis wird trüb/.test(log(st)) && !R.aktionenVon(held(st), st).some((a) => a.id === 'ziel'), 'Frist abgelaufen: Ziel verloren, keine Aktion mehr');
 }
 
+{
+  const st = neu(14, { ziele: [{ id: 'g', name: 'Eisgitter', art: 'gitter', x: 5, y: 4, runden: 2, start: 1, wirkung: { oeffnet: true } }] }, [{ art: 'testpuppe', anzahl: 1 }]);
+  const h = held(st); bis(st, h.id); setze(h, 4, 4);
+  check(st.mech.ziele[0].fortschritt === 1, 'Ein Ziel kann schon angefangen sein (z. B. hilft ein Geretteter)');
+  R.handeln(st, 'ziel', h.id);
+  check(st.mech.ziele[0].fertig && !st.karte.block.has('5,4') && R.erreichbar(st, h, 6).has('5,4') && R.laden(R.speichern(st)).karte.block.has('5,4') === false, '„Öffnet“: Ein aufgeschlagenes Gitter macht das Feld begehbar (auch nach dem Laden)');
+}
+
 console.log('Verstärkungswellen');
 {
   const st = neu(4, { wellen: [{ id: 'w', name: 'Die Hauszugänge', kurz: 'aus den Häusern', quellen: [[10, 4]], gegner: [['testpuppe', 0, 2, 2]], alle: 2, ab: 3, max: 2, text: 'Hinter den Türen kratzt es' }] }, [{ art: 'testpuppe', anzahl: 1 }]);

@@ -1,6 +1,7 @@
 /*
  * Die Krone unter dem Eis – ENTWURF (Schwierigkeit 4, siehe KONZEPT-KRONE.md)
- * Bisher Akt I: Vorgeschichte, drei Wege nach Veyrholm (je ein Pfadkampf), Marktplatz der leeren Fenster, Kammern der Verschleppten.
+ * Akt I: Vorgeschichte, drei Wege nach Veyrholm (je ein Pfadkampf), Marktplatz der leeren Fenster, Kammern der Verschleppten.
+ * Akt II: Brücke über den Gletscherbruch, Tor der Kronenwache. Akt III bisher: Archiv der Namen, Frostkammer (der Kronensaal folgt).
  * Die Kämpfe nutzen die Mechaniken aus regeln.js (Ziel-Objekte, Wellen, Eis, Schutzfeld, Rufer, Nester).
  * Karten ohne Bild: M Fels/Mauer, K niedriger Wall (Deckung), Q Abgrund oder Wasser (versperrt den Weg, nicht die Sicht).
  */
@@ -31,7 +32,24 @@
   const KAMMERN = { name: "Die Kammern der Verschleppten", b: 12, h: 9, boden: "stein", bild: null,
     hindernisse: ausText(["MMMMMMMMMMMM", "M....MM....M", "M..........M", "M..MM..MM..M", "...........M", "M..MM..MM..M", "M..........M", "M....MM....M", "MMMMMMMMMMMM"]),
     start: { spieler: sp, wolf: [[3, 4], [2, 3], [2, 5], [1, 2]], gegner: [[8, 4], [9, 2], [9, 6], [7, 2], [7, 6], [10, 4]] } };
-  const KARTEN = { STURMGRAT, UNTERSTOLLEN, PILGERSTRASSE, MARKT, KAMMERN };
+  /* ----- Akt II und III ----- */
+  // Die Brücke über den Gletscherbruch: drei Felder breit über dem Abgrund, Felsplattformen an beiden Enden, rechts der Ausgang
+  const BRUECKE = { name: "Die Brücke über den Gletscherbruch", b: 12, h: 9, boden: "stein", bild: null,
+    hindernisse: ausText(["MMMMMMMMMMMM", "M...QQQQ...M", "M..QQQQQQ..M", "............", "............", "............", "M..QQQQQQ..M", "M...QQQQ...M", "MMMMMMMMMMMM"]),
+    start: { spieler: sp, wolf: [[0, 3], [0, 5], [0, 4], [2, 2]], gegner: [[9, 4], [9, 1], [10, 2], [9, 7], [10, 6], [9, 3], [9, 5], [10, 1], [10, 7], [8, 4]] } };
+  // Das Tor der Kronenwache: Vorhof vor dem Palast, zwei Runensäulen an den Seiten
+  const TOR = { name: "Das Tor der Kronenwache", b: 12, h: 9, boden: "stein", bild: null,
+    hindernisse: ausText(["MMMMMMMMMMMM", "M...M..M...M", "M..........M", "M..K....K..M", "............", "M..K....K..M", "M..........M", "M...M..M...M", "MMMMMMMMMMMM"]),
+    start: { spieler: sp, wolf: [[3, 4], [2, 2], [2, 6], [4, 4]], gegner: [[8, 4], [9, 3], [9, 5], [10, 4], [10, 2], [10, 6], [7, 2], [7, 6]] } };
+  // Das Archiv der Namen: Regalgänge, drei Schrifttafeln, Schriftkapseln in den Wänden
+  const ARCHIV = { name: "Das Archiv der Namen", b: 12, h: 9, boden: "stein", bild: null,
+    hindernisse: ausText(["MMMMMMMMMMMM", "M.M.M..M.M.M", "M..........M", "M.MM.MM.MM.M", "............", "M.MM.MM.MM.M", "M..........M", "M.M.M..M.M.M", "MMMMMMMMMMMM"]),
+    start: { spieler: [[1, 4], [2, 4], [0, 4], [1, 2], [1, 6], [2, 2]], wolf: [[3, 4], [3, 2], [3, 6], [2, 6]], gegner: [[9, 4], [8, 2], [8, 6], [10, 2], [10, 6], [7, 4], [10, 3], [5, 2], [5, 6], [9, 2]] } };
+  // Die Frostkammer: Säulenhalle mit zwei Nestern, in der Mitte die Frostmatrone
+  const FROSTKAMMER = { name: "Die Frostkammer", b: 12, h: 9, boden: "stein", bild: null,
+    hindernisse: ausText(["MMMMMMMMMMMM", "M....MM....M", "M.MM....MM.M", "M..........M", "............", "M..........M", "M.MM....MM.M", "M....MM....M", "MMMMMMMMMMMM"]),
+    start: { spieler: sp, wolf: [[3, 4], [3, 3], [3, 5], [1, 3]], gegner: [[9, 4], [10, 1], [10, 7], [8, 3], [8, 5], [10, 3], [10, 5], [7, 4]] } };
+  const KARTEN = { STURMGRAT, UNTERSTOLLEN, PILGERSTRASSE, MARKT, KAMMERN, BRUECKE, TOR, ARCHIV, FROSTKAMMER };
   // Ziel-Objekte und Mechaniken je Kampf (Felder müssen frei sein, siehe tests/krone.test.js)
   const OBJEKTE = {
     horn: { id: "horn", name: "Das Jagdhorn", art: "horn", x: 10, y: 3, runden: 2, ruhe: true, aktion: "Jagdhorn sichern", fertigText: "Ihr reißt das Horn vom Pfahl. Die Jäger hören auf zu blasen" },
@@ -45,6 +63,12 @@
       { id: "b2", name: "Eisblock mit einer alten Frau", art: "eisblock", x: 5, y: 4, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis bricht, eine alte Frau atmet zum ersten Mal seit Jahren", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } },
       { id: "b3", name: "Eisblock mit einem Wachmann", art: "eisblock", x: 10, y: 7, runden: 2, frist: 6, aktion: "Eis aufschlagen", fertigText: "Das Eis platzt, ein Mann in alter Rüstung sinkt auf die Knie", wirkung: { gerettet: true, verlorenText: "Hinter dem Eis wird es still." } }],
   };
+  OBJEKTE.gitter = [3, 4, 5].map((y, i) => ({ id: "g" + (i + 1), name: "Eisgitter", art: "gitter", x: 10, y, runden: 2, aktion: "Eisgitter aufschlagen", fertigText: "Das Gitter zerspringt", wirkung: { oeffnet: true } }));
+  OBJEKTE.saeulen = [{ id: "r1", name: "Runensäule Nord", art: "saeule", x: 9, y: 1, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" },
+    { id: "r2", name: "Runensäule Süd", art: "saeule", x: 9, y: 7, runden: 2, ruhe: true, aktion: "Runensäule abschalten", fertigText: "Die Rune erlischt" }];
+  OBJEKTE.tafeln = [{ id: "t1", name: "Tafel der Gründer", art: "tafel", x: 6, y: 1, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
+    { id: "t2", name: "Tafel der Wächter", art: "tafel", x: 6, y: 7, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } },
+    { id: "t3", name: "Tafel des Herzens", art: "tafel", x: 11, y: 4, runden: 2, frist: 8, umkehrbar: true, aktion: "Tafel sichern", fertigText: "Ihr wickelt die Tafel in Mäntel. Die Namen bleiben", wirkung: { verlorenText: "Die letzten Zeichen verblassen." } }];
   const NAMEN = { siegeljaeger: "Maskierter Jäger", jaegerschuetze: "Maskierter Schütze", funkenhund: "Fährtenhund", jaegerhauptmann: "Jägerhauptmann Varrek", eisgezeichneter: "Verlorener Pilger" };
   const bonusName = { signalhorn: "das Signalhorn", kernsplitter: "den Kernsplitter", pilgerzeichen: "das Pilgerzeichen" };
 
@@ -299,7 +323,7 @@
       },
     },
     lager_akt1: {
-      art: "lager", abschnitt: 1, titel: "Lagerfeuer in einem Haus ohne Eis", ort: "Veyrholm", aufstieg: 2, weiter: "akt2_entwurf",
+      art: "lager", abschnitt: 1, titel: "Lagerfeuer in einem Haus ohne Eis", ort: "Veyrholm", aufstieg: 2, weiter: "bruecke_ankunft",
       text: (A) => [
         "Ein Haus am Rand des Platzes, in dem das Eis nur bis zur Türschwelle reicht. Ihr macht Feuer aus alten Möbeln. Draußen ist es still, so still, dass ihr euren Atem hört.",
         A.merker.s4_verschleppte > 0 ? "Die Geretteten schlafen dicht am Feuer. Das Kind hält im Schlaf den Ärmel eines von euch fest." : "",
@@ -307,9 +331,151 @@
         "Ihr seid stärker geworden. **Stufe 2.**",
       ],
     },
-    akt2_entwurf: {
-      art: "ende", abschnitt: 1, titel: "Fortsetzung folgt", ort: "Veyrholm",
-      text: ["Hier endet der Entwurf von Akt I. Als Nächstes: die Brücke über den Gletscherbruch, das Tor der Kronenwache, das Archiv der Namen und die Frostkammer."],
+    /* ================= Akt II · Die Stadt erwacht ================= */
+    bruecke_ankunft: {
+      art: "gespraech", abschnitt: 2, titel: "Der Gletscherbruch", ort: "Veyrholm",
+      text: (A) => [
+        "Zwischen der Unterstadt und dem Palastbezirk klafft ein Riss im Gletscher, so tief, dass unten nur Dunkelheit ist. Darüber eine Brücke aus Stein und Eis, drei Schritt breit. Auf der anderen Seite: Felsplattformen, und auf ihnen Maskierte mit Bögen. In der Mitte der Brücke liegt etwas Großes in Ketten und hebt den Kopf.",
+        A.merker.s4_verschleppte >= 2 ? "Die alte Brückenwärterin hat es euch gesagt: Nur die Felder mit den Sternen im Eis tragen. Ihr seht, welche brechen werden." : "",
+        A.merker.markt_verloren ? "Seit dem Marktplatz ist die Stadt wach. Mehr Augen hinter den Fenstern, mehr Bögen auf den Plattformen." : "",
+      ],
+      optionen: [
+        { id: "spaehen", text: "Die Schützen ausspähen", frage: "Ihr legt euch flach an den Rand und beobachtet die Plattformen.",
+          probe: { name: "Wahrnehmung", attr: "WEI", sg: 13, geuebt: ["waldlaeufer", "schurke"], knapp: true,
+            erfolg: { text: "Sie wechseln die Wache. Wenn ihr jetzt lauft, sind sie nicht bereit.", setzt: { bruecke_ueberrascht: true } },
+            knapp: { text: "Vier Schützen, eine Kettenbestie. Mehr erkennt ihr nicht." },
+            fehl: { text: "Ein Pfeil schlägt neben euch ins Eis. Sie haben euch gesehen.", glocke: 1 } } },
+        { id: "seil", text: "Ein Seil als Geländer spannen", wenn: (A) => Boolean(A.merker.seil && !A.merker.bruecke_seil), frage: "Ihr spannt Ylvas Seil am Brückenrand.",
+          antwort: "Es wird halten, wenn jemand stürzt. Vielleicht.", setzt: { bruecke_seil: true } },
+        { id: "los", text: "Über die Brücke", weiter: "kampf_bruecke" },
+      ],
+    },
+    kampf_bruecke: {
+      art: "kampf", abschnitt: 2, stufe: 2, titel: "Die Brücke über den Gletscherbruch", ort: "Der Gletscherbruch",
+      text: (A) => [`Am Ende der Brücke versperrt ein Eisgitter den Weg: Schlagt es auf (je Feld zwei Aktionen daneben) und kommt alle auf die andere Seite (die markierten Felder rechts) – oder besiegt alle. Die Kettenbestie stößt Helden zurück, am Rand geht es in den Abgrund. Die Brücke knackt: Angekündigte Felder brechen eine Runde später ein.${A.merker.s4_verschleppte >= 2 ? " Dank der Brückenwärterin seht ihr die brüchigen Felder." : ""}`],
+      kampf: (A) => {
+        const eis = []; for (let x = 3; x <= 8; x++) { eis.push([x, 3]); eis.push([x, 5]); }
+        let mal = 1; if (A.merker.markt_verloren) mal *= 1.15; if (A.merker.bund_gewarnt) mal *= 1.05;
+        return { begegnung: "k_bruecke", karte: BRUECKE, keinAnfuehrer: true, mischen: false, namen: NAMEN, skalaMal: mal, ueberraschung: Boolean(A.merker.bruecke_ueberrascht),
+          mechanik: { ziele: OBJEKTE.gitter, eis: { felder: eis, proRunde: 2, ab: 2, max: 5, bekannt: A.merker.s4_verschleppte >= 2 }, ausgang: { felder: [[10, 3], [10, 4], [10, 5], [11, 3], [11, 4], [11, 5]], text: "Ihr seid drüben! Hinter euch bricht ein Stück der Brücke in die Tiefe." } },
+          sieg: { weiter: "bruecke_nach" }, verloren: { setzt: { zeit_verloren: true }, glocke: 1, weiter: "bruecke_flucht" } };
+      },
+    },
+    bruecke_nach: {
+      art: "erzaehlung", abschnitt: 2, titel: "Der Palastbezirk", ort: "Veyrholm", weiter: "tor_ankunft", rastErlaubt: true,
+      text: ["Auf der anderen Seite ist die Luft kälter und stiller. Die Häuser sind größer, die Gestalten in den Fenstern tragen Schmuck. Vor euch steigt eine Prachtstraße zum Palast hinauf."],
+    },
+    bruecke_flucht: {
+      art: "erzaehlung", abschnitt: 2, titel: "Der lange Weg", ort: "Veyrholm", weiter: "tor_ankunft",
+      text: ["Ihr müsst zurück, einen Umweg suchen, über eine halb eingestürzte Nebenbrücke klettern. Als ihr endlich im Palastbezirk steht, ist es Nacht, und der Bund hat Zeit gehabt, sich vorzubereiten."],
+    },
+    tor_ankunft: {
+      art: "gespraech", abschnitt: 2, titel: "Das Tor der Kronenwache", ort: "Vor dem Palast",
+      text: (A) => [
+        "Vor dem Palasttor steht der Eisenhirte: ein Wächter aus Stein und Eisen, doppelt so groß wie ein Mann. Auf seiner Brust pulsiert eine Rune, und ein schimmerndes Feld umgibt ihn. Links und rechts des Vorhofs ragen zwei Runensäulen auf.",
+        A.merker.s4_verschleppte >= 3 ? "Der gerettete Wachmann tritt neben euch. „Ich kenne ihn. Ich habe neben ihm Wache gestanden, vor dreihundert Jahren. Die Säulen nähren ihn. Ich fange bei der nördlichen an.“" : "",
+      ],
+      optionen: [
+        { id: "runen", text: "Die Runen deuten", frage: "Ihr betrachtet die Zeichen an Säulen und Brust.",
+          probe: { name: "Runen lesen", attr: "INT", sg: 13, geuebt: ["zauberer", "kleriker"], knapp: true,
+            erfolg: { text: "Die Säulen speisen ihn. Sind beide aus, erstarrt er. Und vor jedem Bodenstoß hebt er die Fäuste: Wer dann zwei Schritt Abstand hält, bleibt verschont.", setzt: { runen_bekannt: true } },
+            knapp: { text: "Die Säulen und die Brust gehören zusammen. Mehr seht ihr nicht." },
+            fehl: { text: "Die Zeichen verschwimmen vor euren Augen. Kälte kriecht in eure Finger.", glocke: 1 } } },
+        { id: "los", text: "Den Vorhof betreten", weiter: "kampf_tor" },
+      ],
+    },
+    kampf_tor: {
+      art: "kampf", abschnitt: 2, stufe: 2, titel: "Das Tor der Kronenwache", ort: "Vor dem Palast",
+      text: ["Der Eisenhirte trägt ein Runenschild (halber Schaden, bricht nach genug Treffern für zwei Runden). Alle drei Runden kündigt er einen Bodenstoß an: Wer im Umkreis von zwei Feldern bleibt, wird getroffen. Schaltet die beiden Runensäulen ab (je zwei Aktionen in Ruhe) – dann erstarrt er. Oder besiegt ihn."],
+      kampf: (A) => ({ begegnung: "k_tor", karte: TOR, keinAnfuehrer: true, mischen: false, skalaMal: A.merker.zeit_verloren ? 1.1 : 1,
+        mechanik: { ziele: OBJEKTE.saeulen.map((z) => Object.assign({}, z, A.merker.s4_verschleppte >= 3 && z.id === "r1" ? { start: 1 } : {})),
+          schild: { art: "eisenhirte", ziele: ["r1", "r2"], halt: 18, pause: 2, text: "Runenschild" },
+          sieg: { ziele: 2, art: "saeule", besiegt: { art: "eisenhirte", n: 1 }, text: "Der Eisenhirte erstarrt. Langsam, mit einem Knirschen wie Gletschereis, tritt er beiseite. Das Tor ist frei." } },
+        sieg: { weiter: "tor_nach" } }),
+    },
+    tor_nach: {
+      art: "erzaehlung", abschnitt: 2, titel: "Das offene Tor", ort: "Der Palast", weiter: "lager_akt2", rastErlaubt: true,
+      text: ["Hinter dem Tor liegt der Palast, und unter ihm, irgendwo, das Kronenherz. Ihr spürt es: ein langsamer Puls im Boden, wie ein Herz im Schlaf. Im Palast brennt Licht. Jemand ist vor euch hier."],
+    },
+    lager_akt2: {
+      art: "lager", abschnitt: 2, titel: "Lagerfeuer in der Wachstube", ort: "Der Palast", aufstieg: 3, weiter: "archiv_ankunft",
+      text: (A) => [
+        "Die alte Wachstube neben dem Tor hat einen Kamin. Ihr verbrennt Speerschäfte und Stuhlbeine und wärmt euch, so gut es geht.",
+        A.merker.s4_route_bonus === "kernsplitter" ? "Der Kernsplitter pulsiert schneller, seit ihr im Palast seid. Er will nach Hause." : "",
+        A.merker.anselm_spur ? "An der Wand der Wachstube: ein frisches Zeichen, eine leere Krone, und darunter ein Kürzel. A." : "",
+        "Ihr seid stärker geworden. **Stufe 3.**",
+      ],
+    },
+    /* ================= Akt III · Das Herz der Siegel ================= */
+    archiv_ankunft: {
+      art: "gespraech", abschnitt: 3, titel: "Das Archiv der Namen", ort: "Der Palast",
+      text: (A) => [
+        "Unter dem Palast liegt ein Archiv: Gang um Gang, Regal um Regal, und an den Enden drei steinerne Tafeln voller Namen. Ein Kälterufer steht vor der ersten und streicht mit der Hand darüber. Wo er streicht, verschwinden die Namen.",
+        "Neben ihm ein Mann mit einem Buch, der Runen vorliest. Ein Runenleser. Er sieht euch und lächelt.",
+        A.merker.s4_route_bonus === "pilgerzeichen" ? "Das Pilgerzeichen in eurer Tasche wird warm: Hier gibt es einen Weg, den nur Pilger kennen." : "",
+      ],
+      optionen: [
+        { id: "warum", text: "Den Runenleser ansprechen", wer: "Der Runenleser", frage: "„Warum löscht ihr die Namen?“",
+          antwort: (A) => `„Ein Name ist ein Siegel, das man vergessen kann“, sagt er. „Das Kronenherz hält die Siegel zusammen, weil es sich an alle erinnert. Wenn niemand sich erinnert, gehorcht es dem, der es hält.“ Er klappt das Buch zu.${A.merker.anselm_spur ? " „Grüße von Anselm übrigens.“" : ""}` },
+        { id: "los", text: "Die Tafeln sichern", weiter: "kampf_archiv" },
+      ],
+    },
+    kampf_archiv: {
+      art: "kampf", abschnitt: 3, stufe: 3, titel: "Das Archiv der Namen", ort: "Unter dem Palast",
+      text: (A) => [`Sichert die drei Tafeln (je zwei Aktionen daneben), bevor die Namen verblassen – ihr habt bis Runde 8. Der Kälterufer löscht, was ihr gesichert habt, wenn er herankommt. Der Runenleser lässt Eis zwischen euch wachsen. Aus den Schriftkapseln brechen Glasschwärmer.${A.merker.s4_route_bonus === "signalhorn" ? " Das Signalhorn hält die Schwärmer eine Weile zurück." : ""}`],
+      kampf: (A) => ({ begegnung: "k_archiv", karte: ARCHIV, keinAnfuehrer: true, namen: NAMEN,
+        mechanik: { ziele: OBJEKTE.tafeln, zieleZuerst: true, sieg: { ziele: 3, art: "tafel", text: "Alle drei Tafeln sind gesichert. Der Runenleser flucht und verschwindet in den Gängen." },
+          wellen: [{ id: "kapseln", name: "Die Schriftkapseln", kurz: "aus den Kapseln", quellen: [[3, 1], [8, 1], [3, 7], [8, 7]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 3, ab: A.merker.s4_route_bonus === "signalhorn" ? 5 : 3, max: 2, text: "In den Wänden klirrt Glas" }] },
+        nachher: (st) => ({ setzt: { tafeln: st.mech ? st.mech.ziele.filter((z) => z.fertig).length : 0 } }),
+        sieg: { weiter: "archiv_nach" }, verloren: { glocke: 1, weiter: "archiv_nach" } }),
+    },
+    archiv_nach: {
+      art: "erzaehlung", abschnitt: 3, titel: "Was die Tafeln sagen", ort: "Unter dem Palast", weiter: "frost_suche", rastErlaubt: true,
+      beimEintritt: (A) => (A.merker.tafeln >= 2 ? { setzt: { archiv_wahrheit: true } } : null),
+      text: (A) => [
+        A.merker.tafeln >= 2 ? "Ihr lest die Tafeln im Licht einer Fackel. Die Gründer haben das Kronenherz gebaut, um die sieben Siegel stabil zu halten. Aber auf der Tafel des Herzens steht noch etwas, später eingemeißelt, in hastiger Schrift: Wer das Herz hält, kann jedes Siegel öffnen. Die letzten Könige haben es versucht. Dann kam das Eis."
+          : A.merker.tafeln === 1 ? "Eine Tafel habt ihr retten können. Sie nennt die Namen der Gründer und spricht von einem Herz, das sich an alle Siegel erinnert. Wozu es gebaut wurde, steht auf den anderen. Die sind leer."
+          : "Die Tafeln sind leer. Was immer sie über das Kronenherz sagten, ist vergessen. Der Runenleser hat bekommen, was er wollte.",
+      ],
+    },
+    frost_suche: {
+      art: "probe", abschnitt: 3, titel: "Ein kalter Luftzug", ort: "Unter dem Palast",
+      text: (A) => ["Zwischen zwei Regalen zieht es eiskalt. Dahinter könnte ein Gang liegen. Eine Person sucht.", A.merker.s4_route_bonus === "pilgerzeichen" ? "Das Pilgerzeichen zeigt euch die Stelle: Vorteil." : ""],
+      probe: { name: "Suchen", attr: "WEI", sg: 13, geuebt: ["schurke", "waldlaeufer"], vorteil: (A) => (A.merker.s4_route_bonus === "pilgerzeichen" ? 1 : 0),
+        erfolg: { text: "Hinter dem Regal: eine Tür aus Eis, und dahinter eine Halle voller Säulen. In der Mitte, auf einem Thron aus Kristall, sitzt eine Frau aus Raureif. Die Frostmatrone. Sie herrscht über die Schwärmer – auch über die im Kronensaal.", weiter: "frost_wahl" },
+        fehl: { text: "Ihr findet nichts als kalte Steine. Was immer dort zieht, bleibt euch verborgen.", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "akt3_entwurf" } },
+    },
+    frost_wahl: {
+      art: "wahl", abschnitt: 3, titel: "Die Frostmatrone", ort: "Die Frostkammer",
+      text: ["Besiegt ihr sie, wird der Kronensaal leichter: keine Schwärmer mehr aus ihren Nestern. Aber sie ist stark, und niemand zwingt euch. Ihr könnt mit ihr reden, oder leise wieder gehen. Stimmt ab."],
+      optionen: [
+        { id: "kampf", text: "Die Frostmatrone herausfordern", weiter: "kampf_frost" },
+        { id: "reden", text: "Mit ihr reden", weiter: "frost_reden" },
+        { id: "gehen", text: "Leise wieder gehen", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "akt3_entwurf" },
+      ],
+    },
+    frost_reden: {
+      art: "probe", abschnitt: 3, titel: "Ein Handel im Eis", ort: "Die Frostkammer",
+      text: ["„Ihr wollt zum Herzen“, sagt sie, und ihre Stimme klingt wie Eis, das bricht. „Was gebt ihr mir, wenn ich meine Kinder zurückhalte?“ Eine Person verhandelt."],
+      probe: { name: "Verhandeln", attr: "CHA", sg: 15, geuebt: ["kleriker", "schurke"], knapp: true,
+        erfolg: { text: "Ihr versprecht ihr die Kammer, für immer, ohne Krone und ohne Bund. Sie neigt den Kopf. „Dann schweigen meine Kinder im Saal.“", setzt: { s4_frostmatrone: "verschont" }, weiter: "akt3_entwurf" },
+        knapp: { text: "Sie lacht. „Ein Teil meiner Kinder. Nicht alle.“", setzt: { s4_frostmatrone: "verschont", matrone_halb: true }, weiter: "akt3_entwurf" },
+        fehl: { text: "„Ihr habt nichts, was ich will.“ Die Nester glühen auf.", weiter: "kampf_frost" } },
+    },
+    kampf_frost: {
+      art: "kampf", abschnitt: 3, stufe: 3, titel: "Die Frostkammer", ort: "Die Frostkammer",
+      text: ["Besiegt die Frostmatrone. Sie greift auf zwei Felder Entfernung, lässt Eiskorridore zwischen euch wachsen und speit Brut. Zwei Nester lassen Schwärmer schlüpfen."],
+      kampf: () => ({ begegnung: "k_frost", karte: FROSTKAMMER, keinAnfuehrer: true, mischen: false,
+        mechanik: { sieg: { besiegt: { art: "frostmatrone", n: 1 }, text: "Die Frostmatrone zerspringt wie ein Spiegel. Die Nester verstummen." } },
+        sieg: { setzt: { s4_frostmatrone: "besiegt" }, weiter: "frost_nach" }, verloren: { setzt: { s4_frostmatrone: "nicht_gefunden" }, glocke: 1, weiter: "akt3_entwurf" } }),
+    },
+    frost_nach: {
+      art: "erzaehlung", abschnitt: 3, titel: "Stille in der Kammer", ort: "Die Frostkammer", weiter: "akt3_entwurf", rastErlaubt: true,
+      text: ["Wo die Frostmatrone saß, liegt ein Häufchen Raureif, und darin ein Ring aus blauem Kristall. Er ist kalt, aber er schützt: Wer ihn trägt, friert nicht. Im Kronensaal werden keine Schwärmer auf euch warten."],
+    },
+    akt3_entwurf: {
+      art: "ende", abschnitt: 3, titel: "Fortsetzung folgt", ort: "Vor dem Kronensaal",
+      text: ["Hier endet der Entwurf. Als Nächstes: der Kronensaal, der König unter dem Eis und die Entscheidung über das Kronenherz."],
     },
     krone_verloren: { art: "ende", abschnitt: 0, titel: "Unter dem Eis", ort: "", text: ["Das Eis schließt sich über euch. Irgendwann wird jemand durch die Fenster schauen und euch sehen, wie Fische im Winterteich."] },
   };
@@ -325,6 +491,10 @@
     frostknecht: { klassen: ["krieger"], text: "Langsam (4 Felder), robust (RK 15). Hält Engstellen – nicht frontal festbeißen, sondern umgehen." },
     eisgezeichneter: { klassen: ["kleriker"], text: "Untot und schwach (9 TP), kommt in Gruppen. Licht und Vertreiben wirken." },
     kaelterufer: { klassen: ["zauberer", "kleriker"], text: "Weckt erledigte Ziele wieder und heilt seine Verbündeten. Solange er lebt, kommt Verstärkung. Zuerst ausschalten!" },
+    kettenbestie: { klassen: ["krieger", "waldlaeufer"], text: "Schwer (2W6+3) und mit Rückstoß: STR-Rettung, sonst bis zu zwei Felder zurück – am Abgrund ein Sturz. Nicht mit dem Rücken zum Rand stehen." },
+    eisenhirte: { klassen: ["zauberer", "krieger"], text: "Runenschild halbiert den Schaden, bis es bricht. Bodenstoß wird angekündigt: zwei Felder Abstand halten. Die beiden Runensäulen lassen ihn erstarren." },
+    runenleser: { klassen: ["zauberer"], text: "Lässt neben eng stehenden Helden Eis wachsen (angekündigt, zwei Runden). Verteilt euch." },
+    frostmatrone: { klassen: ["zauberer", "kleriker"], text: "Frostgriff auf zwei Felder, Eiskorridore und Brut. Unter halbem Leben wird sie härter (RK +1)." },
     eidwaechter: { klassen: ["kleriker", "krieger"], text: "Schwer (RK 15, Eidhammer 2W6+3). Sein Schutzkreis fängt die Hälfte des Schadens ab, bis alle drei Grablichter brennen." },
   };
   const META = {

@@ -105,6 +105,9 @@
     kettenbestie: { name: "Kettenbestie", tp: 40, rk: 14, werte: { STR: 18, GES: 10, KON: 16, INT: 4, WEI: 10, CHA: 4 }, angriff: { name: "Kettenhieb", bonus: 6, schaden: "2W6+3" }, rueckstoss: { felder: 2, sg: 13 }, bewegung: 5, xp: 450 },
     splitterbrutmutter: { name: "Splitterbrutmutter", tp: 40, rk: 13, werte: { STR: 16, GES: 12, KON: 15, INT: 4, WEI: 10, CHA: 4 }, angriff: { name: "Splitterbiss", bonus: 5, schaden: "2W6+2" }, brut: { art: "glasschwaermer", alle: 2, max: 4 }, bewegung: 4, xp: 450 },
     eidwaechter: { name: "Eidwächter", tp: 40, rk: 15, werte: { STR: 17, GES: 9, KON: 16, INT: 8, WEI: 12, CHA: 8 }, angriff: { name: "Eidhammer", bonus: 5, schaden: "2W6+3" }, untot: true, bewegung: 4, xp: 450 },
+    frostmatrone: { name: "Frostmatrone", tp: 60, rk: 14, werte: { STR: 14, GES: 12, KON: 16, INT: 14, WEI: 16, CHA: 14 }, angriff: { name: "Frostgriff", bonus: 6, schaden: "2W8+2", reichweite: 2 },
+      feldzauber: { name: "Eiskorridor", anzahl: 3, dauer: 2, alle: 3, reichweite: 9 }, brut: { art: "glasschwaermer", alle: 3, max: 3 }, bewegung: 4,
+      phasen: [{ ab: 0.5, text: "Die Frostmatrone kreischt. Der Boden der Kammer überzieht sich mit Raureif, und die Nester glühen auf.", rk: 1 }], xp: 1100 },
     eisenhirte: { name: "Eisenhirte", tp: 70, rk: 16, werte: { STR: 20, GES: 8, KON: 18, INT: 6, WEI: 12, CHA: 6 }, angriff: { name: "Steinfaust", bonus: 6, schaden: "2W8+3" }, bewegung: 3,
       flaeche: { name: "Bodenstoß", form: "ring", radius: 2, schaden: "3W6", sg: 13, rettung: "GES", alle: 3, liegend: true },
       phasen: [{ ab: 0.5, text: "Die Runen am Eisenhirten glühen weiß: Er stampft schneller und wilder.", rk: -1 }], xp: 1100 },
@@ -147,6 +150,11 @@
     k_pilger: { name: "Die namenlosen Pilger", stufe: 1, zusatzAb: 99, gegner: [["eidwaechter", 0.25, 1, 0], ["kaelterufer", 0.25, 1, 0], ["eisgezeichneter", 0.8, 5, -1]], skala: { 2: 0.66, 3: 0.66, 4: 1.98, 5: 1.63, 6: 2.92 }, skalaHC: { 2: 0.71, 3: 0.71, 4: 0.87, 5: 1.18, 6: 1.74 } },
     k_markt: { name: "Marktplatz der leeren Fenster", stufe: 1, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["jaegerschuetze", 0.2, 2, 0.6], ["frostknecht", 0.2, 2], ["eisgezeichneter", 0.7, 5]], skala: { 2: 0.76, 3: 0.76, 4: 0.8, 5: 1.2, 6: 1.35 }, skalaHC: { 2: 0.59, 3: 0.59, 4: 0.63, 5: 1.1, 6: 1.28 } },
     k_kammern: { name: "Die Kammern der Verschleppten", stufe: 1, zusatzAb: 99, gegner: [["frostknecht", 0.25, 2, 0.25], ["glasschwaermer", 0.5, 5]], skala: { 2: 0.85, 3: 0.85, 4: 1.23, 5: 1.59, 6: 2.2 }, skalaHC: { 2: 1.03, 3: 1.03, 4: 1.26, 5: 1.37, 6: 2.2 } },
+    // Akt II (Heldenstufe 2) und III (Stufe 3)
+    k_bruecke: { name: "Die Brücke über den Gletscherbruch", stufe: 2, zusatzAb: 99, gegner: [["kettenbestie", 0.25, 1, 0], ["jaegerschuetze", 0.35, 3, 0.4], ["siegeljaeger", 0.3, 2]], skala: { 2: 0.83, 3: 0.83, 4: 1.13, 5: 1.98, 6: 3.79 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    k_tor: { name: "Das Tor der Kronenwache", stufe: 2, zusatzAb: 99, gegner: [["eisenhirte", 0.25, 1, 0], ["frostknecht", 0.35, 3]], skala: { 2: 1.23, 3: 1.23, 4: 3.96, 5: 3.96, 6: 3.96 }, skalaHC: { 2: 0.63, 3: 0.63, 4: 1.37, 5: 3.19, 6: 3.96 } },
+    k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["eisgezeichneter", 0.6, 4], ["glasschwaermer", 0.3, 2]], skala: { 2: 1.81, 3: 1.81, 4: 2.51, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
+    k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.3, 3]], skala: { 2: 1.37, 3: 1.37, 4: 2.74, 5: 3.71, 6: 3.96 }, skalaHC: { 2: 1, 3: 1, 4: 1, 5: 1, 6: 1 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -1330,7 +1338,7 @@
     const mech = st.mech = { ziele: [], wellen: [], marken: [], wandel: [], wieder: [], gerettet: 0, stat: { getroffen: 0, ausgewichen: 0 }, tpk: tpk || 1, sieg: m.sieg || null, schild: m.schild || null, eis: null,
       ausgang: m.ausgang ? { felder: m.ausgang.felder.map((p) => p.slice()), text: m.ausgang.text || null } : null, zieleZuerst: Boolean(m.zieleZuerst) };
     for (const z of m.ziele || []) {
-      mech.ziele.push({ id: z.id, name: z.name, art: z.art || "ziel", x: z.x, y: z.y, runden: z.runden || 1, fortschritt: 0, fertig: false, verloren: false, ruhe: Boolean(z.ruhe), frist: z.frist || null,
+      mech.ziele.push({ id: z.id, name: z.name, art: z.art || "ziel", x: z.x, y: z.y, runden: z.runden || 1, fortschritt: Math.min(z.start || 0, (z.runden || 1) - 1), fertig: false, verloren: false, ruhe: Boolean(z.ruhe), frist: z.frist || null,
         umkehrbar: Boolean(z.umkehrbar), aktion: z.aktion || null, fertigText: z.fertigText || null, wirkung: z.wirkung || {} });
       st.karte.hindernisse.push(["O", z.x, z.y]); st.karte.block.add(key(z.x, z.y));
     }
@@ -1443,6 +1451,7 @@
     const w = z.wirkung;
     for (const id of [].concat(w.welleAus || [])) { const q = st.mech.wellen.find((x) => x.id === id); if (q && !q.aus) { q.aus = true; st.log.push({ t: `${q.name}: versiegt.`, art: "gut" }); } }
     if (w.gerettet) st.mech.gerettet++;
+    if (w.oeffnet) { feldZurueck(st, { t: "O", x: z.x, y: z.y }); st.log.push({ t: `${z.name}: Der Weg ist frei.`, art: "gut" }); } // Tür, Gitter: das Feld wird begehbar
     if (st.mech.zieleZuerst) pruefeEnde(st);
     if (w.schild) for (const g of gegnerFiguren(st)) if (g.schild && g.schild.ziele.includes(z.id) && g.schild.ziele.every((id) => (st.mech.ziele.find((x) => x.id === id) || {}).fertig)) {
       g.schild.aktiv = false; g.schild.dauerhaftAus = true; st.log.push({ t: `${g.name}: Das ${g.schild.text} erlischt endgültig.`, art: "gut" });

@@ -108,11 +108,11 @@
     halle: { name: "Coldric und die Aschehunde", stufe: 3, gegner: [["grabritter", 0.25], ["aschehund", 0.5]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
     halle_asche: { name: "Die Aschehunde", stufe: 3, gegner: [["aschehund", 0.75]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
     // Das Moor der stummen Lichter (ab 2 Helden): eigene Tabelle je Gruppengröße, mit tools/kalibrieren-moor.js bestimmt
-    moor_rand: { name: "Kröten und Irrlichter", stufe: 1, gegner: [["schlammkroete", 0.5], ["irrlicht", 0.75]], skala: { 2: 0.37, 3: 1.14, 4: 2.16, 5: 2.2, 6: 2.78 }, skalaHC: { 2: 1.33, 3: 1.38, 4: 1.64, 5: 1.61, 6: 1.88 } },
-    moor_kroeten: { name: "Schlammkröten", stufe: 1, gegner: [["schlammkroete", 0.85]], skala: { 2: 0.87, 3: 1.23, 4: 2.33, 5: 2.94, 6: 2.89 }, skalaHC: { 2: 0.94, 3: 1.49, 4: 2.38, 5: 2.78, 6: 2.83 } },
-    moor_kroeten2: { name: "Schlammkröten im Ried", stufe: 2, gegner: [["schlammkroete", 1.0], ["irrlicht", 0.5]], skala: { 2: 0.74, 3: 0.94, 4: 1.68, 5: 1.85, 6: 2.03 }, skalaHC: { 2: 0.59, 3: 0.69, 4: 1.38, 5: 1.18, 6: 1.88 } },
-    moor_tote: { name: "Die Ertrunkenen", stufe: 2, gegner: [["moorleiche", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.09, 3: 1.28, 4: 2.12, 5: 2.2, 6: 2.94 }, skalaHC: { 2: 1.68, 3: 1.58, 4: 2.16, 5: 2.33, 6: 2.62 } },
-    moor_schrein: { name: "Alwine, die Stumme", stufe: 2, gegner: [["alwine", 0.25], ["moorleiche", 0.5], ["irrlicht", 0.5]], skala: { 2: 0.32, 3: 0.97, 4: 1.81, 5: 2.2, 6: 1.74 }, skalaHC: { 2: 0.69, 3: 1.05, 4: 1.88, 5: 2.12, 6: 1.68 } },
+    moor_rand: { name: "Kröten und Irrlichter", zusatzAb: 3, stufe: 1, gegner: [["schlammkroete", 0.5], ["irrlicht", 0.75]], skala: { 2: 1.49, 3: 1.57, 4: 2.78, 5: 3.47, 6: 4.8 }, skalaHC: { 2: 1.35, 3: 1.69, 4: 2.01, 5: 2.71, 6: 3.23 } },
+    moor_kroeten: { name: "Schlammkröten", zusatzAb: 3, stufe: 1, gegner: [["schlammkroete", 0.85]], skala: { 2: 1.65, 3: 1.42, 4: 2.45, 5: 2.99, 6: 3.31 }, skalaHC: { 2: 1.61, 3: 1.91, 4: 2.71, 5: 2.92, 6: 2.92 } },
+    moor_kroeten2: { name: "Schlammkröten im Ried", zusatzAb: 3, stufe: 2, gegner: [["schlammkroete", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.49, 3: 1.42, 4: 2.06, 5: 2.11, 6: 2.22 }, skalaHC: { 2: 1.17, 3: 1.29, 4: 1.53, 5: 1.53, 6: 2.01 } },
+    moor_tote: { name: "Die Ertrunkenen", zusatzAb: 3, stufe: 2, gegner: [["moorleiche", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.82, 3: 1.57, 4: 2.58, 5: 2.85, 6: 3.23 }, skalaHC: { 2: 1.65, 3: 1.82, 4: 2.34, 5: 2.71, 6: 2.99 } },
+    moor_schrein: { name: "Alwine, die Stumme", zusatzAb: 3, stufe: 2, gegner: [["alwine", 0.1, 1, 0.6], ["moorleiche", 0.5], ["irrlicht", 0.5]], skala: { 2: 0.75, 3: 0.84, 4: 1.78, 5: 2.45, 6: 3.23 }, skalaHC: { 2: 0.5, 3: 1, 4: 1.61, 5: 1.96, 6: 2.34 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -128,7 +128,8 @@
     const eigen = hardcore ? b.skalaHC || b.skala : b.skala;
     let k = skala != null ? skala : eigen ? eigen[Math.max(2, Math.min(6, n))] || 1 : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
     if (b.faktor) k *= b.faktor[Math.max(3, Math.min(6, n))] || 1;
-    return b.gegner.map(([art, je]) => { const soll = je * n, anzahl = Math.max(1, Math.round(soll)); return { art, anzahl, tpFaktor: k * soll / anzahl }; });
+    // [Art, Anzahl je Figur, höchstens, Grundwert]: z. B. genau eine Alwine, deren Leben nur leicht mit der Gruppe wächst (Grundwert + je Figur)
+    return b.gegner.map(([art, je, max, basis]) => { const soll = (basis || 0) + je * n, anzahl = Math.min(max || Infinity, Math.max(1, Math.round(soll))); return { art, anzahl, tpFaktor: k * soll / anzahl }; });
   }
 
   /* ---------- Karte ---------- */
@@ -265,7 +266,9 @@
     // Ein zusätzlicher Gegner der häufigsten Art (nicht bei fest vorgegebenen Gegnern wie im Duell)
     const basis = opts.gegner ? opts.gegner : gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore").map((g) => Object.assign({}, g));
     const zusatzN = opts.zusatzGegner != null ? opts.zusatzGegner : opts.schwierigkeit === "hardcore" ? 0 : GEGNER_TP.zusatz; // Zusatzgegner nur in Normal
-    if (!opts.gegner && zusatzN) { const h = basis.filter((g) => !GEGNER[g.art].boss).sort((a, b) => b.anzahl - a.anzahl)[0]; if (h) h.anzahl += zusatzN; }
+    // Begegnungen mit „zusatzAb“ (Moor): der Zusatzgegner erst ab dieser Gruppengröße – bei 2 Helden zählt jeder Gegner doppelt
+    const begZ = BEGEGNUNGEN[opts.begegnung || "garten"] || {};
+    if (!opts.gegner && zusatzN && !(begZ.zusatzAb && fids.length < begZ.zusatzAb)) { const h = basis.filter((g) => !GEGNER[g.art].boss).sort((a, b) => b.anzahl - a.anzahl)[0]; if (h) h.anzahl += zusatzN; }
     const gruppen = basis.map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * (opts.skalaMal || 1) * tpGlobal })).concat(opts.zusatz || []);
     let gi = 0;
     for (const g of gruppen) for (let i = 0; i < g.anzahl; i++) {

@@ -13,40 +13,76 @@
   const spalte = (f, x, von, bis) => Array.from({ length: bis - von + 1 }, (_, i) => f(x, von + i));
 
   /* ---------- Karten (12 × 9) ---------- */
-  // Der Bohlenweg: ein Steg aus Planken quer durchs Wasser, links und rechts Inseln mit toten Erlen
+  // Der Bohlenweg (gemaltes Bild): ein Steg, nur eine Feldreihe breit (Zeile 4), links und rechts eine Insel mit totem Baum.
+  // Begehbar ist nur, was in GEHEN steht; alles andere ist Wasser (Q: versperrt den Weg, nicht die Sicht) oder Hindernis.
+  const ausBild = (gehen, fest) => {
+    const frei = new Set(gehen.map(([x, y]) => x + "," + y)), h = [];
+    for (const [t, x, y] of fest) { h.push([t, x, y]); frei.add(x + "," + y); }
+    for (let y = 0; y < 9; y++) for (let x = 0; x < 12; x++) if (!frei.has(x + "," + y)) h.push(Q(x, y));
+    return h;
+  };
   const BOHLENWEG = {
-    name: "Der Bohlenweg", b: 12, h: 9, boden: "moor", bild: null,
-    hindernisse: [].concat(reihe(Q, 0, 0, 11), reihe(Q, 1, 0, 3), reihe(Q, 1, 7, 11), reihe(Q, 7, 0, 2), reihe(Q, 7, 8, 11), reihe(Q, 8, 0, 11),
-      [Q(4, 1), Q(5, 2), Q(6, 2), Q(4, 6), Q(5, 6), Q(6, 7), Q(7, 7), T(1, 2), T(10, 2), T(2, 6), T(9, 6), K(6, 1), K(3, 6)]),
-    start: { spieler: [[1, 4], [1, 3], [1, 5], [2, 4], [2, 3], [2, 5]], wolf: [[0, 4], [0, 3], [0, 5], [3, 5]],
-      gegner: [[10, 4], [9, 3], [9, 5], [10, 3], [10, 5], [8, 4], [11, 4], [11, 3], [11, 5], [8, 2], [8, 6], [7, 4]] },
+    name: "Der Bohlenweg", b: 12, h: 9, boden: "moor", bild: "img/rabenmoor/bohlenweg.webp",
+    hindernisse: ausBild(
+      [[1, 1], [2, 1], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [1, 5], [2, 5], [1, 6], [2, 6], [0, 7], // linke Insel
+        ...Array.from({ length: 12 }, (_, x) => [x, 4]), // Steg und Inselränder
+        [10, 2], [10, 3], [11, 3], [10, 5], [11, 6]], // rechte Insel
+      [T(0, 2), T(11, 2), K(0, 5), K(0, 6), K(11, 5), K(10, 6)]), // Baumstämme, Kiste, Felsen, Stumpf
+    start: { spieler: [[1, 3], [1, 4], [1, 5], [2, 3], [2, 5], [1, 2]], wolf: [[0, 4], [0, 3], [2, 2], [1, 6]],
+      gegner: [[10, 4], [11, 4], [10, 3], [10, 5], [11, 3], [10, 2], [9, 4], [8, 4], [7, 4], [6, 4], [5, 4]] },
   };
-  // Das Ried: Schilfinseln, schmale Furten, die Kröten kommen aus dem Wasser
+  // Das Ried (gemaltes Bild): Schlamminseln zwischen gewundenen Wasserläufen, dichtes Schilf an den Rändern.
+  // Karte als Text, Zeile für Zeile: . begehbar · ~ Wasser · T Schilf/Rohrkolben/Baum · K Stumpf, Fels, Kiste · M Stein
+  const ausText = (zeilen) => { const h = []; zeilen.forEach((z, y) => [...z].forEach((c, x) => { if (c === "~") h.push(Q(x, y)); else if (c === "T") h.push(T(x, y)); else if (c === "K") h.push(K(x, y)); else if (c === "M") h.push(M(x, y)); })); return h; };
   const RIED = {
-    name: "Das Ried", b: 12, h: 9, boden: "moor", bild: null,
-    hindernisse: [].concat([T(0, 0), T(1, 0), T(0, 1), T(10, 0), T(11, 0), T(11, 1), T(0, 8), T(11, 8), T(0, 7)],
-      [Q(4, 0), Q(5, 0), Q(6, 0), Q(4, 1), Q(5, 1), Q(3, 3), Q(4, 3), Q(5, 4), Q(6, 4), Q(7, 4), Q(8, 5), Q(3, 6), Q(4, 7), Q(5, 7), Q(6, 8), Q(7, 8), Q(9, 2), Q(10, 3)],
-      [T(2, 2), T(7, 2), T(8, 7), T(2, 5), T(9, 5), K(6, 6)]),
-    start: { spieler: [[1, 4], [1, 5], [2, 4], [1, 3], [2, 6], [1, 6]], wolf: [[0, 4], [0, 5], [2, 3], [0, 3]],
-      gegner: [[9, 4], [10, 5], [8, 3], [10, 1], [9, 7], [11, 4], [10, 6], [8, 1], [11, 6], [7, 6], [11, 2], [10, 7]] },
+    name: "Das Ried", b: 12, h: 9, boden: "moor", bild: "img/rabenmoor/ried.webp",
+    hindernisse: ausText([
+      "TTTTT~~..TTT",
+      "TT..~~~...TT",
+      "........K~~.",
+      "...~T....~~.",
+      "~~~...~~~...",
+      "...~........",
+      "...~~....K~T",
+      "TT..~.~~~.TT",
+      "TTT...~~.TTT",
+    ]),
+    start: { spieler: [[1, 3], [1, 2], [0, 3], [2, 3], [1, 5], [1, 6]], wolf: [[0, 2], [0, 5], [2, 6], [2, 1]],
+      gegner: [[10, 4], [9, 4], [10, 5], [11, 5], [11, 3], [8, 3], [7, 3], [9, 1], [8, 1], [7, 2], [6, 3], [11, 2]] },
   };
-  // Der Totenpfad: ein Damm aus Wurzeln zwischen schwarzen Tümpeln; aus ihnen steigen die Ertrunkenen
+  // Der Totenpfad (gemaltes Bild): ein Damm aus Wurzeln zwischen schwarzen Tümpeln, links ein toter Baum, rechts ein Grenzstein
   const TOTENPFAD = {
-    name: "Der Totenpfad", b: 12, h: 9, boden: "moor", bild: null,
-    hindernisse: [].concat(reihe(Q, 0, 0, 11), reihe(Q, 8, 0, 11), [Q(0, 1), Q(1, 1), Q(10, 1), Q(11, 1), Q(0, 7), Q(11, 7)],
-      [Q(3, 2), Q(4, 2), Q(3, 3), Q(7, 5), Q(8, 5), Q(8, 6), Q(5, 6), Q(6, 1), Q(9, 3)],
-      [T(1, 2), T(10, 6), T(5, 4), M(2, 6), M(9, 2), K(6, 3)]),
-    start: { spieler: [[1, 4], [1, 5], [2, 4], [1, 3], [2, 5], [2, 3]], wolf: [[0, 4], [0, 5], [0, 3], [3, 4]],
-      gegner: [[10, 4], [9, 5], [10, 3], [8, 3], [10, 5], [7, 2], [9, 7], [11, 4], [7, 7], [11, 3], [6, 6], [11, 5]] },
+    name: "Der Totenpfad", b: 12, h: 9, boden: "moor", bild: "img/rabenmoor/totenpfad.webp",
+    hindernisse: ausText([
+      "~~~~~~~~~~~~",
+      "~T~~~~TT~~T~",
+      ".T..~T....M.",
+      "...T~..K.~..",
+      "............",
+      "...~T..~~..T",
+      "TK.....~~.KT",
+      "T~~~~~~T.~~T",
+      "~~~~~~~~~~~~",
+    ]),
+    start: { spieler: [[1, 4], [0, 4], [1, 3], [2, 4], [1, 5], [2, 3]], wolf: [[0, 3], [0, 5], [2, 5], [0, 2]],
+      gegner: [[10, 4], [11, 4], [10, 3], [10, 5], [11, 3], [9, 4], [9, 5], [11, 2], [8, 4], [8, 2], [9, 2], [9, 6]] },
   };
-  // Der versunkene Schrein: ein Ring aus Steinen auf einer Insel, ringsum Wasser, in der Mitte der Altar
+  // Der versunkene Schrein (gemaltes Bild): Insel mit sechs Spiralsteinen, in der Mitte Altar und Statue, ringsum Wasser
   const SCHREIN = {
-    name: "Der versunkene Schrein", b: 12, h: 9, boden: "moor", bild: null,
-    hindernisse: [].concat(reihe(Q, 0, 0, 11), reihe(Q, 8, 0, 11), spalte(Q, 0, 1, 7), spalte(Q, 11, 1, 7),
-      [Q(1, 1), Q(10, 1), Q(1, 7), Q(10, 7), Q(1, 6), Q(10, 2)],
-      [M(4, 2), M(7, 2), M(3, 4), M(8, 4), M(4, 6), M(7, 6), K(5, 4), K(6, 4)]),
-    start: { spieler: [[5, 7], [6, 7], [4, 7], [7, 7], [3, 7], [8, 7]], wolf: [[2, 7], [9, 7], [3, 6], [8, 6]],
-      gegner: [[6, 2], [5, 2], [5, 3], [6, 3], [3, 2], [8, 2], [2, 3], [9, 3], [2, 4], [9, 4], [5, 1], [6, 1]] },
+    name: "Der versunkene Schrein", b: 12, h: 9, boden: "moor", bild: "img/rabenmoor/schrein.webp",
+    hindernisse: ausText([
+      "~~~~~~~~~~~~",
+      "~~~~.....T~~",
+      "~~T.M...M.~~",
+      "~~...MM....~",
+      "~~M..KK..M.~",
+      "~T........K~",
+      "~~..M..M.T~~",
+      "~~~T....T~~~",
+      "~~~~~~~~~~~~",
+    ]),
+    start: { spieler: [[5, 7], [6, 7], [4, 7], [7, 7], [5, 6], [6, 6]], wolf: [[3, 6], [8, 6], [2, 6], [5, 5]],
+      gegner: [[6, 2], [5, 2], [7, 2], [7, 3], [4, 3], [8, 3], [5, 1], [6, 1], [7, 1], [3, 3], [8, 4], [3, 4]] },
   };
   const KARTEN = { BOHLENWEG, RIED, TOTENPFAD, SCHREIN };
 

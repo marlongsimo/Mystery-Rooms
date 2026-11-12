@@ -5,12 +5,14 @@
  * Jede Moor-Begegnung bekommt je Gruppengröße den Faktor auf die Gegner-TP, bei dem gleich viel Leben übrig bleibt.
  * Der Endkampf (moor_schrein) wird härter eingestellt (Ziel: Maßstab − 0,15).
  * Schreibt skala (Normal) und skalaHC (Hardcore) der moor_-Begegnungen in js/regeln.js.
- * Aufruf: node abenteuer/tools/kalibrieren-moor.js [N=150]
+ * Aufruf: node abenteuer/tools/kalibrieren-moor.js [N=150] [--nur=moor_rand,…]
  */
 "use strict";
 const fs = require("fs"), path = require("path");
 const DATEI = path.join(__dirname, "..", "js", "regeln.js");
 const N = +process.argv.find((a) => /^\d+$/.test(a)) || 150;
+// --nur=moor_rand,moor_tote: nur diese Begegnungen neu bestimmen (z. B. nach einer neuen Karte)
+const NUR = (process.argv.find((a) => a.startsWith("--nur=")) || "").slice(6).split(",").filter(Boolean);
 const laden = () => { delete require.cache[require.resolve("../js/regeln.js")]; return require("../js/regeln.js"); };
 let R = laden(); const F = R.FD, GW = require("../daten/grauwacht.js"), MO = require("../daten/rabenmoor.js");
 const KARTE = { moor_rand: MO.KARTEN.BOHLENWEG, moor_kroeten: MO.KARTEN.RIED, moor_kroeten2: MO.KARTEN.RIED, moor_tote: MO.KARTEN.TOTENPFAD, moor_schrein: MO.KARTEN.SCHREIN,
@@ -26,7 +28,7 @@ function quote(beg, n, hard, skala) {
   return s / N;
 }
 function suche(ziel, q) {
-  let lo = Math.log(0.25), hi = Math.log(3), best = null;
+  let lo = Math.log(0.25), hi = Math.log(6), best = null;
   for (let it = 0; it < 7; it++) { const mid = (lo + hi) / 2, k = Math.exp(mid), x = q(k); if (!best || Math.abs(x - ziel) < Math.abs(best.q - ziel)) best = { k, q: x }; if (x > ziel) lo = mid; else hi = mid; }
   return { k: Math.round(best.k * 100) / 100, q: best.q };
 }
@@ -35,7 +37,7 @@ for (const hard of [false, true]) {
   const ref = {};
   for (const st of [1, 2]) { let s = 0, z = 0; for (const beg of REF[st]) for (const n of [3, 4, 5, 6]) { s += quote(beg, n, hard); z++; } ref[st] = s / z; }
   console.log(`${hard ? "Hardcore" : "Normal"} – Maßstab Grauwacht (übriges Leben): Stufe 1 ${(ref[1] * 100).toFixed(0)} %, Stufe 2 ${(ref[2] * 100).toFixed(0)} %`);
-  for (const beg of Object.keys(R.BEGEGNUNGEN).filter((b) => b.startsWith("moor_"))) {
+  for (const beg of Object.keys(R.BEGEGNUNGEN).filter((b) => b.startsWith("moor_") && (!NUR.length || NUR.includes(b)))) {
     const b = R.BEGEGNUNGEN[beg], ziel = ref[b.stufe] - (beg === "moor_schrein" ? 0.15 : 0), tab = {};
     for (const n of [2, 3, 4, 5, 6]) { const e = suche(ziel, (k) => quote(beg, n, hard, k)); tab[n] = e.k; process.stdout.write(`  ${beg} ${n}: ${e.k} (${(e.q * 100).toFixed(0)} %)\n`); }
     (ergebnis[beg] = ergebnis[beg] || {})[hard ? "skalaHC" : "skala"] = tab;

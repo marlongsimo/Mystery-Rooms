@@ -34,7 +34,7 @@ Wichtig für alle Karten:
 
 Legende: `~` tiefes Wasser · `B` toter Baum oder dichtes Schilf (blockiert) · `S` Stein/Mauerrest · `K` Baumstumpf, Kiste oder Fass (Deckung) · `.` begehbarer Boden · `h` Startplatz der Helden · `g` Startplatz der Gegner (nur zur Orientierung, im Bild nichts davon zeigen)
 
-### `bohlenweg` – Der Bohlenweg
+### `bohlenweg` – Der Bohlenweg ✓ eingebaut (Hindernisse nach dem Bild ausgerichtet: Steg eine Feldreihe breit)
 > Top-down orthographic battle map, painted fantasy style, 4:3. A wide wooden plank causeway crossing a black moor from left to right through the middle three rows, with small grassy islands at both ends; dark still water along the top and bottom edges; two dead alder trees on each island; a few broken planks, a mossy crate and a stump. Night, faint pale mist, subtle moonlight. No characters, no grid, no text.
 ```
      0 1 2 3 4 5 6 7 8 91011
@@ -49,7 +49,7 @@ Legende: `~` tiefes Wasser · `B` toter Baum oder dichtes Schilf (blockiert) · 
   8  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 ```
 
-### `ried` – Das Ried
+### `ried` – Das Ried ✓ eingebaut (Hindernisse nach dem Bild ausgerichtet)
 > Top-down orthographic battle map, painted fantasy style, 4:3. A reed marsh: patches of muddy ground and grass hummocks separated by narrow channels of dark water; thick reed clumps at the corners and scattered in the middle; one rotting stump. Night, greenish gloom, mist pooling in the channels. No characters, no grid, no text.
 ```
      0 1 2 3 4 5 6 7 8 91011
@@ -64,7 +64,7 @@ Legende: `~` tiefes Wasser · `B` toter Baum oder dichtes Schilf (blockiert) · 
   8  B . . . . . ~ ~ . . . B
 ```
 
-### `totenpfad` – Der Totenpfad
+### `totenpfad` – Der Totenpfad ✓ eingebaut (Hindernisse nach dem Bild ausgerichtet)
 > Top-down orthographic battle map, painted fantasy style, 4:3. A causeway of tangled roots and peat crossing a moor of black, ink-like pools; dark water along the top and bottom edges; a few pools inside the walkable area; a sunken stone marker, a toppled boundary stone, one dead tree and a half-buried crate. Eerie, cold, faint pale light reflecting in the pools. No characters, no grid, no text.
 ```
      0 1 2 3 4 5 6 7 8 91011
@@ -79,7 +79,7 @@ Legende: `~` tiefes Wasser · `B` toter Baum oder dichtes Schilf (blockiert) · 
   8  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 ```
 
-### `schrein` – Der versunkene Schrein
+### `schrein` – Der versunkene Schrein ✓ eingebaut (Hindernisse nach dem Bild ausgerichtet)
 > Top-down orthographic battle map, painted fantasy style, 4:3. A small mossy island surrounded on all sides by dark still water. On the island a ring of six weathered standing stones and in the centre a low stone altar (two cells wide) with a small stone statue of a woman holding a finger to her lips. Pale lights reflected in the water, cold mist, moonlight. No characters, no grid, no text.
 ```
      0 1 2 3 4 5 6 7 8 91011

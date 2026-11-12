@@ -17,6 +17,8 @@ const D = require('../daten/rabenmoor.js');
   try { const out = execFileSync('node', [__dirname + '/../tools/durchlauf-moor.js', '200'], { encoding: 'utf8' }); check(/Alle Szenen erreicht/.test(out), 'Engine: 200 Durchläufe mit 2–6 Helden ohne Fehler, Szenen erreichbar · ' + out.split('\n')[0]); }
   catch (e) { check(false, 'Engine-Durchlauf: ' + (e.stdout || e.message).slice(0, 400)); }
 
+  try { const out = execFileSync('node', [__dirname + '/../tools/karten-pruefen.js', 'rabenmoor'], { encoding: 'utf8' }); check(true, 'Karten: alle Startplätze erreichbar · ' + out.trim().split('\n').map((z) => z.split(':')[0]).join(', ')); }
+  catch (e) { check(false, 'Karten: ' + (e.stdout || e.message).slice(0, 400)); }
   // 2. Browser
   const b = await chromium.launch(), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   p.setDefaultTimeout(20000); p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());

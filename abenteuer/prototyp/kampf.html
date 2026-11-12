@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mythara · Prototyp Kampfansicht</title>
+<style>
+@font-face { font-family: "Cinzel"; src: url("../../portal/fonts/cinzel-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Inter"; src: url("../../portal/fonts/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("../../portal/fonts/inter-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../fonts/cormorant-garamond-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../fonts/cormorant-garamond-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+:root {
+  --gold: #d9b26a; --gold-hell: #f6dc9c; --gold-dunkel: #7a5a26; --blut: #b3262f; --blut-hell: #ff5a52; --eis: #8fd0ff; --eis-hell: #d8f1ff; --heil: #6fe08a;
+  --tinte: #0b0d12; --nacht: #11141c; --stein: #1a1e28; --text: #ece4d4; --text-leise: #a89f8e;
+  --rahmen: linear-gradient(180deg, #f6dc9c, #b8893f 40%, #6e4e1c 60%, #d9b26a);
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; background: #050608; overflow: hidden; }
+body { font-family: "Inter", system-ui, sans-serif; color: var(--text); display: grid; place-items: center; }
+#buehne { width: 1920px; height: 1080px; position: relative; transform-origin: center; overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 40%, #1a2030 0%, #0b0d13 55%, #050608 100%); }
+#buehne::before { content: ""; position: absolute; inset: 0; background: url("../img/krone/abschnitt-3.webp") center/cover; opacity: .10; filter: blur(14px) saturate(1.2); }
+
+/* ---------- Kopfleiste ---------- */
+.kopf { position: absolute; left: 24px; right: 24px; top: 18px; height: 84px; display: flex; align-items: center; gap: 22px; z-index: 5;
+  padding: 0 26px; border-radius: 18px; background: linear-gradient(180deg, rgba(28,30,40,.92), rgba(14,15,20,.92));
+  box-shadow: 0 0 0 1px rgba(217,178,106,.35), 0 0 0 4px rgba(0,0,0,.6), 0 18px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,236,190,.12); }
+.logo { font-family: "Cinzel"; font-size: 34px; letter-spacing: .08em; background: linear-gradient(180deg, #fff1c8, #d9a64a 55%, #8a5d1e); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(255,170,60,.25)); }
+.trenner { width: 1px; height: 46px; background: linear-gradient(180deg, transparent, rgba(217,178,106,.6), transparent); }
+.titel b { display: block; font-family: "Cinzel"; font-size: 23px; color: var(--gold-hell); letter-spacing: .03em; }
+.titel span { font-family: "Cormorant Garamond"; font-style: italic; font-size: 19px; color: var(--text-leise); }
+.kopf .rechts { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+.chip { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 18px; border-radius: 23px; font-family: "Cinzel"; font-size: 17px; color: var(--gold-hell);
+  background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px rgba(217,178,106,.35); }
+.chip .runde { font-size: 26px; color: #fff; text-shadow: 0 0 14px rgba(255,200,110,.6); }
+.frost { width: 230px; }
+.frost .leiste { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 6px; }
+.frost .leiste i { height: 9px; border-radius: 3px; background: rgba(143,208,255,.12); box-shadow: inset 0 0 0 1px rgba(143,208,255,.25); }
+.frost .leiste i.an { background: linear-gradient(90deg, #4aa6e8, #bfe9ff); box-shadow: 0 0 10px rgba(143,208,255,.7); }
+.frost small { font-family: "Cinzel"; font-size: 13px; letter-spacing: .12em; color: var(--eis-hell); }
+
+/* ---------- Gruppe (links) ---------- */
+.gruppe { position: absolute; left: 24px; top: 124px; width: 300px; display: grid; gap: 14px; z-index: 4; }
+.held { position: relative; display: grid; grid-template-columns: 86px 1fr; gap: 14px; align-items: center; padding: 12px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(30,33,44,.94), rgba(14,15,20,.94)); box-shadow: 0 0 0 1px rgba(217,178,106,.22), 0 10px 26px rgba(0,0,0,.5); transition: .4s; }
+.held.aktiv { box-shadow: 0 0 0 2px var(--gold), 0 0 34px rgba(246,200,110,.35), 0 10px 26px rgba(0,0,0,.5); transform: translateX(6px); }
+.held .bild { width: 86px; height: 86px; border-radius: 12px; background-size: cover; background-position: center; box-shadow: 0 0 0 2px #6e4e1c, 0 0 0 4px rgba(0,0,0,.6); }
+.held .name { font-family: "Cinzel"; font-size: 20px; color: #fff; }
+.held .klasse { font-size: 13px; color: var(--text-leise); letter-spacing: .04em; margin-bottom: 8px; }
+.leben { position: relative; height: 16px; border-radius: 8px; background: #2a0d10; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6); }
+.leben .rest, .leben .wert { position: absolute; inset: 0 auto 0 0; border-radius: 8px; }
+.leben .rest { background: #f4e2b8; transition: width .9s cubic-bezier(.3,.7,.2,1) .35s; }
+.leben .wert { background: linear-gradient(180deg, #ff6b60, #b3262f 60%, #7c1219); transition: width .25s ease-out; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+.leben.heil .wert { background: linear-gradient(180deg, #8ff0a2, #2f9a4a); }
+.leben b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 600; text-shadow: 0 1px 2px #000; letter-spacing: .04em; }
+.held .werte { display: flex; gap: 12px; margin-top: 8px; font-size: 13px; color: var(--text-leise); }
+.held .werte em { font-style: normal; color: var(--gold-hell); font-weight: 600; }
+.marken { position: absolute; top: 10px; right: 10px; display: flex; gap: 4px; }
+.marken i { width: 9px; height: 9px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(246,200,110,.7); }
+.marken i.weg { background: #3a3326; box-shadow: none; }
+
+/* ---------- Spielbrett ---------- */
+.rahmen-brett { position: absolute; left: 348px; top: 124px; width: 1224px; height: 812px; perspective: 1700px; z-index: 2; }
+.brett { position: absolute; left: 12px; top: 6px; width: 1200px; height: 900px; transform-origin: 50% 0; transform: rotateX(24deg) scale(.88); transform-style: preserve-3d;
+  border-radius: 14px; box-shadow: 0 0 0 2px rgba(217,178,106,.45), 0 0 0 8px rgba(10,10,14,.9), 0 0 0 10px rgba(217,178,106,.25), 0 60px 90px rgba(0,0,0,.8); transition: transform 1.2s cubic-bezier(.3,.7,.2,1); }
+.brett .karte { position: absolute; inset: 0; border-radius: 14px; background: url("../img/krone/kronensaal.webp") center/cover; filter: saturate(1.1) contrast(1.05) brightness(.92); }
+.brett .raster { position: absolute; inset: 0; border-radius: 14px; background-image: linear-gradient(rgba(255,240,210,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,240,210,.07) 1px, transparent 1px); background-size: 100px 100px; }
+.brett .vignette { position: absolute; inset: 0; border-radius: 14px; background: radial-gradient(85% 80% at 50% 50%, transparent 55%, rgba(0,0,0,.65)); pointer-events: none; }
+.brett canvas { position: absolute; inset: 0; pointer-events: none; }
+.feld { position: absolute; width: 92px; height: 92px; margin: 4px; border-radius: 12px; pointer-events: none; }
+.feld.weg { background: rgba(143,208,255,.16); box-shadow: inset 0 0 0 2px rgba(143,208,255,.55); animation: einblenden .4s both; }
+.feld.pfad { background: rgba(246,220,156,.28); box-shadow: inset 0 0 0 2px rgba(246,220,156,.85), 0 0 18px rgba(246,200,110,.5); }
+.feld.gefahr { background: rgba(214,40,50,.32); box-shadow: inset 0 0 0 2px rgba(255,90,80,.95); animation: pulsieren 1s ease-in-out infinite; }
+.feld.ziel { box-shadow: inset 0 0 0 3px rgba(255,90,80,.95), 0 0 26px rgba(255,90,80,.6); }
+@keyframes pulsieren { 50% { background: rgba(214,40,50,.12); box-shadow: inset 0 0 0 2px rgba(255,90,80,.5); } }
+@keyframes einblenden { from { opacity: 0; transform: scale(.8); } }
+.licht { position: absolute; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255,200,120,.32), rgba(255,170,80,.08) 45%, transparent 70%); transition: left .9s cubic-bezier(.3,.7,.2,1), top .9s cubic-bezier(.3,.7,.2,1); animation: flackern 2.4s infinite; }
+@keyframes flackern { 0%, 100% { opacity: .9; } 30% { opacity: 1; } 55% { opacity: .78; } 70% { opacity: .95; } }
+
+/* Spielfiguren: stehen aufrecht im gekippten Brett */
+.figur { position: absolute; width: 100px; height: 100px; transform-style: preserve-3d; transition: left .32s linear, top .32s linear; }
+.figur .steh { position: absolute; left: 50%; bottom: 30px; transform-origin: 50% 100%; transform: translateX(-50%) rotateX(-24deg); display: grid; justify-items: center; }
+.figur .schatten { position: absolute; left: 50%; top: 50%; width: 78px; height: 30px; margin: 4px 0 0 -39px; border-radius: 50%; background: radial-gradient(rgba(0,0,0,.75), transparent 70%); }
+.figur .ring { position: absolute; left: 50%; top: 50%; width: 92px; height: 46px; margin: -2px 0 0 -46px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(143,208,255,.7), 0 0 18px rgba(143,208,255,.5); opacity: .8; }
+.figur.feind .ring { box-shadow: 0 0 0 3px rgba(255,80,70,.75), 0 0 18px rgba(255,80,70,.5); }
+.figur.aktiv .ring { box-shadow: 0 0 0 3px var(--gold-hell), 0 0 30px rgba(246,200,110,.9); animation: ringpuls 1.4s ease-in-out infinite; opacity: 1; }
+@keyframes ringpuls { 50% { box-shadow: 0 0 0 5px var(--gold-hell), 0 0 44px rgba(246,200,110,1); } }
+.marke { width: 80px; height: 80px; border-radius: 50%; background-size: cover; background-position: center; position: relative;
+  box-shadow: 0 0 0 3px #2a1e0c, 0 0 0 6px #c79a4c, 0 0 0 8px #3a2a12, 0 12px 20px rgba(0,0,0,.7); }
+.marke::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(70% 60% at 35% 25%, rgba(255,255,255,.28), transparent 60%); }
+.figur.feind .marke { box-shadow: 0 0 0 3px #2a0c0c, 0 0 0 6px #9b2a2a, 0 0 0 8px #3a1212, 0 12px 20px rgba(0,0,0,.7); }
+.figur.boss .marke { width: 108px; height: 108px; box-shadow: 0 0 0 3px #2a1e0c, 0 0 0 7px #e8c46a, 0 0 0 10px #3a2a12, 0 0 40px rgba(143,208,255,.55), 0 14px 26px rgba(0,0,0,.7); }
+.figur .mini { width: 74px; height: 8px; margin-top: 9px; border-radius: 4px; background: #2a0d10; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.8); }
+.figur .mini i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #ff6b60, #b3262f); transition: width .5s; }
+.figur:not(.feind) .mini i { background: linear-gradient(90deg, #8ff0a2, #2f9a4a); }
+.figur.schild .marke { box-shadow: 0 0 0 3px #2a1e0c, 0 0 0 7px #e8c46a, 0 0 0 10px #3a2a12, 0 0 0 16px rgba(143,208,255,.25), 0 0 46px rgba(143,208,255,.65), 0 14px 26px rgba(0,0,0,.7); }
+.figur.getroffen .marke { animation: treffer .45s; }
+@keyframes treffer { 0% { filter: none; } 15% { filter: brightness(2.2) sepia(1) hue-rotate(-50deg) saturate(5); transform: translateX(-7px); } 35% { transform: translateX(6px); } 55% { transform: translateX(-4px); } 100% { filter: none; transform: none; } }
+
+/* Schadenszahlen */
+.zahl { position: absolute; font-family: "Cinzel"; font-size: 52px; font-weight: 600; color: #fff; pointer-events: none; transform: translate(-50%, -50%);
+  text-shadow: 0 0 2px #000, 0 3px 0 #5a0d12, 0 0 22px rgba(255,60,50,.8); animation: steigen 1.6s cubic-bezier(.2,.8,.3,1) forwards; z-index: 30; }
+.zahl.krit { font-size: 84px; color: #ffe9a8; text-shadow: 0 0 2px #000, 0 4px 0 #7a4a10, 0 0 40px rgba(255,200,80,1); }
+.zahl.krit::before { content: "KRITISCH"; position: absolute; left: 50%; top: -30px; transform: translateX(-50%); font-size: 18px; letter-spacing: .3em; color: var(--gold-hell); }
+.zahl.heil { color: #d9ffe2; text-shadow: 0 0 2px #000, 0 3px 0 #1d5a2a, 0 0 22px rgba(80,230,120,.9); }
+.zahl.leise { font-size: 30px; color: var(--eis-hell); text-shadow: 0 0 2px #000, 0 0 18px rgba(143,208,255,.8); }
+@keyframes steigen { 0% { opacity: 0; transform: translate(-50%, -20%) scale(.4); } 15% { opacity: 1; transform: translate(-50%, -60%) scale(1.25); } 30% { transform: translate(-50%, -70%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -190%) scale(.95); } }
+
+/* ---------- Rechte Spalte ---------- */
+.seite { position: absolute; right: 24px; top: 124px; width: 300px; display: grid; gap: 16px; z-index: 4; }
+.karte-boss, .protokoll { border-radius: 16px; background: linear-gradient(180deg, rgba(28,30,40,.94), rgba(12,13,18,.94)); box-shadow: 0 0 0 1px rgba(217,178,106,.25), 0 10px 26px rgba(0,0,0,.5); }
+.karte-boss { overflow: hidden; }
+.karte-boss .kopfbild { height: 150px; background: url("../img/krone/abschnitt-3.webp") 52% 18%/190% auto; position: relative; }
+.karte-boss .kopfbild::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(12,13,18,1)); }
+.karte-boss .inhalt { padding: 0 18px 18px; margin-top: -34px; position: relative; }
+.karte-boss h3 { font-family: "Cinzel"; font-size: 21px; color: #fff; }
+.karte-boss .phase { font-family: "Cormorant Garamond"; font-style: italic; font-size: 18px; color: var(--eis-hell); margin: 2px 0 10px; }
+.phasen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+.phasen span { text-align: center; font-family: "Cinzel"; font-size: 13px; padding: 6px 0; border-radius: 8px; background: rgba(255,255,255,.04); color: var(--text-leise); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.phasen span.an { color: #fff; background: linear-gradient(180deg, rgba(143,208,255,.35), rgba(60,120,180,.2)); box-shadow: inset 0 0 0 1px rgba(143,208,255,.7), 0 0 16px rgba(143,208,255,.4); }
+.boss-leben { height: 20px; }
+.schildanzeige { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--eis-hell); }
+.schildanzeige .balken { flex: 1; height: 8px; border-radius: 4px; background: rgba(143,208,255,.15); overflow: hidden; }
+.schildanzeige .balken i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #4aa6e8, #d8f1ff); box-shadow: 0 0 12px rgba(143,208,255,.8); transition: width .6s; }
+.protokoll { padding: 16px 18px; height: 432px; display: flex; flex-direction: column; }
+.protokoll h4 { font-family: "Cinzel"; font-size: 15px; letter-spacing: .14em; color: var(--gold); margin-bottom: 10px; }
+.eintraege { flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; mask-image: linear-gradient(180deg, transparent, #000 22%); }
+.eintrag { font-size: 14px; line-height: 1.4; color: #d9d0bf; padding-left: 12px; border-left: 2px solid rgba(217,178,106,.4); animation: einrutschen .45s both; }
+.eintrag b { color: #fff; font-weight: 600; }
+.eintrag.gut { border-color: var(--heil); } .eintrag.schlecht { border-color: var(--blut-hell); } .eintrag.gold { border-color: var(--gold-hell); color: var(--gold-hell); }
+.eintrag .wurf { display: inline-grid; place-items: center; min-width: 26px; height: 22px; padding: 0 6px; margin-right: 4px; border-radius: 6px; font-family: "Cinzel"; font-size: 13px; background: rgba(217,178,106,.18); color: var(--gold-hell); }
+@keyframes einrutschen { from { opacity: 0; transform: translateY(10px); } }
+
+/* ---------- Initiative ---------- */
+.initiative { position: absolute; left: 348px; right: 348px; bottom: 22px; height: 118px; display: flex; align-items: center; justify-content: center; gap: 14px; z-index: 5;
+  border-radius: 18px; background: linear-gradient(180deg, rgba(24,26,34,.9), rgba(10,11,15,.95)); box-shadow: 0 0 0 1px rgba(217,178,106,.3), 0 -10px 30px rgba(0,0,0,.4); }
+.initiative::before { content: "INITIATIVE"; position: absolute; left: 22px; top: 50%; transform: translateY(-50%) rotate(-90deg); transform-origin: center; font-family: "Cinzel"; font-size: 12px; letter-spacing: .3em; color: var(--gold-dunkel); }
+.ini { position: relative; width: 74px; height: 74px; border-radius: 14px; background-size: cover; background-position: center; transition: .45s cubic-bezier(.3,.7,.2,1); opacity: .62; filter: saturate(.7);
+  box-shadow: 0 0 0 2px #3a2a12, 0 0 0 4px rgba(0,0,0,.6); }
+.ini.feind { box-shadow: 0 0 0 2px #6a1a1a, 0 0 0 4px rgba(0,0,0,.6); }
+.ini.dran { width: 96px; height: 96px; opacity: 1; filter: none; box-shadow: 0 0 0 3px var(--gold-hell), 0 0 28px rgba(246,200,110,.6); }
+.ini b { position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); min-width: 30px; height: 22px; padding: 0 6px; border-radius: 11px; font-family: "Cinzel"; font-size: 13px; display: grid; place-items: center;
+  background: #120e08; color: var(--gold-hell); box-shadow: 0 0 0 1px var(--gold-dunkel); }
+.ini.feind b { color: #ffb0a8; box-shadow: 0 0 0 1px #6a1a1a; }
+.ini.vorbei { opacity: .32; }
+
+/* ---------- Überblendungen ---------- */
+.banner { position: absolute; left: 0; right: 0; top: 42%; display: grid; place-items: center; pointer-events: none; z-index: 40; opacity: 0; }
+.banner.zeigen { animation: banner 1.9s cubic-bezier(.2,.8,.3,1) both; }
+.banner .band { width: 100%; padding: 18px 0 22px; text-align: center; background: linear-gradient(90deg, transparent, rgba(8,8,12,.88) 20%, rgba(8,8,12,.88) 80%, transparent); }
+.banner .band::before, .banner .band::after { content: ""; display: block; height: 1px; margin: 0 22%; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.banner h2 { font-family: "Cinzel"; font-size: 64px; letter-spacing: .12em; margin: 10px 0 2px; background: linear-gradient(180deg, #fff3cf, #d9a64a 60%, #8a5d1e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.banner p { font-family: "Cormorant Garamond"; font-style: italic; font-size: 26px; color: var(--text); margin-bottom: 10px; }
+@keyframes banner { 0% { opacity: 0; transform: scaleY(.2); } 12% { opacity: 1; transform: scaleY(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.zug { position: absolute; left: 50%; top: 150px; transform: translateX(-50%); display: flex; align-items: center; gap: 18px; padding: 10px 30px 10px 10px; border-radius: 60px; z-index: 40; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(40,30,12,.95), rgba(14,12,8,.95)); box-shadow: 0 0 0 2px var(--gold), 0 0 50px rgba(246,200,110,.4); }
+.zug.zeigen { animation: zug 2s cubic-bezier(.2,.8,.3,1) both; }
+.zug .bild { width: 70px; height: 70px; border-radius: 50%; background-size: cover; box-shadow: 0 0 0 3px var(--gold-hell); }
+.zug small { display: block; font-family: "Cinzel"; font-size: 13px; letter-spacing: .3em; color: var(--gold); }
+.zug b { font-family: "Cinzel"; font-size: 32px; color: #fff; }
+@keyframes zug { 0% { opacity: 0; transform: translate(-50%, -30px); } 15% { opacity: 1; transform: translate(-50%, 0); } 82% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -12px); } }
+
+/* Würfel */
+.wurf { position: absolute; left: 50%; top: 46%; width: 220px; height: 220px; margin: -110px 0 0 -110px; z-index: 45; pointer-events: none; opacity: 0; display: grid; place-items: center; }
+.wurf.zeigen { animation: wurfein 1.9s cubic-bezier(.2,.8,.3,1) both; }
+.wurf svg { position: absolute; inset: 0; filter: drop-shadow(0 18px 30px rgba(0,0,0,.8)); animation: rollen .9s cubic-bezier(.2,.9,.3,1); }
+.wurf .augen { position: relative; font-family: "Cinzel"; font-size: 64px; color: #fff; text-shadow: 0 0 18px rgba(255,210,120,.9), 0 2px 0 #4a2a08; margin-top: 18px; }
+.wurf .art { position: absolute; bottom: -34px; font-family: "Cinzel"; font-size: 18px; letter-spacing: .25em; color: var(--gold-hell); white-space: nowrap; }
+.wurf.krit .augen { color: #fff6d6; font-size: 76px; }
+@keyframes rollen { 0% { transform: rotate(-540deg) scale(.3); } 70% { transform: rotate(14deg) scale(1.08); } 100% { transform: rotate(0) scale(1); } }
+@keyframes wurfein { 0% { opacity: 0; } 8% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: scale(.85); } }
+.blitz { position: absolute; inset: 0; z-index: 44; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 46%, rgba(255,230,160,.85), rgba(255,180,60,.25) 30%, transparent 60%); }
+.blitz.an { animation: blitz .9s ease-out; }
+@keyframes blitz { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+#buehne.beben { animation: beben .5s; }
+@keyframes beben { 20% { transform: translate(-8px, 4px); } 40% { transform: translate(7px, -5px); } 60% { transform: translate(-5px, 3px); } 80% { transform: translate(3px, -2px); } }
+
+/* Boss-Einblendung */
+.intro { position: absolute; inset: 0; z-index: 60; display: grid; place-items: center; background: #000; opacity: 0; pointer-events: none; }
+.intro.zeigen { animation: intro 4.2s ease both; }
+.intro .bild { position: absolute; inset: 0; background: url("../img/krone/abschnitt-3.webp") 50% 30%/cover; animation: kenburns 4.2s linear both; }
+.intro .bild::after { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 70% at 50% 40%, transparent, rgba(0,0,0,.85)), linear-gradient(180deg, transparent 50%, #000); }
+.intro .text { position: relative; text-align: center; margin-top: 380px; }
+.intro small { font-family: "Cinzel"; letter-spacing: .5em; font-size: 18px; color: var(--eis); }
+.intro h1 { font-family: "Cinzel"; font-size: 92px; letter-spacing: .06em; margin: 8px 0; background: linear-gradient(180deg, #fff, #cfe9ff 50%, #6aa8d8); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 30px rgba(143,208,255,.5)); }
+.intro p { font-family: "Cormorant Garamond"; font-style: italic; font-size: 30px; color: #e8f2ff; }
+@keyframes kenburns { from { transform: scale(1.18); } to { transform: scale(1.0); } }
+@keyframes intro { 0% { opacity: 0; } 10% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Steuerung des Prototyps */
+.demo { position: fixed; right: 14px; bottom: 14px; display: flex; gap: 6px; z-index: 99; }
+.demo button { font: 600 12px "Inter"; color: #ddd; background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="buehne">
+  <header class="kopf">
+    <div class="logo">MYTHARA</div>
+    <div class="trenner"></div>
+    <div class="titel"><b>Die Krone unter dem Eis</b><span>Kapitel III · Der Kronensaal</span></div>
+    <div class="rechts">
+      <div class="frost"><small>FROST</small><div class="leiste"><i class="an"></i><i class="an"></i><i class="an"></i><i></i><i></i><i></i><i></i></div></div>
+      <div class="chip">Runde <span class="runde" id="runde">1</span></div>
+      <div class="chip">Stufe 3 · Normal</div>
+    </div>
+  </header>
+
+  <aside class="gruppe" id="gruppe"></aside>
+
+  <div class="rahmen-brett">
+    <div class="brett" id="brett">
+      <div class="karte"></div><div class="raster"></div>
+      <div id="felder"></div>
+      <div class="licht" id="licht"></div>
+      <canvas id="nebel" width="1200" height="900"></canvas>
+      <div id="figuren"></div>
+      <canvas id="funken" width="1200" height="900"></canvas>
+      <div class="vignette"></div>
+    </div>
+  </div>
+
+  <aside class="seite">
+    <div class="karte-boss">
+      <div class="kopfbild"></div>
+      <div class="inhalt">
+        <h3>Der König unter dem Eis</h3>
+        <div class="phase" id="phasetext">Phase I · Der Wächter</div>
+        <div class="leben boss-leben" id="bossleben"><div class="rest"></div><div class="wert"></div><b></b></div>
+        <div class="schildanzeige">Kristallschutz <div class="balken"><i id="schild"></i></div></div>
+        <div class="phasen" id="phasen"><span class="an">I</span><span>II</span><span>III</span></div>
+      </div>
+    </div>
+    <div class="protokoll"><h4>CHRONIK DES KAMPFES</h4><div class="eintraege" id="log"></div></div>
+  </aside>
+
+  <div class="initiative" id="initiative"></div>
+
+  <div class="banner" id="banner"><div class="band"><h2></h2><p></p></div></div>
+  <div class="zug" id="zug"><div class="bild"></div><div><small>DEIN ZUG</small><b></b></div></div>
+  <div class="blitz" id="blitz"></div>
+  <div class="wurf" id="wurf">
+    <svg viewBox="0 0 220 220"><defs><linearGradient id="w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a2a14"/><stop offset=".5" stop-color="#1a130a"/><stop offset="1" stop-color="#0c0905"/></linearGradient>
+      <linearGradient id="k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c0"/><stop offset="1" stop-color="#a8752a"/></linearGradient></defs>
+      <polygon points="110,8 204,62 204,158 110,212 16,158 16,62" fill="url(#w)" stroke="url(#k)" stroke-width="5"/>
+      <polygon points="110,40 172,146 48,146" fill="rgba(255,220,150,.07)" stroke="url(#k)" stroke-width="2.5"/>
+      <path d="M110 8 L110 40 M204 62 L172 146 M204 158 L172 146 M110 212 L172 146 M110 212 L48 146 M16 158 L48 146 M16 62 L48 146 M16 62 L110 40 M204 62 L110 40" stroke="url(#k)" stroke-width="2" opacity=".75"/></svg>
+    <div class="augen">20</div><div class="art">ANGRIFF</div>
+  </div>
+  <div class="intro" id="intro"><div class="bild"></div><div class="text"><small>ENDGEGNER</small><h1>Der König unter dem Eis</h1><p>Er ist nicht der König. Er ist die Erinnerung, die das Herz an ihn bewahrt.</p></div></div>
+</div>
+<div class="demo"><button id="neu">Demo neu starten</button></div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s), warte = (ms) => new Promise((r) => setTimeout(r, ms));
+const F = "../img/figuren/";
+// Gegnerbilder: Ausschnitte aus den Abschnittsbildern der Krone (bis eigene Porträts da sind)
+const AUS = (bild, x, y, z) => `url(../img/krone/${bild}.webp) ${x}% ${y}% / ${z}% auto`;
+const FIG = {
+  torvald: { name: "Torvald", klasse: "Schildwächter · Krieger", bild: `url(${F}schildwaechter.jpg) center/cover`, tp: 34, max: 34, rk: 18, x: 3, y: 4, ini: 14 },
+  vaelin: { name: "Vaelin", klasse: "Elementarist · Zauberer", bild: `url(${F}elementarist.jpg) center/cover`, tp: 22, max: 22, rk: 13, x: 2, y: 3, ini: 16 },
+  elara: { name: "Elara", klasse: "Lichtbringerin · Klerikerin", bild: `url(${F}lichtbringer.jpg) center/cover`, tp: 26, max: 26, rk: 16, x: 2, y: 5, ini: 12 },
+  kael: { name: "Kael", klasse: "Wildnisläufer · Waldläufer", bild: `url(${F}wildnislaeufer.jpg) center/cover`, tp: 28, max: 28, rk: 15, x: 1, y: 4, ini: 18 },
+  koenig: { name: "Der König", feind: true, boss: true, bild: AUS("abschnitt-3", 56, 3, 420), tp: 96, max: 96, x: 9, y: 4, ini: 11 },
+  knecht1: { name: "Frostknecht", feind: true, bild: AUS("abschnitt-2", 73, 2, 520), tp: 24, max: 24, x: 7, y: 3, ini: 10 },
+  knecht2: { name: "Frostknecht", feind: true, bild: AUS("abschnitt-2", 73, 2, 520), tp: 24, max: 24, x: 7, y: 5, ini: 9 },
+  schuetze: { name: "Maskierter Schütze", feind: true, bild: AUS("abschnitt-2", 0, 12, 600), tp: 14, max: 14, x: 8, y: 2, ini: 8 },
+};
+const START = JSON.parse(JSON.stringify(FIG));
+const REIHE = ["kael", "vaelin", "torvald", "elara", "koenig", "knecht1", "knecht2", "schuetze"];
+const HELDEN = ["torvald", "vaelin", "elara", "kael"];
+const Z = 100, mitte = (p) => ({ x: p.x * Z + Z / 2, y: p.y * Z + Z / 2 });
+let lauf = 0;
+
+/* ---------- Aufbau ---------- */
+function bauen() {
+  Object.assign(FIG, JSON.parse(JSON.stringify(START)));
+  $("#gruppe").innerHTML = HELDEN.map((id) => { const f = FIG[id]; return `<div class="held" id="h-${id}"><div class="bild" style="background:${f.bild}"></div><div><div class="name">${f.name}</div><div class="klasse">${f.klasse}</div>
+    <div class="leben" id="l-${id}"><div class="rest"></div><div class="wert"></div><b></b></div><div class="werte"><span>RK <em>${f.rk}</em></span><span>Tränke <em>2</em></span></div></div><div class="marken" id="m-${id}"><i></i><i></i></div></div>`; }).join("");
+  $("#figuren").innerHTML = Object.entries(FIG).map(([id, f]) => `<div class="figur ${f.feind ? "feind" : ""} ${f.boss ? "boss schild" : ""}" id="f-${id}" style="left:${f.x * Z}px;top:${f.y * Z}px"><div class="schatten"></div><div class="ring"></div>
+    <div class="steh"><div class="marke" style="background:${f.bild}"></div><div class="mini"><i></i></div></div></div>`).join("");
+  $("#initiative").innerHTML = REIHE.map((id) => `<div class="ini ${FIG[id].feind ? "feind" : ""}" id="i-${id}" style="background:${FIG[id].bild}"><b>${FIG[id].ini}</b></div>`).join("");
+  $("#log").innerHTML = ""; $("#felder").innerHTML = ""; $("#runde").textContent = "1"; $("#schild").style.width = "100%";
+  $("#phasetext").textContent = "Phase I · Der Wächter"; [...$("#phasen").children].forEach((s, i) => s.classList.toggle("an", i === 0));
+  for (const id in FIG) leben(id, true);
+}
+function leben(id, sofort) {
+  const f = FIG[id], p = Math.max(0, f.tp) / f.max * 100;
+  const el = f.boss ? $("#bossleben") : $("#l-" + id);
+  if (el) { if (sofort) { el.querySelector(".rest").style.transition = "none"; requestAnimationFrame(() => (el.querySelector(".rest").style.transition = "")); }
+    el.querySelector(".wert").style.width = p + "%"; el.querySelector(".rest").style.width = p + "%"; el.querySelector("b").textContent = `${Math.max(0, f.tp)} / ${f.max}`; }
+  const m = $(`#f-${id} .mini i`); if (m) m.style.width = p + "%";
+}
+function log(html, art = "") { const d = document.createElement("div"); d.className = "eintrag " + art; d.innerHTML = html; $("#log").appendChild(d); while ($("#log").children.length > 9) $("#log").firstChild.remove(); }
+function aktiv(id) {
+  document.querySelectorAll(".figur").forEach((e) => e.classList.toggle("aktiv", e.id === "f-" + id));
+  document.querySelectorAll(".held").forEach((e) => e.classList.toggle("aktiv", e.id === "h-" + id));
+  const i = REIHE.indexOf(id); REIHE.forEach((r, n) => { const e = $("#i-" + r); e.classList.toggle("dran", r === id); e.classList.toggle("vorbei", n < i); });
+  const p = mitte(FIG[id]); $("#licht").style.left = p.x + "px"; $("#licht").style.top = p.y + "px";
+}
+async function banner(t, u, ms = 1900) { const b = $("#banner"); b.querySelector("h2").textContent = t; b.querySelector("p").textContent = u; b.classList.remove("zeigen"); void b.offsetWidth; b.classList.add("zeigen"); await warte(ms); }
+async function zug(id) { const z = $("#zug"); z.querySelector(".bild").style.background = FIG[id].bild; z.querySelector("b").textContent = FIG[id].name; z.classList.remove("zeigen"); void z.offsetWidth; z.classList.add("zeigen"); aktiv(id); await warte(1100); }
+function felder(liste, art) { for (const [x, y] of liste) { const d = document.createElement("div"); d.className = "feld " + art; d.style.left = x * Z + "px"; d.style.top = y * Z + "px"; $("#felder").appendChild(d); } }
+const felderWeg = (art) => document.querySelectorAll(art ? ".feld." + art : ".feld").forEach((e) => e.remove());
+async function gehen(id, pfad) {
+  const e = $("#f-" + id); felder(pfad, "pfad");
+  for (const [x, y] of pfad) { FIG[id].x = x; FIG[id].y = y; e.style.left = x * Z + "px"; e.style.top = y * Z + "px"; const p = mitte(FIG[id]); $("#licht").style.left = p.x + "px"; $("#licht").style.top = p.y + "px"; await warte(330); }
+  felderWeg("pfad"); felderWeg("weg");
+}
+async function wuerfeln(augen, art, krit) {
+  const w = $("#wurf"); w.classList.toggle("krit", Boolean(krit)); w.querySelector(".art").textContent = art; const a = w.querySelector(".augen");
+  w.classList.remove("zeigen"); void w.offsetWidth; w.classList.add("zeigen");
+  for (let i = 0; i < 9; i++) { a.textContent = 1 + Math.floor(Math.random() * 20); await warte(60 + i * 12); } a.textContent = augen;
+  if (krit) { $("#blitz").classList.remove("an"); void $("#blitz").offsetWidth; $("#blitz").classList.add("an"); }
+  await warte(900);
+}
+function zahl(id, text, art) {
+  const p = mitte(FIG[id]), d = document.createElement("div"); d.className = "zahl " + (art || ""); d.textContent = text;
+  // Position auf dem gekippten Brett in Bildschirmkoordinaten umrechnen
+  const r = $("#f-" + id).querySelector(".marke").getBoundingClientRect(), b = $("#buehne").getBoundingClientRect(), s = b.width / 1920;
+  d.style.left = (r.left + r.width / 2 - b.left) / s + "px"; d.style.top = (r.top - b.top) / s - 10 + "px"; $("#buehne").appendChild(d); setTimeout(() => d.remove(), 1700);
+}
+async function ausfall(von, zu) {
+  const a = $(`#f-${von} .marke`), dx = (FIG[zu].x - FIG[von].x) * 28, dy = (FIG[zu].y - FIG[von].y) * 28;
+  await a.animate([{ transform: "none" }, { transform: `translate(${dx}px, ${dy}px) scale(1.08)` }, { transform: "none" }], { duration: 380, easing: "cubic-bezier(.4,0,.2,1)" }).finished;
+}
+function treffen(id, n, art) {
+  FIG[id].tp -= n; const e = $("#f-" + id); e.classList.remove("getroffen"); void e.offsetWidth; e.classList.add("getroffen");
+  zahl(id, (art === "heil" ? "+" : "−") + Math.abs(n), art); leben(id); if (art === "krit") { $("#buehne").classList.remove("beben"); void $("#buehne").offsetWidth; $("#buehne").classList.add("beben"); }
+}
+function heilen(id, n) { FIG[id].tp = Math.min(FIG[id].max, FIG[id].tp + n); const l = $("#l-" + id); l.classList.add("heil"); zahl(id, "+" + n, "heil"); leben(id); setTimeout(() => l.classList.remove("heil"), 1200); }
+
+/* ---------- Partikel: Nebel, Glut, Funken ---------- */
+const nebel = $("#nebel").getContext("2d"), funkenCtx = $("#funken").getContext("2d"), N = [], P = [];
+for (let i = 0; i < 26; i++) N.push({ x: Math.random() * 1200, y: Math.random() * 900, r: 120 + Math.random() * 180, v: .15 + Math.random() * .35, a: .04 + Math.random() * .05 });
+for (let i = 0; i < 70; i++) P.push({ x: Math.random() * 1200, y: Math.random() * 900, v: .3 + Math.random() * .8, s: 1 + Math.random() * 2, art: "schnee" });
+function wolke(x, y, art, n = 60) { for (let i = 0; i < n; i++) { const w = Math.random() * Math.PI * 2, g = (art === "heil" ? 1.2 : 3) + Math.random() * (art === "feuer" ? 7 : 3); P.push({ x, y, vx: Math.cos(w) * g, vy: Math.sin(w) * g - (art === "heil" ? 2 : 0), s: 2 + Math.random() * 4, art, leben: 1 }); } }
+function strahl(von, zu, art) { const a = mitte(FIG[von]), b = mitte(FIG[zu]); for (let i = 0; i < 26; i++) { const t = i / 26; P.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t - 40, vx: 0, vy: 0, s: 3 - t * 1.5, art, leben: 1 - t * .5, verzug: i * 9 }); } }
+const FARBE = { feuer: [255, 140, 40], heil: [120, 255, 160], eis: [170, 225, 255], gold: [255, 220, 130], schnee: [230, 240, 255] };
+(function schleife() {
+  nebel.clearRect(0, 0, 1200, 900);
+  for (const n of N) { n.x += n.v; if (n.x - n.r > 1200) n.x = -n.r; const g = nebel.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r); g.addColorStop(0, `rgba(200,225,255,${n.a})`); g.addColorStop(1, "rgba(200,225,255,0)"); nebel.fillStyle = g; nebel.fillRect(n.x - n.r, n.y - n.r, n.r * 2, n.r * 2); }
+  funkenCtx.clearRect(0, 0, 1200, 900); funkenCtx.globalCompositeOperation = "lighter";
+  for (let i = P.length - 1; i >= 0; i--) {
+    const p = P[i];
+    if (p.art === "schnee") { p.y += p.v; p.x += Math.sin(p.y / 60) * .4; if (p.y > 900) { p.y = -5; p.x = Math.random() * 1200; } funkenCtx.fillStyle = "rgba(230,240,255,.55)"; funkenCtx.beginPath(); funkenCtx.arc(p.x, p.y, p.s, 0, 7); funkenCtx.fill(); continue; }
+    if (p.verzug > 0) { p.verzug -= 16; continue; }
+    p.x += p.vx; p.y += p.vy; p.vx *= .93; p.vy = p.vy * .93 + (p.art === "feuer" ? -.08 : p.art === "heil" ? -.05 : .02); p.leben -= .018;
+    if (p.leben <= 0) { P.splice(i, 1); continue; }
+    const [r, g, b] = FARBE[p.art], gr = funkenCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.s * 4);
+    gr.addColorStop(0, `rgba(${r},${g},${b},${p.leben})`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`); funkenCtx.fillStyle = gr; funkenCtx.fillRect(p.x - p.s * 4, p.y - p.s * 4, p.s * 8, p.s * 8);
+  }
+  funkenCtx.globalCompositeOperation = "source-over"; requestAnimationFrame(schleife);
+})();
+
+/* ---------- Ablauf der Demo ---------- */
+async function demo() {
+  const meins = ++lauf, ok = () => meins === lauf;
+  bauen(); window.SZENE = "start";
+  $("#intro").classList.remove("zeigen"); void $("#intro").offsetWidth; $("#intro").classList.add("zeigen"); window.SZENE = "intro";
+  await warte(3600); if (!ok()) return;
+  log("Der Kronensaal erwacht. <b>Der König unter dem Eis</b> erhebt sich.", "gold");
+  await banner("Runde 1", "Die Initiative ist gewürfelt"); if (!ok()) return;
+  // Kael: bewegen, schießen
+  await zug("kael"); window.SZENE = "zug";
+  felder([[2, 4], [3, 3], [3, 5], [4, 3], [4, 4], [4, 5], [5, 3], [5, 4], [5, 5], [3, 2], [4, 2], [5, 2], [5, 6]], "weg"); await warte(900); window.SZENE = "bewegen";
+  await gehen("kael", [[2, 4], [3, 4], [4, 3]]); if (!ok()) return;
+  felder([[7, 3]], "ziel"); await warte(400);
+  window.SZENE = "wurf"; await wuerfeln(17, "ANGRIFF · 17 + 6"); if (!ok()) return;
+  strahl("kael", "knecht1", "gold"); await warte(380); felderWeg("ziel");
+  treffen("knecht1", 11); log(`<span class="wurf">23</span><b>Kael</b> trifft den Frostknecht mit dem Langbogen: <b>11</b> Schaden.`); window.SZENE = "treffer";
+  await warte(1300); if (!ok()) return;
+  // Vaelin: Feuerball
+  await zug("vaelin");
+  felder([[6, 3], [7, 3], [8, 3], [6, 4], [7, 4], [8, 4], [6, 5], [7, 5], [8, 5]], "ziel"); log("<b>Vaelin</b> formt einen Feuerball …"); await warte(900); window.SZENE = "zielen";
+  await wuerfeln(14, "FEUERBALL · SG 15"); if (!ok()) return;
+  wolke(750, 420, "feuer", 140); wolke(720, 380, "feuer", 60); felderWeg("ziel"); window.SZENE = "feuer";
+  treffen("knecht1", 14); await warte(120); treffen("knecht2", 14);
+  log(`<b>Feuerball</b>: Frostknecht <b>14</b>, Frostknecht <b>14</b>. Der erste Frostknecht zerbirst.`, "gut");
+  await warte(700); $("#f-knecht1").animate([{ opacity: 1, filter: "none" }, { opacity: 0, filter: "brightness(3) blur(6px)" }], { duration: 900, fill: "forwards" });
+  await warte(900); if (!ok()) return;
+  // König: Kronenschlag ankündigen
+  await zug("koenig");
+  felder([[8, 4], [7, 4], [6, 4], [5, 4], [4, 4]], "gefahr"); window.SZENE = "gefahr";
+  log("<b>Der König</b> hebt das Schwert: <b>Kronenschlag</b>! Die markierten Felder werden bei seinem nächsten Zug getroffen.", "schlecht");
+  await banner("Kronenschlag", "Weicht aus – die Linie trifft beim nächsten Zug des Königs", 2100); if (!ok()) return;
+  // Torvald: aus der Linie, kritischer Treffer
+  await zug("torvald");
+  await gehen("torvald", [[4, 5], [5, 5], [6, 6], [7, 6], [8, 5]]); felder([[9, 4]], "ziel"); await warte(300);
+  window.SZENE = "krit"; await wuerfeln(20, "KRITISCHER TREFFER", true); window.SZENE = "kritTreffer"; if (!ok()) return;
+  await ausfall("torvald", "koenig"); felderWeg("ziel"); wolke(930, 430, "gold", 90);
+  treffen("koenig", 24, "krit"); $("#schild").style.width = "35%";
+  log(`<span class="wurf">20</span><b>Torvald</b> trifft kritisch: <b>24</b> Schaden. Der Kristallschutz bekommt Risse.`, "gold");
+  await warte(1400); if (!ok()) return;
+  // Elara: Heilung
+  await zug("elara"); log("<b>Elara</b> spricht ein Heilendes Wort."); FIG.torvald.tp = 22; leben("torvald");
+  strahl("elara", "torvald", "heil"); await warte(400); wolke(850, 540, "heil", 70); heilen("torvald", 9); window.SZENE = "heil";
+  log("<b>Torvald</b> heilt <b>9</b> Lebenspunkte.", "gut"); await warte(1400); if (!ok()) return;
+  // Phase II
+  FIG.koenig.tp = 62; leben("koenig"); aktiv("koenig");
+  $("#buehne").classList.remove("beben"); void $("#buehne").offsetWidth; $("#buehne").classList.add("beben"); wolke(950, 400, "eis", 160);
+  felderWeg("gefahr"); $("#phasetext").textContent = "Phase II · Die gebrochene Krone"; [...$("#phasen").children].forEach((s, i) => s.classList.toggle("an", i <= 1));
+  log("Die Krone bricht. <b>Phase II</b>: Die Ehrengarde tritt aus den Seitengängen.", "schlecht"); window.SZENE = "phase";
+  await banner("Phase II", "Die gebrochene Krone", 2300);
+  window.SZENE = "ende";
+}
+$("#neu").onclick = () => demo();
+function skalieren() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); $("#buehne").style.transform = `scale(${s})`; }
+addEventListener("resize", skalieren); skalieren();
+bauen();
+if (!location.search.includes("still")) demo();
+window.DEMO = { demo, bauen, FIG };
+</script>
+</body>
+</html>

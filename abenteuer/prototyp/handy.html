@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mythara · Prototyp Handy</title>
+<style>
+@font-face { font-family: "Cinzel"; src: url("../../portal/fonts/cinzel-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Inter"; src: url("../../portal/fonts/inter-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("../../portal/fonts/inter-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Cormorant Garamond"; src: url("../fonts/cormorant-garamond-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+:root { --gold: #d9b26a; --gold-hell: #f6dc9c; --gold-dunkel: #7a5a26; --blut: #b3262f; --eis: #8fd0ff; --text: #ece4d4; --leise: #a89f8e; }
+* { box-sizing: border-box; margin: 0; }
+html, body { min-height: 100%; background: #07080b; }
+body { font-family: "Inter", system-ui, sans-serif; color: var(--text); max-width: 460px; margin: 0 auto; min-height: 100vh; position: relative; overflow-x: hidden;
+  background: radial-gradient(120% 60% at 50% 0%, rgba(80,120,170,.18), transparent 60%), linear-gradient(180deg, #10131b, #07080b 70%); }
+body::before { content: ""; position: fixed; inset: 0; background: url("../img/krone/abschnitt-3.webp") 55% 0/cover; opacity: .14; filter: blur(2px); mask-image: linear-gradient(180deg, #000 0%, transparent 45%); pointer-events: none; }
+.leiste { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
+.logo { font-family: "Cinzel"; font-size: 22px; letter-spacing: .1em; background: linear-gradient(180deg, #fff1c8, #d9a64a 55%, #8a5d1e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rund { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.4); box-shadow: inset 0 0 0 1px rgba(217,178,106,.4); color: var(--gold-hell); font-size: 18px; }
+/* Held */
+.held { position: relative; margin: 6px 14px 0; padding: 14px; border-radius: 20px; display: grid; grid-template-columns: 92px 1fr; gap: 14px;
+  background: linear-gradient(135deg, rgba(34,36,48,.92), rgba(14,15,20,.92)); box-shadow: 0 0 0 1px rgba(217,178,106,.35), 0 14px 30px rgba(0,0,0,.55); overflow: hidden; }
+.held::after { content: ""; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; background: radial-gradient(rgba(246,200,110,.18), transparent 70%); }
+.held .bild { width: 92px; height: 112px; border-radius: 14px; background: url("../img/figuren/wildnislaeufer.jpg") center 20%/cover; box-shadow: 0 0 0 2px #6e4e1c, 0 0 0 4px rgba(0,0,0,.6); }
+.held h1 { font-family: "Cinzel"; font-size: 26px; color: #fff; line-height: 1.05; }
+.held .klasse { font-family: "Cormorant Garamond"; font-style: italic; font-size: 17px; color: var(--leise); margin-bottom: 10px; }
+.leben { position: relative; height: 18px; border-radius: 9px; background: #2a0d10; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.6); }
+.leben i { position: absolute; inset: 0 auto 0 0; width: 82%; background: linear-gradient(180deg, #ff6b60, #b3262f 60%, #7c1219); border-radius: 9px; }
+.leben b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 600; text-shadow: 0 1px 2px #000; }
+.werte { display: flex; gap: 8px; margin-top: 10px; }
+.werte span { flex: 1; text-align: center; padding: 6px 0 5px; border-radius: 10px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px rgba(217,178,106,.25); font-size: 10px; letter-spacing: .1em; color: var(--leise); }
+.werte span b { display: block; font-family: "Cinzel"; font-size: 17px; color: var(--gold-hell); letter-spacing: 0; }
+/* Dein Zug */
+.dran { position: relative; margin: 14px 14px 0; padding: 14px 16px; border-radius: 18px; overflow: hidden;
+  background: linear-gradient(90deg, rgba(70,48,14,.9), rgba(30,22,10,.9)); box-shadow: 0 0 0 1px var(--gold), 0 0 30px rgba(246,200,110,.28); }
+.dran::before { content: ""; position: absolute; inset: -60% -20%; background: conic-gradient(from 0deg, transparent 0 70%, rgba(255,220,140,.35) 80%, transparent 90%); animation: dreh 4s linear infinite; }
+@keyframes dreh { to { transform: rotate(1turn); } }
+.dran > * { position: relative; }
+.dran small { font-family: "Cinzel"; letter-spacing: .3em; font-size: 11px; color: var(--gold); }
+.dran h2 { font-family: "Cinzel"; font-size: 24px; color: #fff; margin: 2px 0 10px; }
+.schritte { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.schritte span { text-align: center; padding: 7px 0; border-radius: 10px; font-size: 12px; font-weight: 600; background: rgba(0,0,0,.35); color: var(--gold-hell); box-shadow: inset 0 0 0 1px rgba(246,220,156,.4); }
+.schritte span.weg { color: #6d6555; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); text-decoration: line-through; }
+.schritte span small { display: block; font-weight: 400; letter-spacing: 0; font-family: "Inter"; font-size: 10px; color: var(--leise); }
+/* Reiter */
+.reiter { display: flex; margin: 16px 14px 0; padding: 4px; border-radius: 14px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px rgba(217,178,106,.2); }
+.reiter span { flex: 1; text-align: center; padding: 9px 0; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--leise); }
+.reiter span.an { color: #fff; background: linear-gradient(180deg, #8a2a24, #5a1612); box-shadow: inset 0 0 0 1px rgba(255,160,140,.35), 0 4px 12px rgba(0,0,0,.4); }
+/* Aktionen */
+.titelzeile { display: flex; align-items: baseline; justify-content: space-between; margin: 16px 18px 8px; }
+.titelzeile h3 { font-family: "Cinzel"; font-size: 14px; letter-spacing: .2em; color: var(--gold); }
+.titelzeile span { font-size: 12px; color: var(--leise); }
+.karten { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 14px; }
+.karte { position: relative; padding: 12px 12px 11px; border-radius: 16px; min-height: 112px; overflow: hidden;
+  background: linear-gradient(160deg, rgba(40,42,56,.95), rgba(16,17,23,.95)); box-shadow: 0 0 0 1px rgba(217,178,106,.25), 0 8px 18px rgba(0,0,0,.45); transition: .25s; }
+.karte .sym { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 8px; background: radial-gradient(circle at 35% 30%, rgba(255,230,170,.35), rgba(120,80,30,.25)); box-shadow: inset 0 0 0 1px rgba(246,220,156,.45); }
+.karte .sym svg { width: 22px; height: 22px; stroke: var(--gold-hell); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.karte b { display: block; font-family: "Cinzel"; font-size: 15px; color: #fff; }
+.karte small { display: block; margin-top: 3px; font-size: 12px; color: var(--leise); line-height: 1.35; }
+.karte .art { position: absolute; top: 12px; right: 12px; font-size: 9px; letter-spacing: .14em; font-weight: 600; padding: 3px 7px; border-radius: 7px; color: var(--gold-hell); background: rgba(217,178,106,.15); }
+.karte .art.bonus { color: #bfe6ff; background: rgba(143,208,255,.15); }
+.karte .anz { position: absolute; right: 12px; bottom: 11px; font-family: "Cinzel"; font-size: 12px; color: var(--gold); }
+.karte.gewaehlt { background: linear-gradient(160deg, rgba(90,62,20,.95), rgba(30,20,8,.95)); box-shadow: 0 0 0 2px var(--gold-hell), 0 0 26px rgba(246,200,110,.45), 0 8px 18px rgba(0,0,0,.45); transform: translateY(-2px); }
+.karte.aus { opacity: .38; filter: grayscale(.7); }
+.karte.feuer .sym { background: radial-gradient(circle at 35% 30%, rgba(255,170,90,.55), rgba(140,40,10,.35)); }
+.karte.feuer .sym svg { stroke: #ffd2a0; }
+.karte.heil .sym { background: radial-gradient(circle at 35% 30%, rgba(140,255,170,.45), rgba(20,100,50,.3)); }
+.karte.heil .sym svg { stroke: #cfffdc; }
+/* Zielwahl */
+.ziele { margin: 12px 14px 0; padding: 12px; border-radius: 18px; background: rgba(0,0,0,.42); box-shadow: inset 0 0 0 1px rgba(246,220,156,.35); display: none; }
+.ziele.an { display: block; animation: auf .35s ease both; }
+@keyframes auf { from { opacity: 0; transform: translateY(8px); } }
+.ziele h4 { font-family: "Cinzel"; font-size: 13px; letter-spacing: .2em; color: var(--gold); margin: 2px 4px 10px; }
+.ziel { display: grid; grid-template-columns: 52px 1fr 58px; gap: 12px; align-items: center; padding: 8px; border-radius: 14px; margin-bottom: 8px; background: linear-gradient(90deg, rgba(60,20,20,.55), rgba(20,12,12,.55)); box-shadow: inset 0 0 0 1px rgba(255,100,90,.25); }
+.ziel.gewaehlt { box-shadow: inset 0 0 0 2px #ff7a6a, 0 0 22px rgba(255,90,80,.35); }
+.ziel .bild { width: 52px; height: 52px; border-radius: 50%; box-shadow: 0 0 0 2px #9b2a2a; }
+.ziel b { font-size: 14px; color: #fff; } .ziel small { display: block; font-size: 11px; color: var(--leise); margin-top: 2px; }
+.ziel .mini { height: 6px; border-radius: 3px; background: #2a0d10; margin-top: 6px; overflow: hidden; } .ziel .mini i { display: block; height: 100%; background: linear-gradient(90deg, #ff6b60, #b3262f); }
+.chance { position: relative; width: 58px; height: 58px; }
+.chance svg { width: 58px; height: 58px; transform: rotate(-90deg); }
+.chance b { position: absolute; inset: 0; display: grid; place-items: center; font-family: "Cinzel"; font-size: 15px; color: #fff; }
+.chance small { position: absolute; left: 0; right: 0; bottom: -3px; text-align: center; font-size: 8px; letter-spacing: .12em; color: var(--leise); }
+.los { display: block; width: 100%; margin-top: 4px; padding: 14px; border: 0; border-radius: 14px; font-family: "Cinzel"; font-size: 17px; letter-spacing: .08em; color: #241505;
+  background: linear-gradient(180deg, #fff0c4, #e0b260 50%, #b07c2c); box-shadow: 0 0 0 1px #6e4e1c, 0 0 24px rgba(246,200,110,.45), inset 0 1px 0 rgba(255,255,255,.6); }
+/* Initiative */
+.ini { display: flex; gap: 8px; margin: 18px 14px 0; padding: 10px; border-radius: 16px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px rgba(217,178,106,.2); overflow: hidden; }
+.ini i { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 10px; box-shadow: 0 0 0 2px #3a2a12; opacity: .6; }
+.ini i.feind { box-shadow: 0 0 0 2px #6a1a1a; }
+.ini i.dran { width: 48px; height: 48px; margin-top: -4px; opacity: 1; box-shadow: 0 0 0 2px var(--gold-hell), 0 0 14px rgba(246,200,110,.6); }
+.ende { position: sticky; bottom: 0; margin-top: 18px; padding: 12px 14px 18px; background: linear-gradient(180deg, transparent, #07080b 35%); }
+.ende button { width: 100%; padding: 16px; border: 0; border-radius: 16px; font-family: "Cinzel"; font-size: 18px; letter-spacing: .1em; color: #fff;
+  background: linear-gradient(180deg, #a3302a, #6a1612); box-shadow: 0 0 0 1px #d9b26a, 0 0 0 4px rgba(0,0,0,.6), 0 10px 26px rgba(120,20,20,.5), inset 0 1px 0 rgba(255,200,180,.35); }
+</style>
+</head>
+<body>
+<div class="leiste"><div class="rund">☰</div><div class="logo">MYTHARA</div><div class="rund">⚙</div></div>
+<section class="held">
+  <div class="bild"></div>
+  <div>
+    <h1>Kael</h1><div class="klasse">Wildnisläufer · Stufe 3</div>
+    <div class="leben"><i></i><b>23 / 28</b></div>
+    <div class="werte"><span>RK<b>15</b></span><span>TEMPO<b>6</b></span><span>TRÄNKE<b>2</b></span></div>
+  </div>
+</section>
+<section class="dran">
+  <small>DEIN ZUG · RUNDE 2</small><h2>Kael ist am Zug</h2>
+  <div class="schritte"><span class="weg">Bewegen<small>am Tisch</small></span><span>Aktion<small>bereit</small></span><span>Bonus<small>bereit</small></span></div>
+</section>
+<div class="reiter"><span class="an">Aktionen</span><span>Fähigkeiten</span><span>Inventar</span><span>Held</span></div>
+<div class="titelzeile"><h3>WAS TUST DU?</h3><span>Tippe eine Karte an</span></div>
+<div class="karten" id="karten">
+  <div class="karte" data-k="bogen"><span class="art">AKTION</span><div class="sym"><svg viewBox="0 0 24 24"><path d="M5 19 C 5 9, 9 5, 19 5"/><path d="M5 19 L19 5"/><path d="M15 5 h4 v4"/></svg></div><b>Langbogen</b><small>1W8+4 · Reichweite 12</small></div>
+  <div class="karte feuer" data-k="salve"><span class="art">AKTION</span><div class="sym"><svg viewBox="0 0 24 24"><path d="M4 18 L14 8 M8 20 L18 10 M4 14 L12 6"/><path d="M14 8 h3 v3 M18 10 h2"/></svg></div><b>Pfeilsalve</b><small>Zwei Ziele · je 1W8+4</small><span class="anz">1×</span></div>
+  <div class="karte" data-k="mal"><span class="art bonus">BONUS</span><div class="sym"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2 v4 M12 18 v4 M2 12 h4 M18 12 h4"/></svg></div><b>Jägermal</b><small>+1W6 gegen das Ziel</small></div>
+  <div class="karte heil" data-k="trank"><span class="art bonus">BONUS</span><div class="sym"><svg viewBox="0 0 24 24"><path d="M9 3 h6 M10 3 v5 L6 15 a5 5 0 0 0 4.5 6 h3 A5 5 0 0 0 18 15 L14 8 V3"/><path d="M8 15 h8"/></svg></div><b>Heiltrank</b><small>2W4+2 Leben</small><span class="anz">2×</span></div>
+  <div class="karte" data-k="ziel"><span class="art">AKTION</span><div class="sym"><svg viewBox="0 0 24 24"><path d="M8 13 V6 a1.5 1.5 0 0 1 3 0 v6 M11 11 V4.5 a1.5 1.5 0 0 1 3 0 V11 M14 11 V6 a1.5 1.5 0 0 1 3 0 v7 a6 6 0 0 1 -6 6 h-1 a6 6 0 0 1 -5 -3 l-2 -3 a1.5 1.5 0 0 1 2.4 -1.8 L8 13"/></svg></div><b>Runenpunkt</b><small>Neben dir · 1 von 2</small></div>
+  <div class="karte aus" data-k="spurt"><span class="art">AKTION</span><div class="sym"><svg viewBox="0 0 24 24"><path d="M13 4 a2 2 0 1 1 0 .1 M8 21 l3 -6 l3 2 v5 M11 15 l-1 -5 l5 -1 l3 4 M6 11 l4 -1"/></svg></div><b>Spurt</b><small>Kein Gegner in Reichweite</small></div>
+</div>
+<section class="ziele" id="ziele">
+  <h4>ZIEL WÄHLEN</h4>
+  <div class="ziel gewaehlt"><div class="bild" style="background:url(../img/krone/abschnitt-3.webp) 56% 3%/420% auto"></div><div><b>Der König unter dem Eis</b><small>Entfernung 5 · Kristallschutz aktiv</small><div class="mini"><i style="width:65%"></i></div></div>
+    <div class="chance"><svg viewBox="0 0 58 58"><circle cx="29" cy="29" r="24" stroke="rgba(255,255,255,.1)" stroke-width="5" fill="none"/><circle cx="29" cy="29" r="24" stroke="#f6dc9c" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="67.9"/></svg><b>55%</b><small>TREFFER</small></div></div>
+  <div class="ziel"><div class="bild" style="background:url(../img/krone/abschnitt-2.webp) 73% 2%/520% auto"></div><div><b>Frostknecht</b><small>Entfernung 3 · angeschlagen</small><div class="mini"><i style="width:30%"></i></div></div>
+    <div class="chance"><svg viewBox="0 0 58 58"><circle cx="29" cy="29" r="24" stroke="rgba(255,255,255,.1)" stroke-width="5" fill="none"/><circle cx="29" cy="29" r="24" stroke="#7fe07a" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="45.2"/></svg><b>70%</b><small>TREFFER</small></div></div>
+  <button class="los">Pfeil abschießen</button>
+</section>
+<div class="ini">
+  <i class="dran" style="background:url(../img/figuren/wildnislaeufer.jpg) center/cover"></i><i style="background:url(../img/figuren/elementarist.jpg) center/cover"></i><i style="background:url(../img/figuren/schildwaechter.jpg) center/cover"></i><i style="background:url(../img/figuren/lichtbringer.jpg) center/cover"></i>
+  <i class="feind" style="background:url(../img/krone/abschnitt-3.webp) 56% 3%/420% auto"></i><i class="feind" style="background:url(../img/krone/abschnitt-2.webp) 73% 2%/520% auto"></i><i class="feind" style="background:url(../img/krone/abschnitt-2.webp) 0% 12%/600% auto"></i>
+</div>
+<div class="ende"><button>Zug beenden</button></div>
+<script>
+document.querySelectorAll(".karte:not(.aus)").forEach((k) => k.onclick = () => {
+  document.querySelectorAll(".karte").forEach((x) => x.classList.toggle("gewaehlt", x === k));
+  document.getElementById("ziele").classList.toggle("an", ["bogen", "salve", "mal"].includes(k.dataset.k));
+  if (navigator.vibrate) navigator.vibrate(12);
+});
+if (location.hash === "#ziel") document.querySelector('[data-k="bogen"]').click();
+</script>
+</body>
+</html>

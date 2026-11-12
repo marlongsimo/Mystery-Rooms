@@ -22,7 +22,7 @@ Kleine Vorschaubilder in „Aktuelle Kampagnen“.
 
 - **abschnitt-1 (Rabenmoor):** ✓ eingebaut
   > Painted dark-fantasy scene: a peat-cutters' village square at dusk on an island in a moor, villagers holding torches and pitchforks, a broad man with a chain of office in front, a weeping woman apart from the crowd. Warm torchlight against cold blue mist. No text.
-- **abschnitt-2 (Das tiefe Moor):**
+- **abschnitt-2 (Das tiefe Moor):** ✓ eingebaut
   > Painted dark-fantasy scene: a small island deep in a black moor with a ring of mossy standing stones and a stone altar; a translucent pale girl made of mist, hair full of duckweed, sits beside a sleeping child on the altar; dozens of still pale lights hover around over the water. Cold, sad, quiet. No text.
 
 ## 3. Kampfkarten (Draufsicht, genau 4 : 3, mind. 1448 × 1086)

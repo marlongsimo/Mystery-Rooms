@@ -826,7 +826,13 @@
     else z.z[zu] = a.dauer;
   }
 
+  /** Beobachtungspunkt für Auswertungen (tools/): API.beobachter(art, st, f, aktionId, zielId, ergebnis). Ohne Beobachter keine Wirkung. */
   function handeln(st, aktionId, zielId) {
+    const b = API.beobachter; if (!b) return handelnKern(st, aktionId, zielId);
+    const f = aktiv(st); b("vor", st, f, aktionId, zielId);
+    const e = handelnKern(st, aktionId, zielId); b("nach", st, f, aktionId, zielId, e); return e;
+  }
+  function handelnKern(st, aktionId, zielId) {
     const f = aktiv(st);
     const g = grund(st, aktionId); if (g) return { fehler: g };
     const { a, typ } = findeAktion(f, aktionId);

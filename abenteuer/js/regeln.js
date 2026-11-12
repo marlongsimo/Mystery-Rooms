@@ -88,6 +88,9 @@
     moorleiche: { name: "Moorleiche", tp: 16, rk: 10, werte: { STR: 14, GES: 7, KON: 15, INT: 3, WEI: 6, CHA: 3 }, angriff: { name: "Nasser Griff", bonus: 4, schaden: "1W8+2" }, untot: true, bewegung: 4, xp: 50 },
     schlammkroete: { name: "Schlammkröte", tp: 18, rk: 11, werte: { STR: 15, GES: 12, KON: 14, INT: 2, WEI: 10, CHA: 3 }, angriff: { name: "Zunge", bonus: 4, schaden: "1W8+2", reichweite: 2 }, xp: 50 },
     alwine: { name: "Alwine", tp: 52, rk: 13, werte: { STR: 8, GES: 14, KON: 14, INT: 12, WEI: 16, CHA: 18 }, angriff: { name: "Kalte Hand", bonus: 5, schaden: "2W6+2", reichweite: 4 }, atem: { name: "Wehklage", schaden: "3W6", sg: 13, alle: 3, rettung: "WEI" }, bewegung: 5, xp: 700 },
+    // Die letzte Fackel von Hochwacht: Jäger haben es auf die Begleiterin abgesehen (jaeger: true)
+    siegeljaeger: { name: "Siegeljäger", tp: 12, rk: 13, werte: { STR: 13, GES: 14, KON: 12, INT: 10, WEI: 12, CHA: 8 }, angriff: { name: "Hakenschwert", bonus: 4, schaden: "1W6+2" }, jaeger: true, bewegung: 6, xp: 50 },
+    jaegerschuetze: { name: "Siegeljäger-Schütze", tp: 9, rk: 12, werte: { STR: 10, GES: 15, KON: 11, INT: 10, WEI: 13, CHA: 8 }, angriff: { name: "Kurzbogen", bonus: 4, schaden: "1W6+2", reichweite: 6 }, jaeger: true, xp: 50 },
     grabritter: { name: "Grabritter", tp: 45, rk: 17, werte: { STR: 18, GES: 11, KON: 16, INT: 10, WEI: 12, CHA: 12 }, angriff: { name: "Zweihänder", bonus: 6, schaden: "2W6+4" }, untot: true, xp: 450 },
   };
   const WOLF_WERTE = { STR: 12, GES: 15, KON: 12, INT: 3, WEI: 12, CHA: 6 };
@@ -113,6 +116,8 @@
     moor_kroeten2: { name: "Schlammkröten im Ried", zusatzAb: 3, stufe: 2, gegner: [["schlammkroete", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.49, 3: 1.42, 4: 2.06, 5: 2.11, 6: 2.22 }, skalaHC: { 2: 1.17, 3: 1.29, 4: 1.53, 5: 1.53, 6: 2.01 } },
     moor_tote: { name: "Die Ertrunkenen", zusatzAb: 3, stufe: 2, gegner: [["moorleiche", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.82, 3: 1.57, 4: 2.58, 5: 2.85, 6: 3.23 }, skalaHC: { 2: 1.65, 3: 1.82, 4: 2.34, 5: 2.71, 6: 2.99 } },
     moor_schrein: { name: "Alwine, die Stumme", zusatzAb: 3, stufe: 2, gegner: [["alwine", 0.1, 1, 0.6], ["moorleiche", 0.5], ["irrlicht", 0.5]], skala: { 2: 0.75, 3: 0.84, 4: 1.78, 5: 2.45, 6: 3.23 }, skalaHC: { 2: 0.5, 3: 1, 4: 1.61, 5: 1.96, 6: 2.34 } },
+    // Die letzte Fackel von Hochwacht (Prototyp): genau ein bis zwei Jäger, dazu Kobolde; Tabelle per tools/eskorte-sim.js
+    pass: { name: "Hinterhalt am Pass", stufe: 1, zusatzAb: 99, gegner: [["siegeljaeger", 0.25, 3, 0.25], ["jaegerschuetze", 0.15, 2, 0.4], ["schattenkobold", 0.55]], skala: { 2: 2.38, 3: 3.15, 4: 4.36, 5: 4.56, 6: 5.66 }, skalaHC: { 2: 2.28, 3: 3.08, 4: 4.18, 5: 4.46, 6: 5.3 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -216,7 +221,8 @@
   const aktiv = (st) => fig(st, st.reihe[st.am]);
   const istFig = (f, fid) => f && f.fid === fid;
   const wolfVon = (st, f) => st.figuren.find((o) => o.art === "wolf" && o.besitzer === f.id);
-  const spielerFiguren = (st) => st.figuren.filter((f) => f.seite === "spieler" && f.art !== "wolf");
+  const spielerFiguren = (st) => st.figuren.filter((f) => f.seite === "spieler" && f.art !== "wolf" && f.art !== "begleiter");
+  const begleiterVon = (st) => st.figuren.find((f) => f.art === "begleiter");
   const gegnerFiguren = (st) => st.figuren.filter((f) => f.seite === "gegner");
 
   function neueFigur(fid, i, stufe, x, y) {
@@ -259,6 +265,14 @@
         st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[st.stufe - 1], tpMax: wd.tp[st.stufe - 1], rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
       }
     });
+    // Eskorte: eine Begleiterin (z. B. Sera Venn) als eigene Figur auf Heldenseite – ohne Spielerzug, sie läuft in der Begleiterphase
+    if (opts.begleiter) {
+      const b = opts.begleiter;
+      st.figuren.push({ id: "b0", seite: "spieler", art: "begleiter", name: b.name, titel: b.titel || "Begleiterin", x: b.start[0], y: b.start[1], tp: b.tp, tpMax: b.tp, rk: b.rk || 12, rkBasis: b.rk || 12,
+        werte: b.werte || { STR: 8, GES: 12, KON: 10, INT: 13, WEI: 14, CHA: 13 }, z: {}, reaktion: 0, genutzt: {}, rucksack: [], todes: { e: 0, f: 0 } });
+      st.eskorte = { route: b.route.map((p) => p.slice()), schritt: 0, ausgang: b.ausgang !== false, jaegerSieg: Boolean(b.jaegerSieg), schrittweite: b.schrittweite || 2, warten: b.warten || 3, unten: null };
+      st.log.push({ t: `${b.name} ist bei euch. Bringt sie zum Ausgang – manche Gegner haben es auf sie abgesehen.`, art: "gut" });
+    }
     // Gemischte Startplätze der Gegner (Abwechslung)
     if (opts.mischen) { const g = k.start.gegner.slice(); for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; } k = Object.assign({}, k, { start: Object.assign({}, k.start, { gegner: g }) }); }
     // Allgemeiner Faktor für das Leben aller Gegner (Ausgleich zur Klassenbalance)
@@ -296,7 +310,7 @@
       if (kand[0]) { kand[0].laeufer = { x: opts.laeufer.feld[0], y: opts.laeufer.feld[1], ereignis: opts.laeufer.ereignis, nah: opts.laeufer.nah != null ? opts.laeufer.nah : 1, warten: Boolean(opts.laeufer.warten) }; kand[0].name += " (rennt zum Seil)"; }
     }
     // Initiative (Wölfe handeln im Zug ihrer Besitzerin)
-    const teil = st.figuren.filter((f) => f.art !== "wolf");
+    const teil = st.figuren.filter((f) => f.art !== "wolf" && f.art !== "begleiter");
     for (const f of teil) { const w = W(r, 20); f.ini = w + mod(f.werte.GES) + (hatDing(f, "auge") ? 3 : 0); f.iniWurf = w; }
     st.reihe = teil.slice().sort((a, b) => b.ini - a.ini || mod(b.werte.GES) - mod(a.werte.GES) || (a.seite === "spieler" ? -1 : 1)).map((f) => f.id);
     st.log.push({ t: "Initiative: " + st.reihe.map((id) => { const f = fig(st, id); return `${f.name} (${f.ini})`; }).join(" · ") });
@@ -456,7 +470,7 @@
   function schaden(st, z, n, opts = {}) {
     if (z.tot) return;
     if (z.seite === "spieler" && z.tp <= 0) {
-      if (st.schwierigkeit === "hardcore" && z.art !== "wolf" && n > 0) {
+      if (st.schwierigkeit === "hardcore" && z.art !== "wolf" && z.art !== "begleiter" && n > 0) {
         z.todes.f += opts.krit ? 2 : 1;
         st.log.push({ t: `${z.name} wird am Boden getroffen: Todeswurf misslungen (${z.todes.f}/3).`, art: "schlecht" });
         if (z.todes.f >= 3) stirbt(st, z);
@@ -468,6 +482,7 @@
     if (z.tp === 0) {
       if (z.seite === "gegner") st.log.push({ t: `${z.name} ist besiegt.`, art: "gut" });
       else if (z.art === "wolf") { st.log.push({ t: `${z.name} bleibt winselnd liegen.`, art: "schlecht" }); if (st.schwierigkeit === "hardcore") z.tot = true; }
+      else if (z.art === "begleiter") { z.stabil = false; z.z.liegend = true; if (st.eskorte) st.eskorte.unten = st.runde; st.log.push({ t: `${z.name} bricht zusammen! Stabilisiert sie bis zum Ende der nächsten Runde, sonst wird sie verschleppt.`, art: "schlecht" }); }
       else {
         z.todes = { e: 0, f: 0 }; z.stabil = false;
         for (const k of ["versteckt", "raserei", "finte", "gift", "rueckzug"]) delete z.z[k];
@@ -495,7 +510,9 @@
   function pruefeEnde(st) {
     if (st.ende) return st.ende;
     const sp = spielerFiguren(st), ge = gegnerFiguren(st);
-    if (ge.every((f) => f.tp <= 0)) {
+    // Eskorte mit „jaegerSieg“: Sind alle Jäger besiegt, ist die Begleiterin in Sicherheit
+    const jaegerWeg = st.eskorte && st.eskorte.jaegerSieg && ge.some((f) => GEGNER[f.art].jaeger) && ge.filter((f) => GEGNER[f.art].jaeger).every((f) => f.tp <= 0);
+    if (ge.every((f) => f.tp <= 0) || jaegerWeg) {
       st.ende = "sieg"; st.xp = ge.reduce((a, g) => a + GEGNER[g.art].xp, 0);
       st.log.push({ t: `Sieg! Alle Gegner sind besiegt. Jede Figur erhält ${Math.floor(st.xp / sp.length)} EP.`, art: "ende" });
     } else if (sp.every((f) => f.tp <= 0)) {
@@ -1009,6 +1026,7 @@
       if (verblasst.length) { verblasst.forEach((g) => { delete g.z.segen; delete g.z.segenBis; }); st.log.push({ t: `Der Segen verblasst bei ${verblasst.map((g) => g.name).join(", ")}.` }); }
       for (const g of st.figuren) if (g.seite === "gegner" && g.atemRunde && st.runde - g.atemRunde >= GEGNER[g.art].atem.alle) g.atemBereit = true;
       st.log.push({ t: `— Runde ${st.runde} —`, art: "runde" });
+      if (st.eskorte) begleiterPhase(st);
     }
     if (!st.ende) beginneZug(st);
   }
@@ -1028,13 +1046,48 @@
   /* ---------- Gegner ---------- */
   function gegnerAngriff(st, g, z) {
     const d = GEGNER[g.art];
+    z = abfangen(st, z);
     const metallVorher = z.rk;
     return angriffswurf(st, g, z, {
       name: d.angriff.name, bonus: d.angriff.bonus + (g.anfuehrer ? 1 : 0), schaden: d.angriff.schaden.replace(/[+-]\d+$/, ""), fest: parse(d.angriff.schaden).b, nah: abstand(g, z) <= 1, magisch: Boolean(d.boss),
       nachTreffer: () => { if (d.rost && z.metall && z.rk > z.rkBasis - 2 && metallVorher === z.rk) { z.rk -= 1; st.log.push({ t: `Die Rüstung von ${z.name} rostet: RK ${z.rk}.` }); } },
     });
   }
+  /* ---------- Eskorte: Begleiterin ---------- */
+  /** Zu Beginn jeder Runde: Die Begleiterin geht bis zu 2 Felder ihren Weg entlang – nicht in bedrohte Felder, nicht ohne die Gruppe */
+  function begleiterPhase(st) {
+    const s = begleiterVon(st), e = st.eskorte; if (!s || st.ende) return;
+    // Rettungsfenster abgelaufen: verschleppt
+    if (s.tp <= 0) {
+      if (!s.stabil && e.unten != null && st.runde >= e.unten + 2) { st.ende = "gefangen"; st.log.push({ t: `Die Jäger packen ${s.name} und verschwinden mit ihr. Ihr müsst sie zurückholen.`, art: "ende" }); }
+      return;
+    }
+    const feinde = gegnerFiguren(st).filter(lebt), bedroht = (p) => feinde.some((g) => abstand(g, p) <= 1);
+    const helden = spielerFiguren(st).filter(lebt);
+    while (e.schritt < e.route.length && s.x === e.route[e.schritt][0] && s.y === e.route[e.schritt][1]) e.schritt++;
+    if (e.schritt >= e.route.length) return;
+    if (!helden.some((h) => abstand(h, s) <= e.warten)) { st.log.push({ t: `${s.name} wartet auf euch.` }); return; }
+    const ziel = { x: e.route[e.schritt][0], y: e.route[e.schritt][1] };
+    const m = erreichbar(st, s, e.schrittweite); let best = { x: s.x, y: s.y, w: abstand(s, ziel) + (bedroht(s) ? 50 : 0) };
+    for (const [k] of m) { const [x, y] = k.split(",").map(Number), p = { x, y }; if (belegt(st, x, y, s)) continue; const w = abstand(p, ziel) + (bedroht(p) ? 50 : 0); if (w < best.w) best = { x, y, w }; }
+    if (best.x === s.x && best.y === s.y) { if (bedroht(s)) st.log.push({ t: `${s.name} sitzt fest – Gegner neben ihr.`, art: "schlecht" }); return; }
+    s.x = best.x; s.y = best.y; delete s.z.liegend;
+    while (e.schritt < e.route.length && s.x === e.route[e.schritt][0] && s.y === e.route[e.schritt][1]) e.schritt++;
+    if (e.schritt >= e.route.length && e.ausgang) { st.ende = "sieg"; st.xp = gegnerFiguren(st).filter((g) => g.tp <= 0).reduce((a, g) => a + GEGNER[g.art].xp, 0); st.log.push({ t: `${s.name} erreicht den Ausgang. Geschafft!`, art: "ende" }); }
+    else st.log.push({ t: `${s.name} geht weiter (${e.schritt}/${e.route.length}).` });
+  }
+  /** Abfangen: Ein Held direkt neben der Begleiterin wirft sich mit seiner Reaktion vor einen gezielten Angriff (nicht gegen Flächenangriffe) */
+  function abfangen(st, z) {
+    if (!z || z.art !== "begleiter") return z;
+    const h = spielerFiguren(st).filter((o) => lebt(o) && o.reaktion > 0 && abstand(o, z) <= 1 && !o.z.festgehalten && o.schuetzt !== false).sort((a, b) => b.rk - a.rk || b.tp - a.tp)[0];
+    if (!h) return z;
+    h.reaktion--; st.log.push({ t: `${h.name} wirft sich vor ${z.name} und fängt den Angriff ab.`, art: "gut" });
+    return h;
+  }
   function zieleFuerGegner(st, g) {
+    // Jäger: die Begleiterin hat Vorrang, wenn sie steht und sichtbar ist
+    const s = GEGNER[g.art].jaeger && begleiterVon(st);
+    if (s && lebt(s) && sicht(st, g, s)) { if (g.visier !== st.runde) { g.visier = st.runde; st.log.push({ t: `${g.name} nimmt ${s.name} ins Visier.`, art: "gegner" }); } return [s]; }
     const alle = st.figuren.filter((f) => f.seite === "spieler" && lebt(f));
     const sichtbar = alle.filter((f) => !f.z.versteckt);
     return sichtbar.length ? sichtbar : alle;
@@ -1121,7 +1174,8 @@
         if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return; }
         lebende = zieleFuerGegner(st, g);
       }
-      const z = lebende.filter((f) => trifft(g, f)).sort((a, b) => (g.z.spott === b.id) - (g.z.spott === a.id) || a.tp - b.tp)[0];
+      let z = lebende.filter((f) => trifft(g, f)).sort((a, b) => (g.z.spott === b.id) - (g.z.spott === a.id) || a.tp - b.tp)[0];
+      if (!z && d.jaeger) z = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && f.art !== "begleiter" && trifft(g, f)).sort((a, b) => a.tp - b.tp)[0];
       if (z) gegnerAngriff(st, g, z);
       if (!st.ende) weiter(st); return;
     }
@@ -1132,6 +1186,7 @@
       if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
       if (!lebt(g)) { if (!st.ende) weiter(st); return; }
       lebende = zieleFuerGegner(st, g); ziel = naechste();
+      if (d.jaeger && ziel && ziel.art === "begleiter" && abstand(g, ziel) > 1) { const daneben = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && f.art !== "begleiter" && abstand(g, f) <= 1); if (daneben.length) { lebende = daneben; ziel = naechste(); } }
       fangschuss(st, g, startX, startY);
       if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return; }
     }
@@ -1273,6 +1328,22 @@
         if (best) { bewegen(st, best.x, best.y); if (lebt(f) && kann("siegelstein")) handeln(st, "siegelstein", f.id); }
       }
       if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
+    }
+    // Eskorte: Wer Sera am nächsten ist, kümmert sich um sie – am Boden stabilisieren, sonst bei nahem Jäger neben sie stellen
+    const sera = st.eskorte && begleiterVon(st);
+    if (sera && st.zug.aktion) {
+      const helden = spielerFiguren(st).filter(lebt), naechster = helden.sort((a, b) => abstand(a, sera) - abstand(b, sera))[0];
+      const neben = () => { if (abstand(f, sera) <= 1) return true; let best = null; for (const [k, c] of bewegungsfelder(st, f)) { if (c === "schritt") continue; const [x, y] = k.split(",").map(Number); if (abstand({ x, y }, sera) <= 1 && (!best || c < best.c)) best = { x, y, c }; } if (best) bewegen(st, best.x, best.y); return lebt(f) && abstand(f, sera) <= 1; };
+      if (sera.tp <= 0 && !sera.stabil && naechster === f) { if (neben() && kann("stabilisieren")) handeln(st, "stabilisieren", sera.id); if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; } }
+      else if (lebt(sera) && naechster === f && !helden.some((h) => h !== f && abstand(h, sera) <= 1) && gegner().some((g) => GEGNER[g.art].jaeger && abstand(g, sera) <= 6)) {
+        neben(); if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
+        const z = gegner().filter((g) => abstand(g, f) <= 1).sort((a, b) => a.tp - b.tp)[0]; if (z) ziel = z;
+        if (abstand(f, sera) <= 1) { // bleibt als Leibwache stehen: angreifen, was erreichbar ist, dann Zug beenden
+          const a = nahAngriff && z ? nahAngriff : fernAngriff;
+          if (a && st.zug.aktion) { const zz = ziele(st, a.id).find((o) => o === ziel) || ziele(st, a.id).sort((x, y) => x.tp - y.tp)[0]; if (zz) handeln(st, a.id, zz.id); }
+          if (!st.ende) zugEnde(st); return;
+        }
+      }
     }
     // 2. Bewegen
     const nah = Boolean(nahAngriff) && (!fernAngriff || ["krieger"].includes(f.klasse) || ["inquisitor", "assassine", "schattenlaeufer", "tiergefaehrte"].includes(f.fid));
@@ -1468,7 +1539,7 @@
     };
   }
 
-  const API = { GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
     findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

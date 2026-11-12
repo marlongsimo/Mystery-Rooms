@@ -199,7 +199,9 @@
   /** Bild mit Ersatz, solange für ein neues Abenteuer noch keine Bilder da sind */
   const BILD_ERSATZ = `onerror="this.onerror=null;this.src='img/mythara/karte-kampagnen.webp'"`;
   /** Alle Abenteuer (aus daten/*.js), leichtere zuerst */
-  const ABENTEUER = () => Object.values(window.ABD_ALLE || {}).map((d) => window.ABS.metaVon(d.META ? d.META.id : "grauwacht")).sort((a, b) => (a.schwierigkeit || 1) - (b.schwierigkeit || 1)); // leichtere Abenteuer zuerst
+  // Entwürfe (META.entwurf) nur mit ?entwurf in der Adresse
+  const ENTWURF = new URLSearchParams(location.search).has("entwurf");
+  const ABENTEUER = () => Object.values(window.ABD_ALLE || {}).map((d) => window.ABS.metaVon(d.META ? d.META.id : "grauwacht")).filter((m) => ENTWURF || !m.entwurf).sort((a, b) => (a.schwierigkeit || 1) - (b.schwierigkeit || 1)); // leichtere Abenteuer zuerst
   const titelbild = (m) => (m.bild || "img/mythara/karte-kampagnen.webp");
   const abenteuerKachel = (m, attr) => `<button class="hub-kachel welt" ${attr}="${m.id}"><img src="${titelbild(m)}" alt="" ${BILD_ERSATZ}><b>${esc(m.titel)}</b><small>${esc(m.kurztext || "")} <span class="hub-schwer">Schwierigkeit: Stufe ${esc(m.schwierigkeit || 1)}</span> · ${m.min}–${m.max} Helden.</small>${attr === "data-welt" ? `<span class="hub-mehr">Zur Beschreibung →</span>` : ""}</button>`;
   const vor = (t) => {

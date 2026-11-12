@@ -415,6 +415,15 @@
       if (k.beute !== false) beuteZiehen(A);
       return { ok: true, ergebnis: "sieg" };
     }
+    // Eskorte: Die Begleiterin wurde verschleppt – die Geschichte geht anders weiter (Rettungsabschnitt), kein Rückzug
+    if (st.ende === "gefangen" && k.gefangen) {
+      const nz = R.nachKampf(st);
+      for (const fid of A.gruppe) if (nz[fid]) { A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); if (!A.zust[fid].tot && A.zust[fid].tp < 1) A.zust[fid].tp = 1; }
+      for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
+      R.neuerKampf(A.zust); A.kampfMod = null;
+      wirke(A, k.gefangen); ziel(A, k.gefangen);
+      return { ok: true, ergebnis: "gefangen" };
+    }
     if (k.verloren && st.ende !== "sieg") {
       const nz = R.nachKampf(st);
       for (const fid of A.gruppe) if (nz[fid]) { A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); if (!A.zust[fid].tot && A.zust[fid].tp < 1) A.zust[fid].tp = 1; }

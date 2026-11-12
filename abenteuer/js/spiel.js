@@ -396,6 +396,13 @@
     }
     // Ziel eines Läufers (Glockenseil) markieren, solange er unterwegs ist
     for (const g of st.figuren) if (g.laeufer && g.tp > 0) { const L = g.laeufer, lx = L.x * Z + Z / 2, ly = L.y * Z + Z / 2; o += `<g class="seil-ziel"><circle cx="${lx}" cy="${ly}" r="${Z * 0.44}" fill="#C5A267" fill-opacity="${L.da ? ".35" : ".12"}" stroke="#f0d488" stroke-width="2.5" stroke-dasharray="6 4"/><text x="${lx}" y="${ly - Z * 0.5}" text-anchor="middle" font-size="12" font-weight="700" fill="#f0d488" stroke="#000" stroke-width="3" paint-order="stroke">${L.da ? "Er zieht gleich!" : "Glockenseil"}</text></g>`; }
+    // Eskorte: Seras Weg (Punkte) und der Ausgang (Fahne)
+    if (st.eskorte) {
+      const r = st.eskorte.route;
+      r.forEach(([x, y], i) => { const fertig = i < st.eskorte.schritt, letzter = i === r.length - 1; o += letzter
+        ? `<g transform="translate(${x * Z + Z / 2} ${y * Z + Z / 2})" class="ausgang"><circle r="${Z * 0.42}" fill="#e8c46a" fill-opacity=".14" stroke="#e8c46a" stroke-width="2.5" stroke-dasharray="6 4"/><path d="M-6 16V-16L12 -9L-6 -2" fill="#e8c46a" stroke="#6a4e1e" stroke-width="1.5"/></g>`
+        : `<circle cx="${x * Z + Z / 2}" cy="${y * Z + Z / 2}" r="6" fill="${fertig ? "#6a6250" : "#e8c46a"}" fill-opacity=".7"/>`; });
+    }
     // Wer am Boden liegt, wird zuerst gezeichnet, damit stehende Figuren darüber sichtbar bleiben
     for (const f of st.figuren.slice().sort((a, b) => (a.tp > 0) - (b.tp > 0))) {
       if (f.x < 0 || (f.z && f.z.verbannt)) continue;
@@ -415,6 +422,15 @@
         o += `<g transform="translate(${cx} ${cy})">${titel}${B.gegner(f.art)}</g>`;
         o += `<g transform="translate(${cx + 17} ${cy - 17})"><circle r="10" fill="#1b1612" stroke="#d79a7d" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#f0d0c0">${esc((f.name.match(/\d+$/) || [""])[0])}</text></g>`;
       } else {
+        if (f.art === "begleiter") {
+          const visier = st.figuren.some((g) => g.seite === "gegner" && g.tp > 0 && g.visier === st.runde);
+          o += `<g transform="translate(${cx} ${cy})">${titel}${B.begleiter(unten)}</g>`;
+          if (visier && !unten) o += `<g class="visier" transform="translate(${cx} ${cy})"><circle r="30" fill="none" stroke="#ff5a4a" stroke-width="2.5" stroke-dasharray="5 4"/><path d="M0 -36V-26M0 26V36M-36 0H-26M26 0H36" stroke="#ff5a4a" stroke-width="3"/></g>`;
+          if (unten) o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${f.stabil ? "stabil" : "retten!"}</text>`;
+          const w = 44, anteil = Math.max(0, f.tp / f.tpMax);
+          o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="#e8c46a"/>`;
+          continue;
+        }
         const href = f.art === "wolf" ? "img/figuren/wolf.jpg" : F.bild(f.fid);
         o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, f.art === "wolf" ? 17 : 21, farbeVon(f), "c" + f.id, unten)}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
         if (f.tot) o += `<text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="22" fill="#fff">✝</text>`;
@@ -510,6 +526,8 @@
     const tote = R.spielerFiguren(st).filter((f) => f.tot);
     const text = st.ende === "sieg"
       ? `<h2>Sieg</h2><p>Die Gegner sind besiegt, nach ${st.runde} Runden.${tote.length ? ` Gefallen: ${tote.map((f) => esc(f.name)).join(", ")}.` : ""}</p>`
+      : st.ende === "gefangen"
+        ? `<h2>Verschleppt</h2><p>Die Jäger haben ${esc((R.begleiterVon(st) || {}).name || "eure Begleiterin")} mitgenommen. Die Geschichte geht anders weiter.</p>`
       : st.ende === "niederlage"
         ? `<h2>${esc(META().niederlage || "Niederlage")}</h2><p>Niemand ist mehr auf den Beinen. ${tote.length ? `Gefallen: ${tote.map((f) => esc(f.name)).join(", ")}.` : ""}</p>`
         : `<h2>Rückzug</h2><p>Die Gruppe liegt am Boden und zieht sich zum Lagerfeuer zurück. Im echten Abenteuer verliert ihr nichts, ihr versucht es einfach noch einmal.</p>`;

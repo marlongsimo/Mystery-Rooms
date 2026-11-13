@@ -47,7 +47,13 @@ const { chromium } = require('playwright');
         continue;
       }
       if (await k('#weiter-abenteuer')) { kaempfe.push(A && A.szene); continue; }
-      if (await k('#beute-lassen') || await k('[data-geheim]')) continue;
+      if (await k('#beute-lassen')) continue;
+      // Geheime Entscheidung am Tisch: je Figur (Zeile) eine Antwort, dann weiter
+      if (await p.$('[data-geheim]')) {
+        await p.evaluate(() => document.querySelectorAll('.opt-zeile').forEach((z) => { const b = z.querySelector('[data-geheim]'); if (b && !z.querySelector('[data-geheim]:not(.ghost)')) b.click(); }));
+        await p.waitForTimeout(150);
+        if (await k('#sz-weiter')) continue;
+      }
       if (await p.$('[data-stimme]')) { const st = await p.$$('[data-stimme]'); for (const x of st) if (await x.isEnabled()) await x.click(); if (await k('#sz-auswerten')) continue; }
       if (await k('[data-opt]') || await k('[data-wer]') || await k('[data-wurf]') || await k('#sz-kampf') || await k('#sz-weiter')) continue;
     }

@@ -59,7 +59,9 @@ insert into public.rpg_adventure_endings (adventure, ending) values
   ('rabenmoor', 'ende_erloest'), ('rabenmoor', 'ende_besiegt'),
   ('grauwacht', 'ende_waechter'), ('grauwacht', 'ende_kobold'), ('grauwacht', 'ende_opfer'), ('grauwacht', 'ende_bruch'), ('grauwacht', 'ende_verrat'),
   ('hochwacht', 'ende_fackel'), ('hochwacht', 'ende_funke'), ('hochwacht', 'ende_dunkel'),
-  ('krone', 'ende_stabil'), ('krone', 'ende_versiegelt'), ('krone', 'ende_umgeleitet')
+  ('krone', 'ende_stabil'), ('krone', 'ende_versiegelt'), ('krone', 'ende_umgeleitet'),
+  ('weidenhain', 'ende_nacht'), ('weidenhain', 'ende_fest'),
+  ('graufurt', 'ende_norden'), ('graufurt', 'ende_wehre')
 on conflict do nothing;
 
 -- ---------------------------------------------------------------------

@@ -250,7 +250,7 @@
     irrlicht: { klassen: ["zauberer", "waldlaeufer"], text: "Flink und schwer zu treffen (RK 14): Es wirft kalte Funken über 4 Felder und bleibt auf Abstand. Fernkämpfer und Zauber holen es herunter." },
   };
   const META = {
-    id: "weidenhain", entwurf: true, schwierigkeit: 1, reihe: -1, einsteiger: true,
+    id: "weidenhain", schwierigkeit: 1, reihe: -1, einsteiger: true,
     titel: "Das Erntefest von Weidenhain", kurz: "Weidenhain", untertitel: "Ein Einsteiger-Abenteuer am Rand des Schwarzmoors",
     kurztext: "Kröten plündern den Kornspeicher, mitten im Erntefest. Der beste Einstieg in Mythara.",
     ehrentitel: "Retter von Weidenhain", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)

@@ -31,7 +31,7 @@ grant execute on all functions in schema pg_temp to authenticated;
 -- ---------- Bestandsschutz ----------
 select pg_temp.ok((select count(*) from public.rpg_hero_collection where user_id = '00000000-0000-0000-0000-0000000000e0' and quelle = 'bestand') = 15, 'Konto aus der Zeit vor der Migration hat alle 15 Helden (Bestandsschutz)');
 select pg_temp.ok((select count(*) from public.rpg_hero_collection where user_id = '00000000-0000-0000-0000-0000000000e9') = 0, 'Erneutes Ausführen vergibt keinen Bestandsschutz an spätere Konten');
-select pg_temp.ok((select count(*) from public.rpg_hero_catalog) = 15 and (select count(*) from public.rpg_adventure_endings) = 13, 'Katalog: 15 Helden, 13 Enden');
+select pg_temp.ok((select count(*) from public.rpg_hero_catalog) = 15 and (select count(*) from public.rpg_adventure_endings) = 17, 'Katalog: 15 Helden, 17 Enden');
 
 set role authenticated;
 -- ---------- Keine direkten Tabellenrechte ----------

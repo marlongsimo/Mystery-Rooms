@@ -1,6 +1,6 @@
 /*
  * Das Erntefest von Weidenhain (Einsteiger-Kurzabenteuer, Entwurf) – im Browser von der Startseite bis zum Ende durchgespielt.
- * Hub nur mit ?entwurf, als erstes Abenteuer vor dem Moor, Einleitung, Szenen, alle Kämpfe auf den Karten, Ende.
+ * Freigegeben: im Hub ohne ?entwurf, als erstes Abenteuer vor dem Moor, Einleitung, Szenen, alle Kämpfe auf den Karten, Ende.
  * Die Engine (alle Szenen, alle Enden, Kämpfe) prüft tests/kampagnen.test.js und tools/kampagne.js.
  * Aufruf: python3 -m http.server 8765 &  ·  node abenteuer/tests/weidenhain.test.js   (SHOTS=<Ordner> für Screenshots)
  */
@@ -14,12 +14,12 @@ const { chromium } = require('playwright');
   p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());
   const shot = async (n) => { if (SHOTS) { await p.waitForTimeout(300); await p.screenshot({ path: `${SHOTS}/weidenhain-${n}.png` }); } };
   try {
-    // Ohne ?entwurf nicht im Hub
+    // Freigegeben: auch ohne ?entwurf im Hub
     await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await p.reload();
     await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
-    check(!(await p.$('[data-neu-abenteuer="weidenhain"]')), 'Ohne ?entwurf ist das Abenteuer nicht im Hub');
-    // Mit ?entwurf: zwischen Moor und Grauwacht
-    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf&entwurf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
+    check(Boolean(await p.$('[data-neu-abenteuer="weidenhain"]')), 'Das Abenteuer ist im Hub regulär zu sehen (ohne ?entwurf)');
+    // Reihenfolge im Hub
+    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
     const reihe = await p.evaluate(() => [...document.querySelectorAll('[data-neu-abenteuer]')].map((x) => x.dataset.neuAbenteuer));
     check(reihe[0] === 'weidenhain' && reihe.indexOf('weidenhain') < reihe.indexOf('rabenmoor') && reihe.indexOf('rabenmoor') < reihe.indexOf('graufurt'), `Reihenfolge im Hub: ${reihe.join(' → ')}`);
     await shot('1-hub');

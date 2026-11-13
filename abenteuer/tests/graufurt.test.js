@@ -1,6 +1,6 @@
 /*
  * Die Fähre von Graufurt (Kurzabenteuer, Entwurf) – im Browser von der Startseite bis zum Ende durchgespielt.
- * Hub nur mit ?entwurf, Reihenfolge Moor → Graufurt → Grauwacht, Einleitung, Szenen, alle Kämpfe auf den gemalten Karten, Ende.
+ * Freigegeben: im Hub ohne ?entwurf, Reihenfolge Moor → Graufurt → Grauwacht, Einleitung, Szenen, alle Kämpfe auf den gemalten Karten, Ende.
  * Die Engine (alle Szenen, alle Enden, Kämpfe) prüft tests/kampagnen.test.js und tools/kampagne.js.
  * Aufruf: python3 -m http.server 8765 &  ·  node abenteuer/tests/graufurt.test.js   (SHOTS=<Ordner> für Screenshots)
  */
@@ -14,12 +14,12 @@ const { chromium } = require('playwright');
   p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());
   const shot = async (n) => { if (SHOTS) { await p.waitForTimeout(300); await p.screenshot({ path: `${SHOTS}/graufurt-${n}.png` }); } };
   try {
-    // Ohne ?entwurf nicht im Hub
+    // Freigegeben: auch ohne ?entwurf im Hub
     await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await p.reload();
     await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
-    check(!(await p.$('[data-neu-abenteuer="graufurt"]')), 'Ohne ?entwurf ist das Kurzabenteuer nicht im Hub');
-    // Mit ?entwurf: zwischen Moor und Grauwacht
-    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf&entwurf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
+    check(Boolean(await p.$('[data-neu-abenteuer="graufurt"]')), 'Das Kurzabenteuer ist im Hub regulär zu sehen (ohne ?entwurf)');
+    // Reihenfolge im Hub
+    await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.click('#my-gast-start'); await p.click('.hub-kachel[data-hub="neu"]');
     const reihe = await p.evaluate(() => [...document.querySelectorAll('[data-neu-abenteuer]')].map((x) => x.dataset.neuAbenteuer));
     check(reihe.indexOf('rabenmoor') < reihe.indexOf('graufurt') && reihe.indexOf('graufurt') < reihe.indexOf('grauwacht'), `Reihenfolge im Hub: ${reihe.join(' → ')}`);
     await shot('1-hub');

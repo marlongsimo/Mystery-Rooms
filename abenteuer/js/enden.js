@@ -6,12 +6,28 @@
 (function (root) {
   "use strict";
   root.ABENDEN = {
+    "weidenhain": {
+      "titel": "Das Erntefest von Weidenhain",
+      "ehrentitel": "Retter von Weidenhain",
+      "enden": {
+        "ende_nacht": "Aufbruch in der Nacht",
+        "ende_fest": "Ein Fest für die Retter"
+      }
+    },
     "rabenmoor": {
       "titel": "Das Moor der stummen Lichter",
       "ehrentitel": "Kenner des Schwarzmoors",
       "enden": {
         "ende_erloest": "Der Name im Wasser",
         "ende_besiegt": "Stille über dem Moor"
+      }
+    },
+    "graufurt": {
+      "titel": "Die Fähre von Graufurt",
+      "ehrentitel": "Freund von Graufurt",
+      "enden": {
+        "ende_norden": "Der Weg nach Norden",
+        "ende_wehre": "Was die Wehre nimmt"
       }
     },
     "grauwacht": {

@@ -299,7 +299,7 @@
     knochenwaechter: { klassen: ["kleriker", "zauberer"], text: "Knochen brechen unter Wucht: Streitkolben, Hämmer und Schildstöße machen anderthalbfachen Schaden." },
   };
   const META = {
-    id: "graufurt", entwurf: true, schwierigkeit: 1, reihe: 2, titel: "Die Fähre von Graufurt", kurz: "Graufurt", untertitel: "Ein Kurzabenteuer an der Wehre, auf dem Weg nach Grauwacht",
+    id: "graufurt", schwierigkeit: 1, reihe: 2, titel: "Die Fähre von Graufurt", kurz: "Graufurt", untertitel: "Ein Kurzabenteuer an der Wehre, auf dem Weg nach Grauwacht",
     kurztext: "Kobolde haben den Sohn der Fährfrau verschleppt. Im Norden läutet zum ersten Mal die Glocke von Grauwacht.",
     ehrentitel: "Freund von Graufurt", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     abschnitte_namen: { 1: "Graufurt" },

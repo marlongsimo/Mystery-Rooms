@@ -1,6 +1,12 @@
 # MYTHARA – Heldenfreischaltung und wachsende Sammlung
 
-**Status:** Konzeptvorschlag, **nicht umgesetzt**. Geplant für die **Open Beta**. Mythara ist seit dem 13. November 2026 in der **Closed Beta**; bis zur Open Beta bleiben alle 15 Helden frei wählbar.
+**Status:** **Umgesetzt** zur **Open Beta** (Datenbank: `supabase/006_rpg_heldensammlung.sql`, Spiel: `js/sammlung.js`). Mythara war vom 13. November 2026 an in der Closed Beta; Konten aus dieser Zeit haben alle 15 Helden (Bestandsschutz).
+
+**Betrieb:**
+- Admin festlegen (nur SQL Editor): `insert into public.rpg_admins (user_id) select user_id from public.rpg_profiles where lower(handle) = lower('Name') on conflict do nothing;`
+- Admins legen im Spiel unter Profilmenü → „Code-Übersicht“ Freischalt-Codes an: für eine bestimmte Person (1×) oder für eine beliebige Person (1–100×), 30 Tage bis 1 Jahr gültig, höchstens 20 je Tag. Codes werden nur als Hash gespeichert und einmal angezeigt.
+- Im SQL Editor: `select public.rpg_create_unlock_code('Bezeichnung', 1, 90);` und `select * from public.rpg_unlock_codes_uebersicht;`
+- Neue Abenteuer: ihre regulären Enden in `rpg_adventure_endings` eintragen (und in `KAMPAGNEN` in `js/sammlung.js`), sonst bringen sie keine Belohnung.
 **Fortsetzung:** Zum Launch kommt das dauerhafte Heldenlevel dazu, siehe [KONZEPT-HELDENLEVEL.md](KONZEPT-HELDENLEVEL.md) und Teil C unten.
 Grundlage: „MYTHARA – Konzept Heldenfreischaltung“, Konzeptstand 1.0 vom 12. November 2026. Darunter folgen Anmerkungen aus dem Abgleich mit dem Spielstand vom 12. November 2026.
 

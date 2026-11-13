@@ -14,15 +14,19 @@ So entsteht eine neue Kampagne schnell und ohne vergessene Stellen. Grundlage si
 | 4 | **Prüfen**, nach jeder größeren Änderung | `node abenteuer/tools/kampagne.js pruefen <id>` |
 | 5 | **Durchspielen** lassen: Fehler, nie erreichte Szenen, fehlende Enden | `node abenteuer/tools/kampagne.js durchlauf <id> 200` |
 | 6 | **Kämpfe messen**, Zielquoten in `META.zielquoten` | `node abenteuer/tools/kampagne.js kaempfe <id> [--helden]` |
-| 7 | **Kalibrieren** (schreibt den Lebensfaktor je Gruppengröße in `js/regeln.js`) | `… kaempfe <id> --kalibrieren` und `… --kalibrieren --hardcore` |
+| 7 | **Kalibrieren** (schreibt den Lebensfaktor je Gruppengröße in `js/regeln.js`). Warnungen (⚠) beachten: Faktor am Anschlag heißt „mehr oder weniger Gegner einplanen“, über 12 Runden heißt „der Kampf zieht sich“ | `… kaempfe <id> --kalibrieren` und `… --kalibrieren --hardcore` |
 | 8 | Spielen im Browser mit `index.html?entwurf` (Entwürfe sind nur so im Hub sichtbar) | – |
-| 9 | Bilder einsetzen; bis dahin nimmt das Spiel automatisch das Kampagnenbild | – |
+| 9 | Bilder einsetzen; bis dahin nimmt das Spiel automatisch das Kampagnenbild. **Karten am Bild ausrichten:** Raster über das neue Bild legen, Hindernisse eintragen, Kontrollbild ansehen. Danach neu kalibrieren, weil sich die Wege ändern | `node abenteuer/tools/karten.js --bild=pfad.png` und `node abenteuer/tools/karten.js <id>` |
 | 10 | Freigeben: `META.entwurf` entfernen, **Enden erzeugen** und die ausgegebene SQL-Zeile in Supabase ausführen sowie in `supabase/006_rpg_heldensammlung.sql` ergänzen | `node abenteuer/tools/kampagne.js enden` |
-| 11 | Alles testen | `node abenteuer/tests/kampagnen.test.js` und die Browser-Tests |
+| 11 | Alles testen | `node abenteuer/tests/kampagnen.test.js` (Engine) und `node abenteuer/tests/kampagnen-browser.test.js [id]` (Browser, bis zum Ende) |
 
 **Eine Quelle für die Enden:** Reguläre Enden sind Szenen mit `art: "ende"`, die nicht `D.NIEDERLAGE` sind und nicht `niederlage: true` tragen. `tools/kampagne.js enden` erzeugt daraus `js/enden.js` (Endenamen, Kampagnentitel für die Heldensammlung) und die SQL-Zeilen für `rpg_adventure_endings`. Der allgemeine Test schlägt fehl, wenn eins davon fehlt. So kann keine Kampagne ohne Belohnung live gehen.
 
 **Der allgemeine Test** (`tests/kampagnen.test.js`) prüft jede Datei in `daten/` automatisch: statische Prüfung, 200 Durchläufe mit festen Zufallszahlen, alle Szenen und Enden erreicht, Enden in `js/enden.js` und in Migration 006. Für eine neue Kampagne braucht es keinen neuen Testcode.
+
+**Der allgemeine Browsertest** (`tests/kampagnen-browser.test.js`) spielt jedes Abenteuer von der Startseite bis zu einem Ende durch (Hub, Regeln, Heldenwahl, Einleitung, alle Szenenarten, Kämpfe mit der Automatik) und prüft die Reihenfolge im Hub. Auch Entwürfe sind dabei. Mit `SHOTS=<Ordner>` entstehen nebenbei Screenshots von Hub, Szene, Kampf und Ende.
+
+**Die Karten-Kontrolle** (`tools/karten.js`) legt Raster, Hindernisse und Startplätze über jede Kampfkarte und meldet Startplätze auf Hindernissen, doppelte Plätze und abgeschnittene Bereiche.
 
 ---
 

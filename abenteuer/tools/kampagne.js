@@ -11,6 +11,8 @@
  *       Siegquote, übriges Leben und Runden je Kampf und Gruppengröße, so wie die Szenen die Kämpfe aufbauen.
  *       --helden: zusätzlich Ranking der Helden. --kalibrieren: Lebensfaktor je Gruppengröße so suchen, dass die
  *       Zielquote erreicht wird (META.zielquoten[szene], sonst 0,8) und in js/regeln.js schreiben.
+ *       Warnt (⚠), wenn der Faktor am Anschlag ist (zu wenige oder zu viele Gegner), der Kampf über 12 Runden
+ *       dauert oder die Nachmessung mehr als 10 Punkte neben dem Ziel liegt.
  *   node abenteuer/tools/kampagne.js enden
  *       Schreibt js/enden.js (reguläre Enden aller Abenteuer für die Heldensammlung) und gibt die SQL-Zeilen
  *       für rpg_adventure_endings aus (im Supabase SQL Editor ausführen, sobald ein neues Abenteuer live geht).
@@ -211,11 +213,18 @@ function kaempfe(id, N = 150, o = {}) {
   const ergebnis = [];
   for (const sid of liste) {
     if (o.kalibrieren) {
-      const tab = {}; let beg = null;
+      const tab = {}, warnungen = []; let beg = null;
       for (const n of GR) {
         let lo = 0.25, hi = 8;
         for (let it = 0; it < 7; it++) { const mid = Math.sqrt(lo * hi), e = messen(sid, n, mid, Math.max(40, Math.round(N / 2))); beg = e.begegnung; if (e.sieg > ziel(sid)) lo = mid; else hi = mid; }
         tab[n] = +Math.sqrt(lo * hi).toFixed(2);
+        // Nachmessen und warnen, wenn der Faktor allein das Ziel nicht sinnvoll erreicht
+        const e = messen(sid, n, tab[n], Math.max(60, Math.round(N / 2)));
+        if (tab[n] >= 5.5) warnungen.push(`${n} Helden: Faktor ${tab[n]} ist sehr hoch – die Gegner werden zu zähen Brocken. Besser mehr Gegner je Held einplanen (Anzahl oder Höchstzahl in der Begegnung erhöhen).`);
+        else if (tab[n] <= 0.45) warnungen.push(`${n} Helden: Faktor ${tab[n]} ist sehr niedrig – die Begegnung ist für diese Gruppe zu groß. Besser weniger oder schwächere Gegner einplanen.`);
+        if (e.runden > 12) warnungen.push(`${n} Helden: Der Kampf dauert im Schnitt ${e.runden.toFixed(1)} Runden – das zieht sich. Mehr Gegner mit weniger Leben oder ein kürzerer Weg zueinander helfen.`);
+        if (Math.abs(e.sieg - ziel(sid)) > 0.1) warnungen.push(`${n} Helden: Nachmessung ${Math.round(e.sieg * 100)} % statt Ziel ${Math.round(ziel(sid) * 100)} % – mit mehr Läufen wiederholen oder den Faktor von Hand nachziehen.`);
+        if (e.haengt) warnungen.push(`${n} Helden: ${e.haengt} simulierte Kämpfe finden kein Ende (Karte oder Gegner prüfen).`);
       }
       if (!tab[2]) tab[2] = tab[Math.min(...GR)];
       const datei = path.join(WURZEL, "js/regeln.js"); let txt = fs.readFileSync(datei, "utf8");
@@ -223,7 +232,7 @@ function kaempfe(id, N = 150, o = {}) {
       const re = new RegExp(`(    ${beg}: \\{[^\\n]*?)${feld}: \\{[^}]*\\}`);
       if (!re.test(txt)) { ergebnis.push({ sid, fehler: `Begegnung ${beg}: kein Feld ${feld} in js/regeln.js gefunden – bitte einmal von Hand anlegen` }); continue; }
       fs.writeFileSync(datei, txt.replace(re, `$1${neu}`));
-      ergebnis.push({ sid, begegnung: beg, kalibriert: tab, feld });
+      ergebnis.push({ sid, begegnung: beg, kalibriert: tab, feld, warnungen });
     } else {
       const je = {}; let beg = null;
       for (const n of GR) { const e = messen(sid, n, null, N, o.helden); je[n] = e; beg = e.begegnung; }
@@ -267,8 +276,11 @@ if (require.main === module) {
       console.log(`\n${daten(id).META.titel} · ${flag("hardcore") ? "Hardcore" : "Normal"} · ${flag("kalibrieren") ? "Kalibrierung" : (N || 150) + " Kämpfe je Größe"} · Sieg % (übriges Leben %, Runden)`);
       for (const e of k.ergebnis) {
         if (e.fehler) { console.log(`  ✗ ${e.sid}: ${e.fehler}`); schlecht = true; continue; }
-        if (e.kalibriert) { console.log(`  ${e.sid} → ${e.begegnung}.${e.feld} = ${JSON.stringify(e.kalibriert)}`); continue; }
-        console.log(`  ${(e.sid + " [" + e.begegnung + "]").padEnd(40)} Ziel ${Math.round(e.ziel * 100)} % · ` + k.GR.map((n) => { const x = e.je[n]; return `${n}: ${Math.round(x.sieg * 100)} % (${Math.round(x.leben * 100)}, ${x.runden.toFixed(1)})${x.haengt ? " HÄNGT " + x.haengt : ""}`; }).join(" · "));
+        if (e.kalibriert) { console.log(`  ${e.sid} → ${e.begegnung}.${e.feld} = ${JSON.stringify(e.kalibriert)}`); (e.warnungen || []).forEach((w) => console.log("    ⚠ " + w)); continue; }
+        console.log(`  ${(e.sid + " [" + e.begegnung + "]").padEnd(40)} Ziel ${Math.round(e.ziel * 100)} % · ` + k.GR.map((n) => { const x = e.je[n]; return `${n}: ${Math.round(x.sieg * 100)} % (${Math.round(x.leben * 100)}, ${x.runden.toFixed(1)})${x.haengt ? " HÄNGT " + x.haengt : ""}${Math.abs(x.sieg - e.ziel) > 0.1 || x.runden > 12 ? " ⚠" : ""}`; }).join(" · "));
+        const auff = k.GR.filter((n) => Math.abs(e.je[n].sieg - e.ziel) > 0.1), lang = k.GR.filter((n) => e.je[n].runden > 12);
+        if (auff.length) console.log(`    ⚠ mehr als 10 Punkte neben dem Ziel bei ${auff.join(", ")} Helden`);
+        if (lang.length) console.log(`    ⚠ über 12 Runden bei ${lang.join(", ")} Helden – der Kampf zieht sich`);
       }
       if (k.ranking) { console.log("\n  Helden-Ranking: Siegquote · übriges Leben · am Boden"); k.ranking.forEach((x, i) => console.log(`  ${String(i + 1).padStart(2)}. ${(F.FIGUREN[x.f].name + " (" + F.KLASSEN[F.FIGUREN[x.f].klasse].name + ")").padEnd(28)} ${(x.q * 100).toFixed(1).padStart(5)} %  ${(x.tp * 100).toFixed(0).padStart(3)} %  ${(x.b * 100).toFixed(0).padStart(3)} %`)); }
     }

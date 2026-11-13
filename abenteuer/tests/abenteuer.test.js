@@ -43,8 +43,8 @@ const R = require('../js/regeln.js'), F = R.FD;
   for (const vp of [{ width: 390, height: 844 }, { width: 1280, height: 860 }]) {
     const p = await (await br.newContext({ viewport: vp })).newPage();
     const kaputt = [];
-    p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
-    p.on('response', (r) => { if (r.status() >= 400) kaputt.push(r.url()); });
+    p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/\/rpc\/rpg_(my_heroes|campaign_heroes)\b/.test((m.location() || {}).url || '')) errs.push(m.text()); });
+    p.on('response', (r) => { if (r.status() >= 400 && !/\/rpc\/rpg_(my_heroes|campaign_heroes)\b/.test(r.url())) kaputt.push(r.url()); }); // Sammlung vor Migration 006: erwartet
     await p.goto(URL + '?seed=42&schnell&testlauf');
     await p.evaluate(() => localStorage.clear()); await p.reload();
     check(await p.isVisible('#mythara .my-logo img') && await p.isVisible('#my-gast-start') && !(await p.isVisible('#intro')), `${vp.width}px: Mythara-Startbildschirm mit Gastzugang`);

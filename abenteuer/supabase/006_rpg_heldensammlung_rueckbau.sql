@@ -10,6 +10,7 @@ drop function if exists public.rpg_hero_start_offer();
 drop function if exists public.rpg_hero_pick(uuid, text);
 drop function if exists public.rpg_claim_ending(uuid);
 drop function if exists public.rpg_redeem_unlock_code(text);
+drop function if exists public.rpg_campaign_heroes(uuid);
 drop function if exists public.rpg_create_unlock_code(text, integer, integer);
 drop function if exists public.rpg_disable_unlock_code(text);
 drop function if exists public.rpg_hero_angebot_json(public.rpg_hero_offers);

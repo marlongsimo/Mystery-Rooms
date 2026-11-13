@@ -1,0 +1,115 @@
+/* Mythara – Heldensammlung (Open Beta): Karten-Bühne für Registrierung und Belohnung, gesperrte Helden */
+.sm-offen, .sm-offen body { overflow: hidden; }
+.sm-buehne { --gold-hell: #f6dc9c; --leise: #a89f8e; position: fixed; inset: 0; z-index: 900; overflow-y: auto; overflow-x: hidden; color: #ece4d4; font-family: Inter, system-ui, sans-serif;
+  background: radial-gradient(90% 60% at 50% 0%, rgba(90,70,40,.25), transparent 60%), linear-gradient(180deg, #11131a, #07080b 70%); }
+.sm-buehne[hidden] { display: none; }
+.sm-hg { position: fixed; inset: 0; background: var(--bild, none) center 40% / cover; opacity: .3; pointer-events: none; }
+.sm-hg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 70% at 50% 40%, transparent, rgba(7,8,11,.95)), linear-gradient(180deg, transparent 50%, #07080b); }
+.sm-kopf { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 14px; padding: 10px 18px; background: rgba(7,8,11,.86); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(217,178,106,.25); }
+.sm-logo { font: 600 20px Cinzel, serif; letter-spacing: .1em; background: linear-gradient(180deg, #fff1c8, #d9a64a 55%, #8a5d1e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sm-kopf-titel { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-zaehler { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--leise); }
+.sm-zaehler svg { width: 38px; height: 38px; transform: rotate(-90deg); }
+.sm-ring-hg { fill: none; stroke: rgba(255,255,255,.1); stroke-width: 4; }
+.sm-ring { fill: none; stroke: #e0b260; stroke-width: 4; stroke-linecap: round; transition: stroke-dasharray .6s; }
+.sm-zaehler b { font: 600 20px Cinzel, serif; color: var(--gold-hell); }
+.sm-zaehler.puls b { animation: sm-puls .8s; display: inline-block; }
+@keyframes sm-puls { 40% { transform: scale(1.5); color: #fff; text-shadow: 0 0 18px #f6dc9c; } }
+.sm-inhalt { position: relative; max-width: 1100px; margin: 0 auto; padding: 34px 20px 60px; }
+.sm-eyebrow { font: 600 12px Cinzel, serif; letter-spacing: .35em; color: #d9b26a; text-transform: uppercase; text-align: center; }
+.sm-gross { font: 600 clamp(28px, 4vw, 46px)/1.1 Cinzel, serif; text-align: center; margin: 8px 0 6px; background: linear-gradient(180deg, #fff6dc, #f0d08a 50%, #b88a3e); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sm-unter { font: italic 20px/1.35 "Cormorant Garamond", serif; color: var(--leise); text-align: center; max-width: 720px; margin: 10px auto 0; }
+.sm-unter b { color: var(--gold-hell); font-style: normal; }
+.sm-hinweis { text-align: center; color: var(--leise); font-size: 13px; margin-top: 18px; }
+.sm-box { max-width: 680px; margin: 22px auto 0; padding: 14px 18px; border-radius: 14px; background: rgba(0,0,0,.45); box-shadow: inset 0 0 0 1px rgba(217,178,106,.25); font-size: 15px; line-height: 1.5; color: #d8cfbd; text-align: center; }
+.sm-box b { color: var(--gold-hell); }
+.sm-knoepfe { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+.sm-weiter, .sm-knoepfe .btn.gross { min-width: 220px; }
+.sm-runden { display: flex; justify-content: center; gap: 10px; margin: 14px 0 0; }
+.sm-runden i { width: 46px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); }
+.sm-runden i.fertig { background: linear-gradient(90deg, #b8742a, #ffd27a); box-shadow: 0 0 10px rgba(255,190,90,.5); }
+.sm-runden i.jetzt { background: rgba(246,220,156,.55); }
+
+/* Drei Karten, die sich aufdrehen */
+.sm-reihe { display: flex; justify-content: center; gap: clamp(14px, 3vw, 40px); margin: 30px 0 10px; perspective: 1400px; flex-wrap: wrap; }
+.sm-karte { position: relative; width: clamp(210px, 25vw, 280px); aspect-ratio: 5 / 7.4; cursor: pointer; transition: transform .35s ease; }
+.sm-karte .sm-innen { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 1s cubic-bezier(.2,.8,.2,1); }
+.sm-karte.verdeckt .sm-innen { transform: rotateY(180deg) scale(.82); }
+.sm-karte:not(.verdeckt):hover { transform: translateY(-8px); }
+.sm-vorne, .sm-hinten { position: absolute; inset: 0; border-radius: 18px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+.sm-hinten { transform: rotateY(180deg); display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 45%, rgba(246,220,156,.22), transparent 45%), repeating-linear-gradient(45deg, rgba(217,178,106,.07) 0 2px, transparent 2px 14px), linear-gradient(160deg, #2a2117, #0d0c0b);
+  box-shadow: 0 0 0 2px #6e4e1c, inset 0 0 0 8px rgba(0,0,0,.4), inset 0 0 0 9px rgba(217,178,106,.4), 0 20px 50px rgba(0,0,0,.6); }
+.sm-hinten span { font: 600 64px Cinzel, serif; color: #d9b26a; text-shadow: 0 0 24px rgba(246,200,110,.5); }
+.sm-vorne { background: #111 center 18% / cover; box-shadow: 0 0 0 2px var(--rand, #6e4e1c), 0 0 0 6px rgba(0,0,0,.55), 0 0 0 7px rgba(217,178,106,.3), 0 24px 50px rgba(0,0,0,.6); transition: box-shadow .3s; }
+.sm-karte:not(.verdeckt):hover .sm-vorne { box-shadow: 0 0 0 2px #f6dc9c, 0 0 40px rgba(246,200,110,.45), 0 30px 60px rgba(0,0,0,.6); }
+.sm-vorne::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 38%, rgba(7,8,11,.55) 58%, rgba(7,8,11,.96) 82%); }
+.sm-klasse { position: absolute; top: 12px; left: 12px; z-index: 1; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: 4px 9px; border-radius: 8px; color: #fff; background: var(--kf, #555); box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.sm-drin { position: absolute; top: 12px; right: 12px; z-index: 1; font-size: 10px; font-weight: 600; letter-spacing: .1em; padding: 4px 9px; border-radius: 8px; color: #241505; background: linear-gradient(180deg, #fff0c4, #e0b260); box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.sm-info { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 16px 16px 18px; text-align: center; }
+.sm-info h3 { font: 600 26px Cinzel, serif; color: #fff; text-shadow: 0 2px 10px #000; margin: 0; }
+.sm-titel { font: italic 17px "Cormorant Garamond", serif; color: #f6dc9c; }
+.sm-rolle { margin-top: 8px; font-size: 12px; color: #d8cfbd; }
+.sm-lupe { display: inline-block; margin-top: 10px; font-size: 11px; letter-spacing: .12em; color: #d9b26a; opacity: .85; }
+.sm-karte.gewaehlt .sm-vorne { box-shadow: 0 0 0 3px #f6dc9c, 0 0 50px rgba(246,200,110,.7), 0 30px 60px rgba(0,0,0,.6); }
+.sm-karte.weg { transition: transform .8s cubic-bezier(.5,0,.75,0), opacity .8s; opacity: 0; transform: translateY(40px) scale(.7); pointer-events: none; }
+.sm-flieg { position: fixed; z-index: 950; border-radius: 14px; background: #111 center 18% / cover; box-shadow: 0 0 0 2px #f6dc9c, 0 0 40px rgba(246,200,110,.7); pointer-events: none; transition: all .9s cubic-bezier(.5,0,.2,1); }
+
+/* Siegel für Titel und vollständige Sammlung */
+.sm-siegel { width: min(320px, 80vw); margin: 26px auto 0; padding: 26px 22px; border-radius: 22px; text-align: center; background: radial-gradient(circle at 50% 30%, rgba(246,220,156,.18), transparent 60%), linear-gradient(160deg, #2a2117, #0d0c0b); box-shadow: 0 0 0 2px #d9b26a, 0 0 0 7px rgba(0,0,0,.6), 0 0 50px rgba(246,200,110,.35); animation: sm-siegel .9s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes sm-siegel { from { opacity: 0; transform: rotateY(90deg) scale(.8); } }
+.sm-zeichen { font: 600 54px Cinzel, serif; color: #f6dc9c; text-shadow: 0 0 24px rgba(246,200,110,.6); }
+.sm-siegel b { display: block; font: 600 20px Cinzel, serif; color: #fff; margin-top: 6px; }
+.sm-siegel small { display: block; margin-top: 6px; color: #f6dc9c; font-size: 13px; }
+
+/* Vorstellung eines Helden über der Bühne */
+.sm-detail-schleier { position: fixed; inset: 0; z-index: 960; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.72); backdrop-filter: blur(4px); opacity: 0; transition: opacity .25s; }
+.sm-detail-schleier[hidden] { display: none; }
+.sm-detail-schleier.an { opacity: 1; }
+.sm-detail-box { position: relative; width: min(980px, 100%); max-height: calc(100vh - 32px); overflow: auto; border-radius: 18px; background: var(--panel, #1a2533); box-shadow: 0 0 0 1px rgba(217,178,106,.45), 0 40px 90px rgba(0,0,0,.7); }
+.sm-detail-box .held { margin: 0; }
+.sm-x { position: absolute; top: 10px; right: 10px; z-index: 3; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; font-size: 16px; cursor: pointer; }
+.sm-detail-knoepfe { position: sticky; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin: 14px 0; padding: 12px 0; background: linear-gradient(180deg, transparent, var(--panel, #1a2533) 35%); }
+.sm-gesperrt { margin: 12px 0; padding: 12px 14px; border-radius: 12px; background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); font-size: 13.5px; line-height: 1.45; color: #d8cfbd; display: flex; gap: 10px; align-items: flex-start; }
+.sm-gesperrt svg { flex: none; width: 20px; height: 20px; }
+.held.gesperrt .held-bild img { filter: grayscale(1) brightness(.5); }
+
+/* Gesperrte Helden in Galerie und Heldenwahl: grau mit Schloss */
+.fkarte.gesperrt { border-color: rgba(255,255,255,.08); }
+.fkarte.gesperrt img { filter: grayscale(1) brightness(.35); }
+.fkarte.gesperrt b, .fkarte.gesperrt small { color: #7d776c; }
+.fkarte.gesperrt .klasse { background: #444; }
+.fkarte .sm-schloss { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 1; display: grid; place-items: center; pointer-events: none; }
+.fkarte .sm-schloss svg { width: 40%; max-width: 46px; height: auto; filter: drop-shadow(0 2px 6px #000); }
+.fkarte.gesperrt.wackeln { animation: sm-wackeln .4s; }
+@keyframes sm-wackeln { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.banner .sm-frei { display: inline-block; margin-left: 6px; font-size: 11px; color: var(--gold, #c5a267); }
+.held-gesperrt-knopf { display: flex; gap: 10px; align-items: flex-start; }
+
+/* Charaktere: Enden je Kampagne */
+.sm-sammlung-kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 6px 0 4px; }
+.sm-sammlung-zahl { font: 600 15px Cinzel, serif; color: var(--gold, #c5a267); }
+.sm-enden { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 18px; }
+.sm-ende-chip { position: relative; overflow: hidden; padding: 12px 12px 16px; border-radius: 12px; background: linear-gradient(180deg, rgba(7,8,11,.55), rgba(7,8,11,.9)), var(--bild) center / cover; box-shadow: 0 0 0 1px rgba(217,178,106,.3); }
+.sm-ende-chip b { display: block; font: 600 13px Cinzel, serif; color: #fff; }
+.sm-ende-chip span { font-size: 12px; color: #f6dc9c; }
+.sm-ende-chip i { position: absolute; left: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, #b8742a, #ffd27a); }
+.sm-ende-chip.titel { box-shadow: 0 0 0 2px #e0b260, 0 0 18px rgba(246,200,110,.3); }
+.sm-hub-belohnung { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: linear-gradient(90deg, rgba(224,178,96,.18), rgba(0,0,0,.25)); box-shadow: inset 0 0 0 1px rgba(224,178,96,.5); }
+.sm-hub-belohnung span { flex: 1 1 220px; }
+.sm-code-form { display: grid; gap: 8px; margin-top: 8px; }
+.sm-code-form input { font: 600 18px Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line, rgba(197,162,103,.26)); background: rgba(0,0,0,.3); color: var(--text, #ece6da); }
+
+@media (max-width: 900px) { .sm-enden { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) {
+  .sm-inhalt { padding: 22px 14px 48px; }
+  .sm-reihe { gap: 12px; } .sm-karte { width: min(72vw, 270px); }
+  .sm-reihe.drei { flex-wrap: nowrap; gap: 8px; margin-top: 22px; } .sm-reihe.drei .sm-karte { width: 31vw; }
+  .sm-reihe.drei .sm-info h3 { font-size: 15px; } .sm-reihe.drei .sm-titel { font-size: 12px; } .sm-reihe.drei .sm-rolle { display: none; }
+  .sm-reihe.drei .sm-klasse { font-size: 8px; padding: 3px 6px; top: 8px; left: 8px; }
+  .sm-reihe.drei .sm-drin { top: auto; bottom: 64px; right: 50%; transform: translateX(50%); font-size: 9px; white-space: nowrap; }
+  .sm-reihe.drei .sm-info { padding: 10px 8px 12px; }
+  .sm-kopf-titel { display: none; }
+  .sm-knoepfe .btn { flex: 1 1 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .sm-karte .sm-innen, .sm-karte, .sm-flieg { transition: none !important; } }

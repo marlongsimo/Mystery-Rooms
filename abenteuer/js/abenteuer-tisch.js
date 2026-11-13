@@ -290,7 +290,7 @@
         ${th.length ? `<p class="note">Für die Helden, die der Tisch steuert, entscheidet ihr hier gemeinsam:</p>${th.map((fid) => `${gleich ? "" : `<p class="geheim-frage"><b>${esc(F.FIGUREN[fid].name)}:</b> ${esc(pf(fid).frage)}</p>`}<div class="opt-zeile">${B.marke(fid, 28)} <span>🎲 ${esc(F.FIGUREN[fid].name)}</span>${pf(fid).antworten.map((a) => `<button class="btn ${A.geheim[fid] === a.id ? "" : "ghost"} klein" data-geheim="${fid}:${a.id}">${esc(a.text)}</button>`).join("")}</div>`).join("")}` : ""}`;
     }
     if (s.art === "kampf") return `${vorschauHtml(v)}<div class="knoepfe"><button class="btn" id="sz-kampf">Zum Kampf</button></div>`;
-    if (s.art === "ende") return `<p class="note">Dieses Ende steht jetzt in eurer Chronik${A.merker.splitter && A.abenteuer !== "rabenmoor" ? ", zusammen mit dem Splitter von Grauwacht" : ""}. Ihr findet sie auf der Startseite.</p><div class="knoepfe"><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
+    if (s.art === "ende") return `<p class="note">Dieses Ende steht jetzt in eurer Chronik${A.merker.splitter && A.abenteuer !== "rabenmoor" ? ", zusammen mit dem Splitter von Grauwacht" : ""}. Ihr findet sie auf der Startseite.</p><div class="knoepfe"><span data-sm-endeplatz>${window.ABSAMMLUNG ? window.ABSAMMLUNG.endeKnopf() : ""}</span><button class="btn" id="sz-schluss">Zurück zum Start</button></div>`;
     return "";
   }
   function binde(el, v, s) {

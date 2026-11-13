@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#14110d">
   <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/abenteuer.css?v=44">
+  <link rel="stylesheet" href="css/sammlung.css?v=1">
 </head>
 <body>
   <header class="top">
@@ -68,7 +69,7 @@
           <button class="hub-nav-punkt an" data-hub="uebersicht"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/></svg></span>Übersicht</button>
           <button class="hub-nav-punkt" data-hub="kampagnen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l7 7-2 2-7-7V3zM20 3h2v2l-11 11-2-2zM5 17l3 3-2 2-3-3zM19 17l-3 3 2 2 3-3z"/></svg></span>Meine Kampagnen</button>
           <button class="hub-nav-punkt" data-hub="freunde"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3.4"/><circle cx="16.5" cy="8.5" r="3"/><path d="M1.5 20c0-3.8 2.9-6.6 6.5-6.6s6.5 2.8 6.5 6.6z"/><path d="M15 20c0-2.6-.8-4.6-2.2-5.8a6 6 0 0 1 3.7-1.2c3.2 0 6 2.6 6 7z"/></svg></span>Freunde<span class="hub-zahl" data-zahl="freunde" hidden></span></button>
-          <button class="hub-nav-punkt" data-hub="helden"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><circle cx="5" cy="9" r="2.6"/><circle cx="19" cy="9" r="2.6"/><path d="M6 20c0-3.6 2.7-6.5 6-6.5s6 2.9 6 6.5z"/></svg></span>Helden</button>
+          <button class="hub-nav-punkt" data-hub="helden"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><circle cx="5" cy="9" r="2.6"/><circle cx="19" cy="9" r="2.6"/><path d="M6 20c0-3.6 2.7-6.5 6-6.5s6 2.9 6 6.5z"/></svg></span>Charaktere</button>
           <button class="hub-nav-punkt" data-hub="welt"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5l6-2 8 3 6-2v15l-6 2-8-3-6 2z"/></svg></span>Kampagnenwelt</button>
           <button class="hub-nav-punkt" data-hub="regeln"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7v1M12 17.5v.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>Hilfe &amp; Regeln</button>
         </nav>
@@ -80,7 +81,7 @@
           <div class="hub-gast-hinweis" id="hub-gast-hinweis" hidden></div>
           <div class="hub-kacheln">
             <button class="hub-kachel" data-hub="kampagnen"><img src="img/mythara/karte-kampagnen.webp" alt="" loading="lazy"><span class="hub-banner"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l7 7-2 2-7-7V3zM20 3h2v2l-11 11-2-2zM5 17l3 3-2 2-3-3zM19 17l-3 3 2 2 3-3z"/></svg></span></span><b>Meine Kampagnen</b><small>Setze laufende Abenteuer fort, beginne sie neu oder archiviere sie.</small><span class="hub-mehr">Zu meinen Kampagnen →</span></button>
-            <button class="hub-kachel" data-hub="helden"><img src="img/mythara/karte-helden.webp" alt="" loading="lazy"><span class="hub-banner"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z"/></svg></span></span><b>Die Helden</b><small>Lerne die 15 Helden und ihre fünf Klassen kennen.</small><span class="hub-mehr">Zu den Helden →</span></button>
+            <button class="hub-kachel" data-hub="helden"><img src="img/mythara/karte-helden.webp" alt="" loading="lazy"><span class="hub-banner"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8z"/></svg></span></span><b>Charaktere</b><small>Deine Helden, ihre fünf Klassen und die Enden, die du schon entdeckt hast.</small><span class="hub-mehr">Zu den Charakteren →</span></button>
             <button class="hub-kachel klein" data-hub="neu"><img src="img/mythara/karte-neu.webp" alt="" loading="lazy"><span class="hub-banner"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 7v10M7 12h10" stroke="#0d0b08" stroke-width="2.4"/></svg></span></span><b>Neue Kampagne starten</b><small>Wähle ein Abenteuer – allein oder mit Handys.</small></button>
             <button class="hub-kachel klein" data-hub="beitreten"><img src="img/mythara/karte-beitreten.webp" alt="" loading="lazy"><span class="hub-banner"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><circle cx="5" cy="9" r="2.6"/><circle cx="19" cy="9" r="2.6"/><path d="M6 20c0-3.6 2.7-6.5 6-6.5s6 2.9 6 6.5z"/></svg></span></span><b>Kampagne beitreten</b><small>Mit dem Einladungscode vom Spieltisch mitspielen.</small></button>
           </div>
@@ -239,10 +240,11 @@
   <script src="js/regeln.js?v=43"></script>
   <script src="js/bild.js?v=12"></script>
   <script src="js/wuerfel.js?v=1"></script>
-  <script src="js/helden.js?v=10"></script>
+  <script src="js/helden.js?v=11"></script>
   <script src="../platform/multiplayer/vendor/supabase-js-2.45.4.js"></script>
   <script src="../platform/multiplayer/mp-config.js?v=1"></script>
   <script src="js/rpg-netz.js?v=2"></script>
+  <script src="js/sammlung.js?v=1"></script>
   <script src="vendor/qrcode-generator-1.4.4.js"></script>
   <script src="daten/grauwacht.js?v=17"></script>
   <script src="daten/rabenmoor.js?v=8"></script>
@@ -250,10 +252,10 @@
   <script src="daten/krone.js?v=8"></script>
   <script src="js/szenen.js?v=14"></script>
   <script src="js/kampf-fx.js?v=7"></script>
-  <script src="js/spiel.js?v=44"></script>
-  <script src="js/abenteuer-tisch.js?v=24"></script>
+  <script src="js/spiel.js?v=45"></script>
+  <script src="js/abenteuer-tisch.js?v=25"></script>
   <script src="js/einstieg.js?v=6"></script>
-  <script src="js/mythara.js?v=24"></script>
-  <script src="js/kampagnen.js?v=17"></script>
+  <script src="js/mythara.js?v=25"></script>
+  <script src="js/kampagnen.js?v=18"></script>
 </body>
 </html>

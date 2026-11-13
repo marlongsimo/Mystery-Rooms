@@ -64,7 +64,7 @@
           <span><i>Lebenswürfel</i>W${kl.wuerfel}${kl.plaetze ? " · zaubert" : ""}</span>
           <span><i>Rettung</i>${kl.rettung.map((a) => ATTR_NAME[a]).join(", ")}</span>
         </span>
-        <span class="banner-fuss">${dabei ? `<em>${dabei} in der Gruppe</em>` : `3 Helden`}<span aria-hidden="true">→</span></span>
+        <span class="banner-fuss">${dabei ? `<em>${dabei} in der Gruppe</em>` : o.frei ? `${helden.filter(o.frei).length} von 3 Helden frei` : `3 Helden`}<span aria-hidden="true">→</span></span>
       </button>`;
     }).join("")}</div>`;
   }
@@ -81,8 +81,8 @@
   /** Kachel in der Galerie */
   function kachel(fid, o = {}) {
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse];
-    return `<button class="fkarte ${o.an ? "an" : ""} ${o.fokus ? "fokus" : ""}" data-fid="${fid}" ${o.gesperrt ? "aria-disabled=\"true\"" : ""} style="--k:${k.farbe}" title="${esc(d.name)} – ${esc(d.titel)}">
-      <img src="${F.bild(fid)}" alt="" loading="lazy"><span class="klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span>
+    return `<button class="fkarte ${o.an ? "an" : ""} ${o.fokus ? "fokus" : ""} ${o.gesperrt ? "gesperrt" : ""}" data-fid="${fid}" ${o.gesperrt ? "aria-disabled=\"true\"" : ""} style="--k:${k.farbe}" title="${esc(d.name)} – ${esc(d.titel)}${o.gesperrt ? " (gesperrt)" : ""}">
+      <img src="${F.bild(fid)}" alt="" loading="lazy">${o.gesperrt && window.ABSAMMLUNG ? `<span class="sm-schloss">${window.ABSAMMLUNG.SCHLOSS}</span>` : ""}<span class="klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span>
       <b>${esc(d.name)}</b><small>${esc(d.titel)}</small>${o.status ? `<em class="${o.statusArt || ""}">${esc(o.status)}</em>` : ""}</button>`;
   }
   /** Große Vorstellung einer Figur. knopf: HTML für die Aktion (wählen) */

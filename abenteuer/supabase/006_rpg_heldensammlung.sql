@@ -408,14 +408,28 @@ create or replace view public.rpg_unlock_codes_uebersicht as
   from public.rpg_unlock_codes order by created_at desc;
 revoke all on public.rpg_unlock_codes_uebersicht from anon, authenticated;
 
+-- Spieltisch: Helden, die der Tisch steuern darf, kommen aus der Sammlung des Hosts.
+-- Nur Host und Tisch-Gerät der Kampagne dürfen fragen (z. B. nach „Auf anderem Gerät spielen“).
+create or replace function public.rpg_campaign_heroes(p_campaign_id uuid)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare v_host uuid;
+begin
+  if not public.rpg_ist_tisch(p_campaign_id) then raise exception 'Nur der Spieltisch dieser Kampagne darf das abfragen.'; end if;
+  select user_id into v_host from public.rpg_campaign_members where campaign_id = p_campaign_id and role = 'host' and member_status = 'aktiv' limit 1;
+  if v_host is null or not public.rpg_ist_konto(v_host) then return jsonb_build_object('konto', false); end if;
+  return jsonb_build_object('konto', true,
+    'helden', coalesce((select jsonb_agg(hero_id order by unlocked_at) from public.rpg_hero_collection where user_id = v_host), '[]'::jsonb));
+end;
+$$;
+
 -- ---------------------------------------------------------------------
 -- 8) Ausführungsrechte
 -- ---------------------------------------------------------------------
 revoke all on function public.rpg_sammlung_konto(), public.rpg_hero_ziehen(uuid, integer, text[]), public.rpg_hero_angebot_json(public.rpg_hero_offers),
   public.rpg_create_unlock_code(text, integer, integer), public.rpg_disable_unlock_code(text) from public, anon, authenticated;
 revoke all on function public.rpg_my_heroes(), public.rpg_hero_start_offer(), public.rpg_hero_pick(uuid, text), public.rpg_claim_ending(uuid),
-  public.rpg_redeem_unlock_code(text) from public, anon;
+  public.rpg_redeem_unlock_code(text), public.rpg_campaign_heroes(uuid) from public, anon;
 grant execute on function public.rpg_my_heroes(), public.rpg_hero_start_offer(), public.rpg_hero_pick(uuid, text), public.rpg_claim_ending(uuid),
-  public.rpg_redeem_unlock_code(text) to authenticated;
+  public.rpg_redeem_unlock_code(text), public.rpg_campaign_heroes(uuid) to authenticated;
 
 commit;

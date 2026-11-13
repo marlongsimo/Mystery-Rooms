@@ -57,10 +57,12 @@
       titel.textContent = "Willkommen zurück";
       el.innerHTML = `<p class="my-angemeldet">Angemeldet als <b>${esc(profil.handle)}</b></p>
         <p class="my-bald klein">Deine Kampagnen sind mit deinem Konto verbunden und auf jedem Gerät verfügbar, auf dem du dich anmeldest.</p>
+        ${codeFormHtml("my")}
         <button class="my-knopf" type="button" id="my-abmelden">Abmelden</button>
         <p class="my-fb" id="my-konto-fb" role="status"></p>`;
       reg.innerHTML = "";
       $("#my-abmelden").onclick = abmelden;
+      codeFormBinden("my");
       return;
     }
     if (ansicht === "registrieren") {
@@ -126,6 +128,7 @@
       await profilLaden();
       if (!profil || !profil.konto) throw new Error("Das Konto konnte nicht bestätigt werden. Ist in Supabase „Confirm email“ ausgeschaltet?");
       kontoZeichnen(); zeigeHub(); toast(`Willkommen, ${profil.handle}! Dein Konto ist eingerichtet.`);
+      sammlungPruefen(true);
     } catch (e) { fb(e.message, "fehler"); knopf.disabled = false; }
   }
   async function anmelden() {
@@ -234,12 +237,64 @@
     t.querySelectorAll("p, div.note").forEach((n) => { if (/Mit Handys: Dieses Gerät liegt|Tippe den Würfel an/.test(n.textContent)) n.remove(); });
     return t.innerHTML;
   }
+  /* ---------- Heldensammlung (Open Beta, js/sammlung.js) ---------- */
+  const SM = window.ABSAMMLUNG;
+  const smAktiv = () => Boolean(SM && SM.aktiv());
+  /** Kopf der Charaktere-Seite: Anzahl freigeschalteter Helden, Enden je Kampagne, wartende Belohnung */
+  function sammlungKopf() {
+    if (!smAktiv()) return "";
+    const S = SM.zustand(), offen = (S.angebote || []).some((a) => a.art === "ende");
+    if (!S.konto) return `<div class="sm-sammlung-kopf"><span class="sm-sammlung-zahl">5 Starter-Helden</span><span class="hub-untertitel" style="margin:0">Als Gast spielst du mit einem Helden je Klasse. Mit einem <button class="my-link" data-profil="registrieren">Spielerkonto</button> baust du dir deine eigene Sammlung auf.</span></div>`;
+    return `${offen ? `<div class="sm-hub-belohnung"><span><b>Eine Belohnung wartet.</b> Für ein neues Kampagnen-Ende darfst du dir noch einen Helden aussuchen.</span><button class="my-knopf rot" data-sm-offen>Jetzt wählen</button></div>` : ""}
+      <div class="sm-sammlung-kopf"><span class="sm-sammlung-zahl">${S.helden.length} von 15 Helden freigeschaltet</span>${S.helden.length < 15 ? `<span class="hub-untertitel" style="margin:0">Jedes Kampagnen-Ende, das du zum ersten Mal erreichst, bringt einen neuen Helden.</span>` : ""}</div>${SM.endenHtml()}`;
+  }
   function heldenSeite(klasse, fid) {
     const HL = window.ABH_HELDEN, F = window.ABF;
-    if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Die Helden</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p><div class="hub-helden" data-heldenseite>${HL.klassenWahl({})}</div>`); return; }
-    const helden = HL.vonKlasse(klasse); fid = fid || helden[0];
+    if (SM && !SM.zustand().geladen) SM.laden().then(() => { const s = $("#hub-seite"); if (s && !s.hidden && s.querySelector("[data-heldenseite]")) heldenSeite(klasse, fid); });
+    const frei = (f) => !smAktiv() || SM.frei(f);
+    if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Charaktere</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p>${sammlungKopf()}<div class="hub-helden" data-heldenseite>${HL.klassenWahl({ frei: smAktiv() ? frei : null })}</div>`); return; }
+    const helden = HL.vonKlasse(klasse); fid = fid || helden.find(frei) || helden[0];
+    const gesperrt = !frei(fid) ? `<div class="sm-gesperrt">${SM.SCHLOSS}<span><b>Noch gesperrt.</b> ${esc(SM.gesperrtText())}</span></div>` : "";
     seiteZeigen("helden", `<div class="hub-helden" data-heldenseite>${HL.klassenLeiste(klasse).replace('id="klassen-zurueck"', 'data-held-klassen')}${HL.klassenKopf(klasse)}
-      <div class="hub-held-reihe">${helden.map((f) => HL.kachel(f, { an: f === fid })).join("")}</div>${HL.detail(fid, 1, "")}</div>`);
+      <div class="hub-held-reihe">${helden.map((f) => HL.kachel(f, { an: f === fid, gesperrt: !frei(f), status: !frei(f) ? "gesperrt" : "" })).join("")}</div>${HL.detail(fid, 1, gesperrt).replace('<article class="held"', `<article class="held${gesperrt ? " gesperrt" : ""}"`)}</div>`);
+  }
+  /** Einmal je Seitenaufruf (und nach der Registrierung): offene Startrunden oder eine wartende Belohnung zeigen */
+  let sammlungGeprueft = false;
+  async function sammlungPruefen(neu) {
+    if (!SM || !(profil && profil.konto) || (sammlungGeprueft && !neu)) return;
+    sammlungGeprueft = true;
+    const S = await SM.laden(true);
+    if (!S.installiert || !S.konto) return;
+    if (S.start_offen) return SM.registrierung(() => zeigeHub());
+    SM.offeneBelohnung(() => zeigeHub());
+  }
+  function codeFormHtml(p) {
+    if (!smAktiv() || !SM.zustand().konto) return "";
+    const voll = SM.zustand().helden.length >= 15;
+    return `<form class="sm-code-form" id="${p}-sm-code" novalidate><label class="my-bald klein" for="${p}-sm-code-feld">${voll ? "Alle 15 Helden sind freigeschaltet." : "Freischalt-Code einlösen (schaltet alle 15 Helden frei)"}</label>
+      ${voll ? "" : `<input id="${p}-sm-code-feld" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX" maxlength="14"><button class="my-knopf" type="submit">Code einlösen</button>`}<p class="my-fb" id="${p}-sm-code-fb" role="status"></p></form>`;
+  }
+  function codeFormBinden(p, nachher) {
+    const f = $("#" + p + "-sm-code"), i = $("#" + p + "-sm-code-feld"); if (!f || !i) return;
+    const fbc = (t, art = "") => { const e = $("#" + p + "-sm-code-fb"); e.textContent = t; e.dataset.art = art; };
+    i.addEventListener("input", () => { i.value = huebsch(i.value); fbc(""); });
+    f.onsubmit = async (e) => {
+      e.preventDefault();
+      const code = sauber(i.value); if (code.length !== 12) return fbc("Bitte den vollständigen Code eingeben (XXXX-XXXX-XXXX).", "fehler");
+      const k = f.querySelector("button"); k.disabled = true; fbc("Code wird geprüft …");
+      try {
+        const r = await SM.codeEinloesen(huebsch(code));
+        fbc(r.neu ? `✓ ${r.neu} ${r.neu === 1 ? "Held" : "Helden"} freigeschaltet. Jetzt stehen dir alle 15 zur Wahl.` : "✓ Code eingelöst. Du hattest schon alle Helden.", "ok");
+        toast("Alle 15 Helden sind freigeschaltet.");
+        if (nachher) nachher();
+      } catch (err) { fbc(err.message, "fehler"); k.disabled = false; }
+    };
+  }
+  function codeDialog() {
+    if (!smAktiv() || !istKonto()) return toast("Codes kann nur ein Spielerkonto einlösen.");
+    fenster("Freischalt-Code", `<p class="note">Mit einem Freischalt-Code stehen dir sofort alle 15 Helden zur Wahl.</p>${codeFormHtml("dlg")}`);
+    codeFormBinden("dlg");
+    const i = $("#dlg-sm-code-feld"); if (i) i.focus();
   }
   function regelnSeite() {
     seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">So wird Mythara gespielt – zum Nachlesen.</p><div class="hub-text kodex">${kopie('#kodex .seite:not([data-seite="6"])')}</div>`);
@@ -286,10 +341,10 @@
     $("#hub-gruss").textContent = konto ? `Willkommen zurück, ${name}!` : "Willkommen in Mythara!";
     const gh = $("#hub-gast-hinweis"); gh.hidden = konto;
     if (!konto) gh.innerHTML = `<span>Du spielst als <b>Gast</b>. Deine Kampagnen sind an diesen Browser gebunden. Mit einem Konto hast du sie auf jedem Gerät.</span><span class="hub-gast-knoepfe"><button class="my-link" data-profil="registrieren">Konto erstellen</button><button class="my-link" data-profil="anmelden">Anmelden</button></span>`;
-    $("#hub-profil").innerHTML = `<button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small>${konto ? "Spieler" : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
+    $("#hub-profil").innerHTML = `<button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small id="hub-titel">${konto ? esc((smAktiv() && SM.titelText()) || "Spieler") : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
-      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button><button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
+      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-einst").onclick = () => { const t = $("#titel-einst"); if (t) t.click(); };
     const gl = $("#hub-glocke"); if (gl) gl.onclick = anfragenZeigen;
@@ -408,6 +463,7 @@
     $("#qr-overlay").hidden = true;
     if (was === "abmelden") return abmelden();
     if (was === "bild") return bildWaehlen();
+    if (was === "code") return codeDialog();
     ansicht = was === "registrieren" ? "registrieren" : "anmelden";
     zeige("mythara"); kontoZeichnen();
     const f = $(ansicht === "registrieren" ? "#my-reg-name" : "#my-name"); if (f) f.focus();
@@ -447,6 +503,7 @@
     akt.innerHTML = lokal + (offen.length ? offen.map((c) => zeile(c, true)).join("") : lokal ? "" : `<li class="hub-leer">Noch keine laufende Kampagne. Starte eine neue!</li>`);
     const lp = $("#hub-lokal-play"); if (lp) lp.onclick = () => window.ABT.fortsetzen();
     zul.innerHTML = zuletzt.length ? zuletzt.map((c) => zeile(c, false)).join("") : `<li class="hub-leer">Noch nichts gespielt.</li>`;
+    if (SM && istKonto() && !hubListen.nachgeholt) { hubListen.nachgeholt = true; SM.nachholen(liste).catch(() => {}); }
     akt.querySelectorAll("[data-play]").forEach((b) => { b.onclick = async () => {
       const c = liste.find((x) => x.id === b.dataset.play);
       if (c.role === "spieler") { location.href = "handy.html?kampagne=" + encodeURIComponent(c.id); return; } // Mitspieler: direkt zum Spieltisch
@@ -457,6 +514,7 @@
   }
   document.addEventListener("click", (e) => {
     const p = e.target.closest("[data-profil]"); if (p) return profilAktion(p.dataset.profil);
+    if (e.target.closest("[data-sm-offen]") && SM) return SM.offeneBelohnung(() => heldenSeite());
     // Heldenseite: Klasse wählen, Held wählen, zurück zu allen Klassen
     const hs = e.target.closest("[data-heldenseite]");
     if (hs) {
@@ -510,6 +568,14 @@
   kontoZeichnen();
   // Nur neu zeichnen, wenn ein Konto angemeldet ist – sonst bliebe Eingetipptes nicht erhalten.
   // Angemeldet (oder schon als Gast unterwegs) und nichts anderes läuft: gleich auf die Spielerseite.
-  if (KONTEN) profilLaden().then(() => { if (profil && profil.konto) kontoZeichnen(); if (imHub() && !$("#mythara").hidden) zeigeHub(); });
+  if (KONTEN) profilLaden().then(async () => {
+    if (profil && profil.konto) { if (SM) await SM.laden(); kontoZeichnen(); }
+    if (imHub() && !$("#mythara").hidden) zeigeHub();
+    if (imHub() && !$("#hub").hidden) sammlungPruefen();
+  });
+  if (SM) SM.beiAenderung(() => {
+    const t = $("#hub-titel"); if (t && istKonto()) t.textContent = (smAktiv() && SM.titelText()) || "Spieler";
+    if (istKonto() && !$("#mythara").hidden) kontoZeichnen();
+  });
   window.MYTHARA = { KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto() };
 })();

@@ -101,6 +101,17 @@ select pg_temp.als('Z');
 select pg_temp.fehler(format('select public.rpg_claim_ending(%L)', :'k1'), 'keinen Helden gespielt', 'Mitglied ohne Helden bekommt nichts');
 select pg_temp.als('R');
 select pg_temp.fehler(format('select public.rpg_claim_ending(%L)', :'k1'), 'keinen Helden gespielt', 'Wer nicht dabei war, bekommt nichts');
+-- Spieltisch: Helden aus der Sammlung des Hosts
+select pg_temp.fehler(format('select public.rpg_campaign_heroes(%L)', :'k1'), 'Nur der Spieltisch', 'Fremde sehen die Sammlung des Hosts nicht');
+select pg_temp.als('P');
+select pg_temp.fehler(format('select public.rpg_campaign_heroes(%L)', :'k1'), 'Nur der Spieltisch', 'Mitspieler fragen ihre eigene Sammlung ab, nicht die des Hosts');
+select pg_temp.als('N');
+select pg_temp.ok(public.rpg_campaign_heroes(:'k1')->'helden' = public.rpg_my_heroes()->'helden', 'Host am Tisch: seine eigene Sammlung');
+reset role;
+insert into public.rpg_campaign_members (campaign_id, user_id, role, display_name) values (:'k1', '00000000-0000-0000-0000-0000000000e2', 'tisch', 'Tisch');
+set role authenticated;
+select pg_temp.als('G');
+select pg_temp.ok(jsonb_array_length(public.rpg_campaign_heroes(:'k1')->'helden') = 4, 'Tisch-Gerät (Gast) nutzt die Sammlung des Hosts');
 -- Dasselbe Ende in einer zweiten Kampagne: keine Belohnung
 select pg_temp.als('N');
 select pg_temp.kampagne('rabenmoor', 'ende_erloest') as k2 \gset

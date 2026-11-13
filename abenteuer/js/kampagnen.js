@@ -110,7 +110,11 @@
       if (meta.kampf) letzterKampfSave = Date.now();
       zeigeStatus("ok");
       await mitgliederAbgleichen().catch(() => {});
-      if (i.art === "ende") { await rpc("rpg_set_campaign_status", { p_campaign_id: K.id, p_status: "abgeschlossen" }); K.status = "abgeschlossen"; merkeK(); zeigeStatus(""); }
+      if (i.art === "ende") {
+        await rpc("rpg_set_campaign_status", { p_campaign_id: K.id, p_status: "abgeschlossen" }); K.status = "abgeschlossen"; merkeK(); zeigeStatus("");
+        // Heldensammlung (Open Beta): Ende für das Konto an diesem Gerät melden; die Datenbank prüft, ob es zählt
+        if (window.ABSAMMLUNG) window.ABSAMMLUNG.endeMelden(K.id, { knopf: true, versuche: 2 }).catch(() => {});
+      }
     } catch (e) {
       if (/RPG_VERALTET/.test(e.roh || e.message)) await neuererStand();
       else { zeigeStatus("fehler"); console.warn("[Kampagne]", e.message); }

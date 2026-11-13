@@ -58,7 +58,8 @@
     if (LIVE.schreibt) { LIVE.nochmal = true; return; }
     LIVE.schreibt = true; LIVE.nochmal = false;
     const namen = {}; LIVE.client.players.forEach((p) => { namen[p.user_id] = p.player_name; });
-    const daten = Object.assign(window.ABT ? window.ABT.oeffentlich() : {}, { phase: LIVE.phase, besitz: LIVE.besitz, namen, gruppe: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, antwort: LIVE.antwort, antworten: LIVE.antworten || {}, at: Date.now() }, st && LIVE.phase === "kampf" ? R.ansicht(st) : {});
+    const kamp = window.KAMPAGNE && window.KAMPAGNE.aktuell && window.KAMPAGNE.aktuell();
+    const daten = Object.assign(window.ABT ? window.ABT.oeffentlich() : {}, { kampagne: (kamp && kamp.id) || null, phase: LIVE.phase, besitz: LIVE.besitz, namen, gruppe: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, antwort: LIVE.antwort, antworten: LIVE.antworten || {}, at: Date.now() }, st && LIVE.phase === "kampf" ? R.ansicht(st) : {});
     LIVE.client.writeOwn("spiel", daten)
       .catch((e) => toast("Live: " + e.message))
       .then(() => { LIVE.schreibt = false; if (LIVE.nochmal) veroeffentlichen(); });
@@ -188,22 +189,45 @@
     zeigeSektion("lobby");
     if (liveAn()) LIVE.phase = "lobby";
     zeichneSetup(); veroeffentlichen();
+    // Heldensammlung (Open Beta): Welche Helden darf der Tisch stellen? Mit Kampagne die des Hosts, sonst die eigene.
+    const SM = window.ABSAMMLUNG;
+    if (SM) {
+      const k = window.KAMPAGNE && window.KAMPAGNE.aktuell && window.KAMPAGNE.aktuell();
+      SM.tischLaden(k && k.id).then(() => {
+        if ($("#lobby").hidden) return;
+        const vorher = JSON.stringify([SETUP.gruppe, SETUP.tisch]);
+        SETUP.tisch = (SETUP.tisch || []).filter((f) => SM.tischFrei(f));
+        if (liveAn()) gruppeAusHandys(); else SETUP.gruppe = SETUP.gruppe.filter((f) => SM.tischFrei(f));
+        if (JSON.stringify([SETUP.gruppe, SETUP.tisch]) !== vorher) { setupMerken(); veroeffentlichen(); }
+        zeichneSetup();
+      }).catch(() => {});
+    }
+  }
+  /** Darf der Tisch diesen Helden stellen? (Heldensammlung; ohne Sammlung sind alle frei) */
+  const tischFrei = (fid) => !window.ABSAMMLUNG || window.ABSAMMLUNG.tischFrei(fid);
+  function gesperrtHinweis(live) {
+    const SM = window.ABSAMMLUNG, S = SM ? SM.zustand() : {}, schloss = SM ? SM.SCHLOSS : "";
+    const text = live ? "Am Spieltisch ist dieser Held noch nicht freigeschaltet. Wer ihn in seiner Sammlung hat, wählt ihn auf dem eigenen Handy."
+      : S.konto ? "Noch nicht in deiner Sammlung. Jedes Kampagnen-Ende, das du zum ersten Mal erreichst, schaltet einen neuen Helden frei."
+        : "Ohne Spielerkonto stehen fünf Starter-Helden zur Wahl, einer je Klasse. Mit einem Konto baust du dir deine eigene Sammlung auf.";
+    return `<div class="sm-gesperrt">${schloss}<span><b>Gesperrt.</b> ${text}</span></div>`;
   }
   let fokus = null, klasseSicht = null; // Heldenwahl: null = Schritt 1 (Klassen), sonst Schritt 2 (Helden dieser Klasse)
   /** Heldenwahl wie in einem Spiel: Gruppenplätze, Galerie mit Klassenfilter, große Vorstellung */
   function zeichneSetup() {
     const el = $("#lobby"); if (el.hidden) return;
     const HL = window.ABH_HELDEN, n = SETUP.gruppe.length, live = liveAn(), MIN = META().min || 3;
-    if (klasseSicht && (!fokus || !F.FIGUREN[fokus] || F.FIGUREN[fokus].klasse !== klasseSicht)) fokus = HL.vonKlasse(klasseSicht).find((f) => SETUP.gruppe.includes(f)) || HL.vonKlasse(klasseSicht)[0];
+    if (klasseSicht && (!fokus || !F.FIGUREN[fokus] || F.FIGUREN[fokus].klasse !== klasseSicht)) fokus = HL.vonKlasse(klasseSicht).find((f) => SETUP.gruppe.includes(f)) || HL.vonKlasse(klasseSicht).find(tischFrei) || HL.vonKlasse(klasseSicht)[0];
     if (!fokus || !F.FIGUREN[fokus]) fokus = SETUP.gruppe[n - 1] || F.REIHE[0];
     const namen = {}; if (live) for (const [fid, uid] of Object.entries(LIVE.besitz)) namen[fid] = spielerName(uid);
     const sicht = klasseSicht ? HL.vonKlasse(klasseSicht) : [];
     const kacheln = sicht.map((fid) => {
       const uid = live ? LIVE.besitz[fid] : null, an = SETUP.gruppe.includes(fid);
-      return HL.kachel(fid, { an, fokus: fid === fokus, status: uid ? "📱 " + spielerName(uid) : an ? "in der Gruppe" : "", statusArt: uid ? "" : "tisch" });
+      const zu = !uid && !an && !tischFrei(fid);
+      return HL.kachel(fid, { an, fokus: fid === fokus, gesperrt: zu, status: uid ? "📱 " + spielerName(uid) : an ? "in der Gruppe" : zu ? (live ? "📱 nur per Handy" : "gesperrt") : "", statusArt: uid ? "" : "tisch" });
     }).join("");
-    const an = SETUP.gruppe.includes(fokus), uidF = live ? LIVE.besitz[fokus] : null;
-    const knopf = live
+    const an = SETUP.gruppe.includes(fokus), uidF = live ? LIVE.besitz[fokus] : null, zuF = !an && !uidF && !tischFrei(fokus);
+    const knopf = zuF ? gesperrtHinweis(live) + (live ? `<p class="held-hinweis">Wählt eure Figuren auf den Handys. Fehlt jemand, steuert der Tisch weitere Helden – ein Handy kann sie jederzeit übernehmen.</p>` : "") : live
       ? (uidF ? `<p class="held-hinweis">📱 <b>${esc(spielerName(uidF))}</b> spielt ${esc(F.FIGUREN[fokus].name)}.</p>`
         : `<button class="btn ${an ? "ghost " : ""}gross held-knopf" id="f-tisch" ${!an && n >= 6 ? "disabled" : ""}>${an ? "Nicht mehr vom Tisch spielen" : n >= 6 ? "Die Gruppe ist voll" : `${esc(F.FIGUREN[fokus].name)} vom Tisch spielen lassen`}</button>
           <p class="held-hinweis">Wählt eure Figuren auf den Handys. Fehlt jemand, steuert der Tisch weitere Helden – ein Handy kann sie jederzeit übernehmen.</p>`)
@@ -220,7 +244,7 @@
       <div class="wahl-body stufe2">
         <div class="wahl-galerie">${HL.klassenKopf(klasseSicht)}<div class="fkarten drei">${kacheln}</div></div>
         <div class="wahl-detail">${HL.detail(fokus, 1, knopf)}</div>
-      </div>` : `<p class="wahl-schritt"><b>Schritt 1 von 2:</b> Wählt eine Klasse. Darin stellen sich euch je drei Helden vor.</p>${HL.klassenWahl({ gruppe: SETUP.gruppe })}`}
+      </div>` : `<p class="wahl-schritt"><b>Schritt 1 von 2:</b> Wählt eine Klasse. Darin stellen sich euch je drei Helden vor.</p>${HL.klassenWahl({ gruppe: SETUP.gruppe, frei: window.ABSAMMLUNG && window.ABSAMMLUNG.tischBekannt() && !window.ABSAMMLUNG.tischAlleFrei() ? tischFrei : null })}`}
       <div class="wahl-fuss">
         <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (${MIN}–6)` : `Gruppe · ${n} von ${MIN}–6 Figuren`}</h2>
         <p class="note">${status}</p>
@@ -244,12 +268,12 @@
     const kz = $("#klassen-zurueck"); if (kz) kz.onclick = () => { klasseSicht = null; zeichneSetup(); };
     const ft = $("#f-tisch"); if (ft) ft.onclick = () => {
       SETUP.tisch = SETUP.tisch || [];
-      if (SETUP.tisch.includes(fokus)) SETUP.tisch = SETUP.tisch.filter((f) => f !== fokus); else if (n < 6) { SETUP.tisch.push(fokus); if (window.ABE) window.ABE.glocke(0.25); }
+      if (SETUP.tisch.includes(fokus)) SETUP.tisch = SETUP.tisch.filter((f) => f !== fokus); else if (n < 6 && tischFrei(fokus)) { SETUP.tisch.push(fokus); if (window.ABE) window.ABE.glocke(0.25); }
       gruppeAusHandys(); setupMerken(); zeichneSetup(); veroeffentlichen();
     };
     const w = $("#f-waehlen"); if (w) w.onclick = () => {
       const i = SETUP.gruppe.indexOf(fokus);
-      if (i >= 0) SETUP.gruppe.splice(i, 1); else if (SETUP.gruppe.length < 6) { SETUP.gruppe.push(fokus); if (window.ABE) window.ABE.glocke(0.25); }
+      if (i >= 0) SETUP.gruppe.splice(i, 1); else if (SETUP.gruppe.length < 6 && tischFrei(fokus)) { SETUP.gruppe.push(fokus); if (window.ABE) window.ABE.glocke(0.25); }
       setupMerken(); zeichneSetup(); veroeffentlichen();
     };
     el.querySelectorAll("[data-stufe]").forEach((b) => { b.onclick = () => {

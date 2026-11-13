@@ -129,6 +129,19 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden && H.client && H.client.session) wach(); });
 
   /* ---------- Ansichten ---------- */
+  /* ---------- Heldensammlung (Open Beta) ---------- */
+  const SM = window.ABSAMMLUNG;
+  if (SM) { SM.netzSetzen(() => client()); SM.beiAenderung(() => { if (H.spiel && !meineFid()) render(); }); }
+  /** Helden, die ich (mein Konto bzw. das Starter-Set) wählen darf. Was der Tisch schon stellt, darf übernommen werden. */
+  const darf = (fid, gruppe) => !SM || SM.frei(fid) || (gruppe || []).includes(fid);
+  /** Kampagne erreicht ein Ende: Belohnung für mein Konto (die Datenbank prüft, ob es zählt) */
+  const endeGemeldet = new Set();
+  function endeErreicht(s, fid) {
+    const ab = s && s.abenteuer;
+    if (!SM || !fid || !s.kampagne || !ab || ab.art !== "ende" || endeGemeldet.has(s.kampagne)) return;
+    endeGemeldet.add(s.kampagne);
+    setTimeout(() => SM.endeMelden(s.kampagne, { versuche: 8 }).catch(() => {}), 4000); // erst die Endszene lesen lassen
+  }
   function render() {
     const app = $("#app"), c = H.client, drin = Boolean(c && c.session);
     $("#verlassen").hidden = !drin;
@@ -136,6 +149,7 @@
     if (!H.spiel) { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Einen Moment …</h1><p class="note">Der Spieltisch schickt gleich die Figuren.</p></section>`; return; }
     if (H.spiel.phase === "pause") { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Pause</h1><p class="note">Der Spieltisch hat die Runde pausiert und gespeichert. Wenn sie fortgesetzt wird, zeigt der Tisch einen neuen Code – damit trittst du wieder bei.</p></section>`; return; }
     const fid = meineFid();
+    endeErreicht(H.spiel, fid);
     if (!fid) return viewWahl(app);
     viewBogen(app, fid);
   }
@@ -167,28 +181,31 @@
     let zuletzt = null; try { zuletzt = localStorage.getItem(FIGUR_KEY); } catch (e) { /* privat */ }
     const liste = laeuft ? gruppe : F.REIHE;
     const voll = !laeuft && gruppe.length >= 6, istVoll = (fid) => voll && !gruppe.includes(fid);
-    const status = (fid) => { const uid = s.besitz && s.besitz[fid]; return H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : gruppe.includes(fid) ? "🎲 Tisch – übernehmbar" : laeuft ? "wartet auf jemanden" : voll ? "Gruppe voll" : zuletzt === fid ? "zuletzt gespielt" : ""; };
+    if (SM && !laeuft) SM.laden();
+    const zu = (fid) => !laeuft && !darf(fid, gruppe) && !(s.besitz && s.besitz[fid]);
+    const status = (fid) => { const uid = s.besitz && s.besitz[fid]; return H.wahlOffen === fid ? "…" : uid ? "📱 " + ((s.namen || {})[uid] || "vergeben") : gruppe.includes(fid) ? "🎲 Tisch – übernehmbar" : laeuft ? "wartet auf jemanden" : zu(fid) ? "gesperrt" : voll ? "Gruppe voll" : zuletzt === fid ? "zuletzt gespielt" : ""; };
     const kopf = `<p class="eyebrow">Verbunden · ${esc(H.client.session.room_code)}${s.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</p>`;
     const plaetzeHtml = gruppe.length ? HL.plaetze(gruppe, Object.fromEntries(Object.entries(s.besitz || {}).map(([f, u]) => [f, (s.namen || {})[u] || ""]))) : "";
     if (!laeuft) {
       // Schritt 1: Klasse wählen · Schritt 2: die drei Helden der Klasse mit Vorstellung
       if (!H.klasse) {
         app.innerHTML = `<section class="karte-h">${kopf}<h1>Wähle deine Klasse</h1><p class="note">Schritt 1 von 2. In jeder Klasse stellen sich dir drei Helden vor. Jede Person spielt eine Figur. Zusammen mit den Helden, die der Tisch steuert, sind es mindestens 3.</p>
-          ${plaetzeHtml}${HL.klassenWahl({ gruppe })}<p class="fb">${esc(H.fehler)}</p></section>`;
+          ${plaetzeHtml}${HL.klassenWahl({ gruppe, frei: SM && SM.aktiv() ? (f) => darf(f, gruppe) : null })}<p class="fb">${esc(H.fehler)}</p></section>`;
         app.querySelectorAll("[data-klasse]").forEach((b) => { b.onclick = () => { H.klasse = b.dataset.klasse; H.fokus = null; render(); window.scrollTo(0, 0); }; });
         return;
       }
       const helden = HL.vonKlasse(H.klasse);
-      if (!H.fokus || !helden.includes(H.fokus)) H.fokus = helden.find((f) => zuletzt === f) || helden[0];
-      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !istVoll(fid) && !H.wahlOffen;
-      const knopf = `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : istVoll(fid) ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
+      if (!H.fokus || !helden.includes(H.fokus)) H.fokus = helden.find((f) => zuletzt === f && !zu(f)) || helden.find((f) => !zu(f)) || helden[0];
+      const fid = H.fokus, uid = s.besitz && s.besitz[fid], frei = !uid && !istVoll(fid) && !H.wahlOffen && !zu(fid);
+      const knopf = zu(fid) ? `<div class="sm-gesperrt">${SM.SCHLOSS}<span><b>Gesperrt.</b> ${esc(SM.gesperrtText())}</span></div>`
+        : `<button class="btn gross held-knopf" id="f-spielen" ${frei ? "" : "disabled"}>${H.wahlOffen === fid ? "…" : uid ? "Schon vergeben" : istVoll(fid) ? "Die Gruppe ist voll" : `Ich spiele ${esc(F.FIGUREN[fid].name)}`}</button>`;
       app.innerHTML = `<section class="karte-h">${kopf}${HL.klassenLeiste(H.klasse)}${HL.klassenKopf(H.klasse)}
-        <div class="fkarten handy-karten">${helden.map((f) => HL.kachel(f, { an: gruppe.includes(f), fokus: f === fid, status: status(f), statusArt: s.besitz && s.besitz[f] ? "" : "tisch" })).join("")}</div>
+        <div class="fkarten handy-karten">${helden.map((f) => HL.kachel(f, { an: gruppe.includes(f), fokus: f === fid, gesperrt: zu(f), status: status(f), statusArt: s.besitz && s.besitz[f] ? "" : "tisch" })).join("")}</div>
         ${HL.detail(fid, s.stufe || 1, knopf)}<p class="fb">${esc(H.fehler)}</p></section>`;
       app.querySelectorAll("[data-klasse]").forEach((b) => { b.onclick = () => { H.klasse = b.dataset.klasse; H.fokus = null; render(); }; });
       $("#klassen-zurueck").onclick = () => { H.klasse = null; H.fokus = null; render(); window.scrollTo(0, 0); };
       app.querySelectorAll("[data-fid]").forEach((b) => { b.onclick = () => { H.fokus = b.dataset.fid; render(); }; });
-      $("#f-spielen").onclick = () => waehle(fid);
+      const fs = $("#f-spielen"); if (fs) fs.onclick = () => { if (!zu(fid)) waehle(fid); };
       return;
     }
     if (H.fokus && liste.includes(H.fokus)) {

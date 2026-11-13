@@ -166,10 +166,10 @@
     f_faehre: { name: "Kobolde an Bord", stufe: 1, zusatzAb: 99, gegner: [["schattenkobold", 1.5, 9, 0.5]], skala: { 2: 1.64, 3: 2.4, 4: 2.98, 5: 4.23, 6: 4.59 }, skalaHC: { 2: 1.78, 3: 1.98, 4: 2.75, 5: 2.67, 6: 3.9 } },
     f_furt: { name: "Auf der Kiesbank", stufe: 1, zusatzAb: 99, gegner: [["schattenkobold", 1.1, 7, 0.3], ["rostkaefer", 0.5, 3, -0.5]], skala: { 2: 1.88, 3: 2.98, 4: 2.98, 5: 3.9, 6: 4.35 }, skalaHC: { 2: 1.55, 3: 2.82, 4: 2.75, 5: 3.7, 6: 3.6 } },
     f_turm: { name: "Der Zöllner zählt", stufe: 1, zusatzAb: 99, gegner: [["knochenwaechter", 0.2, 2, 0.7], ["schattenkobold", 1.1, 7, 0.3]], skala: { 2: 0.9, 3: 2.46, 4: 2.4, 5: 3.8, 6: 4.59 }, skalaHC: { 2: 0.9, 3: 2.04, 4: 2.4, 5: 2.9, 6: 3.41 } },
-    // Das Erntefest von Weidenhain (Einsteiger-Kurzabenteuer, Heldenstufe 1, 2–6 Helden). Faktoren: tools/kampagne.js kaempfe weidenhain --kalibrieren
+    // Das Erntefest von Weidenhain (Einsteiger-Kurzabenteuer, Heldenstufe 1, die Unke mit Stufe 2, 2–6 Helden). Faktoren: tools/kampagne.js kaempfe weidenhain --kalibrieren
     w_speicher: { name: "Kröten im Korn", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 1.1, 7, 0.2]], skala: { 2: 1.12, 3: 1.19, 4: 1.4, 5: 1.93, 6: 1.98 }, skalaHC: { 2: 1.04, 3: 0.75, 4: 0.88, 5: 1.15, 6: 1.29 } },
     w_muehle: { name: "Am Mühlgraben", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0.6, 4, 0.3], ["irrlicht", 0.5, 3, -0.5]], skala: { 2: 1.43, 3: 3.9, 4: 3.23, 5: 4.47, 6: 4.47 }, skalaHC: { 2: 0.96, 3: 2.46, 4: 1.93, 5: 2.9, 6: 2.67 } },
-    w_unke: { name: "Die alte Unke", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0, 1, 1], ["irrlicht", 1.2, 7, -0.6]], skala: { 2: 1.55, 3: 2.6, 4: 4.6, 5: 6.19, 6: 5.55 }, skalaHC: { 2: 1.51, 3: 2.15, 4: 2.75, 5: 4.59, 6: 3.32 } },
+    w_unke: { name: "Die alte Unke", stufe: 2, zusatzAb: 99, gegner: [["schlammkroete", 0, 1, 1], ["irrlicht", 1.2, 7, -0.6]], skala: { 2: 1.55, 3: 2.6, 4: 4.6, 5: 6.19, 6: 5.55 }, skalaHC: { 2: 1.51, 3: 2.15, 4: 2.75, 5: 4.59, 6: 3.32 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**
@@ -1795,13 +1795,14 @@
       }
     }
     if (!ziel) { if (!st.ende) zugEnde(st); return; } // keine Gegner mehr, nur noch Ziele: wer keins hat, wartet
+    // (Steht nur noch ein Nahkämpfer, bleibt er nicht als Leibwache stehen: Sonst erreicht er einen Schützen nie und der Kampf endet nicht.)
     // Eskorte: Wer Sera am nächsten ist, kümmert sich um sie – am Boden stabilisieren, sonst bei nahem Jäger neben sie stellen
     const sera = st.eskorte && begleiterVon(st);
     if (sera && st.zug.aktion) {
       const helden = spielerFiguren(st).filter(lebt), naechster = helden.sort((a, b) => abstand(a, sera) - abstand(b, sera))[0];
       const neben = () => { if (abstand(f, sera) <= 1) return true; let best = null; for (const [k, c] of bf()) { if (c === "schritt") continue; const [x, y] = k.split(",").map(Number); if (abstand({ x, y }, sera) <= 1 && (!best || c < best.c)) best = { x, y, c }; } if (best) bewegen(st, best.x, best.y); return lebt(f) && abstand(f, sera) <= 1; };
       if (sera.tp <= 0 && !sera.stabil && naechster === f) { if (neben() && kann("stabilisieren")) handeln(st, "stabilisieren", sera.id); if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; } }
-      else if (lebt(sera) && naechster === f && !helden.some((h) => h !== f && abstand(h, sera) <= 1) && gegner().some((g) => GEGNER[g.art].jaeger && abstand(g, sera) <= 6)) {
+      else if (lebt(sera) && naechster === f && (helden.length > 1 || fernAngriff) && !helden.some((h) => h !== f && abstand(h, sera) <= 1) && gegner().some((g) => GEGNER[g.art].jaeger && abstand(g, sera) <= 6)) {
         neben(); if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
         const z = gegner().filter((g) => abstand(g, f) <= 1).sort((a, b) => a.tp - b.tp)[0]; if (z) ziel = z;
         if (abstand(f, sera) <= 1) { // bleibt als Leibwache stehen: angreifen, was erreichbar ist, dann Zug beenden

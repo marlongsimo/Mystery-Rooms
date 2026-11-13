@@ -8,6 +8,16 @@
   "use strict";
   const R = window.ABR, F = window.ABF, B = window.ABB, $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  /** Chronik-Zeile: Treffer / Verfehlt als deutliche Marke vorn, das Ergebniswort im Text hervorgehoben */
+  const logZeile = (l) => {
+    const m = /(kritischer Treffer|Treffer|verfehlt|widersteht|misslingt)/.exec(l.t || "");
+    if (!m || !/W20|Rettungswurf/.test(l.t)) return esc(l.t);
+    const gegner = l.art === "gegner", wort = m[1];
+    const erfolg = wort === "Treffer" || wort === "kritischer Treffer" || wort === "misslingt"; // der Angriff/Zauber wirkt
+    const gut = gegner ? !erfolg : erfolg; // gut für die Helden?
+    const marke = wort === "kritischer Treffer" ? "Kritisch" : wort === "Treffer" ? "Treffer" : wort === "verfehlt" ? "Verfehlt" : wort === "widersteht" ? "Widerstanden" : "Wirkt";
+    return `<b class="lg-marke ${gut ? "gut" : "schlecht"}">${erfolg ? "✓" : "✗"} ${marke}</b> ` + esc(l.t).replace(wort, `<b>${wort}</b>`);
+  };
   const params = new URLSearchParams(location.search);
   const SLUG = params.get("liveslug") || "abenteuer";
   const NAME_KEY = "ab_name", FIGUR_KEY = "ab_meine_figur", KCODE_KEY = "ab_kampagnen_code";
@@ -413,7 +423,7 @@
     }
     if (H.fehler) h += `<p class="fb">${esc(H.fehler)}</p>`;
     if (H.ergebnis && s.phase === "kampf") h += H.ergebnis.wurf ? `<div class="ergebnis wuerfel-erg" data-erg="${esc(H.ergebnis.t)}" data-w="${H.ergebnis.wurf}"></div>` : `<div class="ergebnis ${H.ergebnis.art || ""}"><span>${esc(H.ergebnis.t)}</span></div>`;
-    if (s.phase === "kampf" && s.log && s.log.length) h += `<h3 class="klein">Zuletzt am Tisch · Runde ${s.runde}</h3><ol class="log kurz">${s.log.slice(-5).reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("")}</ol>`;
+    if (s.phase === "kampf" && s.log && s.log.length) h += `<h3 class="klein">Zuletzt am Tisch · Runde ${s.runde}</h3><ol class="log kurz">${s.log.slice(-5).reverse().map((l) => `<li class="${l.art || ""}">${logZeile(l)}</li>`).join("")}</ol>`;
     return h;
   }
 

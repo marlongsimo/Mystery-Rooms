@@ -178,7 +178,7 @@ function durchlauf(id, N = 200, o = {}) {
           else if (stich && b && b.tp > 0 && !b.gefesselt && st.eskorte) { b.tp = 0; st.eskorte.unten = st.runde; R.zugEnde(st); }
           else R.autoZug(st);
         }
-        if (!st.ende) throw new Error("Kampf endet nicht: " + A.szene);
+        if (!st.ende) throw new Error("Kampf endet nicht: " + A.szene + " · Runde " + st.runde + " · " + st.figuren.filter((f) => f.tp > 0).map((f) => `${f.name}@${f.x},${f.y} ${f.tp}TP${Object.keys(f.z || {}).length ? " [" + Object.keys(f.z).join(",") + "]" : ""}`).join("; ") + " · zuletzt: " + st.log.slice(-6).map((l) => l.t).join(" / "));
         S.kampfEnde(A, st); continue;
       }
       throw new Error("Unbekannte Szenenart " + s.art + " in " + A.szene);

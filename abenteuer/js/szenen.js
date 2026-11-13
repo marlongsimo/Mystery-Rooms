@@ -258,16 +258,18 @@
           plaetze: k.plaetze ? [F.PLAETZE[von], F.PLAETZE[A.stufe]] : null };
       }
     }
+    // Normal: Das Lagerfeuer heilt immer ganz. Hardcore: bei fortgeschrittener Uhr (ab 3) nur bis ¾.
+    const unruhig = A.schwierigkeit === "hardcore" && A.glocke >= 3;
     for (const fid of A.gruppe) {
       const z = A.zust[fid]; if (z.tot) continue;
-      const neuZ = frisch(fid, A.stufe), anteil = A.glocke >= 3 ? 0.75 : 1;
+      const neuZ = frisch(fid, A.stufe), anteil = unruhig ? 0.75 : 1;
       if ((z.rucksack || []).some((d) => d.id === "manastein" && d.n > 0)) neuZ.plaetze[0]++;
       A.zust[fid] = Object.assign(neuZ, { tp: Math.max(z.tp, Math.floor(neuZ.tp * anteil)), rucksack: z.rucksack });
     }
     A.lagerZust = JSON.parse(JSON.stringify(A.zust)); A.lagerSzene = A.szene;
     // Hardcore: Wer gefallen ist, wählt am Lagerfeuer eine neue Figur
     A.ersatzOffen = A.gruppe.filter((f) => A.zust[f].tot);
-    notiz(A, `Lagerfeuer: lange Rast${A.glocke >= 3 ? ` (${metaVon(A.abenteuer).uhr.unruhe || "das Flüstern lässt niemanden ganz schlafen"}: TP bis ¾)` : ""}. Gespeichert.`, "gut");
+    notiz(A, `Lagerfeuer: lange Rast${unruhig ? ` (${metaVon(A.abenteuer).uhr.unruhe || "das Flüstern lässt niemanden ganz schlafen"}: TP bis ¾)` : ""}. Gespeichert.`, "gut");
   }
   /** Kurze Rast zwischen Kämpfen (nur Normal): halbe fehlende TP, Glocke schlägt */
   function kurzeRast(A) {
@@ -437,6 +439,13 @@
     if (st.ende === "rueckzug") {
       notiz(A, "Rückzug zum Lagerfeuer.", "schlecht"); glocke(A, 1);
       A.zust = JSON.parse(JSON.stringify(A.lagerZust || startZustand(A)));
+      // Bekam das letzte Lagerfeuer nachträglich einen Stufenaufstieg (laufende Spielstände), wird er hier nachgeholt
+      const ls = A.lagerSzene && DATEN(A).SZENEN[A.lagerSzene];
+      if (ls && ls.aufstieg && A.stufe < ls.aufstieg) {
+        A.stufe = ls.aufstieg; notiz(A, `Aufstieg: Die Gruppe erreicht Stufe ${A.stufe}.`, "gut");
+        for (const fid of A.gruppe) { const z = A.zust[fid]; if (z && !z.tot) A.zust[fid] = Object.assign(frisch(fid, A.stufe), { rucksack: z.rucksack }); }
+        A.lagerZust = JSON.parse(JSON.stringify(A.zust));
+      }
       // Normal: Nach einem Rückzug sind alle wieder bei vollen TP (auch wenn das Lagerfeuer nur bis ¾ geheilt hatte)
       for (const fid of A.gruppe) { const z = A.zust[fid]; if (z && !z.tot) z.tp = Math.max(z.tp, F.tpVon(fid, z.stufe || A.stufe)); }
       return { ok: true, ergebnis: "rueckzug" }; // gleiche Szene beginnt neu

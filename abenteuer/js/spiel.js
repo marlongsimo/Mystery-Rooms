@@ -13,6 +13,16 @@
   "use strict";
   const R = window.ABR, F = window.ABF, B = window.ABB, $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  /** Chronik-Zeile: Treffer / Verfehlt als deutliche Marke vorn, das Ergebniswort im Text hervorgehoben */
+  const logZeile = (l) => {
+    const m = /(kritischer Treffer|Treffer|verfehlt|widersteht|misslingt)/.exec(l.t || "");
+    if (!m || !/W20|Rettungswurf/.test(l.t)) return esc(l.t);
+    const gegner = l.art === "gegner", wort = m[1];
+    const erfolg = wort === "Treffer" || wort === "kritischer Treffer" || wort === "misslingt"; // der Angriff/Zauber wirkt
+    const gut = gegner ? !erfolg : erfolg; // gut für die Helden?
+    const marke = wort === "kritischer Treffer" ? "Kritisch" : wort === "Treffer" ? "Treffer" : wort === "verfehlt" ? "Verfehlt" : wort === "widersteht" ? "Widerstanden" : "Wirkt";
+    return `<b class="lg-marke ${gut ? "gut" : "schlecht"}">${erfolg ? "✓" : "✗"} ${marke}</b> ` + esc(l.t).replace(wort, `<b>${wort}</b>`);
+  };
   const Z = 60; // Feldgröße im SVG
   const params = new URLSearchParams(location.search);
   // Erst wenn alle Skripte geladen sind (sonst fehlt bei langsamem Laden noch die Abenteuer-Oberfläche und das Fortsetzen fällt aus)
@@ -545,7 +555,7 @@
       const gewaehlt = wahl && R.findeAktion(akt, wahl);
       $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt. Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
     }
-    $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("");
+    $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}">${logZeile(l)}</li>`).join("");
     zeichneGegnerInfo(); zeichneLeiste(akt, spielerDran);
     zeigeWurf();
     schwebeZahlen();

@@ -1473,3 +1473,8 @@ body[data-stimmung="frost"] .szene .szene-kopf .glocke i.an, body[data-stimmung=
   header.top { padding-top: calc(env(safe-area-inset-top) + 8px); }
   header.top .back { display: none; }
 }
+
+/* ---------- Kampf-Chronik: Treffer / Verfehlt als Marke ---------- */
+.log li .lg-marke { display: inline-block; font: 600 11px "Inter", sans-serif; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; margin-right: 4px; white-space: nowrap; }
+.log li .lg-marke.gut { color: #9fe39a; background: rgba(90,190,110,.14); border: 1px solid rgba(90,190,110,.45); }
+.log li .lg-marke.schlecht { color: #f0a08c; background: rgba(220,90,70,.13); border: 1px solid rgba(220,90,70,.45); }

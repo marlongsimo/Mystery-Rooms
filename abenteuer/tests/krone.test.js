@@ -23,7 +23,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const fehlt = []; for (const [id, s] of Object.entries(D.SZENEN)) for (const o of [].concat(s.optionen || [], s.weiter ? [{ weiter: s.weiter }] : [])) if (typeof o.weiter === 'string' && !D.SZENEN[o.weiter]) fehlt.push(id + '→' + o.weiter);
   check(!fehlt.length, 'Alle Szenenverweise gibt es' + (fehlt.length ? ': ' + fehlt.join(', ') : ''));
   // 3. Durchlauf: alle Szenen, alle Wege
-  try { const out = require('child_process').execFileSync('node', [__dirname + '/../tools/durchlauf-krone.js', '100'], { encoding: 'utf8' }); check(/Alle Szenen erreicht/.test(out), 'Akt I: 100 Durchläufe ohne Fehler, alle Szenen erreicht (alle drei Wege, auch nach Niederlagen)'); }
+  try { const out = require('child_process').execFileSync('node', [__dirname + '/../tools/kampagne.js', 'durchlauf', 'krone', '100'], { encoding: 'utf8' }); check(/alle Szenen erreicht/.test(out) && /alle regulären Enden erreicht/.test(out), 'Akt I: 100 Durchläufe ohne Fehler, alle Szenen erreicht (alle drei Wege, auch nach Niederlagen)'); }
   catch (e) { check(false, 'Durchlauf: ' + String(e.stdout || e.message).slice(0, 400)); }
   // 4. Kammern: Der Kampf endet erst, wenn alle Eisblöcke offen oder verloren sind
   {

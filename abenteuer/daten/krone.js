@@ -579,6 +579,7 @@
     eidwaechter: { klassen: ["kleriker", "krieger"], text: "Schwer (RK 15, Eidhammer 2W6+3). Sein Schutzkreis fängt die Hälfte des Schadens ab, bis alle drei Grablichter brennen." },
   };
   const META = {
+    ehrentitel: "Bezwinger der Eiskrone", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     id: "krone", schwierigkeit: 4, titel: "Die Krone unter dem Eis", kurz: "Krone", untertitel: "Ein verzweigtes Abenteuer in der versunkenen Stadt Veyrholm",
     kurztext: "Drei Wege führen in eine Stadt unter dem Gletscher – und zum Herzen der sieben Siegel.",
     min: 3, max: 6, stufen: "1–3", dauer: "4–5 Stunden", abschnitte: 3, enden: 3,
@@ -592,6 +593,8 @@
     ],
     kodexUhr: { titel: "Der Frost", text: ["Jede kurze Rast und mancher Umweg kosten Zeit. Mit der Zeit kriecht der <b>Frost</b> tiefer in die Stadt, bis zu sieben Stufen.", "Ab der dritten Stufe findet am Lagerfeuer niemand mehr richtig Schlaf: Eine lange Rast heilt dann nur noch bis drei Viertel der Trefferpunkte. Wer zügig vorankommt, steht dem König ausgeruhter gegenüber."] },
     abschnitte_namen: { 1: "Der Eintritt in die Stadt", 2: "Die Stadt erwacht", 3: "Das Herz der Siegel" },
+    // Ziel-Siegquote je Kampf für tools/kampagne.js (kaempfe --kalibrieren); fehlt ein Kampf, gilt 0,8
+    zielquoten: { kampf_grat: 0.85, kampf_stollen: 0.85, kampf_pilger: 0.85, kampf_markt: 0.8, kampf_kammern: 0.88, kampf_bruecke: 0.8, kampf_tor: 0.8, kampf_archiv: 0.8, kampf_frost: 0.85, kampf_krone: 0.78 },
   };
   const API = { META, EREIGNISSE: [], WISSEN, START: "prolog", NIEDERLAGE: "krone_verloren", SZENEN, KARTEN, OBJEKTE };
   root.ABD_ALLE = root.ABD_ALLE || {}; root.ABD_ALLE.krone = API;

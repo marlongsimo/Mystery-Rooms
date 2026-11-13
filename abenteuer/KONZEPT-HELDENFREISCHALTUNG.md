@@ -153,7 +153,7 @@ Das Spiel rechnet im Browser des Spieltischs; Supabase speichert Stände, kann e
 
 ### B6. Die Balance trägt das Zufallsangebot
 Simulation im Moor (Normal, alle Kämpfe, 2–6 Helden, eingebaute KI):
-- Die 15 Helden liegen nur **4,6 Prozentpunkte** auseinander (90,5–95,1 % Siegquote, Werkzeug: `tools/auswertung-moor.js`).
+- Die 15 Helden liegen nur **4,6 Prozentpunkte** auseinander (90,5–95,1 % Siegquote, Werkzeug heute: `tools/kampagne.js kaempfe rabenmoor --helden`).
 - Ein Startangebot mit „schwächeren“ Helden ist also kein echter Nachteil.
 - Vor der Einführung sollte dieselbe Auswertung für alle Abenteuer laufen. Grauwacht hat dafür `tools/simulation.js`.
 

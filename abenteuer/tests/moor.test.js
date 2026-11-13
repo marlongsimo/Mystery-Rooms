@@ -2,7 +2,7 @@
  * Abenteuer „Das Moor der stummen Lichter“ – ein Gerät, nur zwei Helden, im Browser bis zum Ende.
  * Spielerseite: Abenteuerwahl zeigt das Moor → Kodex mit den Lichtern → Heldenwahl ab 2 → Einleitung des Moors →
  * Szenen (Gespräch, Proben, geheime Entscheidungen, Abstimmung, Lichter-Rätsel, Kämpfe auf Moorkarten) → Ende.
- * Dazu die Engine ohne Browser: 200 Durchläufe mit 2–6 Helden (tools/durchlauf-moor.js).
+ * Dazu die Engine ohne Browser: 200 Durchläufe mit 2–6 Helden (tools/kampagne.js durchlauf rabenmoor).
  * Aufruf: python3 -m http.server 8765 &  ·  node abenteuer/tests/moor.test.js
  */
 const BASE = process.env.BASE || 'http://localhost:8765';
@@ -14,7 +14,7 @@ const D = require('../daten/rabenmoor.js');
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
   const until = async (p, fn, arg, ms = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(250); } return false; };
   // 1. Engine
-  try { const out = execFileSync('node', [__dirname + '/../tools/durchlauf-moor.js', '200'], { encoding: 'utf8' }); check(/Alle Szenen erreicht/.test(out), 'Engine: 200 Durchläufe mit 2–6 Helden ohne Fehler, Szenen erreichbar · ' + out.split('\n')[0]); }
+  try { const out = execFileSync('node', [__dirname + '/../tools/kampagne.js', 'durchlauf', 'rabenmoor', '200'], { encoding: 'utf8' }); check(/alle Szenen erreicht/.test(out) && /alle regulären Enden erreicht/.test(out), 'Engine: 200 Durchläufe mit 2–6 Helden ohne Fehler, Szenen erreichbar · ' + out.split('\n').filter((z) => /Enden:/.test(z)).join('').trim()); }
   catch (e) { check(false, 'Engine-Durchlauf: ' + (e.stdout || e.message).slice(0, 400)); }
 
   try { const out = execFileSync('node', [__dirname + '/../tools/karten-pruefen.js', 'rabenmoor'], { encoding: 'utf8' }); check(true, 'Karten: alle Startplätze erreichbar · ' + out.trim().split('\n').map((z) => z.split(':')[0]).join(', ')); }

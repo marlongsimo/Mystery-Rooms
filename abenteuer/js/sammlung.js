@@ -22,16 +22,11 @@
 
   /** Festes Starter-Set ohne Konto: ein Einstiegsheld je Klasse */
   const STARTER = ["schildwaechter", "elementarist", "trickser", "lichtbringer", "wildnislaeufer"];
-  const TITEL = { rabenmoor: "Kenner des Schwarzmoors", grauwacht: "Hüter von Grauwacht", hochwacht: "Fackelträger des Nordens", krone: "Bezwinger der Eiskrone" };
-  /** Reguläre Enden je Abenteuer (gleich wie rpg_adventure_endings in Migration 006) */
-  const KAMPAGNEN = {
-    rabenmoor: { titel: "Das Moor der stummen Lichter", enden: { ende_erloest: "Der Name im Wasser", ende_besiegt: "Stille über dem Moor" } },
-    grauwacht: { titel: "Das Siegel von Grauwacht", enden: { ende_waechter: "Der letzte Winter", ende_kobold: "Der Hüter mit den vielen Zähnen", ende_opfer: "Der neue Hüter", ende_bruch: "Der Einsturz", ende_verrat: "Der Hüter wider Willen" } },
-    hochwacht: { titel: "Die letzte Fackel von Hochwacht", enden: { ende_fackel: "Die Fackel bewahrt", ende_funke: "Der Funke im Gepäck", ende_dunkel: "Die Nordwarte verstummt" } },
-    krone: { titel: "Die Krone unter dem Eis", enden: { ende_stabil: "Das Herz schlägt ruhig", ende_versiegelt: "Die Stadt schläft", ende_umgeleitet: "Ein Siegel entlastet, ein anderes bebt" } },
-  };
+  /** Reguläre Enden und Kampagnentitel je Abenteuer: aus js/enden.js (erzeugt aus daten/*.js mit tools/kampagne.js enden) */
+  const KAMPAGNEN = window.ABENDEN || {};
+  const TITEL = Object.fromEntries(Object.entries(KAMPAGNEN).map(([ab, v]) => [ab, v.ehrentitel || ""]));
   // Volle Adresse: In einer CSS-Variable würde ein relativer Pfad vom CSS-Ordner aus gelesen
-const bildVon = (ab) => new URL(`img/${KAMPAGNEN[ab] ? ab : "grauwacht"}/titel.webp`, location.href).href;
+  const bildVon = (ab) => new URL(`img/${KAMPAGNEN[ab] ? ab : "grauwacht"}/titel.webp`, location.href).href;
   const SCHLOSS = '<svg viewBox="0 0 24 24" fill="none" stroke="#e8dcc0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="rgba(0,0,0,.55)"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="16" r="1.4" fill="#e8dcc0"/></svg>';
 
   /* ---------- Verbindung ---------- */

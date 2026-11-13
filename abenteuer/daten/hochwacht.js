@@ -415,7 +415,7 @@
       text: (A) => ["Ihr drückt den Funken in den Schnee, bis er erlischt. Das Signalfeuer brennt noch eine Nacht, dann geht es aus. Die Jäger finden keine Spur mehr – und ihr auch nicht.", ...epilog(A), "Den Weg zum nächsten Siegel werdet ihr in alten Büchern suchen müssen. Sera sagt, sie kennt eine Bibliothek."],
     },
     nordwarte_verstummt: {
-      art: "ende", abschnitt: 3, titel: "Die Nordwarte verstummt", ort: "Die Hochwarte",
+      art: "ende", niederlage: true, abschnitt: 3, titel: "Die Nordwarte verstummt", ort: "Die Hochwarte",
       text: (A) => ["Der Fackelzehrer nimmt den Funken, und mit ihm Sera. Das Signalfeuer bleibt kalt.", ...epilog(A), "Irgendwo im Norden wartet sie. Ihr werdet sie suchen."],
     },
     hochwacht_verloren: { art: "ende", abschnitt: 0, titel: "Die Nordwarte verstummt", ort: "", text: ["Der Wind trägt Schnee über eure Spuren. Im Norden erlischt ein Licht."] },
@@ -429,6 +429,7 @@
     jaegerschuetze: { klassen: ["waldlaeufer"], text: "Schießt aus 6 Feldern bevorzugt auf Sera. Deckung oder ein Held neben ihr (Abfangen) schützt sie." },
   };
   const META = {
+    ehrentitel: "Fackelträger des Nordens", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     id: "hochwacht", schwierigkeit: 3, titel: "Die letzte Fackel von Hochwacht", kurz: "Hochwacht", untertitel: "Ein Eskorte-Abenteuer im Norden",
     kurztext: "Bringt die Botin Sera Venn durch einen belagerten Pass zur Hochwarte.",
     min: 3, max: 6, stufen: "1–3", dauer: "3–4 Stunden", abschnitte: 3, enden: 3,

@@ -179,7 +179,7 @@ Zum Launch soll der Aufstieg **aus den Kampagnen heraus** wandern: Helden haben 
 | Neu freigeschalteter Held | sofort voll spielbar | startet auf Stufe 1; der Erfahrungsschatz bringt ihn bis zwei Stufen unter den stärksten eigenen Helden |
 | B2 Gäste und Tisch-Helden | Starter-Set | zusätzlich: spielen auf der empfohlenen Stufe der Kampagne |
 | B4 Hardcore-Ersatz | frei wählbar | frei wählbar, spielt als Gast auf der empfohlenen Stufe |
-| 6. Datenmodell | `006_rpg_heldensammlung.sql` | dazu `007_rpg_heldenlevel.sql` (Stufe, XP, Talente, Buchungen) |
+| 6. Datenmodell | `006_rpg_heldensammlung.sql` | dazu `007_rpg_heldenlevel.sql` (Stufe, XP, Buchungen) |
 
 **Empfehlung für die Open Beta:** Das Datenmodell der Sammlung so anlegen, dass `rpg_hero_progress` (Stufe, XP) direkt danebenpasst. XP schon während der Open Beta still mitschreiben (Phase 0 im Heldenlevel-Konzept) und zum Launch gutschreiben.
 

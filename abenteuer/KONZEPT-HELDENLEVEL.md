@@ -1,7 +1,7 @@
 # MYTHARA – Heldenlevel: Aufstieg außerhalb der Kampagnen
 
 **Status:** Konzept, **nicht umgesetzt**. Geplant für den **Launch** (nach der Open Beta).
-**Stand:** 13. November 2026. Grundlage: Abstimmung im Projekt vom 13. November 2026, Simulationen mit der heutigen Engine (`tools/stufen-sim.js`, `tools/balance-helden.js`).
+**Stand:** 13. November 2026, Fassung 2 (Fähigkeiten auf Stufe 3 und 7, sonst Verbesserungen, Meistertitel auf Stufe 10). Grundlage: Abstimmung im Projekt vom 13. November 2026, Simulationen mit der heutigen Engine (`tools/stufen-sim.js`, `tools/balance-helden.js`).
 **Baut auf:** [KONZEPT-HELDENFREISCHALTUNG.md](KONZEPT-HELDENFREISCHALTUNG.md). Die Freischaltung kommt zur Open Beta, das Heldenlevel zum Launch.
 
 ---
@@ -43,15 +43,17 @@ Zum Launch dreht sich das um:
 
 | Begriff | Bedeutung |
 |---|---|
-| **Heldenstufe** | Dauerhafte Stufe eines Helden am Konto, 1 bis 10. Bestimmt Lebenspunkte, Treffsicherheit, Fähigkeiten und Talente. |
+| **Heldenstufe** | Dauerhafte Stufe eines Helden am Konto, 1 bis 10. Bestimmt Lebenspunkte, Treffsicherheit, Fähigkeiten, Verbesserungen und den Meistertitel. |
 | **XP** | Erfahrung. Gibt es für Abschnitte und Kampagnen, gehört einem bestimmten Helden. |
 | **Erfahrungsschatz** | Ein kleiner Teil jeder Belohnung fließt in einen Topf am Konto, den man frei auf einen beliebigen eigenen Helden verteilen kann. |
 | **Kampagnenrang** | Schwierigkeit einer Kampagne, 1 bis 5. Bestimmt Stärke der Gegner und Höhe der XP. Jede Kampagne hat einen Grundrang und kann auf höheren Rängen wiederholt werden. |
 | **Empfohlene Stufe** | Die Heldenstufe, für die eine Kampagne auf ihrem Rang ausgelegt ist. |
 | **Gruppenstufe** | Durchschnitt der Heldenstufen der Gruppe. Wird beim Start mit der Empfehlung verglichen. |
 | **Kampagnen-Segen** | Ein kleiner Vorteil, den die Gruppe am Lagerfeuer wählt. Gilt nur bis zum Ende dieser Kampagne. Ersetzt den heutigen Aufstieg am Lagerfeuer. |
-| **Talent** | Eine Wahl beim Aufstieg (Stufe 4, 6, 8): eine bestehende Fähigkeit verbessern oder eine kleine neue Eigenschaft wählen. |
-| **Signaturfähigkeit** | Neue, starke Fähigkeit eines Helden auf Stufe 5 und 9. |
+| **Neue Fähigkeit** | Auf Stufe 3 und 7 bekommt jeder Held eine neue Fähigkeit: die, die er heute auf Stufe 2 und 3 bekommt. |
+| **Verbesserung** | Auf Stufe 5 und 8 wird eine vorhandene Fähigkeit des Helden stärker (mehr Einsätze, größere Reichweite, zusätzlicher Effekt). Fest je Held, ohne Auswahl. |
+| **Meisterstufe** | Stufe 10: eine große Meisterverbesserung der Kernfähigkeit **und** ein **Meistertitel**. |
+| **Meistertitel** | Ehrentitel des Helden, z. B. „Torvald, Schild von Grauwacht“. Er erscheint im Spiel überall, wo der Held zu sehen ist (Abschnitt 13.4). |
 
 ---
 
@@ -70,7 +72,7 @@ Bevor die Kurve festgelegt wird, habe ich gemessen, wie stark die Siegquote heut
 
 **Was daraus folgt:**
 1. **Eine Stufe ist heute sehr viel wert:** 10 bis 22 Prozentpunkte Siegquote. Das liegt daran, dass sich die Lebenspunkte von Stufe 1 auf 3 fast verdreifachen und auf Stufe 2 und 3 neue Fähigkeiten dazukommen.
-2. **Bei 10 Stufen muss jede Stufe weniger bewirken.** Würde jede Stufe so viel bringen wie heute, wäre eine Kampagne zwei Stufen über der Empfehlung trivial und zwei Stufen darunter kaum zu schaffen. Ziel: **etwa 5 bis 8 Prozentpunkte je Stufe** in der Nähe der Empfehlung (Abschnitt 6.3).
+2. **Bei 10 Stufen muss jede Stufe weniger bewirken.** Würde jede Stufe so viel bringen wie heute, wäre eine Kampagne zwei Stufen über der Empfehlung trivial und zwei Stufen darunter kaum zu schaffen. Ziel: **etwa 5 bis 8 Prozentpunkte je Stufe** in der Nähe der Empfehlung (Abschnitt 6.3). Das neue Modell erreicht das, indem es die heutigen drei Stufen auf zehn streckt: Die Fähigkeiten von heute Stufe 2 und 3 kommen erst auf Stufe 3 und 7, die Lebenspunkte wachsen je Stufe nur um die Hälfte des heutigen Zuwachses.
 3. **Die Gegner müssen mitwachsen.** Die heutigen Gegner sind für die Stufen 1 bis 3 gebaut. Für Kampagnen auf Rang 3 bis 5 brauchen sie Stufenwerte bis zur Heldenstufe 10 (Abschnitt 6).
 
 ---
@@ -78,59 +80,59 @@ Bevor die Kurve festgelegt wird, habe ich gemessen, wie stark die Siegquote heut
 ## 5. Die Heldenstufen 1 bis 10
 
 ### 5.1 Grundsatz
-- **Stufe 1 bis 3 bleiben wie heute:** dieselben Lebenspunkte, Fähigkeiten und Zauberplätze. Damit bleibt alles gültig, was heute gebaut und balanciert ist.
-- **Ab Stufe 4 wird jede Stufe flacher:** weniger Lebenspunkte je Stufe als heute, dafür Entscheidungen (Talente) und zwei große Momente (Signaturfähigkeiten auf 5 und 9).
-- **Jede Stufe bringt etwas Spürbares**, aber keine einzelne Stufe verdoppelt die Kraft.
+- **Keine neuen Fähigkeitsbäume.** Jeder Held behält genau die Fähigkeiten, die er heute hat. Sie werden nur über zehn Stufen verteilt.
+- **Neue Fähigkeiten auf Stufe 3 und 7:** Was ein Held heute auf Stufe 2 bekommt, bekommt er künftig auf Stufe 3. Was er heute auf Stufe 3 bekommt, bekommt er auf Stufe 7.
+- **Alle anderen Stufen verbessern Werte des Helden oder seine Fähigkeiten.**
+- **Keine Auswahl beim Aufstieg.** Jeder Held hat einen festen Weg. Das hält das Spiel am Tisch einfach: Niemand muss einen Bogen ausfüllen, und Gäste und Tisch-Helden brauchen keine Sonderregel.
+- **Stufe 10 ist die Meisterstufe:** eine große Meisterverbesserung und zusätzlich ein Meistertitel, der im Spiel beim Helden steht.
 
 ### 5.2 Was jede Stufe bringt
 
-| Stufe | Lebenspunkte | Übungsbonus | Neu |
-|---|---|---|---|
-| 1 | wie heute | +2 | Grundfähigkeiten |
-| 2 | wie heute | +2 | Fähigkeit der Stufe 2 (wie heute) |
-| 3 | wie heute | +2 | Fähigkeit der Stufe 3 (wie heute) |
-| 4 | + Zuwachs | +2 | **Talent 1** (Wahl aus 3) |
-| 5 | + Zuwachs | **+3** | **Signaturfähigkeit I** |
-| 6 | + Zuwachs | +3 | **Talent 2** (Wahl aus 3) |
-| 7 | + Zuwachs | +3 | **Attributsteigerung:** +2 auf das Hauptattribut (höchstens 20) |
-| 8 | + Zuwachs | +3 | **Talent 3** (Wahl aus 3) |
-| 9 | + Zuwachs | **+4** | **Signaturfähigkeit II** |
-| 10 | + Zuwachs | +4 | **Meistertalent** (Wahl aus 2) und Titel, z. B. „Torvald, Schild von Grauwacht“ |
+| Stufe | Werte | Fähigkeiten |
+|---|---|---|
+| 1 | Grundwerte wie heute Stufe 1 | Grundfähigkeiten wie heute Stufe 1 |
+| 2 | + Lebenspunkte | – |
+| **3** | + Lebenspunkte, 4 Zauberplätze | **Neue Fähigkeit I** (heute Stufe 2) |
+| 4 | + Lebenspunkte, **Hauptattribut +2** (höchstens 20) | – |
+| 5 | + Lebenspunkte, **Übungsbonus +3** | **Verbesserung I** |
+| 6 | + Lebenspunkte, **Rüstungsklasse +1** | – |
+| **7** | + Lebenspunkte, Zauberplätze 2. Grades | **Neue Fähigkeit II** (heute Stufe 3) |
+| 8 | + Lebenspunkte | **Verbesserung II** |
+| 9 | + Lebenspunkte, **Übungsbonus +4**, Zauberplätze | – |
+| **10** | + Lebenspunkte, Zauberplätze | **Meisterverbesserung** und **Meistertitel** |
 
-**Lebenspunkte-Zuwachs ab Stufe 4:** je Stufe die halbe Augenzahl des Trefferwürfels, ohne Konstitution. Krieger und Waldläufer (W10) bekommen +5, Zauberer, Schurken und Kleriker (W8) +4. Der Krieger behält seinen Klassenbonus von +3 je Stufe.
+**Übungsbonus:** heute fest +2 (`UEBUNG` in `regeln.js`), künftig +2 auf Stufe 1–4, +3 auf 5–8 und +4 auf 9–10. Er wirkt auf Angriffe, Rettungswurf-SG und Proben.
+
+**Lebenspunkte:** Stufe 1 wie heute. Jede weitere Stufe bringt **die Hälfte des heutigen Zuwachses je Stufe**. Dadurch entspricht Stufe 3 in etwa der heutigen Stufe 2 und Stufe 5 der heutigen Stufe 3.
 
 | Beispiel | Stufe 1 | Stufe 3 | Stufe 5 | Stufe 7 | Stufe 10 |
 |---|---|---|---|---|---|
-| Torvald (Krieger) | 13 | 35 | 51 | 67 | 91 |
-| Kael (Waldläufer) | 11 | 25 | 35 | 45 | 60 |
-| Lyra (Zauberin) | 9 | 21 | 29 | 37 | 49 |
-
-Damit wächst ein Held von Stufe 3 auf 10 um etwa das 2,3- bis 2,6-Fache. Von Stufe 1 auf 3 ist es heute das 2,3- bis 2,7-Fache. Die zweite Hälfte der Reise ist also gestreckter.
-
-**Übungsbonus:** steigt auf +3 (Stufe 5) und +4 (Stufe 9). Er wirkt auf Angriffe, Rettungswurf-SG und Proben. Heute ist er fest +2 (`UEBUNG` in `regeln.js`).
+| Torvald (Krieger) | 13 | 24 | 35 | 46 | 63 |
+| Kael (Waldläufer) | 11 | 18 | 25 | 32 | 43 |
+| Lyra (Zauberin) | 9 | 15 | 21 | 27 | 36 |
 
 **Zauberplätze** (Zauberer und Kleriker; heute Stufe 1: 3, Stufe 2: 4, Stufe 3: 3 + 2 starke):
 
-| Stufe | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-|---|---|---|---|---|---|---|---|
-| Plätze 1. Grad + 2. Grad | 4 + 2 | 4 + 3 | 4 + 3 | 4 + 3 | 4 + 4 | 4 + 4 | 5 + 4 |
+| Stufe | 1–2 | 3–6 | 7–8 | 9 | 10 |
+|---|---|---|---|---|---|
+| Plätze 1. Grad + 2. Grad | 3 + 0 | 4 + 0 | 4 + 2 | 4 + 3 | 5 + 3 |
 
-Plätze 3. Grades führe ich bewusst nicht ein. Die Signaturfähigkeiten übernehmen die Rolle der großen Zauber und sind leichter zu balancieren.
+**Klassenmerkmale wandern mit:** Tatendrang der Krieger und die Gerissenen Aktionen der Schurken (Spurt, Verstecken, Rückzug) kommen heute auf Stufe 2. Künftig kommen sie auf Stufe 3.
 
-### 5.3 Talente
-Talente sind Entscheidungen, keine reinen Zahlen. Jede Klasse hat **sechs Talente**. Auf Stufe 4, 6 und 8 werden jeweils **drei davon angeboten** (nur solche, die der Held noch nicht hat), einer wird gewählt. Auf Stufe 10 gibt es **zwei Meistertalente** je Klasse zur Wahl.
+### 5.3 Verbesserungen und Meisterstufe
+- **Verbesserung I (Stufe 5) und II (Stufe 8):** Je Held fest vorgegeben. Sie machen eine Fähigkeit spürbar stärker: mehr Einsätze, mehr Reichweite, ein zusätzliches Ziel oder ein zusätzlicher Effekt. **Kein bloßes „+1 Schaden“**, damit sich jede Stufe lohnt.
+- **Meisterverbesserung (Stufe 10):** die größte Verbesserung, meist an der Fähigkeit, die den Helden ausmacht.
+- **Meistertitel (Stufe 10):** Zusätzlich bekommt der Held einen Ehrentitel. Der Titel ist reine Anerkennung ohne Spielwert und wird im Spiel überall angezeigt, wo der Held erscheint (13.4).
+- **Inhalt:** 15 Helden × 3 Verbesserungen = 45 Verbesserungen, dazu 15 Meistertitel. Die vollständige Liste steht in **Anhang A**.
 
-**Regeln für Talente:**
-- Ein Talent verstärkt eine vorhandene Fähigkeit oder gibt eine kleine neue Eigenschaft.
-- Kein Talent verdoppelt Schaden oder Einsätze.
-- Talente lassen sich zurücksetzen: einmal kostenlos, danach gegen 10 % der XP der aktuellen Stufe (siehe Abschnitt 11).
+### 5.4 Lücken, die geschlossen werden müssen
+Durch das Balancing im November 2026 haben drei Helden auf einer Stufe heute keine Fähigkeit mehr. Für den Launch bekommen sie eine (Vorschläge, Details in Anhang A):
 
-Die vollständigen Talentlisten stehen in **Anhang A**.
-
-### 5.4 Signaturfähigkeiten
-Jeder der 15 Helden bekommt auf Stufe 5 und 9 je eine eigene **Signaturfähigkeit**, insgesamt 30. Sie machen den Helden unverwechselbar und sind die großen Momente des Aufstiegs. Einsatz meist **1× je Kampf** oder **1× je Rast**, damit sie besonders bleiben. Die Liste steht in **Anhang B**.
-
-**Hinweis:** Silra und Kael haben heute auf Stufe 3 keine neue Fähigkeit mehr (Kaels Doppelschuss kam beim Balancing auf Stufe 2). Für den Launch sollte jede Figur auf Stufe 3 wieder etwas Neues bekommen (Vorschläge in Anhang B).
+| Held | Stufe neu | Lücke | Vorschlag |
+|---|---|---|---|
+| Orin | 3 | Jagdvorbereitung ist auf Stufe 1 gewandert | *Lähmender Bolzen* (Aktion, 2× je Rast): Treffer, und das Ziel ist 1 Runde verlangsamt |
+| Kael | 7 | Doppelschuss ist auf Stufe 2 gewandert | *Pfeilregen* (Aktion, 1× je Rast): ein Angriff gegen jeden Gegner in einem Kreis mit 1 Feld |
+| Silra | 7 | hatte nie eine Fähigkeit auf Stufe 3 | *Glückssträhne* (passiv): Glückspilz 2× je Kampf, Platztausch 2× je Rast |
 
 ---
 
@@ -288,14 +290,14 @@ Die Gegner richten sich nach dem **Rang der Kampagne**, nicht nach der Gruppe. S
 Helden, die **mehr als zwei Stufen unter der Empfehlung** liegen, werden für diese Kampagne auf **Empfehlung minus 2** angehoben.
 - So kann ein neuer Freund mit Stufe-1-Helden bei einer Rang-3-Kampagne mitspielen, ohne nach einem Treffer am Boden zu liegen.
 - **XP-Faktor:** Für angehobene Helden zählt die **echte** Stufe. Sie lernen also besonders schnell (× 1,5).
-- **Fähigkeiten:** Angehoben werden nur Werte (Lebenspunkte, Übungsbonus, Zauberplätze), keine Talente und keine Signaturfähigkeiten.
+- **Was angehoben wird:** Werte und Fähigkeiten der angehobenen Stufe (Lebenspunkte, Übungsbonus, Zauberplätze, neue Fähigkeit auf 3 bzw. 7), aber keine Verbesserungen und kein Meistertitel.
 
 ### 9.4 Keine Drosselung nach oben
 Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger XP (Abschnitt 7.3), und die Gruppe sieht vorher, dass die Kampagne leicht wird.
 
 ### 9.5 Gäste und Tisch-Helden
-- **Gäste ohne Konto** spielen ihre Helden auf der **empfohlenen Stufe der Kampagne**. Talente und Signaturfähigkeiten bekommen sie nach einer festen Standardwahl, damit niemand einen Bogen ausfüllen muss.
-- **Helden, die der Tisch steuert,** werden genauso behandelt (empfohlene Stufe, Standardwahl).
+- **Gäste ohne Konto** spielen ihre Helden auf der **empfohlenen Stufe der Kampagne**, mit allen Fähigkeiten und Verbesserungen dieser Stufe. Weil es keine Auswahl beim Aufstieg gibt, braucht es dafür keine Sonderregel. Einen Meistertitel tragen Gast-Helden nicht.
+- **Helden, die der Tisch steuert,** werden genauso behandelt (empfohlene Stufe).
 - Wer ein Konto anlegt, bekommt die XP eines Gast-Durchgangs **nicht** nachträglich. Das entspricht der Regel der Freischaltung: Die Verknüpfung von Gast und Konto kommt erst später als eigener Schritt.
 
 ---
@@ -309,10 +311,10 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 
 ---
 
-## 11. Talente zurücksetzen und andere Komfortregeln
+## 11. Komfortregeln
 
-- **Talente zurücksetzen:** einmal kostenlos je Held, danach kostet es 10 % der XP der aktuellen Stufe. Die Stufe sinkt dabei nicht.
-- **Kein Stufenverlust:** XP können nie verloren gehen, außer durch Zurücksetzen von Talenten.
+- **Kein Stufenverlust:** XP gehen nie verloren.
+- **Kein Zurücksetzen nötig:** Weil der Weg je Held fest ist, gibt es nichts falsch zu wählen.
 - **Höchststufe:** Ab Stufe 10 fließen weitere XP vollständig in den Erfahrungsschatz.
 - **Keine Uhr und kein Druck:** keine Tagesaufgaben, keine Login-Serien, keine verfallenden XP.
 
@@ -326,7 +328,7 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 | Neuer Held nach Kampagnenabschluss | Startet auf **Stufe 1**, der Erfahrungsschatz bringt ihn schnell bis zwei Stufen unter den stärksten eigenen Helden (7.4) |
 | „Keine dauerhafte Machtsteigerung“ | Gilt bis zum Launch. Ab Launch gibt es dauerhafte Stufen, aber **keine** dauerhaften Gegenstände und keine Kaufvorteile |
 | Belohnung nach dem Finale | Freischaltung (einmal je Konto und Kampagnenversion) **plus** XP für die beteiligten Helden |
-| Chronik | Freischaltungen, Aufstiege, Talente und Signaturfähigkeiten erscheinen in der Chronik des Helden |
+| Chronik | Freischaltungen, Aufstiege, neue Fähigkeiten, Verbesserungen und der Meistertitel erscheinen in der Chronik des Helden |
 
 **Bestehende Konten** behalten beim Launch alle bis dahin freigeschalteten Helden. Die XP, die in der Open Beta schon gesammelt wurden, werden gutgeschrieben (siehe Phase 0).
 
@@ -335,10 +337,10 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 ## 13. Oberfläche
 
 ### 13.1 „Meine Helden“ im Hub
-- Heldenkarte mit Stufe als großer Zahl, XP-Balken zur nächsten Stufe und gewählten Talenten.
-- Ein offenes Talent (Stufe 4, 6, 8 erreicht, aber noch nicht gewählt) ist deutlich sichtbar.
+- Heldenkarte mit Stufe als großer Zahl und XP-Balken zur nächsten Stufe.
+- Ein Stufenpfad 1–10 zeigt, was schon erreicht ist und was noch kommt: nächste neue Fähigkeit, nächste Verbesserung, Meisterstufe. Das macht Vorfreude statt Überraschung.
 - Erfahrungsschatz oben mit Knopf „Verteilen“.
-- Aufklappbar: alle Stufen 1–10 mit dem, was noch kommt (Vorfreude statt Überraschung).
+- Helden auf Stufe 10 haben einen goldenen Meisterrahmen und ihren Meistertitel unter dem Namen.
 
 ### 13.2 Kampagne starten
 - Wahl des **Rangs**, beim ersten Durchgang fest auf dem Grundrang.
@@ -346,12 +348,22 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 - Am Tisch neben jedem Helden seine Stufe.
 
 ### 13.3 Nach einem Abschnitt und nach dem Finale
-- **Tisch:** kurze Übersicht „Kapitel II abgeschlossen“ mit XP je Held. Beim Aufstieg eine goldene Titelkarte im Stil der Kapitelkarten: „Torvald erreicht Stufe 6“.
-- **Handy:** Der eigene Held mit XP-Balken, der sich füllt. Bei einem Aufstieg erscheint die Talentwahl direkt auf dem Handy. Sie kann auch später im Hub erfolgen.
+- **Tisch:** kurze Übersicht „Kapitel II abgeschlossen“ mit XP je Held. Beim Aufstieg eine goldene Titelkarte im Stil der Kapitelkarten: „Torvald erreicht Stufe 7: neue Fähigkeit Bollwerk“.
+- **Stufe 10:** eine eigene, größere Karte: „Torvald wird zum **Schild von Grauwacht**“.
+- **Handy:** Der eigene Held mit XP-Balken, der sich füllt. Beim Aufstieg zeigt das Handy, was neu ist (Fähigkeit, Verbesserung oder Werte). Es gibt nichts auszuwählen.
 - **Hub:** Eintrag in der Chronik.
 
-### 13.4 Im Kampf
-- Unverändert, nur mit höheren Zahlen. Signaturfähigkeiten bekommen auf dem Handy eine eigene goldene Kartenfarbe.
+### 13.4 Der Meistertitel im Spiel
+Der Meistertitel steht überall, wo der Held erscheint:
+- **Tisch, Gruppenleiste** (Kampf und Erzählbühne): unter dem Namen, z. B. *„Schild von Grauwacht“*, dazu ein goldener Rahmen um das Porträt.
+- **Zug-Banner:** „DEIN ZUG · Torvald, Schild von Grauwacht“.
+- **Spielfigur auf dem Brett:** goldener Meisterring um den Sockel.
+- **Handy:** in der Heldenkarte unter dem Namen.
+- **Lobby und Heldenwahl:** neben dem Namen, damit die Mitspieler sehen, wer mit einem Meister kommt.
+- **Chronik und Abspann:** „Mit Torvald, dem Schild von Grauwacht“.
+
+### 13.5 Im Kampf
+- Unverändert, nur mit höheren Zahlen. Verbesserte Fähigkeiten tragen auf dem Handy einen kleinen goldenen Stern.
 
 ---
 
@@ -359,14 +371,15 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 
 ### 14.1 Engine
 - **`figuren.js`:**
-  - `tpVon(fid, stufe)` für die Stufen 4–10 erweitern (Formel aus 5.2).
+  - `tpVon(fid, stufe)` für die Stufen 1–10 (Formel aus 5.2).
   - `PLAETZE` bis Stufe 10.
-  - Fähigkeiten mit `ab: 5` und `ab: 9` (Signaturen).
-  - Neues Feld `talente` je Klasse.
+  - Bei den Fähigkeiten wird aus `ab: 2` künftig `ab: 3` und aus `ab: 3` künftig `ab: 7`.
+  - Neues Feld `verbesserungen` je Held: `{ 5: …, 8: …, 10: … }`.
+  - Neues Feld `meistertitel` je Held.
 - **`regeln.js`:**
   - `UEBUNG` wird eine Funktion der Stufe.
   - Gegner bekommen `bedrohung` (Skalierung nach 6.2) in `neuesSpiel`.
-  - Talente wirken über die vorhandenen Stellen (Treffer, Schaden, Einsätze, Rettung).
+  - Verbesserungen wirken über die vorhandenen Stellen (Einsätze, Reichweite, Ziele, Schaden, Rettung).
 - **`szenen.js`:**
   - Der Aufstieg am Lagerfeuer entfällt, stattdessen der Kampagnen-Segen.
   - `A.stufe` wird zur Heldenstufe je Held (`A.zust[fid].stufe`).
@@ -377,19 +390,18 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 
 | Objekt | Zweck |
 |---|---|
-| `rpg_hero_progress` | Je Konto und Held: Stufe, XP, gewählte Talente, freie Talentwahl, Anzahl Zurücksetzungen |
+| `rpg_hero_progress` | Je Konto und Held: Stufe, XP, Datum der Meisterstufe |
 | `rpg_xp_ledger` | Buchungen (nur Anfügen): Konto, Held, Kampagne, Anlass, XP, Faktoren, eindeutiger Schlüssel gegen Doppelbuchung |
 | `rpg_xp_pool` | Erfahrungsschatz je Konto |
-| `rpg_campaign_members` (bestehend) | Neu: Heldenstufe und Talente **beim Start** der Kampagne, damit sich nichts mitten im Abenteuer ändert |
+| `rpg_campaign_members` (bestehend) | Neu: Heldenstufe **beim Start** der Kampagne, damit sich nichts mitten im Abenteuer ändert |
 
 **Funktionen (Vorschlag):**
 - `rpg_award_progress(p_campaign_id, p_event)` vergibt XP für Abschnitt oder Ende. Sie rechnet **auf dem Server** und prüft auf Plausibilität wie im Freischaltungs-Konzept B5: gespeicherter Stand, Mindestdauer, gültige Endszene.
 - `rpg_spend_pool(p_hero_id, p_xp)` verteilt XP aus dem Erfahrungsschatz.
-- `rpg_choose_talent(p_hero_id, p_stufe, p_talent)` und `rpg_reset_talents(p_hero_id)`.
 
 **Weitere Regeln:**
 - **Idempotent:** Ein Abschnitt bringt je Held und Kampagne genau einmal XP, auch bei Neuladen und Wiederverbindung.
-- **RLS:** Jeder sieht und ändert nur den eigenen Fortschritt. Mitspieler sehen nur die Stufe.
+- **RLS:** Jeder sieht und ändert nur den eigenen Fortschritt. Mitspieler sehen nur Stufe und Meistertitel.
 - **Migrationen:**
   - `006_rpg_heldensammlung.sql` (Freischaltung, Open Beta)
   - `007_rpg_heldenlevel.sql` (Level, Launch)
@@ -404,13 +416,13 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 |---|---|---|---|
 | **0 · Vorbereitung** | Open Beta | Tabellen und XP-Buchungen schon anlegen und mitschreiben, aber ohne Wirkung im Spiel | keine; beim Launch werden die gesammelten XP gutgeschrieben |
 | **1 · Engine** | vor Launch | Stufen 4–10, Übungsbonus, Zauberplätze, Gegner-Bedrohung, Simulation mit `--stufe/--rang` | keine (nur intern) |
-| **2 · Inhalte** | vor Launch | 30 Talente (6 je Klasse), 10 Meistertalente, 30 Signaturfähigkeiten, Kampagnen-Segen, Balance nach 6.3 | keine (nur intern) |
-| **3 · Launch** | Launch | XP-Vergabe live, „Meine Helden“ mit Stufen, Talentwahl, Rangwahl, Ampel, Aufstiegskarten | Heldenlevel spielbar |
+| **2 · Inhalte** | vor Launch | 45 Verbesserungen (3 je Held), 3 neue Fähigkeiten für die Lücken (5.4), 15 Meistertitel, Kampagnen-Segen, Balance nach 6.3 | keine (nur intern) |
+| **3 · Launch** | Launch | XP-Vergabe live, „Meine Helden“ mit Stufenpfad, Meistertitel im Spiel, Rangwahl, Ampel, Aufstiegskarten | Heldenlevel spielbar |
 | **4 · Ausbau** | nach Launch | 5. Kampagne (Rang 5), kurze **Gefechte** (einzelne Kämpfe, 20 Minuten, für gezieltes Leveln), Erfolge | mehr Inhalte |
 
 **Grober Aufwand:**
-- Phase 1: mittel. Die Engine ist darauf vorbereitet, Stufen sind schon ein Parameter.
-- Phase 2: groß. Das ist vor allem Inhalt und Balance, mit vielen Simulationsläufen.
+- Phase 1: mittel. Die Engine ist darauf vorbereitet, Stufen sind schon ein Parameter, und die Fähigkeiten tragen schon ein `ab`.
+- Phase 2: mittel. Weil es keine neuen Fähigkeitsbäume gibt, sind es 45 Verbesserungen an bestehenden Fähigkeiten und drei neue Fähigkeiten, dazu viele Simulationsläufe.
 - Phase 3: mittel. Oberfläche und Supabase, nach dem Muster der Kampagnen und der Freischaltung.
 
 ---
@@ -424,6 +436,8 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 | Freunde mit unterschiedlicher Stufe können nicht zusammen spielen | Gegner nach Rang, Anhebung nach unten, Ampel vor dem Start |
 | Neue Helden fühlen sich wertlos an | Erfahrungsschatz bis zwei Stufen unter dem stärksten Helden |
 | Eine Klasse wird auf hoher Stufe übermächtig | Abnahmekriterium „Δ ohne höchstens 4 Prozentpunkte“ je Stufe (6.3) |
+| Stufe 8–10 wirken leer, weil die letzte neue Fähigkeit auf 7 kommt | Verbesserung II (8) und Meisterverbesserung (10) sichtbar stark, Meistertitel als Ziel, Übungsbonus +4 auf 9 |
+| Zwei Spieler mit demselben Helden sind gleich | Bewusst so gewollt (einfach); falls gewünscht später auf Stufe 10 eine Wahl zwischen zwei Meisterverbesserungen |
 | Zahlenaufblähung, Kämpfe dauern zu lange | Flache Kurve ab Stufe 4, Gegner +12 % Lebenspunkte je Bedrohungsstufe, Mechaniken statt Zahlen |
 | Der Aufstieg am Lagerfeuer fehlt | Kampagnen-Segen und XP-Anzeige am Lagerfeuer (Abschnitt 8) |
 | Manipulierte Abschlüsse | Server rechnet XP, Plausibilitätsprüfung, Idempotenz |
@@ -436,8 +450,8 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 - Siegquote echter Runden je Rang und Abstand zur Empfehlung (Vergleich mit 6.3).
 - Anteil der Gruppen mit Ampel gelb oder rot und deren Siegquote.
 - Wie oft Kampagnen wiederholt werden, und auf welchem Rang.
-- Nutzung des Erfahrungsschatzes und der Talentrücksetzung.
-- Beliebtheit der Talente je Klasse (Hinweis auf zu starke oder zu schwache Talente).
+- Nutzung des Erfahrungsschatzes.
+- Wie viele Helden die Meisterstufe erreichen, und nach wie vielen Kampagnen.
 
 ---
 
@@ -449,101 +463,48 @@ Helden über der Empfehlung werden **nicht** geschwächt. Sie bekommen weniger X
 4. **Kampagnen auf höherem Rang wiederholen?** *Empfehlung: ja, ab dem ersten Abschluss.* Das bringt viel Wiederspielwert ohne neue Geschichten.
 5. **XP aus der Open Beta gutschreiben?** *Empfehlung: ja* (Phase 0). Das belohnt frühe Spieler.
 6. **Gefechte als XP-Quelle?** *Empfehlung: ja, aber erst nach dem Launch* und mit halber XP je Minute im Vergleich zu Kampagnen, damit die Geschichten der Hauptweg bleiben.
-7. **Wann wird gewählt, Talente am Handy oder nur im Hub?** *Empfehlung: beides.* Direkt nach dem Aufstieg am Handy, sonst später im Hub.
+7. **Meisterstufe mit oder ohne Wahl?** *Empfehlung: zum Launch ohne Wahl* (eine feste Meisterverbesserung je Held). Eine Wahl zwischen zwei Meisterverbesserungen kann später ergänzt werden, ohne das Datenmodell zu ändern.
 
 ---
 
-## Anhang A – Talente je Klasse
+## Anhang A – Fähigkeiten, Verbesserungen und Meistertitel je Held
 
-Je Klasse sechs Talente (Angebot auf Stufe 4, 6 und 8: drei davon) und zwei Meistertalente (Stufe 10, eines davon).
+Spalten: **Stufe 3** und **Stufe 7** sind die heutigen Fähigkeiten der Stufen 2 und 3. **Stufe 5** und **Stufe 8** sind Verbesserungen. **Stufe 10** ist die Meisterverbesserung, darunter der Meistertitel. Alle Werte sind Entwürfe für Phase 2 und werden mit der Simulation eingestellt.
 
-### Krieger (Torvald, Ragnar, Isolde)
-| Talent | Wirkung |
-|---|---|
-| Eiserne Haut | +1 RK |
-| Zweiter Wind | Zweiter Atem heilt zusätzlich +Stufe Lebenspunkte |
-| Wachsam | Gelegenheitsangriffe gegen dich mit Nachteil |
-| Kriegsruf | Tatendrang: Verbündete in 2 Feldern +1 auf den nächsten Angriff |
-| Standhaft | Vorteil auf Rettungswürfe gegen Umstoßen und Rückstoß |
-| Waffenmeister | Kritischer Treffer schon bei 19–20 (bei Isolde: 18–20) |
-| **Meister: Unbeugsam** | Einmal je Kampf: Fällt man auf 0, bleibt man mit 1 Lebenspunkt stehen |
-| **Meister: Heerführer** | Verbündete neben dir +1 RK |
+### Krieger
+| Held | Stufe 3 (neu) | Stufe 5 (Verbesserung I) | Stufe 7 (neu) | Stufe 8 (Verbesserung II) | Stufe 10 (Meister) |
+|---|---|---|---|---|---|
+| **Torvald** | Tatendrang | Spott 2× je Rast | Bollwerk | Schildstoß 2× je Kampf, stößt 2 Felder | Schutzhaltung auch für Verbündete in 2 Feldern, dreimal je Runde · **„Schild von Grauwacht“** |
+| **Ragnar** | Tatendrang | Raserei 2× je Rast | Unbändig | Blutrausch schon unter ¾ der Lebenspunkte | Rücksichtsloser Angriff trifft einmal je Runde alle Gegner neben ihm · **„Der Unbeugsame“** |
+| **Isolde** | Tatendrang | Finte 3× je Rast | Klingenmeisterin | Entwaffnen 2× je Kampf, wirkt 3 Runden | Parade zweimal je Runde, Parade-Treffer kritisch bei 17–20 · **„Erste Klinge des Nordens“** |
 
-### Zauberer (Lyra, Vaelin, Morwen)
-| Talent | Wirkung |
-|---|---|
-| Arkane Ader | +1 Zauberplatz 1. Grades |
-| Weite Zauber | +3 Felder Reichweite für Zauber |
-| Zaubertrick-Meister | Zaubertricks +1 Schaden je 2 Stufen über 4 |
-| Schutzzauber | +1 RK, solange ein eigener Zauber wirkt |
-| Zähe Konzentration | Vorteil auf Rettungswürfe gegen Kontrolle |
-| Lehrmeister | Einmal je Kampf ein Zauber ohne Platz |
-| **Meister: Überladung** | Einmal je Rast: ein Zauber mit doppeltem Würfelschaden |
-| **Meister: Zeitstillstand** | Einmal je Kampf: eine zusätzliche Aktion |
+### Zauberer
+| Held | Stufe 3 (neu) | Stufe 5 (Verbesserung I) | Stufe 7 (neu) | Stufe 8 (Verbesserung II) | Stufe 10 (Meister) |
+|---|---|---|---|---|---|
+| **Lyra** | Gedankenstütze | Analyse wirkt auf zwei Ziele | Bannkreis | Schutzglyphe +7 statt +5 RK, einmal je Kampf ohne Platz | Zeitriss trifft auch alle Gegner in 2 Feldern um das Ziel · **„Hüterin der Ordnung“** |
+| **Vaelin** | Donnerwelle, Elementarer Nachhall | Glutpfeil: Feld brennt 2 Runden, 1W6 | Glutsphäre | Magisches Geschoss mit 4 statt 3 Lichtpfeilen | Glutsphäre einmal je Rast ohne Platz, Radius +1 · **„Herr der Elemente“** |
+| **Morwen** | Schattenschritt, Spiegelbilder | Furcht trifft zwei Ziele | Albtraum | Spiegelbilder 4 statt 3 | Albtraum verängstigt zusätzlich alle Gegner in 2 Feldern um das Ziel · **„Die aus dem Schatten“** |
 
-### Schurke (Silra, Vex, Darian)
-| Talent | Wirkung |
-|---|---|
-| Gift der Wahl | Hinterhalt +1W6 |
-| Schattenschritt | +2 Felder Bewegung, wenn du versteckt beginnst |
-| Ausweichen | Halber Schaden bei gelungenem GES-Rettungswurf gegen Flächen |
-| Doppelte Klinge | Zweiter Angriff (Bonus) ohne Abzug |
-| Schmutzige Tricks | +1 Einsatz für deine begrenzte Bonus-Fähigkeit |
-| Glück der Gauner | Einmal je Kampf einen eigenen W20 wiederholen |
-| **Meister: Todesstoß** | Kritische Treffer verdreifachen den Hinterhalt |
-| **Meister: Schemen** | Gegner haben Nachteil gegen dich in der ersten Runde jedes Kampfes |
+### Schurken
+| Held | Stufe 3 (neu) | Stufe 5 (Verbesserung I) | Stufe 7 (neu) | Stufe 8 (Verbesserung II) | Stufe 10 (Meister) |
+|---|---|---|---|---|---|
+| **Darian** | Kletterer, Schattenstoß, Gerissene Aktionen | Rauchbombe 2× je Rast | Fallensteller | Schattenwirbel 3× je Rast | Fallen machen doppelten Schaden und halten fest · **„Der Unsichtbare“** |
+| **Silra** | Gerissene Aktionen | Schmutziger Trick +1 Einsatz, Reichweite 2 Felder | **Glückssträhne** (neu, siehe 5.4) | Zweiter Dolch mit vollem Schaden | Hinterhalt mit jedem Dolch, nicht nur einmal je Zug · **„Königin der Gassen“** |
+| **Vex** | Gerissene Aktionen | Gift 3× je Rast | Hinrichtung | Todesstoß: Vorteil auch aus dem Versteck in jeder Runde | Hinrichtung +2W6 statt 1W6; Gegner (keine Bosse) unter 8 Lebenspunkten fallen bei einem Treffer · **„Die letzte Klinge“** |
 
-### Kleriker (Elara, Brogar, Seran)
-| Talent | Wirkung |
-|---|---|
-| Gesegnete Hände | Heilzauber +2 |
-| Schutzpatron | Heilendes Wort gibt dem Ziel +1 RK bis zu seinem Zug |
-| Göttliche Macht | +1 Einsatz der Göttlichen Macht je Rast |
-| Lichtblick | Aufrichten gibt 1W6 statt 1 Lebenspunkt |
-| Zorn des Glaubens | Zaubertricks +1 Schaden, gegen Untote +2 |
-| Fürsprache | Einmal je Kampf einen misslungenen Rettungswurf eines Verbündeten wiederholen |
-| **Meister: Wunder** | Einmal je Rast: alle Verbündeten in 6 Feldern heilen 2W8 |
-| **Meister: Heiliger Bann** | Untote und Fluchwesen in 2 Feldern um dich haben Nachteil |
+### Kleriker
+| Held | Stufe 3 (neu) | Stufe 5 (Verbesserung I) | Stufe 7 (neu) | Stufe 8 (Verbesserung II) | Stufe 10 (Meister) |
+|---|---|---|---|---|---|
+| **Elara** | Untote vertreiben | Segen auf 4 Verbündete | Schutzkreis | Strahlende Aura wirkt in 2 Feldern | Schutzkreis +3 RK und heilt jede Runde 1W6 · **„Licht von Grauwacht“** |
+| **Brogar** | Bewahren | Lebenshauch 2× je Kampf | Massenheilwort | Bewahren verteilt 6 × Stufe statt 5 × Stufe | Massenheilwort heilt alle Verbündeten in 6 Feldern · **„Der Barmherzige“** |
+| **Seran** | Bannen | Brandmal 2× je Kampf ohne Platz | Gerechter Zorn | Befehl: Flieh! trifft zwei Ziele | Gerechter Zorn +3W6, und das Brandmal-Ziel kann nicht fliehen · **„Hammer der Wahrheit“** |
 
-### Waldläufer (Kael, Faye, Orin)
-| Talent | Wirkung |
-|---|---|
-| Tödliches Mal | Jägermal +1W4 zusätzlich |
-| Flinker Schütze | Leichtfüßig: 3 statt 2 Felder |
-| Fährtenmeister | Erstes Mal des Kampfes ohne Einsatz |
-| Gefährte | Wolf bzw. Fallen und Netz: +1 Einsatz je Rast |
-| Weitschuss | +4 Felder Reichweite, kein Nachteil auf große Entfernung |
-| Überleben | +1 Heiltrank je Kampagne |
-| **Meister: Pfeilhagel** | Einmal je Kampf: Angriff gegen jeden Gegner in einem Kreis mit 2 Feldern |
-| **Meister: Unerbittlich** | Das markierte Ziel kann sich nicht verstecken und hat −2 RK |
-
----
-
-## Anhang B – Signaturfähigkeiten (Stufe 5 und 9)
-
-| Held | Stufe 5 | Stufe 9 |
-|---|---|---|
-| **Torvald** (Schildwächter) | *Schildwall:* Verbündete neben dir +2 RK bis zu deinem nächsten Zug (Bonus, 1× je Kampf) | *Letzte Bastion:* 2 Runden fängt Torvald alle Angriffe gegen Verbündete in 2 Feldern ab (1× je Rast) |
-| **Ragnar** (Berserker) | *Blutfurie:* Raserei-Runden mit zwei Angriffen | *Unaufhaltsam:* 1× je Kampf: Angriff gegen alle Gegner neben dir |
-| **Isolde** (Duellantin) | *Riposte-Kette:* Parade bis zu zweimal je Runde | *Tanz der Klingen:* 1× je Kampf: drei Angriffe auf verschiedene Ziele, ohne Gelegenheitsangriffe |
-| **Lyra** (Gelehrte) | *Schwachstelle offenlegen:* Analyse wirkt auf zwei Ziele | *Zeitfalte:* 1× je Rast: ein Verbündeter bekommt sofort einen zusätzlichen Zug |
-| **Vaelin** (Elementarist) | *Feuersturm:* Kegel 4 Felder, 4W6, GES halbiert (Platz 2. Grades) | *Meteor:* 1× je Rast: Kreis mit 2 Feldern, 8W6, angekündigt eine Runde vorher |
-| **Morwen** (Schattenmagierin) | *Schattenfessel:* Ziel kann sich 1 Runde nicht bewegen und hat Nachteil | *Albtraumflut:* 1× je Rast: alle Gegner in 3 Feldern verängstigt (WEI) |
-| **Silra** (Trickserin) | *Taschenspieler:* Stiehlt eine Stärkung des Gegners (Schild, Segen) und gibt sie einem Verbündeten | *Großer Coup:* 1× je Kampf: Platztausch mit einem Gegner, beide Seiten verwirrt |
-| **Vex** (Assassine) | *Markiert zum Tod:* Ziel nimmt von dir +2W6 bis Kampfende (1× je Kampf) | *Klinge aus dem Nichts:* 1× je Kampf: Teleport hinter ein Ziel und kritischer Treffer |
-| **Darian** (Schattenläufer) | *Rauchschleier:* Feld mit 2 Feldern Radius, Verbündete darin versteckt | *Hundert Fallen:* 1× je Rast: drei Fallen auf einmal |
-| **Elara** (Lichtbringerin) | *Morgenröte:* Kreis mit 2 Feldern, heilt Verbündete 2W6, Untote nehmen 2W6 | *Sonnenfanal:* 1× je Rast: alle Gegner in 4 Feldern geblendet, Untote 4W8 |
-| **Brogar** (Wanderheiler) | *Lebensband:* Verbindung zu einem Verbündeten, Schaden wird geteilt | *Auferstehung:* 1× je Kampagne: ein gefallener Verbündeter steht mit halben Lebenspunkten auf (auch Hardcore) |
-| **Seran** (Inquisitor) | *Urteil:* Brandmal-Ziel kann nicht fliehen und nicht geheilt werden | *Feuerprobe:* 1× je Rast: alle markierten Gegner nehmen 4W8 |
-| **Kael** (Wildnisläufer) | *Durchschlagender Pfeil:* trifft alle Gegner in einer Linie | *Sturm aus Pfeilen:* 1× je Kampf: drei Schüsse mit Vorteil |
-| **Faye** (Tiergefährtin) | *Rudelruf:* ein zweiter Wolf für 3 Runden | *Grau, der Alte:* Grau wird ein Leitwolf: +10 Lebenspunkte, Umreißen ohne Einsatz |
-| **Orin** (Kopfgeldjäger) | *Lebend oder tot:* Netz und Treffer gleichzeitig | *Kopfgeld:* 1× je Kampf: Schaden gegen das markierte Ziel verdoppelt, bis es fällt |
-
-**Lücken auf Stufe 3 schließen:**
-- *Silra:* „Glückssträhne“, Glückspilz 2× je Kampf.
-- *Kael:* „Adlerauge“, Fernkampf ohne Nachteil auf große Entfernung und gegen Deckung.
-
-Alle Werte in Anhang A und B sind Entwürfe. Sie werden in Phase 2 mit der Simulation eingestellt. Was die Abnahme nach 6.3 nicht besteht, wird angepasst.
+### Waldläufer
+| Held | Stufe 3 (neu) | Stufe 5 (Verbesserung I) | Stufe 7 (neu) | Stufe 8 (Verbesserung II) | Stufe 10 (Meister) |
+|---|---|---|---|---|---|
+| **Kael** | Doppelschuss | Jägermal +1W8 statt +1W6 | **Pfeilregen** (neu, siehe 5.4) | Fesselnder Pfeil 3× je Rast | Doppelschuss trifft drei Ziele · **„Falke des Nordens“** |
+| **Faye** | Eingespielt | Grau +10 Lebenspunkte | Ein Rudel | Grau: Umreißen 3× je Rast | Grau greift zweimal je Zug an · **„Herrin der Wölfe“** |
+| **Orin** | **Lähmender Bolzen** (neu, siehe 5.4) | Netz mit 8 Feldern Reichweite, Befreien gegen SG +2 | Erlegen | Fangschuss zweimal je Runde | Erlegen 2× je Kampf, +4W6 statt +2W6 · **„Der Unentrinnbare“** |
 
 ---
 

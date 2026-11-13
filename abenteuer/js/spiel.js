@@ -625,6 +625,7 @@
   function zeigeSektion(id) {
     for (const x of ["mythara", "hub", "einladen", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; }
     document.body.classList.toggle("im-kampf", id === "spiel");
+    document.body.classList.toggle("im-szene", id === "szene");
     // Für das Neuladen merken, ob man gerade im Spiel war (nur dann wird automatisch fortgesetzt)
     try { sessionStorage.setItem("ab_ansicht", id); } catch (e) { /* privat */ }
   }

@@ -37,12 +37,13 @@
 
   /* ---------- Titelkarte beim Wechsel in einen neuen Abschnitt ---------- */
   function titelkarte(n, fertig) {
-    const el = document.createElement("div"); el.className = "titelkarte"; el.setAttribute("role", "presentation");
-    el.innerHTML = `<div><p class="eyebrow">Abschnitt ${n}</p><h2>${esc(((A && S.metaVon(A.abenteuer).abschnitte_namen) || ABSCHNITTE)[n] || "")}</h2><span class="titel-zier" aria-hidden="true"></span></div>`;
+    const el = document.createElement("div"); el.className = "titelkarte kino"; el.setAttribute("role", "presentation");
+    const m = A ? S.metaVon(A.abenteuer) : {}, roem = ["", "I", "II", "III", "IV", "V"][n] || n;
+    el.innerHTML = `${A ? `<i class="tk-bild" style="--bild:url('${bildFuer(n)}')"></i>` : ""}<div>${m.titel ? `<span class="tk-kampagne">${esc(m.titel)}</span>` : ""}<p class="eyebrow">Kapitel ${roem}</p><h2>${esc((m.abschnitte_namen || ABSCHNITTE)[n] || "")}</h2><span class="titel-zier" aria-hidden="true"></span></div>`;
     document.body.appendChild(el);
     if (window.ABE) window.ABE.glocke(n === 3 ? 1 : 0.7);
     let weg = false; const schliessen = () => { if (weg) return; weg = true; el.classList.add("aus"); setTimeout(() => { el.remove(); if (fertig) fertig(); }, 700); };
-    el.onclick = schliessen; setTimeout(schliessen, 3400);
+    el.onclick = schliessen; setTimeout(schliessen, 4200);
   }
   try { hilfeAn = localStorage.getItem("ab_hilfe") !== "aus"; } catch (e) { /* privat */ }
   const ATTR = { STR: "Stärke", GES: "Geschicklichkeit", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
@@ -82,6 +83,12 @@
   }
 
   /* ---------- Darstellung ---------- */
+  /** Bild der Bühne: Abschnittsbild der Kampagne (Grauwacht: Mythara-Abschnittsbilder) */
+  function bildFuer(n) {
+    const m = S.metaVon(A.abenteuer), k = [1, 2, 3].includes(+n) ? +n : 1;
+    const pfad = !A.abenteuer || A.abenteuer === "grauwacht" ? `img/mythara/abschnitt-${k}.webp` : (m.abschnittBilder || {})[k] || m.vorschau || m.bild || "img/mythara/karte-kampagnen.webp";
+    return new URL(pfad, location.href).href; // als CSS-Variable sonst relativ zur CSS-Datei
+  }
   function glockeHtml(n) { const u = A ? S.metaVon(A.abenteuer).uhr : { name: "Glocke" }; return `<span class="glocke${u.klasse ? " " + u.klasse : ""}" title="${esc(u.name)}: ${n} von 7">${Array.from({ length: 7 }, (_, i) => `<i class="${i < n ? "an" : ""}"></i>`).join("")}<small>${esc(u.name)} ${n}/7</small></span>`; }
   function gruppeHtml() {
     return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
@@ -149,16 +156,19 @@
     render.antwort = v.antwort;
     if (window.ABE && render.letzte != null && A.glocke > render.letzte) window.ABE.glocke(0.9);
     render.letzte = A.glocke;
-    let h = `<div class="szene-kopf"><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}<span class="kopf-links">${sprache ? `<button class="link" id="sz-vorlesen" title="Text vorlesen (Browserstimme) – noch einmal tippen zum Anhalten">🔊 Vorlesen</button>` : ""}${AB.liveAn() ? (window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-kpause" title="Kampagne speichern und pausieren – fortsetzen unter „Meine Kampagnen“">Pausieren</button>` : "") : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}${window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-tisch" title="Auf einem anderen Gerät als Spieltisch weiterspielen">Tisch wechseln</button>` : ""}</span></div>
-      <h1>${esc(v.titel)}</h1><div class="erzaehlung ${auftritt ? "auftritt" : ""}">${v.text.map((p, i) => `<p style="--i:${i}">${fett(p)}</p>`).join("")}</div>`;
+    const meta = S.metaVon(A.abenteuer), kapitel = ((meta.abschnitte_namen || ABSCHNITTE)[v.abschnitt] || "");
+    let h = `<div class="sz-buehne" aria-hidden="true" style="--bild:url('${bildFuer(v.abschnitt)}')"><i class="sz-bild"></i><canvas class="sz-kanal"></canvas></div>
+      <div class="szene-kopf"><span class="sz-marke" aria-hidden="true">MYTHARA</span><span class="sz-titel"><b>${esc(meta.titel || "")}</b>${kapitel ? `<i>${esc(kapitel)}</i>` : ""}</span><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}<span class="kopf-links">${sprache ? `<button class="link" id="sz-vorlesen" title="Text vorlesen (Browserstimme) – noch einmal tippen zum Anhalten">🔊 Vorlesen</button>` : ""}${AB.liveAn() ? (window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-kpause" title="Kampagne speichern und pausieren – fortsetzen unter „Meine Kampagnen“">Pausieren</button>` : "") : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}${window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-tisch" title="Auf einem anderen Gerät als Spieltisch weiterspielen">Tisch wechseln</button>` : ""}</span></div>
+      <div class="sz-rahmen"><article class="sz-blatt"><p class="sz-ort">${esc(v.ort || "")}</p><h1>${esc(v.titel)}</h1><span class="sz-zier" aria-hidden="true"></span><div class="erzaehlung ${auftritt ? "auftritt" : ""}">${v.text.map((p, i) => `<p style="--i:${i}">${fett(p)}</p>`).join("")}</div>`;
     if (hilfeAn && HILFE[s.art] && !A.zwischenprobe) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE[s.art])}</p><button class="link" id="hilfe-aus">Hinweise ausblenden</button></div>`;
     if (A.zwischenprobe && hilfeAn) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE.probe)}</p></div>`;
     if (s.art === "gespraech" && v.dialog.length) h += dialogHtml(v.dialog);
     else if (v.antwort) h += `<div class="antwort">${fett(v.antwort)}</div>`;
-    h += `<div class="interaktion ${auftritt ? "auftritt" : ""}" style="--i:${v.text.length}">${interaktion(v, s)}</div>`;
-    h += gruppeHtml();
-    if (v.protokoll.length) h += `<ol class="log kurz">${v.protokoll.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("")}</ol>`;
+    h += `<div class="interaktion ${auftritt ? "auftritt" : ""}" style="--i:${v.text.length}">${interaktion(v, s)}</div></article>`;
+    h += `<aside class="sz-gruppe" aria-label="Die Gruppe"><h3>Die Gruppe</h3>${gruppeHtml()}</aside>`;
+    h += `<aside class="sz-chronik" aria-label="Verlauf"><h3>Chronik</h3>${v.protokoll.length ? `<ol class="log kurz">${v.protokoll.slice().reverse().map((l) => `<li class="${l.art || ""}">${esc(l.t)}</li>`).join("")}</ol>` : `<p class="note">Noch ist nichts geschehen.</p>`}</aside></div>`;
     el.innerHTML = h;
+    if (window.ABFX && window.ABFX.buehne) window.ABFX.buehne(el.querySelector(".sz-buehne"), A.abenteuer);
     const pw = el.querySelector(".probe-wuerfel");
     if (pw && window.ABW) {
       const [fid, w, ges, sg] = pw.dataset.wurfKey.split("-").map((x, i) => (i ? +x : x)), neu = pw.dataset.wurfKey !== letzterWurf; letzterWurf = pw.dataset.wurfKey;
@@ -365,7 +375,7 @@
   /** Pause: zurück zum Titel, der Spielstand bleibt erhalten */
   function pause() { merken(); fortsetzenKnopf(); AB.zeigeIntro(); if (window.KAMPAGNE) window.KAMPAGNE.pausieren({ allein: true }); }
 
-  window.ABT = { pause, vorlesen: (an) => { vorlesenAn = an; if (!an) verstummen(); }, hilfe: (v) => { hilfeAn = v; if (A) render(); }, start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
+  window.ABT = { titelkarte: (n) => titelkarte(n), pause, vorlesen: (an) => { vorlesenAn = an; if (!an) verstummen(); }, hilfe: (v) => { hilfeAn = v; if (A) render(); }, start, fortsetzen, kampfFertig, gespeichert: () => { try { return Boolean(localStorage.getItem(KEY)); } catch (e) { return false; } }, zeige, render, wunsch, oeffentlich, laeuft: () => Boolean(A), A: () => A,
     speichern: () => (A ? S.speichern(A) : null), laden: (o) => { A = S.laden(o); },
     /** Stand aus einer Kampagne übernehmen und im Browser merken */
     uebernehmen: (o) => { A = S.laden(o); merken(); },

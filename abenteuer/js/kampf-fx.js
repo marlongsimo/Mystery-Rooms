@@ -90,15 +90,31 @@
     z.className = "fx-zug"; z.innerHTML = `${bild ? `<span class="fx-zug-bild" style="background-image:url('${bild}')"></span>` : ""}<span><small>DEIN ZUG</small><b>${esc(f.name)}</b></span>`;
     void z.offsetWidth; z.classList.add("zeigen");
   }
+  /** Beinamen der Bosse und Anführer (nur Anzeige) */
+  const BEINAME = { abt: "Der Abt ohne Namen", grabritter: "Coldric, Ritter der Gruft", alwine: "Die Stumme im Moor", fackelzehrer: "Der das Licht frisst",
+    jaegerhauptmann: "Varrek, Hauptmann der Siegeljäger", eisenhirte: "Wächter des Kronentors", koenig: "Herr des Kronenherzens", frostmatrone: "Herrin der Frostkammer",
+    splitterbrutmutter: "Mutter des Schwarms", eidwaechter: "Hüter der Pilgerstraße", kettenbestie: "Die Bestie auf der Brücke", runenleser: "Leser der vergessenen Namen" };
+  /** Boss-Auftritt: Porträt groß, sein Bild verschwommen als Hintergrund, Kinobalken, Name und Beiname */
   function bossIntro(g) {
     const D = window.ABD_ALLE && window.ABD_ALLE[kampagne()], meta = D && D.META;
     const eigen = window.ABB && window.ABB.gegnerBild && window.ABB.gegnerBild(g.art);
-    const bild = meta && meta.abschnittBilder ? meta.abschnittBilder[3] || meta.abschnittBilder[2] || meta.bild : meta && meta.bild;
+    const bild = eigen || (meta && meta.abschnittBilder ? meta.abschnittBilder[3] || meta.abschnittBilder[2] || meta.bild : meta && meta.bild);
     let d = $("#fx-intro"); if (!d) { d = document.createElement("div"); d.id = "fx-intro"; document.body.appendChild(d); }
-    d.className = "fx-intro"; const dd = (window.AB && window.AB.R && window.AB.R.GEGNER[g.art]) || {};
-    d.innerHTML = `<div class="fx-intro-bild" style="${bild ? `background-image:url('${bild}')` : ""}"></div>${eigen ? `<div class="fx-intro-portraet" style="background-image:url('${eigen}')"></div>` : ""}<div class="fx-intro-text"><small>${dd.boss || dd.phasen ? "ENDGEGNER" : "ANFÜHRER"}</small><h1>${esc(g.name.replace(/ \d+$/, ""))}</h1></div>`;
+    const dd = (window.AB && window.AB.R && window.AB.R.GEGNER[g.art]) || {}, name = g.name.replace(/ \d+$/, "");
+    d.className = "fx-intro boss" + (eigen ? " mit-portraet" : "");
+    d.innerHTML = `<div class="fx-intro-bild" style="${bild ? `background-image:url('${bild}')` : ""}"></div>${eigen ? `<div class="fx-intro-portraet" style="background-image:url('${eigen}')"></div>` : ""}
+      <div class="fx-intro-text"><small>${dd.boss || dd.phasen ? "ENDGEGNER" : "ANFÜHRER"}</small><h1>${esc(name)}</h1>${BEINAME[g.art] ? `<p>${esc(BEINAME[g.art])}</p>` : ""}<span class="fx-intro-linie"></span></div>`;
     void d.offsetWidth; d.classList.add("zeigen"); d.onclick = () => d.classList.remove("zeigen");
-    setTimeout(() => d.classList.remove("zeigen"), 3600);
+    setTimeout(() => d.classList.remove("zeigen"), 3800);
+  }
+  /** Ein Boss fällt: Porträt wird grau und zerspringt, „Bezwungen“ */
+  function bossFall(g) {
+    const eigen = window.ABB && window.ABB.gegnerBild && window.ABB.gegnerBild(g.art);
+    let d = $("#fx-fall"); if (!d) { d = document.createElement("div"); d.id = "fx-fall"; document.body.appendChild(d); }
+    d.className = "fx-fall";
+    d.innerHTML = `${eigen ? `<div class="fx-fall-portraet" style="background-image:url('${eigen}')"></div>` : ""}<div class="fx-fall-text"><small>BEZWUNGEN</small><h2>${esc(g.name.replace(/ \d+$/, ""))}</h2></div>`;
+    void d.offsetWidth; d.classList.add("zeigen"); d.onclick = () => d.classList.remove("zeigen");
+    setTimeout(() => d.classList.remove("zeigen"), 3000);
   }
   const istBoss = (R, g) => { const d = R.GEGNER[g.art] || {}; return Boolean(d.boss || d.phasen || (g.tpMax >= 60)); };
 
@@ -200,14 +216,43 @@
       } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 30); }
     }
     if (krit) { setTimeout(() => { blitz("gold"); beben(); }, 160); }
+    const gefallen = st.figuren.find((f) => f.seite === "gegner" && vorher.tp[f.id] > 0 && f.tp <= 0 && istBoss(R, f) && !f.geflohen);
+    if (gefallen) setTimeout(() => { beben(); blitz("gold"); bossFall(gefallen); }, 500);
     if (logNeu.some((l) => /Feuerball|Flammen|Glut|Feuer/.test(l.t) && l.art === "wurf")) { const z = st.figuren.filter((f) => vorher.tp[f.id] > f.tp && f.seite === "gegner"); for (const f of z) { const p = figurPos(f.id); if (p) wolke(p.x, p.y, "feuer", 60); } }
     // Banner: neue Runde, Phasenwechsel, wer am Zug ist
     const phase = logNeu.find((l) => /Phase (II|III)|Das Siegel bricht|Die Krone des Königs bricht|zerfällt zu Eis und Licht/.test(l.t));
     if (phase) { beben(); blitz("eis"); banner((phase.t.match(/Phase (II|III)/) || [])[0] || "Die Wende", phase.t.replace(/^.*?: /, "").split(".")[0], "phase"); }
     else if (st.runde !== vorher.runde) banner(`Runde ${st.runde}`, "", "runde");
     else if (neu.akt !== vorher.akt && !st.ende) { const f = R.aktiv(st); if (f.seite === "spieler" && f.tp > 0) zugBanner(f); }
-    if (st.ende && endeGezeigt !== st.seed) { endeGezeigt = st.seed; if (st.ende === "sieg") { blitz("gold"); banner("Sieg", "", "sieg"); } }
+    if (st.ende && endeGezeigt !== st.seed) { endeGezeigt = st.seed; if (st.ende === "sieg") { const nachFall = gefallen ? 3300 : 0; setTimeout(() => { blitz("gold"); banner("Sieg", "", "sieg"); }, nachFall); } }
   }
 
-  window.ABFX = { nach, aktiv: () => !ruhig(), banner, bossIntro };
+
+  /* ---------- Erzählbühne: dieselbe Stimmung (Nebel, Glut, Schnee, Frost) hinter den Szenen ---------- */
+  let bKanal = null, bCtx = null, bTeile = [], bLauf = false, bArt = null;
+  function buehne(el, ab) {
+    document.body.classList.toggle("fx-an", !ruhig());
+    document.body.dataset.stimmung = STIMMUNG[ab] || "glut";
+    const c = el && el.querySelector(".sz-kanal"); if (!c || ruhig()) return;
+    const r = el.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
+    bKanal = c; bCtx = c.getContext("2d");
+    const art = STIMMUNG[ab] || "glut", e = { w: c.width, h: c.height, dpr };
+    if (bArt !== art || !bTeile.length) { bArt = art; bTeile = []; const n = art === "nebel" ? 14 : art === "glut" ? 46 : art === "frost" ? 40 : 70; for (let i = 0; i < n; i++) bTeile.push(neuAmb(art, e, true)); }
+    if (!bLauf) { bLauf = true; requestAnimationFrame(bSchleife); }
+  }
+  function bSchleife() {
+    if (!bKanal || !bKanal.isConnected || !bKanal.offsetParent) { bLauf = false; return; }
+    const e = { w: bKanal.width, h: bKanal.height, dpr: Math.min(2, window.devicePixelRatio || 1) }, c = bCtx;
+    c.clearRect(0, 0, e.w, e.h);
+    for (const p of bTeile) {
+      if (p.amb === "nebel") { p.x += p.v; if (p.x - p.r > e.w) p.x = -p.r; const g = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r); g.addColorStop(0, `rgba(200,220,210,${p.a})`); g.addColorStop(1, "rgba(200,220,210,0)"); c.fillStyle = g; c.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); continue; }
+      p.w += .02; p.y += p.amb === "glut" ? -p.v : p.v; p.x += Math.sin(p.w) * .4;
+      if (p.y < -12 || p.y > e.h + 12 || p.x > e.w + 12) Object.assign(p, neuAmb(p.amb, e, false));
+      const col = p.amb === "glut" ? "255,150,60" : p.amb === "frost" ? "190,230,255" : "235,242,255";
+      c.fillStyle = `rgba(${col},${p.a})`; c.beginPath(); c.arc(p.x, p.y, p.s, 0, 7); c.fill();
+    }
+    requestAnimationFrame(bSchleife);
+  }
+  window.ABFX = { nach, aktiv: () => !ruhig(), banner, bossIntro, bossFall, buehne };
 })();

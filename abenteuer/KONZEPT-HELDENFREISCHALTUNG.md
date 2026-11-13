@@ -188,10 +188,11 @@ Zum Launch soll der Aufstieg **aus den Kampagnen heraus** wandern: Helden haben 
 ## Teil D – Entscheidungen vom 13. November 2026
 
 - **Freischaltung nur über Kampagnen-Enden:** Ein neuer Held kommt dazu, wenn ein Konto ein **Ende einer Kampagne zum ersten Mal** erreicht. Gewählt wird aus drei Angeboten. Ein schon bekanntes Ende bringt keinen weiteren Helden. Damit ist B8, Frage 1 entschieden: Jedes Ende zählt einmal.
+- **Keine Chronik:** Die Chronik aus Teil A (Abschnitt 4 „Am Konto gespeichert“, Abschnitt 5 und Teil A, 3) entfällt. Sichtbar sind nur die Sammlung, der Fortschritt „x von y Enden“ je Kampagne und die Kampagnentitel.
 - **Keine Story-Freischaltungen:** keine eigenen Pfade oder Verzweigungen in den Kampagnen (B1, zweiter Punkt, und B8, Frage 3 entfallen).
-- **Reichweite:** 13 reguläre Enden (Moor 2, Grauwacht 5, Hochwacht 3, Krone 3) plus 3 Start-Helden ergeben 16 Freischaltungen. Das reicht für alle 15 Helden; ab dem 13. neuen Ende greift die Regel für die vollständige Sammlung (Titel, Chronikeintrag).
+- **Reichweite:** 13 reguläre Enden (Moor 2, Grauwacht 5, Hochwacht 3, Krone 3) plus 3 Start-Helden ergeben 16 Freischaltungen. Das reicht für alle 15 Helden; ab dem 13. neuen Ende greift die Regel für die vollständige Sammlung (Fortschritt und Kampagnentitel, keine Chronik).
 - **Schon bekanntes Ende:** Sieg wie immer, dazu der Hinweis, wie viele Enden der Kampagne noch offen sind. Keine Freischaltung.
-- **Sammlung vollständig:** Ein neues Ende wird als **Siegel in der Chronik** festgehalten. Wer **alle Enden einer Kampagne** gefunden hat, bekommt einen **Titel**, der neben dem Spielernamen erscheint: „Kenner des Schwarzmoors“, „Hüter von Grauwacht“, „Fackelträger des Nordens“, „Bezwinger der Eiskrone“ (Vorschläge).
+- **Sammlung vollständig:** Ein neues Ende bringt keinen Helden mehr, zählt aber im Fortschritt „x von y Enden“ (unter Charaktere). Eine Chronik gibt es bewusst nicht. Wer **alle Enden einer Kampagne** gefunden hat, bekommt einen **Titel**, der neben dem Spielernamen erscheint: „Kenner des Schwarzmoors“, „Hüter von Grauwacht“, „Fackelträger des Nordens“, „Bezwinger der Eiskrone“ (Vorschläge).
 - **Nach der Registrierung:** Übersicht „Deine Helden sind eingebucht“ mit den drei Helden und dem Hinweis, dass sie unter **Charaktere** verfügbar sind; „Weiter“ führt zur Startseite nach der Anmeldung.
 - **Prototyp:** `abenteuer/prototyp/helden.html` (nicht verlinkt, `noindex`). Er zeigt die Registrierung mit drei Runden, „Meine Helden“ mit gesperrten Helden, die Heldenwahl im Spiel und die Belohnung nach einem neuen Ende.
 

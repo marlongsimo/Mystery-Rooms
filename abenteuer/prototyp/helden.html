@@ -392,18 +392,18 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
     let inhalt = "";
     if (B.schritt === 0) {
       inhalt = `<p class="eyebrow">Kampagne gewonnen · Ende: ${esc(K.enden[B.ende])}</p><h1 class="gross">Sieg</h1><p class="unter">${esc(K.titel)}.</p><div class="zier"></div>
-        ${neuesEnde ? `<div class="hinweis-box"><b>Neues Ende entdeckt.</b> Zum ersten Mal habt ihr „${esc(K.enden[B.ende])}“ erreicht. ${S.sammlung.length >= 15 ? "Eure Sammlung ist schon vollständig. Dafür bekommt ihr einen Eintrag in eurer Chronik." : "Dafür schließt sich euch ein neuer Held an."}</div>
-          <div class="knoepfe" style="justify-content:center"><button class="btn gold" id="b-weiter">${S.sammlung.length >= 15 ? "Chronik ansehen" : "Belohnung ansehen"}</button></div>`
+        ${neuesEnde ? `<div class="hinweis-box"><b>Neues Ende entdeckt.</b> Zum ersten Mal habt ihr „${esc(K.enden[B.ende])}“ erreicht. ${S.sammlung.length >= 15 ? "Eure Sammlung ist schon vollständig, deshalb gibt es keinen neuen Helden. Das Ende zählt aber für euren Kampagnentitel." : "Dafür schließt sich euch ein neuer Held an."}</div>
+          <div class="knoepfe" style="justify-content:center"><button class="btn gold" id="b-weiter">${S.sammlung.length >= 15 ? "Weiter" : "Belohnung ansehen"}</button></div>`
         : `<div class="hinweis-box">Dieses Ende habt ihr schon einmal erreicht. Einen neuen Helden gibt es nur für ein Ende, das ihr zum ersten Mal erreicht. ${(() => { const n = Object.keys(K.enden).filter((e) => !S.enden.includes(B.kampagne + ":" + e)).length; return n === 0 ? `Alle Enden von „${esc(K.titel)}“ habt ihr schon entdeckt.` : `In „${esc(K.titel)}“ wartet noch ${n === 1 ? "ein weiteres Ende" : n + " weitere Enden"}.`; })()}</div>`}`;
     } else if (B.schritt === 2) {
       const pool = F.REIHE.filter((f) => !S.sammlung.includes(f));
       if (!pool.length) {
         const n = Object.keys(K.enden).length, g = Object.keys(K.enden).filter((e) => S.enden.includes(B.kampagne + ":" + e)).length, alle = g === n;
         const TITEL = { rabenmoor: "Kenner des Schwarzmoors", grauwacht: "Hüter von Grauwacht", hochwacht: "Fackelträger des Nordens", krone: "Bezwinger der Eiskrone" };
-        inhalt = `<p class="eyebrow">Sammlung vollständig · alle 15 Helden</p><h1 class="gross">Ein Eintrag in eurer Chronik</h1>
-          <div class="siegel"><div class="zeichen">✦</div><b>${esc(K.enden[B.ende])}</b><small>${esc(K.titel)} · Ende ${g} von ${n}</small></div>
-          <p class="unter" style="margin-top:18px">${alle ? `Ihr habt alle Enden dieser Kampagne gefunden. Dafür tragt ihr ab sofort den Titel <b style="color:var(--gold-hell);font-style:normal">„${TITEL[B.kampagne]}“</b>, er erscheint neben eurem Namen.` : `Jedes neue Ende wird als Siegel in der Chronik festgehalten. Wer alle ${n} Enden dieser Kampagne findet, bekommt den Titel „${TITEL[B.kampagne]}“.`}</p>
-          <div class="knoepfe" style="justify-content:center"><button class="btn leise" data-geh="start">Zur Startseite</button></div>`;
+        inhalt = `<p class="eyebrow">Sammlung vollständig · alle 15 Helden</p><h1 class="gross">${alle ? "Alle Enden gefunden" : "Neues Ende entdeckt"}</h1>
+          <div class="siegel"><div class="zeichen">${alle ? "♛" : "✦"}</div><b>${alle ? esc(TITEL[B.kampagne]) : esc(K.enden[B.ende])}</b><small>${esc(K.titel)} · ${g} von ${n} Enden</small></div>
+          <p class="unter" style="margin-top:18px">${alle ? `Ihr habt alle Enden dieser Kampagne gefunden. Ab sofort tragt ihr den Titel <b style="color:var(--gold-hell);font-style:normal">„${TITEL[B.kampagne]}“</b>, er erscheint neben eurem Namen.` : `Wer alle ${n} Enden dieser Kampagne findet, bekommt den Titel „${TITEL[B.kampagne]}“. Euren Fortschritt seht ihr unter Charaktere.`}</p>
+          <div class="knoepfe" style="justify-content:center"><button class="btn leise" data-geh="sammlung">Charaktere</button><button class="btn leise" data-geh="start">Zur Startseite</button></div>`;
       }
       else {
         if (!B.angebote) B.angebote = ziehen(pool, Math.min(3, pool.length));

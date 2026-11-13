@@ -1,6 +1,6 @@
 # MYTHARA – Die letzte Fackel von Hochwacht
 
-**Status:** Kampagnenkonzept, **nicht umgesetzt**. Vorgesehen als dritte Kampagne mit **Schwierigkeitsstufe 3**.
+**Status:** **Umgesetzt** und spielbar (Closed Beta seit 13. November 2026). Dritte Kampagne mit **Schwierigkeitsstufe 3**.
 Grundlage: „MYTHARA – Kampagnenkonzept Schwierigkeitsstufe 3: Die letzte Fackel von Hochwacht“, Konzeptversion 1.0 vom 12. November 2026. Teil A fasst das Konzept zusammen. Teil B enthält die Festlegungen und Anmerkungen aus dem Abgleich mit der Engine (Stand 12. November 2026).
 
 | | |

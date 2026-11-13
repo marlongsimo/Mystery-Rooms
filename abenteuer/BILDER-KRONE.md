@@ -1,6 +1,6 @@
 # Bilder für „Die Krone unter dem Eis“ (vollständige Sammlung – 14 Bilder)
 
-Die Kampagne ist noch ein Entwurf (im Hub nur mit `?entwurf`). Bis Bilder da sind, werden die Karten gezeichnet. **Die Prompts gebe ich gesammelt am Ende der Kampagne.** Danach baue ich sie ein und richte die unsichtbaren Hindernisse am Bild aus.
+**Status:** Alle Bilder sind eingebaut, die Kampagne ist freigegeben (Closed Beta seit 13. November 2026). Die Prompts kamen gesammelt am Ende der Kampagne; danach wurden die unsichtbaren Hindernisse jeder Karte am Bild ausgerichtet.
 
 **Stil** (wie die anderen Kampagnen): gemalte Fantasy-Illustration, düster-atmosphärisch, gedeckte Farben, Ölmalerei-/Gouache-Anmutung. Kein Text, keine Schrift, keine Wasserzeichen, keine Rahmen. Leitfarben: gebrochenes Steinwerk, blauschwarzes Eis, matte Kristalle, verrostetes Metall, wenige warme Lichtquellen; im Finale ein kontrollierter Gold- und Weißglanz. Ablage: `abenteuer/img/krone/`.
 

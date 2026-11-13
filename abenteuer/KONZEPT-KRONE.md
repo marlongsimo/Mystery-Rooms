@@ -1,6 +1,6 @@
 # Die Krone unter dem Eis – Konzept (Schwierigkeit Stufe 4)
 
-Grundlage: „MYTHARA Kampagnenkonzept Stufe 4 – Die Krone unter dem Eis“ (PDF). Hier steht die abgestimmte Fassung für die Umsetzung in der bestehenden Engine. **Status: Konzept, noch nicht gebaut.**
+Grundlage: „MYTHARA Kampagnenkonzept Stufe 4 – Die Krone unter dem Eis“ (PDF). Hier steht die abgestimmte Fassung für die Umsetzung in der bestehenden Engine. **Status: Umgesetzt** und spielbar (Closed Beta seit 13. November 2026).
 
 ## K1. Eckdaten (festgelegt)
 | Merkmal | Festlegung |
@@ -88,17 +88,17 @@ Umgesetzt in `js/regeln.js` (Abschnitt „Mechaniken“), eingeschaltet je Kampf
 
 Schon angelegte Gegner: Frostknecht, Eisgezeichneter, Glasschwärmer, Schwärmernest, Kälterufer, Runenleser, Kettenbestie, Eisenhirte. Ihre Werte sind vorläufig; das Balancing folgt mit den echten Kämpfen.
 
-### Stand Akt I (Entwurf, gebaut und getestet)
+### Stand Akt I (gebaut und getestet)
 `daten/krone.js`: Vorgeschichte (Grauwacht, Hochwacht) → Kaltbrunn (Ylva Hallgrim) → Routenwahl → je Weg Anmarsch (Probe), Wahl Kampf/Umgehen (ohne Belohnung) → Pfadkampf → Marktplatz (Hauptkampf 1) → Kammern der Verschleppten (optional) → Lager (Stufe 2) → Ende des Entwurfs.
 Pfadkämpfe: Sturmgrat (Jagdhorn sichern oder alle besiegen), Unterstollen (zwei Nester oder die Brutmutter, brüchiges Eis), Pilgerstraße (drei Grablichter brechen den Schutzkreis des Eidwächters; ab 5 Helden zwei Aktionen in Ruhe). Niederlagen führen weiter, nur ohne Belohnung.
 Siegquote Normal (Automatik, 120 Gruppen je Größe, 3–6 Helden): Pfadkämpfe 78–92 %, Marktplatz 72–86 % (6 Helden danach leicht entschärft), Kammern 85–93 % mit im Schnitt 2 von 3 Geretteten. Werkzeuge: `tools/auswertung-krone.js` (auch `--kalibrieren`), `tools/durchlauf-krone.js`; Test: `tests/krone.test.js`.
 
-### Stand Akt II und Archiv/Frostkammer (Entwurf, gebaut und getestet)
+### Stand Akt II und Archiv/Frostkammer (gebaut und getestet)
 Brücke (Durchbruch: Eisgitter aufschlagen, alle Stehenden auf die andere Seite; Verwundete werden mitgetragen; brüchige Felder sichtbar mit 2+ Geretteten) → Tor der Kronenwache (Eisenhirte mit Runenschild und Bodenstoß; zwei Runensäulen lassen ihn erstarren, ab 5 Helden drei Aktionen je Säule; der gerettete Wachmann hilft) → Lager (Stufe 3) → Archiv der Namen (drei Tafeln bis Runde 6, Kälterufer löscht, Runenleser, Schwärmer aus Kapseln; 2+ Tafeln = die Wahrheit über das Kronenherz) → Frostkammer (finden, herausfordern, verhandeln oder gehen; Frostmatrone mit Frostwelle, Eiskorridoren und Brut) → Ende des Entwurfs vor dem Kronensaal.
 Neu in der Engine: Ziel-Wirkung „öffnet“ (Gitter, Türen), angefangene Ziele (`start`), Gegner mit negativem Grundwert kommen erst ab einer Gruppengröße.
 Siegquote Normal (Automatik): Brücke 81–88 %, Tor 76–85 %, Archiv 78–88 %, Frostkammer 73–91 %. Lang: Archiv und Frostkammer mit 5–6 Helden (12–16 Runden).
 
-### Stand Finale (Entwurf, gebaut und getestet)
+### Stand Finale (gebaut und getestet)
 Vor dem Kronensaal: Anselm (bei Verrat in Grauwacht Gegenspieler, sonst geht er), Kernsplitter, Wachmann. Kronensaal: Der König unter dem Eis mit Kristallschutz (Kernsplitter bricht ihn für 3 Runden), Kronenschlag in einer Linie (angekündigt), Rückstoß; Phase II (2/3): Ehrengarde aus den Seitengängen, bis alle drei Runenpunkte geschlossen sind (bricht auch den Schutz); Phase III (1/3): RK −2, der Boden reißt auf. Sieg: König besiegt oder drei Aktionen in Ruhe am Kronenherz. Schwärmer je nach Frostmatrone (besiegt: keine, verschont: 1–2 Wellen, sonst 3). Danach Entscheidung: stabilisieren, versiegeln, umleiten – jeweils mit Epilog (Weg, Gerettete, Frostmatrone, Anselm, Sera, Gefallene). Siegquote Normal 76–86 %.
 
 ### Stand nach den Bildern (regulär im Hub, Stufe 4)

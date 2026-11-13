@@ -14,7 +14,10 @@
   let alt = null, stimmung = null, partikel = [], kanal = null, ctx = null, laeuft = false, bossGezeigt = null, endeGezeigt = null;
 
   /* ---------- Stimmung je Kampagne ---------- */
-  const STIMMUNG = { rabenmoor: "nebel", grauwacht: "glut", hochwacht: "schnee", krone: "frost" };
+  const STIMMUNG = { weidenhain: "glut", rabenmoor: "nebel", graufurt: "regen", grauwacht: "glut", hochwacht: "schnee", krone: "frost" };
+  // Farbstimmung der Oberfläche (CSS kennt glut, nebel, schnee, frost): Regen nutzt die Nebel-Farben
+  const stil = (art) => (art === "regen" ? "nebel" : art);
+  const REGEN = (c, p, e) => { p.y += p.v; p.x -= p.v * .2; if (p.y - p.l > e.h || p.x < -20) Object.assign(p, neuAmb("regen", e, false)); c.strokeStyle = `rgba(190,210,225,${p.a})`; c.lineWidth = 1.3 * e.dpr; c.beginPath(); c.moveTo(p.x, p.y); c.lineTo(p.x + p.l * .2, p.y - p.l); c.stroke(); };
   const FARBE = { feuer: [255, 140, 40], heil: [120, 255, 160], gold: [255, 220, 130], blut: [255, 80, 70], eis: [170, 225, 255] };
   function kampagne() { try { return (window.AB && window.AB.META && window.AB.META().id) || "grauwacht"; } catch (e) { return "grauwacht"; } }
   function ebene() {
@@ -29,11 +32,12 @@
   function ambient(art) {
     const e = ebene(); if (!e) return;
     partikel = partikel.filter((p) => !p.amb);
-    const n = art === "nebel" ? 18 : art === "glut" ? 40 : art === "frost" ? 34 : 60;
+    const n = art === "regen" ? 110 : art === "nebel" ? 18 : art === "glut" ? 40 : art === "frost" ? 34 : 60;
     for (let i = 0; i < n; i++) partikel.push(neuAmb(art, e, true));
   }
   function neuAmb(art, e, zufall) {
     const x = Math.random() * e.w, y = zufall ? Math.random() * e.h : (art === "glut" ? e.h + 10 : -10);
+    if (art === "regen") return { amb: art, x: Math.random() * e.w * 1.25, y: zufall ? Math.random() * e.h : -20, l: (12 + Math.random() * 16) * e.dpr, v: (9 + Math.random() * 7) * e.dpr, a: .16 + Math.random() * .24 };
     if (art === "nebel") return { amb: art, x, y, r: (90 + Math.random() * 150) * e.dpr, v: (.12 + Math.random() * .25) * e.dpr, a: .05 + Math.random() * .05 };
     if (art === "glut") return { amb: art, x, y, s: (1 + Math.random() * 1.8) * e.dpr, v: (.25 + Math.random() * .6) * e.dpr, w: Math.random() * 6, a: .35 + Math.random() * .5 };
     return { amb: art, x, y, s: (.8 + Math.random() * (art === "frost" ? 1.4 : 2)) * e.dpr, v: (.25 + Math.random() * .7) * e.dpr, w: Math.random() * 6, a: .35 + Math.random() * .4 };
@@ -45,6 +49,7 @@
     for (let i = partikel.length - 1; i >= 0; i--) {
       const p = partikel[i];
       if (p.amb === "nebel") { p.x += p.v; if (p.x - p.r > e.w) p.x = -p.r; const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r); g.addColorStop(0, `rgba(200,220,210,${p.a})`); g.addColorStop(1, "rgba(200,220,210,0)"); ctx.fillStyle = g; ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); continue; }
+      if (p.amb === "regen") { REGEN(ctx, p, e); continue; }
       if (p.amb) {
         p.w += .02; p.y += p.amb === "glut" ? -p.v : p.v; p.x += Math.sin(p.w) * .4;
         if (p.y < -12 || p.y > e.h + 12) Object.assign(p, neuAmb(p.amb, e, false));
@@ -179,7 +184,7 @@
     if (!st) return;
     document.body.classList.toggle("fx-an", !ruhig());
     gruppe(st, R); bossKarte(st, R); kopf(st);
-    document.body.dataset.stimmung = STIMMUNG[kampagne()] || "glut";
+    document.body.dataset.stimmung = stil(STIMMUNG[kampagne()] || "glut");
     const neu = { pos: {}, tp: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
     for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; }
     const wrap = $(".karte-wrap"); if (wrap) wrap.classList.toggle("mit-bild", Boolean(st.karte.bild));
@@ -232,13 +237,13 @@
   let bKanal = null, bCtx = null, bTeile = [], bLauf = false, bArt = null;
   function buehne(el, ab) {
     document.body.classList.toggle("fx-an", !ruhig());
-    document.body.dataset.stimmung = STIMMUNG[ab] || "glut";
+    document.body.dataset.stimmung = stil(STIMMUNG[ab] || "glut");
     const c = el && el.querySelector(".sz-kanal"); if (!c || ruhig()) return;
     const r = el.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
     c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
     bKanal = c; bCtx = c.getContext("2d");
     const art = STIMMUNG[ab] || "glut", e = { w: c.width, h: c.height, dpr };
-    if (bArt !== art || !bTeile.length) { bArt = art; bTeile = []; const n = art === "nebel" ? 14 : art === "glut" ? 46 : art === "frost" ? 40 : 70; for (let i = 0; i < n; i++) bTeile.push(neuAmb(art, e, true)); }
+    if (bArt !== art || !bTeile.length) { bArt = art; bTeile = []; const n = art === "regen" ? 120 : art === "nebel" ? 14 : art === "glut" ? 46 : art === "frost" ? 40 : 70; for (let i = 0; i < n; i++) bTeile.push(neuAmb(art, e, true)); }
     if (!bLauf) { bLauf = true; requestAnimationFrame(bSchleife); }
   }
   function bSchleife() {
@@ -247,6 +252,7 @@
     c.clearRect(0, 0, e.w, e.h);
     for (const p of bTeile) {
       if (p.amb === "nebel") { p.x += p.v; if (p.x - p.r > e.w) p.x = -p.r; const g = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r); g.addColorStop(0, `rgba(200,220,210,${p.a})`); g.addColorStop(1, "rgba(200,220,210,0)"); c.fillStyle = g; c.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); continue; }
+      if (p.amb === "regen") { REGEN(c, p, e); continue; }
       p.w += .02; p.y += p.amb === "glut" ? -p.v : p.v; p.x += Math.sin(p.w) * .4;
       if (p.y < -12 || p.y > e.h + 12 || p.x > e.w + 12) Object.assign(p, neuAmb(p.amb, e, false));
       const col = p.amb === "glut" ? "255,150,60" : p.amb === "frost" ? "190,230,255" : "235,242,255";

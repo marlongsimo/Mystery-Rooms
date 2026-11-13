@@ -117,6 +117,37 @@
   (() => { const s = AB.SETUP(); document.querySelectorAll("[data-schwer-wahl]").forEach((x) => x.classList.toggle("an", x.dataset.schwerWahl === s.schwierigkeit)); })();
 
   /** Intro (Einleitung) zeigen und danach cb – kommt nach der Heldenwahl, direkt vor dem Abenteuer */
-  function intro(cb) { nachIntro = cb; glocke(0.8); AB.zeigeSektion("einleitung"); einl.start(0); }
+  function intro(cb) {
+    nachIntro = cb;
+    const weiter = () => { glocke(0.8); AB.zeigeSektion("einleitung"); einl.start(0); };
+    vorladen(); titelkarte(weiter);
+  }
+  /** Titelsequenz: das Titelbild groß mit langsamem Zoom, Titel und Untertitel blenden ein. Tippen überspringt.
+   *  Aus bei ?schnell (Tests), bei „Bewegung reduzieren“ und wenn die Effekte abgeschaltet sind. */
+  function titelkarte(weiter) {
+    const m = AB.META ? AB.META() : null, ruhig = window.ABFX ? !window.ABFX.aktiv() : true;
+    if (!m || !m.bild || ruhig) return weiter();
+    const k = document.createElement("div"); k.className = "titelkarte"; k.setAttribute("role", "dialog"); k.setAttribute("aria-label", m.titel);
+    k.innerHTML = `<div class="tk-bild" style="background-image:url('${esc(new URL(m.bild, location.href).href)}')"></div><div class="tk-schleier"></div>
+      <div class="tk-text"><p class="tk-marke">Mythara</p><h1>${esc(m.titel)}</h1><i class="tk-linie"></i>${m.untertitel ? `<p class="tk-unter">${esc(m.untertitel)}</p>` : ""}</div>
+      <button class="tk-weiter" type="button">Tippen zum Fortfahren</button>`;
+    document.body.appendChild(k);
+    let zu = false;
+    const ende = () => { if (zu) return; zu = true; clearTimeout(uhr); document.removeEventListener("keydown", taste); k.classList.add("geht"); weiter(); setTimeout(() => k.remove(), 800); };
+    const taste = (e) => { if (e.key === "Enter" || e.key === " " || e.key === "Escape") { e.preventDefault(); ende(); } };
+    const uhr = setTimeout(ende, 6500);
+    k.onclick = ende; document.addEventListener("keydown", taste);
+    glocke(0.6);
+  }
+  /** Bilder des gewählten Abenteuers im Hintergrund vorladen, damit Szenen und Karten ohne Nachladen erscheinen */
+  function vorladen() {
+    const id = AB.SETUP().abenteuer || "grauwacht", D = window.ABD_ALLE && window.ABD_ALLE[id];
+    if (!D || vorladen.fertig === id || new URLSearchParams(location.search).has("schnell")) return; vorladen.fertig = id;
+    const bilder = new Set(), suche = (o, tiefe) => { if (!o || tiefe > 6) return; if (typeof o === "string") { if (/^img\/[\w\-\/]+\.(webp|png|jpe?g)$/.test(o)) bilder.add(o); } else if (typeof o === "object") for (const v of Object.values(o)) suche(v, tiefe + 1); };
+    suche(D.META, 0); suche(D.KARTEN, 0); suche(D.SZENEN, 0);
+    const liste = [...bilder]; let i = 0;
+    const naechstes = () => { if (i >= liste.length) return; const b = new Image(); b.onload = b.onerror = () => setTimeout(naechstes, 60); b.src = liste[i++]; };
+    naechstes(); naechstes();
+  }
   window.ABE = { glocke, intro, abenteuerTexte };
 })();

@@ -1451,3 +1451,25 @@ body[data-stimmung="frost"] .szene .szene-kopf .glocke i.an, body[data-stimmung=
 @media (prefers-reduced-motion: reduce) { .fx-fall.zeigen .fx-fall-portraet { animation: none; filter: grayscale(1) brightness(.5); } }
 .fx-intro.boss { justify-content: center; }
 .fx-intro.boss .fx-intro-portraet { width: min(22vw, 38vh); }
+
+/* ---------- Titelsequenz vor der Einleitung (einstieg.js: titelkarte) ---------- */
+.titelkarte { position: fixed; inset: 0; z-index: 400; background: #07080b; overflow: hidden; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; animation: tk-ein .9s ease both; transition: opacity .7s ease; }
+.titelkarte.geht { opacity: 0; pointer-events: none; }
+.tk-bild { position: absolute; inset: -2%; background-size: cover; background-position: center; animation: tk-zoom 9s ease-out both; }
+.tk-schleier { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,8,11,.35) 0%, rgba(7,8,11,0) 30%, rgba(7,8,11,.55) 62%, rgba(7,8,11,.94) 100%), radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.6) 100%); }
+.tk-text { position: relative; text-align: center; padding: 0 24px calc(13vh + env(safe-area-inset-bottom)); max-width: 1000px; }
+.tk-marke { font-family: "Cinzel", serif; letter-spacing: .5em; text-indent: .5em; text-transform: uppercase; font-size: clamp(11px, 1.2vw, 15px); color: #d9b46a; margin: 0 0 14px; animation: tk-auf 1.2s .5s ease both; }
+.tk-text h1 { font-family: "Cinzel", serif; font-weight: 600; font-size: clamp(30px, 6vw, 76px); line-height: 1.08; margin: 0; color: #f6ecd6; text-shadow: 0 4px 30px rgba(0,0,0,.85), 0 0 60px rgba(217,180,106,.25); animation: tk-auf 1.6s .9s ease both; }
+.tk-linie { display: block; height: 1px; width: min(360px, 60vw); margin: 20px auto 16px; background: linear-gradient(90deg, transparent, #d9b46a, transparent); transform-origin: center; animation: tk-linie 1.4s 1.7s ease both; }
+.tk-unter { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: clamp(17px, 2.2vw, 26px); color: #e2dac8; margin: 0; text-shadow: 0 2px 14px rgba(0,0,0,.9); animation: tk-auf 1.4s 2.1s ease both; }
+.tk-weiter { position: absolute; left: 0; right: 0; bottom: calc(4vh + env(safe-area-inset-bottom)); background: none; border: 0; color: rgba(226,218,200,.6); font: 600 12px "Inter", sans-serif; letter-spacing: .22em; text-transform: uppercase; cursor: pointer; animation: tk-auf 1s 3.2s ease both; }
+@keyframes tk-ein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tk-zoom { from { transform: scale(1); } to { transform: scale(1.12); } }
+@keyframes tk-auf { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes tk-linie { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
+
+/* ---------- Als App installiert (ohne Browserleiste): Platz für Notch und Home-Balken ---------- */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  header.top { padding-top: calc(env(safe-area-inset-top) + 8px); }
+  header.top .back { display: none; }
+}

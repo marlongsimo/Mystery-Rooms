@@ -19,7 +19,11 @@
 --     bekommen alle 15 Helden (einmalig, wird beim erneuten Ausführen nicht wiederholt).
 --   • Spieler ohne Konto (Gäste) haben keine Sammlung; das Spiel gibt ihnen ein festes Starter-Set.
 --
--- Codes anlegen (nur im SQL Editor, nicht aus dem Spiel heraus möglich):
+-- Admins: dürfen im Spiel unter „Code-Übersicht“ Codes anlegen und sperren. Festlegen nur hier im SQL Editor:
+--   insert into public.rpg_admins (user_id) select user_id from public.rpg_profiles where lower(handle) = lower('DeinName') on conflict do nothing;
+--   delete from public.rpg_admins where user_id = (select user_id from public.rpg_profiles where lower(handle) = lower('DeinName'));
+--
+-- Codes anlegen im SQL Editor (geht zusätzlich zur Code-Übersicht im Spiel):
 --   select public.rpg_create_unlock_code('Beta-Tester Runde 1', 20, 90);
 --     → gibt den Code einmal im Klartext zurück (z. B. K7QM-2XHP-9RTA), 20 Einlösungen, 90 Tage gültig
 --   select public.rpg_disable_unlock_code('Beta-Tester Runde 1');   → sperrt alle Codes mit dieser Bezeichnung
@@ -111,7 +115,13 @@ create table if not exists public.rpg_ending_claims (
   primary key (user_id, campaign_id)
 );
 
--- Freischalt-Codes (nur als Hash gespeichert)
+-- Admins (nur per SQL Editor eintragen, siehe Kopf)
+create table if not exists public.rpg_admins (
+  user_id   uuid        primary key references auth.users(id) on delete cascade,
+  added_at  timestamptz not null default now()
+);
+
+-- Freischalt-Codes (nur als Hash gespeichert). for_user: nur dieses Konto darf ihn einlösen (sonst jeder)
 create table if not exists public.rpg_unlock_codes (
   id          uuid        primary key default gen_random_uuid(),
   code_hash   text        not null unique,
@@ -122,6 +132,8 @@ create table if not exists public.rpg_unlock_codes (
   active      boolean     not null default true,
   created_at  timestamptz not null default now()
 );
+alter table public.rpg_unlock_codes add column if not exists for_user uuid references auth.users(id) on delete cascade;
+alter table public.rpg_unlock_codes add column if not exists created_by uuid references auth.users(id) on delete set null;
 create table if not exists public.rpg_unlock_redemptions (
   code_id      uuid        not null references public.rpg_unlock_codes(id) on delete cascade,
   user_id      uuid        not null references auth.users(id) on delete cascade,
@@ -154,9 +166,10 @@ alter table public.rpg_unlock_codes        enable row level security;
 alter table public.rpg_unlock_redemptions  enable row level security;
 alter table public.rpg_unlock_attempts     enable row level security;
 alter table public.rpg_sammlung_meta       enable row level security;
+alter table public.rpg_admins              enable row level security;
 revoke all on public.rpg_hero_catalog, public.rpg_adventure_endings, public.rpg_hero_collection, public.rpg_hero_offers,
   public.rpg_hero_endings_found, public.rpg_ending_claims, public.rpg_unlock_codes, public.rpg_unlock_redemptions,
-  public.rpg_unlock_attempts, public.rpg_sammlung_meta from anon, authenticated;
+  public.rpg_unlock_attempts, public.rpg_sammlung_meta, public.rpg_admins from anon, authenticated;
 
 -- ---------------------------------------------------------------------
 -- 4) Bestandsschutz: einmalig alle 15 Helden für alle Konten, die es jetzt schon gibt
@@ -235,6 +248,7 @@ begin
   if not public.rpg_sammlung_konto() then return jsonb_build_object('konto', false); end if;
   return jsonb_build_object(
     'konto', true,
+    'admin', exists (select 1 from public.rpg_admins where user_id = v_uid),
     'helden', coalesce((select jsonb_agg(hero_id order by unlocked_at) from public.rpg_hero_collection where user_id = v_uid), '[]'::jsonb),
     'start_offen', (select count(*) from public.rpg_hero_collection where user_id = v_uid) < 3
                    and (select count(*) from public.rpg_hero_collection where user_id = v_uid and quelle = 'start') < 3,
@@ -362,6 +376,7 @@ begin
   if exists (select 1 from public.rpg_unlock_redemptions where code_id = v_k.id and user_id = v_uid) then
     raise exception 'Diesen Code hast du schon eingelöst.';
   end if;
+  if v_k.for_user is not null and v_k.for_user <> v_uid then raise exception 'Dieser Code ist für ein anderes Konto bestimmt.'; end if;
   if not v_k.active then raise exception 'Dieser Code ist nicht mehr gültig.'; end if;
   if v_k.expires_at < now() then raise exception 'Dieser Code ist abgelaufen.'; end if;
   if v_k.uses >= v_k.max_uses then raise exception 'Dieser Code wurde schon so oft eingelöst wie möglich.'; end if;
@@ -403,10 +418,74 @@ begin
 end;
 $$;
 
-create or replace view public.rpg_unlock_codes_uebersicht as
-  select label as bezeichnung, uses as eingeloest, max_uses as hoechstens, expires_at as gueltig_bis, active as aktiv, created_at as angelegt
-  from public.rpg_unlock_codes order by created_at desc;
+drop view if exists public.rpg_unlock_codes_uebersicht;
+create view public.rpg_unlock_codes_uebersicht as
+  select k.label as bezeichnung, fp.handle as nur_fuer, k.uses as eingeloest, k.max_uses as hoechstens, k.expires_at as gueltig_bis, k.active as aktiv,
+    k.created_at as angelegt, cp.handle as angelegt_von
+  from public.rpg_unlock_codes k
+  left join public.rpg_profiles fp on fp.user_id = k.for_user
+  left join public.rpg_profiles cp on cp.user_id = k.created_by
+  order by k.created_at desc;
 revoke all on public.rpg_unlock_codes_uebersicht from anon, authenticated;
+
+-- ---------------------------------------------------------------------
+-- 7b) Code-Übersicht im Spiel (nur Admins). Grenzen: höchstens 100 Einlösungen, 365 Tage, 20 neue Codes je Tag und Admin.
+-- ---------------------------------------------------------------------
+create or replace function public.rpg_ist_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select public.rpg_sammlung_konto() and exists (select 1 from public.rpg_admins where user_id = auth.uid());
+$$;
+
+-- p_fuer: Benutzername, der den Code einlösen darf (leer = jede Person)
+create or replace function public.rpg_admin_create_code(p_label text, p_fuer text default null, p_max_uses integer default 1, p_valid_days integer default 90)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare v_uid uuid := auth.uid(); v_fuer uuid; v_handle text; v_code text; v_max integer; v_tage integer;
+begin
+  if not public.rpg_ist_admin() then raise exception 'Nur Admins können Codes anlegen.'; end if;
+  if coalesce(trim(p_label), '') = '' then raise exception 'Bitte eine Bezeichnung angeben.'; end if;
+  if (select count(*) from public.rpg_unlock_codes where created_by = v_uid and created_at > now() - interval '1 day') >= 20 then
+    raise exception 'Höchstens 20 neue Codes pro Tag.';
+  end if;
+  if coalesce(trim(p_fuer), '') <> '' then
+    select p.user_id, p.handle into v_fuer, v_handle from public.rpg_profiles p where lower(p.handle) = lower(trim(p_fuer));
+    if v_fuer is null or not public.rpg_ist_konto(v_fuer) then raise exception 'Ein Konto „%“ gibt es nicht.', trim(p_fuer); end if;
+  end if;
+  v_max := case when v_fuer is not null then 1 else least(100, greatest(1, coalesce(p_max_uses, 1))) end;
+  v_tage := least(365, greatest(1, coalesce(p_valid_days, 90)));
+  loop
+    v_code := public.rpg_neuer_code();
+    exit when not exists (select 1 from public.rpg_unlock_codes where code_hash = public.rpg_link_hash(v_code));
+  end loop;
+  insert into public.rpg_unlock_codes (code_hash, label, max_uses, expires_at, for_user, created_by)
+  values (public.rpg_link_hash(v_code), left(trim(p_label), 80), v_max, now() + make_interval(days => v_tage), v_fuer, v_uid);
+  return jsonb_build_object('code', v_code, 'bezeichnung', left(trim(p_label), 80), 'nur_fuer', v_handle, 'hoechstens', v_max,
+    'gueltig_bis', now() + make_interval(days => v_tage));
+end;
+$$;
+
+-- Die neuesten 200 Codes (ohne Klartext: der wird nur beim Anlegen einmal gezeigt)
+create or replace function public.rpg_admin_codes()
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.rpg_ist_admin() then raise exception 'Nur Admins sehen die Code-Übersicht.'; end if;
+  return coalesce((select jsonb_agg(x order by x.angelegt desc) from (
+    select k.id, k.label as bezeichnung, fp.handle as nur_fuer, k.uses as eingeloest, k.max_uses as hoechstens, k.expires_at as gueltig_bis,
+      k.active as aktiv, k.created_at as angelegt, cp.handle as angelegt_von
+    from public.rpg_unlock_codes k
+    left join public.rpg_profiles fp on fp.user_id = k.for_user
+    left join public.rpg_profiles cp on cp.user_id = k.created_by
+    order by k.created_at desc limit 200) x), '[]'::jsonb);
+end;
+$$;
+
+create or replace function public.rpg_admin_disable_code(p_id uuid)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if not public.rpg_ist_admin() then raise exception 'Nur Admins können Codes sperren.'; end if;
+  update public.rpg_unlock_codes set active = false where id = p_id and active;
+  return found;
+end;
+$$;
 
 -- Spieltisch: Helden, die der Tisch steuern darf, kommen aus der Sammlung des Hosts.
 -- Nur Host und Tisch-Gerät der Kampagne dürfen fragen (z. B. nach „Auf anderem Gerät spielen“).
@@ -426,10 +505,12 @@ $$;
 -- 8) Ausführungsrechte
 -- ---------------------------------------------------------------------
 revoke all on function public.rpg_sammlung_konto(), public.rpg_hero_ziehen(uuid, integer, text[]), public.rpg_hero_angebot_json(public.rpg_hero_offers),
-  public.rpg_create_unlock_code(text, integer, integer), public.rpg_disable_unlock_code(text) from public, anon, authenticated;
+  public.rpg_create_unlock_code(text, integer, integer), public.rpg_disable_unlock_code(text), public.rpg_ist_admin() from public, anon, authenticated;
 revoke all on function public.rpg_my_heroes(), public.rpg_hero_start_offer(), public.rpg_hero_pick(uuid, text), public.rpg_claim_ending(uuid),
-  public.rpg_redeem_unlock_code(text), public.rpg_campaign_heroes(uuid) from public, anon;
+  public.rpg_redeem_unlock_code(text), public.rpg_campaign_heroes(uuid),
+  public.rpg_admin_create_code(text, text, integer, integer), public.rpg_admin_codes(), public.rpg_admin_disable_code(uuid) from public, anon;
 grant execute on function public.rpg_my_heroes(), public.rpg_hero_start_offer(), public.rpg_hero_pick(uuid, text), public.rpg_claim_ending(uuid),
-  public.rpg_redeem_unlock_code(text), public.rpg_campaign_heroes(uuid) to authenticated;
+  public.rpg_redeem_unlock_code(text), public.rpg_campaign_heroes(uuid),
+  public.rpg_admin_create_code(text, text, integer, integer), public.rpg_admin_codes(), public.rpg_admin_disable_code(uuid) to authenticated;
 
 commit;

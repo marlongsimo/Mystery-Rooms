@@ -100,6 +100,22 @@
 .sm-code-form { display: grid; gap: 8px; margin-top: 8px; }
 .sm-code-form input { font: 600 18px Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line, rgba(197,162,103,.26)); background: rgba(0,0,0,.3); color: var(--text, #ece6da); }
 
+/* Code-Übersicht (Admins) */
+.sm-admin-form { display: grid; gap: 10px; margin: 6px 0 14px; }
+.sm-admin-form label { display: grid; gap: 4px; font-size: 13px; color: var(--muted, #a7afb9); }
+.sm-admin-form input:not([type=radio]), .sm-admin-form select { font: 15px Inter, sans-serif; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line, rgba(197,162,103,.26)); background: rgba(0,0,0,.3); color: var(--text, #ece6da); }
+.sm-a-wahl { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.sm-a-wahl legend { font-size: 13px; color: var(--muted, #a7afb9); margin-bottom: 4px; }
+.sm-a-wahl label { display: flex; align-items: center; gap: 6px; color: var(--text, #ece6da); font-size: 14px; }
+.sm-a-reihe { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.sm-code-neu { margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: linear-gradient(90deg, rgba(224,178,96,.18), rgba(0,0,0,.25)); box-shadow: inset 0 0 0 1px rgba(224,178,96,.5); }
+.sm-code-anzeige { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 8px 0; }
+.sm-code-anzeige b { font: 600 24px/1.2 Inter, monospace; letter-spacing: .12em; color: #f6dc9c; user-select: all; }
+.sm-code-liste li > span:first-child { display: grid; gap: 2px; flex: 1 1 200px; }
+.sm-code-liste small { color: var(--muted, #a7afb9); font-size: 12px; }
+.sm-code-status { font-style: normal; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,.08); color: var(--muted, #a7afb9); }
+.sm-code-status.aktiv { background: rgba(127,179,151,.18); color: #9fd4b4; }
+
 @media (max-width: 900px) { .sm-enden { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 620px) {
   .sm-inhalt { padding: 22px 14px 48px; }

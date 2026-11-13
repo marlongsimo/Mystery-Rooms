@@ -171,3 +171,41 @@ select pg_temp.fehler(format('select public.rpg_redeem_unlock_code(%L)', :'zu'),
 reset role;
 select pg_temp.ok((select uses from public.rpg_unlock_codes where label = 'Beta-Tester') = 2, 'Zähler der Einlösungen stimmt');
 select pg_temp.ok((select count(*) from public.rpg_unlock_codes_uebersicht) = 3, 'Übersicht der Codes für den SQL Editor');
+
+-- ---------- Admins: Code-Übersicht im Spiel ----------
+set role authenticated;
+select pg_temp.als('P');
+select pg_temp.fehler('select public.rpg_admin_codes()', 'Nur Admins', 'Normales Konto sieht die Code-Übersicht nicht');
+select pg_temp.fehler($$select public.rpg_admin_create_code('Versuch')$$, 'Nur Admins', 'Normales Konto kann keine Codes anlegen');
+select pg_temp.ok(not (public.rpg_my_heroes()->>'admin')::boolean, 'Normales Konto: admin = false');
+select pg_temp.fehler('insert into public.rpg_admins (user_id) values (auth.uid())', 'permission denied', 'Niemand kann sich selbst zum Admin machen');
+select pg_temp.als('G');
+select pg_temp.fehler('select public.rpg_admin_codes()', 'Nur Admins', 'Gast sieht die Code-Übersicht nicht');
+reset role;
+insert into public.rpg_admins (user_id) select user_id from public.rpg_profiles where lower(handle) = lower('neuling');
+set role authenticated;
+select pg_temp.als('N');
+select pg_temp.ok((public.rpg_my_heroes()->>'admin')::boolean, 'Admin per SQL eingetragen: admin = true');
+select public.rpg_admin_create_code('Für Mitspieler', 'mitspieler', 5, 90) as pers \gset
+select pg_temp.ok(:'pers'::jsonb->>'nur_fuer' = 'Mitspieler' and (:'pers'::jsonb->>'hoechstens')::int = 1, 'Persönlicher Code: nur für „Mitspieler“, immer 1× einlösbar');
+select public.rpg_admin_create_code('Für alle', null, 1, 90) as offen \gset
+select pg_temp.ok(:'offen'::jsonb->>'nur_fuer' is null and (:'offen'::jsonb->>'hoechstens')::int = 1, 'Offener Code: jede Person, 1×');
+select pg_temp.ok((public.rpg_admin_create_code('Viel', '', 5000, 9999)->>'hoechstens')::int = 100, 'Grenze: höchstens 100 Einlösungen');
+select pg_temp.fehler($$select public.rpg_admin_create_code('X', 'gibtsnicht')$$, 'gibt es nicht', 'Unbekannter Benutzername');
+select pg_temp.fehler($$select public.rpg_admin_create_code('  ')$$, 'Bezeichnung', 'Bezeichnung ist Pflicht');
+select pg_temp.ok((select count(*) from jsonb_array_elements(public.rpg_admin_codes()) c where c->>'angelegt_von' = 'Neuling') = 3, 'Code-Übersicht zeigt, wer angelegt hat');
+select pg_temp.ok(not exists (select 1 from jsonb_array_elements(public.rpg_admin_codes()) c where c ? 'code' or c ? 'code_hash'), 'Code-Übersicht zeigt keine Codes im Klartext oder als Hash');
+reset role; delete from public.rpg_unlock_attempts; set role authenticated;
+select pg_temp.als('Z');
+select pg_temp.fehler(format('select public.rpg_redeem_unlock_code(%L)', :'pers'::jsonb->>'code'), 'anderes Konto', 'Persönlicher Code: ein anderes Konto kann ihn nicht einlösen');
+select pg_temp.ok((public.rpg_redeem_unlock_code(:'offen'::jsonb->>'code')->>'gesamt')::int = 15, 'Offener Code: beliebiges Konto löst ihn ein');
+select pg_temp.als('P');
+select pg_temp.fehler(format('select public.rpg_redeem_unlock_code(%L)', :'offen'::jsonb->>'code'), 'so oft eingelöst', 'Offener Code 1×: danach verbraucht');
+select pg_temp.ok((public.rpg_redeem_unlock_code(:'pers'::jsonb->>'code')->>'gesamt')::int = 15, 'Persönlicher Code: der Empfänger löst ihn ein');
+select pg_temp.als('N');
+select pg_temp.ok(public.rpg_admin_disable_code((select (c->>'id')::uuid from jsonb_array_elements(public.rpg_admin_codes()) c where c->>'bezeichnung' = 'Viel')), 'Admin sperrt einen Code');
+select pg_temp.ok((select not (c->>'aktiv')::boolean from jsonb_array_elements(public.rpg_admin_codes()) c where c->>'bezeichnung' = 'Viel'), 'Gesperrt in der Übersicht');
+select public.rpg_admin_create_code('Serie ' || i) from generate_series(1, 17) i; -- zusammen mit den 3 von oben: 20
+select pg_temp.fehler($$select public.rpg_admin_create_code('Eins zu viel')$$, 'Höchstens 20', 'Grenze: 20 neue Codes pro Tag');
+reset role;
+select pg_temp.ok((select count(*) from public.rpg_unlock_codes_uebersicht where nur_fuer = 'Mitspieler' and angelegt_von = 'Neuling') = 1, 'SQL-Übersicht zeigt Empfänger und Admin');

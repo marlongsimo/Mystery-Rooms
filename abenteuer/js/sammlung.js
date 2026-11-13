@@ -350,6 +350,12 @@ const bildVon = (ab) => new URL(`img/${KAMPAGNEN[ab] ? ab : "grauwacht"}/titel.w
     return r;
   }
 
+  /* ---------- Code-Übersicht für Admins (Admin wird nur per SQL festgelegt, der Server prüft jeden Aufruf) ---------- */
+  const istAdmin = () => Boolean(S.geladen && S.installiert && S.konto && S.admin);
+  const adminCodes = () => rpc("rpg_admin_codes", {});
+  const adminErstellen = (o) => rpc("rpg_admin_create_code", { p_label: o.bezeichnung, p_fuer: o.fuer || null, p_max_uses: o.anzahl || 1, p_valid_days: o.tage || 90 });
+  const adminSperren = (id) => rpc("rpg_admin_disable_code", { p_id: id });
+
   /* ---------- Sammlung als Seite (Charaktere im Hub) ---------- */
   /** Fortschritt je Kampagne: gefundene Enden */
   function endenHtml() {
@@ -371,5 +377,6 @@ const bildVon = (ab) => new URL(`img/${KAMPAGNEN[ab] ? ab : "grauwacht"}/titel.w
     tischLaden, tischFrei, tischBekannt, tischAlleFrei: () => !T.frei,
     registrierung, endeMelden, offeneBelohnung, nachholen, codeEinloesen,
     detail, schliessen, endenHtml, gesperrtText, titelText, endeKnopf,
+    istAdmin, adminCodes, adminErstellen, adminSperren,
   };
 })();

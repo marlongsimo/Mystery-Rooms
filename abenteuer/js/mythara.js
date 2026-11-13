@@ -290,6 +290,59 @@
       } catch (err) { fbc(err.message, "fehler"); k.disabled = false; }
     };
   }
+  /** Admins: Codes anlegen (für eine bestimmte Person oder jede Person), Übersicht, sperren */
+  async function codeUebersicht(neu) {
+    if (!smAktiv() || !SM.istAdmin()) return toast("Die Code-Übersicht gibt es nur für Admins.");
+    let liste = [];
+    try { liste = await SM.adminCodes(); } catch (e) { return toast(e.message); }
+    const d = (t) => { try { return new Date(t).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }); } catch (e) { return ""; } };
+    const status = (c) => !c.aktiv ? "gesperrt" : new Date(c.gueltig_bis) < new Date() ? "abgelaufen" : c.eingeloest >= c.hoechstens ? "verbraucht" : "aktiv";
+    const o = fenster("Code-Übersicht", `
+      ${neu ? `<div class="sm-code-neu"><p class="note">Neuer Code „${esc(neu.bezeichnung)}“${neu.nur_fuer ? ` · nur für <b>${esc(neu.nur_fuer)}</b>` : " · für jede Person"} · ${neu.hoechstens}× einlösbar · gültig bis ${d(neu.gueltig_bis)}</p>
+        <div class="sm-code-anzeige"><b id="sm-code-text">${esc(neu.code)}</b><button class="btn klein" id="sm-code-kopieren">Kopieren</button></div>
+        <p class="note klein">Der Code wird nur jetzt angezeigt. Bitte gleich weitergeben oder notieren.</p></div>` : ""}
+      <form class="sm-admin-form" id="sm-admin-form" novalidate>
+        <h3 class="f-unter">Neuen Code erstellen</h3>
+        <label>Bezeichnung <input id="sm-a-name" maxlength="80" placeholder="z. B. Für Lena, Gewinnspiel März" required></label>
+        <fieldset class="sm-a-wahl"><legend>Einlösbar von</legend>
+          <label><input type="radio" name="sm-a-fuer" value="person" checked> einer bestimmten Person</label>
+          <label><input type="radio" name="sm-a-fuer" value="alle"> einer beliebigen Person</label></fieldset>
+        <label id="sm-a-handle-feld">Benutzername <input id="sm-a-handle" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Benutzername des Spielers"></label>
+        <div class="sm-a-reihe">
+          <label id="sm-a-anzahl-feld" hidden>Wie oft einlösbar <input id="sm-a-anzahl" type="number" min="1" max="100" value="1"></label>
+          <label>Gültig <select id="sm-a-tage"><option value="30">30 Tage</option><option value="90" selected>90 Tage</option><option value="180">180 Tage</option><option value="365">1 Jahr</option></select></label>
+        </div>
+        <button class="my-knopf rot" type="submit">Code erstellen</button><p class="my-fb" id="sm-a-fb" role="status"></p>
+        <p class="note klein">Ein Code schaltet alle 15 Helden frei. Ein Code für eine bestimmte Person ist immer 1× einlösbar, und nur ihr Konto kann ihn einlösen. Höchstens 20 neue Codes pro Tag.</p>
+      </form>
+      <h3 class="f-unter">Codes (${liste.length})</h3>
+      ${liste.length ? `<ul class="f-liste sm-code-liste">${liste.map((c) => `<li><span><b>${esc(c.bezeichnung)}</b><small>${c.nur_fuer ? "nur für " + esc(c.nur_fuer) : "jede Person"} · ${c.eingeloest} von ${c.hoechstens} eingelöst · bis ${d(c.gueltig_bis)}${c.angelegt_von ? " · von " + esc(c.angelegt_von) : ""}</small></span>
+        <span class="f-knoepfe"><em class="sm-code-status ${status(c)}">${status(c)}</em>${c.aktiv ? `<button class="btn ghost klein gefahr" data-sm-sperren="${esc(c.id)}">Sperren</button>` : ""}</span></li>`).join("")}</ul>` : `<p class="note">Noch keine Codes.</p>`}`);
+    const umschalten = () => {
+      const person = o.querySelector('input[name="sm-a-fuer"]:checked').value === "person";
+      $("#sm-a-handle-feld").hidden = !person; $("#sm-a-anzahl-feld").hidden = person;
+    };
+    o.querySelectorAll('input[name="sm-a-fuer"]').forEach((r) => { r.onchange = umschalten; });
+    const kp = $("#sm-code-kopieren");
+    if (kp) kp.onclick = async () => { try { await navigator.clipboard.writeText($("#sm-code-text").textContent); toast("Code kopiert."); } catch (e) { toast("Kopieren geht hier nicht – bitte abschreiben."); } };
+    $("#sm-admin-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const fb2 = (t) => { $("#sm-a-fb").textContent = t; };
+      const bezeichnung = $("#sm-a-name").value.trim(), person = o.querySelector('input[name="sm-a-fuer"]:checked').value === "person", fuer = $("#sm-a-handle").value.trim();
+      if (!bezeichnung) return fb2("Bitte eine Bezeichnung angeben.");
+      if (person && !NAME.test(fuer)) return fb2("Bitte den genauen Benutzernamen eingeben.");
+      const k = e.target.querySelector("button[type=submit]"); k.disabled = true; fb2("Code wird erstellt …");
+      try { const r = await SM.adminErstellen({ bezeichnung, fuer: person ? fuer : null, anzahl: person ? 1 : +$("#sm-a-anzahl").value || 1, tage: +$("#sm-a-tage").value || 90 }); codeUebersicht(r); }
+      catch (err) { fb2(err.message); k.disabled = false; }
+    };
+    o.querySelectorAll("[data-sm-sperren]").forEach((b) => { b.onclick = async () => {
+      if (!confirm("Diesen Code sperren? Er kann danach nicht mehr eingelöst werden.")) return;
+      b.disabled = true;
+      try { await SM.adminSperren(b.dataset.smSperren); toast("Code gesperrt."); } catch (e) { toast(e.message); }
+      codeUebersicht();
+    }; });
+    if (neu) o.querySelector(".karte-box").scrollTop = 0;
+  }
   function codeDialog() {
     if (!smAktiv() || !istKonto()) return toast("Codes kann nur ein Spielerkonto einlösen.");
     fenster("Freischalt-Code", `<p class="note">Mit einem Freischalt-Code stehen dir sofort alle 15 Helden zur Wahl.</p>${codeFormHtml("dlg")}`);
@@ -344,7 +397,7 @@
     $("#hub-profil").innerHTML = `<button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small id="hub-titel">${konto ? esc((smAktiv() && SM.titelText()) || "Spieler") : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
-      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
+      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-einst").onclick = () => { const t = $("#titel-einst"); if (t) t.click(); };
     const gl = $("#hub-glocke"); if (gl) gl.onclick = anfragenZeigen;
@@ -464,6 +517,7 @@
     if (was === "abmelden") return abmelden();
     if (was === "bild") return bildWaehlen();
     if (was === "code") return codeDialog();
+    if (was === "codes") return codeUebersicht();
     ansicht = was === "registrieren" ? "registrieren" : "anmelden";
     zeige("mythara"); kontoZeichnen();
     const f = $(ansicht === "registrieren" ? "#my-reg-name" : "#my-name"); if (f) f.focus();

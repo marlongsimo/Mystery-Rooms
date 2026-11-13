@@ -24,6 +24,13 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 004_rpg_tisch_test.sql 2>&1 
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../005_rpg_abenteuer.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../005_rpg_abenteuer.sql    # zweimal: idempotent
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 005_rpg_abenteuer_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+# Migration 006: ein Konto gibt es schon vorher (Bestandsschutz), eines entsteht zwischen den beiden Läufen (kein Bestandsschutz)
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -c "insert into auth.users (id, is_anonymous) values ('00000000-0000-0000-0000-0000000000e0', false); insert into public.rpg_profiles (user_id, handle) values ('00000000-0000-0000-0000-0000000000e0', 'Altspieler');"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../006_rpg_heldensammlung.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -c "insert into auth.users (id, is_anonymous) values ('00000000-0000-0000-0000-0000000000e9', false); insert into public.rpg_profiles (user_id, handle) values ('00000000-0000-0000-0000-0000000000e9', 'Nachzuegler');"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../006_rpg_heldensammlung.sql   # zweimal: idempotent
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 006_rpg_heldensammlung_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../006_rpg_heldensammlung_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../005_rpg_abenteuer_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../004_rpg_tisch_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../001_rpg_kampagnen.sql

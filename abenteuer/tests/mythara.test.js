@@ -5,7 +5,7 @@
 const BASE = process.env.BASE || 'http://localhost:8765';
 const { chromium } = require('playwright');
 (async () => {
-  const b = await chromium.launch(); let ok = true; const errs = [];
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch()); let ok = true; const errs = [];
   const until = async (p, fn, arg, ms = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(250); } return false; };
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
   const neu = async (vp) => { const p = await b.newPage({ viewport: vp }); p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/\/rpc\/rpg_(my_heroes|campaign_heroes)\b/.test((m.location() || {}).url || '')) errs.push(m.text()); }); return p; };

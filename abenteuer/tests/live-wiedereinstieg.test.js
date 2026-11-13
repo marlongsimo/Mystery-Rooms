@@ -7,7 +7,7 @@
 const BASE = process.env.BASE || 'http://localhost:8765';
 const { chromium } = require('playwright');
 (async () => {
-  const b = await chromium.launch(); let ok = true; const errs = [];
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch()); let ok = true; const errs = [];
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
   const page = async (name, w = 1200) => { const p = await (await b.newContext({ viewport: { width: w, height: 900 } })).newPage(); p.setDefaultTimeout(30000); p.on('pageerror', (e) => errs.push(name + ': ' + e.message)); p.on('dialog', (d) => d.accept()); return p; };
   const until = async (p, fn, arg, ms = 30000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(300); } return false; };

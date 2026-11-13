@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
   let ok = true; const errs = [];
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
   const until = async (p, fn, arg, ms = 15000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(200); } return false; };
-  const b = await chromium.launch(), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch()), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   p.setDefaultTimeout(15000); p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());
   const sichtbar = (id) => p.evaluate((id) => !document.querySelector('#' + id).hidden, id);
   try {

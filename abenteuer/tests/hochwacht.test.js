@@ -46,7 +46,7 @@ const R = require('../js/regeln.js'), D = require('../daten/hochwacht.js'), P = 
   try { const out = require('child_process').execFileSync('node', [__dirname + '/../tools/durchlauf-hochwacht.js', '120'], { encoding: 'utf8' }); check(/Alle Szenen erreicht/.test(out), 'Akt I–III: 120 Durchläufe ohne Fehler, alle Szenen und alle Enden erreicht (auch die Rettungen)'); }
   catch (e) { check(false, 'Durchlauf: ' + (e.stdout || e.message).slice(0, 300)); }
   // 8. Browser
-  const b = await chromium.launch(), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch()), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   p.setDefaultTimeout(20000); p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());
   try {
     await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await p.reload();

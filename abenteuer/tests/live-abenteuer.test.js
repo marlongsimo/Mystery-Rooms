@@ -12,7 +12,7 @@ const QH = process.env.LIVESLUG ? '?liveslug=' + process.env.LIVESLUG : '';
 const SHOT = process.env.SHOT_DIR;
 const { chromium } = require('playwright');
 (async () => {
-  const b = await chromium.launch(); let ok = true; const errs = [];
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch()); let ok = true; const errs = [];
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
 
   const einstieg = async (p, modus) => {

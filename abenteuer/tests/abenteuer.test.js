@@ -39,7 +39,7 @@ const R = require('../js/regeln.js'), F = R.FD;
   for (let i = 0; i < 40 && !a.ende; i++) for (const s of [a, b]) R.aktiv(s).seite === 'gegner' ? R.gegnerZug(s) : R.autoZug(s);
   check(JSON.stringify(R.speichern(a)) === JSON.stringify(R.speichern(b)), 'Speichern und Laden ergibt denselben Kampfverlauf (inkl. Wolf und Zustände)');
 
-  const br = await chromium.launch();
+  const br = require('./alle-helden').alleHeldenFrei(await chromium.launch());
   for (const vp of [{ width: 390, height: 844 }, { width: 1280, height: 860 }]) {
     const p = await (await br.newContext({ viewport: vp })).newPage();
     const kaputt = [];

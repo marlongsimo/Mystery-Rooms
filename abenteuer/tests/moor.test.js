@@ -20,7 +20,7 @@ const D = require('../daten/rabenmoor.js');
   try { const out = execFileSync('node', [__dirname + '/../tools/karten-pruefen.js', 'rabenmoor'], { encoding: 'utf8' }); check(true, 'Karten: alle Startplätze erreichbar · ' + out.trim().split('\n').map((z) => z.split(':')[0]).join(', ')); }
   catch (e) { check(false, 'Karten: ' + (e.stdout || e.message).slice(0, 400)); }
   // 2. Browser
-  const b = await chromium.launch(), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch()), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   p.setDefaultTimeout(20000); p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());
   p.on('console', (m) => { if (m.type() === 'error' && !/favicon|404|ERR_|Failed to load resource/.test(m.text())) errs.push(m.text()); });
   await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.evaluate(() => localStorage.clear()); await p.reload();

@@ -36,7 +36,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
     S.kampfEnde(A, st); check(A.merker.s4_verschleppte === st.mech.gerettet && A.szene === 'kammern_nach', 'Die Zahl der Geretteten wird für die Geschichte gemerkt');
   }
   // 5. Browser: Hub (nur mit ?entwurf), Pilgerstraße bis in den Kampf, Grablichter und Schutzkreis zu sehen, Kampf zu Ende
-  const b = await chromium.launch(), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch()), p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   p.on('pageerror', (e) => errs.push(e.message));
   try {
     await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await p.reload();

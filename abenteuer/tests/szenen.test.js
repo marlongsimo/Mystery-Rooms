@@ -100,7 +100,7 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   check(['ende_waechter', 'ende_kobold', 'ende_opfer', 'ende_bruch', 'ende_verrat'].every((e) => /ausblick\(/.test(D.SZENEN[e].text.toString())), 'Jedes Ende hat einen Ausblick');
 
   // 2. Browser
-  const b = await chromium.launch();
+  const b = require('./alle-helden').alleHeldenFrei(await chromium.launch());
   const p = await (await b.newContext({ viewport: { width: 1024, height: 900 } })).newPage();
   p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error' && !/\/rpc\/rpg_(my_heroes|campaign_heroes)\b/.test((m.location() || {}).url || '')) errs.push(m.text()); });
   await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf');

@@ -125,7 +125,7 @@ Spieler starten mit drei Helden, die sie selbst aus jeweils drei zufälligen Ang
 ### B1. Das Tempo passt erst mit mehr Abenteuern
 Bei 3 Start-Helden und einem Helden pro Kampagne braucht man **12 abgeschlossene Kampagnen** bis zur vollen Sammlung. Mit den vier Abenteuern der Closed Beta (Moor, Grauwacht, Hochwacht, Krone) kommt ein Spieler auf **höchstens 7 von 15**, wenn nur die erste Kampagne je Abenteuer zählt. Zählt jedes Ende einmal (Grauwacht 5, Hochwacht 3, Krone 3, Moor 2 Siegesenden), reicht es für die ganze Sammlung. Weitere Hebel neben neuen Abenteuern:
 - **Jedes erreichte Ende zählt einmal.** Grauwacht hat 5 Enden, das Moor 2 Siegesenden. Das belohnt Wiederspielen mit anderen Entscheidungen.
-- **Freischaltung durch die Geschichte:** Ein Held taucht in einem Abenteuer als Nebenfigur auf und schließt sich an, wenn die Gruppe ihm hilft. Beispiel: Faye verirrt sich im Schwarzmoor; wer sie rettet, schaltet sie frei. Das ist thematischer als ein Zufallsangebot und lässt sich gut mit den bestehenden „Momenten“ der Figuren verbinden.
+- ~~Freischaltung durch die Geschichte~~ (Helden als Nebenfiguren, die sich über einen bestimmten Pfad anschließen): **verworfen** am 13. November 2026. Es gibt keine Verzweigungen in den Kampagnen für Freischaltungen.
 
 ### B2. Gäste und Tisch-Helden regeln
 Das Konzept legt fest, dass Gäste nichts freischalten, aber nicht, **welche Helden sie spielen dürfen**. Dasselbe gilt für die Helden, die der Spieltisch steuert (seit November 2026 möglich, z. B. zwei Handys plus ein Tisch-Held). Vorschlag:
@@ -182,4 +182,13 @@ Zum Launch soll der Aufstieg **aus den Kampagnen heraus** wandern: Helden haben 
 | 6. Datenmodell | `006_rpg_heldensammlung.sql` | dazu `007_rpg_heldenlevel.sql` (Stufe, XP, Buchungen) |
 
 **Empfehlung für die Open Beta:** Das Datenmodell der Sammlung so anlegen, dass `rpg_hero_progress` (Stufe, XP) direkt danebenpasst. XP schon während der Open Beta still mitschreiben (Phase 0 im Heldenlevel-Konzept) und zum Launch gutschreiben.
+
+---
+
+## Teil D – Entscheidungen vom 13. November 2026
+
+- **Freischaltung nur über Kampagnen-Enden:** Ein neuer Held kommt dazu, wenn ein Konto ein **Ende einer Kampagne zum ersten Mal** erreicht. Gewählt wird aus drei Angeboten. Ein schon bekanntes Ende bringt keinen weiteren Helden. Damit ist B8, Frage 1 entschieden: Jedes Ende zählt einmal.
+- **Keine Story-Freischaltungen:** keine eigenen Pfade oder Verzweigungen in den Kampagnen (B1, zweiter Punkt, und B8, Frage 3 entfallen).
+- **Reichweite:** 13 reguläre Enden (Moor 2, Grauwacht 5, Hochwacht 3, Krone 3) plus 3 Start-Helden ergeben 16 Freischaltungen. Das reicht für alle 15 Helden; ab dem 13. neuen Ende greift die Regel für die vollständige Sammlung (Titel, Chronikeintrag).
+- **Prototyp:** `abenteuer/prototyp/helden.html` (nicht verlinkt, `noindex`). Er zeigt die Registrierung mit drei Runden, „Meine Helden“ mit gesperrten Helden, die Heldenwahl im Spiel und die Belohnung nach einem neuen Ende.
 

@@ -313,7 +313,7 @@ $$;
 -- Neues Ende → Wahl aus drei (solange die Sammlung nicht vollständig ist). Bekanntes Ende → nichts.
 create or replace function public.rpg_claim_ending(p_campaign_id uuid)
 returns jsonb language plpgsql security definer set search_path = public as $$
-declare v_uid uuid := auth.uid(); v_c public.rpg_campaigns%rowtype; v_m public.rpg_campaign_members%rowtype;
+declare v_uid uuid := auth.uid(); v_c public.rpg_campaigns%rowtype;
   v_state jsonb; v_ab text; v_ende text; v_cl public.rpg_ending_claims%rowtype; v_neu boolean; v_o public.rpg_hero_offers%rowtype;
   v_helden text[]; v_n integer; v_gef integer;
 begin
@@ -329,8 +329,12 @@ begin
   end if;
   select * into v_c from public.rpg_campaigns where id = p_campaign_id;
   if not found then raise exception 'Diese Kampagne gibt es nicht.'; end if;
-  select * into v_m from public.rpg_campaign_members where campaign_id = p_campaign_id and user_id = v_uid and member_status = 'aktiv';
-  if not found or not (v_m.role = 'host' or v_m.character_id is not null) then raise exception 'Du hast in dieser Kampagne keinen Helden gespielt.'; end if;
+  -- Dabei war, wer die Kampagne leitet (Host) oder als Mitglied einen Helden gespielt hat
+  if not exists (select 1 from public.rpg_campaign_members m
+                 where m.campaign_id = p_campaign_id and m.user_id = v_uid and m.member_status = 'aktiv'
+                   and (m.role = 'host' or m.character_id is not null)) then
+    raise exception 'Du hast in dieser Kampagne keinen Helden gespielt.';
+  end if;
   if v_c.status <> 'abgeschlossen' then raise exception 'Diese Kampagne ist noch nicht abgeschlossen.'; end if;
   if v_c.current_version < 8 or v_c.completed_at is null or v_c.completed_at - v_c.created_at < interval '15 minutes' then
     raise exception 'Dieses Ende kann nicht gewertet werden.';

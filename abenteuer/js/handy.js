@@ -52,6 +52,8 @@
     c.on("players", pruefe);
     c.on("lost", (why) => {
       const pause = H.spiel && H.spiel.phase === "pause"; H.spiel = null; H.row = null;
+      // Die Kampagne ist zu Ende: nicht auf einen neuen Tisch warten, sondern den Abschluss zeigen
+      if (H.endeGesehen) { clearTimeout(H.kTimer); H.wartet = false; render(); return; }
       if ((kCode() || kId) && H.kName) { toast(pause ? "Der Spieltisch hat pausiert. Du wirst automatisch wieder verbunden, sobald es weitergeht." : "Verbindung zum Spieltisch beendet – warte auf den Tisch …"); kampagneWarten(H.kName, c.session && c.session.room_code); }
       else toast(pause ? "Der Spieltisch hat die Runde pausiert. Zum Weiterspielen mit dem neuen Code beitreten." : why || "Verbindung beendet.");
       render();
@@ -148,6 +150,7 @@
   const endeGemeldet = new Set();
   function endeErreicht(s, fid) {
     const ab = s && s.abenteuer;
+    if (ab && ab.art === "ende") H.endeGesehen = { titel: ab.titel || "", kampagne: s.kampagne || null };
     if (!SM || !fid || !s.kampagne || !ab || ab.art !== "ende" || endeGemeldet.has(s.kampagne)) return;
     endeGemeldet.add(s.kampagne);
     setTimeout(() => SM.endeMelden(s.kampagne, { versuche: 8 }).catch(() => {}), 4000); // erst die Endszene lesen lassen
@@ -155,6 +158,7 @@
   function render() {
     const app = $("#app"), c = H.client, drin = Boolean(c && c.session);
     $("#verlassen").hidden = !drin;
+    if (!drin && H.endeGesehen) return viewAbschluss(app);
     if (!drin) return viewBeitritt(app);
     if (!H.spiel) { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Einen Moment …</h1><p class="note">Der Spieltisch schickt gleich die Figuren.</p></section>`; return; }
     if (H.spiel.phase === "pause") { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Pause</h1><p class="note">Der Spieltisch hat die Runde pausiert und gespeichert. Wenn sie fortgesetzt wird, zeigt der Tisch einen neuen Code – damit trittst du wieder bei.</p></section>`; return; }
@@ -447,10 +451,19 @@
   }
 
   $("#verlassen").onclick = async () => {
-    if (!confirm("Den Spieltisch verlassen? Deine Figur steuert dann der Tisch.")) return;
+    const amEnde = Boolean(H.endeGesehen || (H.spiel && H.spiel.abenteuer && H.spiel.abenteuer.art === "ende"));
+    if (!amEnde && !confirm("Den Spieltisch verlassen? Deine Figur steuert dann der Tisch.")) return;
     try { await H.client.leave(); } catch (e) { /* schon zu */ }
-    H.spiel = null; H.row = null; render();
+    H.spiel = null; H.row = null;
+    if (amEnde) { location.href = "index.html"; return; } // nach dem Ende: zurück zur Startseite
+    render();
   };
+  /** Nach dem Ende der Kampagne: kurzer Abschluss statt der Beitrittsseite */
+  function viewAbschluss(app) {
+    app.innerHTML = `<section class="karte-h"><p class="eyebrow">Kampagne beendet</p><h1>${esc(H.endeGesehen.titel || "Das Ende")}</h1>
+      <p class="note">Der Spieltisch hat die Kampagne abgeschlossen. ${SM && SM.zustand().konto ? "Neue Enden und Belohnungen findest du auf der Startseite unter „Charaktere“ und in deiner Chronik." : "Danke fürs Mitspielen!"}</p>
+      <div class="knoepfe"><a class="btn breit" href="index.html">Zur Startseite</a></div></section>`;
+  }
 
   (async () => {
     render();

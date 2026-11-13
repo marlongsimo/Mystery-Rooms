@@ -129,3 +129,16 @@
   .sm-knoepfe .btn { flex: 1 1 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .sm-karte .sm-innen, .sm-karte, .sm-flieg { transition: none !important; } }
+
+/* ---------- Chronik im Profil: alle Enden je Kampagne ---------- */
+.sm-chronik { display: grid; gap: 14px; margin-top: 10px; max-height: 60vh; overflow-y: auto; text-align: left; }
+.sm-chronik-kampagne h3 { font: 600 15px "Cinzel", serif; color: #f1e3bf; margin: 0 0 6px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; justify-content: space-between; }
+.sm-chronik-kampagne h3 span { font: 400 12px "Inter", sans-serif; color: #b9ad94; }
+.sm-chronik-kampagne.leer { opacity: .6; }
+.sm-chronik ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.sm-chronik li { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(217,180,106,.22); background: rgba(217,180,106,.07); font-size: 14px; }
+.sm-chronik li.da b { color: #f6ecd6; font-weight: 600; }
+.sm-chronik li.da b::before { content: "✦ "; color: #d9b46a; }
+.sm-chronik li small { color: #b9ad94; white-space: nowrap; }
+.sm-chronik li.offen { border-style: dashed; background: none; color: #8d8474; }
+.sm-chronik li.offen b { font-weight: 400; font-style: italic; }

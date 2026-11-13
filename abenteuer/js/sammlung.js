@@ -360,6 +360,17 @@
       return `<div class="sm-ende-chip ${titel ? "titel" : ""}" style="--bild:url('${bildVon(ab)}')"><b>${esc(v.titel)}</b><span>${g} von ${n} Enden${titel ? ` · ♛ ${esc(TITEL[ab])}` : ""}</span><i style="width:${n ? (g / n) * 100 : 0}%"></i></div>`;
     }).join("")}</div>`;
   }
+  /** Chronik des Kontos: je Kampagne alle Enden, gefundene mit Namen und Datum, die übrigen verdeckt */
+  function chronikHtml() {
+    if (!S.konto) return `<p class="note">Die Chronik gehört zu einem Spielerkonto: Dort stehen alle Enden, die du erreicht hast.</p>`;
+    const gef = S.enden || [], datum = (t) => { try { return new Date(t).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }); } catch (e) { return ""; } };
+    const teile = Object.entries(KAMPAGNEN).map(([ab, v]) => {
+      const meine = gef.filter((e) => e.abenteuer === ab), n = (S.alle_enden || {})[ab] || Object.keys(v.enden).length, titel = (S.titel || []).includes(ab);
+      const zeilen = Object.entries(v.enden).map(([id, name]) => { const e = meine.find((x) => x.ende === id); return e ? `<li class="da"><b>${esc(name)}</b><small>${esc(datum(e.am))}</small></li>` : `<li class="offen"><b>Noch nicht entdeckt</b><small>???</small></li>`; }).join("");
+      return `<section class="sm-chronik-kampagne ${meine.length ? "" : "leer"}"><h3>${esc(v.titel)}<span>${meine.length} von ${n} Enden${titel ? ` · ♛ ${esc(TITEL[ab])}` : ""}</span></h3><ol>${zeilen}</ol></section>`;
+    }).join("");
+    return `<p class="note">${gef.length ? `Du hast ${gef.length} ${gef.length === 1 ? "Ende" : "Enden"} entdeckt. Jedes neue Ende schaltet einen Helden frei.` : "Noch kein Ende entdeckt. Spielt eine Kampagne bis zum Schluss, dann steht sie hier."}</p><div class="sm-chronik">${teile}</div>`;
+  }
   const gesperrtText = () => (S.konto ? "Jedes Kampagnen-Ende, das du zum ersten Mal erreichst, schaltet einen Helden frei: Du wählst aus drei Angeboten." : "Ohne Konto spielst du mit fünf Starter-Helden. Mit einem Spielerkonto baust du dir deine eigene Sammlung auf.");
   /** Neuester Kampagnentitel des Kontos (für den Kopf der Startseite) */
   const titelText = () => { const t = (S.titel || []).slice(-1)[0]; return t ? TITEL[t] : ""; };
@@ -371,7 +382,7 @@
     aktiv: () => S.geladen && S.installiert && !S.offline,
     tischLaden, tischFrei, tischBekannt, tischAlleFrei: () => !T.frei,
     registrierung, endeMelden, offeneBelohnung, nachholen, codeEinloesen,
-    detail, schliessen, endenHtml, gesperrtText, titelText, endeKnopf,
+    detail, schliessen, endenHtml, chronikHtml, gesperrtText, titelText, endeKnopf,
     istAdmin, adminCodes, adminErstellen, adminSperren,
   };
 })();

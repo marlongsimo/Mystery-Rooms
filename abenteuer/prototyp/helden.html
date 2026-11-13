@@ -70,6 +70,27 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
 .ende-chip b { display: block; font: 600 14px Cinzel, serif; color: #fff; } .ende-chip span { font-size: 12px; color: var(--gold-hell); }
 .ende-chip i { position: absolute; left: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, #b8742a, #ffd27a); }
 @media (max-width: 900px) { .enden-liste { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.drin-marke { position: absolute; top: 12px; right: 12px; z-index: 1; font-size: 10px; font-weight: 600; letter-spacing: .1em; padding: 4px 9px; border-radius: 8px; color: #241505; background: linear-gradient(180deg, #fff0c4, #e0b260); box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.btn.weiter { min-width: 240px; font-size: 18px; padding: 16px 40px; }
+.hub-raster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 900px; margin: 24px auto 0; }
+.hub-kachel { position: relative; min-height: 190px; padding: 18px; border: 0; border-radius: 18px; text-align: left; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
+  background: linear-gradient(180deg, rgba(7,8,11,.05), rgba(7,8,11,.88) 75%), var(--bild) center / cover; box-shadow: 0 0 0 1px rgba(217,178,106,.4), 0 14px 30px rgba(0,0,0,.5); transition: transform .2s, box-shadow .2s; }
+.hub-kachel:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 0 0 1px var(--gold-hell), 0 0 26px rgba(246,200,110,.3), 0 14px 30px rgba(0,0,0,.5); }
+.hub-kachel:disabled { opacity: .5; cursor: default; }
+.hub-kachel b { font: 600 22px Cinzel, serif; color: #fff; } .hub-kachel small { font-size: 13px; color: var(--gold-hell); margin-top: 4px; }
+.hub-kachel .neu { position: absolute; top: 14px; right: 14px; font-size: 10px; font-weight: 600; letter-spacing: .14em; padding: 3px 8px; border-radius: 8px; color: #241505; background: linear-gradient(180deg, #fff0c4, #e0b260); }
+.hub-helden { display: flex; gap: 6px; margin-top: 10px; } .hub-helden i { width: 38px; height: 38px; border-radius: 10px; background: #111 center 18% / cover; box-shadow: 0 0 0 2px var(--gold-dunkel); }
+@media (max-width: 620px) { .hub-raster { grid-template-columns: 1fr; } .hub-kachel { min-height: 150px; } }
+@media (max-width: 620px) {
+  .buehne.drei { flex-wrap: nowrap; gap: 8px; margin-top: 22px; } .buehne.drei .karte { width: 31vw; }
+  .buehne.drei .vorne h3 { font-size: 15px; } .buehne.drei .vorne .titel { font-size: 12px; } .buehne.drei .vorne .rolle, .buehne.drei .vorne .lupe { display: none; }
+  .buehne.drei .vorne .klasse { font-size: 8px; padding: 3px 6px; top: 8px; left: 8px; } .buehne.drei .drin-marke { top: auto; bottom: 64px; right: 50%; transform: translateX(50%); font-size: 9px; white-space: nowrap; }
+  .buehne.drei .vorne .info { padding: 10px 8px 12px; }
+}
+.siegel { width: min(320px, 80vw); margin: 26px auto 0; padding: 26px 22px; border-radius: 22px; text-align: center; background: radial-gradient(circle at 50% 30%, rgba(246,220,156,.18), transparent 60%), linear-gradient(160deg, #2a2117, #0d0c0b); box-shadow: 0 0 0 2px #d9b26a, 0 0 0 7px rgba(0,0,0,.6), 0 0 50px rgba(246,200,110,.35); animation: siegel-auf .9s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes siegel-auf { from { opacity: 0; transform: rotateY(90deg) scale(.8); } }
+.siegel .zeichen { font: 600 54px Cinzel, serif; color: var(--gold-hell); text-shadow: 0 0 24px rgba(246,200,110,.6); }
+.siegel b { display: block; font: 600 20px Cinzel, serif; color: #fff; margin-top: 6px; } .siegel small { display: block; margin-top: 6px; color: var(--gold-hell); font-size: 13px; }
 .hinweis { text-align: center; color: var(--leise); font-size: 13px; margin-top: 18px; }
 
 /* Detail zum Begutachten */
@@ -160,6 +181,10 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
   .kopf { position: relative; gap: 8px; padding: 10px 14px; } .proto { display: none; } .zaehler { margin-left: auto; }
   .ansichten { order: 3; width: 100%; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .ansichten button { white-space: nowrap; }
   main { padding-top: 20px; } .karte { width: min(72vw, 270px); }
+  .leiste-wahl { flex-direction: column; gap: 10px; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); margin-left: -20px; margin-right: -20px; background: linear-gradient(180deg, rgba(7,8,11,0), #07080b 25%); }
+  .leiste-wahl .platz { gap: 6px; } .leiste-wahl .platz i { width: 40px; height: 40px; border-radius: 10px; }
+  .leiste-wahl .btn { width: calc(100% - 40px); }
+  .mini { grid-template-columns: 76px 1fr; } .mini .pb, .mini .schloss { width: 76px; height: 92px; } .mini b { font-size: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { .karte .innen, .karte, .flieg { transition: none !important; } }
 </style>
@@ -169,14 +194,16 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
   <span class="logo">MYTHARA</span><span class="proto">Prototyp · Heldenfreischaltung</span>
   <nav class="ansichten" id="ansichten">
     <button data-a="registrierung" class="an">1 · Registrierung</button>
-    <button data-a="sammlung">2 · Meine Helden</button>
-    <button data-a="wahl">3 · Heldenwahl im Spiel</button>
-    <button data-a="belohnung">4 · Nach der Kampagne</button>
+    <button data-a="start">2 · Startseite</button>
+    <button data-a="sammlung">3 · Charaktere</button>
+    <button data-a="wahl">4 · Heldenwahl im Spiel</button>
+    <button data-a="belohnung">5 · Nach der Kampagne</button>
   </nav>
   <div class="zaehler" id="zaehler"><svg class="ring" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="4"/><circle id="ring" cx="20" cy="20" r="16" fill="none" stroke="#f6dc9c" stroke-width="4" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><span><b id="anzahl">0</b> von 15 Helden</span><button class="link" id="zuruecksetzen">Zurücksetzen</button></div>
 </header>
 <main>
   <section class="ansicht" id="registrierung"></section>
+  <section class="ansicht" id="start" hidden></section>
   <section class="ansicht" id="sammlung" hidden></section>
   <section class="ansicht" id="wahl" hidden></section>
   <section class="ansicht" id="belohnung" hidden></section>
@@ -204,6 +231,7 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
 
   /* ---------- Zustand ---------- */
   let S = laden();
+  let sperre = false; // während Einbuchen-Animation keine weiteren Eingaben
   function laden() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.sammlung)) { s.enden = s.enden || []; return s; } } catch (e) { /* neu */ } return { sammlung: [], neu: [], runde: 0, angebote: null, gesehen: [], enden: [] }; }
   function speichern() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* privat */ } zaehler(); }
   function zaehler(puls) {
@@ -225,7 +253,7 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
   function karte(fid, extra = "") {
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse];
     return `<div class="karte verdeckt ${extra}" data-fid="${fid}" role="button" tabindex="0" aria-label="${esc(d.name)} ansehen"><div class="innen">
-      <div class="vorne" style="background-image:url('${bild(fid)}');--rand:${k.farbe};--kf:${k.farbe}"><span class="klasse">${esc(k.name)}</span>
+      <div class="vorne" style="background-image:url('${bild(fid)}');--rand:${k.farbe};--kf:${k.farbe}"><span class="klasse">${esc(k.name)}</span>${extra.includes("eingebucht") ? '<span class="drin-marke">✓ Eingebucht</span>' : ""}
         <div class="info"><h3>${esc(d.name)}</h3><div class="titel">${esc(d.titel)}</div><div class="rolle">${esc(d.rolle)}</div><span class="lupe">ANSEHEN ›</span></div></div>
       <div class="hinten"><span>M</span></div></div></div>`;
   }
@@ -234,6 +262,7 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
   /* ---------- Detail zum Begutachten ---------- */
   const ATTR = ["STR", "GES", "KON", "INT", "WEI", "CHA"], TYP = { aktion: "Aktion", bonus: "Bonus", passiv: "Passiv", frei: "Frei", reaktion: "Reaktion" };
   function detail(fid, opt = {}) {
+    if (sperre) return;
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], zu = !S.sammlung.includes(fid) && !opt.einbuchen;
     const f1 = F.faehigVon(fid, 1);
     $("#detail").innerHTML = `<div class="bild" style="background-image:url('${bild(fid)}')${zu ? ";filter:grayscale(1) brightness(.5)" : ""}"></div>
@@ -248,7 +277,7 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
         <div class="knoepfe"><button class="btn leise" id="d-zu">${opt.einbuchen ? "Zurück zur Auswahl" : "Schließen"}</button>${opt.einbuchen ? `<button class="btn gold" id="d-ein">${esc(d.name)} einbuchen</button>` : ""}</div></div>`;
     $("#schleier").classList.add("an");
     $("#d-zu").onclick = schliessen;
-    if (opt.einbuchen) $("#d-ein").onclick = () => { schliessen(); opt.einbuchen(); };
+    if (opt.einbuchen) $("#d-ein").onclick = () => { if (sperre) return; sperre = true; schliessen(); opt.einbuchen(); };
   }
   function schliessen() { $("#schleier").classList.remove("an"); }
   $("#schleier").onclick = (e) => { if (e.target.id === "schleier") schliessen(); };
@@ -260,18 +289,19 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
     const f = document.createElement("div"); f.className = "flieg"; f.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;background-image:url('${bild(fid)}')`;
     document.body.appendChild(f); el.style.visibility = "hidden";
     requestAnimationFrame(() => requestAnimationFrame(() => { f.style.left = z.left + "px"; f.style.top = z.top + "px"; f.style.width = "40px"; f.style.height = "40px"; f.style.opacity = ".2"; }));
-    setTimeout(() => { f.remove(); zaehler(true); fertig && fertig(); }, 950);
+    setTimeout(() => { f.remove(); zaehler(true); sperre = false; fertig && fertig(); }, 950);
   }
   function aufnehmen(fid) { if (!S.sammlung.includes(fid)) { S.sammlung.push(fid); S.neu.push(fid); } speichern(); }
 
   /* ---------- 1 · Registrierung: drei Runden ---------- */
   function registrierung() {
     const el = $("#registrierung");
-    if (S.runde >= 3) {
-      el.innerHTML = `<p class="eyebrow">Willkommen in Mythara</p><h1 class="gross">Deine ersten Helden</h1><div class="zier"></div>
-        <div class="buehne">${S.sammlung.slice(0, 3).map((f) => karte(f)).join("")}</div>
-        <p class="unter">Drei Helden stehen dir zur Seite. Jedes Kampagnen-Ende, das ihr zum ersten Mal erreicht, bringt einen neuen Helden dazu.</p>
-        <div class="knoepfe" style="justify-content:center"><button class="btn gold" data-geh="sammlung">Zu meinen Helden</button></div>`;
+    if (S.runde >= 3 || S.sammlung.length >= 3) {
+      el.innerHTML = `<p class="eyebrow">Registrierung abgeschlossen</p><h1 class="gross">Deine Helden sind eingebucht</h1>
+        <div class="runden">${[0, 1, 2].map(() => '<i class="fertig"></i>').join("")}</div>
+        <div class="buehne drei">${S.sammlung.slice(0, 3).map((f) => karte(f, "eingebucht")).join("")}</div>
+        <p class="unter">Ab sofort stehen sie dir unter <b style="color:var(--gold-hell);font-style:normal">Charaktere</b> zur Verfügung. Jedes Kampagnen-Ende, das du zum ersten Mal erreichst, bringt einen neuen Helden dazu.</p>
+        <div class="knoepfe" style="justify-content:center;margin-top:22px"><button class="btn gold weiter" data-geh="start">Weiter</button></div>`;
       aufdecken(el); binden(el); return;
     }
     if (!S.angebote) {
@@ -287,12 +317,28 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
     el.querySelectorAll(".karte").forEach((k) => { const f = k.dataset.fid; k.onclick = () => !k.classList.contains("verdeckt") && detail(f, { einbuchen: () => regEinbuchen(k, f) }); });
   }
   function regEinbuchen(k, fid) {
+    const runde = S.runde;
+    if (runde >= 3 || S.sammlung.length >= 3 || !(S.angebote || []).includes(fid)) { sperre = false; return; }
     const andere = [...document.querySelectorAll("#reg-buehne .karte")].filter((x) => x !== k);
     andere.forEach((x) => x.classList.add("weg")); k.classList.add("gewaehlt");
-    setTimeout(() => einfliegen(k, fid, () => { aufnehmen(fid); S.runde++; S.angebote = null; speichern(); registrierung(); }), 650);
+    setTimeout(() => einfliegen(k, fid, () => { if (S.runde === runde) { aufnehmen(fid); S.runde = runde + 1; S.angebote = null; speichern(); } registrierung(); }), 650);
   }
 
-  /* ---------- 2 · Meine Helden ---------- */
+  /* ---------- 2 · Startseite nach der Anmeldung (nachgebaut wie der Hub) ---------- */
+  function start() {
+    const el = $("#start"), meine = S.sammlung.slice(-4);
+    el.innerHTML = `<div class="hub"><p class="eyebrow">Willkommen in Mythara</p><h1 class="gross">Schön, dass du da bist</h1><p class="unter">Deine Reise beginnt hier. Wähle, wie es weitergeht.</p><div class="zier"></div>
+      <div class="hub-raster">
+        <button class="hub-kachel" data-geh="wahl" style="--bild:url('../img/mythara/karte-neu.webp')"><b>Neue Kampagne</b><small>Gruppe wählen und losziehen</small></button>
+        <button class="hub-kachel" data-geh="belohnung" style="--bild:url('../img/mythara/karte-kampagnen.webp')"><b>Meine Kampagnen</b><small>Im Prototyp: Belohnung nach einem Kampagnen-Ende</small></button>
+        <button class="hub-kachel gross-kachel" data-geh="sammlung" style="--bild:url('../img/mythara/karte-helden.webp')"><b>Charaktere</b><small>${S.sammlung.length} von 15 Helden freigeschaltet</small>
+          <span class="hub-helden">${meine.map((f) => `<i style="background-image:url('${bild(f)}')"></i>`).join("")}</span>${S.neu.length ? '<span class="neu">NEU</span>' : ""}</button>
+        <button class="hub-kachel" disabled style="--bild:url('../img/mythara/karte-beitreten.webp')"><b>Kampagnenwelt</b><small>im Prototyp nicht enthalten</small></button>
+      </div></div>`;
+    binden(el);
+  }
+
+  /* ---------- 3 · Charaktere ---------- */
   function miniHtml(fid, modus) {
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], hat = S.sammlung.includes(fid);
     const wie = hat ? `<small>${esc(d.rolle)}</small>` : `<span class="wie">Gesperrt · Belohnung für ein neues Kampagnen-Ende</span>`;
@@ -308,7 +354,7 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
   function sammlung() {
     const el = $("#sammlung");
     const offen = ALLE_ENDEN.length - S.enden.length;
-    el.innerHTML = `<p class="eyebrow">Hub</p><h1 class="gross">Meine Helden</h1><p class="unter">${S.sammlung.length} von 15 freigeschaltet. Jedes Kampagnen-Ende, das ihr zum ersten Mal erreicht, bringt einen neuen Helden. Noch ${offen} von ${ALLE_ENDEN.length} Enden zu entdecken.</p><div class="zier"></div>
+    el.innerHTML = `<p class="eyebrow">Hub</p><h1 class="gross">Charaktere</h1><p class="unter">${S.sammlung.length} von 15 freigeschaltet. Jedes Kampagnen-Ende, das ihr zum ersten Mal erreicht, bringt einen neuen Helden. Noch ${offen} von ${ALLE_ENDEN.length} Enden zu entdecken.</p><div class="zier"></div>
       <div class="enden-liste">${Object.entries(KAMPAGNEN).map(([k, v]) => { const n = Object.keys(v.enden).length, g = Object.keys(v.enden).filter((e) => S.enden.includes(k + ":" + e)).length; return `<div class="ende-chip" style="--bild:url('${v.bild}')"><b>${esc(v.titel)}</b><span>${g} von ${n} Enden</span><i style="width:${(g / n) * 100}%"></i></div>`; }).join("")}</div>${nachKlassen("sammlung")}`;
     el.querySelectorAll("[data-mini]").forEach((b) => { b.onclick = () => detail(b.dataset.mini); });
     S.neu = []; speichern();
@@ -342,16 +388,23 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
     const schluessel = B.kampagne + ":" + B.ende, neuesEnde = !S.enden.includes(schluessel) || B.schritt > 0;
     const steuer = `<div class="steuer">Prototyp-Steuerung: Kampagne <select id="b-kamp">${Object.entries(KAMPAGNEN).map(([k, v]) => `<option value="${k}" ${k === B.kampagne ? "selected" : ""}>${esc(v.titel)}</option>`).join("")}</select>
       erreichtes Ende <select id="b-ende">${Object.entries(K.enden).map(([e, t]) => `<option value="${e}" ${e === B.ende ? "selected" : ""}>${esc(t)}${S.enden.includes(B.kampagne + ":" + e) ? " (schon erreicht)" : ""}</option>`).join("")}</select>
-      <button class="btn leise" id="b-neu" style="padding:6px 12px">Neu starten</button></div>`;
+      <button class="btn leise" id="b-neu" style="padding:6px 12px">Neu starten</button><button class="btn leise" id="b-voll" style="padding:6px 12px">Test: alle 15 Helden freischalten</button></div>`;
     let inhalt = "";
     if (B.schritt === 0) {
       inhalt = `<p class="eyebrow">Kampagne gewonnen · Ende: ${esc(K.enden[B.ende])}</p><h1 class="gross">Sieg</h1><p class="unter">${esc(K.titel)}.</p><div class="zier"></div>
-        ${neuesEnde ? `<div class="hinweis-box"><b>Neues Ende entdeckt.</b> Zum ersten Mal habt ihr „${esc(K.enden[B.ende])}“ erreicht. Dafür schließt sich euch ein neuer Held an.</div>
-          <div class="knoepfe" style="justify-content:center"><button class="btn gold" id="b-weiter">Belohnung ansehen</button></div>`
+        ${neuesEnde ? `<div class="hinweis-box"><b>Neues Ende entdeckt.</b> Zum ersten Mal habt ihr „${esc(K.enden[B.ende])}“ erreicht. ${S.sammlung.length >= 15 ? "Eure Sammlung ist schon vollständig. Dafür bekommt ihr einen Eintrag in eurer Chronik." : "Dafür schließt sich euch ein neuer Held an."}</div>
+          <div class="knoepfe" style="justify-content:center"><button class="btn gold" id="b-weiter">${S.sammlung.length >= 15 ? "Chronik ansehen" : "Belohnung ansehen"}</button></div>`
         : `<div class="hinweis-box">Dieses Ende habt ihr schon einmal erreicht. Einen neuen Helden gibt es nur für ein Ende, das ihr zum ersten Mal erreicht. ${(() => { const n = Object.keys(K.enden).filter((e) => !S.enden.includes(B.kampagne + ":" + e)).length; return n === 0 ? `Alle Enden von „${esc(K.titel)}“ habt ihr schon entdeckt.` : `In „${esc(K.titel)}“ wartet noch ${n === 1 ? "ein weiteres Ende" : n + " weitere Enden"}.`; })()}</div>`}`;
     } else if (B.schritt === 2) {
       const pool = F.REIHE.filter((f) => !S.sammlung.includes(f));
-      if (!pool.length) inhalt = `<div class="ende-karte"><p class="eyebrow">Sammlung vollständig</p><h1 class="gross" style="font-size:32px">Alle 15 Helden</h1><p class="unter">Statt einer Freischaltung gibt es einen Titel und einen Eintrag in der Chronik.</p></div>`;
+      if (!pool.length) {
+        const n = Object.keys(K.enden).length, g = Object.keys(K.enden).filter((e) => S.enden.includes(B.kampagne + ":" + e)).length, alle = g === n;
+        const TITEL = { rabenmoor: "Kenner des Schwarzmoors", grauwacht: "Hüter von Grauwacht", hochwacht: "Fackelträger des Nordens", krone: "Bezwinger der Eiskrone" };
+        inhalt = `<p class="eyebrow">Sammlung vollständig · alle 15 Helden</p><h1 class="gross">Ein Eintrag in eurer Chronik</h1>
+          <div class="siegel"><div class="zeichen">✦</div><b>${esc(K.enden[B.ende])}</b><small>${esc(K.titel)} · Ende ${g} von ${n}</small></div>
+          <p class="unter" style="margin-top:18px">${alle ? `Ihr habt alle Enden dieser Kampagne gefunden. Dafür tragt ihr ab sofort den Titel <b style="color:var(--gold-hell);font-style:normal">„${TITEL[B.kampagne]}“</b>, er erscheint neben eurem Namen.` : `Jedes neue Ende wird als Siegel in der Chronik festgehalten. Wer alle ${n} Enden dieser Kampagne findet, bekommt den Titel „${TITEL[B.kampagne]}“.`}</p>
+          <div class="knoepfe" style="justify-content:center"><button class="btn leise" data-geh="start">Zur Startseite</button></div>`;
+      }
       else {
         if (!B.angebote) B.angebote = ziehen(pool, Math.min(3, pool.length));
         inhalt = `<p class="eyebrow">Belohnung · neues Ende</p><h1 class="gross">Wähle einen neuen Helden</h1><p class="unter">Einer von dreien schließt sich dir dauerhaft an. Sieh sie dir an und entscheide dich.</p>
@@ -361,16 +414,19 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
       const neu = S.sammlung.slice(-1);
       inhalt = `<p class="eyebrow">Neu in deiner Sammlung</p><h1 class="gross">${neu.map((f) => esc(F.FIGUREN[f].name)).join("")}</h1><div class="buehne">${neu.map((f) => karte(f)).join("")}</div>
         <p class="unter">${S.sammlung.length} von 15 Helden · ${S.enden.length} von ${ALLE_ENDEN.length} Enden entdeckt. In der nächsten Kampagne steht ${neu.map((f) => esc(F.FIGUREN[f].name)).join("")} zur Wahl.</p>
-        <div class="knoepfe" style="justify-content:center"><button class="btn leise" data-geh="sammlung">Meine Helden</button><button class="btn gold" data-geh="wahl">Zur Heldenwahl</button></div>`;
+        <div class="knoepfe" style="justify-content:center"><button class="btn leise" data-geh="sammlung">Charaktere</button><button class="btn gold" data-geh="wahl">Zur Heldenwahl</button></div>`;
     }
     el.innerHTML = `<div class="sieg"><div class="hg" style="--bild:url('${K.bild}')"></div>${steuer}${inhalt}</div>`;
     $("#b-kamp").onchange = (e) => { B = { kampagne: e.target.value, ende: Object.keys(KAMPAGNEN[e.target.value].enden)[0], schritt: 0, angebote: null }; belohnung(); };
     $("#b-ende").onchange = (e) => { B.ende = e.target.value; B.schritt = 0; B.angebote = null; belohnung(); };
     $("#b-neu").onclick = () => { B.schritt = 0; B.angebote = null; belohnung(); };
+    $("#b-voll").onclick = () => { S.sammlung = F.REIHE.slice(); S.runde = 3; speichern(); B.schritt = 0; B.angebote = null; belohnung(); };
     const w = $("#b-weiter"); if (w) w.onclick = () => { if (!S.enden.includes(schluessel)) { S.enden.push(schluessel); speichern(); } B.schritt = 2; belohnung(); };
     if (B.schritt === 2) $("#belohnung").querySelectorAll("#b-buehne .karte").forEach((k) => {
       const f = k.dataset.fid;
       k.onclick = () => !k.classList.contains("verdeckt") && detail(f, { einbuchen: () => {
+        if (B.schritt !== 2 || !(B.angebote || []).includes(f)) { sperre = false; return; }
+        B.schritt = 2.5; // Wahl läuft, kein zweites Mal
         [...document.querySelectorAll("#b-buehne .karte")].filter((x) => x !== k).forEach((x) => x.classList.add("weg")); k.classList.add("gewaehlt");
         setTimeout(() => einfliegen(k, f, () => { aufnehmen(f); B.schritt = 3; belohnung(); }), 650);
       } });
@@ -379,7 +435,7 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
   }
 
   /* ---------- Navigation ---------- */
-  const ANSICHT = { registrierung, sammlung, wahl, belohnung };
+  const ANSICHT = { registrierung, start, sammlung, wahl, belohnung };
   function geh(a) {
     document.querySelectorAll("#ansichten button").forEach((b) => b.classList.toggle("an", b.dataset.a === a));
     document.querySelectorAll(".ansicht").forEach((s) => { s.hidden = s.id !== a; });
@@ -391,8 +447,8 @@ h1.gross { font: 600 clamp(30px, 4vw, 48px)/1.1 Cinzel, serif; text-align: cente
   $("#zuruecksetzen").onclick = () => { S = { sammlung: [], neu: [], runde: 0, angebote: null, gesehen: [], enden: [] }; WAHL = []; B = { kampagne: "rabenmoor", ende: "ende_erloest", schritt: 0, angebote: null }; speichern(); geh("registrierung"); };
   // Testhilfe: ?demo füllt eine Beispielsammlung
   if (/[?&]demo/.test(location.search) && !S.sammlung.length) { S.sammlung = ["schildwaechter", "elementarist", "trickser", "lichtbringer"]; S.runde = 3; speichern(); }
-  const start = (location.hash || "").slice(1);
-  zaehler(); geh(ANSICHT[start] ? start : "registrierung");
+  const startAnsicht = (location.hash || "").slice(1);
+  zaehler(); geh(ANSICHT[startAnsicht] ? startAnsicht : "registrierung");
   window.PROTO = { S: () => S, geh, B: () => B };
 })();
 </script>

@@ -190,5 +190,8 @@ Zum Launch soll der Aufstieg **aus den Kampagnen heraus** wandern: Helden haben 
 - **Freischaltung nur über Kampagnen-Enden:** Ein neuer Held kommt dazu, wenn ein Konto ein **Ende einer Kampagne zum ersten Mal** erreicht. Gewählt wird aus drei Angeboten. Ein schon bekanntes Ende bringt keinen weiteren Helden. Damit ist B8, Frage 1 entschieden: Jedes Ende zählt einmal.
 - **Keine Story-Freischaltungen:** keine eigenen Pfade oder Verzweigungen in den Kampagnen (B1, zweiter Punkt, und B8, Frage 3 entfallen).
 - **Reichweite:** 13 reguläre Enden (Moor 2, Grauwacht 5, Hochwacht 3, Krone 3) plus 3 Start-Helden ergeben 16 Freischaltungen. Das reicht für alle 15 Helden; ab dem 13. neuen Ende greift die Regel für die vollständige Sammlung (Titel, Chronikeintrag).
+- **Schon bekanntes Ende:** Sieg wie immer, dazu der Hinweis, wie viele Enden der Kampagne noch offen sind. Keine Freischaltung.
+- **Sammlung vollständig:** Ein neues Ende wird als **Siegel in der Chronik** festgehalten. Wer **alle Enden einer Kampagne** gefunden hat, bekommt einen **Titel**, der neben dem Spielernamen erscheint: „Kenner des Schwarzmoors“, „Hüter von Grauwacht“, „Fackelträger des Nordens“, „Bezwinger der Eiskrone“ (Vorschläge).
+- **Nach der Registrierung:** Übersicht „Deine Helden sind eingebucht“ mit den drei Helden und dem Hinweis, dass sie unter **Charaktere** verfügbar sind; „Weiter“ führt zur Startseite nach der Anmeldung.
 - **Prototyp:** `abenteuer/prototyp/helden.html` (nicht verlinkt, `noindex`). Er zeigt die Registrierung mit drei Runden, „Meine Helden“ mit gesperrten Helden, die Heldenwahl im Spiel und die Belohnung nach einem neuen Ende.
 

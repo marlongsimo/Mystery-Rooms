@@ -16,7 +16,7 @@ const PROBE = {
       sieg: { ziele: 2, art: "siegelstein", text: "Zwei Siegelsteine schweigen – der Platz ist frei." },
       wellen: [{ id: "haus", name: "Die Hauszugänge", kurz: "aus den Häusern", quellen: [[5, 0], [6, 8]], gegner: [["eisgezeichneter", 0.35, 3, 0]], alle: 2, ab: 3, max: 3, an: "kaelterufer", text: "Hinter den Türen kratzt es" }],
       eis: { felder: eisFelder, proRunde: 1, ab: 3 } } }),
-  tor: (n) => ({ gegner: [{ art: "eisenhirte", anzahl: 1, tpFaktor: 0.6 + n * 0.12 }, { art: "kettenbestie", anzahl: n >= 5 ? 1 : 0 }, { art: "runenleser", anzahl: n >= 4 ? 1 : 0 }, { art: "frostknecht", anzahl: Math.round(n * 0.3) }].filter((g) => g.anzahl),
+  tor: (n) => ({ gegner: [{ art: "eisenhirte", anzahl: 1, tpFaktor: 0.8 + n * 0.12 }, { art: "kettenbestie", anzahl: n >= 5 ? 1 : 0 }, { art: "runenleser", anzahl: n >= 4 ? 1 : 0 }, { art: "frostknecht", anzahl: Math.round(n * 0.3) }].filter((g) => g.anzahl),
     mechanik: { ziele: [{ id: "r1", name: "Runensäule West", art: "saeule", x: 4, y: 1, runden: 2, ruhe: true, wirkung: { schild: true } }, { id: "r2", name: "Runensäule Ost", art: "saeule", x: 4, y: 7, runden: 2, ruhe: true, wirkung: { schild: true } }],
       schild: { art: "eisenhirte", ziele: ["r1", "r2"], halt: 18, pause: 2, text: "Runenschild" } } }),
 };

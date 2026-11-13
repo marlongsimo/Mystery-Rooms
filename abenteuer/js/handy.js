@@ -307,7 +307,7 @@
     const typ = { aktion: "Aktion", bonus: "Bonusaktion", reaktion: "Reaktion", passiv: "passiv", frei: "frei" }[a.typ] || "Aktion";
     const teile = [typ];
     if (a.reichweite) teile.push(a.reichweite === 1 ? "Nahkampf" : `${a.reichweite} Felder`);
-    if (a.art === "angriff") teile.push(`Angriff ${vorz(R.mod(d.werte[a.attr]) + 2 + (a.bogen && d === F.FIGUREN.wildnislaeufer && stufe >= 2 ? 1 : 0))}`);
+    if (a.art === "angriff") teile.push(`Angriff ${vorz(R.mod(d.werte[a.attr]) + 2 + (a.bogen && d === F.FIGUREN.wildnislaeufer ? 1 : 0))}`);
     if (a.rettung && a.attr) teile.push(`${a.rettung}-Rettung SG ${8 + 2 + R.mod(d.werte[a.attr])}`);
     if (a.schaden) teile.push(`${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}${a.art === "angriff" && !a.ohneMod ? " + " + R.mod(d.werte[a.attr]) : a.plusAttr ? " + " + R.mod(d.werte[a.attr]) : a.plus ? " + " + a.plus : ""}`);
     if (a.heilung) teile.push(`heilt ${a.heilung}`);

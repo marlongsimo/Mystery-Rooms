@@ -50,12 +50,12 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Niemand fällt, solange ich stehe.“
 
 **Rolle:** vorn, beschützt · **Werte:** STR 16 (+3) · GES 10 (+0) · KON 14 (+2) · INT 8 (-1) · WEI 13 (+1) · CHA 12 (+1)
-**TP** 15 / 26 / 37 · **RK** 18 (Kettenpanzer und Schild)
+**TP** 13 / 24 / 35 · **RK** 17 (Kettenpanzer und Schild)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Langschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
-| **Spott** | 1 | Bonusaktion · 6 Felder · 2× je Rast | Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir. |
+| **Spott** | 1 | Bonusaktion · 6 Felder · 1× je Rast | Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir. |
 | **Schildstoß** | 1 | Aktion · Nahkampf · STR-Rettung SG 13 · 1× je Kampf | STR-Rettungswurf, sonst wird das Ziel 1 Feld weggestoßen und liegt. |
 | **Zweiter Atem** | 1 | Bonusaktion · heilt 1W10 + Stufe · 1× je Rast | Heilt dich um 1W10 + Stufe. |
 | **Tatendrang** | 2 | frei · 1× je lange Rast | Eine zusätzliche Aktion in diesem Zug, einmal je lange Rast. |
@@ -92,7 +92,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Ein Fehler. Mehr brauche ich nicht.“
 
 **Rolle:** vorn, Einzelkampf · **Werte:** STR 10 (+0) · GES 16 (+3) · KON 14 (+2) · INT 8 (-1) · WEI 12 (+1) · CHA 13 (+1)
-**TP** 15 / 26 / 37 · **RK** 15 (beschlagenes Leder)
+**TP** 17 / 28 / 39 · **RK** 15 (beschlagenes Leder)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
@@ -235,7 +235,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Ein Schnitt. Kein Laut.“
 
 **Rolle:** Mitte, Einzelziel · **Werte:** STR 8 (-1) · GES 16 (+3) · KON 13 (+1) · INT 14 (+2) · WEI 12 (+1) · CHA 10 (+0)
-**TP** 9 / 15 / 21 · **RK** 14 (Leder)
+**TP** 11 / 17 / 23 · **RK** 15 (Leder)
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
@@ -294,7 +294,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | **Bewahren** | 2 | Aktion · 6 Felder · 1× je Rast | Göttliche Macht: 5 × Stufe TP auf Verbündete in 6 Feldern verteilen. |
 | **Massenheilwort** | 3 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · Platz vom 2. Grad | 3 Verbündete je 1W4 + 3 (+ Gesegnete Heilung). |
 | **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
-| **Gesegnete Heilung** | 1 | passiv | Deine Heilzauber heilen zusätzlich 2 + Grad des Platzes. |
+| **Gesegnete Heilung** | 1 | passiv | Deine Heilzauber heilen zusätzlich 1 + Grad des Platzes. |
 | **Kräuterkunde** | – | außerhalb des Kampfes | Erkennt Gifte und Flüche; nach jedem Kampf heilt die Gruppe je 1W4. |
 
 **Versuchung des Abts:** „Ich zeige dir, wie man jede Wunde schließt.“ Wahr, aber jede geschlossene Wunde öffnet sich bei dir.
@@ -334,13 +334,13 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Langbogen** | 1 | Aktion · 20 Felder · Angriff +5 (Stufe 2+: +6) · 1W8 + 3 | Fernkampf, ab Stufe 2 +1 zum Treffen. |
-| **Fesselnder Pfeil** | 1 | Aktion · 20 Felder · Angriff +5 (Stufe 2+: +6) · 1W8 + 3 · 2× je Rast | Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde). |
-| **Doppelschuss** | 3 | Aktion · 20 Felder · Angriff +5 (Stufe 2+: +6) · 1W8 + 3 · 2× je Rast | Zwei Ziele nebeneinander, je ein Angriff. |
+| **Langbogen** | 1 | Aktion · 20 Felder · Angriff +6 · 1W8 + 3 | Fernkampf, +1 zum Treffen. |
+| **Fesselnder Pfeil** | 1 | Aktion · 20 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde). |
+| **Doppelschuss** | 2 | Aktion · 20 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Zwei Ziele nebeneinander, je ein Angriff. |
 | **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Scharfes Auge** | 1 | passiv | Ignoriert Deckung. |
 | **Leichtfüßig** | 1 | passiv | Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff. |
-| **Bogenschütze** | 2 | passiv | +1 auf Fernkampf. |
+| **Bogenschütze** | 1 | passiv | +1 auf Fernkampf. |
 | **Fährtenleser** | 1 | passiv | Vorteil auf Spuren und Wahrnehmung im Freien. |
 | **Fährtenleser** | – | außerhalb des Kampfes | Liest Spuren genau, findet sichere Wege. |
 
@@ -352,7 +352,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 „Grau geht vor. Ich folge.“
 
 **Rolle:** Mitte, mit Wolf · **Werte:** STR 10 (+0) · GES 16 (+3) · KON 13 (+1) · INT 12 (+1) · WEI 14 (+2) · CHA 8 (-1)
-**TP** 9 / 16 / 23 · **RK** 14 (Leder) · **Wolf Grau:** TP 8 / 12 / 20, RK 13, Biss +4/+4/+5, 1W6 + 2, 8 Felder
+**TP** 11 / 18 / 25 · **RK** 14 (Leder) · **Wolf Grau:** TP 8 / 12 / 20, RK 13, Biss +4/+4/+5, 1W6 + 2, 8 Felder
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
@@ -379,12 +379,12 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Leichte Armbrust** | 1 | Aktion · 16 Felder · Angriff +5 · 1W8 + 3 | Fernkampf. |
-| **Netz** | 1 | Aktion · 6 Felder · STR-Rettung SG 13 · 1× je Rast | STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13). |
+| **Schwere Armbrust** | 1 | Aktion · 16 Felder · Angriff +5 · 1W10 + 3 | Fernkampf. |
+| **Netz** | 1 | Aktion · 6 Felder · STR-Rettung SG 13 · 2× je Rast | STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13). |
 | **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Schwachstelle** | 1 | passiv | Gegen dein markiertes Ziel kritisch bei 19–20. |
 | **Fangschuss** | 1 | passiv | Reaktion, automatisch: Bewegt sich dein markiertes Ziel, schießt du einmal. |
-| **Jagdvorbereitung** | 2 | passiv | Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz). |
+| **Jagdvorbereitung** | 1 | passiv | Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz). |
 | **Erlegen** | 3 | passiv · 1× je Kampf | 1× je Kampf gegen dein markiertes Ziel unter halben TP: +2W6. |
 | **Fährtenleser** | 1 | passiv | Vorteil auf Spuren und Wahrnehmung im Freien. |
 | **Steckbriefe** | – | außerhalb des Kampfes | Kennt Kreaturen: vor einem Kampf eine Schwäche des Gegners. |

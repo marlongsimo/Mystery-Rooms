@@ -585,6 +585,12 @@
     bild: "img/krone/titel.webp", vorschau: "img/krone/vorschau.webp", abschnittBilder: { 1: "img/krone/abschnitt-1.webp", 2: "img/krone/abschnitt-2.webp", 3: "img/krone/abschnitt-3.webp" },
     uhr: { name: "Frost", max: 7, mehr: "Der Frost kriecht tiefer.", weniger: "Die Kälte lässt etwas nach.", unruhe: "der Frost lässt niemanden ganz schlafen", rueckzug: "Der Frost kriecht tiefer." },
     gruppe: "Die Eisgänger", aufbruch: "Hinab nach Veyrholm", niederlage: "Unter dem Eis", chronik: "Chronik von Veyrholm",
+    einleitung: [
+      { eyebrow: "I · Die sieben Siegel", titel: "Wer sie gebaut hat", text: ["Die sieben Siegel stammen aus einem Reich, an das sich kaum jemand erinnert. Seine Hauptstadt hieß Veyrholm.", "Seit Jahrhunderten liegt sie unter dem Gletscher im hohen Norden."] },
+      { eyebrow: "II · Die Antwort", titel: "Ein Licht unter dem Eis", text: ["Als das Signal von Hochwacht aufflammte, kam eine Antwort: ein kaltes Leuchten tief im Gletscher.", "Unter dem Palast von Veyrholm liegt das Kronenherz. Es verbindet alle sieben Siegel miteinander."] },
+      { eyebrow: "III · Der Wettlauf", titel: "Die Hohlkrone", text: ["Ihr seid nicht die Einzigen, die das Licht gesehen haben. Der Bund der Hohlkrone sucht das Herz schon lange. Wer es hält, kann die Siegel lenken oder sie alle zugleich brechen.", "Drei Wege führen hinab: über den Sturmgrat, durch die Unterstollen oder entlang der alten Pilgerstraße. Ihr könnt nur einen davon gehen."] },
+    ],
+    kodexUhr: { titel: "Der Frost", text: ["Jede kurze Rast und mancher Umweg kosten Zeit. Mit der Zeit kriecht der <b>Frost</b> tiefer in die Stadt, bis zu sieben Stufen.", "Ab der dritten Stufe findet am Lagerfeuer niemand mehr richtig Schlaf: Eine lange Rast heilt dann nur noch bis drei Viertel der Trefferpunkte. Wer zügig vorankommt, steht dem König ausgeruhter gegenüber."] },
     abschnitte_namen: { 1: "Der Eintritt in die Stadt", 2: "Die Stadt erwacht", 3: "Das Herz der Siegel" },
   };
   const API = { META, EREIGNISSE: [], WISSEN, START: "prolog", NIEDERLAGE: "krone_verloren", SZENEN, KARTEN, OBJEKTE };

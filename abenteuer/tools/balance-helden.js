@@ -53,8 +53,11 @@ function diff(a, b, wer) {
 
 /** Gleichverteiltes Mischen (Fisher-Yates) – jede Gruppe gleich wahrscheinlich, jeder Held gleich oft dabei */
 function mischen(liste, r) { const a = liste.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+/** Automatische Reaktionen und Passive aus dem Kampfprotokoll: [Muster, Spezial? (begrenzt/kostet Platz)] */
+const REAKTIONEN = [[/^(.+?) stellt sich mit dem Schild dazwischen/, false, "Schutzhaltung"], [/^(.+?) pariert und sticht zurück/, false, "Parade"], [/^(.+?) schießt .+ hinterher \(Fangschuss\)/, false, "Fangschuss"],
+  [/^(.+?) wirft eine Schutzglyphe/, true, "Schutzglyphe"], [/^(.+?) reißt einen arkanen Schild/, true, "Arkaner Schild"], [/^(.+?): Gedankenstütze/, true, "Gedankenstütze"], [/^(.+?) hat Glück und versucht/, true, "Glückspilz"]];
 const leer = () => ({ k: 0, sieg: 0, steht: 0, nieBoden: 0, runden: 0, schadenAus: 0, schadenEin: 0, heilAndere: 0, heilSelbst: 0, auf: 0, kontrolle: 0, unterst: 0,
-  akt: 0, aktWirkung: 0, spez: 0, spezWirkung: 0, kSpezMoeglich: 0, kSpezSinnvoll: 0, groesse: { 3: 0, 4: 0, 5: 0, 6: 0 }, siegGroesse: { 3: 0, 4: 0, 5: 0, 6: 0 }, faehig: {} });
+  akt: 0, aktWirkung: 0, reakt: 0, spez: 0, spezWirkung: 0, kSpezMoeglich: 0, kSpezSinnvoll: 0, groesse: { 3: 0, 4: 0, 5: 0, 6: 0 }, siegGroesse: { 3: 0, 4: 0, 5: 0, 6: 0 }, faehig: {} });
 const zeilen = [], bericht = {};
 const fmt = (x, d = 0) => (Number.isFinite(x) ? x.toFixed(d) : "–");
 const proz = (x, d = 0) => fmt(x * 100, d) + " %";
@@ -75,8 +78,9 @@ for (const ab of NUR) {
     if (!o.stufe || s.stufe) o.stufe = A.stufe; else o.stufe = (R.BEGEGNUNGEN[o.begegnung] || {}).stufe || A.stufe;
     const st = R.neuesSpiel(5e6 + i * 13 + n * 7 + id.length, o);
     // je Held in diesem Kampf
-    const k = {}; for (const f of R.spielerFiguren(st)) if (f.fid && f.art !== "wolf") k[f.fid] = { boden: false, schadenAus: 0, schadenEin: 0, heilAndere: 0, heilSelbst: 0, auf: 0, kontrolle: 0, unterst: 0, akt: 0, aktWirkung: 0, spez: 0, spezWirkung: 0, spezMoeglich: false, faehig: {} };
-    for (const f of R.spielerFiguren(st)) if (k[f.fid]) k[f.fid].spezMoeglich = R.aktionenVon(f, st).some((a) => a.platz || R.grenze(f, a));
+    const k = {}; for (const f of R.spielerFiguren(st)) if (f.fid && f.art !== "wolf") k[f.fid] = { boden: false, schadenAus: 0, schadenEin: 0, heilAndere: 0, heilSelbst: 0, auf: 0, kontrolle: 0, unterst: 0, akt: 0, aktWirkung: 0, reakt: 0, spez: 0, spezWirkung: 0, spezMoeglich: false, faehig: {} };
+    const namen = {}; for (const f of R.spielerFiguren(st)) if (k[f.fid]) namen[f.name] = f.fid;
+    for (const f of R.spielerFiguren(st)) if (k[f.fid]) k[f.fid].spezMoeglich = R.aktionenVon(f, st).some((a) => a.platz || R.grenze(f, a)) || Boolean(f.plaetzeMax && f.plaetzeMax[0]);
     let vorAktion = null;
     R.beobachter = (art, st2, f, aktionId, zielId, e) => {
       if (art === "vor") { vorAktion = snap(st2); return; }
@@ -90,13 +94,25 @@ for (const ab of NUR) {
     };
     let schritte = 0;
     while (!st.ende && schritte++ < 4000) {
-      const akt = R.aktiv(st), vor = snap(st);
+      const akt = R.aktiv(st), vor = snap(st), logVor = st.log.length;
       if (akt.seite === "gegner") R.gegnerZug(st); else R.autoZug(st);
       const nach = snap(st);
+      // Reaktionen und automatische Passive der Helden (stehen nur im Protokoll)
+      const reagiert = new Set();
+      for (const l of st.log.slice(logVor)) for (const [re, spez, rname] of REAKTIONEN) {
+        const m = re.exec(l.t || ""), fidR = m && namen[m[1]]; if (!fidR || !k[fidR]) continue;
+        const h = k[fidR]; h.reakt++; reagiert.add(fidR);
+        if (spez) { h.spez++; h.spezWirkung++; const fa = h.faehig["passiv:" + rname] || (h.faehig["passiv:" + rname] = { name: rname + " (automatisch)", n: 0, w: 0, spez: true }); fa.n++; fa.w++; }
+      }
       // erlittener Schaden: jeder Held, in jedem Zug
       for (const [fid2, h] of Object.entries(k)) for (const [oid, y] of nach.m) if (y.held && y.fid === fid2) { const x = vor.m.get(oid); if (x) h.schadenEin += Math.max(0, x.tp - y.tp); if (y.tp <= 0) h.boden = true; }
       const fid = ownerFid(akt);
-      if (akt.seite === "gegner") { for (const [oid, y] of nach.m) { const x = vor.m.get(oid); if (x && y.seite === "gegner") sonst.schadenGegnerZug += Math.max(0, x.tp - y.tp); } continue; }
+      if (akt.seite === "gegner") {
+        let sch = 0; for (const [oid, y] of nach.m) { const x = vor.m.get(oid); if (x && y.seite === "gegner") sch += Math.max(0, x.tp - y.tp); }
+        // Schaden im Gegnerzug: eindeutig einem reagierenden Helden zuordnen (Parade, Fangschuss), sonst „nicht zugeordnet“
+        if (sch && reagiert.size === 1) k[[...reagiert][0]].schadenAus += sch; else sonst.schadenGegnerZug += sch;
+        continue;
+      }
       const d = diff(vor, nach, akt.id);
       if (!fid || !k[fid]) { sonst.schadenBegleiter += d.schaden; continue; }
       const h = k[fid];
@@ -113,7 +129,7 @@ for (const ab of NUR) {
       const x = k[f.fid], h = held[f.fid];
       h.k++; if (sieg) h.sieg++; if (f.tp > 0 && !f.tot) h.steht++; if (!x.boden) h.nieBoden++; h.runden += st.runde;
       h.groesse[n]++; if (sieg) h.siegGroesse[n]++;
-      for (const key of ["schadenAus", "schadenEin", "heilAndere", "heilSelbst", "auf", "kontrolle", "unterst", "akt", "aktWirkung", "spez", "spezWirkung"]) h[key] += x[key];
+      for (const key of ["schadenAus", "schadenEin", "heilAndere", "heilSelbst", "auf", "kontrolle", "unterst", "akt", "aktWirkung", "reakt", "spez", "spezWirkung"]) h[key] += x[key];
       if (x.spezMoeglich) h.kSpezMoeglich++;
       if (x.spezWirkung > 0) h.kSpezSinnvoll++;
       for (const [aid, fa] of Object.entries(x.faehig)) { const t = h.faehig[aid] || (h.faehig[aid] = { name: fa.name, n: 0, w: 0, spez: fa.spez }); t.n += fa.n; t.w += fa.w; }
@@ -127,7 +143,7 @@ for (const ab of NUR) {
 const name = (f) => `${F.FIGUREN[f].name} (${F.KLASSEN[F.FIGUREN[f].klasse].name})`;
 let md = `# Balance-Analyse der Helden (${HARD ? "Hardcore" : "Normal"})\n\nErzeugt mit \`node abenteuer/tools/balance-helden.js ${N}${HARD ? " --hardcore" : ""}\`. Gesteuert von der eingebauten KI, nicht von Menschen.\n`;
 md += `Je Kampfszene und Gruppengröße (3, 4, 5, 6) ${N} zufällige Gruppen. Werte „je Kampf“ sind Durchschnitte über alle Kämpfe, in denen der Held dabei war.\n\n`;
-md += `**Spalten:** Kämpfe = Anzahl Simulationen mit dem Held · Ø Gruppe = durchschnittliche Gruppengröße · Sieg = Siegquote seiner Gruppen (95-%-Bereich) · Δ ohne = Siegquote mit ihm minus Siegquote aller Kämpfe ohne ihn (Prozentpunkte; misst seinen Beitrag unabhängig von der Kampagnenschwere) · Steht = am Kampfende auf den Beinen · Nie 0 = nie auf 0 TP · Schaden aus/ein = verursacht/erlitten je Kampf (ohne Overkill) · Heilung = an anderen (+ selbst) je Kampf · Auf = Verbündete aufgerichtet je Kampf · Unterst./Kontr. = neue Zustände auf Verbündeten/Gegnern je Kampf · Aktionen = ausgeführte Aktionen je Kampf, davon mit Wirkung · Spezial = Spezialfähigkeiten (begrenzt oder Zauberplatz) je Kampf, davon mit Wirkung · Spezial sinnvoll = Anteil der Kämpfe mit mindestens einer wirksamen Spezialfähigkeit.\n`;
+md += `**Spalten:** Kämpfe = Anzahl Simulationen mit dem Held · Ø Gruppe = durchschnittliche Gruppengröße · Sieg = Siegquote seiner Gruppen (95-%-Bereich) · Δ ohne = Siegquote mit ihm minus Siegquote aller Kämpfe ohne ihn (Prozentpunkte; misst seinen Beitrag unabhängig von der Kampagnenschwere) · Steht = am Kampfende auf den Beinen · Nie 0 = nie auf 0 TP · Schaden aus/ein = verursacht/erlitten je Kampf (ohne Overkill) · Heilung = an anderen (+ selbst) je Kampf · Auf = Verbündete aufgerichtet je Kampf · Unterst./Kontr. = neue Zustände auf Verbündeten/Gegnern je Kampf · Aktionen = ausgeführte Aktionen je Kampf, davon mit Wirkung · Reakt. = automatische Reaktionen/Passive je Kampf (Schutzhaltung, Parade, Fangschuss, Schutzglyphe, Arkaner Schild, Gedankenstütze, Glückspilz) · Spezial = Spezialfähigkeiten (begrenzt oder Zauberplatz, auch automatische wie Schutzglyphe) je Kampf, davon mit Wirkung · Spezial sinnvoll = Anteil der Kämpfe mit mindestens einer wirksamen Spezialfähigkeit.\n`;
 for (const [ab, b] of Object.entries(bericht)) {
   const g = b.gruppe, liste = F.REIHE.filter((f) => b.held[f].k).sort((x, y) => b.held[y].sieg / b.held[y].k - b.held[x].sieg / b.held[x].k);
   md += `\n## ${b.titel}\n\n${b.szenen} Kampfszenen · ${g.kaempfe} Kämpfe · Sieg gesamt ${proz(g.siege / g.kaempfe, 1)}\n\n`;
@@ -135,10 +151,10 @@ for (const [ab, b] of Object.entries(bericht)) {
   md += `**Klasse in der Gruppe:** ${Object.entries(g.klasse).map(([kl, e]) => `${F.KLASSEN[kl].name} mit ${proz(e.mit.s / e.mit.k)} / ohne ${proz(e.ohne.s / e.ohne.k)}`).join(" · ")}\n\n`;
   const schadenHelden = liste.reduce((s, f) => s + b.held[f].schadenAus, 0), alle = schadenHelden + b.sonst.schadenGegnerZug + b.sonst.schadenBegleiter;
   md += `**Zuordnung des Gegnerschadens:** ${proz(schadenHelden / alle)} direkt im Zug eines Helden · ${proz(b.sonst.schadenGegnerZug / alle)} im Zug der Gegner (Reaktionen, Flächen, Nachwirkungen – nicht einem Helden zugeordnet) · ${proz(b.sonst.schadenBegleiter / alle)} durch Begleiter.\n\n`;
-  md += `| # | Held | Kämpfe | Ø Gruppe | Sieg (95 %) | Δ ohne | Steht | Nie 0 | Schaden aus | Schaden ein | Heilung | Auf | Unterst. | Kontr. | Aktionen (Wirkung) | Spezial (Wirkung) | Spezial sinnvoll |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n`;
+  md += `| # | Held | Kämpfe | Ø Gruppe | Sieg (95 %) | Δ ohne | Steht | Nie 0 | Schaden aus | Schaden ein | Heilung | Auf | Unterst. | Kontr. | Aktionen (Wirkung) | Reakt. | Spezial (Wirkung) | Spezial sinnvoll |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n`;
   liste.forEach((f, i) => {
     const h = b.held[f], q = h.sieg / h.k, [lo, hi] = wilson(h.sieg, h.k), og = GROESSEN.reduce((s, n) => s + n * h.groesse[n], 0) / h.k;
-    md += `| ${i + 1} | ${name(f)} | ${h.k} | ${fmt(og, 1)} | ${proz(q, 1)} (${fmt(lo * 100)}–${fmt(hi * 100)}) | ${(() => { const ohne = (g.siege - h.sieg) / (g.kaempfe - h.k), d = (q - ohne) * 100; return (d >= 0 ? "+" : "−") + fmt(Math.abs(d), 1); })()} | ${proz(h.steht / h.k)} | ${proz(h.nieBoden / h.k)} | ${fmt(h.schadenAus / h.k, 1)} | ${fmt(h.schadenEin / h.k, 1)} | ${fmt(h.heilAndere / h.k, 1)} (+${fmt(h.heilSelbst / h.k, 1)}) | ${fmt(h.auf / h.k, 2)} | ${fmt(h.unterst / h.k, 1)} | ${fmt(h.kontrolle / h.k, 1)} | ${fmt(h.akt / h.k, 1)} (${proz(h.aktWirkung / Math.max(1, h.akt))}) | ${fmt(h.spez / h.k, 1)} (${proz(h.spezWirkung / Math.max(1, h.spez))}) | ${proz(h.kSpezSinnvoll / h.k)} |\n`;
+    md += `| ${i + 1} | ${name(f)} | ${h.k} | ${fmt(og, 1)} | ${proz(q, 1)} (${fmt(lo * 100)}–${fmt(hi * 100)}) | ${(() => { const ohne = (g.siege - h.sieg) / (g.kaempfe - h.k), d = (q - ohne) * 100; return (d >= 0 ? "+" : "−") + fmt(Math.abs(d), 1); })()} | ${proz(h.steht / h.k)} | ${proz(h.nieBoden / h.k)} | ${fmt(h.schadenAus / h.k, 1)} | ${fmt(h.schadenEin / h.k, 1)} | ${fmt(h.heilAndere / h.k, 1)} (+${fmt(h.heilSelbst / h.k, 1)}) | ${fmt(h.auf / h.k, 2)} | ${fmt(h.unterst / h.k, 1)} | ${fmt(h.kontrolle / h.k, 1)} | ${fmt(h.akt / h.k, 1)} (${proz(h.aktWirkung / Math.max(1, h.akt))}) | ${fmt(h.reakt / h.k, 1)} | ${fmt(h.spez / h.k, 1)} (${proz(h.spezWirkung / Math.max(1, h.spez))}) | ${proz(h.kSpezSinnvoll / h.k)} |\n`;
   });
   md += `\n<details><summary>Fähigkeiten je Held (Einsätze gesamt · Anteil mit Wirkung)</summary>\n\n`;
   for (const f of liste) {
@@ -147,7 +163,7 @@ for (const [ab, b] of Object.entries(bericht)) {
   }
   md += `\n★ = Spezialfähigkeit\n</details>\n`;
   console.log(`\n${b.titel} · ${g.kaempfe} Kämpfe · Sieg ${proz(g.siege / g.kaempfe, 1)}`);
-  liste.forEach((f, i) => { const h = b.held[f]; console.log(`${String(i + 1).padStart(2)}. ${name(f).padEnd(26)} n=${String(h.k).padStart(4)}  Sieg ${proz(h.sieg / h.k, 1).padStart(7)}  aus ${fmt(h.schadenAus / h.k, 1).padStart(5)}  ein ${fmt(h.schadenEin / h.k, 1).padStart(5)}  Heil ${fmt(h.heilAndere / h.k, 1).padStart(4)}  steht ${proz(h.steht / h.k).padStart(5)}  Spez.sinnv. ${proz(h.kSpezSinnvoll / h.k).padStart(5)}`); });
+  liste.forEach((f, i) => { const h = b.held[f]; const dd = (h.sieg / h.k - (g.siege - h.sieg) / (g.kaempfe - h.k)) * 100; console.log(`${String(i + 1).padStart(2)}. ${name(f).padEnd(26)} n=${String(h.k).padStart(4)}  Sieg ${proz(h.sieg / h.k, 1).padStart(7)}  Δ ${(dd >= 0 ? "+" : "") + dd.toFixed(1)}  aus ${fmt(h.schadenAus / h.k, 1).padStart(5)}  ein ${fmt(h.schadenEin / h.k, 1).padStart(5)}  Heil ${fmt(h.heilAndere / h.k, 1).padStart(4)}  steht ${proz(h.steht / h.k).padStart(5)}  Spez.sinnv. ${proz(h.kSpezSinnvoll / h.k).padStart(5)}`); });
 }
 if (arg("md")) require("fs").writeFileSync(arg("md"), md);
 if (arg("csv")) require("fs").writeFileSync(arg("csv"), "kampagne;szene;gruppengroesse;gruppe;held;sieg;steht_am_ende;war_am_boden;runden;schaden_aus;schaden_ein;heilung_andere;heilung_selbst;aufgerichtet;kontrolle;unterstuetzung;aktionen;aktionen_mit_wirkung;spezial;spezial_mit_wirkung\n" + zeilen.join("\n") + "\n");

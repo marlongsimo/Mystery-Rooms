@@ -15,7 +15,7 @@ function info(a, d) {
   const t = [TYP[a.typ] || "Aktion"];
   if (a.reichweite) t.push(a.reichweite === 1 ? "Nahkampf" : `${a.reichweite} Felder`);
   if (a.radius || a.form === "kreis") t.push(`Radius ${a.radius || a.groesse}`);
-  if (a.art === "angriff") t.push(`Angriff ${vorz(mod(d.werte[a.attr]) + 2)}${a.bogen && d === F.FIGUREN.wildnislaeufer ? " (Stufe 2+: " + vorz(mod(d.werte[a.attr]) + 3) + ")" : ""}`);
+  if (a.art === "angriff") t.push(`Angriff ${vorz(mod(d.werte[a.attr]) + 2 + (a.bogen && d === F.FIGUREN.wildnislaeufer ? 1 : 0))}`);
   if (a.rettung && a.attr) t.push(`${a.rettung}-Rettung SG ${8 + 2 + mod(d.werte[a.attr])}`);
   if (a.schaden) t.push(`${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}${a.art === "angriff" && !a.ohneMod ? " + " + mod(d.werte[a.attr]) : a.plusAttr ? " + " + mod(d.werte[a.attr]) : a.plus ? " + " + a.plus : ""}`);
   if (a.heilung) t.push(`heilt ${a.heilung}${a.plusStufe ? " + Stufe" : a.plusAttr ? " + " + a.plusAttr : ""}`);

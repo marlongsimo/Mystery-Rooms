@@ -155,5 +155,10 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   if (endeArt && endeArt !== 'grauwacht_behaelt') check(await p.evaluate(() => JSON.parse(localStorage.getItem('ab_chronik') || '[]').length === 1), 'Das Ende steht einmal in der Chronik des Geräts');
   check(errs.length === 0, 'keine Konsolenfehler' + (errs.length ? ': ' + errs.slice(0, 3).join(' | ') : ''));
   await b.close();
+  // Jede weitere Kampagne braucht eigene Texte für Kampagnenwelt, Einleitung und Kodex-Seite zur Uhr (sonst erscheint Grauwacht)
+  for (const d of ['rabenmoor', 'hochwacht', 'krone']) {
+    require('../daten/' + d + '.js'); const m = globalThis.ABD_ALLE[d].META;
+    check(m.kurztext && m.untertitel && Array.isArray(m.einleitung) && m.einleitung.length >= 2 && m.einleitung.every((e) => e.titel && e.text.length) && m.kodexUhr && m.kodexUhr.text.length, `${m.titel}: Kurztext, Untertitel, Einleitung und Kodex-Seite zur Uhr vorhanden`);
+  }
   console.log(ok ? '\nALLE PRÜFUNGEN BESTANDEN' : '\nFEHLER'); process.exit(ok ? 0 : 1);
 })();

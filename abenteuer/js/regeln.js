@@ -373,7 +373,7 @@
     if (st.schwierigkeit === "hardcore") st.log.push({ t: "Hardcore: Wer am Boden liegt, würfelt Todeswürfe. Der Tod ist endgültig.", art: "schlecht" });
     if (opts.ueberraschung) st.log.push({ t: "Überraschung! Die Gegner setzen die erste Runde aus.", art: "gut" });
     // Jagdvorbereitung: Kopfgeldjäger ab Stufe 2 beginnt mit einem markierten Gegner
-    for (const f of spielerFiguren(st)) if (istFig(f, "kopfgeldjaeger") && f.stufe >= 2) {
+    for (const f of spielerFiguren(st)) if (istFig(f, "kopfgeldjaeger") && f.stufe >= 1) {
       const z = gegnerFiguren(st).sort((a, b) => b.tp - a.tp)[0];
       if (z) { z.z.mal_jaeger = f.id; f.malZiel = z.id; st.log.push({ t: `${f.name} hat ${z.name} schon im Visier (Jagdvorbereitung).` }); }
     }
@@ -674,7 +674,7 @@
 
   /** Angriff einer Spielerfigur mit einer Waffe oder einem Angriffszauber */
   function spielerAngriff(st, f, a, z, opt = {}) {
-    let bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") && f.stufe >= 2 ? 1 : 0);
+    let bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") ? 1 : 0);
     bonus += abstand(f, z) <= 1 ? (hatDing(f, "ring") ? 1 : 0) : (hatDing(f, "feder") ? 1 : 0);
     // Klassenregler für Waffenangriffe (Stärke oder Geschick): fester Bonus/Malus und Zusatzwürfel
     const kl = FD.KLASSEN[f.klasse] || {}, waffe = a.attr === "STR" || a.attr === "GES";
@@ -911,7 +911,7 @@
       }
       case "heilung": {
         let n = roll(r, a.heilung).total + mod(f.werte[a.plusAttr || "WEI"]);
-        if (istFig(f, "wanderheiler")) n += 2 + (a.platz || 1);
+        if (istFig(f, "wanderheiler")) n += 1 + (a.platz || 1);
         heilen(st, ziel, n, `${f.name}: ${a.name}`); break;
       }
       case "selbstheilung": heilen(st, f, roll(r, a.heilung).total + (a.plusStufe ? f.stufe : 0), `${f.name}: ${a.name}`); break;
@@ -959,7 +959,7 @@
       }
       case "massenheil": {
         const zs3 = st.figuren.filter((o) => o.seite === "spieler" && !o.tot && o.tp < o.tpMax && abstand(f, o) <= a.reichweite).sort((x, y) => x.tp / x.tpMax - y.tp / y.tpMax).slice(0, 3);
-        for (const o of zs3) heilen(st, o, roll(r, a.heilung).total + mod(f.werte.WEI) + 2 + 2, `${f.name}: Massenheilwort`);
+        for (const o of zs3) heilen(st, o, roll(r, a.heilung).total + mod(f.werte.WEI) + 2 + 1, `${f.name}: Massenheilwort`);
         break;
       }
       case "bannkreis": st.zonen.push({ art: "bann", x: ziel.x, y: ziel.y, radius: a.radius, bis: st.runde + a.dauer }); st.log.push({ t: `${f.name} zieht einen Bannkreis um ${ziel.name}: Gegner darin −2 RK.`, art: "gut" }); break;
@@ -1682,7 +1682,7 @@
         if (z.tp < 8) return -1;
         const pfail = Math.max(0.05, Math.min(0.95, (SG(f, a.attr) - 1 - mod(z.werte[a.rettung])) / 20));
         const runden = a.zustand === "netz" ? 2 : a.dauer || 1;
-        const wirkung = a.zustand === "geblendet" ? 0.6 : a.zustand === "festgehalten" || a.zustand === "netz" ? 0.6 : a.zustand === "zeitriss" ? 0.6 : 1;
+        const wirkung = a.zustand === "geblendet" ? 0.6 : a.zustand === "netz" ? 1.2 : a.zustand === "festgehalten" ? 0.6 : a.zustand === "zeitriss" ? 0.6 : 1; // Netz: Gegner verliert Züge beim Befreien, Angriffe gegen ihn mit Vorteil
         const betroffen = a.radius ? flaecheZiele(st, f, { form: "kreis", groesse: a.radius }, z).filter((o) => o.tp >= 6) : [z];
         return betroffen.reduce((s, o) => s + pfail * bedrohung(o) * runden * wirkung * 0.9, 0) + (a.zustand === "verbannt" ? 4 : 0) - slot - begrenzt;
       }
@@ -1802,6 +1802,8 @@
         }
       }
     }
+    // Schmutziger Trick, solange der Gegner noch neben einem steht (danach geht es weg)
+    if (kann("trick") && st.zug.bonus) { const t = gegner().filter((g) => abstand(g, f) <= 1 && g.tp > 6).sort((a, b) => bedrohung(b) - bedrohung(a))[0]; if (t) versuche(st, "trick", t); }
     // 2. Bewegen
     const nah = Boolean(nahAngriff) && (!fernAngriff || ["krieger"].includes(f.klasse) || ["inquisitor", "assassine", "schattenlaeufer", "tiergefaehrte"].includes(f.fid));
     const m = bf();
@@ -1899,7 +1901,7 @@
     if (!h || !z) return { p: null, art: null, text: "" };
     const a = h.a, klemm = (x) => Math.max(0.05, Math.min(0.95, x));
     if (a.art === "angriff") {
-      const bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") && f.stufe >= 2 ? 1 : 0);
+      const bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") ? 1 : 0);
       const spec = { fern: Boolean(a.fern) || (a.wurfwaffe && abstand(f, z) > 1), ruecksichtslos: a.ruecksichtslos };
       const v = vorteil(st, f, z, spec).v, rk = rkEff(st, z, f, spec);
       let p = klemm((21 - (rk - bonus)) / 20);

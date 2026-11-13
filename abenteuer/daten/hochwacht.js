@@ -435,6 +435,12 @@
     bild: "img/hochwacht/titel.webp", vorschau: "img/hochwacht/vorschau.webp", abschnittBilder: { 1: "img/hochwacht/abschnitt-1.webp", 2: "img/hochwacht/abschnitt-2.webp", 3: "img/hochwacht/abschnitt-3.webp" },
     uhr: { name: "Kälte", max: 7, mehr: "Der Wind wird schärfer.", weniger: "Der Wind legt sich ein wenig.", unruhe: "die Kälte lässt niemanden ganz schlafen", rueckzug: "Der Wind wird schärfer." },
     gruppe: "Die Fackelträger", aufbruch: "Über den Pass", niederlage: "Die Nordwarte verstummt", chronik: "Chronik von Hochwacht",
+    einleitung: [
+      { eyebrow: "I · Die sieben Siegel", titel: "Was der Krieg zurückließ", text: ["Vor dreihundert Jahren endete der Krieg der Magier. Was er hervorgebracht hatte, ließ sich nicht töten. Man band es in sieben Siegel.", "Grauwacht war eines davon. Wer dort war, weiß: Die Siegel halten nicht von allein."] },
+      { eyebrow: "II · Der Norden", titel: "Ein Licht auf dem Felsgrat", text: ["Über dem Pass im Norden steht die Signalwarte von Hochwacht. Seit Jahrzehnten war sie dunkel.", "Seit drei Nächten brennt dort oben wieder ein schwaches Licht. Niemand weiß, wer es entzündet hat."] },
+      { eyebrow: "III · Der Auftrag", titel: "Die Botin und der Funke", text: ["Sera Venn ist die letzte Botin des alten Wachtordens. Sie trägt den Wachtfunken, der die Nordwarte öffnet. Der Funke zieht alles an, was im Pass auf Beute wartet. Sera kennt den Weg, aber sie ist keine Kämpferin.", "Bringt sie lebend zur Hochwarte. Die Siegeljäger sind schon unterwegs."] },
+    ],
+    kodexUhr: { titel: "Die Kälte", text: ["Jede kurze Rast und mancher Umweg kosten Zeit. Mit der Zeit wird es im Pass <b>kälter</b>, bis zu sieben Stufen.", "Ab der dritten Stufe findet am Lagerfeuer niemand mehr richtig Schlaf: Eine lange Rast heilt dann nur noch bis drei Viertel der Trefferpunkte. Wer zügig weiterzieht, kommt ausgeruhter oben an."] },
     abschnitte_namen: { 1: "Der Überfall am Pass", 2: "Die stumme Wacht", 3: "Das letzte Licht" },
   };
   const API = { META, ESKORTE, EREIGNISSE: [], WISSEN, START: "prolog", NIEDERLAGE: "hochwacht_verloren", SZENEN, KARTEN };

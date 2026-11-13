@@ -44,11 +44,11 @@
     /* ============ Krieger ============ */
     schildwaechter: {
       name: "Torvald", titel: "Der Schildwächter", klasse: "krieger", rolle: "vorn, beschützt", spruch: "Niemand fällt, solange ich stehe.",
-      werte: { STR: 16, KON: 14, WEI: 13, CHA: 12, GES: 10, INT: 8 }, rk: [18, 18, 18], ruestung: "Kettenpanzer und Schild", metall: true,
+      werte: { STR: 16, KON: 14, WEI: 13, CHA: 12, GES: 10, INT: 8 }, rk: [17, 17, 17], ruestung: "Kettenpanzer und Schild", tpMinus: 2, metall: true,
       faehig: [
         { id: "langschwert", name: "Langschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W8", text: "Nahkampf." },
         { id: "schutzhaltung", name: "Schutzhaltung", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Ein Angriff gegen einen Verbündeten neben dir erfolgt mit Nachteil (ab Stufe 3 zweimal je Runde)." },
-        { id: "spott", name: "Spott", typ: "bonus", ab: 1, art: "spott", reichweite: 6, pro: { rast: 2 }, text: "Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir." },
+        { id: "spott", name: "Spott", typ: "bonus", ab: 1, art: "spott", reichweite: 6, pro: { rast: 1 }, text: "Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir." },
         { id: "schildstoss", name: "Schildstoß", typ: "aktion", ab: 1, art: "stoss", reichweite: 1, rettung: "STR", attr: "STR", pro: { kampf: 1 }, wucht: true, text: "STR-Rettungswurf, sonst wird das Ziel 1 Feld weggestoßen und liegt." },
         { id: "bollwerk", name: "Bollwerk", typ: "passiv", ab: 3, text: "Schutzhaltung zweimal je Runde." },
       ],
@@ -72,7 +72,7 @@
     },
     duellant: {
       name: "Isolde", titel: "Die Duellantin", klasse: "krieger", rolle: "vorn, Einzelkampf", spruch: "Ein Fehler. Mehr brauche ich nicht.",
-      werte: { GES: 16, KON: 14, CHA: 13, WEI: 12, STR: 10, INT: 8 }, rk: [15, 15, 15], ruestung: "beschlagenes Leder", metall: false,
+      werte: { GES: 16, KON: 14, CHA: 13, WEI: 12, STR: 10, INT: 8 }, rk: [15, 15, 15], ruestung: "beschlagenes Leder", metall: false, tpMinus: -2,
       faehig: [
         { id: "rapier", name: "Rapier", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W8", text: "Nahkampf." },
         { id: "parade", name: "Parade", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Verfehlt dich ein Nahangriff, greifst du sofort an." },
@@ -169,7 +169,7 @@
     },
     assassine: {
       name: "Vex", titel: "Der Assassine", klasse: "schurke", rolle: "Mitte, Einzelziel", spruch: "Ein Schnitt. Kein Laut.",
-      werte: { GES: 16, INT: 14, KON: 13, WEI: 12, CHA: 10, STR: 8 }, rk: [14, 14, 14], ruestung: "Leder",
+      werte: { GES: 16, INT: 14, KON: 13, WEI: 12, CHA: 10, STR: 8 }, rk: [15, 15, 15], ruestung: "Leder", tpMinus: -2,
       faehig: [
         { id: "klinge", name: "Klinge der Gilde", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W8", text: "Nahkampf." },
         { id: "armbrust", name: "Leichte Armbrust", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W8", fern: true, text: "Fernkampf." },
@@ -204,7 +204,7 @@
       werte: { WEI: 16, KON: 14, GES: 13, INT: 12, CHA: 10, STR: 8 }, rk: [15, 15, 15], ruestung: "Schuppenpanzer", metall: true,
       faehig: [
         { id: "dornenranke", name: "Dornenranke", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 8, rettung: "GES", attr: "WEI", schaden: "1W8", plusAttr: true, zustand: "verlangsamt", dauer: 1, text: "Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt." },
-        { id: "gesegnete_heilung", name: "Gesegnete Heilung", typ: "passiv", ab: 1, text: "Deine Heilzauber heilen zusätzlich 2 + Grad des Platzes." },
+        { id: "gesegnete_heilung", name: "Gesegnete Heilung", typ: "passiv", ab: 1, text: "Deine Heilzauber heilen zusätzlich 1 + Grad des Platzes." },
         { id: "schild_glaube", name: "Schild des Glaubens", typ: "bonus", ab: 1, art: "schild", reichweite: 6, platz: 1, text: "Ein Verbündeter +2 RK bis Kampfende." },
         { id: "lebenshauch", name: "Lebenshauch", typ: "aktion", ab: 1, art: "aufrichten", reichweite: 6, pro: { kampf: 1 }, text: "Ein Verbündeter am Boden in 6 Feldern steht mit 1 TP auf." },
         { id: "bewahren", name: "Bewahren", typ: "aktion", ab: 2, art: "bewahren", reichweite: 6, pro: { rast: 1 }, text: "Göttliche Macht: 5 × Stufe TP auf Verbündete in 6 Feldern verteilen." },
@@ -235,12 +235,12 @@
       name: "Kael", titel: "Der Wildnisläufer", klasse: "waldlaeufer", rolle: "hinten, Fernkampf, Spuren", spruch: "Ich sehe dich, lange bevor du mich siehst.",
       werte: { GES: 16, WEI: 14, KON: 13, INT: 12, STR: 10, CHA: 8 }, rk: [14, 14, 14], ruestung: "Leder",
       faehig: [
-        { id: "langbogen", name: "Langbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, text: "Fernkampf, ab Stufe 2 +1 zum Treffen." },
+        { id: "langbogen", name: "Langbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, text: "Fernkampf, +1 zum Treffen." },
         { id: "fesselpfeil", name: "Fesselnder Pfeil", typ: "aktion", ab: 1, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, fesseln: true, pro: { rast: 2 }, text: "Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde)." },
         { id: "scharfes_auge", name: "Scharfes Auge", typ: "passiv", ab: 1, text: "Ignoriert Deckung." },
         { id: "leichtfuessig", name: "Leichtfüßig", typ: "passiv", ab: 1, text: "Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff." },
-        { id: "bogenschuetze", name: "Bogenschütze", typ: "passiv", ab: 2, text: "+1 auf Fernkampf." },
-        { id: "doppelschuss", name: "Doppelschuss", typ: "aktion", ab: 3, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, doppel: true, pro: { rast: 2 }, text: "Zwei Ziele nebeneinander, je ein Angriff." },
+        { id: "bogenschuetze", name: "Bogenschütze", typ: "passiv", ab: 1, text: "+1 auf Fernkampf." },
+        { id: "doppelschuss", name: "Doppelschuss", typ: "aktion", ab: 2, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, doppel: true, pro: { rast: 2 }, text: "Zwei Ziele nebeneinander, je ein Angriff." },
       ],
       aussen: { name: "Fährtenleser", text: "Liest Spuren genau, findet sichere Wege." },
       versuchung: "„Du wirst nie wieder jemanden verlieren, den du beschützen willst.“ Wahr, weil du niemanden mehr nah genug heranlässt.",
@@ -248,7 +248,7 @@
     },
     tiergefaehrte: {
       name: "Faye", titel: "Die Tiergefährtin", klasse: "waldlaeufer", rolle: "Mitte, mit Wolf", spruch: "Grau geht vor. Ich folge.",
-      werte: { GES: 16, WEI: 14, KON: 13, INT: 12, STR: 10, CHA: 8 }, rk: [14, 14, 14], ruestung: "Leder", tpMinus: 2,
+      werte: { GES: 16, WEI: 14, KON: 13, INT: 12, STR: 10, CHA: 8 }, rk: [14, 14, 14], ruestung: "Leder",
       wolf: { name: "Grau", tp: [8, 12, 20], rk: 13, angriff: [4, 4, 5], schaden: "1W6", plus: 2, bewegung: 8 },
       faehig: [
         { id: "kurzschwert", name: "Kurzschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W6", text: "Nahkampf." },
@@ -267,11 +267,11 @@
       name: "Orin", titel: "Der Kopfgeldjäger", klasse: "waldlaeufer", rolle: "hinten, markiert und erlegt", spruch: "Jeder hat einen Preis. Und eine Schwäche.",
       werte: { GES: 16, WEI: 14, KON: 13, INT: 12, STR: 10, CHA: 8 }, rk: [15, 15, 15], ruestung: "beschlagenes Leder",
       faehig: [
-        { id: "armbrust", name: "Leichte Armbrust", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W8", fern: true, text: "Fernkampf." },
+        { id: "armbrust", name: "Schwere Armbrust", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W10", fern: true, text: "Fernkampf." },
         { id: "schwachstelle", name: "Schwachstelle", typ: "passiv", ab: 1, text: "Gegen dein markiertes Ziel kritisch bei 19–20." },
-        { id: "netz", name: "Netz", typ: "aktion", ab: 1, art: "kontrolle", zustand: "netz", reichweite: 6, rettung: "STR", attr: "GES", pro: { rast: 1 }, text: "STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13)." },
+        { id: "netz", name: "Netz", typ: "aktion", ab: 1, art: "kontrolle", zustand: "netz", reichweite: 6, rettung: "STR", attr: "GES", pro: { rast: 2 }, text: "STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13)." },
         { id: "fangschuss", name: "Fangschuss", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Bewegt sich dein markiertes Ziel, schießt du einmal." },
-        { id: "jagdvorbereitung", name: "Jagdvorbereitung", typ: "passiv", ab: 2, text: "Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz)." },
+        { id: "jagdvorbereitung", name: "Jagdvorbereitung", typ: "passiv", ab: 1, text: "Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz)." },
         { id: "erlegen", name: "Erlegen", typ: "passiv", ab: 3, pro: { kampf: 1 }, text: "1× je Kampf gegen dein markiertes Ziel unter halben TP: +2W6." },
       ],
       aussen: { name: "Steckbriefe", text: "Kennt Kreaturen: vor einem Kampf eine Schwäche des Gegners." },

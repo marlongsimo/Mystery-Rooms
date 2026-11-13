@@ -79,6 +79,8 @@ function endenSql(t = endenTabelle()) {
 // Schlüssel, deren Text-Wert eine Szene sein MUSS (richtig/falsch/abschluss sind bei Rätseln und Proben Texte)
 const ZIEL_SCHLUESSEL = new Set(["weiter", "sieg", "verloren", "gefangen", "niederlage"]);
 const ARTEN = new Set(["erzaehlung", "gespraech", "wahl", "geheim", "probe", "kampf", "lager", "raetsel", "ende"]);
+const sid_regulaer = (D, x) => x !== D.SZENEN[D.NIEDERLAGE] && !x.niederlage;
+const enden_anzahl = (D) => Object.values(D.SZENEN).filter((x) => x.art === "ende" && sid_regulaer(D, x)).length;
 function pruefen(id) {
   const D = daten(id), sz = D.SZENEN, fehler = [], hinweise = [], kanten = {};
   const istSzene = (x) => typeof x === "string" && Object.prototype.hasOwnProperty.call(sz, x);
@@ -125,6 +127,21 @@ function pruefen(id) {
   // Enden für die Heldensammlung
   const enden = endenVon(id);
   if (!enden.length) fehler.push("kein reguläres Ende");
+  // Erzähltiefe: Merker, die eine Entscheidung setzt und die nie wieder jemand liest – die Entscheidung bleibt folgenlos
+  {
+    const src = fs.readFileSync(path.join(WURZEL, "daten", id + ".js"), "utf8"), gesetzt = new Set(), gelesen = new Set();
+    for (const m of src.matchAll(/setzt:\s*(?:\([^)]*\)\s*=>\s*\(?\s*)?\{([^}]*)\}/g)) for (const k of m[1].matchAll(/(?:\[\s*"([a-z_0-9]+)"\s*\+|(?:^|,)\s*([a-z_0-9]+)\s*:)/g)) gesetzt.add(k[1] ? k[1] + "*" : k[2]);
+    for (const m of src.matchAll(/merker\.([a-z_0-9]+)/g)) gelesen.add(m[1]);
+    for (const m of src.matchAll(/merker\[\s*"([a-z_0-9]+)"\s*\+/g)) gelesen.add(m[1] + "*");
+    for (const m of src.matchAll(/\bm\.([a-z_0-9]+)/g)) gelesen.add(m[1]);
+    for (const m of src.matchAll(/startsWith\("([a-z_0-9]+)"\)/g)) gelesen.add(m[1] + "*");
+    const stumm = [...gesetzt].filter((k) => !gelesen.has(k));
+    if (stumm.length) hinweise.push(`Folgenlose Entscheidungen: Diese Merker werden gesetzt, aber nie gelesen: ${stumm.join(", ")}. Entweder später darauf reagieren oder die Entscheidung streichen.`);
+    const ohneFolge = (src.match(/setzt:/g) || []).length - (src.match(/folge:/g) || []).length;
+    if (!/folge:/.test(src)) hinweise.push("Keine einzige sichtbare Folge („folge: …“): Die Gruppe sieht nicht, was ihre Entscheidungen bewirken.");
+    else if (ohneFolge > 6) hinweise.push(`Etwa ${ohneFolge} Entscheidungen setzen einen Merker ohne sichtbare Folge („folge: …“).`);
+    if (Object.values(sz).some((x) => x.art === "ende" && sid_regulaer(D, x)) && !D.META.endeHinweise && enden_anzahl(D) > 1) hinweise.push("META.endeHinweise fehlt: Am Ende erfährt die Gruppe nicht, woran die anderen Enden hängen.");
+  }
   if (!D.META.ehrentitel) hinweise.push("META.ehrentitel fehlt (Kampagnentitel, wenn alle Enden gefunden sind)");
   if (!D.META.entwurf) {
     const gen = loadEndenDatei(), soll = Object.fromEntries(enden.map((e) => [e.id, e.titel]));

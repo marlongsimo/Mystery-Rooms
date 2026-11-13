@@ -13,6 +13,15 @@
  *   kampf       Kampf mit Begegnung und Karte; Sieg / Rückzug (Normal) / Niederlage (Hardcore)
  *   lager       Lagerfeuer: lange Rast, ggf. Aufstieg, Speicherpunkt
  *   ende        Abschluss mit Epilog
+ *
+ * Folgen sichtbar machen (Erzähltiefe):
+ *   folge: "…"          an einer Option / einem Probenergebnis / einer geheimen Antwort: kurze Zeile, was das bewirkt.
+ *                       Erscheint sofort (im Gespräch) oder als „Nachhall“ über der nächsten Szene, steht im Verlauf
+ *                       und in der Rückschau am Ende. Auch als Funktion (A, hilfen[, fid]) möglich.
+ *   Text mit „↳ “ vorn  Absatz, der nur wegen einer früheren Entscheidung dasteht – wird als Folge hervorgehoben.
+ *   wichtig: true       Gesprächsoption, die man nicht versehentlich überspringen soll.
+ *   rueckschau(A, h)    an einer Ende-Szene: Zeilen „Was ihr getan habt“. Ohne Angabe: die gesammelten Folgen.
+ *   META.endeHinweise   { endeId: "Hinweis ohne Spoiler" } – am Ende für die Enden, die man nicht gesehen hat.
  */
 (function (root) {
   "use strict";
@@ -69,7 +78,13 @@
   }
   /** Erste lebende Figur einer Klasse in der Gruppe (oder undefined) */
   const klasse = (A, k) => A.gruppe.find((f) => hat(A, f) && F.FIGUREN[f].klasse === k);
-  const hilfen = { hat, m, name, ereignis, klasse, lebende: (A) => lebende(A) };
+  /** Was eine Figur in einer geheimen Szene geantwortet hat (oder undefined) */
+  const geheimAntwort = (A, szeneId, fid) => ((A.geheimChronik || {})[szeneId] || {})[fid];
+  /** Alle lebenden Figuren, die in einer geheimen Szene eine bestimmte Antwort gegeben haben */
+  const geheimWer = (A, szeneId, ant) => lebende(A).filter((f) => geheimAntwort(A, szeneId, f) === ant);
+  /** Namen als Aufzählung: „Torvald“, „Torvald und Elara“, „Torvald, Elara und Pim“ */
+  const namen = (A, fids) => { const n = fids.map((f) => name(A, f)); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + " und " + n[n.length - 1]; };
+  const hilfen = { hat, m, name, namen, ereignis, klasse, geheimAntwort, geheimWer, lebende: (A) => lebende(A) };
 
   function notiz(A, t, art) { A.protokoll.push({ t, art: art || "" }); if (A.protokoll.length > 200) A.protokoll.shift(); }
   /** Wirkung einer Option/eines Ergebnisses anwenden */
@@ -89,6 +104,19 @@
     if (w.naechsterKampf) A.kampfMod = (A.kampfMod || 1) * w.naechsterKampf;
     if (w.beute) beuteZiehen(A);
     if (w.notiz) notiz(A, typeof w.notiz === "function" ? w.notiz(A, hilfen) : w.notiz, "gut");
+    if (w.folge) folge(A, typeof w.folge === "function" ? w.folge(A, hilfen) : w.folge);
+  }
+  /** Eine sichtbare Folge festhalten: Verlauf, Nachhall über der nächsten Szene, Rückschau am Ende */
+  function folge(A, t, art) {
+    if (!t) return;
+    A.folgen = A.folgen || []; A.nachhallNeu = A.nachhallNeu || [];
+    if (!art || art === "folge") { if (!A.folgen.includes(t)) A.folgen.push(t); notiz(A, t, "folge"); }
+    if (!A.nachhallNeu.some((x) => x.t === t)) A.nachhallNeu.push({ art: art || "folge", t });
+  }
+  /** Folgen, die seit Index n dazukamen, gehören zur letzten Gesprächsantwort (dort anzeigen, nicht erst in der nächsten Szene) */
+  function folgenInsGespraech(A, n) {
+    const neu = (A.nachhallNeu || []).splice(n), d = A.dialog && A.dialog[A.szene] && A.dialog[A.szene][A.dialog[A.szene].length - 1];
+    if (d && neu.length) d.folgen = (d.folgen || []).concat(neu.map((x) => x.t));
   }
   function glocke(A, n) {
     A.glocke = Math.max(0, Math.min(7, A.glocke + n));
@@ -98,6 +126,7 @@
   function geheZu(A, id) {
     if (!DATEN(A).SZENEN[id]) throw new Error("Unbekannte Szene: " + id);
     A.szene = id; A.gewaehlt = A.gewaehlt || {}; A.stimmen = {}; A.geheim = {}; A.probe = null; A.ergebnis = null;
+    A.nachhall = A.nachhallNeu && A.nachhallNeu.length ? A.nachhallNeu : null; A.nachhallNeu = [];
     const s = szene(A);
     if (s.abschnitt) A.abschnitt = s.abschnitt;
     if (s.beimEintritt) wirke(A, s.beimEintritt(A, hilfen));
@@ -135,7 +164,9 @@
       A.antwort = typeof o.antwort === "function" ? o.antwort(A, hilfen) : o.antwort || null;
       A.dialog = A.dialog || {}; A.dialog[A.szene] = A.dialog[A.szene] || [];
       if (!o.weiter) A.dialog[A.szene].push({ frage: o.frage || o.text, wer: o.wer || null, antwort: A.antwort, probe: o.probe ? o.probe.name : null, offen: Boolean(o.probe) });
+      const n0 = (A.nachhallNeu || []).length;
       wirke(A, o);
+      if (!o.weiter) folgenInsGespraech(A, n0);
       if (o.probe) { A.zwischenprobe = { opt: o.id, wuerfe: {}, wer: null }; return { ok: true, probe: true }; }
       if (o.weiter) { A.antwort = null; ziel(A, o); }
       return { ok: true };
@@ -145,6 +176,7 @@
   }
   function entscheide(A, o) {
     notiz(A, `Entscheidung: ${o.text}`, "runde");
+    folge(A, o.text, "entscheidung");
     wirke(A, o);
     ziel(A, o);
   }
@@ -217,7 +249,9 @@
     const t = typeof e.text === "function" ? e.text(A, hilfen, pz) : e.text;
     notiz(A, { erfolg: "Geschafft", knapp: "Knapp daneben", fehl: "Misslungen" }[stufe] + (t ? ": " + t : "."), stufe === "erfolg" ? "gut" : "schlecht");
     if (A.zwischenprobe) {
+      const n0 = (A.nachhallNeu || []).length;
       A.antwort = t; wirke(A, e); A.zwischenprobe = null;
+      if (!e.weiter) folgenInsGespraech(A, n0);
       const d = A.dialog && A.dialog[A.szene] && A.dialog[A.szene][A.dialog[A.szene].length - 1];
       if (d && d.offen) { d.offen = false; d.antwort = t; d.stufe = stufe; d.wurf = Object.values(pz.wuerfe)[0]; d.werWuerfelt = Object.keys(pz.wuerfe)[0]; d.sg = p.sg; }
       if (e.weiter) { A.antwort = null; ziel(A, e); }
@@ -239,8 +273,19 @@
   const alleGeheim = (A) => lebende(A).every((f) => A.geheim[f]);
   function geheimAuswerten(A) {
     const s = szene(A);
-    for (const [fid, ant] of Object.entries(A.geheim)) { const a = geheimFuer(A, fid).antworten.find((x) => x.id === ant); if (a && a.setzt) wirke(A, { setzt: a.setzt(fid) }); }
-    notiz(A, (typeof s.abschluss === "function" ? s.abschluss(A, hilfen) : s.abschluss) || "Jede Person hat für sich entschieden.");
+    const zaehl = {}, texte = {};
+    A.geheimChronik = A.geheimChronik || {}; A.geheimChronik[A.szene] = Object.assign({}, A.geheim);
+    for (const [fid, ant] of Object.entries(A.geheim)) {
+      const a = geheimFuer(A, fid).antworten.find((x) => x.id === ant); if (!a) continue;
+      zaehl[ant] = (zaehl[ant] || 0) + 1; texte[ant] = a.kurz || a.text;
+      if (a.setzt) wirke(A, { setzt: a.setzt(fid) });
+    }
+    // Wie die Gruppe entschieden hat – ohne Namen. Wer was gesagt hat, bleibt geheim (bis die Geschichte es aufgreift).
+    if (s.verteilung !== false && Object.keys(zaehl).length) folge(A, Object.entries(zaehl).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${n} × ${texte[k]}`).join(" · "), "geheim");
+    const ab = (typeof s.abschluss === "function" ? s.abschluss(A, hilfen) : s.abschluss) || "";
+    if (ab) folge(A, ab, "abschluss");
+    for (const [fid, ant] of Object.entries(A.geheim)) { const a = geheimFuer(A, fid).antworten.find((x) => x.id === ant); if (a && a.folge) folge(A, typeof a.folge === "function" ? a.folge(A, hilfen, fid) : a.folge); }
+    notiz(A, ab || "Jede Person hat für sich entschieden.");
     ziel(A, s);
   }
 
@@ -456,13 +501,26 @@
   }
 
   /* ---------- Ansicht für Tisch und Handys ---------- */
+  /** Rückschau am Ende: was die Gruppe getan hat, und Hinweise auf die Enden, die sie nicht gesehen hat */
+  function rueckschau(A, s) {
+    const D = DATEN(A), M = D.META || {};
+    if (A.szene === D.NIEDERLAGE || s.niederlage) return null;
+    let zeilen = typeof s.rueckschau === "function" ? s.rueckschau(A, hilfen) : s.rueckschau;
+    zeilen = (zeilen && zeilen.length ? zeilen : (A.folgen || []).slice(-7)).filter(Boolean);
+    const enden = Object.entries(D.SZENEN).filter(([id, x]) => x.art === "ende" && id !== D.NIEDERLAGE && !x.niederlage).map(([id]) => id);
+    const andere = enden.filter((id) => id !== A.szene).map((id) => (M.endeHinweise || {})[id]).filter(Boolean);
+    return { zeilen, andere, enden: enden.length };
+  }
   function ansicht(A) {
     const s = szene(A), pz = probeZustand(A), p = pz ? aktuelleProbe(A) : null;
     return {
       dialog: (A.dialog && A.dialog[A.szene]) || [],
       szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || A.abschnitt || 1, text: text(A), antwort: A.antwort || null,
       glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
-      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: sgVon(A, o.probe) } : null, weiter: Boolean(o.weiter) })),
+      nachhall: A.nachhall || null,
+      offen: s.art === "gespraech" ? optionen(A).filter((o) => !o.weiter).map((o) => ({ text: o.text, wichtig: Boolean(o.wichtig) })) : null,
+      rueckschau: s.art === "ende" ? rueckschau(A, s) : null,
+      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wichtig: Boolean(o.wichtig), wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: sgVon(A, o.probe) } : null, weiter: Boolean(o.weiter) })),
       stimmen: s.art === "wahl" ? A.stimmen : null,
       geheimFrage: s.art === "geheim" ? { frage: typeof s.frage === "string" ? s.frage : "Jede Person entscheidet für sich.", antworten: Array.isArray(s.antworten) ? s.antworten.map((a) => ({ id: a.id, text: a.text })) : [],
         proFigur: Object.fromEntries(lebende(A).map((f) => { const q = geheimFuer(A, f); return [f, { frage: q.frage, antworten: q.antworten.map((a) => ({ id: a.id, text: a.text })) }]; })), fertig: Object.keys(A.geheim) } : null,

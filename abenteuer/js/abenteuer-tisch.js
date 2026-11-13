@@ -8,6 +8,12 @@
   const S = window.ABS, R = window.ABR, F = window.ABF, B = window.ABB, AB = window.AB, $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fett = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
+  /** Absatz der Erzählung; „↳ “ vorn markiert eine Folge früherer Entscheidungen */
+  const absatz = (p, i) => (/^↳\s/.test(p) ? `<p class="sz-folge" style="--i:${i}"><small>Eure Spur</small>${fett(p.replace(/^↳\s+/, ""))}</p>` : `<p style="--i:${i}">${fett(p)}</p>`);
+  /** Nachhall: was die letzte Entscheidung bewirkt hat (über der Szene) */
+  const nachhallHtml = (n) => (n && n.length ? `<div class="sz-nachhall" role="status">${n.map((x) => `<p class="nh-${x.art}"><small>${{ entscheidung: "Eure Entscheidung", geheim: "Im Geheimen entschieden", abschluss: "", folge: "Das hat Folgen" }[x.art] || ""}</small>${fett(x.t)}</p>`).join("")}</div>` : "");
+  /** Rückschau am Ende */
+  const rueckschauHtml = (r) => (!r ? "" : `<div class="sz-rueckschau">${r.zeilen.length ? `<h3>Was ihr getan habt</h3><ul>${r.zeilen.map((z) => `<li>${fett(z)}</li>`).join("")}</ul>` : ""}${r.andere.length ? `<h3>Was hätte sein können</h3><ul class="andere">${r.andere.map((z) => `<li>${fett(z)}</li>`).join("")}</ul>` : ""}${r.enden > 1 ? `<p class="note">Diese Geschichte hat ${r.enden} Enden. Ihr habt eines davon erlebt.</p>` : ""}</div>`);
   const KEY = "ab_abenteuer";
   let A = null, hilfeAn = true, letzterWurf = null;
   const SCHNELL = new URLSearchParams(location.search).has("schnell");
@@ -159,7 +165,7 @@
     const meta = S.metaVon(A.abenteuer), kapitel = ((meta.abschnitte_namen || ABSCHNITTE)[v.abschnitt] || "");
     let h = `<div class="sz-buehne" aria-hidden="true" style="--bild:url('${bildFuer(v.abschnitt)}')"><i class="sz-bild"></i><canvas class="sz-kanal"></canvas></div>
       <div class="szene-kopf"><span class="sz-marke" aria-hidden="true">MYTHARA</span><span class="sz-titel"><b>${esc(meta.titel || "")}</b>${kapitel ? `<i>${esc(kapitel)}</i>` : ""}</span><span class="eyebrow">Abschnitt ${v.abschnitt} · ${esc(v.ort)} · Stufe ${v.stufe}${v.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>${glockeHtml(v.glocke)}<span class="kopf-links">${sprache ? `<button class="link" id="sz-vorlesen" title="Text vorlesen (Browserstimme) – noch einmal tippen zum Anhalten">🔊 Vorlesen</button>` : ""}${AB.liveAn() ? (window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-kpause" title="Kampagne speichern und pausieren – fortsetzen unter „Meine Kampagnen“">Pausieren</button>` : "") : `<button class="link" id="sz-pause" title="Zurück zum Titel – der Spielstand bleibt gespeichert">Pause</button>`}${window.KAMPAGNE && window.KAMPAGNE.aktiv() ? `<button class="link" id="sz-tisch" title="Auf einem anderen Gerät als Spieltisch weiterspielen">Tisch wechseln</button>` : ""}</span></div>
-      <div class="sz-rahmen"><article class="sz-blatt"><p class="sz-ort">${esc(v.ort || "")}</p><h1>${esc(v.titel)}</h1><span class="sz-zier" aria-hidden="true"></span><div class="erzaehlung ${auftritt ? "auftritt" : ""}">${v.text.map((p, i) => `<p style="--i:${i}">${fett(p)}</p>`).join("")}</div>`;
+      <div class="sz-rahmen"><article class="sz-blatt"><p class="sz-ort">${esc(v.ort || "")}</p><h1>${esc(v.titel)}</h1><span class="sz-zier" aria-hidden="true"></span>${nachhallHtml(v.nachhall)}<div class="erzaehlung ${auftritt ? "auftritt" : ""}">${v.text.map(absatz).join("")}</div>${rueckschauHtml(v.rueckschau)}`;
     if (hilfeAn && HILFE[s.art] && !A.zwischenprobe) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE[s.art])}</p><button class="link" id="hilfe-aus">Hinweise ausblenden</button></div>`;
     if (A.zwischenprobe && hilfeAn) h += `<div class="hilfe"><span>ⓘ</span><p>${esc(HILFE.probe)}</p></div>`;
     if (s.art === "gespraech" && v.dialog.length) h += dialogHtml(v.dialog);
@@ -181,7 +187,7 @@
   }
   function dialogHtml(d) {
     const l = d[d.length - 1], wuerfel = l && l.wurf ? `<div class="probe-wuerfel" data-wurf-key="${l.werWuerfelt}-${l.wurf.w}-${l.wurf.gesamt}-${l.sg || 0}"></div>` : "";
-    return `<div class="dialog">${d.map((e) => `<div class="d-frage"><small>Ihr</small><p>${fett(e.frage)}</p></div>${e.offen ? `<div class="d-antwort offen"><small>🎲 ${esc(e.probe)}</small><p>… eine Figur muss würfeln.</p></div>` : e.antwort ? `<div class="d-antwort ${e.stufe || ""}"><small>${e.probe ? `🎲 ${esc(e.probe)} · ${{ erfolg: "geschafft", knapp: "knapp daneben", fehl: "misslungen" }[e.stufe] || ""}${e.werWuerfelt ? " · " + esc(F.FIGUREN[e.werWuerfelt].name) + " würfelt " + e.wurf.w : ""}` : esc(e.wer || "")}</small><p>${fett(e.antwort)}</p></div>` : ""}`).join("")}</div>${wuerfel}`;
+    return `<div class="dialog">${d.map((e) => `<div class="d-frage"><small>Ihr</small><p>${fett(e.frage)}</p></div>${e.offen ? `<div class="d-antwort offen"><small>🎲 ${esc(e.probe)}</small><p>… eine Figur muss würfeln.</p></div>` : e.antwort ? `<div class="d-antwort ${e.stufe || ""}"><small>${e.probe ? `🎲 ${esc(e.probe)} · ${{ erfolg: "geschafft", knapp: "knapp daneben", fehl: "misslungen" }[e.stufe] || ""}${e.werWuerfelt ? " · " + esc(F.FIGUREN[e.werWuerfelt].name) + " würfelt " + e.wurf.w : ""}` : esc(e.wer || "")}</small><p>${fett(e.antwort)}</p></div>` : ""}${(e.folgen || []).map((t) => `<div class="d-folge"><small>Das hat Folgen</small><p>${fett(t)}</p></div>`).join("")}`).join("")}</div>${wuerfel}`;
   }
   function probeHtml(v) {
     const p = v.probe, lebend = S.lebende(A);
@@ -270,8 +276,8 @@
     }
     if (s.art === "gespraech") {
       const fragen = v.optionen.filter((o) => !o.weiter), weiter = v.optionen.filter((o) => o.weiter);
-      return `${fragen.length ? `<p class="akt-gruppe">Was wollt ihr tun?</p>` : ""}<div class="optionen-tisch">${fragen.map((o) => `<button class="btn ghost frage" data-opt="${o.id}"><span>${esc(o.text)}</span>${o.probe ? `<small>🎲 Probe: ${esc(ATTR[o.probe.attr] || "")} gegen SG ${o.probe.sg}</small>` : o.wer ? `<small>an ${esc(o.wer)}</small>` : ""}</button>`).join("")}</div>
-        ${weiter.length ? `<p class="akt-gruppe">Weitergehen</p><div class="optionen-tisch">${weiter.map((o) => `<button class="btn" data-opt="${o.id}">${esc(o.text)}</button>`).join("")}</div>` : ""}`;
+      return `${fragen.length ? `<p class="akt-gruppe">Was wollt ihr tun?</p>` : ""}<div class="optionen-tisch">${fragen.map((o) => `<button class="btn ghost frage ${o.wichtig ? "wichtig" : ""}" data-opt="${o.id}"><span>${o.wichtig ? `<i class="fr-stern" title="Das solltet ihr nicht auslassen">✦</i> ` : ""}${esc(o.text)}</span>${o.probe ? `<small>🎲 Probe: ${esc(ATTR[o.probe.attr] || "")} gegen SG ${o.probe.sg}</small>` : o.wer ? `<small>an ${esc(o.wer)}</small>` : ""}</button>`).join("")}</div>
+        ${weiter.length ? `<p class="akt-gruppe">Weitergehen</p>${fragen.length ? `<p class="note offen-hinweis">${fragen.some((o) => o.wichtig) ? `<b>✦ Noch offen:</b> ${fragen.filter((o) => o.wichtig).map((o) => esc(o.text)).join(" · ")}. ` : ""}Ihr habt noch ${fragen.length} ${fragen.length === 1 ? "Möglichkeit" : "Möglichkeiten"} nicht genutzt. Wer weitergeht, erfährt das hier nicht mehr.</p>` : ""}<div class="optionen-tisch">${weiter.map((o) => `<button class="btn" data-opt="${o.id}" ${fragen.some((f) => f.wichtig) ? 'data-offen="1"' : ""}>${esc(o.text)}</button>`).join("")}</div>` : ""}`;
     }
     if (s.art === "wahl") {
       if (!live()) return `<div class="optionen-tisch">${v.optionen.map((o) => `<button class="btn ghost" data-opt="${o.id}">${esc(o.text)}</button>`).join("")}</div><p class="note">Besprecht es und tippt die Entscheidung an.</p>`;
@@ -295,7 +301,10 @@
   }
   function binde(el, v, s) {
     const nach = () => { merken(); render(); AB.veroeffentlichen(); };
-    el.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => { S.waehle(A, b.dataset.opt); nachSzene(); }; });
+    el.querySelectorAll("[data-opt]").forEach((b) => { b.onclick = () => {
+      if (b.dataset.offen && !new URLSearchParams(location.search).has("schnell") && !confirm("Ihr habt hier noch nicht alles Wichtige erfahren (✦). Trotzdem weitergehen?")) return;
+      S.waehle(A, b.dataset.opt); nachSzene();
+    }; });
     el.querySelectorAll("[data-held]").forEach((sp) => {
       const auf = (e) => { if (e.target.closest("[data-wiederbeleben]")) return; heldZeigen(sp.dataset.held); };
       sp.onclick = auf; sp.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); auf(e); } };

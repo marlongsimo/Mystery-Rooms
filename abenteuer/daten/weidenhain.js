@@ -1,5 +1,5 @@
 /*
- * Das Erntefest von Weidenhain – Einsteiger-Kurzabenteuer (1 Abschnitt, Stufe 1–2 (Aufstieg am Lagerfeuer vor der Unke), 2–6 Helden, etwa 45 Minuten)
+ * Das Erntefest von Weidenhain – Einsteiger-Kurzabenteuer (1 Abschnitt, Stufe 1–2 (Aufstieg am Lagerfeuer vor der Unke), 2–6 Helden, etwa 1 Stunde)
  * Spielt vor „Das Moor der stummen Lichter“: Die Gruppe findet auf einem Dorffest zusammen, erlebt jede Szenenart
  * einmal in ruhigem Tempo (Gespräch, Abstimmung, Probe, Kampf, Lager, geheime Entscheidung) und sieht zum ersten Mal
  * die stummen Lichter über dem Schwarzmoor. Gebaut nach KAMPAGNEN-BAUKASTEN.md: nur vorhandene Gegner (Schlammkröte, Irrlicht).
@@ -66,13 +66,63 @@
   };
   const KARTEN = { SPEICHER, MUEHLE, WEHR };
 
-  /* ---------- Epilog ---------- */
+  /* ---------- Erzählfäden ----------
+   * Tebbe (Ilses Bruder, an der Mühle): merker.tebbe = "heil" | "verletzt"  – hängt an der Wegwahl
+   * Die Unke: merker.unke = "tot" | "frei"; wer von Mette oder Tebbe weiß, dass sie Angst hat, entscheidet wissend
+   * Das Müllergeld (geheim): fund_genommen / fund_gemeldet, wer: nahm_<fid> / zeigte_<fid>
+   * Der Spielmann (geheim): grund_<fid> = silber | dorf | abenteuer – das Lied am Ende nennt die Namen
+   * Hanne: lohn (ihr habt nach dem Lohn gefragt) */
+  const kenntAngst = (A) => Boolean(A.merker.lichter_gesehen || A.merker.tebbe === "heil");
+  const mitGrund = (A, h, g) => h.lebende(A).filter((f) => A.merker["grund_" + f] === g);
+  const nehmer = (A, h) => h.lebende(A).filter((f) => A.merker["nahm_" + f]);
+  const zeiger = (A, h) => h.lebende(A).filter((f) => A.merker["zeigte_" + f]);
+  const ist = (n) => (n.length === 1 ? "ist" : "sind");
+
+  /* ---------- Epilog: was aus Weidenhain wird (hängt an euren Entscheidungen) ---------- */
   function epilog(A, h) {
     const m = A.merker, t = [];
     t.push(A.glocke <= 2 ? "Das Korn ist gerettet, fast jeder Sack. Weidenhain wird gut über den Winter kommen." : A.glocke <= 5 ? "Ein Teil des Korns ist verloren. Es wird ein knapper Winter, aber niemand muss hungern." : "Die Kröten haben viel gefressen, bevor ihr sie aufhalten konntet. Weidenhain wird im Winter zusammenrücken müssen.");
+    // Tebbe und Ilse
+    t.push(m.tebbe === "heil" ? "↳ Tebbe weicht euch nicht mehr von der Seite. Er trägt die Mühlkatze unter dem Hemd und erzählt jedem, der es hören will, wie ihr über den Graben gekommen seid. Ilse drückt euch wortlos einen Laib Brot in die Hand, noch warm."
+      : m.tebbe === "verletzt" ? "↳ Tebbe sitzt mit verbundenem Bein am Feuer. Er wird wieder laufen, sagt das Kräuterweib, aber hinken wird er wohl. Ilse dankt euch. Sie meint es ehrlich, und doch sieht sie dabei auf sein Bein." : "");
+    // Die Unke
+    t.push(m.unke === "frei" ? (kenntAngst(A) ? "↳ Mette nickt, als sie hört, dass die Unke lebt. „Sie saß schon am Wehr, als meine Großmutter ein Kind war. Wenn sie wieder quakt, wissen wir, dass die Lichter fort sind. Und wenn sie flieht, wissen wir, dass sie kommen.“ Weidenhain hat jetzt eine Wächterin, die niemand füttern muss."
+        : "↳ Ihr habt die Unke ziehen lassen, ohne recht zu wissen, warum. Hanne schüttelt den Kopf darüber. Mette nicht.")
+      : m.unke === "tot" ? (kenntAngst(A) ? "↳ Die alte Unke treibt am Morgen im Mühlteich. Ihr wusstet, dass sie nur Angst hatte, und habt es trotzdem zu Ende gebracht. Hanne lässt sie verbrennen. Mette sieht dem Rauch nach und sagt lange nichts."
+        : "↳ Die alte Unke treibt am Morgen im Mühlteich. Hanne lässt sie verbrennen, und das Dorf atmet auf. Nur Mette murmelt: „Sie saß schon am Wehr, als meine Großmutter ein Kind war.“") : "");
+    // Das Müllergeld
+    const n = nehmer(A, h), z = zeiger(A, h);
+    if (m.fund_gemeldet && !m.fund_genommen) t.push(`↳ Die Müllerin Agnes hält den Beutel mit beiden Händen, als ${h.namen(A, z)} ihn ihr ${z.length === 1 ? "bringt" : "bringen"}. Es ist alles, was ihr Mann ihr hinterlassen hat, und sie hatte es verloren geglaubt. Sie gibt euch seine Laterne mit. „Die hat ihn dreißig Jahre heimgebracht.“`);
+    else if (m.fund_gemeldet && m.fund_genommen) t.push("↳ Die Müllerin Agnes zählt, was ihr unter der Diele gefunden habt. Sie zählt zweimal. „Es war mehr“, sagt sie leise, und dann: „Es ist gut. Es ist mehr, als ich hatte.“ Sie fragt nicht. Jemand von euch ist froh darüber.");
+    else if (m.fund_genommen) t.push(`↳ Im Frühjahr wird die Müllerin Agnes die lose Diele in der Mühle heben und das Versteck ihres Mannes finden. ${n.length === 1 ? "Ein Beutel wird fehlen" : "Es wird fast leer sein"}. Sie wird nie erfahren, wer in jener Nacht in der Mühle war. Ihr schon.`);
+    else if (m.fund_gesehen) t.push("↳ Unter der Diele in der Mühle liegt noch immer das Geld des toten Müllers. Niemand von euch hat es angerührt, und niemand hat ein Wort darüber verloren. Im Frühjahr wird Agnes es finden.");
+    // Hanne und der Lohn
+    t.push(m.lohn ? "↳ Hanne zählt euch das Silber in die Hand, Münze für Münze, genau so viel wie abgemacht. „Ihr habt danach gefragt“, sagt sie. „Also sollt ihr es auch genau bekommen.“"
+      : "↳ Hanne drückt euch einen Beutel in die Hand, der schwerer ist, als er sein müsste. „Ihr habt nicht einmal gefragt, was es gibt“, sagt sie. „So etwas merkt sich ein Dorf.“");
+    // Das Lied des Spielmanns: Hier werden die geheimen Antworten laut
+    const si = mitGrund(A, h, "silber"), d = mitGrund(A, h, "dorf"), ab = mitGrund(A, h, "abenteuer");
+    if (si.length || d.length || ab.length) {
+      const verse = [];
+      if (d.length) verse.push(`${h.namen(A, d)} ${d.length === 1 ? "kam" : "kamen"}, weil das Dorf in Not war`);
+      if (ab.length) verse.push(`${h.namen(A, ab)} ${ab.length === 1 ? "suchte" : "suchten"} das Abenteuer und ${ab.length === 1 ? "fand" : "fanden"} es im Schlamm`);
+      if (si.length) verse.push(`${h.namen(A, si)} ${si.length === 1 ? "kam" : "kamen"} für das Silber und ${si.length === 1 ? "blieb" : "blieben"} trotzdem bis zum Schluss`);
+      t.push(`↳ Dann steigt der Spielmann auf einen Tisch und singt sein Lied. Es ist nicht gut, aber es ist ehrlich, denn er hat genau zugehört: ${verse.join("; ")}. ${si.length && (d.length || ab.length) ? "Ein paar von euch sehen einander an. Das habt ihr voneinander nicht gewusst." : si.length ? "Das Dorf lacht, und ihr lacht mit." : "Das Dorf singt die zweite Strophe schon mit."}`);
+      if (m.fund_genommen) t.push("↳ Die letzte Strophe singt er leiser. Sie handelt von einer Mühle, einer losen Diele und von jemandem, der im Dunkeln die Hand ausstreckt. Er nennt keinen Namen. Er sieht auch niemanden an.");
+    }
     t.push(m.ziege ? "Die Ziege des Bürgermeisters folgt euch bis zum Dorfrand. Sie hat beschlossen, dass ihr jetzt zu ihr gehört." : "");
-    t.push(m.lied ? "Der Spielmann hat ein Lied über euch gemacht. Es ist nicht gut, aber alle singen mit." : "");
     if (A.gefallen.length) t.push(`Unter der Dorflinde von Weidenhain liegt jetzt ein Stein mit ${A.gefallen.length === 1 ? "einem Namen" : "Namen"}: ${A.gefallen.map((f) => h.name(A, f)).join(", ")}. Jedes Erntefest legen die Kinder Kränze dazu.`);
+    return t.filter(Boolean);
+  }
+  /** Rückschau: die Entscheidungen der Nacht in einem Satz je Faden */
+  function rueckschau(A, h) {
+    const m = A.merker, n = nehmer(A, h), z = zeiger(A, h), t = [];
+    t.push(m.tebbe === "heil" ? "Ihr seid sofort am Graben entlang zur Mühle. Tebbe kam mit dem Schrecken davon." : m.fackeln ? "Ihr habt erst Fackeln geholt. Der Weg war sicher, aber Tebbe saß zu lange allein auf dem Mühlboden." : m.tebbe === "verletzt" ? "Der Graben hat euch aufgehalten. Ihr kamt zu spät, um Tebbe das Bein zu ersparen." : "");
+    t.push(m.unke === "frei" ? `Ihr habt die alte Unke ziehen lassen${kenntAngst(A) ? ", weil ihr wusstet, wovor sie floh" : ", ohne zu wissen, wovor sie floh"}.` : m.unke === "tot" ? `Ihr habt die alte Unke getötet${kenntAngst(A) ? ", obwohl ihr wusstet, dass sie nur Angst hatte" : ". Dass sie selbst auf der Flucht war, habt ihr nie erfahren"}.` : "");
+    t.push(m.fund_gemeldet ? `${h.namen(A, z)} ${z.length === 1 ? "hat" : "haben"} das Geld des Müllers nicht für sich behalten${m.fund_genommen ? ` – aber ${n.length === 1 ? "jemand anderes hatte" : "andere hatten"} schon zugegriffen` : ""}.` : m.fund_genommen ? `${n.length === 1 ? "Eine Person" : n.length + " von euch"} ${n.length === 1 ? "hat" : "haben"} in der Mühle Geld genommen, das einer Witwe gehört. Die anderen wissen es bis heute nicht.` : m.fund_gesehen ? "Das Geld unter der Diele hat niemand angerührt." : "");
+    const si = mitGrund(A, h, "silber"), d = mitGrund(A, h, "dorf"), ab = mitGrund(A, h, "abenteuer");
+    if (si.length + d.length + ab.length) t.push(`Dem Spielmann gesagt: ${[d.length ? `${h.namen(A, d)} für das Dorf` : "", ab.length ? `${h.namen(A, ab)} für das Abenteuer` : "", si.length ? `${h.namen(A, si)} für das Silber` : ""].filter(Boolean).join(", ")}.`);
+    t.push(m.lichter_gesehen ? "Ihr habt der alten Mette zugehört. Ihr wisst, was über dem Moor steht." : "Die alte Mette am Feuer habt ihr nicht gefragt. Was sie über die Lichter weiß, nehmt ihr nicht mit ins Moor.");
+    t.push(m.aufbruch === "nacht" ? "Ihr seid noch in der Nacht nach Rabenmoor aufgebrochen." : m.aufbruch === "morgen" ? "Ihr habt dem Dorf noch eine Nacht geschenkt und seid erst am Morgen aufgebrochen." : "");
     return t.filter(Boolean);
   }
 
@@ -81,7 +131,8 @@
       art: "erzaehlung", abschnitt: 1, titel: "Weidenhain", ort: "Am Rand des Schwarzmoors, Abend", weiter: "festplatz",
       text: [
         "Ihr kennt euch kaum. Ihr seid alle aus demselben Grund in Weidenhain: Es ist Erntefest, und wer Arbeit sucht, findet hier welche. Auf dem Dorfplatz brennt ein Feuer, es riecht nach Brot und Bier, und jemand spielt schief auf einer Fiedel.",
-        "Dann schreit jemand. Hinter der Scheune poltert es, Säcke fallen, und eine Magd rennt aus dem Kornspeicher, als wäre der Teufel hinter ihr her.",
+        "Ihr sitzt an einem langen Tisch zwischen Leuten, die einander seit ihrer Geburt kennen. Kinder rennen mit Strohkränzen zwischen den Bänken hindurch. Eine alte Frau am Feuer sieht als Einzige nicht zum Tanz, sondern nach Süden, wo das Moor liegt.",
+        "Dann schreit jemand. Hinter der Scheune poltert es, Säcke fallen, und eine junge Magd rennt aus dem Kornspeicher, als wäre der Teufel hinter ihr her.",
       ],
     },
     festplatz: {
@@ -89,19 +140,24 @@
       text: (A, h) => [
         "Die Musik bricht ab. Hanne Kalk, die Bürgermeisterin, eine breite Frau mit Mehl an den Händen, kommt auf euch zu. „Ihr da. Ihr seht aus, als könntet ihr kämpfen. Könnt ihr?“",
         h.klasse(A, "kleriker") ? "Sie sieht das heilige Zeichen und nickt erleichtert." : "",
-      ].filter(Boolean),
+        "Hinter ihr steht die Magd, bleich, die Schürze voller Korn. Am Feuer hat sich die alte Frau nicht umgedreht.",
+        "*Hört euch um, bevor ihr geht. Was ihr hier erfahrt, verändert, was später geschieht. Mit ✦ markiert ist, was ihr nicht auslassen solltet.*",
+      ],
       optionen: [
-        { id: "was", text: "Fragen, was passiert ist", wer: "Hanne", frage: "„Was ist im Speicher?“",
-          antwort: "„Kröten. So groß wie Hunde. Seit drei Tagen kommen sie aus dem Mühlgraben und fressen unser Korn. Heute sind sie in den Speicher. Wenn das Korn weg ist, wird der Winter lang.“" },
-        { id: "lichter", text: "Die alte Mette nach den Lichtern fragen", wer: "Mette", frage: "Eine alte Frau am Feuer zeigt nach Süden.",
-          antwort: "„Seht ihr das? Über dem Moor. Lichter, die nicht flackern.“ Ihr seht hin. Weit im Süden, über dem Schwarzmoor, schweben drei kleine, stille Lichter. „Die Kröten fürchten sie“, sagt Mette. „Darum fliehen sie zu uns. Was die Kröten fürchtet, sollten wir auch fürchten.“",
-          setzt: { lichter_gesehen: true } },
+        { id: "was", text: "Hanne fragen, was passiert ist", wer: "Hanne", frage: "„Was ist im Speicher?“", wichtig: true,
+          antwort: "„Kröten. So groß wie Hunde. Seit drei Tagen kommen sie aus dem Mühlgraben und fressen unser Korn. Heute sind sie in den Speicher. Wenn das Korn weg ist, wird der Winter lang.“ Sie senkt die Stimme. „Früher haben sie das nie getan. Früher hatten sie Angst vor uns.“" },
+        { id: "ilse", text: "Die Magd fragen, was sie gesehen hat", wer: "Ilse", frage: "Ihr geht zu der Magd. Sie heißt Ilse und zittert noch.", wichtig: true,
+          antwort: "„Sie waren überall zwischen den Säcken“, sagt sie. Dann packt sie euren Arm. „Mein Bruder. Tebbe. Er ist zwölf. Er ist vorhin zur alten Mühle gelaufen, weil die Katze dort Junge hat, und der Graben … die kommen doch alle aus dem Graben!“ Sie beschreibt euch den Pfad, den Tebbe immer nimmt: hinter den Kopfweiden entlang, wo der Boden fester ist.",
+          setzt: { tebbe_bekannt: true }, folge: "Ihr wisst jetzt, dass ein Junge an der Mühle ist – und kennt Tebbes Pfad hinter den Weiden. Der Weg am Graben wird leichter." },
+        { id: "lichter", text: "Zu der alten Frau am Feuer gehen", wer: "Mette", frage: "Die alte Frau heißt Mette. Sie zeigt nach Süden, ohne euch anzusehen.", wichtig: true,
+          antwort: "„Seht ihr das? Über dem Moor. Lichter, die nicht flackern.“ Ihr seht hin. Weit im Süden, über dem Schwarzmoor, schweben drei kleine, stille Lichter. „Die Kröten fürchten sie“, sagt Mette. „Darum fliehen sie zu uns. Die alte Unke am Wehr hat ihr ganzes Volk hergeführt, weg von dort. Sie ist nicht böse. Sie hat Angst.“ Mette sieht euch zum ersten Mal an. „Was die Unke fürchtet, sollten wir auch fürchten.“",
+          setzt: { lichter_gesehen: true }, folge: "Ihr wisst jetzt, warum die Kröten kommen: Sie fliehen vor den Lichtern über dem Moor. Das werdet ihr am Wehr nicht vergessen." },
         { id: "lohn", text: "Nach dem Lohn fragen", wer: "Hanne", frage: "„Und was zahlt ihr?“",
-          antwort: "Hanne verschränkt die Arme. „Essen, ein Bett und einen Beutel Silber. Und das Dorf wird sich an euch erinnern.“ Sie zögert. „Und die Heiltränke vom Kräuterweib. Die sind mehr wert als das Silber.“",
-          tranke: 1, setzt: { lohn: true } },
+          antwort: "Hanne verschränkt die Arme. Hinter ihr poltert es im Speicher. „Essen, ein Bett und einen Beutel Silber“, sagt sie knapp. „Und hier, damit ihr nicht umsonst blutet.“ Sie drückt euch einen Heiltrank vom Kräuterweib in die Hand. Freundlicher ist ihr Blick dabei nicht geworden.",
+          tranke: 1, setzt: { lohn: true }, folge: "Ihr habt einen Heiltrank bekommen. Hanne hat sich gemerkt, dass ihr nach dem Lohn gefragt habt." },
         { id: "spuren", text: "Die Spuren am Speicher lesen (Waldläufer)", wenn: (A, h) => Boolean(h.klasse(A, "waldlaeufer")), frage: "Ihr kniet euch in den Schlamm vor dem Speicher.",
-          antwort: "Breite, nasse Abdrücke, die alle vom Mühlgraben kommen. Und einer davon ist viel größer als die anderen. Irgendwo am Graben wartet etwas, das die anderen anführt.",
-          setzt: { spuren: true } },
+          antwort: "Breite, nasse Abdrücke, die alle vom Mühlgraben kommen. Einer davon ist viel größer als die anderen, und er führt nicht zum Speicher. Er bleibt am Wasser. Was auch immer die anderen anführt, es frisst nicht mit.",
+          setzt: { spuren: true }, folge: "Ihr wisst: Am Graben wartet etwas Großes, das die anderen anführt – und selbst kein Korn anrührt." },
         { id: "los", text: "Zum Kornspeicher", weiter: "speicher" },
       ],
     },
@@ -122,104 +178,187 @@
       text: (A) => [
         "Die letzte Kröte hüpft durch ein Loch in der Rückwand davon. Dahinter rauscht der Mühlgraben.",
         "Hanne Kalk steht in der Tür und zählt die Säcke. „Das war gut“, sagt sie. „Aber sie kommen wieder, solange wir nicht wissen, woher.“",
-        A.merker.spuren ? "Ihr wisst es schon: vom Graben, und dort wartet etwas Größeres." : "",
-      ].filter(Boolean),
+        A.merker.spuren ? "↳ Ihr wisst es schon: vom Graben, und dort wartet etwas Größeres, das selbst kein Korn frisst." : "",
+        A.merker.tebbe_bekannt ? "↳ Ilse steht hinter ihr und sagt nichts. Sie muss nichts sagen. Ihr wisst, wer an der Mühle ist, und ihr wisst, dass jede Viertelstunde zählt."
+          : "Da drängt sich die Magd an ihr vorbei, die vorhin geschrien hat. „Mein Bruder“, sagt sie. „Tebbe. Er ist zwölf. Er ist zur Mühle gelaufen, wegen der Katze, und ich habe vor lauter Angst nicht daran gedacht!“ Hanne wird blass. Davon hat ihr niemand etwas gesagt. Euch auch nicht, weil ihr nicht gefragt habt.",
+      ],
+      beimEintritt: (A) => (A.merker.tebbe_bekannt ? null : { folge: "Erst jetzt erfahrt ihr, dass ein Junge an der Mühle ist. Den sicheren Pfad dorthin kennt ihr nicht." }),
     },
     wegwahl: {
       art: "wahl", abschnitt: 1, titel: "Am Graben entlang?", ort: "Hinter dem Speicher",
-      text: [
-        "Der Mühlgraben führt vom Dorf hinaus zur alten Mühle und weiter zum Wehr. Dort kommen die Kröten her. Es ist dunkel, und der Weg am Graben ist rutschig.",
-        "*Eine Abstimmung: Jede Person stimmt ab, die Mehrheit entscheidet.*",
+      text: (A) => [
+        "Der Mühlgraben führt vom Dorf hinaus zur alten Mühle und weiter zum Wehr. Dort kommen die Kröten her, und dort ist Tebbe. Es ist dunkel, und der Weg am Graben ist rutschig.",
+        A.merker.tebbe_bekannt ? "↳ Ilse hat euch Tebbes Pfad beschrieben: hinter den Kopfweiden, wo der Boden fester ist. Im Dunkeln ist er trotzdem kein Spaziergang." : "",
+        "Hanne will euch Fackeln und Laternen holen lassen. Das dauert. „Mit Licht kommt ihr heil an“, sagt sie. Ilse sagt: „Bis dahin ist er allein.“",
+        "*Eine Abstimmung: Jede Person stimmt ab, die Mehrheit entscheidet. Beides hat seinen Preis.*",
       ],
       optionen: [
-        { id: "graben", text: "Sofort am Graben entlang zur Mühle", weiter: "graben" },
-        { id: "fackeln", text: "Erst Fackeln und Laternen holen (kostet Zeit, dafür Licht)", glocke: 1, setzt: { fackeln: true }, weiter: "fackeln" },
+        { id: "graben", text: "Sofort am Graben entlang zur Mühle – für Tebbe zählt jede Minute", weiter: "graben" },
+        { id: "fackeln", text: "Erst Fackeln und Laternen holen – sicherer Weg, aber Tebbe wartet länger", glocke: 1, setzt: { fackeln: true, tebbe: "verletzt" }, weiter: "fackeln",
+          folge: "Ihr habt euch für den sicheren Weg entschieden. Tebbe ist so lange allein." },
       ],
     },
     fackeln: {
       art: "erzaehlung", abschnitt: 1, titel: "Fackeln", ort: "Weidenhain", weiter: "kampf_muehle",
-      text: ["Das halbe Dorf drückt euch Fackeln und Laternen in die Hände. Der Weg zur Mühle ist hell erleuchtet, und ihr kommt sicher an. Aber die Nacht ist weiter fortgeschritten, und die Kröten haben euch kommen sehen."],
+      text: [
+        "Das halbe Dorf drückt euch Fackeln und Laternen in die Hände, und das Kräuterweib steckt euch noch einen Trank zu. Der Weg zur Mühle ist hell erleuchtet, und ihr kommt sicher an.",
+        "Aber es hat gedauert. Die Kröten haben euer Licht kommen sehen, und aus der Mühle hört ihr eine Kinderstimme, die nicht mehr ruft, sondern nur noch wimmert.",
+      ],
       beimEintritt: () => ({ tranke: 1 }),
     },
     graben: {
       art: "probe", abschnitt: 1, titel: "Der rutschige Weg", ort: "Am Mühlgraben",
-      text: ["Der Pfad am Graben ist schmal und schlammig. Alle müssen sicher auftreten.", "*Eine Probe: Jede Person würfelt. Gelingt es der Hälfte, kommt die Gruppe gut durch.*"],
-      probe: { name: "Trittsicher", wer: "gruppe", attr: "GES", sg: 10, geuebt: ["schurke", "waldlaeufer"], knapp: true,
-        erfolg: { text: "Ihr kommt leise und schnell zur Mühle. Die Kröten sitzen am Steg und haben euch nicht bemerkt.", setzt: { ueberraschung: true }, weiter: "kampf_muehle" },
-        knapp: { text: "Jemand rutscht in den Graben, ihr zieht ihn heraus. Nass, aber heil. An der Mühle quakt es: Sie wissen, dass ihr kommt.", weiter: "kampf_muehle" },
-        fehl: { text: "Der Schlamm hält euch auf. Als ihr endlich an der Mühle seid, ist es spät, und die Kröten warten schon.", glocke: 1, weiter: "kampf_muehle" } },
+      text: (A) => [
+        "Der Pfad am Graben ist schmal und schlammig. Alle müssen sicher auftreten.",
+        A.merker.tebbe_bekannt ? "↳ Ihr haltet euch hinter den Kopfweiden, wie Ilse es beschrieben hat. Dort trägt der Boden." : "",
+        "*Eine Probe: Jede Person würfelt. Gelingt es der Hälfte, kommt die Gruppe gut durch.*",
+      ],
+      probe: { name: "Trittsicher", wer: "gruppe", attr: "GES", sg: (A) => (A.merker.tebbe_bekannt ? 8 : 10), geuebt: ["schurke", "waldlaeufer"], knapp: true,
+        erfolg: { text: "Ihr kommt leise und schnell zur Mühle. Die Kröten sitzen am Steg und haben euch nicht bemerkt. Oben im Mühlfenster seht ihr ein kleines, blasses Gesicht.", setzt: { ueberraschung: true, tebbe: "heil" }, weiter: "kampf_muehle",
+          folge: "Ihr seid rechtzeitig da: Tebbe ist unverletzt, und die Kröten haben euch nicht kommen hören." },
+        knapp: { text: "Jemand rutscht in den Graben, ihr zieht ihn heraus. Nass, aber heil. An der Mühle quakt es: Sie wissen, dass ihr kommt. Oben im Mühlfenster duckt sich ein kleines, blasses Gesicht.", setzt: { tebbe: "heil" }, weiter: "kampf_muehle",
+          folge: "Ihr seid rechtzeitig da: Tebbe ist unverletzt. Aber die Kröten haben euch gehört." },
+        fehl: { text: "Der Schlamm hält euch auf. Zweimal müsst ihr umkehren, weil der Pfad im Wasser endet. Als ihr endlich an der Mühle seid, ist es spät, und aus der Mühle kommt kein Rufen mehr, nur ein Wimmern.", glocke: 1, setzt: { tebbe: "verletzt" }, weiter: "kampf_muehle",
+          folge: "Der Graben hat euch zu lange aufgehalten. Tebbe hat es nicht unverletzt überstanden." } },
     },
     kampf_muehle: {
       art: "kampf", abschnitt: 1, titel: "Am Mühlgraben", ort: "Die alte Mühle",
-      text: (A) => ["Der Graben teilt die Wiese. Nur über den Steg in der Mitte kommt man hinüber. Über dem Wasser tanzt ein kleines Licht.", A.merker.ueberraschung ? "Ihr seid zuerst da. Die Kröten haben euch noch nicht bemerkt." : ""].filter(Boolean),
-      kampf: (A) => ({ begegnung: "w_muehle", karte: MUEHLE, keinAnfuehrer: true, ueberraschung: Boolean(A.merker.ueberraschung), sieg: { weiter: "lager" } }),
+      text: (A) => ["Der Graben teilt die Wiese. Nur über den Steg in der Mitte kommt man hinüber. Über dem Wasser tanzt ein kleines Licht.", A.merker.ueberraschung ? "↳ Ihr seid zuerst da. Die Kröten haben euch noch nicht bemerkt." : ""].filter(Boolean),
+      kampf: (A) => ({ begegnung: "w_muehle", karte: MUEHLE, keinAnfuehrer: true, ueberraschung: Boolean(A.merker.ueberraschung), sieg: { weiter: "muehle_innen" } }),
+    },
+    muehle_innen: {
+      art: "erzaehlung", abschnitt: 1, titel: "In der Mühle", ort: "Die alte Mühle", weiter: "fund",
+      text: (A, h) => [
+        "Die Mühle steht seit dem Tod des alten Müllers leer. Es riecht nach Staub und altem Mehl. Über euch knarrt eine Diele.",
+        A.merker.tebbe === "heil"
+          ? "↳ Tebbe klettert vom Mühlboden herunter, eine fauchende Katze im Arm und zwei Junge im Hemd. Er ist unverletzt und redet ohne Punkt und Komma. „Ich hab die Große gesehen! Am Wehr! Sie hat die Kleinen mit der Schnauze weggeschoben, als die Lichter kamen. Die hat sich vor die gestellt. Die hat mehr Angst als ich!“"
+          : "↳ Tebbe liegt auf dem Mühlboden, die Katze an sich gedrückt. Eine Zunge hat ihn am Bein erwischt, bevor er die Leiter hochkam; die Wade ist dick und dunkel. Er weint nicht mehr, dazu ist er zu müde. Ihr gebt ihm einen eurer Heiltränke. Er hilft, aber nicht ganz. Was er am Wehr gesehen hat, kann er euch nicht mehr erzählen: Er schläft ein, noch während ihr ihn verbindet.",
+        A.merker.tebbe === "heil" && h.klasse(A, "kleriker") ? `${h.name(A, h.klasse(A, "kleriker"))} sieht nach dem Jungen und findet nur Schrammen. „Glück gehabt“, sagt Tebbe. Niemand widerspricht ihm.` : "",
+      ],
+      beimEintritt: (A) => (A.merker.tebbe === "heil"
+        ? { folge: "Tebbe hat die alte Unke beobachtet: Sie beschützt ihr Volk vor den Lichtern. Sie hat Angst." }
+        : { trankWeg: 1, folge: "Ein Heiltrank ist für Tebbes Bein draufgegangen. Was er am Wehr gesehen hat, erfahrt ihr nicht." }),
+    },
+    fund: {
+      art: "geheim", abschnitt: 1, titel: "Die lose Diele", ort: "Die alte Mühle", verteilung: false,
+      text: [
+        "Während die anderen Holz fürs Feuer suchen, tritt jede Person irgendwann auf dieselbe lose Diele neben dem Mahlstein. Darunter liegt ein Leinenbeutel, schwer von Münzen. Auf dem Stoff steht mit Kohle ein Name: AGNES.",
+        "Agnes ist die Witwe des Müllers. Sie wohnt im Dorf und näht für fremde Leute. Offenbar weiß sie nichts von diesem Versteck.",
+        "*Eine geheime Entscheidung: Jede Person steht einen Moment allein vor der Diele. Niemand sieht, was die anderen tun.*",
+      ],
+      frage: "Du bist allein mit dem Beutel. Was tust du?",
+      antworten: [
+        { id: "nehmen", text: "Ein paar Münzen einstecken. Wer soll es merken?", kurz: "nahm etwas", setzt: (f) => ({ fund_gesehen: true, fund_genommen: true, ["nahm_" + f]: true }) },
+        { id: "lassen", text: "Die Diele zurücklegen und schweigen.", kurz: "schwieg", setzt: () => ({ fund_gesehen: true }) },
+        { id: "melden", text: "Die anderen rufen: Das gehört der Müllerin.", kurz: "rief die anderen", setzt: (f) => ({ fund_gesehen: true, fund_gemeldet: true, ["zeigte_" + f]: true }) },
+      ],
+      abschluss: (A, h) => {
+        const z = zeiger(A, h);
+        if (!z.length) return "Niemand sagt ein Wort. Die Diele liegt wieder an ihrem Platz. Ob jemand etwas genommen hat, weiß nur, wer es getan hat.";
+        return `${h.namen(A, z)} ${z.length === 1 ? "ruft" : "rufen"} die anderen zusammen und ${z.length === 1 ? "hebt" : "heben"} die Diele an. „Das gehört der Müllerin.“ Ihr nehmt den Beutel für sie mit.${A.merker.fund_genommen ? " Im Staub neben dem Versteck sind frische Fingerspuren, und der Beutel ist nicht mehr ganz zugebunden. Niemand sagt etwas dazu." : ""}`;
+      },
+      weiter: "lager",
     },
     lager: {
       art: "lager", abschnitt: 1, titel: "Am Mühlrad", ort: "Die alte Mühle", weiter: "spielmann", aufstieg: 2,
       text: (A) => [
         "In der Mühle ist es trocken. Das Mühlrad knarrt im Wind. Ihr verbindet eure Wunden und teilt das Brot, das Hanne euch mitgegeben hat.",
+        A.merker.tebbe === "heil" ? "↳ Tebbe sitzt zwischen euch, die Katzen im Schoß, und will alles wissen: woher ihr kommt, ob das Schwert schwer ist, ob man Zaubern lernen kann. Irgendwann schläft er mitten im Satz ein." : "↳ Tebbe schläft unruhig neben dem Feuer. Wenn er aufwacht, fragt er nach Ilse.",
         A.glocke >= 4 ? "Vom Dorf her ist keine Musik mehr zu hören. Es ist spät geworden." : "Vom Dorf her klingt wieder Musik. Man feiert, weil man euch vertraut.",
-        "*Am Lagerfeuer erholt ihr euch ganz. Das Spiel wird hier gespeichert.*",
+        "*Am Lagerfeuer erholt ihr euch ganz und steigt auf Stufe 2 auf. Das Spiel wird hier gespeichert.*",
       ],
     },
     spielmann: {
       art: "geheim", abschnitt: 1, titel: "Der Spielmann", ort: "Die alte Mühle",
-      text: ["Ein junger Spielmann ist euch aus dem Dorf gefolgt. Er will ein Lied über euch machen und fragt jede Person einzeln, leise, damit die anderen es nicht hören: „Warum bist du hier?“", "*Eine geheime Entscheidung: Jede Person antwortet für sich. Die anderen sehen die Antwort nicht.*"],
+      text: [
+        "Ein junger Spielmann ist euch aus dem Dorf gefolgt, die Fiedel auf dem Rücken. Er heißt Wenzel, und er will ein Lied über euch machen. „Ein ehrliches“, sagt er. „Davon gibt es zu wenige.“",
+        "Er fragt jede Person einzeln, leise, damit die anderen es nicht hören: „Warum bist du hier?“",
+        "*Eine geheime Entscheidung: Jede Person antwortet für sich. Wenzel vergisst nichts – am Ende singt er, was ihr gesagt habt.*",
+      ],
       frage: "„Warum bist du hier?“",
       antworten: [
-        { id: "silber", text: "„Für das Silber.“", setzt: (f) => ({ ["grund_" + f]: "silber" }) },
-        { id: "dorf", text: "„Weil das Dorf Hilfe braucht.“", setzt: (f) => ({ ["grund_" + f]: "dorf", lied: true }) },
-        { id: "abenteuer", text: "„Weil ich Abenteuer suche.“", setzt: (f) => ({ ["grund_" + f]: "abenteuer", lied: true }) },
+        { id: "silber", text: "„Für das Silber.“", kurz: "für das Silber", setzt: (f) => ({ ["grund_" + f]: "silber" }) },
+        { id: "dorf", text: "„Weil das Dorf Hilfe braucht.“", kurz: "für das Dorf", setzt: (f) => ({ ["grund_" + f]: "dorf", lied: true }) },
+        { id: "abenteuer", text: "„Weil ich Abenteuer suche.“", kurz: "für das Abenteuer", setzt: (f) => ({ ["grund_" + f]: "abenteuer", lied: true }) },
       ],
-      abschluss: (A) => (A.merker.lied ? "Der Spielmann grinst und schreibt eifrig. „Daraus wird ein Lied.“" : "Der Spielmann seufzt. „Für Silber singt niemand gern. Aber gut.“"),
+      abschluss: (A) => (A.merker.lied ? "Wenzel grinst und schreibt eifrig. „Daraus wird ein Lied. Mit Namen.“" : "Wenzel seufzt. „Für Silber singt niemand gern. Aber ehrlich ist es. Ich singe es trotzdem, mit Namen.“"),
       weiter: "wehr",
     },
     wehr: {
       art: "erzaehlung", abschnitt: 1, titel: "Das alte Wehr", ort: "Hinter der Mühle", weiter: "kampf_unke",
       text: (A) => [
         "Am Wehr staut sich der Mühlteich. Auf den Steinen sitzt die größte Kröte, die ihr je gesehen habt, so groß wie ein Kalb. Die Dörfler nennen sie die alte Unke.",
-        "Über ihr schweben Irrlichter, und die Unke duckt sich unter ihnen, als hätte sie Angst. Dann sieht sie euch, und die Angst wird zu Wut.",
+        "Über ihr schweben Irrlichter, und die Unke duckt sich unter ihnen. Hinter ihr, im flachen Wasser, drängen sich Dutzende kleinere Kröten aneinander.",
+        A.merker.lichter_gesehen ? "↳ Ihr denkt an Mettes Worte: Sie ist nicht böse, sie hat Angst. Jetzt seht ihr es selbst. Die Unke sieht nicht zu euch. Sie sieht nach oben, zu den Lichtern." : "",
+        A.merker.tebbe === "heil" ? "↳ Es ist genau, wie Tebbe gesagt hat: Sie hat sich vor die Kleinen gestellt." : "",
+        !kenntAngst(A) ? "Ihr seht ein riesiges Tier, das euch den Weg versperrt. Mehr wisst ihr nicht über sie." : "",
+        "Dann treibt eines der Irrlichter auf euch zu, die Unke fährt herum, und was eben noch Angst war, wird Wut. Sie kennt nur einen Weg, ihr Volk zu schützen.",
         A.merker.lichter_gesehen ? "Weit im Süden, über dem Moor, stehen die stillen Lichter, die Mette euch gezeigt hat. Sie sind näher gekommen." : "",
-      ].filter(Boolean),
+      ],
     },
     kampf_unke: {
       art: "kampf", abschnitt: 1, titel: "Die alte Unke", ort: "Das alte Wehr",
       text: ["Die Unke ist zäh und ihre Zunge reicht weit. Die Irrlichter bleiben auf Abstand und werfen kalte Funken: Fernkämpfer und Zauber holen sie herunter."],
-      kampf: { begegnung: "w_unke", karte: WEHR, keinAnfuehrer: true, namen: { schlammkroete: "Die alte Unke" }, sieg: { weiter: "nach_unke" } },
+      kampf: { begegnung: "w_unke", karte: WEHR, keinAnfuehrer: true, namen: { schlammkroete: "Die alte Unke" }, sieg: { weiter: "unke_schicksal" } },
+    },
+    unke_schicksal: {
+      art: "wahl", abschnitt: 1, titel: "Die Unke am Boden", ort: "Das alte Wehr",
+      text: (A) => [
+        "Das letzte Irrlicht zerstiebt über dem Wasser. Die alte Unke liegt halb auf den Steinen, schwer atmend, zu erschöpft, um die Zunge noch einmal zu heben. Hinter ihr sind die kleinen Kröten verstummt.",
+        kenntAngst(A) ? "↳ Ihr wisst, was sie hergetrieben hat. Ohne die Lichter über ihr ist nichts mehr an ihr, das angreift. Sie wartet einfach ab, was ihr tut."
+          : "Sie sieht euch an und rührt sich nicht. Ihr wisst nicht, was in so einem Tier vorgeht. Vielleicht sammelt sie nur Kraft.",
+        "Ein Hieb, und Weidenhain ist sie los. Oder ihr tretet zurück und lasst sie ins Wasser gleiten.",
+        "*Eine Abstimmung. Was ihr hier tut, bestimmt, was aus dem Wehr wird.*",
+      ],
+      optionen: [
+        { id: "toeten", text: "Es zu Ende bringen. Das Dorf soll sicher sein.", setzt: { unke: "tot" }, weiter: "nach_unke",
+          folge: (A) => (kenntAngst(A) ? "Ihr habt die alte Unke getötet, obwohl ihr wusstet, dass sie nur Angst hatte." : "Ihr habt die alte Unke getötet. Am Wehr wird es still.") },
+        { id: "lassen", text: "Zurücktreten und sie ziehen lassen.", setzt: { unke: "frei" }, weiter: "nach_unke",
+          folge: (A) => (kenntAngst(A) ? "Ihr habt die alte Unke verschont. Sie führt ihr Volk den Graben hinab, weg vom Dorf und weg von den Lichtern." : "Ihr habt die alte Unke ziehen lassen, ohne zu wissen, was sie tun wird.") },
+      ],
     },
     nach_unke: {
       art: "erzaehlung", abschnitt: 1, titel: "Ein Bote aus dem Süden", ort: "Das alte Wehr", weiter: "entscheidung",
-      text: [
-        "Die Unke rutscht ins Wasser und taucht nicht wieder auf. Die Irrlichter treiben davon, nach Süden, zum Schwarzmoor.",
-        "Als ihr ins Dorf zurückkommt, sitzt ein Junge am Feuer, vielleicht zwölf, schlammverschmiert bis zu den Knien. Er ist die ganze Nacht gelaufen. „Ich komme aus Rabenmoor“, keucht er. „Drei Kinder sind weg. Sie sind den Lichtern ins Moor gefolgt. Und das Dorf will die alte Hedda verbrennen.“",
-        "Er sieht euch an. „Sie sagen, hier sind Leute, die gegen Kröten kämpfen können.“",
+      text: (A) => [
+        A.merker.unke === "frei" ? "↳ Die Unke gleitet ins Wasser. Eine nach der anderen folgen ihr die kleinen Kröten, den Graben hinab, nach Norden, fort vom Dorf. Am Wehr bleibt nur das Rauschen."
+          : "↳ Es ist schnell vorbei. Die kleinen Kröten stieben auseinander, in alle Richtungen, kopflos. Ein paar davon werden wohl wieder im Dorf landen, aber ohne die Alte sind sie nur noch Kröten.",
+        "Die Irrlichter sind fort. Nur ganz im Süden, über dem Schwarzmoor, stehen noch die stillen.",
+        "Als ihr ins Dorf zurückkommt, sitzt ein fremder Junge am Feuer, vielleicht zwölf, schlammverschmiert bis zu den Knien. Er ist die ganze Nacht gelaufen. „Ich komme aus Rabenmoor“, keucht er. „Drei Kinder sind weg. Sie sind den Lichtern ins Moor gefolgt. Und das Dorf will die alte Hedda verbrennen, weil es sagt, sie hat sie gerufen.“",
+        A.merker.tebbe === "verletzt" ? "↳ Er ist so alt wie Tebbe. Ihr seht alle kurz zu dem Jungen mit dem verbundenen Bein hinüber." : A.merker.tebbe === "heil" ? "↳ Tebbe, der neben ihm sitzt, schiebt ihm wortlos seine Schale Suppe hin." : "",
+        "Er sieht euch an. „Sie sagen, hier sind Leute, die helfen.“",
       ],
     },
     entscheidung: {
       art: "wahl", abschnitt: 1, titel: "Wann brecht ihr auf?", ort: "Weidenhain",
-      text: ["Rabenmoor liegt einen halben Tag südlich, mitten im Schwarzmoor. Stimmt ab."],
+      text: (A) => [
+        "Rabenmoor liegt einen halben Tag südlich, mitten im Schwarzmoor. Der Junge will sofort zurück. Hanne sagt, im Dunkeln geht niemand ins Moor, der bei Verstand ist, und dass ihr kaum noch stehen könnt.",
+        A.merker.lichter_gesehen ? "↳ Mette sagt nur: „Gestern waren es drei Lichter.“ Ihr zählt nach. Es sind vier." : "",
+        "*Eine Abstimmung: die letzte dieser Nacht.*",
+      ],
       optionen: [
-        { id: "sofort", text: "Sofort aufbrechen, noch in dieser Nacht", setzt: { aufbruch: "nacht" }, weiter: "ende_nacht" },
-        { id: "morgen", text: "Bis zum Morgen bleiben, ausruhen und das Fest zu Ende feiern", setzt: { aufbruch: "morgen" }, weiter: "ende_fest" },
+        { id: "sofort", text: "Sofort aufbrechen, noch in dieser Nacht", setzt: { aufbruch: "nacht" }, weiter: "ende_nacht", folge: "Ihr brecht noch in der Nacht auf. Das Fest findet ohne euch statt." },
+        { id: "morgen", text: "Bis zum Morgen bleiben, ausruhen und das Fest zu Ende feiern", setzt: { aufbruch: "morgen" }, weiter: "ende_fest", folge: "Ihr bleibt bis zum Morgen. In Rabenmoor vergeht eine weitere Nacht." },
       ],
     },
 
     /* ----- Enden ----- */
     ende_nacht: {
-      art: "ende", abschnitt: 1, titel: "Aufbruch in der Nacht", ort: "Weidenhain",
+      art: "ende", abschnitt: 1, titel: "Aufbruch in der Nacht", ort: "Weidenhain", rueckschau,
       text: (A, h) => [
-        "Hanne Kalk drückt euch den Beutel Silber in die Hand und sagt nichts. Das ganze Dorf steht am Weg nach Süden und hält Laternen hoch, bis ihr im Nebel verschwindet.",
+        "Ihr packt, während das Dorf noch die Tische zurechtrückt. Es wird ein kurzer Abschied, im Stehen, mit vollem Mund.",
         ...epilog(A, h),
+        "Das ganze Dorf steht am Weg nach Süden und hält Laternen hoch, bis ihr im Nebel verschwindet. Der Junge aus Rabenmoor geht voraus, so schnell, dass ihr kaum Schritt haltet.",
         "Vor euch liegt das Schwarzmoor. Über dem Wasser schweben stille Lichter, und keines von ihnen flackert.",
         "*Weiter geht es in „Das Moor der stummen Lichter“.*",
       ],
     },
     ende_fest: {
-      art: "ende", abschnitt: 1, titel: "Ein Fest für die Retter", ort: "Weidenhain",
+      art: "ende", abschnitt: 1, titel: "Ein Fest für die Retter", ort: "Weidenhain", rueckschau,
       text: (A, h) => [
-        "Die Musik spielt wieder, diesmal für euch. Ihr esst, trinkt und schlaft ein paar Stunden im Heu. Der Junge aus Rabenmoor schläft neben dem Feuer, aber er wacht immer wieder auf und sieht nach Süden.",
+        "Die Musik spielt wieder, diesmal für euch. Ihr esst, trinkt und sitzt zum ersten Mal an diesem Abend nicht als Fremde am Tisch.",
         ...epilog(A, h),
-        "Im Morgengrauen brecht ihr auf. Ausgeruht und satt, aber eine Nacht später. Über dem Moor sind es jetzt vier Lichter.",
+        "Ihr schlaft ein paar Stunden im Heu. Der Junge aus Rabenmoor schläft neben dem Feuer, aber er wacht immer wieder auf und sieht nach Süden.",
+        "Im Morgengrauen brecht ihr auf. Ausgeruht und satt, aber eine Nacht später. Über dem Moor sind es jetzt fünf Lichter.",
         "*Weiter geht es in „Das Moor der stummen Lichter“.*",
       ],
     },
@@ -233,8 +372,8 @@
       art: "probe", abschnitt: 1, titel: "Die Ziege des Bürgermeisters", ort: "Weidenhain",
       text: ["Die Ziege des Bürgermeisters hat sich losgerissen und rennt quer über den Festplatz, mitten durch die Tische. Jemand muss sie fangen."],
       probe: { name: "Ziege fangen", attr: "GES", sg: 11, geuebt: ["schurke", "waldlaeufer"], knapp: true,
-        erfolg: { text: "Ein Sprung, ein Griff, und ihr habt sie. Das ganze Dorf jubelt. Die Ziege kaut zufrieden an eurem Ärmel.", setzt: { ziege: true }, weiter: (A) => A.ereignisZiel },
-        knapp: { text: "Ihr erwischt sie, nachdem sie zwei Tische umgeworfen hat. Gelächter, aber auch Applaus.", setzt: { ziege: true }, weiter: (A) => A.ereignisZiel },
+        erfolg: { text: "Ein Sprung, ein Griff, und ihr habt sie. Das ganze Dorf jubelt. Die Ziege kaut zufrieden an eurem Ärmel.", setzt: { ziege: true }, weiter: (A) => A.ereignisZiel, folge: "Die Ziege des Bürgermeisters hat euch ins Herz geschlossen." },
+        knapp: { text: "Ihr erwischt sie, nachdem sie zwei Tische umgeworfen hat. Gelächter, aber auch Applaus.", setzt: { ziege: true }, weiter: (A) => A.ereignisZiel, folge: "Die Ziege des Bürgermeisters hat euch ins Herz geschlossen." },
         fehl: { text: "Die Ziege ist schneller als ihr. Bis ein Kind sie mit einem Apfel lockt, ist eine halbe Stunde vergangen.", glocke: 1, weiter: (A) => A.ereignisZiel } },
     },
     e_kraeuterweib: {
@@ -255,7 +394,7 @@
     kurztext: "Kröten plündern den Kornspeicher, mitten im Erntefest. Der beste Einstieg in Mythara.",
     ehrentitel: "Retter von Weidenhain", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     abschnitte_namen: { 1: "Weidenhain" },
-    min: 2, max: 6, stufen: "1–2", dauer: "etwa 45 Minuten", abschnitte: 1, enden: 2,
+    min: 2, max: 6, stufen: "1–2", dauer: "etwa 1 Stunde", abschnitte: 1, enden: 2,
     // Bilder siehe BILDER-WEIDENHAIN.md (alle eingebaut)
     bild: "img/weidenhain/titel.webp", vorschau: "img/weidenhain/vorschau.webp", abschnittBilder: { 1: "img/weidenhain/abschnitt-1.webp" },
     uhr: { name: "Nacht", symbol: "☾", max: 7, mehr: "Die Nacht schreitet voran.", weniger: "Ihr habt etwas Zeit gewonnen.", unruhe: "das Quaken vom Graben lässt niemanden ganz schlafen", rueckzug: "Die Nacht schreitet voran." },
@@ -266,6 +405,8 @@
       { eyebrow: "III · Die Nacht", titel: "Bis Mitternacht", text: ["Seit drei Tagen kommen Kröten aus dem Graben und fressen das Korn. Je länger die Nacht dauert, desto mehr ist verloren.", "Über dem Moor im Süden steht etwas am Himmel, das dort nicht hingehört."] },
     ],
     kodexUhr: { titel: "Die Nacht", text: ["Jeder Umweg und jede kurze Rast lassen die <b>Nacht</b> voranschreiten, bis zu sieben Stunden.", "Je später es wird, desto mehr Korn fressen die Kröten. Wie viel Weidenhain bleibt, erzählt das Ende."] },
+    // Hinweise ohne Spoiler auf das Ende, das die Gruppe nicht gesehen hat
+    endeHinweise: { ende_nacht: "Ein anderes Ende beginnt damit, dass ihr dem Jungen aus Rabenmoor noch in derselben Nacht folgt.", ende_fest: "Ein anderes Ende beginnt damit, dass ihr dem Dorf noch eine Nacht schenkt." },
     // Ziel-Siegquote je Kampf (Einsteiger: freundlich)
     zielquoten: { kampf_speicher: 0.92, kampf_muehle: 0.88, kampf_unke: 0.85 },
   };

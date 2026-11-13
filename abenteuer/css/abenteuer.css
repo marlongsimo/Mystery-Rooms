@@ -1478,3 +1478,32 @@ body[data-stimmung="frost"] .szene .szene-kopf .glocke i.an, body[data-stimmung=
 .log li .lg-marke { display: inline-block; font: 600 11px "Inter", sans-serif; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; margin-right: 4px; white-space: nowrap; }
 .log li .lg-marke.gut { color: #9fe39a; background: rgba(90,190,110,.14); border: 1px solid rgba(90,190,110,.45); }
 .log li .lg-marke.schlecht { color: #f0a08c; background: rgba(220,90,70,.13); border: 1px solid rgba(220,90,70,.45); }
+
+/* ---------- Erzähltiefe: Nachhall, Spur, Folgen im Gespräch, Rückschau ---------- */
+.sz-nachhall { margin: 0 0 18px; padding: 12px 16px; border-left: 3px solid #d9b46a; border-radius: 0 10px 10px 0; background: linear-gradient(90deg, rgba(217,180,106,.14), rgba(217,180,106,.03)); animation: nh-ein .7s ease both; }
+.sz-nachhall p { margin: 0 0 6px; font-family: "Cormorant Garamond", serif; font-size: 18px; line-height: 1.45; color: #efe4c8; }
+.sz-nachhall p:last-child { margin-bottom: 0; }
+.sz-nachhall small, .sz-folge small, .d-folge small { display: block; font: 600 10.5px "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #d9b46a; margin-bottom: 2px; }
+.sz-nachhall .nh-entscheidung { font-weight: 600; color: #f6ecd6; }
+.sz-nachhall .nh-geheim { font-style: italic; }
+.sz-nachhall .nh-abschluss small { display: none; }
+@keyframes nh-ein { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.erzaehlung p.sz-folge { padding: 10px 14px; border-left: 3px solid rgba(217,180,106,.7); background: rgba(217,180,106,.07); border-radius: 0 8px 8px 0; }
+.erzaehlung p.sz-folge::first-letter { font-size: inherit; float: none; color: inherit; font-family: inherit; padding: 0; margin: 0; line-height: inherit; }
+.dialog .d-folge { margin: -2px 0 10px 18px; padding: 7px 12px; border-left: 2px solid #d9b46a; background: rgba(217,180,106,.08); border-radius: 0 8px 8px 0; }
+.dialog .d-folge p { margin: 0; font-size: 14.5px; color: #efe4c8; }
+.btn.frage.wichtig { border-color: rgba(217,180,106,.75); }
+.fr-stern { color: #d9b46a; font-style: normal; }
+.offen-hinweis { margin: 0 0 8px; }
+.sz-rueckschau { margin: 22px 0 6px; padding: 16px 18px; border: 1px solid rgba(217,180,106,.35); border-radius: 12px; background: rgba(12,10,7,.55); }
+.sz-rueckschau h3 { font: 600 13px "Cinzel", serif; letter-spacing: .14em; text-transform: uppercase; color: #d9b46a; margin: 0 0 8px; }
+.sz-rueckschau ul + h3 { margin-top: 16px; }
+.sz-rueckschau ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.sz-rueckschau li { padding-left: 20px; position: relative; font-family: "Cormorant Garamond", serif; font-size: 18px; line-height: 1.4; color: #e9dfc6; }
+.sz-rueckschau li::before { content: "✦"; position: absolute; left: 0; color: #d9b46a; font-size: 12px; top: 5px; }
+.sz-rueckschau ul.andere li { color: #b9ad94; font-style: italic; }
+.sz-rueckschau ul.andere li::before { content: "?"; font-style: normal; }
+.sz-rueckschau .note { margin: 12px 0 0; }
+body.handy .sz-nachhall p, body.handy .sz-rueckschau li { font-size: 16px; }
+.log li.folge { color: #e6cf94; }
+.erzaehlung p.sz-folge + p.sz-folge small { display: none; }

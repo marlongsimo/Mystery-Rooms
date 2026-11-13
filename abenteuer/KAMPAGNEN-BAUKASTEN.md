@@ -118,3 +118,26 @@ Neue Gegner kommen in `R.GEGNER`, neue Begegnungen in `R.BEGEGNUNGEN` (Stufe, Ge
 
 - **Krone wirkt leichter als geplant.** Die alte Auswertung hat die Helden für Kämpfe der Stufen 2 und 3 mit Trefferpunkten und Zauberplätzen der Stufe 1 gerechnet. Mit ausgeruhten Helden der richtigen Stufe liegen die späteren Kämpfe bei 91–99 % statt 78–88 %. Im echten Spiel kommt die Gruppe oft angeschlagen an, die Wahrheit liegt also dazwischen. Vor einer Neukalibrierung sollten echte Runden zeigen, wie schwer es sich anfühlt.
 - **Totenpfad (Moor):** In einzelnen simulierten Kämpfen mit 4 Helden findet die Kampf-KI kein Ende (Simulation hängt, kein Fehler im Spiel). Bei Gelegenheit ansehen.
+
+## Erzähltiefe: Entscheidungen müssen sichtbare Folgen haben
+
+Eine Kampagne wirkt nur dann erzählerisch, wenn die Gruppe merkt, was ihre Entscheidungen bewirken. Dafür gibt es feste Bausteine:
+
+| Baustein | Wo | Wirkung |
+|---|---|---|
+| `folge: "…"` | Option, Probenergebnis, geheime Antwort, Kampfsieg | Kurze Zeile, was das bewirkt. Erscheint sofort im Gespräch oder als „Nachhall“ über der nächsten Szene, steht im Verlauf und in der Rückschau |
+| Text mit `↳ ` vorn | Absatz in `text` | Absatz, der nur wegen einer früheren Entscheidung dasteht. Wird als „Eure Spur“ hervorgehoben |
+| `wichtig: true` | Gesprächsoption | Mit ✦ markiert; wer weitergeht, ohne sie zu nutzen, wird gefragt |
+| `kurz: "…"` | geheime Antwort | Kurzform für die Verteilung („2 × für das Dorf“). `verteilung: false` an der Szene blendet die Verteilung aus |
+| `h.geheimWer(A, szene, antwort)`, `h.namen(A, fids)` | in Texten | Greift später auf, wer im Geheimen was gesagt hat |
+| `rueckschau(A, h)` | Ende-Szene | „Was ihr getan habt“ in wenigen Zeilen. Ohne Angabe: die gesammelten Folgen |
+| `META.endeHinweise` | `{ endeId: "…" }` | Hinweis ohne Spoiler auf die Enden, die die Gruppe nicht gesehen hat |
+
+Regeln für neue Kampagnen:
+
+1. Jede Entscheidung, die einen Merker setzt, braucht eine `folge` und mindestens eine spätere Stelle, die darauf reagiert (am besten ein `↳`-Absatz).
+2. Jede geheime Entscheidung kommt später zurück: im Ende, in einer Szene, in der Reaktion einer Nebenfigur.
+3. Nebenfiguren haben einen Namen und etwas, das sie wollen. Was ihnen geschieht, hängt an der Gruppe.
+4. `kampagne.js pruefen <id>` meldet Merker, die gesetzt und nie gelesen werden, fehlende Folgen und fehlende Ende-Hinweise.
+
+Muster: `daten/weidenhain.js` (Tebbe, die Unke, das Müllergeld, das Lied des Spielmanns).

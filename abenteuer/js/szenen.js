@@ -437,6 +437,8 @@
     if (st.ende === "rueckzug") {
       notiz(A, "Rückzug zum Lagerfeuer.", "schlecht"); glocke(A, 1);
       A.zust = JSON.parse(JSON.stringify(A.lagerZust || startZustand(A)));
+      // Normal: Nach einem Rückzug sind alle wieder bei vollen TP (auch wenn das Lagerfeuer nur bis ¾ geheilt hatte)
+      for (const fid of A.gruppe) { const z = A.zust[fid]; if (z && !z.tot) z.tp = Math.max(z.tp, F.tpVon(fid, z.stufe || A.stufe)); }
       return { ok: true, ergebnis: "rueckzug" }; // gleiche Szene beginnt neu
     }
     for (const fid of A.gruppe) A.zust[fid].tot = true;

@@ -4,7 +4,7 @@
  * einmal in ruhigem Tempo (Gespräch, Abstimmung, Probe, Kampf, Lager, geheime Entscheidung) und sieht zum ersten Mal
  * die stummen Lichter über dem Schwarzmoor. Gebaut nach KAMPAGNEN-BAUKASTEN.md: nur vorhandene Gegner (Schlammkröte, Irrlicht).
  * Die „Uhr“ ist die Nacht (A.glocke, 0–7): Je später es wird, desto mehr fressen die Kröten und desto stiller wird das Fest.
- * Karten ohne gemaltes Bild: Die Hindernisse werden gezeichnet (Raster 12 × 9). Bilder siehe BILDER-WEIDENHAIN.md.
+ * Karten mit gemalten Bildern (img/weidenhain/), Hindernisse am Bild ausgerichtet (Raster 12 × 9). Bilder siehe BILDER-WEIDENHAIN.md.
  */
 (function (root) {
   "use strict";
@@ -15,54 +15,54 @@
   /* ---------- Karten (12 × 9) ---------- */
   // Der Kornspeicher: links das Tor, rechts das Loch zum Graben, dazwischen Säcke und Fässer
   const SPEICHER = {
-    name: "Der Kornspeicher", b: 12, h: 9, boden: "holz",
+    name: "Der Kornspeicher", b: 12, h: 9, boden: "holz", bild: "img/weidenhain/speicher.webp",
     hindernisse: ausText([
       "MMMMMMMMMMMM",
-      "M..K....K..M",
-      "M..........M",
-      "M...KK..KK.M",
+      "MMKK.....KMM",
+      "M..KK..KK.MM",
+      "M..KK..KK.MM",
       "............",
-      "M...KK..KK.M",
-      "M..........M",
-      "M..K....K..M",
+      "M..KK..KK.MM",
+      "M.........MM",
+      "MMKK.....KMM",
       "MMMMMMMMMMMM",
     ]),
     start: { spieler: [[0, 4], [1, 4], [1, 3], [1, 5], [2, 3], [2, 5]], wolf: [[2, 4], [3, 4], [2, 2], [2, 6]],
-      gegner: [[9, 4], [10, 4], [11, 4], [10, 3], [10, 5], [10, 2], [10, 6], [9, 2], [9, 6], [7, 4], [7, 2], [7, 6]] },
+      gegner: [[9, 4], [10, 4], [11, 4], [9, 3], [9, 5], [9, 2], [9, 6], [6, 2], [6, 6], [7, 4], [6, 3], [6, 5]] },
   };
   // Die Mühle: der Mühlgraben teilt die Wiese, in der Mitte ein Steg, oben rechts das Mühlhaus
   const MUEHLE = {
-    name: "Am Mühlgraben", b: 12, h: 9, boden: "garten",
+    name: "Am Mühlgraben", b: 12, h: 9, boden: "garten", bild: "img/weidenhain/muehle.webp",
     hindernisse: ausText([
-      "TT....~~MMMM",
-      "T.....~~MMMM",
-      "......~~....",
+      "TTT...~~.MMM",
+      "TTTKK.~~KMMM",
+      "TT....~~..MM",
       "..K...~~..K.",
       "............",
       "..K...~~....",
-      "......~~..K.",
-      "T.....~~....",
+      "TT....~~.KKT",
       "TT....~~..TT",
+      "TTT...~~..TT",
     ]),
     start: { spieler: [[0, 3], [1, 3], [1, 4], [0, 4], [1, 5], [0, 5]], wolf: [[2, 4], [3, 4], [3, 2], [3, 6]],
-      gegner: [[9, 4], [10, 4], [11, 4], [9, 3], [9, 5], [8, 4], [8, 2], [9, 2], [10, 5], [11, 5], [8, 6], [9, 6]] },
+      gegner: [[9, 4], [10, 4], [11, 4], [9, 3], [9, 5], [8, 4], [8, 2], [9, 2], [10, 5], [11, 5], [8, 6], [11, 3]] },
   };
   // Das Wehr: ein Streifen Ufer zwischen Mühlteich oben und dem Abfluss unten, das Wehr aus Steinen am unteren Rand
   const WEHR = {
-    name: "Das alte Wehr", b: 12, h: 9, boden: "moor",
+    name: "Das alte Wehr", b: 12, h: 9, boden: "moor", bild: "img/weidenhain/wehr.webp",
     hindernisse: ausText([
-      "~~~~~~~~~~~~",
-      "~~~~~~~~~~~~",
-      "..T......M..",
+      "TT~~~~~~~~~T",
+      "TTT~~~~~~MMT",
+      ".TT......MM.",
       "............",
+      ".T..........",
+      "TTT.......K.",
       "............",
-      "............",
-      "..T....K....",
-      "~~~~MMMM~~~~",
-      "~~~~~~~~~~~~",
+      "MMMMMMMMMMMM",
+      "T~~~~~~~~~~~",
     ]),
-    start: { spieler: [[0, 3], [0, 4], [1, 3], [1, 4], [0, 5], [1, 5]], wolf: [[2, 3], [2, 4], [2, 5], [1, 2]],
-      gegner: [[9, 4], [10, 4], [9, 3], [10, 3], [9, 5], [10, 5], [11, 4], [11, 3], [11, 5], [8, 4], [8, 2], [8, 6]] },
+    start: { spieler: [[0, 3], [1, 3], [2, 3], [0, 4], [2, 4], [3, 4]], wolf: [[3, 3], [3, 5], [3, 2], [4, 4]],
+      gegner: [[9, 4], [10, 4], [9, 3], [10, 3], [9, 5], [11, 4], [11, 3], [11, 5], [8, 4], [8, 2], [8, 6], [9, 6]] },
   };
   const KARTEN = { SPEICHER, MUEHLE, WEHR };
 
@@ -256,7 +256,7 @@
     ehrentitel: "Retter von Weidenhain", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     abschnitte_namen: { 1: "Weidenhain" },
     min: 2, max: 6, stufen: "1", dauer: "etwa 45 Minuten", abschnitte: 1, enden: 2,
-    // Bilder (siehe BILDER-WEIDENHAIN.md): solange sie fehlen, zeigt das Spiel das allgemeine Kampagnenbild
+    // Bilder siehe BILDER-WEIDENHAIN.md (alle eingebaut)
     bild: "img/weidenhain/titel.webp", vorschau: "img/weidenhain/vorschau.webp", abschnittBilder: { 1: "img/weidenhain/abschnitt-1.webp" },
     uhr: { name: "Nacht", symbol: "☾", max: 7, mehr: "Die Nacht schreitet voran.", weniger: "Ihr habt etwas Zeit gewonnen.", unruhe: "das Quaken vom Graben lässt niemanden ganz schlafen", rueckzug: "Die Nacht schreitet voran." },
     gruppe: "Die Retter von Weidenhain", aufbruch: "Zum Erntefest", niederlage: "Ein langer Winter", chronik: "Chronik von Weidenhain",

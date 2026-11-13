@@ -1,6 +1,6 @@
-# Bilder für „Das Erntefest von Weidenhain“ (Einsteiger-Kurzabenteuer, Entwurf)
+# Bilder für „Das Erntefest von Weidenhain“ (Einsteiger-Kurzabenteuer) – alle 6 eingebaut
 
-Das Abenteuer läuft schon ohne diese Bilder: Kampfkarten werden gezeichnet, und für Titel und Abschnitt erscheint das allgemeine Kampagnenbild. Sobald du Bilder lieferst, baue ich sie ein und richte die unsichtbaren Hindernisse am Bild aus.
+Alle Bilder sind eingebaut. Die unsichtbaren Hindernisse der Kampfkarten sind am Bild ausgerichtet; die Raster unten zeigen den ursprünglichen Entwurf, die gültigen stehen in `daten/weidenhain.js`.
 
 **Neue Gegnerbilder braucht es nicht:** Schlammkröte und Irrlicht gibt es schon aus dem Moor. Die alte Unke ist eine Schlammkröte mit eigenem Namen.
 
@@ -18,13 +18,13 @@ Ablage: `abenteuer/img/weidenhain/`. PNG oder JPG in hoher Auflösung genügt.
 
 ---
 
-## 1. Titelbild – `titel` (Querformat, mind. 1600 × 750)
+## 1. Titelbild – `titel` ✓ eingebaut (Querformat, mind. 1600 × 750)
 > A painted fantasy illustration of a small village harvest festival at night on the edge of a dark marsh: a big bonfire on the village square, lanterns strung between timber houses, villagers dancing, tables with bread and pumpkins, a wooden granary barn with its door ajar and a few large toad shapes slipping out. Far in the south, beyond willow trees, a dark marsh under a cold sky with three small, perfectly still pale lights hanging above the water. Warm golden firelight against cold blue night. No text.
 
-## 2. Vorschau – `vorschau` (Querformat 16:11, mind. 640 × 440)
+## 2. Vorschau – `vorschau` ✓ eingebaut (Querformat 16:11, mind. 640 × 440)
 > Close-up of the same scene: the granary door at night lit by the festival fire, a large wet marsh toad with glistening skin peering out between grain sacks. No text.
 
-## 3. Abschnittsbild – `abschnitt-1` (Querformat 16:11, mind. 640 × 440)
+## 3. Abschnittsbild – `abschnitt-1` ✓ eingebaut (Querformat 16:11, mind. 640 × 440)
 > Painted fantasy scene: a stout village mayor woman with flour on her hands and a festival ribbon talks to a small group of strangers by a bonfire; behind them a timber granary, in the far distance three still pale lights above a dark marsh. Warm and cosy, a little uneasy. No text.
 
 ---
@@ -37,7 +37,7 @@ Ablage: `abenteuer/img/weidenhain/`. PNG oder JPG in hoher Auflösung genügt.
 
 **Legende:** `~` Wasser · `T` Baum oder Schilf · `K` Säcke, Kisten, Fässer · `M` Mauer oder Stein · `.` begehbar. Helden starten links, Gegner rechts.
 
-### `speicher` – Kröten im Korn
+### `speicher` – Kröten im Korn ✓ eingebaut
 ```
 MMMMMMMMMMMM
 M..K....K..M
@@ -51,7 +51,7 @@ MMMMMMMMMMMM
 ```
 > Top-down orthographic battle map, painted fantasy style, 4:3. The inside of a wooden village granary: plank floor with spilled grain, thick timber walls around all edges, a wide open barn door in the middle of the left wall, a ragged hole in the middle of the right wall with mud and water beyond; stacks of grain sacks and barrels in two double rows, a few single sacks near the corners. Warm lantern light from the door, dark corners. No characters, no grid, no text.
 
-### `muehle` – Am Mühlgraben
+### `muehle` – Am Mühlgraben ✓ eingebaut
 ```
 TT....~~MMMM
 T.....~~MMMM
@@ -65,7 +65,7 @@ TT....~~..TT
 ```
 > Top-down orthographic battle map, painted fantasy style, 4:3. A meadow at night split by a straight mill race running from top to bottom just right of the centre, crossed by a narrow wooden footbridge in the middle; the corner of a stone watermill in the upper right; a few hay bales and crates on the grass, willows in the corners. Moonlight and a faint cold glow over the water. No characters, no grid, no text.
 
-### `wehr` – Die alte Unke
+### `wehr` – Die alte Unke ✓ eingebaut
 ```
 ~~~~~~~~~~~~
 ~~~~~~~~~~~~

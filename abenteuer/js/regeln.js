@@ -167,9 +167,9 @@
     f_furt: { name: "Auf der Kiesbank", stufe: 1, zusatzAb: 99, gegner: [["schattenkobold", 1.1, 7, 0.3], ["rostkaefer", 0.5, 3, -0.5]], skala: { 2: 1.88, 3: 2.98, 4: 2.98, 5: 3.9, 6: 4.35 }, skalaHC: { 2: 1.55, 3: 2.82, 4: 2.75, 5: 3.7, 6: 3.6 } },
     f_turm: { name: "Der Zöllner zählt", stufe: 1, zusatzAb: 99, gegner: [["knochenwaechter", 0.2, 2, 0.7], ["schattenkobold", 1.1, 7, 0.3]], skala: { 2: 0.9, 3: 2.46, 4: 2.4, 5: 3.8, 6: 4.59 }, skalaHC: { 2: 0.9, 3: 2.04, 4: 2.4, 5: 2.9, 6: 3.41 } },
     // Das Erntefest von Weidenhain (Einsteiger-Kurzabenteuer, Heldenstufe 1, 2–6 Helden). Faktoren: tools/kampagne.js kaempfe weidenhain --kalibrieren
-    w_speicher: { name: "Kröten im Korn", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 1.1, 7, 0.2]], skala: { 2: 1.09, 3: 1.78, 4: 1.93, 5: 1.98, 6: 1.98 }, skalaHC: { 2: 1.04, 3: 0.93, 4: 1.12, 5: 1.09, 6: 1.19 } },
-    w_muehle: { name: "Am Mühlgraben", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0.6, 4, 0.3], ["irrlicht", 0.5, 3, -0.5]], skala: { 2: 1.22, 3: 3.6, 4: 2.98, 5: 4.23, 6: 3.7 }, skalaHC: { 2: 1.15, 3: 2.21, 4: 2.33, 5: 2.75, 6: 2.6 } },
-    w_unke: { name: "Die alte Unke", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0, 1, 1], ["irrlicht", 1.2, 7, -0.6]], skala: { 2: 1.83, 3: 2.75, 4: 5.26, 5: 6.71, 6: 6.36 }, skalaHC: { 2: 1.47, 3: 2.15, 4: 3.06, 5: 3.8, 6: 3.6 } },
+    w_speicher: { name: "Kröten im Korn", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 1.1, 7, 0.2]], skala: { 2: 1.12, 3: 1.19, 4: 1.4, 5: 1.93, 6: 1.98 }, skalaHC: { 2: 1.04, 3: 0.75, 4: 0.88, 5: 1.15, 6: 1.29 } },
+    w_muehle: { name: "Am Mühlgraben", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0.6, 4, 0.3], ["irrlicht", 0.5, 3, -0.5]], skala: { 2: 1.43, 3: 3.9, 4: 3.23, 5: 4.47, 6: 4.47 }, skalaHC: { 2: 0.96, 3: 2.46, 4: 1.93, 5: 2.9, 6: 2.67 } },
+    w_unke: { name: "Die alte Unke", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0, 1, 1], ["irrlicht", 1.2, 7, -0.6]], skala: { 2: 1.55, 3: 2.6, 4: 4.6, 5: 6.19, 6: 5.55 }, skalaHC: { 2: 1.51, 3: 2.15, 4: 2.75, 5: 4.59, 6: 3.32 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**

@@ -1,6 +1,7 @@
 # MYTHARA – Heldenfreischaltung und wachsende Sammlung
 
 **Status:** Konzeptvorschlag, **nicht umgesetzt**. Geplant für die **Open Beta**. Mythara ist seit dem 13. November 2026 in der **Closed Beta**; bis zur Open Beta bleiben alle 15 Helden frei wählbar.
+**Fortsetzung:** Zum Launch kommt das dauerhafte Heldenlevel dazu, siehe [KONZEPT-HELDENLEVEL.md](KONZEPT-HELDENLEVEL.md) und Teil C unten.
 Grundlage: „MYTHARA – Konzept Heldenfreischaltung“, Konzeptstand 1.0 vom 12. November 2026. Darunter folgen Anmerkungen aus dem Abgleich mit dem Spielstand vom 12. November 2026.
 
 ---
@@ -122,7 +123,7 @@ Spieler starten mit drei Helden, die sie selbst aus jeweils drei zufälligen Ang
 ## Teil B – Anmerkungen aus dem Abgleich mit dem Spielstand
 
 ### B1. Das Tempo passt erst mit mehr Abenteuern
-Bei 3 Start-Helden und einem Helden pro Kampagne braucht man **12 abgeschlossene Kampagnen** bis zur vollen Sammlung. Mit den heutigen zwei Abenteuern (Grauwacht, Moor der stummen Lichter) kommt ein Spieler auf **höchstens 5 von 15**. Weitere Hebel neben neuen Abenteuern:
+Bei 3 Start-Helden und einem Helden pro Kampagne braucht man **12 abgeschlossene Kampagnen** bis zur vollen Sammlung. Mit den vier Abenteuern der Closed Beta (Moor, Grauwacht, Hochwacht, Krone) kommt ein Spieler auf **höchstens 7 von 15**, wenn nur die erste Kampagne je Abenteuer zählt. Zählt jedes Ende einmal (Grauwacht 5, Hochwacht 3, Krone 3, Moor 2 Siegesenden), reicht es für die ganze Sammlung. Weitere Hebel neben neuen Abenteuern:
 - **Jedes erreichte Ende zählt einmal.** Grauwacht hat 5 Enden, das Moor 2 Siegesenden. Das belohnt Wiederspielen mit anderen Entscheidungen.
 - **Freischaltung durch die Geschichte:** Ein Held taucht in einem Abenteuer als Nebenfigur auf und schließt sich an, wenn die Gruppe ihm hilft. Beispiel: Faye verirrt sich im Schwarzmoor; wer sie rettet, schaltet sie frei. Das ist thematischer als ein Zufallsangebot und lässt sich gut mit den bestehenden „Momenten“ der Figuren verbinden.
 
@@ -156,10 +157,29 @@ Simulation im Moor (Normal, alle Kämpfe, 2–6 Helden, eingebaute KI):
 - Konten haben Benutzernamen und Profile (002), Freunde und Einladungen gibt es (003).
 - Der Heldenkatalog lässt sich aus `js/figuren.js` (15 Helden, 5 Klassen) speisen.
 - Die Heldenwahl am Tisch (`spiel.js` → `zeichneSetup`) und auf dem Handy (`handy.js` → `viewWahl`) müsste nur nach der Sammlung filtern.
-- Neue Tabellen und Funktionen als Migration `005_rpg_heldensammlung.sql` im bewährten Ablauf: lokal prüfen (`supabase/tests/pruefen.sh`), mit Rückbau-Skript, und du führst sie in Supabase aus.
+- Neue Tabellen und Funktionen als Migration `006_rpg_heldensammlung.sql` (005 ist inzwischen für die Abenteuer-Zuordnung der Kampagnen vergeben) im bewährten Ablauf: lokal prüfen (`supabase/tests/pruefen.sh`), mit Rückbau-Skript, und du führst sie in Supabase aus.
 
 ### B8. Offene Entscheidungen vor dem Start
 1. Zählt jedes **Ende** einzeln oder nur die erste Kampagne pro Abenteuer?
 2. Gibt es ein **Starter-Set** für Gäste und das Spiel auf einem Gerät, und wenn ja, welche fünf Helden?
 3. Sollen auch **Freischaltungen durch die Geschichte** (B1) kommen, und in welchem Abenteuer zuerst?
 4. Werden **bestehende Konten** beim Start alle Helden behalten (Bestandsschutz) oder auch die drei Startrunden spielen?
+
+---
+
+## Teil C – Abgleich mit dem Heldenlevel-Konzept (Stand 13. November 2026)
+
+Zum Launch soll der Aufstieg **aus den Kampagnen heraus** wandern: Helden haben dann eine dauerhafte Stufe von 1 bis 10 am Konto und sammeln XP durch gespielte Abschnitte und Kampagnen (Details in [KONZEPT-HELDENLEVEL.md](KONZEPT-HELDENLEVEL.md)). Was sich dadurch an diesem Konzept ändert:
+
+| Stelle in Teil A | Bis zum Launch (Open Beta) | Ab dem Launch |
+|---|---|---|
+| 4. „Nur im jeweiligen Abenteuer: Level 1–3“ | gilt | Stufe 1–10 am Konto; im Abenteuer gibt es keinen Aufstieg mehr, sondern einen Kampagnen-Segen |
+| 4. „Keine dauerhafte Machtsteigerung“ | gilt | dauerhafte Stufen ja; weiterhin keine dauerhaften Gegenstände und keine Kaufvorteile |
+| 3. Belohnung nach dem Finale | Freischaltung | Freischaltung **plus** XP für die beteiligten Helden |
+| Neu freigeschalteter Held | sofort voll spielbar | startet auf Stufe 1; der Erfahrungsschatz bringt ihn bis zwei Stufen unter den stärksten eigenen Helden |
+| B2 Gäste und Tisch-Helden | Starter-Set | zusätzlich: spielen auf der empfohlenen Stufe der Kampagne |
+| B4 Hardcore-Ersatz | frei wählbar | frei wählbar, spielt als Gast auf der empfohlenen Stufe |
+| 6. Datenmodell | `006_rpg_heldensammlung.sql` | dazu `007_rpg_heldenlevel.sql` (Stufe, XP, Talente, Buchungen) |
+
+**Empfehlung für die Open Beta:** Das Datenmodell der Sammlung so anlegen, dass `rpg_hero_progress` (Stufe, XP) direkt danebenpasst. XP schon während der Open Beta still mitschreiben (Phase 0 im Heldenlevel-Konzept) und zum Launch gutschreiben.
+

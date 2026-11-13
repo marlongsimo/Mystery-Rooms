@@ -17,6 +17,18 @@
  *       Schreibt js/enden.js (reguläre Enden aller Abenteuer für die Heldensammlung) und gibt die SQL-Zeilen
  *       für rpg_adventure_endings aus (im Supabase SQL Editor ausführen, sobald ein neues Abenteuer live geht).
  *
+ *   node abenteuer/tools/kampagne.js aufbau <id> [N=60] [--hardcore] [--nur=a,b]
+ *       Schlägt je Kampf eine Gegnerzahl vor: probiert mehrere Mengen (60 % bis 200 % der eingetragenen Zahl),
+ *       kalibriert jede kurz und zeigt, bei welcher Menge der Kampf 5–9 Runden dauert und der Lebensfaktor
+ *       im gesunden Bereich bleibt. Schreibt nichts; die Zahlen trägt man in js/regeln.js ein und kalibriert dann.
+ *   node abenteuer/tools/kampagne.js alles <id> [--kalibrieren] [--ohne-browser]
+ *       Alles nacheinander: prüfen, 200 Durchläufe, Kämpfe (Normal und Hardcore), Karten-Kontrolle, Browsertest.
+ *       Mit --kalibrieren werden die Kämpfe vorher für Normal und Hardcore kalibriert. Am Ende eine Zusammenfassung.
+ *   node abenteuer/tools/kampagne.js freigeben <id>
+ *       Freigabe in einem Schritt: entfernt META.entwurf, erzeugt js/enden.js, ergänzt die Enden in Migration 006
+ *       und im lokalen Datenbanktest, zählt die Versionsnummern in index.html/handy.html hoch und gibt die
+ *       SQL-Zeile für Supabase aus (nur die neuen Enden dieses Abenteuers).
+ *
  * Reguläres Ende = Szene mit art "ende", nicht D.NIEDERLAGE und nicht als niederlage: true markiert.
  */
 "use strict";
@@ -243,8 +255,86 @@ function kaempfe(id, N = 150, o = {}) {
   return { id, GR, ergebnis, ranking };
 }
 
+/* ---------- Aufbau: Gegnerzahl vorschlagen ---------- */
+function aufbau(id, N = 60, o = {}) {
+  const D = daten(id), GR = [];
+  for (let n = Math.max(2, D.META.min || 3); n <= (D.META.max || 6); n++) GR.push(n);
+  const liste = Object.keys(D.SZENEN).filter((s) => D.SZENEN[s].art === "kampf" && (!o.nur || !o.nur.length || o.nur.includes(s)));
+  const ziel = (s) => (D.META.zielquoten && D.META.zielquoten[s]) || 0.8;
+  const MENGEN = [0.6, 0.8, 1, 1.3, 1.6, 2];
+  function kampf(sid, n, i, skala) {
+    const r = R.rng(sid.length * 7919 + n * 104729 + i), gruppe = F.REIHE.slice().sort(() => r() - 0.5).slice(0, n);
+    const A = S.neu(9e5 + i * 17 + n, { gruppe, abenteuer: id, schwierigkeit: o.hardcore ? "hardcore" : "normal" });
+    A.szene = sid; A.stufe = D.SZENEN[sid].stufe || (R.BEGEGNUNGEN[S.kampfOptionen(A).begegnung] || {}).stufe || 1;
+    for (const f of gruppe) Object.assign(A.zust[f], { stufe: A.stufe, tp: F.tpVon(f, A.stufe), plaetze: F.KLASSEN[F.FIGUREN[f].klasse].plaetze ? F.PLAETZE[A.stufe].slice() : [0, 0] });
+    const opt = S.kampfOptionen(A); opt.skala = skala;
+    const st = R.neuesSpiel(7e6 + i * 31 + n * 7 + sid.length, opt); let k = 0;
+    while (!st.ende && k++ < 4000) { if (R.aktiv(st).seite === "gegner") R.gegnerZug(st); else R.autoZug(st); }
+    return { sieg: st.ende === "sieg", runden: st.runde, begegnung: opt.begegnung, gegner: st.figuren.filter((f) => f.seite === "gegner").length };
+  }
+  const messen = (sid, n, skala, m) => { let s = 0, r = 0, g = 0, beg = null; for (let i = 0; i < m; i++) { const e = kampf(sid, n, i, skala); s += e.sieg; r += e.runden; g += e.gegner; beg = e.begegnung; } return { sieg: s / m, runden: r / m, gegner: g / m, begegnung: beg }; };
+  const out = [];
+  for (const sid of liste) {
+    const beg = messen(sid, GR[0], 1, 1).begegnung, B = R.BEGEGNUNGEN[beg];
+    if (!B || !B.gegner) { out.push({ sid, fehler: "Kampf ohne Begegnung (feste Gegner): kein Vorschlag möglich" }); continue; }
+    const original = B.gegner, zeilen = [];
+    for (const m of MENGEN) {
+      // Genau festgelegte Gegner (Anführer, Bosse: „je Figur 0“) bleiben, alle anderen skalieren mit
+      B.gegner = original.map(([art, je, max, basis]) => (je === 0 ? [art, je, max, basis] : [art, +(je * m).toFixed(2), max ? Math.max(1, Math.round(max * Math.max(1, m))) : max, basis]));
+      let strafe = 0; const je = {};
+      for (const n of GR) {
+        let lo = 0.25, hi = 8;
+        for (let it = 0; it < 5; it++) { const mid = Math.sqrt(lo * hi); if (messen(sid, n, mid, Math.max(24, Math.round(N / 2))).sieg > ziel(sid)) lo = mid; else hi = mid; }
+        const fk = +Math.sqrt(lo * hi).toFixed(2), e = messen(sid, n, fk, N);
+        je[n] = { faktor: fk, runden: e.runden, sieg: e.sieg, gegner: e.gegner };
+        strafe += Math.max(0, 5 - e.runden) + Math.max(0, e.runden - 9) * 1.5 + Math.max(0, fk - 3.5) * 2 + Math.max(0, 0.7 - fk) * 6 + Math.abs(e.sieg - ziel(sid)) * 10;
+      }
+      zeilen.push({ menge: m, gegner: B.gegner, je, strafe: strafe / GR.length });
+    }
+    B.gegner = original;
+    const beste = zeilen.slice().sort((a, b) => a.strafe - b.strafe)[0];
+    out.push({ sid, begegnung: beg, ziel: ziel(sid), zeilen, beste });
+  }
+  return { id, GR, ergebnis: out };
+}
+
+/* ---------- Freigabe in einem Schritt ---------- */
+function freigeben(id) {
+  const D = daten(id), schritte = []; let neuFrei = false;
+  const datei = path.join(WURZEL, "daten", id + ".js"); let txt = fs.readFileSync(datei, "utf8");
+  if (/entwurf:\s*true,?\s*/.test(txt)) { fs.writeFileSync(datei, txt.replace(/entwurf:\s*true,?\s*/, "")); D.META.entwurf = false; neuFrei = true; schritte.push("META.entwurf entfernt"); }
+  else schritte.push("war schon freigegeben (kein META.entwurf)");
+  const p = pruefenOhneEnden(id); if (p.length) return { id, fehler: p };
+  const t = endenTabelle(); fs.writeFileSync(path.join(WURZEL, "js/enden.js"), endenDatei(t)); schritte.push("js/enden.js erzeugt");
+  // Migration 006: fehlende Enden an die Liste hängen
+  const mig = path.join(WURZEL, "supabase/006_rpg_heldensammlung.sql"); let sql = fs.readFileSync(mig, "utf8");
+  const neu = Object.keys(t[id].enden).filter((e) => !sql.includes(`('${id}', '${e}')`));
+  if (neu.length) {
+    const re = /(insert into public\.rpg_adventure_endings \(adventure, ending\) values[\s\S]*?)\n(on conflict do nothing;)/;
+    if (!re.test(sql)) return { id, fehler: ["Liste der Enden in Migration 006 nicht gefunden"] };
+    fs.writeFileSync(mig, sql.replace(re, `$1,\n  ${neu.map((e) => `('${id}', '${e}')`).join(", ")}\n$2`)); schritte.push(`Migration 006: ${neu.length} Enden ergänzt`);
+  }
+  // Lokaler Datenbanktest zählt die Enden
+  const test = path.join(WURZEL, "supabase/tests/006_rpg_heldensammlung_test.sql");
+  if (fs.existsSync(test)) {
+    const gesamt = Object.values(t).reduce((a, v) => a + Object.keys(v.enden).length, 0); let tt = fs.readFileSync(test, "utf8");
+    const re2 = /rpg_adventure_endings\) = \d+, 'Katalog: 15 Helden, \d+ Enden'/;
+    if (re2.test(tt)) { fs.writeFileSync(test, tt.replace(re2, `rpg_adventure_endings) = ${gesamt}, 'Katalog: 15 Helden, ${gesamt} Enden'`)); schritte.push(`Datenbanktest erwartet jetzt ${gesamt} Enden`); }
+  }
+  // Versionsnummern hochzählen, damit Browser die neuen Dateien laden
+  if (neuFrei || neu.length) for (const h of ["index.html", "handy.html"]) {
+    const hp = path.join(WURZEL, h); if (!fs.existsSync(hp)) continue; let html = fs.readFileSync(hp, "utf8"), geaendert = false;
+    for (const f of [`daten/${id}.js`, "js/enden.js"]) html = html.replace(new RegExp(`(${f.replace(/[.\/]/g, "\\$&")}\\?v=)(\\d+)`), (_, a, n) => { geaendert = true; return a + (+n + 1); });
+    if (geaendert) { fs.writeFileSync(hp, html); schritte.push(`${h}: Versionsnummern erhöht`); }
+  }
+  const zeilen = Object.keys(t[id].enden).map((e) => `('${id}', '${e}')`);
+  return { id, schritte, sql: `insert into public.rpg_adventure_endings (adventure, ending) values\n  ${zeilen.join(",\n  ")}\non conflict do nothing;` };
+}
+/** Prüfung vor der Freigabe: alles außer „js/enden.js passt nicht“ (das erledigt die Freigabe selbst) */
+function pruefenOhneEnden(id) { return pruefen(id).fehler.filter((f) => !/js\/enden\.js passt nicht/.test(f)); }
+
 /* ---------- Befehlszeile ---------- */
-module.exports = { ALLE, ids, pruefen, durchlauf, kaempfe, endenVon, endenTabelle, endenDatei, endenSql, loadEndenDatei, istRegulaeresEnde };
+module.exports = { ALLE, ids, pruefen, durchlauf, kaempfe, aufbau, freigeben, endenVon, endenTabelle, endenDatei, endenSql, loadEndenDatei, istRegulaeresEnde };
 if (require.main === module) {
   const a = process.argv.slice(2), befehl = a[0], ziel = a[1] && !a[1].startsWith("--") && !/^\d+$/.test(a[1]) ? a[1] : "alle";
   const N = +(a.find((x) => /^\d+$/.test(x)) || 0) || undefined, flag = (n) => a.includes("--" + n);
@@ -284,13 +374,43 @@ if (require.main === module) {
       }
       if (k.ranking) { console.log("\n  Helden-Ranking: Siegquote · übriges Leben · am Boden"); k.ranking.forEach((x, i) => console.log(`  ${String(i + 1).padStart(2)}. ${(F.FIGUREN[x.f].name + " (" + F.KLASSEN[F.FIGUREN[x.f].klasse].name + ")").padEnd(28)} ${(x.q * 100).toFixed(1).padStart(5)} %  ${(x.tp * 100).toFixed(0).padStart(3)} %  ${(x.b * 100).toFixed(0).padStart(3)} %`)); }
     }
+  } else if (befehl === "aufbau") {
+    for (const id of welche) {
+      const a2 = aufbau(id, N || 60, { hardcore: flag("hardcore"), nur: wert("nur").split(",").filter(Boolean) });
+      console.log(`\n${daten(id).META.titel} · Vorschlag für die Gegnerzahl${flag("hardcore") ? " · Hardcore" : ""} (Ziel: 5–9 Runden, Lebensfaktor 0,7–3,5)`);
+      for (const e of a2.ergebnis) {
+        if (e.fehler) { console.log(`  · ${e.sid}: ${e.fehler}`); continue; }
+        console.log(`\n  ${e.sid} [${e.begegnung}] · Ziel ${Math.round(e.ziel * 100)} %`);
+        for (const z of e.zeilen) console.log(`    ${z === e.beste ? "→" : " "} ${String(Math.round(z.menge * 100)).padStart(3)} % Gegner · ` + a2.GR.map((n) => `${n}: ${z.je[n].gegner.toFixed(0)} Gegner, ${z.je[n].runden.toFixed(1)} R., Faktor ${z.je[n].faktor}`).join(" · "));
+        console.log(e.beste.menge === 1 ? "    ✓ Die eingetragene Gegnerzahl passt." : `    ⚠ Vorschlag: ${Math.round(e.beste.menge * 100)} % der Gegner → gegner: ${JSON.stringify(e.beste.gegner)}`);
+      }
+    }
+  } else if (befehl === "freigeben") {
+    if (ziel === "alle") { console.log("Bitte ein Abenteuer nennen: freigeben <id>"); process.exit(1); }
+    const f = freigeben(ziel);
+    if (f.fehler) { console.log(`✗ ${ziel} kann nicht freigegeben werden:`); f.fehler.forEach((x) => console.log("  ✗ " + x)); schlecht = true; }
+    else { console.log(`${daten(ziel).META.titel} freigegeben:`); f.schritte.forEach((x) => console.log("  ✓ " + x)); console.log("\nSQL für Supabase (SQL Editor, darf mehrfach laufen):\n\n" + f.sql + "\n\nDanach: node abenteuer/tests/kampagnen.test.js"); }
+  } else if (befehl === "alles") {
+    if (ziel === "alle") { console.log("Bitte ein Abenteuer nennen: alles <id>"); process.exit(1); }
+    const { spawnSync } = require("child_process"), lauf = (argv) => spawnSync("node", argv, { encoding: "utf8", cwd: WURZEL });
+    const bericht = [], merke = (name, ok, text) => { bericht.push({ name, ok, text }); console.log(`\n===== ${name} =====\n${text.trim()}`); };
+    const selbst = path.join(__dirname, "kampagne.js");
+    if (flag("kalibrieren")) for (const m of [[], ["--hardcore"]]) { const r = lauf([selbst, "kaempfe", ziel, "120", "--kalibrieren", ...m]); merke("Kalibrieren" + (m.length ? " (Hardcore)" : ""), r.status === 0 && !/⚠/.test(r.stdout), r.stdout + r.stderr); }
+    let r = lauf([selbst, "pruefen", ziel]); merke("Prüfen", r.status === 0, r.stdout + r.stderr);
+    r = lauf([selbst, "durchlauf", ziel, "200"]); merke("Durchlauf", r.status === 0, r.stdout + r.stderr);
+    for (const m of [[], ["--hardcore"]]) { r = lauf([selbst, "kaempfe", ziel, "100", ...m]); merke("Kämpfe" + (m.length ? " (Hardcore)" : ""), r.status === 0 && !/⚠/.test(r.stdout), r.stdout + r.stderr); }
+    r = lauf([path.join(__dirname, "karten.js"), ziel, wert("ordner") || "karten-kontrolle"]); merke("Karten", r.status === 0, r.stdout + r.stderr);
+    if (!flag("ohne-browser")) { r = lauf([path.join(WURZEL, "tests/kampagnen-browser.test.js"), ziel]); merke("Browser", r.status === 0, r.stdout + r.stderr); }
+    console.log(`\n===== Zusammenfassung: ${daten(ziel).META.titel} =====`);
+    bericht.forEach((x) => console.log(`  ${x.ok ? "✓" : "⚠"} ${x.name}${x.ok ? "" : " – bitte oben nachsehen"}`));
+    schlecht = bericht.some((x) => !x.ok && !/^Kämpfe|^Kalibrieren/.test(x.name));
   } else if (befehl === "enden") {
     const t = endenTabelle();
     fs.writeFileSync(path.join(WURZEL, "js/enden.js"), endenDatei(t));
     console.log("js/enden.js geschrieben: " + Object.entries(t).map(([ab, v]) => `${ab} ${Object.keys(v.enden).length}`).join(", "));
     console.log("\nSQL für Supabase (SQL Editor, darf mehrfach laufen):\n\n" + endenSql(t));
   } else {
-    console.log("Befehle: pruefen [id|alle] · durchlauf <id|alle> [N] [--hardcore] · kaempfe <id> [N] [--hardcore] [--nur=a,b] [--helden] [--kalibrieren] · enden");
+    console.log("Befehle: pruefen [id|alle] · durchlauf <id|alle> [N] [--hardcore] · kaempfe <id> [N] [--hardcore] [--nur=a,b] [--helden] [--kalibrieren] · aufbau <id> · alles <id> [--kalibrieren] [--ohne-browser] · freigeben <id> · enden");
     console.log("Abenteuer: " + ids().join(", "));
   }
   process.exit(schlecht ? 1 : 0);

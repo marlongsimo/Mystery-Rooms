@@ -8,17 +8,17 @@ So entsteht eine neue Kampagne schnell und ohne vergessene Stellen. Grundlage si
 
 | Schritt | Was | Werkzeug |
 |---|---|---|
-| 1 | Idee in der **Konzeptvorlage** (Teil B) festhalten: Akte, Szenenliste, Kämpfe, Enden, Bilder | – |
+| 1 | Idee in der **Konzeptvorlage** (Teil B) festhalten: Akte, Szenenliste, Kämpfe, Enden. **Die Bild-Prompts entstehen gleich mit** und gehen sofort raus, damit die Bilder parallel gemalt werden | – |
 | 2 | Datei `daten/<id>.js` anlegen (Vorbild: `daten/hochwacht.js` für kurz, `daten/krone.js` für verzweigt), `META.entwurf: true` setzen | – |
 | 3 | In `index.html` die Datei einbinden (neben den anderen `daten/*.js`) | – |
 | 4 | **Prüfen**, nach jeder größeren Änderung | `node abenteuer/tools/kampagne.js pruefen <id>` |
 | 5 | **Durchspielen** lassen: Fehler, nie erreichte Szenen, fehlende Enden | `node abenteuer/tools/kampagne.js durchlauf <id> 200` |
-| 6 | **Kämpfe messen**, Zielquoten in `META.zielquoten` | `node abenteuer/tools/kampagne.js kaempfe <id> [--helden]` |
+| 6 | **Gegnerzahl festlegen**, dann **Kämpfe messen**, Zielquoten in `META.zielquoten` | `node abenteuer/tools/kampagne.js aufbau <id>` und `… kaempfe <id> [--helden]` |
 | 7 | **Kalibrieren** (schreibt den Lebensfaktor je Gruppengröße in `js/regeln.js`). Warnungen (⚠) beachten: Faktor am Anschlag heißt „mehr oder weniger Gegner einplanen“, über 12 Runden heißt „der Kampf zieht sich“ | `… kaempfe <id> --kalibrieren` und `… --kalibrieren --hardcore` |
 | 8 | Spielen im Browser mit `index.html?entwurf` (Entwürfe sind nur so im Hub sichtbar) | – |
-| 9 | Bilder einsetzen; bis dahin nimmt das Spiel automatisch das Kampagnenbild. **Karten am Bild ausrichten:** Raster über das neue Bild legen, Hindernisse eintragen, Kontrollbild ansehen. Danach neu kalibrieren, weil sich die Wege ändern | `node abenteuer/tools/karten.js --bild=pfad.png` und `node abenteuer/tools/karten.js <id>` |
-| 10 | Freigeben: `META.entwurf` entfernen, **Enden erzeugen** und die ausgegebene SQL-Zeile in Supabase ausführen sowie in `supabase/006_rpg_heldensammlung.sql` ergänzen | `node abenteuer/tools/kampagne.js enden` |
-| 11 | Alles testen | `node abenteuer/tests/kampagnen.test.js` (Engine) und `node abenteuer/tests/kampagnen-browser.test.js [id]` (Browser, bis zum Ende) |
+| 9 | **Karten vom Bild bauen (Bilder zuerst):** Die Kampfkarten entstehen erst, wenn die Bilder da sind. Hindernisse vorschlagen lassen, am Kontrollbild korrigieren, Startplätze setzen. So wird nur einmal kalibriert. Solange Bilder fehlen, reichen einfache gezeichnete Karten zum Probespielen | `node abenteuer/tools/karten.js --bild=pfad.png --vorschlag` und `node abenteuer/tools/karten.js <id>` |
+| 10 | **Freigeben** in einem Schritt: entfernt `META.entwurf`, erzeugt `js/enden.js`, ergänzt Migration 006 und den Datenbanktest, gibt die SQL-Zeile für Supabase aus | `node abenteuer/tools/kampagne.js freigeben <id>` |
+| 11 | Alles testen, in einem Befehl: prüfen, Durchlauf, Kämpfe (Normal und Hardcore), Karten, Browser | `node abenteuer/tools/kampagne.js alles <id> [--kalibrieren]` |
 
 **Eine Quelle für die Enden:** Reguläre Enden sind Szenen mit `art: "ende"`, die nicht `D.NIEDERLAGE` sind und nicht `niederlage: true` tragen. `tools/kampagne.js enden` erzeugt daraus `js/enden.js` (Endenamen, Kampagnentitel für die Heldensammlung) und die SQL-Zeilen für `rpg_adventure_endings`. Der allgemeine Test schlägt fehl, wenn eins davon fehlt. So kann keine Kampagne ohne Belohnung live gehen.
 
@@ -27,6 +27,10 @@ So entsteht eine neue Kampagne schnell und ohne vergessene Stellen. Grundlage si
 **Der allgemeine Browsertest** (`tests/kampagnen-browser.test.js`) spielt jedes Abenteuer von der Startseite bis zu einem Ende durch (Hub, Regeln, Heldenwahl, Einleitung, alle Szenenarten, Kämpfe mit der Automatik) und prüft die Reihenfolge im Hub. Auch Entwürfe sind dabei. Mit `SHOTS=<Ordner>` entstehen nebenbei Screenshots von Hub, Szene, Kampf und Ende.
 
 **Die Karten-Kontrolle** (`tools/karten.js`) legt Raster, Hindernisse und Startplätze über jede Kampfkarte und meldet Startplätze auf Hindernissen, doppelte Plätze und abgeschnittene Bereiche.
+
+**Der Hindernis-Vorschlag** (`karten.js --bild=… --vorschlag`) lernt aus allen schon ausgerichteten Karten und schlägt für ein neues Bild die Hindernisse vor. Güte (gemessen mit `karten.js --guete`, jede Karte ohne sich selbst vorhergesagt): rund 80 % der Felder richtig als begehbar oder versperrt, bei „immer versperrt raten“ wären es 58 %. Wasser und große Flächen erkennt er gut, einzelne Kisten, Säulen und Ränder oft nicht. Er ist ein erster Entwurf, kein Ersatz für die Kontrolle am Bild.
+
+**Der Aufbau-Vorschlag** (`kampagne.js aufbau <id>`) probiert je Kampf mehrere Gegnerzahlen durch und zeigt, bei welcher der Kampf 5–9 Runden dauert und der Lebensfaktor im gesunden Bereich bleibt. Das spart die zweite Kalibrierrunde.
 
 ---
 

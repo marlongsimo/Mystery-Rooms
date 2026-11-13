@@ -6,6 +6,13 @@
  *   node abenteuer/tools/karten.js <id> [Ordner] --raster   nur Raster mit Koordinaten (für ein neues Bild)
  *   node abenteuer/tools/karten.js --bild=pfad.png [Ordner] Raster über ein beliebiges Bild (noch ohne Daten)
  *
+ *   node abenteuer/tools/karten.js --bild=pfad.png [Ordner] --vorschlag
+ *       Schlägt die Hindernisse für ein neues Bild vor (als Raster-Text zum Einfügen in daten/<id>.js und als
+ *       Kontrollbild). Das Werkzeug lernt dafür aus allen Karten, die schon von Hand ausgerichtet sind.
+ *       Der Vorschlag ist ein erster Entwurf: bitte am Kontrollbild prüfen und korrigieren.
+ *   node abenteuer/tools/karten.js --guete
+ *       Misst, wie gut der Vorschlag ist: sagt jede vorhandene Karte vorher, ohne sie selbst zum Lernen zu benutzen.
+ *
  * Farben: rot Mauer/Fels (M) · orange Kiste/Sack (K) · grün Baum/Schilf (T) · blau Wasser (Q/~)
  *         weiß Helden · hellblau Wolf · rot gefüllt Gegner · gelb Begleitung
  * Prüft nebenbei: Startplätze auf Hindernissen, doppelte Startplätze, abgeschnittene Bereiche (kein Weg von den Helden zu den Gegnern).
@@ -55,8 +62,80 @@ function pruefeKarte(K) {
   return { meld, hinweise };
 }
 
+/* ---------- Hindernis-Vorschlag: lernt aus den schon ausgerichteten Karten (nächste Nachbarn) ---------- */
+/** Merkmale je Feld aus dem Bild: Farbe (absolut und gegen den Bilddurchschnitt), Unruhe, Sättigung, Randnähe, Nachbarschaft */
+async function merkmale(page, bildDatei, B, H) {
+  const roh = await page.evaluate(async ({ url, B, H }) => {
+    const img = new Image(); img.src = url; await img.decode();
+    const S = 16, c = document.createElement("canvas"); c.width = B * S; c.height = H * S;
+    const g = c.getContext("2d", { willReadFrequently: true }); g.drawImage(img, 0, 0, c.width, c.height);
+    const d = g.getImageData(0, 0, c.width, c.height).data, out = [];
+    for (let y = 0; y < H; y++) for (let x = 0; x < B; x++) {
+      let r = 0, gr = 0, b = 0, l1 = 0, l2 = 0, n = 0, kante = 0, dunkel = 0; const q = [0, 0, 0, 0], L2 = [];
+      for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) { const k = ((y * S + j) * c.width + x * S + i) * 4, R = d[k] / 255, G = d[k + 1] / 255, Bl = d[k + 2] / 255, L = 0.3 * R + 0.59 * G + 0.11 * Bl; r += R; gr += G; b += Bl; l1 += L; l2 += L * L; n++; q[(j < S / 2 ? 0 : 2) + (i < S / 2 ? 0 : 1)] += L; L2.push(L); if (L < 0.12) dunkel++; }
+      for (let j = 0; j < S - 1; j++) for (let i = 0; i < S - 1; i++) kante += Math.abs(L2[j * S + i] - L2[j * S + i + 1]) + Math.abs(L2[j * S + i] - L2[(j + 1) * S + i]);
+      r /= n; gr /= n; b /= n; l1 /= n;
+      const qm = q.map((v) => v / (n / 4));
+      out.push({ x, y, r, g: gr, b, l: l1, std: Math.sqrt(Math.max(0, l2 / n - l1 * l1)), sat: Math.max(r, gr, b) - Math.min(r, gr, b), kante: kante / (S * S), dunkel: dunkel / n, qd: Math.max(...qm) - Math.min(...qm) });
+    }
+    return out;
+  }, { url: dataUrl(bildDatei), B, H });
+  const med = (k) => { const a = roh.map((z) => z[k]).sort((p, q) => p - q); return a[a.length >> 1]; };
+  const m = { r: med("r"), g: med("g"), b: med("b"), l: med("l"), std: med("std"), kante: med("kante") };
+  const bei = (x, y) => roh[Math.max(0, Math.min(H - 1, y)) * B + Math.max(0, Math.min(B - 1, x))];
+  return roh.map((z) => {
+    const nb = [bei(z.x - 1, z.y), bei(z.x + 1, z.y), bei(z.x, z.y - 1), bei(z.x, z.y + 1)], nl = nb.reduce((a, q) => a + q.l, 0) / 4;
+    const rand = Math.min(z.x, z.y, B - 1 - z.x, H - 1 - z.y);
+    const nstd = nb.reduce((a, q) => a + q.std, 0) / 4;
+    return [z.r, z.g, z.b, (z.r - m.r) * 2, (z.g - m.g) * 2, (z.b - m.b) * 2, z.std * 4, (z.std - m.std) * 4, z.sat * 1.5, (z.b - z.r) * 2, (z.g - (z.r + z.b) / 2) * 2, Math.min(rand, 3) / 5, (z.l - nl) * 2,
+      z.kante * 6, (z.kante - m.kante) * 6, z.dunkel * 0.8, z.qd * 3, (z.l - m.l) * 2, nstd * 3];
+  });
+}
+/** Alle Karten mit Bild und Hindernissen als Lernbeispiele */
+async function lernen(page) {
+  const beispiele = [];
+  for (const f of fs.readdirSync(path.join(WURZEL, "daten")).filter((x) => x.endsWith(".js")).sort()) {
+    const D = require(path.join(WURZEL, "daten", f));
+    for (const [name, K] of Object.entries(D.KARTEN || {})) {
+      if (!K.bild || !fs.existsSync(path.join(WURZEL, K.bild)) || (K.b || 12) !== 12 || (K.h || 9) !== 9) continue;
+      // Nur die vier Grundarten lernen; alles andere (Sonderfelder einzelner Abenteuer) zählt als Mauer
+      const typ = {}; for (const [t, x, y] of K.hindernisse || []) typ[x + "," + y] = ZEICHEN[t] ? t : "M";
+      const m = await merkmale(page, path.join(WURZEL, K.bild), 12, 9);
+      m.forEach((v, i) => beispiele.push({ karte: f + ":" + name, v, t: typ[(i % 12) + "," + Math.floor(i / 12)] || "." }));
+    }
+  }
+  return beispiele;
+}
+function vorhersage(beispiele, v, ohneKarte) {
+  const k = 9, best = [];
+  for (const e of beispiele) {
+    if (e.karte === ohneKarte) continue;
+    let d = 0; for (let i = 0; i < v.length; i++) { const x = v[i] - e.v[i]; d += x * x; }
+    if (best.length < k || d < best[best.length - 1].d) { best.push({ d, t: e.t }); best.sort((a, b) => a.d - b.d); if (best.length > k) best.pop(); }
+  }
+  const stimmen = {}; for (const q of best) stimmen[q.t] = (stimmen[q.t] || 0) + 1 / (0.02 + q.d);
+  const reihe = Object.entries(stimmen).sort((a, b) => b[1] - a[1]), summe = reihe.reduce((a, q) => a + q[1], 0);
+  return { t: reihe[0][0], sicher: reihe[0][1] / summe };
+}
+const ZEICHEN = { Q: "~", T: "T", K: "K", M: "M", ".": "." };
+
 (async () => {
   const { chromium } = require("playwright");
+  if (flag("guete")) {
+    const b0 = await chromium.launch(), p0 = await b0.newPage();
+    const bsp = await lernen(p0); await b0.close();
+    const karten = [...new Set(bsp.map((e) => e.karte))]; let gleich = 0, frei_ok = 0, n = 0; const je = [];
+    for (const kn of karten) {
+      const zellen = bsp.filter((e) => e.karte === kn); let g = 0, f2 = 0;
+      for (const e of zellen) { const v = vorhersage(bsp, e.v, kn); if (v.t === e.t) g++; if ((v.t === ".") === (e.t === ".")) f2++; }
+      gleich += g; frei_ok += f2; n += zellen.length; je.push([kn, f2 / zellen.length]);
+    }
+    console.log(`Güte des Hindernis-Vorschlags über ${karten.length} Karten (${n} Felder), jede Karte ohne sich selbst vorhergesagt:`);
+    console.log(`  begehbar/versperrt richtig: ${(frei_ok / n * 100).toFixed(1)} %  ·  auch die Art richtig (Wasser, Baum, Kiste, Mauer): ${(gleich / n * 100).toFixed(1)} %`);
+    je.sort((a, b) => a[1] - b[1]); console.log("  schwächste Karten: " + je.slice(0, 4).map(([k, q]) => `${k} ${(q * 100).toFixed(0)} %`).join(" · "));
+    console.log("  beste Karten: " + je.slice(-4).map(([k, q]) => `${k} ${(q * 100).toFixed(0)} %`).join(" · "));
+    process.exit(0);
+  }
   const einzelbild = wert("bild");
   const id = einzelbild ? null : frei[0], ordner = path.resolve((einzelbild ? frei[0] : frei[1]) || "karten-kontrolle");
   if (!einzelbild && !id) { console.log("Aufruf: node abenteuer/tools/karten.js <id> [Ordner] [--raster]   oder   --bild=pfad.png [Ordner]"); process.exit(1); }
@@ -67,6 +146,18 @@ function pruefeKarte(K) {
     await p.setContent(html({ b: 12, h: 9 }, path.resolve(einzelbild), true));
     const ziel = path.join(ordner, "raster-" + path.basename(einzelbild).replace(/\.[a-z]+$/i, "") + ".png");
     await p.screenshot({ path: ziel }); console.log("Raster: " + ziel);
+    if (flag("vorschlag")) {
+      const bsp = await lernen(p), m = await merkmale(p, path.resolve(einzelbild), 12, 9);
+      const vor = m.map((v) => vorhersage(bsp, v, null)), hind = [], zeilen = [];
+      for (let y = 0; y < 9; y++) { let z = ""; for (let x = 0; x < 12; x++) { const q = vor[y * 12 + x]; z += ZEICHEN[q.t]; if (q.t !== ".") hind.push([q.t, x, y]); } zeilen.push(z); }
+      const unsicher = vor.map((q, i) => (q.sicher < 0.6 ? `${i % 12},${Math.floor(i / 12)}` : null)).filter(Boolean);
+      await p.setContent(html({ b: 12, h: 9, hindernisse: hind }, path.resolve(einzelbild), false));
+      const ziel2 = path.join(ordner, "vorschlag-" + path.basename(einzelbild).replace(/\.[a-z]+$/i, "") + ".png");
+      await p.screenshot({ path: ziel2 });
+      console.log(`Vorschlag (gelernt aus ${new Set(bsp.map((e) => e.karte)).size} Karten): ${ziel2}\n\n    hindernisse: ausText([\n${zeilen.map((z) => `      "${z}",`).join("\n")}\n    ]),\n`);
+      console.log(unsicher.length ? `Unsichere Felder (bitte am Bild prüfen): ${unsicher.join(" · ")}` : "Keine unsicheren Felder.");
+      console.log("Der Vorschlag ist ein erster Entwurf: Kontrollbild ansehen, korrigieren, dann die Startplätze setzen.");
+    }
   } else {
     const D = require(path.join(WURZEL, "daten", id + ".js"));
     for (const [name, K] of Object.entries(D.KARTEN || {})) {

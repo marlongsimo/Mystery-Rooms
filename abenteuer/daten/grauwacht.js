@@ -982,6 +982,7 @@
     id: "grauwacht", schwierigkeit: 2, titel: "Das Siegel von Grauwacht", kurz: "Grauwacht", kurztext: "Eine alte Abtei, ein vergessenes Siegel und eine Glocke, die seit sieben Nächten läutet.", ort: "Halmbruck", min: 3, max: 6, stufen: "1–3", dauer: "etwa 3 Stunden",
     uhr: { name: "Glocke", symbol: "🔔", max: 7, mehr: "Die Glocke schlägt.", weniger: "Die Glocke verstummt ein wenig.", unruhe: "das Flüstern lässt niemanden ganz schlafen", rueckzug: "Die Glocke schlägt." },
     gruppe: "Die Gemeinschaft von Grauwacht", aufbruch: "Aufbruch nach Halmbruck", niederlage: "Grauwacht behält euch", chronik: "Chronik von Grauwacht",
+    bild: "img/grauwacht/titel.webp", vorschau: "img/grauwacht/vorschau.webp",
   };
   const API = { META, EREIGNISSE, WISSEN, START: "prolog", NIEDERLAGE: "grauwacht_behaelt", SZENEN, KARTEN };
   root.ABD_ALLE = root.ABD_ALLE || {}; root.ABD_ALLE.grauwacht = API;

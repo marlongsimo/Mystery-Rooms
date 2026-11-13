@@ -265,7 +265,7 @@
     }
     seiteZeigen("welt", `<button class="hub-zurueck klein" data-welt="">← Alle Abenteuer</button>
       <h1 class="hub-gruss">Das Siegel von Grauwacht</h1><p class="hub-untertitel">Das erste Abenteuer in den Splitterlanden</p>
-      <img class="hub-welt-bild" src="img/mythara/karte-kampagnen.webp" alt="">
+      <img class="hub-welt-bild" src="${titelbild(window.ABS.metaVon("grauwacht"))}" alt="" ${BILD_ERSATZ}>
       <ul class="hub-fakten"><li>Schwierigkeit <b>Stufe ${esc(window.ABS.metaVon("grauwacht").schwierigkeit || 2)}</b></li><li><b>3–6</b> Heldinnen und Helden</li><li>etwa <b>3 Stunden</b></li><li><b>3</b> Abschnitte</li><li><b>5</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
       <div class="hub-text einleitung">${kopie("#einl-grauwacht .seite")}</div>
       <button class="my-knopf rot hub-welt-start" data-neu-start="grauwacht">Kampagne starten</button>`);

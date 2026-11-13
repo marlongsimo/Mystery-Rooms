@@ -40,7 +40,7 @@ function endenVon(id) {
 function endenTabelle() {
   const t = {};
   // Reihenfolge wie im Hub: leichtere Abenteuer zuerst
-  const reihe = ids().sort((a, b) => (ALLE[a].META.schwierigkeit || 1) - (ALLE[b].META.schwierigkeit || 1));
+  const reihe = ids().sort((a, b) => (ALLE[a].META.schwierigkeit || 1) - (ALLE[b].META.schwierigkeit || 1) || (ALLE[a].META.reihe || 0) - (ALLE[b].META.reihe || 0));
   for (const id of reihe) { const D = ALLE[id]; if (D.META && D.META.entwurf) continue; t[id] = { titel: D.META.titel, ehrentitel: D.META.ehrentitel || "", enden: Object.fromEntries(endenVon(id).map((e) => [e.id, e.titel])) }; }
   return t;
 }
@@ -213,7 +213,7 @@ function kaempfe(id, N = 150, o = {}) {
     if (o.kalibrieren) {
       const tab = {}; let beg = null;
       for (const n of GR) {
-        let lo = 0.25, hi = 4;
+        let lo = 0.25, hi = 8;
         for (let it = 0; it < 7; it++) { const mid = Math.sqrt(lo * hi), e = messen(sid, n, mid, Math.max(40, Math.round(N / 2))); beg = e.begegnung; if (e.sieg > ziel(sid)) lo = mid; else hi = mid; }
         tab[n] = +Math.sqrt(lo * hi).toFixed(2);
       }

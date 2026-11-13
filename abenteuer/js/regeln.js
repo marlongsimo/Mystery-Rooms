@@ -161,6 +161,11 @@
     k_archiv: { name: "Das Archiv der Namen", stufe: 3, zusatzAb: 99, gegner: [["kaelterufer", 0.25, 1, 0], ["runenleser", 0.2, 1, 0.2], ["frostknecht", 0.3, 2, -0.5], ["jaegerschuetze", 0.25, 1, -0.5], ["eisgezeichneter", 0.8, 5], ["glasschwaermer", 0.3, 2]], skala: { 2: 1.46, 3: 1.46, 4: 1.49, 5: 1.59, 6: 2.4 }, skalaHC: { 2: 1.18, 3: 1.18, 4: 1.15, 5: 1.1, 6: 2.2 } },
     k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.8, 6], ["frostknecht", 0.4, 3, -0.5]], skala: { 2: 0.51, 3: 0.51, 4: 1.15, 5: 1.59, 6: 2.3 }, skalaHC: { 2: 0.39, 3: 0.39, 4: 0.99, 5: 1.23, 6: 1.98 } },
     k_krone: { name: "Der Kronensaal", stufe: 3, zusatzAb: 99, gegner: [["koenig", 0.25, 1, 0], ["frostknecht", 0.5, 4, -1], ["jaegerschuetze", 0.3, 2, -0.5], ["kettenbestie", 0.5, 1, -2]], skala: { 2: 0.68, 3: 0.68, 4: 0.93, 5: 0.8, 6: 1.1 }, skalaHC: { 2: 0.43, 3: 0.43, 4: 0.51, 5: 0.42, 6: 0.6 } },
+    // Die Fähre von Graufurt (Kurzabenteuer, Heldenstufe 1, 2–6 Helden). Faktoren: tools/kampagne.js kaempfe graufurt --kalibrieren
+    f_kette: { name: "Rost am Anleger", stufe: 1, zusatzAb: 99, gegner: [["rostkaefer", 1.0, 6, 0.3], ["schattenkobold", 0.6, 4, -1]], skala: { 2: 1.88, 3: 3.32, 4: 3.5, 5: 3.32, 6: 3.23 }, skalaHC: { 2: 2.82, 3: 2.82, 4: 3.14, 5: 2.67, 6: 2.75 } },
+    f_faehre: { name: "Kobolde an Bord", stufe: 1, zusatzAb: 99, gegner: [["schattenkobold", 1.5, 9, 0.5]], skala: { 2: 1.47, 3: 2.53, 4: 2.98, 5: 3.7, 6: 3.9 }, skalaHC: { 2: 1.32, 3: 2.67, 4: 2.4, 5: 2.9, 6: 3.06 } },
+    f_furt: { name: "Auf der Kiesbank", stufe: 1, zusatzAb: 99, gegner: [["schattenkobold", 1.1, 7, 0.3], ["rostkaefer", 0.5, 3, -0.5]], skala: { 2: 1.6, 3: 3.06, 4: 3.06, 5: 4.01, 6: 4.47 }, skalaHC: { 2: 1.73, 3: 2.46, 4: 2.67, 5: 3.5, 6: 3.8 } },
+    f_turm: { name: "Der Zöllner zählt", stufe: 1, zusatzAb: 99, gegner: [["knochenwaechter", 0.2, 2, 0.7], ["schattenkobold", 1.1, 7, 0.3]], skala: { 2: 1.22, 3: 2.53, 4: 2.53, 5: 3.41, 6: 4.23 }, skalaHC: { 2: 1.36, 3: 2.21, 4: 2.21, 5: 2.9, 6: 3.06 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**

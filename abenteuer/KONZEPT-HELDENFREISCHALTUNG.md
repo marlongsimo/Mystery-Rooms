@@ -1,6 +1,6 @@
 # MYTHARA – Heldenfreischaltung und wachsende Sammlung
 
-**Status:** Konzeptvorschlag, **nicht umgesetzt**. Geplant für die Zeit **nach einer erfolgreichen Beta**, sobald es genug Kampagnen oder weitere Wege gibt, Helden freizuschalten.
+**Status:** Konzeptvorschlag, **nicht umgesetzt**. Geplant für die **Open Beta**. Mythara ist seit dem 13. November 2026 in der **Closed Beta**; bis zur Open Beta bleiben alle 15 Helden frei wählbar.
 Grundlage: „MYTHARA – Konzept Heldenfreischaltung“, Konzeptstand 1.0 vom 12. November 2026. Darunter folgen Anmerkungen aus dem Abgleich mit dem Spielstand vom 12. November 2026.
 
 ---

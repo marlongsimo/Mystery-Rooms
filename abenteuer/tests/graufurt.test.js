@@ -1,6 +1,6 @@
 /*
  * Die Fähre von Graufurt (Kurzabenteuer, Entwurf) – im Browser von der Startseite bis zum Ende durchgespielt.
- * Hub nur mit ?entwurf, Reihenfolge Moor → Graufurt → Grauwacht, Einleitung, Szenen, alle Kämpfe auf gezeichneten Karten, Ende.
+ * Hub nur mit ?entwurf, Reihenfolge Moor → Graufurt → Grauwacht, Einleitung, Szenen, alle Kämpfe auf den gemalten Karten, Ende.
  * Die Engine (alle Szenen, alle Enden, Kämpfe) prüft tests/kampagnen.test.js und tools/kampagne.js.
  * Aufruf: python3 -m http.server 8765 &  ·  node abenteuer/tests/graufurt.test.js   (SHOTS=<Ordner> für Screenshots)
  */
@@ -53,7 +53,7 @@ const { chromium } = require('playwright');
     }
     if (!ende) console.log('    hängt in', await p.evaluate(() => JSON.stringify({ szene: window.ABT.A() && window.ABT.A().szene, sichtbar: [...document.querySelectorAll('section:not([hidden])')].map((x) => x.id), knoepfe: [...document.querySelectorAll('button')].filter((x) => x.offsetParent && !x.disabled).map((x) => x.id || x.className + ':' + x.textContent.trim().slice(0, 30)).slice(0, 25) })));
     check(Boolean(ende) && ['ende_norden', 'ende_wehre'].includes(ende), `Bis zum Ende durchgespielt: „${ende}“ (${gesehen.size} Szenen)`);
-    check(kaempfe.length >= 2, `Kämpfe im Browser auf gezeichneten Karten: ${kaempfe.length}`);
+    check(kaempfe.length >= 2, `Kämpfe im Browser auf den gemalten Karten: ${kaempfe.length}`);
     check(['faehrhaus', 'wegwahl', 'anderes_ufer', 'lager', 'turm_wahl', 'kampf_turm', 'turm_nach', 'splitter'].every((s) => gesehen.has(s)), 'Fährhaus, Weg über die Wehre, Lager, Zollturm und der graue Stein kommen vor');
     check(await p.evaluate(() => { const s = document.querySelector('#szene'); return Boolean(s && !s.hidden && /Siegel von Grauwacht/.test(s.textContent)); }), 'Das Ende verweist auf „Das Siegel von Grauwacht“');
   } catch (e) { check(false, 'Browser: ' + e.message.split('\n')[0]); }

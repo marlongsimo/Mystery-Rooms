@@ -4,7 +4,7 @@
  * hören die Helden zum ersten Mal die Glocke von Grauwacht. Gebaut nach KAMPAGNEN-BAUKASTEN.md:
  * nur vorhandene Gegner (Rostkäfer, Schattenkobolde, Knochenwächter) und vorhandene Bausteine (gefesselte Begleitung aus Hochwacht).
  * Die „Uhr“ ist der Pegel der Wehre (A.glocke, 0–7): Es regnet, der Fluss steigt, Pims Zeit wird knapp.
- * Karten ohne gemaltes Bild: Die Hindernisse werden gezeichnet (Raster 12 × 9). Bilder siehe BILDER-GRAUFURT.md.
+ * Karten mit gemalten Bildern (img/graufurt/), Hindernisse am Bild ausgerichtet (Raster 12 × 9). Bilder siehe BILDER-GRAUFURT.md.
  */
 (function (root) {
   "use strict";
@@ -15,32 +15,32 @@
   /* ---------- Karten (12 × 9) ---------- */
   // Die Fährstelle: Wiese am Ufer, rechts die Wehre mit dem Anleger, an den Pfosten hängt die zerfressene Kette
   const UFER = {
-    name: "Die Fährstelle", b: 12, h: 9, boden: "garten",
+    name: "Die Fährstelle", b: 12, h: 9, boden: "garten", bild: "img/graufurt/ufer.webp",
     hindernisse: ausText([
-      "TT....K.~~~~",
+      "TTTTT.K...~~",
+      "TTT......K~~",
+      "TTKK...M..~~",
+      "T...........",
+      "T.......K...",
       "T.........~~",
-      "..K.....M.~~",
-      "...........~",
-      "............",
-      "...........~",
-      "..K......M~~",
-      "T.........~~",
-      "TT...K..~~~~",
+      "TTK....MM.~~",
+      "TT.....MMK~~",
+      "TTTTKM..T.~~",
     ]),
-    start: { spieler: [[1, 3], [1, 4], [1, 5], [2, 3], [2, 5], [0, 4]], wolf: [[0, 3], [0, 5], [2, 4], [1, 2]],
-      gegner: [[8, 3], [8, 4], [8, 5], [9, 4], [10, 4], [9, 3], [9, 5], [7, 4], [10, 3], [7, 3], [7, 5], [11, 4]] },
+    start: { spieler: [[1, 3], [1, 4], [1, 5], [2, 3], [2, 4], [2, 5]], wolf: [[3, 3], [3, 4], [3, 5], [3, 6]],
+      gegner: [[9, 3], [10, 3], [11, 3], [9, 4], [10, 4], [11, 4], [8, 3], [7, 4], [7, 3], [8, 5], [9, 5], [9, 6]] },
   };
   // Die Fähre: ein breites Floß mitten auf der Wehre, Pfosten an den Ecken, Ladung in der Mitte
   const FAEHRE = {
-    name: "Die Fähre", b: 12, h: 9, boden: "holz",
+    name: "Die Fähre", b: 12, h: 9, boden: "holz", bild: "img/graufurt/faehre.webp",
     hindernisse: ausText([
       "~~~~~~~~~~~~",
       "~~~~~~~~~~~~",
-      "~K........K~",
-      "~..........~",
-      "~....KK....~",
-      "~..........~",
-      "~K........K~",
+      "K..........K",
+      ".....KK.....",
+      "....KKK.....",
+      ".....KK.....",
+      "K..........K",
       "~~~~~~~~~~~~",
       "~~~~~~~~~~~~",
     ]),
@@ -49,37 +49,37 @@
   };
   // Die alte Furt: Kies und Steine im flachen Wasser, dazwischen tiefe Rinnen
   const FURT = {
-    name: "Die alte Furt", b: 12, h: 9, boden: "moor",
+    name: "Die alte Furt", b: 12, h: 9, boden: "moor", bild: "img/graufurt/furt.webp",
     hindernisse: ausText([
-      "~~~~..~~~~~~",
-      "~~~.....~~~~",
-      "~...M......~",
-      "......~~....",
-      "...........M",
-      "..~~....M...",
-      "~.......~...",
-      "~~~~.....~~~",
-      "~~~~~~..~~~~",
+      "TT~.M..~~~~M",
+      "T.~.....~~~M",
+      "...MM....~~~",
+      "...M......MM",
+      "............",
+      "~~~~...MM...",
+      "~~~~~~......",
+      "TM.~~~~~~~~~",
+      "TT.....~~~M~",
     ]),
-    start: { spieler: [[0, 3], [0, 4], [1, 3], [1, 4], [0, 5], [1, 5]], wolf: [[2, 3], [2, 4], [1, 2], [2, 6]],
-      gegner: [[10, 3], [11, 3], [10, 4], [9, 4], [10, 5], [11, 5], [9, 3], [9, 5], [10, 6], [11, 6], [8, 3], [10, 2]] },
+    start: { spieler: [[0, 3], [1, 3], [0, 4], [1, 4], [2, 3], [2, 4]], wolf: [[2, 2], [1, 2], [0, 2], [3, 4]],
+      gegner: [[9, 3], [9, 4], [10, 4], [11, 4], [8, 4], [8, 3], [9, 5], [10, 5], [11, 5], [8, 6], [9, 6], [10, 6]] },
   };
   // Der Zollturm: runder Raum mit Säulen, links die Tür, rechts an der Wand liegt Pim gefesselt
   const TURM = {
-    name: "Der Zollturm", b: 12, h: 9, boden: "stein",
+    name: "Der Zollturm", b: 12, h: 9, boden: "stein", bild: "img/graufurt/turm.webp",
     hindernisse: ausText([
       "MMMMMMMMMMMM",
-      "MM...KK...MM",
-      "M..........M",
-      "M...M..M...M",
-      "............",
-      "M...M..M...M",
-      "M..........M",
-      "MM..K...K.MM",
+      "MMM..KK..MMM",
+      "MM..M..M..MM",
+      "MM........MM",
+      "MM...KK....M",
+      "MM..M..M..MM",
+      "MM........MM",
+      "MMM.K..K.MMM",
       "MMMMMMMMMMMM",
     ]),
-    start: { spieler: [[0, 4], [1, 4], [1, 3], [1, 5], [2, 3], [2, 5]], wolf: [[2, 4], [3, 4], [2, 2], [2, 6]], begleiter: [10, 4],
-      gegner: [[8, 3], [8, 4], [8, 5], [9, 3], [9, 5], [9, 4], [6, 4], [6, 3], [6, 5], [10, 2], [10, 6], [5, 4]] },
+    start: { spieler: [[2, 4], [2, 3], [3, 4], [2, 5], [3, 3], [3, 5]], wolf: [[2, 6], [3, 6], [2, 2], [3, 2]], begleiter: [9, 4],
+      gegner: [[7, 3], [7, 4], [8, 3], [8, 4], [8, 5], [8, 6], [9, 3], [9, 5], [9, 6], [6, 5], [6, 6], [5, 6]] },
   };
   const KARTEN = { UFER, FAEHRE, FURT, TURM };
 
@@ -304,7 +304,7 @@
     ehrentitel: "Freund von Graufurt", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     abschnitte_namen: { 1: "Graufurt" },
     min: 2, max: 6, stufen: "1", dauer: "etwa 1 Stunde", abschnitte: 1, enden: 2,
-    // Bilder (siehe BILDER-GRAUFURT.md): solange sie fehlen, zeigt das Spiel das allgemeine Kampagnenbild
+    // Bilder siehe BILDER-GRAUFURT.md (alle eingebaut)
     bild: "img/graufurt/titel.webp", vorschau: "img/graufurt/vorschau.webp", abschnittBilder: { 1: "img/graufurt/abschnitt-1.webp" },
     uhr: { name: "Pegel", symbol: "≈", max: 7, mehr: "Die Wehre steigt.", weniger: "Der Fluss fällt ein wenig.", unruhe: "das Rauschen des Flusses lässt niemanden ganz schlafen", rueckzug: "Die Wehre steigt." },
     gruppe: "Die Fährleute von Graufurt", aufbruch: "An die Wehre", niederlage: "Die Wehre steigt", chronik: "Chronik von Graufurt",

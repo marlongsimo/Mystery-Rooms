@@ -744,6 +744,7 @@
   function start(seed) {
     clearTimeout(gegnerTimer);
     if (SETUP.gruppe.length < Math.min(3, META().min)) { zeigeSetup(); return; }
+    F.STUFEN10.aktiv = false; // Übungskampf: immer im bisherigen Modell (Stufe 1–3 frei wählbar)
     st = R.neuesSpiel(seed, { figuren: SETUP.gruppe, stufe: SETUP.stufe, schwierigkeit: SETUP.schwierigkeit, begegnung: BEGEGNUNGEN[SETUP.begegnung] ? SETUP.begegnung : "garten" });
     wahl = null; tipp = null; letzteTP = {}; letzterLog = st.log.length;
     window.AB.st = st;

@@ -334,7 +334,7 @@
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
     fids.forEach((fid, i) => {
       const [x, y] = k.start.spieler[i];
-      const f = neueFigur(fid, i, st.stufe, x, y);
+      const f = neueFigur(fid, i, (opts.stufen && opts.stufen[fid]) || st.stufe, x, y);
       const v = opts.vorher && opts.vorher[fid];
       const extra = opts.ausruestung && opts.ausruestung[fid];
       if (extra) { f.rk += extra.rk || 0; f.rkBasis += extra.rk || 0; f.ausruestung = extra.name; st.log.push({ t: `${f.name} trägt ${extra.name}: RK ${f.rk}.`, art: "gut" }); }
@@ -346,7 +346,7 @@
       const wd = FD.FIGUREN[fid].wolf;
       if (wd) {
         const frei = k.start.wolf.find(([wx, wy]) => !belegt(st, wx, wy));
-        st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[FD.altStufe(st.stufe) - 1] + (hs(f) >= 5 ? 10 : 0), tpMax: wd.tp[FD.altStufe(st.stufe) - 1] + (hs(f) >= 5 ? 10 : 0), rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
+        st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[FD.altStufe(f.stufe) - 1] + (hs(f) >= 5 ? 10 : 0), tpMax: wd.tp[FD.altStufe(f.stufe) - 1] + (hs(f) >= 5 ? 10 : 0), rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
       }
     });
     // Eskorte: eine Begleiterin (z. B. Sera Venn) als eigene Figur auf Heldenseite – ohne Spielerzug, sie läuft in der Begleiterphase

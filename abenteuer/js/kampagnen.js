@@ -458,5 +458,5 @@
   const menue = document.querySelector("#intro .titel-menue");
   if (menue) { const b = document.createElement("button"); b.className = "menue"; b.id = "titel-kampagnen"; b.dataset.kampagnen = ""; b.innerHTML = '<span class="m-sym" aria-hidden="true">❖</span>Meine Kampagnen'; b.onclick = bibliothek; const g = $("#titel-gruppe"); menue.insertBefore(b, g); }
 
-  window.KAMPAGNE = { abenteuerAusTitel, vergessenWennLeer: () => { if (K && K.version === 0) { K = null; merkeK(); } }, einladen, tischWechseln, tischUebernehmen, beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern };
+  window.KAMPAGNE = { abenteuerAusTitel, vergessenWennLeer: () => { if (K && K.version === 0) { K = null; merkeK(); } }, einladen, tischWechseln, tischUebernehmen, beginnen, aktiv, geaendert, abenteuerBegonnen, pausieren, bibliothek, fortsetzen, aktuell: () => K, speichern, mitgliederAbgleichen };
 })();

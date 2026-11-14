@@ -67,6 +67,9 @@
     if (o.gegner && !o.begegnung) { o.gegner = o.gegner.map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * k })); o.skala10 = k; } else o.skala = k;
   }
 
+  /** Stufe eines Helden in dieser Kampagne: im Zehn-Stufen-Modell seine eigene, sonst die der Gruppe */
+  const hst = (A, fid) => (A.heldStufe && A.heldStufe[fid]) || A.stufe;
+
   function neu(seed, opts = {}) {
     const A = {
       seed, rs: seed >>> 0 || 1, abenteuer: opts.abenteuer || "grauwacht", szene: null, merker: {}, glocke: 0, stufe: 1,
@@ -75,7 +78,15 @@
       gewaehlt: {}, stimmen: {}, geheim: {}, probe: null, ergebnis: null, protokoll: [], gefallen: [],
     };
     // Zehn-Stufen-Modell: Die Gruppe spielt die ganze Kampagne auf ihrer Heldenstufe (bis zur Speicherung am Konto: die empfohlene)
-    if (modell10()) A.stufe = Math.max(1, Math.min(F.STUFEN10.max, opts.heldenstufe || empfStufe(A.abenteuer)));
+    if (opts.modell10) F.STUFEN10.aktiv = true;
+    if (modell10()) {
+      A.modell10 = true; const empf = empfStufe(A.abenteuer);
+      A.stufe = Math.max(1, Math.min(F.STUFEN10.max, opts.heldenstufe || empf));
+      // Eigene Stufe je Held (opts.heldStufen: echte Stufen vom Konto). Wer mehr als zwei Stufen unter der Empfehlung liegt,
+      // wird für diese Kampagne auf Empfehlung − 2 angehoben. Helden ohne bekannte Stufe (Gäste) spielen auf der empfohlenen.
+      if (opts.heldStufen) { A.heldStufe = {}; A.heldEcht = {};
+        for (const fid of A.gruppe) { const echt = opts.heldStufen[fid]; if (echt == null) continue; A.heldEcht[fid] = echt; A.heldStufe[fid] = Math.max(1, Math.min(F.STUFEN10.max, Math.max(echt, empf - 2))); } }
+    }
     R.zufall(A);
     A.zust = startZustand(A);
     geheZu(A, DATEN(A).START);
@@ -83,7 +94,7 @@
   }
   function startZustand(A) {
     const z = {};
-    for (const fid of A.gruppe) z[fid] = frisch(fid, A.stufe);
+    for (const fid of A.gruppe) z[fid] = frisch(fid, hst(A, fid));
     return z;
   }
   function frisch(fid, stufe) {
@@ -148,7 +159,7 @@
     if (w.plus) for (const [k, v] of Object.entries(w.plus)) A.merker[k] = (A.merker[k] || 0) + v;
     if (w.glocke) glocke(A, w.glocke);
     if (w.tranke) for (let i = 0; i < w.tranke; i++) { const fid = A.gruppe.filter((f) => !A.zust[f].tot)[i % Math.max(1, A.gruppe.length)]; if (fid) A.zust[fid].rucksack[0].n++; }
-    if (w.heilen) for (const fid of lebende(A)) { const max = F.tpVon(fid, A.stufe), z = A.zust[fid]; z.tp = Math.min(max, z.tp + Math.ceil(max * w.heilen)); }
+    if (w.heilen) for (const fid of lebende(A)) { const max = F.tpVon(fid, hst(A, fid)), z = A.zust[fid]; z.tp = Math.min(max, z.tp + Math.ceil(max * w.heilen)); }
     if (w.schaden) for (const fid of lebende(A)) { const z = A.zust[fid]; z.tp = Math.max(1, z.tp - R.roll(A.r, w.schaden).total); }
     if (w.schadenFig && A.zust[w.schadenFig.fid] && !A.zust[w.schadenFig.fid].tot) { const z = A.zust[w.schadenFig.fid]; z.tp = Math.max(1, z.tp - R.roll(A.r, w.schadenFig.wurf).total); }
     if (w.trankWeg) for (let i = 0; i < w.trankWeg; i++) { const t = lebende(A).map((f) => A.zust[f].rucksack.find((d) => d.id === "heiltrank")).filter((d) => d && d.n > 0).sort((a, b) => b.n - a.n)[0]; if (t) t.n--; }
@@ -373,7 +384,7 @@
     const unruhig = A.schwierigkeit === "hardcore" && A.glocke >= 3;
     for (const fid of A.gruppe) {
       const z = A.zust[fid]; if (z.tot) continue;
-      const neuZ = frisch(fid, A.stufe), anteil = unruhig ? 0.75 : 1;
+      const neuZ = frisch(fid, hst(A, fid)), anteil = unruhig ? 0.75 : 1;
       if ((z.rucksack || []).some((d) => d.id === "manastein" && d.n > 0)) neuZ.plaetze[0]++;
       A.zust[fid] = Object.assign(neuZ, { tp: Math.max(z.tp, Math.floor(neuZ.tp * anteil)), rucksack: z.rucksack });
     }
@@ -386,7 +397,7 @@
   function kurzeRast(A) {
     if (A.schwierigkeit === "hardcore") return { fehler: "In Hardcore gibt es keine kurze Rast." };
     if (A.merker["kurz_" + (szene(A).abschnitt || A.abschnitt || 1)]) return { fehler: "In diesem Abschnitt habt ihr schon gerastet." };
-    const z = R.kurzeRast(A.zust); for (const fid of Object.keys(z)) z[fid].stufe = A.stufe;
+    const z = R.kurzeRast(A.zust); for (const fid of Object.keys(z)) z[fid].stufe = hst(A, fid);
     A.merker["kurz_" + (szene(A).abschnitt || A.abschnitt || 1)] = true; glocke(A, 1); notiz(A, "Kurze Rast: Wunden verbunden.", "gut");
     return { ok: true };
   }
@@ -421,7 +432,7 @@
   function ersatz(A, alt, neu) {
     if (!(A.ersatzOffen || []).includes(alt)) return { fehler: "Diese Figur braucht keinen Ersatz." };
     if (!freieFiguren(A).includes(neu)) return { fehler: "Diese Figur ist nicht frei." };
-    A.gruppe[A.gruppe.indexOf(alt)] = neu; A.zust[neu] = frisch(neu, A.stufe); A.lagerZust[neu] = JSON.parse(JSON.stringify(A.zust[neu]));
+    A.gruppe[A.gruppe.indexOf(alt)] = neu; A.zust[neu] = frisch(neu, hst(A, neu)); A.lagerZust[neu] = JSON.parse(JSON.stringify(A.zust[neu]));
     A.ersatzOffen = A.ersatzOffen.filter((f) => f !== alt);
     notiz(A, `${name(A, neu)} stößt am Lagerfeuer zur Gruppe. ${name(A, alt)} wird nicht vergessen.`, "gut");
     return { ok: true };
@@ -468,7 +479,7 @@
     if (!z || !z.tot) return { fehler: "Diese Figur ist nicht gefallen." };
     if (!t) return { fehler: "Niemand trägt eine Reliquie der Brüder." };
     A.zust[t].rucksack.find((d) => d.id === "reliquie" && d.n > 0).n--;
-    z.tot = false; z.tp = Math.ceil(F.tpVon(fid, A.stufe) / 2);
+    z.tot = false; z.tp = Math.ceil(F.tpVon(fid, hst(A, fid)) / 2);
     A.gefallen = A.gefallen.filter((f) => f !== fid);
     if (A.ersatzOffen) A.ersatzOffen = A.ersatzOffen.filter((f) => f !== fid);
     if (A.lagerZust && A.lagerZust[fid]) A.lagerZust[fid] = JSON.parse(JSON.stringify(z));
@@ -488,7 +499,7 @@
   function gegnerVorschau(A) {
     const s = szene(A); if (s.art !== "kampf") return null;
     const k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
-    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, bedrohung: bedrohung(A, s, k) }, k, { mischen: false, anfuehrer: false });
+    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, stufen: A.heldStufe || null, schwierigkeit: A.schwierigkeit, bedrohung: bedrohung(A, s, k) }, k, { mischen: false, anfuehrer: false });
     if (A.kampfMod) o.skalaMal = (o.skalaMal || 1) * A.kampfMod;
     skala10(A, o);
     const st = R.neuesSpiel(1, o), arten = [], W = DATEN(A).WISSEN || {};
@@ -508,8 +519,8 @@
   }
   function kampfOptionen(A) {
     const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
-    const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: A.stufe });
-    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher, bedrohung: bedrohung(A, s, k) }, k);
+    const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: hst(A, fid) });
+    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, stufen: A.heldStufe || null, schwierigkeit: A.schwierigkeit, vorher, bedrohung: bedrohung(A, s, k) }, k);
     // Abwechslung: gemischte Startplätze, in etwa jedem dritten Kampf ein Anführer (nicht im Duell und nicht beim Endgegner)
     if (!o.gegner && !o.boss) { o.mischen = k.mischen !== false; o.anfuehrer = anfuehrerFestlegen(A, k); } // feste Plätze (z. B. Nester): mischen: false
     if (A.kampfMod) { o.skalaMal = (o.skalaMal || 1) * A.kampfMod; }
@@ -525,7 +536,7 @@
     if (typeof k.nachher === "function") wirke(A, k.nachher(st, A));
     if (st.ende === "sieg") {
       const nz = R.nachKampf(st);
-      for (const fid of A.gruppe) if (nz[fid]) A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); else if (A.gefallen.includes(fid)) A.zust[fid].tot = true;
+      for (const fid of A.gruppe) if (nz[fid]) A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: hst(A, fid) }); else if (A.gefallen.includes(fid)) A.zust[fid].tot = true;
       for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
       R.neuerKampf(A.zust); A.kampfMod = null;
       wirke(A, k.sieg); ziel(A, k.sieg || {});
@@ -535,7 +546,7 @@
     // Eskorte: Die Begleiterin wurde verschleppt – die Geschichte geht anders weiter (Rettungsabschnitt), kein Rückzug
     if (st.ende === "gefangen" && k.gefangen) {
       const nz = R.nachKampf(st);
-      for (const fid of A.gruppe) if (nz[fid]) { A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); if (!A.zust[fid].tot && A.zust[fid].tp < 1) A.zust[fid].tp = 1; }
+      for (const fid of A.gruppe) if (nz[fid]) { A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: hst(A, fid) }); if (!A.zust[fid].tot && A.zust[fid].tp < 1) A.zust[fid].tp = 1; }
       for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
       R.neuerKampf(A.zust); A.kampfMod = null;
       wirke(A, k.gefangen); ziel(A, k.gefangen);
@@ -543,7 +554,7 @@
     }
     if (k.verloren && st.ende !== "sieg") {
       const nz = R.nachKampf(st);
-      for (const fid of A.gruppe) if (nz[fid]) { A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: A.stufe }); if (!A.zust[fid].tot && A.zust[fid].tp < 1) A.zust[fid].tp = 1; }
+      for (const fid of A.gruppe) if (nz[fid]) { A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: hst(A, fid) }); if (!A.zust[fid].tot && A.zust[fid].tp < 1) A.zust[fid].tp = 1; }
       for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
       R.neuerKampf(A.zust);
       wirke(A, k.verloren); ziel(A, k.verloren);
@@ -560,7 +571,7 @@
         A.lagerZust = JSON.parse(JSON.stringify(A.zust));
       }
       // Normal: Nach einem Rückzug sind alle wieder bei vollen TP (auch wenn das Lagerfeuer nur bis ¾ geheilt hatte)
-      for (const fid of A.gruppe) { const z = A.zust[fid]; if (z && !z.tot) z.tp = Math.max(z.tp, F.tpVon(fid, z.stufe || A.stufe)); }
+      for (const fid of A.gruppe) { const z = A.zust[fid]; if (z && !z.tot) z.tp = Math.max(z.tp, F.tpVon(fid, z.stufe || hst(A, fid))); }
       return { ok: true, ergebnis: "rueckzug" }; // gleiche Szene beginnt neu
     }
     for (const fid of A.gruppe) A.zust[fid].tot = true;
@@ -584,7 +595,7 @@
     return {
       dialog: (A.dialog && A.dialog[A.szene]) || [],
       szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || A.abschnitt || 1, text: text(A), antwort: A.antwort || null,
-      glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
+      glocke: A.glocke, stufe: A.stufe, modell10: Boolean(A.modell10), heldStufe: A.heldStufe || null, empfohlen: A.modell10 ? empfStufe(A.abenteuer) : null, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
       nachhall: A.nachhall || null,
       offen: s.art === "gespraech" ? optionen(A).filter((o) => !o.weiter).map((o) => ({ text: o.text, wichtig: Boolean(o.wichtig) })) : null,
       fragen: gespraechStand(A),
@@ -606,9 +617,10 @@
     };
   }
   function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
-  function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
+  /** Spielstand laden. Er bestimmt auch, nach welchem Stufenmodell gespielt wird (laufende Kampagnen bleiben in ihrem Modell). */
+  function laden(o) { const A = R.zufall(JSON.parse(JSON.stringify(o))); F.STUFEN10.aktiv = Boolean(A.modell10); return A; }
 
-  const API = { metaVon, empfStufe, bedrohung, datenVon, wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { metaVon, empfStufe, bedrohung, hst, datenVon, wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, gegnerVorschau, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

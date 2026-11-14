@@ -26,7 +26,12 @@
   - Der Grundwert hängt an der Schwierigkeit der Kampagne. Ein Held auf der empfohlenen Stufe bekommt genau den Grundwert, ein Held darunter mehr, ein Held darüber weniger. So zieht ein starker Held im Solo-Mode schwächere in einer mittleren Kampagne schnell hoch.
   - Im Coop-Mode kommen Tisch-Helden aus der Sammlung des Gastgebers (ist so umgesetzt); ihre XP gehen an die Helden des Gastgebers.
   - Zahlen (Vorschlag, in `js/figuren.js`: `SCHWIERIGKEIT[n].xp`, `XP_FAKTOR`, `XP_BIS`): Grundwert 100 / 200 / 300 / 450 / 600 für Schwierigkeit 1–5. Faktor nach Abstand zur empfohlenen Stufe: −3 und tiefer ×2, −2 ×1,6, −1 ×1,3, 0 ×1, +1 ×0,7, +2 ×0,45, +3 ×0,25, +4 und höher ×0,1. Bis zur nächsten Stufe: 100, 150, 250, 350, 500, 700, 900, 1200, 1500 (zusammen 5650 bis Stufe 10).
-  - Noch nicht gebaut: Speicherung am Konto und Vergabe auf dem Server.
+  - **Kurzabenteuer** (Weidenhain, Graufurt) geben den halben Grundwert.
+  - **Gebaut:** Migration `supabase/007_rpg_heldenlevel.sql` (Fortschritt je Konto und Held, Buchungen, Vergabe mit `rpg_award_xp` auf dem Server, Lesen mit `rpg_hero_levels` und `rpg_campaign_levels`; lokal geprüft mit `supabase/tests/pruefen.sh`).
+  - **Einschalten:** Sobald die Migration in Supabase läuft, spielt jede **neu begonnene** Kampagne im Zehn-Stufen-Modell (`A.modell10`), jeder Held auf seiner eigenen Stufe (`A.heldStufe`). Laufende Kampagnen bleiben in ihrem Modell. Ohne die Migration bleibt alles wie bisher.
+  - **Wer spielt auf welcher Stufe:** eigene Helden auf ihrer Stufe; Tisch-Helden auf der Stufe des Gastgebers; Helden von Gästen auf der empfohlenen Stufe. Wer mehr als zwei Stufen unter der Empfehlung liegt, wird für die Kampagne auf Empfehlung − 2 angehoben (XP zählen nach der echten Stufe).
+  - **Anzeige:** Stufe und XP-Balken auf den Heldenkacheln, der Heldenkarte (mit Markierung in der Stufentabelle), der Charaktere-Seite („Deine Helden“) und im Profil („Meine Helden“); nach der Kampagne zeigt die Belohnung XP und Aufstieg je Held.
+  - Noch offen: Kampagnen-Segen am Lagerfeuer, Ampel vor dem Start, Meistertitel im Spiel.
 
 **Umgesetzt:**
 - `js/figuren.js`: Zehn-Stufen-Modell hinter dem Schalter `STUFEN10.aktiv` (aus): Lebenspunkte, Zauberplätze, Übungsbonus, Rüstungsklasse +1 ab Stufe 6, Hauptattribut +2 ab Stufe 4, Fähigkeiten auf Stufe 3 und 7. Dazu `AUFSTIEG` (Verbesserungen und Meistertitel im Wortlaut), `stufenpfad(fid)` und `SCHWIERIGKEIT`.

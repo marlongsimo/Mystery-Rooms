@@ -254,7 +254,7 @@
     const HL = window.ABH_HELDEN, F = window.ABF;
     if (SM && !SM.zustand().geladen) SM.laden().then(() => { const s = $("#hub-seite"); if (s && !s.hidden && s.querySelector("[data-heldenseite]")) heldenSeite(klasse, fid); });
     const frei = (f) => !smAktiv() || SM.frei(f);
-    if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Charaktere</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p>${sammlungKopf()}<div class="hub-helden" data-heldenseite>${HL.klassenWahl({ frei: smAktiv() ? frei : null })}</div>`); return; }
+    if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Charaktere</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p>${sammlungKopf()}<div class="hub-helden" data-heldenseite>${HL.klassenWahl({ frei: smAktiv() ? frei : null })}</div>${smAktiv() && SM.zustand().konto && SM.zustand().stufenDa ? `<h2 class="hub-zwischen">Deine Helden</h2>${SM.heldenUebersichtHtml()}` : ""}`); return; }
     const helden = HL.vonKlasse(klasse); fid = fid || helden.find(frei) || helden[0];
     const gesperrt = !frei(fid) ? `<div class="sm-gesperrt">${SM.SCHLOSS}<span><b>Noch gesperrt.</b> ${esc(SM.gesperrtText())}</span></div>` : "";
     seiteZeigen("helden", `<div class="hub-helden" data-heldenseite>${HL.klassenLeiste(klasse).replace('id="klassen-zurueck"', 'data-held-klassen')}${HL.klassenKopf(klasse)}
@@ -402,7 +402,7 @@
     $("#hub-profil").innerHTML = `<button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small id="hub-titel">${konto ? esc((smAktiv() && SM.titelText()) || "Spieler") : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
-      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
+      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-einst").onclick = () => { const t = $("#titel-einst"); if (t) t.click(); };
     const gl = $("#hub-glocke"); if (gl) gl.onclick = anfragenZeigen;
@@ -522,6 +522,7 @@
     if (was === "abmelden") return abmelden();
     if (was === "bild") return bildWaehlen();
     if (was === "code") return codeDialog();
+    if (was === "stufen") return SM.laden(true).then(() => fenster("Meine Helden", SM.heldenUebersichtHtml()));
     if (was === "chronik") return SM.laden(true).then(() => fenster("Chronik", SM.chronikHtml()));
     if (was === "codes") return codeUebersicht();
     ansicht = was === "registrieren" ? "registrieren" : "anmelden";

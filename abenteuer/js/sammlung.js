@@ -43,14 +43,30 @@
   const hoerer = new Set();
   const melden = () => hoerer.forEach((f) => { try { f(S); } catch (e) { console.warn("[Sammlung]", e); } });
 
+  /** Heldenstufen (Migration 007): null, wenn es sie in der Datenbank noch nicht gibt oder keine Verbindung besteht */
+  async function stufenHolen(name, args) { try { return await rpc(name, args); } catch (e) { return null; } }
+  /** Eigener Fortschritt eines Helden: { stufe, xp, bis } – null ohne Konto, ohne Heldenstufen oder wenn der Held nicht in der Sammlung ist */
+  function fortschritt(fid) {
+    if (!S.geladen || !S.stufenDa || !S.konto || !S.helden.includes(fid)) return null;
+    return window.ABF.stufeAusXp((S.xp || {})[fid] || 0);
+  }
+  /** Stufe und XP-Balken als HTML (klein: nur Stufe mit schmalem Balken) */
+  function stufeHtml(fid, klein) {
+    const f = fortschritt(fid); if (!f) return "";
+    const voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
+    return klein ? `<span class="sm-stufe klein" title="${voll ? "Höchste Stufe" : `${f.xp} von ${f.bis} XP bis Stufe ${f.stufe + 1}`}"><b>Stufe ${f.stufe}</b><i><u style="width:${pct}%"></u></i></span>`
+      : `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${f.stufe}</b><span>${voll ? "Höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</span></div><i><u style="width:${pct}%"></u></i></div>`;
+  }
+
   /** Eigene Sammlung laden (neu: Zwischenspeicher übergehen) */
   function laden(neu) {
     if (S.geladen && !neu) return Promise.resolve(S);
     if (laedt) return laedt;
     laedt = (async () => {
       try {
-        const r = await rpc("rpg_my_heroes", {});
-        S = Object.assign({ helden: [], angebote: [], enden: [], alle_enden: {}, titel: [] }, r, { geladen: true, installiert: true, konto: Boolean(r && r.konto) });
+        const [r, lv] = await Promise.all([rpc("rpg_my_heroes", {}), stufenHolen("rpg_hero_levels", {})]);
+        S = Object.assign({ helden: [], angebote: [], enden: [], alle_enden: {}, titel: [] }, r, { geladen: true, installiert: true, konto: Boolean(r && r.konto),
+          stufenDa: Boolean(lv), xp: (lv && lv.xp) || {} });
       } catch (e) {
         // Fehlt die Migration, bleibt alles wie bisher. Bei anderen Fehlern (Netz) niemanden aussperren.
         S = { geladen: true, installiert: !fehlt(e), konto: false, helden: [], start_offen: false, angebote: [], enden: [], alle_enden: {}, titel: [], fehler: fehlt(e) ? null : e.message, offline: !fehlt(e) };
@@ -72,10 +88,13 @@
   let T = { kampagne: undefined, frei: null }; // frei: null = alle Helden
   async function tischLaden(kampagne) {
     kampagne = kampagne || null;
-    if (!kampagne) { await laden(); T = { kampagne: null, frei: !S.installiert || S.offline ? null : S.konto ? S.helden.slice() : STARTER.slice() }; return T; }
+    // Stufen: host = XP der Tisch-Helden (null: Gastgeber ohne Konto), spieler = XP der Handy-Helden von Mitspielern mit Konto
+    if (!kampagne) { await laden(); T = { kampagne: null, frei: !S.installiert || S.offline ? null : S.konto ? S.helden.slice() : STARTER.slice(), stufenDa: Boolean(S.stufenDa), xp: { host: S.konto ? S.xp || {} : null, spieler: {} } }; return T; }
+    const lv = await stufenHolen("rpg_campaign_levels", { p_campaign_id: kampagne });
+    const mitStufen = (o) => Object.assign(o, { stufenDa: Boolean(lv), xp: lv || { host: null, spieler: {} } });
     try {
       const r = await rpc("rpg_campaign_heroes", { p_campaign_id: kampagne });
-      T = { kampagne, frei: r && r.konto ? r.helden || [] : STARTER.slice() };
+      T = mitStufen({ kampagne, frei: r && r.konto ? r.helden || [] : STARTER.slice() });
     } catch (e) {
       // Migration fehlt oder keine Verbindung: niemanden aussperren. Sonst (z. B. nicht Tisch dieser Kampagne): eigene Sammlung.
       if (fehlt(e) || !/Spieltisch/.test(e.message || "")) T = { kampagne, frei: null };
@@ -86,6 +105,18 @@
   }
   const tischFrei = (fid) => !T.frei || T.frei.includes(fid);
   const tischBekannt = () => T.kampagne !== undefined;
+  /** Für den Kampagnenstart: gibt es Heldenstufen, und welche echte Stufe hat jeder Held der Gruppe?
+   *  handy(fid): wird dieser Held von einem Handy gespielt? Helden ohne bekannte Stufe (Gäste) fehlen in der Liste. */
+  function tischStufen(gruppe, handy) {
+    if (!T.stufenDa) return { da: false, stufen: {} };
+    const F = window.ABF, x = T.xp || {}, stufen = {};
+    for (const fid of gruppe || []) {
+      const amHandy = handy && handy(fid);
+      if (amHandy) { if (x.spieler && x.spieler[fid] != null) stufen[fid] = F.stufeAusXp(x.spieler[fid]).stufe; }
+      else if (x.host && (!T.frei || T.frei.includes(fid))) stufen[fid] = F.stufeAusXp(x.host[fid] || 0).stufe;
+    }
+    return { da: true, stufen };
+  }
 
   /* ---------- Karten-Bühne (Registrierung, Belohnung) ---------- */
   let sperre = false;
@@ -234,9 +265,13 @@
     }
     if (!r || !r.konto) return null;
     gemeldet.add(kampagne);
+    // Erfahrung für diesen Abschluss (Migration 007; fehlt sie, gibt es einfach keine XP-Anzeige)
+    const xp = await stufenHolen("rpg_award_xp", { p_campaign_id: kampagne });
+    r.xp = xp && xp.konto ? xp.helden || [] : [];
+    const xpNeu = r.xp.some((h) => h.neu);
     await laden(true);
-    if (r.schon_gemeldet && !r.angebot) return r; // schon gemeldet und nichts mehr offen: nichts erneut zeigen
-    if (o.still && !r.neu) return r;               // Nachholen: ein bekanntes Ende nicht nachträglich anzeigen
+    if (r.schon_gemeldet && !r.angebot && !xpNeu) return r; // schon gemeldet und nichts mehr offen: nichts erneut zeigen
+    if (o.still && !r.neu && !xpNeu) return r;               // Nachholen: ein bekanntes Ende nicht nachträglich anzeigen
     if (o.knopf) { endeErgebnis = { kampagne, r }; endePlatzFuellen(); if (r.neu) toast(r.angebot ? "Neues Ende entdeckt: Ein neuer Held wartet auf dich!" : "Neues Ende entdeckt!"); return r; }
     belohnung(r, o);
     return r;
@@ -268,17 +303,29 @@
       ? `<div class="sm-siegel"><div class="sm-zeichen">♛</div><b>${esc(TITEL[r.abenteuer] || "")}</b><small>${esc(K.titel)} · ${fortschritt()}</small></div>
          <p class="sm-unter">Ihr habt alle Enden dieser Kampagne gefunden. Ab sofort trägst du den Titel <b>„${esc(TITEL[r.abenteuer] || "")}“</b>. Er erscheint neben deinem Namen.</p>`
       : "";
+    // Erfahrung: je Held, was er bekommen hat, der Balken bis zur nächsten Stufe und ob er aufgestiegen ist
+    const xpHtml = () => {
+      const F = window.ABF, liste = r.xp || []; if (!liste.length) return "";
+      return `<div class="sm-xp"><p class="sm-xp-titel">Erfahrung</p>${liste.map((h) => {
+        const d = F.FIGUREN[h.held]; if (!d) return "";
+        const f = F.stufeAusXp(h.gesamt || 0), auf = h.stufe > h.vorher, voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
+        return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>${h.xp > 0 ? "+" + h.xp + " XP" : voll ? "Höchste Stufe" : "+0 XP"}</span></div>
+          <i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</small></div></div>`;
+      }).join("")}</div>`;
+    };
     const schritt0 = () => {
       if (!r.neu) {
         const rest = (r.gesamt || 0) - (r.gefunden || 0);
         const el = rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen${endName ? " · Ende: " + esc(endName) : ""}</p><h1 class="sm-gross">Sieg</h1><p class="sm-unter">${esc(K.titel)}.</p>
           <div class="sm-box">Dieses Ende hast du schon einmal erreicht. Einen neuen Helden gibt es nur für ein Ende, das du zum ersten Mal erreichst. ${rest <= 0 ? `Alle Enden von „${esc(K.titel)}“ hast du schon entdeckt.` : `In „${esc(K.titel)}“ wartet noch ${rest === 1 ? "ein weiteres Ende" : rest + " weitere Enden"}.`}</div>
+          ${xpHtml()}
           <div class="sm-knoepfe"><button class="btn gross" id="sm-zu">Weiter</button></div>`, { kopf, bild });
         el.querySelector("#sm-zu").onclick = zu; return;
       }
       const voll = !r.angebot;
       const el = rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen${endName ? " · Ende: " + esc(endName) : ""}</p><h1 class="sm-gross">Sieg</h1><p class="sm-unter">${esc(K.titel)} · ${fortschritt()} entdeckt.</p>
         <div class="sm-box"><b>Neues Ende entdeckt.</b> Zum ersten Mal hast du „${esc(endName)}“ erreicht. ${voll ? "Deine Sammlung ist schon vollständig, deshalb gibt es keinen neuen Helden. Das Ende zählt aber für deinen Kampagnentitel." : "Dafür schließt sich dir ein neuer Held an."}</div>
+        ${xpHtml()}
         <div class="sm-knoepfe"><button class="btn gross" id="sm-weiter">${voll ? "Weiter" : "Belohnung ansehen"}</button></div>`, { kopf, bild });
       el.querySelector("#sm-weiter").onclick = voll ? schrittVoll : schrittWahl;
     };
@@ -361,6 +408,17 @@
     }).join("")}</div>`;
   }
   /** Chronik des Kontos: je Kampagne alle Enden, gefundene mit Namen und Datum, die übrigen verdeckt */
+  /** Alle eigenen Helden mit Stufe und XP-Balken (Charaktere-Seite und Profil) */
+  function heldenUebersichtHtml() {
+    const F = window.ABF;
+    if (!S.konto) return `<p class="note">Stufen und Erfahrung gehören zu einem Spielerkonto. Als Gast spielst du deine Helden auf der empfohlenen Stufe der Kampagne.</p>`;
+    if (!S.stufenDa) return `<p class="note">Die Heldenstufen sind noch nicht freigeschaltet.</p>`;
+    const liste = S.helden.filter((f) => F.FIGUREN[f]).map((f) => ({ f, p: fortschritt(f), xp: (S.xp || {})[f] || 0 })).sort((a, b) => b.xp - a.xp || F.REIHE.indexOf(a.f) - F.REIHE.indexOf(b.f));
+    return `<div class="sm-helden-liste">${liste.map(({ f, p }) => { const d = F.FIGUREN[f], voll = !p.bis, pct = voll ? 100 : Math.round(100 * p.xp / p.bis);
+      return `<div class="sm-xp-zeile" data-held-stufe="${f}"><img src="${F.bild(f)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>Stufe ${p.stufe}</span></div>
+        <i><u style="width:${pct}%"></u></i><small>${esc(F.KLASSEN[d.klasse].name)} · ${voll ? "höchste Stufe erreicht" : `${p.xp} / ${p.bis} XP bis Stufe ${p.stufe + 1}`}</small></div></div>`; }).join("")}</div>
+      <p class="note">Erfahrung gibt es für jeden erfolgreichen Abschluss einer Kampagne, für jeden Helden der Gruppe. Wer unter der empfohlenen Stufe liegt, bekommt mehr, wer darüber liegt, weniger.</p>`;
+  }
   function chronikHtml() {
     if (!S.konto) return `<p class="note">Die Chronik gehört zu einem Spielerkonto: Dort stehen alle Enden, die du erreicht hast.</p>`;
     const gef = S.enden || [], datum = (t) => { try { return new Date(t).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }); } catch (e) { return ""; } };
@@ -380,7 +438,7 @@
     netzSetzen: (fn) => { netzQuelle = fn; },
     laden, frei, anzahl, zustand: () => S, beiAenderung: (fn) => { hoerer.add(fn); return () => hoerer.delete(fn); },
     aktiv: () => S.geladen && S.installiert && !S.offline,
-    tischLaden, tischFrei, tischBekannt, tischAlleFrei: () => !T.frei,
+    tischLaden, tischFrei, tischBekannt, tischStufen, fortschritt, stufeHtml, heldenUebersichtHtml, tischAlleFrei: () => !T.frei,
     registrierung, endeMelden, offeneBelohnung, nachholen, codeEinloesen,
     detail, schliessen, endenHtml, chronikHtml, gesperrtText, titelText, endeKnopf,
     istAdmin, adminCodes, adminErstellen, adminSperren,

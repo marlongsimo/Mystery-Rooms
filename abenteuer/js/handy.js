@@ -160,6 +160,8 @@
     $("#verlassen").hidden = !drin;
     if (!drin && H.endeGesehen) return viewAbschluss(app);
     if (!drin) return viewBeitritt(app);
+    // Stufenmodell der laufenden Kampagne übernehmen (bestimmt Lebenspunkte, Zauberplätze und Fähigkeiten in der Anzeige)
+    if (H.spiel && H.spiel.abenteuer) F.STUFEN10.aktiv = Boolean(H.spiel.abenteuer.modell10);
     if (!H.spiel) { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Einen Moment …</h1><p class="note">Der Spieltisch schickt gleich die Figuren.</p></section>`; return; }
     if (H.spiel.phase === "pause") { app.innerHTML = `<section class="karte-h"><p class="eyebrow">Verbunden · ${esc(c.session.room_code)}</p><h1>Pause</h1><p class="note">Der Spieltisch hat die Runde pausiert und gespeichert. Wenn sie fortgesetzt wird, zeigt der Tisch einen neuen Code – damit trittst du wieder bei.</p></section>`; return; }
     const fid = meineFid();
@@ -291,7 +293,7 @@
 
   function viewBogen(app, fid) {
     const s = H.spiel, d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], fd = figDaten(fid), ab = s.abenteuer, az = ab && ab.zust && ab.zust[fid];
-    const stufe = (fd && fd.stufe) || (ab && ab.stufe) || s.stufe || 1;
+    const stufe = (fd && fd.stufe) || (ab && ab.heldStufe && ab.heldStufe[fid]) || (ab && ab.stufe) || s.stufe || 1;
     const tpMax = fd ? fd.tpMax : F.tpVon(fid, stufe), tp = fd ? fd.tp : az ? az.tp : tpMax, rk = fd ? fd.rk : F.rkVon(fid, stufe);
     const plMax = fd && fd.plaetzeMax ? fd.plaetzeMax : k.plaetze ? F.plaetzeVon(stufe) : [0, 0], pl = fd && fd.plaetze ? fd.plaetze : az ? az.plaetze : plMax;
     const dran = Boolean(fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0);

@@ -142,3 +142,31 @@
 .sm-chronik li small { color: #b9ad94; white-space: nowrap; }
 .sm-chronik li.offen { border-style: dashed; background: none; color: #8d8474; }
 .sm-chronik li.offen b { font-weight: 400; font-style: italic; }
+
+/* ---------- Heldenstufen und Erfahrung ---------- */
+.sm-stufe { margin: 8px 0 10px; max-width: 420px; }
+.sm-stufe-kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.sm-stufe-kopf b { font: 600 15px "Cinzel", serif; color: #f6dc9c; }
+.sm-stufe-kopf span { font: 400 12px "Inter", sans-serif; color: #b9ad94; }
+.sm-stufe i, .sm-xp-zeile i { display: block; height: 7px; border-radius: 4px; background: rgba(255,255,255,.12); overflow: hidden; }
+.sm-stufe i u, .sm-xp-zeile i u { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #b8893a, #f6dc9c); text-decoration: none; transition: width .6s ease; }
+.sm-stufe.klein { display: flex; flex-direction: column; gap: 3px; margin: 4px 0 0; width: 100%; }
+.sm-stufe.klein b { font: 600 11px "Inter", sans-serif; color: #f6dc9c; letter-spacing: .04em; }
+.sm-stufe.klein i { height: 4px; }
+.sm-xp { margin: 14px auto 4px; max-width: 520px; text-align: left; }
+.sm-xp-titel { font: 600 12px "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #d9b46a; margin: 0 0 8px; }
+.sm-xp-zeile { display: flex; gap: 12px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,.28); border: 1px solid rgba(217,180,106,.16); margin-bottom: 6px; }
+.sm-xp-zeile.auf { border-color: rgba(246,220,156,.65); background: rgba(217,180,106,.14); }
+.sm-xp-zeile img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; object-position: top; flex: none; border: 1px solid rgba(217,180,106,.4); }
+.sm-xp-mitte { flex: 1; min-width: 0; }
+.sm-xp-kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.sm-xp-kopf b { font: 600 14px "Cinzel", serif; color: #f1e3bf; }
+.sm-xp-kopf span { font: 600 13px "Inter", sans-serif; color: #f6dc9c; white-space: nowrap; }
+.sm-xp-zeile small { display: block; margin-top: 4px; font: 400 12px "Inter", sans-serif; color: #b9ad94; }
+.sm-xp-zeile small strong { color: #f6dc9c; font-weight: 600; }
+.sm-helden-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 10px; margin: 8px 0 10px; }
+.sm-helden-liste .sm-xp-zeile { margin: 0; }
+.hub-zwischen { font: 600 17px "Cinzel", serif; color: #f1e3bf; margin: 26px 0 4px; }
+.held-pfad tr.aktuell { background: rgba(246,220,156,.14); box-shadow: inset 3px 0 0 #f6dc9c; }
+.held-pfad tr.aktuell th small { display: block; font: 600 10px "Inter", sans-serif; color: #f6dc9c; letter-spacing: .06em; text-transform: uppercase; }
+.held-pfad tr.erreicht th { color: #d9b46a; }

@@ -83,11 +83,20 @@
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse];
     return `<button class="fkarte ${o.an ? "an" : ""} ${o.fokus ? "fokus" : ""} ${o.gesperrt ? "gesperrt" : ""}" data-fid="${fid}" ${o.gesperrt ? "aria-disabled=\"true\"" : ""} style="--k:${k.farbe}" title="${esc(d.name)} – ${esc(d.titel)}${o.gesperrt ? " (gesperrt)" : ""}">
       <img src="${F.bild(fid)}" alt="" loading="lazy">${o.gesperrt && window.ABSAMMLUNG ? `<span class="sm-schloss">${window.ABSAMMLUNG.SCHLOSS}</span>` : ""}<span class="klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span>
-      <b>${esc(d.name)}</b><small>${esc(d.titel)}</small>${o.status ? `<em class="${o.statusArt || ""}">${esc(o.status)}</em>` : ""}</button>`;
+      <b>${esc(d.name)}</b><small>${esc(d.titel)}</small>${!o.gesperrt && window.ABSAMMLUNG && window.ABSAMMLUNG.stufeHtml ? window.ABSAMMLUNG.stufeHtml(fid, true) : ""}${o.status ? `<em class="${o.statusArt || ""}">${esc(o.status)}</em>` : ""}</button>`;
   }
   /** Große Vorstellung einer Figur. knopf: HTML für die Aktion (wählen) */
-  function detail(fid, stufe = 1, knopf = "") {
-    const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], pr = PROFIL[fid];
+  function detail(fid, stufe = 1, knopf = "", o = {}) {
+    // Eigener Fortschritt (Konto mit Heldenstufen): Die Karte zeigt den Helden auf seiner echten Stufe – außer in einer laufenden Kampagne (o.fest)
+    const SM = window.ABSAMMLUNG, fo = !o.fest && SM && SM.fortschritt ? SM.fortschritt(fid) : null;
+    if (!fo) return detailHtml(fid, stufe, knopf, null);
+    const vorher = F.STUFEN10.aktiv; F.STUFEN10.aktiv = true;
+    try { return detailHtml(fid, fo.stufe, knopf, fo); } finally { F.STUFEN10.aktiv = vorher; }
+  }
+  function detailHtml(fid, stufeRoh, knopf, fo) {
+    const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], pr = PROFIL[fid], SM = window.ABSAMMLUNG;
+    // Im Zehn-Stufen-Modell gelten Lebenspunkte und Werte der Heldenstufe; Fähigkeiten gibt es ab Stufe 3 und 7
+    const m10 = F.STUFEN10.aktiv, heldenstufe = stufeRoh, stufe = F.altStufe(stufeRoh), abText = (ab) => (m10 ? F.neuAb(ab) : ab);
     // Fähigkeiten passend zur Stufe: freigeschaltete in der Liste, spätere darunter
     const eigene = d.faehig.filter((a) => a.ab <= stufe), spaeter = d.faehig.filter((a) => a.ab > stufe);
     const kl = F.KLASSE_FAEHIG[d.klasse].filter((a) => a.ab <= stufe);
@@ -98,22 +107,22 @@
       <div class="held-bild"><img src="${F.bild(fid)}" alt="${esc(d.name)}"><span class="held-klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span></div>
       <div class="held-text">
         <p class="eyebrow">${esc(d.rolle)} · ${"●".repeat(pr.anspruch)}${"○".repeat(3 - pr.anspruch)} ${ANSPRUCH[pr.anspruch]}</p>
-        <h2>${esc(d.name)}</h2><p class="held-titel">${esc(d.titel)}</p>
+        <h2>${esc(d.name)}</h2><p class="held-titel">${esc(d.titel)}</p>${fo && SM ? SM.stufeHtml(fid) : m10 ? `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${heldenstufe}</b><span>in dieser Kampagne</span></div></div>` : ""}
         <blockquote>„${esc(d.spruch)}“</blockquote>
         <p class="held-spielweise">${esc(pr.spielweise)}</p>
         <div class="held-achsen">${balken}</div>
-        <div class="held-kern"><span><b>${F.tpVon(fid, stufe)}</b><small>Trefferpunkte</small></span><span><b>${F.rkVon(fid, stufe)}</b><small>Rüstungsklasse</small></span><span><b>${d.bewegung || k.bewegung || 6}</b><small>Felder Bewegung</small></span>${k.plaetze ? `<span><b>${F.plaetzeVon(stufe)[0] + F.plaetzeVon(stufe)[1]}</b><small>Zauberplätze</small></span>` : ""}${d.wolf ? `<span><b>🐺</b><small>Wolf ${esc(d.wolf.name)}</small></span>` : ""}</div>
+        <div class="held-kern"><span><b>${F.tpVon(fid, heldenstufe)}</b><small>Trefferpunkte</small></span><span><b>${F.rkVon(fid, heldenstufe)}</b><small>Rüstungsklasse</small></span><span><b>${d.bewegung || k.bewegung || 6}</b><small>Felder Bewegung</small></span>${k.plaetze ? `<span><b>${F.plaetzeVon(heldenstufe)[0] + F.plaetzeVon(heldenstufe)[1]}</b><small>Zauberplätze</small></span>` : ""}${d.wolf ? `<span><b>🐺</b><small>Wolf ${esc(d.wolf.name)}</small></span>` : ""}</div>
         <div class="held-werte">${werte}</div>
         ${knopf}
         <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="stufen">Stufen</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>
         <div class="held-tafel" data-tafel="faehig">
           <ul class="held-faehig">${k.merkmal ? (([n, ...t]) => `<li class="klassen-merkmal"><b>${esc(n)}</b><span class="typ">Klassenmerkmal · immer</span><p>${esc(t.join(": "))}</p></li>`)(k.merkmal.split(": ")) : ""}${eigene.map(fae).join("")}${kl.map(fae).join("")}</ul>
-          ${spaeter.length ? `<p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${a.ab})`).join(" · ")}</p>` : ""}
+          ${spaeter.length ? `<p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${abText(a.ab)})`).join(" · ")}</p>` : ""}
         </div>
         <div class="held-tafel" data-tafel="stufen" hidden>${(() => {
           const pf = F.stufenpfad(fid);
           return `<p class="held-spaeter">So wächst ${esc(d.name)} von Stufe 1 bis 10. Der Weg ist fest, es gibt nichts auszuwählen.</p>
-          <table class="held-pfad"><thead><tr><th>Stufe</th><th>Leben</th><th>Was dazukommt</th></tr></thead><tbody>${pf.map((z) => `<tr class="${z.neu.length ? "neu" : ""} ${z.verbesserung ? "besser" : ""} ${z.meister ? "meister" : ""}"><th>${z.stufe}</th><td>${z.tp}</td><td>${[
+          <table class="held-pfad"><thead><tr><th>Stufe</th><th>Leben</th><th>Was dazukommt</th></tr></thead><tbody>${pf.map((z) => `<tr class="${z.neu.length ? "neu" : ""} ${z.verbesserung ? "besser" : ""} ${z.meister ? "meister" : ""} ${m10 && z.stufe === heldenstufe ? "aktuell" : ""} ${m10 && z.stufe < heldenstufe ? "erreicht" : ""}"><th>${z.stufe}${m10 && z.stufe === heldenstufe ? "<small>jetzt</small>" : ""}</th><td>${z.tp}</td><td>${[
             z.stufe === 1 ? "<span>Grundfähigkeiten und Grundwerte</span>" : "",
             ...z.neu.map((n) => `<span class="pf-neu"><b>Neue Fähigkeit: ${esc(n.name)}</b><small>${esc(n.text || "")}</small></span>`),
             z.verbesserung ? `<span class="pf-besser"><b>Verbesserung:</b> ${esc(z.verbesserung)}</span>` : "",
@@ -121,7 +130,7 @@
             z.titel ? `<span class="pf-titel">Meistertitel: „${esc(d.name)}, ${esc(z.titel)}“</span>` : "",
             z.werte.length ? `<span class="pf-werte">${z.werte.map(esc).join(" · ")}</span>` : "",
           ].filter(Boolean).join("") || "<span class=\"pf-werte\">mehr Leben</span>"}</td></tr>`).join("")}</tbody></table>
-          <p class="held-spaeter">Die Heldenstufen kommen mit dem Level-System. Bis dahin steigt die Gruppe wie bisher innerhalb einer Kampagne auf.</p>`;
+          <p class="held-spaeter">Erfahrung gibt es für jeden erfolgreichen Abschluss einer Kampagne. Stufen und Erfahrung gehören zu einem Spielerkonto.</p>`;
         })()}</div>
         <div class="held-tafel" data-tafel="aussen" hidden><p class="held-aussen"><b>${esc(d.aussen.name)}:</b> ${esc(d.aussen.text)}</p><p class="held-spaeter">Rolle in der Gruppe: ${esc(d.rolle)}</p><p class="held-spaeter">Rettungswürfe der Klasse: ${k.rettung.map((a) => ATTR_NAME[a]).join(", ")} · Lebenswürfel W${k.wuerfel}</p></div>
       </div></article>`;

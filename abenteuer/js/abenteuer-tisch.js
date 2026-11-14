@@ -76,11 +76,25 @@
   function start(setup) {
     const id = setup.abenteuer || "grauwacht";
     if (setup.gruppe.length < S.metaVon(id).min) return;
-    A = S.neu(Math.floor(Math.random() * 1e9), { gruppe: setup.gruppe, schwierigkeit: setup.schwierigkeit, abenteuer: id });
-    merken();
-    if (window.KAMPAGNE) window.KAMPAGNE.abenteuerBegonnen();
-    zeige();
+    // Heldenstufen (Migration 007): Gibt es sie, spielt jede neue Kampagne im Zehn-Stufen-Modell – jeder Held auf seiner Stufe.
+    // Ohne sie bleibt alles beim bisherigen Aufstieg innerhalb der Kampagne.
+    const SM = window.ABSAMMLUNG, K = window.KAMPAGNE, k = K && K.aktuell && K.aktuell();
+    const los = () => {
+      startet = false;
+      const lv = SM && SM.tischStufen ? SM.tischStufen(setup.gruppe, (fid) => Boolean(live() && besitzer(fid))) : { da: false };
+      window.ABF.STUFEN10.aktiv = Boolean(lv.da);
+      A = S.neu(Math.floor(Math.random() * 1e9), { gruppe: setup.gruppe, schwierigkeit: setup.schwierigkeit, abenteuer: id, modell10: Boolean(lv.da), heldStufen: lv.da ? lv.stufen : null });
+      merken();
+      if (window.KAMPAGNE) window.KAMPAGNE.abenteuerBegonnen();
+      zeige();
+    };
+    // Coop: vorher die Mitspieler mit ihren Helden in die Kampagne übernehmen und deren Stufen holen (höchstens 5 Sekunden warten)
+    if (live() && SM && k && k.id && K.mitgliederAbgleichen) {
+      if (startet) return; startet = true;
+      Promise.race([K.mitgliederAbgleichen().catch(() => {}).then(() => SM.tischLaden(k.id)), new Promise((r) => setTimeout(r, 5000))]).catch(() => {}).then(los);
+    } else los();
   }
+  let startet = false;
   function fortsetzen() {
     try { A = S.laden(JSON.parse(localStorage.getItem(KEY))); } catch (e) { A = null; }
     if (A) zeige();
@@ -99,7 +113,7 @@
   }
   function glockeHtml(n) { const u = A ? S.metaVon(A.abenteuer).uhr : { name: "Glocke" }; return `<span class="glocke${u.klasse ? " " + u.klasse : ""}" title="${esc(u.name)}: ${n} von 7">${Array.from({ length: 7 }, (_, i) => `<i class="${i < n ? "an" : ""}"></i>`).join("")}<small>${esc(u.name)} ${n}/7</small></span>`; }
   function gruppeHtml() {
-    return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
+    return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, S.hst(A, fid)), b = besitzer(fid);
       const dinge = (z.rucksack || []).filter((x) => R.GEGENSTAENDE[x.id] && x.n > 0).map((x) => `<i title="${esc(R.GEGENSTAENDE[x.id].name)}: ${esc(R.GEGENSTAENDE[x.id].text)}">${R.GEGENSTAENDE[x.id].sym}</i>`).join("");
       const rel = z.tot && S.reliquieTraeger(A) ? `<button class="btn klein reliquie-knopf" data-wiederbeleben="${fid}" title="Reliquie der Brüder nutzen">✝ Zurückholen</button>` : "";
       return `<span class="${z.tot ? "tot" : ""}" data-held="${fid}" role="button" tabindex="0" title="${esc(d.name)} ansehen">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small>${rel}</span>`; }).join("")}</div>`;
@@ -107,9 +121,9 @@
   /** Heldenansicht im Abenteuer: alle Einzelheiten wie bei der Auswahl, auf der aktuellen Stufe, mit aktuellem Stand */
   function heldZeigen(fid) {
     const HL = window.ABH_HELDEN; if (!HL || !A) return;
-    const z = A.zust[fid], max = F.tpVon(fid, A.stufe), b = besitzer(fid);
+    const z = A.zust[fid], max = F.tpVon(fid, S.hst(A, fid)), b = besitzer(fid);
     const dinge = (z.rucksack || []).filter((x) => x.n > 0).map((x) => { const g = R.GEGENSTAENDE[x.id], t = R.DINGE && R.DINGE[x.id]; const n = g ? `${g.sym} ${g.name}` : t ? t.name : x.id; return `<li><b>${esc(n)}${x.n > 1 ? ` ×${x.n}` : ""}</b>${g ? `<span>${esc(g.text)}</span>` : ""}</li>`; }).join("");
-    const stand = `<div class="held-stand"><p><b>Stufe ${A.stufe}</b> · ${z.tot ? "<span class=\"gefallen\">gefallen</span>" : `${z.tp}/${max} TP`}${b ? ` · 📱 ${esc(AB.spielerName(b))}` : ""}</p>${dinge ? `<ul>${dinge}</ul>` : `<p class="note">Keine Gegenstände.</p>`}</div>`;
+    const stand = `<div class="held-stand"><p><b>Stufe ${S.hst(A, fid)}</b> · ${z.tot ? "<span class=\"gefallen\">gefallen</span>" : `${z.tp}/${max} TP`}${b ? ` · 📱 ${esc(AB.spielerName(b))}` : ""}</p>${dinge ? `<ul>${dinge}</ul>` : `<p class="note">Keine Gegenstände.</p>`}</div>`;
     let dlg = document.getElementById("held-dialog");
     if (!dlg) {
       dlg = document.createElement("dialog"); dlg.id = "held-dialog"; dlg.className = "held-dialog";
@@ -118,7 +132,7 @@
       dlg.querySelector(".held-dialog-zu").onclick = () => dlg.close();
       dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
     }
-    dlg.querySelector(".held-dialog-inhalt").innerHTML = HL.detail(fid, A.stufe, stand);
+    dlg.querySelector(".held-dialog-inhalt").innerHTML = HL.detail(fid, S.hst(A, fid), stand, { fest: true });
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
   }
   /* ---------- Chronik: jedes beendete Abenteuer bleibt auf dem Gerät ---------- */

@@ -7,7 +7,7 @@ Aufruf:  python3 krimidinner/tools/check_case.py krimidinner/silberkamm
 import json, os, re, sys
 
 def main(folder):
-    errs, notes = [], []
+    errs, notes, warns = [], [], []
     fall = json.load(open(os.path.join(folder, "fall.json"), encoding="utf-8"))
     ids = [r["id"] for r in fall["roles"]]
     pmin, pmax = fall["players"]["min"], fall["players"]["max"]
@@ -113,6 +113,41 @@ def main(folder):
     if svg and not os.path.exists(os.path.join(folder, svg)):
         errs.append(f"Asset fehlt: {svg}")
 
+    # Losungswörter müssen im Gastgeberheft stehen (sonst hängt die Spielleitung ohne App)
+    for r in fall["rounds"]:
+        if not any(w and w.upper() in gh.upper() for w in [r["word"]] + list(r.get("alt", []))):
+            errs.append(f"Losungswort {r['word']} ({r['name']}) steht nicht im Gastgeberheft")
+    for cid, spec in fall.get("cards", {}).items():
+        if spec.get("extraWord") and spec["extraWord"].upper() not in gh.upper():
+            errs.append(f"{cid}: Zusatzwort {spec['extraWord']} steht nicht im Gastgeberheft")
+
+    # Leere Teile in Rollenblättern, Ziele gegenüber Rollen, die fehlen können, feste Artikel
+    surname = {r["id"]: r["names"][0].split()[-1] for r in fall["roles"]}
+    optional = [rid for rid in order[pmin:]]
+    for r in fall["roles"]:
+        p = os.path.join(folder, r["file"])
+        if not os.path.exists(p): continue
+        t = open(p, encoding="utf-8").read()
+        chunks = re.split(r"^## ", t, flags=re.M)[1:]
+        for ch in chunks:
+            head, _, body = ch.partition("\n")
+            if not body.replace("-", "").strip():
+                errs.append(f"{r['id']}: Teil „{head.strip()}“ ist leer")
+            if "Ziele" in head:
+                # nur Rollen, die fehlen können, während diese Rolle besetzt ist (später in cast.order)
+                later = [x for x in optional if order.index(x) > order.index(r["id"])]
+                victim = fall.get("texts", {}).get("accusation", "")
+                for rid in later:
+                    named = ("{" + rid + ":") in body or (surname[rid] in body and surname[rid] not in victim)
+                    if named and "nicht am Tisch" not in body:
+                        warns.append(f"{r['id']}: Ziel nennt {surname[rid]} ({rid}), {rid} kann fehlen – Ersatz „Sitzt … nicht am Tisch“ ergänzen")
+        plain = re.sub(r"\{R\d\d:[^}]*\}", "", t)
+        for rid, sn in surname.items():
+            if rid == r["id"]: continue
+            for m in re.finditer(re.escape(sn) + r", (der|die|dessen|deren|den|dem) ", plain):
+                warns.append(f"{r['id']}: fester Artikel nach {sn} („{m.group(0).strip()}“) – Variante {{{rid}: … / …}} prüfen")
+
+    for w in warns: print("HINWEIS:", w)
     for n in notes: print("·", n)
     for e in errs: print("FEHLER:", e)
     print("OK" if not errs else f"{len(errs)} Fehler")

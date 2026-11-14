@@ -318,6 +318,10 @@ Diese Felder nutzt `silberkamm/fall.json` zusätzlich. Die Engine muss sie bei d
 - Kartennummern und Bedingungen, Kartenzahl je Besetzung
 - Abschnitte des Gastgeberhefts, Aussagekarten
 - Regelabschnitte und Asset
+- Losungswörter und Zusatzwörter stehen im Gastgeberheft
+- kein leerer Teil in einem Rollenblatt
+
+Dazu kommen Hinweise, die nichts blockieren: Ziele gegenüber Rollen, die bei kleiner Besetzung fehlen können (ohne Ersatz „Sitzt … nicht am Tisch“), und feste Artikel nach dem Namen einer anderen Rolle.
 
 Später geht es in `build_case.py` auf.
 
@@ -359,6 +363,10 @@ Umgesetzt sind die Engine, Code v2, die gemeinsame Live-Kennung und beide Fälle
 | `eichenfels/tests/krimidinner.test.js` | 70, darunter v1-Code, 200 v2-Codes hin und zurück, Tippfehler |
 | `eichenfels/tests/live.test.js` | 16, gegen die echte Datenbank |
 | `silberkamm/tests/silberkamm.test.js` | 51 |
+| `mirage/tests/mirage.test.js` | 52 |
+| `nebenan/tests/nebenan.test.js` | 48 |
+
+Ein gemeinsames `tests/engine.test.js` (Abschnitt 10) gibt es nicht. Die Tests je Fall decken die Engine mit ab. Sie laufen auch ohne Server: `BASE=file://$PWD node krimidinner/<fall>/tests/<fall>.test.js`.
 
 Der Silberkamm-Test prüft unter anderem: 8 Rollen, 4 Runden und Finale, `present`- und `missing`-Karte, Wagenplan statt Grundriss, Codes eines anderen Falls, gleiche Chance auf die Täterrolle für alle (600 Verteilungen), Live mit Sitzungsstand `fall`.
 
@@ -368,3 +376,9 @@ Der Silberkamm-Test prüft unter anderem: 8 Rollen, 4 Runden und Finale, `presen
 - **Freigabe ohne Rollenteil:** `rounds[]` ohne `rolePart` funktioniert auch mitten im Ablauf. KULISSE öffnet nur Karten. Die Rollenteile Runde 2–4 hängen an den Engine-Runden 3–5.
 - **Neues Feld `steps[].label`:** setzt die Kurzbeschriftung im Ablauf, etwa „P2b“.
 - **Pflege von `engine/`:** bleibt fallneutral.
+
+**Nachtrag Gastgeberheft (alle Fälle):**
+- **A9 · Wenn etwas schiefgeht** steht nach A5 und gehört in `steps` zur Vorbereitung.
+- Jede Phase endet mit einer Zeile „**Weiter, wenn:** …“.
+- Wer mitspielt, liest vorab nur A1 bis A5 und A9. Hinweise, die auf die Lösung zeigen, gehören deshalb nicht in diese Abschnitte.
+- Vorlage für Testabende: `TESTPROTOKOLL.md`.

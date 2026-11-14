@@ -15,9 +15,20 @@ Jedes Spiel hat ein eigenes Spielprinzip.
 | **DEADLINE.exe** – Der letzte Zugriff | Ermitteln auf einem simulierten Computer: vier parallele Stränge, Terminal, sechs Enden | Vorschau, allein vollständig spielbar | [`deadline/`](deadline/) |
 | **Das ARCHON-Protokoll** – 120 Minuten. Eine Chance. | Schwerer Desktop-Thriller: Finanzermittlung, Register, Audio, Terminal; Wissensdatenbank im Spiel | Vorschau, allein, am besten Computer/Tablet (Handy geht mit Hinweis) | [`archon/`](archon/) |
 | **SEKTOR 9** – Das letzte Protokoll | Kooperative Ermittlung in 3D: fünf Hallen mit Standpunkten, ECHO als Gegenspieler, Abschaltung zu zweit, Abstimmung, drei Enden | spielbar, allein oder bis zu viert | [`sektor-9/`](sektor-9/) |
-| **Der letzte Gast** (Krimidinner) | Rollenspiel am Tisch für 4–10 Personen mit Spielleitung, Beweisrunden, Anklage | Vorschau: im Katalog, Rollen per Code, Runden per Losungswort, Druckversion · noch nicht am Tisch getestet | [`krimidinner/eichenfels/`](krimidinner/eichenfels/) |
+| **Krimidinner** (vier Fälle) | Rollenspiel am Tisch mit Spielleitung, Beweisrunden und Anklage; Rollen per Code, Runden per Losungswort, Druckversion | Vorschau, im Katalog · noch nicht am Tisch getestet – siehe unten | [`krimidinner/`](krimidinner/) |
 | Das Geheimnis der Pyramide | – | geplant | – |
 | Projekt Schattenlabor | – | geplant | – |
+
+### Krimidinner: vier Fälle auf einer Engine
+
+| Fall | Schauplatz | Personen | Dauer | Ordner |
+|---|---|---|---|---|
+| 01 · **Der letzte Gast** | Sternwarte Eichenfels, heute | 4–10 | 2–2½ Std. | [`krimidinner/eichenfels/`](krimidinner/eichenfels/) |
+| 02 · **Abfahrt ins Dunkel** | Silberkamm-Express, 1929 | 6–8 | 3–3½ Std. | [`krimidinner/silberkamm/`](krimidinner/silberkamm/) |
+| 03 · **Vorhang aus Lügen** | Palais Mirage, 1958 | 6–10 | 3 Std. | [`krimidinner/mirage/`](krimidinner/mirage/) |
+| 04 · **Nebenan – Der stille Kreis** | Haus am Anger, 2004 | 5–10 | 3–3½ Std. | [`krimidinner/nebenan/`](krimidinner/nebenan/) |
+
+Texte (`.md`) und `fall.json` sind die Quelle, `python3 krimidinner/engine/build_case.py <fall>` erzeugt daraus `js/content.js` und prüft den Fall vorher (`krimidinner/tools/check_case.py`). Aufbau und Norm: [`krimidinner/ENGINE.md`](krimidinner/ENGINE.md). Vorlage für Testabende: [`krimidinner/TESTPROTOKOLL.md`](krimidinner/TESTPROTOKOLL.md).
 
 ### Der letzte Fall: zwei Versionen
 
@@ -56,3 +67,4 @@ Tabelle `game_ratings` ist angelegt (`platform/rating/setup.sql`). Besucher kön
 
 - Tests auf echten Geräten (iOS Safari, Android)
 - Der letzte Fall, Version 2: Kapitel 4 und 5
+- Krimidinner: Testabende je Fall mit kleinster, mittlerer und größter Besetzung (Protokoll nach `krimidinner/TESTPROTOKOLL.md`)

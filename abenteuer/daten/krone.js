@@ -92,9 +92,9 @@
       art: "wahl", abschnitt: 1, titel: "Was hinter euch liegt (1/2)", ort: "Im hohen Norden",
       text: ["Habt ihr das Siegel von Grauwacht erlebt? Wie endete es? (Das ändert Gespräche und einzelne Kämpfe, nicht den Weg. Wer es nicht kennt, wählt „Nicht dabei gewesen“.)"],
       optionen: [
-        { id: "erneuert", text: "Wir haben das Siegel erneuert", setzt: { grauwacht: "erneuert" }, weiter: "vorgeschichte2" },
-        { id: "gebrochen", text: "Wir haben das Siegel gebrochen", setzt: { grauwacht: "gebrochen", bund_gewarnt: true }, weiter: "vorgeschichte2" },
-        { id: "verrat", text: "Anselm hat uns verraten", setzt: { grauwacht: "verrat", anselm_spur: true }, weiter: "vorgeschichte2" },
+        { id: "erneuert", text: "Wir haben das Siegel erneuert", setzt: { grauwacht: "erneuert" }, folge: "Ihr habt in Grauwacht ein Siegel erneuert. Ihr wisst, wie sich eines anfühlt, das hält.", weiter: "vorgeschichte2" },
+        { id: "gebrochen", text: "Wir haben das Siegel gebrochen", setzt: { grauwacht: "gebrochen", bund_gewarnt: true }, folge: "Wer ein Siegel bricht, über den wird geredet. Der Bund der Hohlkrone hat von euch gehört und ist auf der Hut.", weiter: "vorgeschichte2" },
+        { id: "verrat", text: "Anselm hat uns verraten", setzt: { grauwacht: "verrat", anselm_spur: true }, folge: "Anselm ist euch in Grauwacht entkommen. Achtet auf seinen Namen: Ihr werdet ihm wieder begegnen.", weiter: "vorgeschichte2" },
         { id: "nicht", text: "Nicht dabei gewesen", setzt: { grauwacht: "nicht" }, weiter: "vorgeschichte2" },
       ],
     },
@@ -102,10 +102,10 @@
       art: "wahl", abschnitt: 1, titel: "Was hinter euch liegt (2/2)", ort: "Im hohen Norden",
       text: ["Und die Hochwarte? Was wurde aus dem Wachtfunken und aus Sera Venn?"],
       optionen: [
-        { id: "fackel", text: "Der Funke brennt auf der Hochwarte, Sera hütet ihn", setzt: { hochwacht: "fackel" }, weiter: "gletscherrand" },
-        { id: "funke", text: "Wir haben den Funken mitgenommen", setzt: { hochwacht: "funke", funke: true, bund_gewarnt: true }, weiter: "gletscherrand" },
-        { id: "dunkel", text: "Wir haben den Funken gelöscht", setzt: { hochwacht: "dunkel" }, weiter: "gletscherrand" },
-        { id: "verloren", text: "Sera wurde verschleppt", setzt: { hochwacht: "verloren", sera_verschollen: true }, weiter: "gletscherrand" },
+        { id: "fackel", text: "Der Funke brennt auf der Hochwarte, Sera hütet ihn", setzt: { hochwacht: "fackel" }, folge: "Der Funke brennt auf der Hochwarte, und Sera Venn weiß, wohin ihr geht. Der Orden hat euch nicht vergessen.", weiter: "gletscherrand" },
+        { id: "funke", text: "Wir haben den Funken mitgenommen", setzt: { hochwacht: "funke", funke: true, bund_gewarnt: true }, folge: "Ihr tragt den Wachtfunken bei euch. Er zeigt euch Wege – und er zeigt dem Bund der Hohlkrone, wo ihr seid.", weiter: "gletscherrand" },
+        { id: "dunkel", text: "Wir haben den Funken gelöscht", setzt: { hochwacht: "dunkel" }, folge: "Die Hochwarte ist dunkel. Von dort kommt keine Hilfe und kein Zeichen.", weiter: "gletscherrand" },
+        { id: "verloren", text: "Sera wurde verschleppt", setzt: { hochwacht: "verloren", sera_verschollen: true }, folge: "Sera Venn ist verschleppt. Ihr geht ohne ihren Rat nach Norden und haltet die Augen nach ihr offen.", weiter: "gletscherrand" },
         { id: "nicht", text: "Nicht dabei gewesen", setzt: { hochwacht: "nicht" }, weiter: "gletscherrand" },
       ],
     },
@@ -114,26 +114,26 @@
       text: (A) => [
         "Kaltbrunn sind sieben Häuser am Rand eines Gletschers, so groß, dass er bis an den Himmel zu reichen scheint. In der einzigen Stube mit Feuer sitzt Ylva Hallgrim, Eisschneiderin, und mustert euch, als zähle sie, wie viele von euch zurückkommen.",
         "„Ihr wollt nach Veyrholm“, sagt sie. „Wie die Maskierten vor zwei Tagen. Ich sag euch, was ich denen auch gesagt habe: Es gibt drei Wege hinein. Keiner ist gut.“",
-        A.merker.hochwacht === "fackel" ? "Auf dem Tisch liegt ein Brief mit dem Siegel des Wachtordens. Ylva schiebt ihn zu euch herüber: „Kam vor einer Woche. Für euch, steht drauf.“" : "",
-        A.merker.funke ? "Der Wachtfunke in eurem Gepäck ist unruhig. Er zieht nach Norden, wie eine Kompassnadel, die zittert." : "",
+        A.merker.hochwacht === "fackel" ? "↳ Auf dem Tisch liegt ein Brief mit dem Siegel des Wachtordens. Ylva schiebt ihn zu euch herüber: „Kam vor einer Woche. Für euch, steht drauf.“" : "",
+        A.merker.funke ? "↳ Der Wachtfunke in eurem Gepäck ist unruhig. Er zieht nach Norden, wie eine Kompassnadel, die zittert." : "",
       ],
       optionen: [
         { id: "veyrholm", text: "Nach Veyrholm fragen", wer: "Ylva", frage: "„Was ist Veyrholm?“",
-          antwort: "„Eine Stadt, die der Gletscher gefressen hat. Vor dreihundert Jahren, sagen die Alten, über Nacht. Die Leute sind nicht geflohen. Man sieht sie manchmal, unter dem Eis, wie Fische im Winterteich.“ Sie spuckt ins Feuer. „Und seit dem Licht bewegen sie sich.“", setzt: { veyrholm_wissen: true } },
+          antwort: "„Eine Stadt, die der Gletscher gefressen hat. Vor dreihundert Jahren, sagen die Alten, über Nacht. Die Leute sind nicht geflohen. Man sieht sie manchmal, unter dem Eis, wie Fische im Winterteich.“ Sie spuckt ins Feuer. „Und seit dem Licht bewegen sie sich.“", setzt: { veyrholm_wissen: true }, folge: "Ihr wisst, was euch erwartet: Die Bewohner von Veyrholm sind noch da, unter dem Eis. Und sie bewegen sich." },
         { id: "bund", text: "Nach den Maskierten fragen", wer: "Ylva", frage: "„Wer waren die Maskierten?“",
           antwort: (A) => `„Zwölf, vielleicht fünfzehn. Masken mit einer leeren Krone darauf. Sie nennen sich den Bund der Hohlkrone. Ihr Anführer heißt Varrek und hat Hunde dabei, die nach etwas schnüffeln, das ich nicht riechen kann.“${A.merker.anselm_spur ? " Sie zögert. „Einer hatte einen Brief. Mit dem Siegel eines Abtes. Anselm, stand da.“" : ""}`,
-          setzt: { bund_bekannt: true } },
-        { id: "wege", text: "Nach den drei Wegen fragen", wer: "Ylva", frage: "„Welche drei Wege?“",
-          antwort: "„Der Sturmgrat: offen, windig, schnell. Da sind die Maskierten hoch, Varrek und seine Hunde. Die Unterstollen: das alte Bergwerk, kurz und dunkel, aber im Eis nisten Glasschwärmer. Und die Pilgerstraße: Treppen, Schreine, Gräber. Langsam. Still. Zu still.“", setzt: { wege_bekannt: true } },
+          setzt: { bund_bekannt: true }, folge: (A) => `Ihr kennt eure Gegner jetzt beim Namen: der Bund der Hohlkrone, geführt von Varrek.${A.merker.anselm_spur ? " Und Anselm hat mit ihnen zu tun." : ""}` },
+        { id: "wege", text: "Nach den drei Wegen fragen", wichtig: true, wer: "Ylva", frage: "„Welche drei Wege?“",
+          antwort: "„Der Sturmgrat: offen, windig, schnell. Da sind die Maskierten hoch, Varrek und seine Hunde. Die Unterstollen: das alte Bergwerk, kurz und dunkel, aber im Eis nisten Glasschwärmer. Und die Pilgerstraße: Treppen, Schreine, Gräber. Langsam. Still. Zu still.“", setzt: { wege_bekannt: true }, folge: "Ihr kennt die drei Wege und ihre Gefahren. Auf dem Plateau wählt ihr nicht blind." },
         { id: "brief", text: "Den Brief des Ordens lesen", wenn: (A) => A.merker.hochwacht === "fackel", wer: "Sera (Brief)", frage: "Ihr brecht das Siegel.",
-          antwort: "„Das Licht unter dem Eis ist die Antwort auf unser Signal. Veyrholm ruft zurück. Geht nicht ohne Vorrat. Ich schicke, was der Orden entbehren kann. – S. V.“ Unter dem Brief: ein Päckchen mit zwei Heiltränken.", tranke: 2 },
+          antwort: "„Das Licht unter dem Eis ist die Antwort auf unser Signal. Veyrholm ruft zurück. Geht nicht ohne Vorrat. Ich schicke, was der Orden entbehren kann. – S. V.“ Unter dem Brief: ein Päckchen mit zwei Heiltränken.", tranke: 2, folge: "Zwei Heiltränke vom Orden. Sera Venn hält euch den Rücken frei." },
         { id: "funke", text: "Dem Zug des Funkens folgen", wenn: (A) => Boolean(A.merker.funke), wer: "Der Wachtfunke", frage: "Ihr haltet den Funken über Ylvas Karte.",
-          antwort: "Er zieht zur Pilgerstraße, bis an einen eingezeichneten Schrein. Ylva wird blass. „Da hat meine Großmutter gebetet. Bevor das Eis kam.“", setzt: { funke_zeigt: true } },
-        { id: "vorraete", text: "Ylva um Ausrüstung bitten", frage: "„Habt Ihr etwas für den Weg?“",
+          antwort: "Er zieht zur Pilgerstraße, bis an einen eingezeichneten Schrein. Ylva wird blass. „Da hat meine Großmutter gebetet. Bevor das Eis kam.“", setzt: { funke_zeigt: true }, folge: "Der Funke zeigt auf einen Schrein an der Pilgerstraße. Wer diesen Weg nimmt, liest die alten Zeichen dort leichter." },
+        { id: "vorraete", text: "Ylva um Ausrüstung bitten", wichtig: true, frage: "„Habt Ihr etwas für den Weg?“",
           probe: { name: "Überzeugen", attr: "CHA", sg: 13, geuebt: ["kleriker", "schurke"], knapp: true,
-            erfolg: { text: "Ylva holt Steigeisen, ein Seil und zwei Heiltränke aus einer Truhe. „Bringt das Seil zurück.“", tranke: 2, setzt: { seil: true } },
-            knapp: { text: "„Ein Trank. Mehr hab ich nicht für Leute, die nicht zurückkommen.“", tranke: 1 },
-            fehl: { text: "„Ich hab den Maskierten schon alles verkauft.“" } } },
+            erfolg: { text: "Ylva holt Steigeisen, ein Seil und zwei Heiltränke aus einer Truhe. „Bringt das Seil zurück.“", tranke: 2, setzt: { seil: true }, folge: "Ihr habt Ylvas Seil und zwei Heiltränke. Das Seil hilft überall, wo man stürzen kann." },
+            knapp: { text: "„Ein Trank. Mehr hab ich nicht für Leute, die nicht zurückkommen.“", tranke: 1, folge: "Ein Heiltrank mehr. Ein Seil habt ihr nicht." },
+            fehl: { text: "„Ich hab den Maskierten schon alles verkauft.“", folge: "Ylva gibt nichts her. Ihr geht ohne Seil auf den Gletscher." } } },
         { id: "los", text: "Zum Gletscherplateau aufbrechen", weiter: "routenwahl" },
       ],
     },
@@ -141,23 +141,23 @@
       art: "wahl", abschnitt: 1, titel: "Drei Wege nach Veyrholm", ort: "Das Gletscherplateau",
       text: (A) => [
         "Auf dem Plateau liegt die Stadt unter euch: Dächer und Türme, eingeschlossen im blauen Eis, als hätte jemand sie in Glas gegossen. Drei Wege führen hinab. Ihr nehmt nur einen.",
-        A.merker.wege_bekannt ? "Ylvas Worte im Ohr: der Grat ist schnell, aber die Maskierten sind dort. Die Stollen sind kurz, aber voller Schwärmer. Die Pilgerstraße ist still." : "",
+        A.merker.wege_bekannt ? "↳ Ylvas Worte im Ohr: der Grat ist schnell, aber die Maskierten sind dort. Die Stollen sind kurz, aber voller Schwärmer. Die Pilgerstraße ist still." : "",
         "Stimmt ab.",
       ],
       optionen: [
-        { id: "grat", text: "A · Der Sturmgrat: offen, windig, Schützen und Hunde", setzt: { s4_route: "sturmgrat" }, weiter: "anmarsch_grat" },
-        { id: "stollen", text: "B · Die Unterstollen: eng, dunkel, brüchiges Eis", setzt: { s4_route: "stollen" }, weiter: "anmarsch_stollen" },
-        { id: "pilger", text: "C · Die Pilgerstraße: Treppen, Schreine, Grabnischen", setzt: { s4_route: "pilgerweg" }, weiter: "anmarsch_pilger" },
+        { id: "grat", text: "A · Der Sturmgrat: offen, windig, Schützen und Hunde", setzt: { s4_route: "sturmgrat" }, folge: "Ihr nehmt den Sturmgrat, den Weg der Maskierten. Was in den Stollen und an der Pilgerstraße liegt, bleibt dort.", weiter: "anmarsch_grat" },
+        { id: "stollen", text: "B · Die Unterstollen: eng, dunkel, brüchiges Eis", setzt: { s4_route: "stollen" }, folge: "Ihr steigt in die Unterstollen. Was auf dem Grat und an der Pilgerstraße zu holen war, bleibt dort.", weiter: "anmarsch_stollen" },
+        { id: "pilger", text: "C · Die Pilgerstraße: Treppen, Schreine, Grabnischen", setzt: { s4_route: "pilgerweg" }, folge: "Ihr nehmt die Pilgerstraße, den Weg der Toten. Was auf dem Grat und in den Stollen zu holen war, bleibt dort.", weiter: "anmarsch_pilger" },
       ],
     },
     // ----- A · Sturmgrat -----
     anmarsch_grat: {
       art: "probe", abschnitt: 1, titel: "Der Sturmgrat", ort: "Der Sturmgrat",
-      text: (A) => ["Der Grat ist so schmal, dass ihr hintereinander gehen müsst. Der Wind reißt an euren Mänteln. Alle klettern; gelingt es der Hälfte, kommt ihr ungesehen voran.", A.merker.seil ? "Ylvas Seil hält euch zusammen: Vorteil." : ""],
+      text: (A) => ["Der Grat ist so schmal, dass ihr hintereinander gehen müsst. Der Wind reißt an euren Mänteln. Alle klettern; gelingt es der Hälfte, kommt ihr ungesehen voran.", A.merker.seil ? "↳ Ylvas Seil hält euch zusammen: Vorteil." : ""],
       probe: { name: "Klettern", wer: "gruppe", attr: "GES", sg: 12, geuebt: ["waldlaeufer", "schurke"], vorteil: (A) => (A.merker.seil ? 1 : 0), knapp: true,
-        erfolg: { text: "Ihr seht die Maskierten, bevor sie euch sehen: Sie bewachen ein großes Jagdhorn auf einem Pfahl. Damit rufen sie, wer immer in der Stadt auf sie hört.", setzt: { grat_ueberrascht: true }, weiter: "grat_wahl" },
+        erfolg: { text: "Ihr seht die Maskierten, bevor sie euch sehen: Sie bewachen ein großes Jagdhorn auf einem Pfahl. Damit rufen sie, wer immer in der Stadt auf sie hört.", setzt: { grat_ueberrascht: true }, folge: "Die Maskierten haben euch nicht bemerkt. Wenn ihr angreift, gehört der erste Schlag euch.", weiter: "grat_wahl" },
         knapp: { text: "Ihr kommt hinauf, aber nicht leise. Vor euch, auf einem Felsen, ein großes Jagdhorn. Die Maskierten drehen sich um.", weiter: "grat_wahl" },
-        fehl: { text: "Ein Stein löst sich und poltert in die Tiefe. Oben bläst jemand in ein Horn.", glocke: 1, weiter: "grat_wahl" } },
+        fehl: { text: "Ein Stein löst sich und poltert in die Tiefe. Oben bläst jemand in ein Horn.", glocke: 1, folge: "Die Maskierten sind gewarnt, und der Aufstieg hat Zeit gekostet.", weiter: "grat_wahl" } },
     },
     grat_wahl: {
       art: "wahl", abschnitt: 1, titel: "Das Jagdhorn", ort: "Der Sturmgrat",
@@ -171,15 +171,15 @@
       art: "probe", abschnitt: 1, titel: "Im Windschatten", ort: "Der Sturmgrat",
       text: ["Geduckt, Felsen um Felsen. Alle schleichen; gelingt es der Hälfte, seid ihr vorbei."],
       probe: { name: "Schleichen", wer: "gruppe", attr: "GES", sg: 13, geuebt: ["schurke", "waldlaeufer"],
-        erfolg: { text: "Der Wind verschluckt eure Schritte. Hinter euch bleiben die Maskierten und ihr Horn zurück.", setzt: { s4_route_bonus: "keiner" }, weiter: "markt_ankunft" },
-        fehl: { text: "Ein Fährtenhund hebt den Kopf. Dann bellen alle.", weiter: "kampf_grat" } },
+        erfolg: { text: "Der Wind verschluckt eure Schritte. Hinter euch bleiben die Maskierten und ihr Horn zurück.", setzt: { s4_route_bonus: "keiner" }, folge: "Ihr seid ungesehen vorbei, aber mit leeren Händen. Das Jagdhorn bleibt beim Bund.", weiter: "markt_ankunft" },
+        fehl: { text: "Ein Fährtenhund hebt den Kopf. Dann bellen alle.", folge: "Die Hunde haben euch gewittert. Jetzt müsst ihr doch um das Horn kämpfen.", weiter: "kampf_grat" } },
     },
     kampf_grat: {
       art: "kampf", abschnitt: 1, titel: "Jagd auf die Fackel", ort: "Der Sturmgrat",
       text: ["Jägerhauptmann Varrek und seine Maskierten verteidigen das Jagdhorn rechts auf dem Felsen. Sichert es (zwei Aktionen direkt daneben, ohne Gegner neben euch) oder besiegt sie. Am Rand geht es in den Abgrund."],
       kampf: (A) => ({ begegnung: "k_grat", karte: STURMGRAT, keinAnfuehrer: true, mischen: false, namen: NAMEN, ueberraschung: Boolean(A.merker.grat_ueberrascht), skalaMal: A.merker.bund_gewarnt ? 1.1 : 1,
         mechanik: { ziele: [OBJEKTE.horn], sieg: { ziele: 1, art: "horn", text: "Das Jagdhorn ist euer. Die Maskierten ziehen sich in den Sturm zurück." } },
-        sieg: { setzt: { s4_route_bonus: "signalhorn" }, weiter: "grat_nach" }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug" } }),
+        sieg: { setzt: { s4_route_bonus: "signalhorn" }, weiter: "grat_nach", folge: "Ihr habt das Signalhorn. Wer in Veyrholm Verstärkung rufen will, zögert, solange ihr es tragt." }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug", folge: "Das Jagdhorn bleibt beim Bund. Ihr kommt mit leeren Händen in die Stadt." } }),
     },
     grat_nach: {
       art: "erzaehlung", abschnitt: 1, titel: "Das Signalhorn", ort: "Der Sturmgrat", weiter: "markt_ankunft", rastErlaubt: true,
@@ -190,9 +190,9 @@
       art: "probe", abschnitt: 1, titel: "Die Unterstollen", ort: "Das alte Bergwerk",
       text: ["Der Stollen ist halb eingestürzt. Milchige Kristallfäden hängen von der Decke, und irgendwo klirrt es, als zerbreche Glas. Eine Person führt durch die Dunkelheit."],
       probe: { name: "Orientierung", attr: "WEI", sg: 12, geuebt: ["waldlaeufer", "zauberer"], knapp: true,
-        erfolg: { text: "Ihr findet einen Weg, auf dem das Eis trägt. Vor euch weitet sich der Stollen zu einer Halle: zwei Nester aus Glas, und etwas Großes, das darin brütet.", setzt: { stollen_bekannt: true }, weiter: "stollen_wahl" },
+        erfolg: { text: "Ihr findet einen Weg, auf dem das Eis trägt. Vor euch weitet sich der Stollen zu einer Halle: zwei Nester aus Glas, und etwas Großes, das darin brütet.", setzt: { stollen_bekannt: true }, folge: "Ihr wisst, wo das Eis im Stollen trägt. In der Nesthalle seht ihr, welche Stellen brechen werden.", weiter: "stollen_wahl" },
         knapp: { text: "Ihr kommt durch, aber es dauert. Vor euch eine Halle voller Glasnester.", weiter: "stollen_wahl" },
-        fehl: { text: "Ein Gang endet im Nichts, ein anderer im Wasser. Ihr seid nass und durchgefroren, als ihr die Nesthalle erreicht.", glocke: 1, weiter: "stollen_wahl" } },
+        fehl: { text: "Ein Gang endet im Nichts, ein anderer im Wasser. Ihr seid nass und durchgefroren, als ihr die Nesthalle erreicht.", glocke: 1, folge: "Der Irrweg hat Zeit und Wärme gekostet.", weiter: "stollen_wahl" } },
     },
     stollen_wahl: {
       art: "wahl", abschnitt: 1, titel: "Das Nest", ort: "Die Unterstollen",
@@ -206,8 +206,8 @@
       art: "probe", abschnitt: 1, titel: "Der Seitenschacht", ort: "Die Unterstollen",
       text: ["Der Schacht ist eng und vereist. Alle kriechen; gelingt es der Hälfte, zieht ihr die anderen durch."],
       probe: { name: "Kriechen", wer: "gruppe", attr: "STR", sg: 12, geuebt: ["krieger"],
-        erfolg: { text: "Mit aufgeschürften Händen und Knien kommt ihr auf der anderen Seite heraus. Hinter euch summt das Nest.", setzt: { s4_route_bonus: "keiner" }, weiter: "markt_ankunft" },
-        fehl: { text: "Der Schacht bricht ein, und ihr rutscht genau in die Nesthalle.", weiter: "kampf_stollen" } },
+        erfolg: { text: "Mit aufgeschürften Händen und Knien kommt ihr auf der anderen Seite heraus. Hinter euch summt das Nest.", setzt: { s4_route_bonus: "keiner" }, folge: "Ihr seid am Nest vorbei, aber mit leeren Händen. Der Splitter aus dem Herzen der Stadt bleibt bei der Brutmutter.", weiter: "markt_ankunft" },
+        fehl: { text: "Der Schacht bricht ein, und ihr rutscht genau in die Nesthalle.", folge: "Der Schacht hat euch mitten ins Nest geworfen. Jetzt müsst ihr kämpfen.", weiter: "kampf_stollen" } },
     },
     kampf_stollen: {
       art: "kampf", abschnitt: 1, titel: "Nest im Eis", ort: "Die Unterstollen",
@@ -216,7 +216,7 @@
         const eis = []; for (let x = 4; x <= 7; x++) eis.push([x, 4]); // das Eisband in der Mitte des Stollens
         return { begegnung: "k_stollen", karte: UNTERSTOLLEN, keinAnfuehrer: true, mischen: false,
           mechanik: { eis: { felder: eis, proRunde: 1, ab: 3, bekannt: Boolean(A.merker.stollen_bekannt) }, sieg: { besiegt: [{ art: "glasnest", n: 2 }, { art: "splitterbrutmutter", n: 1 }], text: "Das Summen bricht ab. Die Nesthalle ist still." } },
-          sieg: { setzt: { s4_route_bonus: "kernsplitter" }, weiter: "stollen_nach" }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug" } };
+          sieg: { setzt: { s4_route_bonus: "kernsplitter" }, weiter: "stollen_nach", folge: "Ihr habt den Kernsplitter. Einmal wird er einen Kristallschutz brechen, wenn ihr es braucht." }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug", folge: "Der Kernsplitter bleibt im Nest. Ihr kommt mit leeren Händen in die Stadt." } };
       },
     },
     stollen_nach: {
@@ -226,15 +226,16 @@
     // ----- C · Pilgerstraße -----
     anmarsch_pilger: {
       art: "probe", abschnitt: 1, titel: "Die Pilgerstraße", ort: "Die Pilgerstraße",
-      text: (A) => ["Hunderte Stufen führen in die Stadt hinab, vorbei an Schreinen und Grabnischen. Im Eis an den Rändern stehen Gestalten, eingefroren mitten im Gehen. Eine Person liest die alten Zeichen an den Schreinen.", A.merker.funke_zeigt ? "Der Funke zieht euch zu dem Schrein, den Ylva gezeigt hat: Vorteil." : ""],
+      text: (A) => ["Hunderte Stufen führen in die Stadt hinab, vorbei an Schreinen und Grabnischen. Im Eis an den Rändern stehen Gestalten, eingefroren mitten im Gehen. Eine Person liest die alten Zeichen an den Schreinen.", A.merker.funke_zeigt ? "↳ Der Funke zieht euch zu dem Schrein, den Ylva gezeigt hat: Vorteil." : ""],
       probe: { name: "Zeichen deuten", attr: "INT", sg: 12, geuebt: ["zauberer", "kleriker"], vorteil: (A) => (A.merker.funke_zeigt ? 1 : 0), knapp: true,
-        erfolg: { text: "Die Zeichen sind Gebete: Drei Grablichter halten die Pilger in Ruhe. Sie sind erloschen. Unten am Tor steht ein Eidwächter, und ein Kälterufer bläst die Lichter aus, sobald jemand sie anzündet.", setzt: { pilger_bekannt: true }, weiter: "pilger_wahl" },
+        erfolg: { text: "Die Zeichen sind Gebete: Drei Grablichter halten die Pilger in Ruhe. Sie sind erloschen. Unten am Tor steht ein Eidwächter, und ein Kälterufer bläst die Lichter aus, sobald jemand sie anzündet.", setzt: { pilger_bekannt: true }, folge: "Ihr wisst, was die Pilger ruhen lässt: drei Grablichter. Und ihr wisst, wer sie wieder ausbläst.", weiter: "pilger_wahl" },
         knapp: { text: "Ihr versteht nur so viel: Die Lichter sind wichtig. Und unten wartet ein Wächter.", weiter: "pilger_wahl" },
-        fehl: { text: "Die Zeichen bleiben stumm. Als ihr weitergeht, knirscht hinter euch das Eis: Die Gestalten haben sich umgedreht.", glocke: 1, weiter: "pilger_wahl" } },
+        fehl: { text: "Die Zeichen bleiben stumm. Als ihr weitergeht, knirscht hinter euch das Eis: Die Gestalten haben sich umgedreht.", glocke: 1, folge: "Die Pilger haben euch bemerkt, und der Frost kriecht tiefer.", weiter: "pilger_wahl" } },
     },
     pilger_wahl: {
       art: "wahl", abschnitt: 1, titel: "Die namenlosen Pilger", ort: "Die Pilgerstraße",
-      text: ["Ihr könnt die drei Grablichter entzünden und den Pilgern ihre Ruhe zurückgeben – oder den Eidwächter bitten, euch durchzulassen. Stimmt ab."],
+      text: (A) => ["Ihr könnt die drei Grablichter entzünden und den Pilgern ihre Ruhe zurückgeben – oder den Eidwächter bitten, euch durchzulassen. Stimmt ab.",
+        A.merker.pilger_bekannt ? "↳ Ihr habt die Gebete an den Schreinen gelesen: Ihr wisst, wo die drei Lichter stehen, und dass der Kälterufer sie ausbläst, solange er steht." : ""],
       optionen: [
         { id: "kampf", text: "Die Grablichter entzünden (Belohnung: das Pilgerzeichen)", weiter: "kampf_pilger" },
         { id: "bitten", text: "Den Eidwächter um Durchlass bitten (keine Belohnung)", weiter: "pilger_bitten" },
@@ -244,9 +245,9 @@
       art: "probe", abschnitt: 1, titel: "Der Eid", ort: "Die Pilgerstraße",
       text: ["Der Eidwächter ist ein Riese aus Eis und alter Rüstung. Er hat geschworen, niemanden durchzulassen, der nicht gebetet hat. Eine Person spricht."],
       probe: { name: "Überzeugen", attr: "CHA", sg: 14, geuebt: ["kleriker"], knapp: true,
-        erfolg: { text: "Ihr sprecht die Worte von den Schreinen nach. Der Wächter senkt den Hammer und tritt beiseite.", setzt: { s4_route_bonus: "keiner" }, weiter: "markt_ankunft" },
-        knapp: { text: "Er lässt euch durch. Aber die Pilger folgen euch ein Stück, und die Kälte kriecht in die Knochen.", setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "markt_ankunft" },
-        fehl: { text: "„Kein Gebet“, dröhnt er. Die Pilger lösen sich aus dem Eis.", weiter: "kampf_pilger" } },
+        erfolg: { text: "Ihr sprecht die Worte von den Schreinen nach. Der Wächter senkt den Hammer und tritt beiseite.", setzt: { s4_route_bonus: "keiner" }, folge: "Der Eidwächter lässt euch ziehen. Die Pilger bleiben ohne Licht, und ihr Zeichen bleibt am Tor.", weiter: "markt_ankunft" },
+        knapp: { text: "Er lässt euch durch. Aber die Pilger folgen euch ein Stück, und die Kälte kriecht in die Knochen.", setzt: { s4_route_bonus: "keiner" }, glocke: 1, folge: "Ihr seid durch, aber die Kälte der Pilger geht mit. Ihr Zeichen bleibt am Tor.", weiter: "markt_ankunft" },
+        fehl: { text: "„Kein Gebet“, dröhnt er. Die Pilger lösen sich aus dem Eis.", folge: "Ohne Gebet kein Durchlass. Jetzt müsst ihr kämpfen.", weiter: "kampf_pilger" } },
     },
     kampf_pilger: {
       art: "kampf", abschnitt: 1, titel: "Die namenlosen Pilger", ort: "Die Pilgerstraße",
@@ -257,7 +258,7 @@
         return { begegnung: "k_pilger", karte: PILGERSTRASSE, keinAnfuehrer: true, namen: NAMEN,
         mechanik: { ziele: lichter, schild: { art: "eidwaechter", ziele: ["l1", "l2", "l3"], halt: 10, pause: 2, text: "Schutzkreis der Pilger" },
           sieg: { ziele: 3, art: "grablicht", text: "Drei Lichter brennen. Die Pilger legen sich nieder, einer nach dem anderen, und das Eis schließt sich über ihnen wie eine Decke." } },
-        sieg: { setzt: { s4_route_bonus: "pilgerzeichen" }, weiter: "pilger_nach" }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug" } };
+        sieg: { setzt: { s4_route_bonus: "pilgerzeichen" }, weiter: "pilger_nach", folge: "Ihr habt das Pilgerzeichen. In Veyrholm zeigt es euch Ruheplätze und Wege, die sonst niemand sieht." }, verloren: { setzt: { s4_route_bonus: "keiner" }, glocke: 1, weiter: "pfad_rueckzug", folge: "Die Grablichter bleiben dunkel. Das Pilgerzeichen bleibt am Tor, und ihr kommt mit leeren Händen in die Stadt." } };
       },
     },
     pilger_nach: {
@@ -274,13 +275,14 @@
       text: (A) => [
         "Alle Wege enden auf demselben Platz. Ringsum Häuser mit leeren Fenstern, und hinter jedem Fenster eine Gestalt aus Eis, die hinausschaut. Die Bewohner sind nicht geflohen.",
         "In der Mitte drei Siegelsteine, groß wie Türen. Sie leuchten. Ein Kälterufer geht von Stein zu Stein und legt die Hand darauf, und mit jedem Mal bewegt sich etwas hinter den Fenstern.",
-        A.merker.s4_route_bonus && A.merker.s4_route_bonus !== "keiner" ? `Ihr tragt ${bonusName[A.merker.s4_route_bonus]} bei euch.` : "",
+        A.merker.veyrholm_wissen ? "↳ „Wie Fische im Winterteich“, hat Ylva gesagt. Sie hat nicht übertrieben. Und auch das stimmt: Seit dem Licht bewegen sie sich." : "",
+        A.merker.s4_route_bonus && A.merker.s4_route_bonus !== "keiner" ? `↳ Ihr tragt ${bonusName[A.merker.s4_route_bonus]} bei euch.` : "",
       ],
       optionen: [
-        { id: "steine", text: "Die Siegelsteine betrachten", wer: "Die Steine", frage: "Was tun die Steine?",
-          antwort: "Sie halten die Stadt wach. Solange sie leuchten, wecken sie die Eisgezeichneten in den Häusern. Zwei abgeschaltete Steine sollten genügen, um den Platz zu beruhigen – wenn der Kälterufer sie nicht wieder entzündet.", setzt: { steine_bekannt: true } },
+        { id: "steine", text: "Die Siegelsteine betrachten", wichtig: true, wer: "Die Steine", frage: "Was tun die Steine?",
+          antwort: "Sie halten die Stadt wach. Solange sie leuchten, wecken sie die Eisgezeichneten in den Häusern. Zwei abgeschaltete Steine sollten genügen, um den Platz zu beruhigen – wenn der Kälterufer sie nicht wieder entzündet.", setzt: { steine_bekannt: true }, folge: "Ihr wisst, wie man den Platz beruhigt: zwei Steine abschalten – und den Kälterufer daran hindern, sie wieder zu wecken." },
         { id: "ruhe", text: "Den sicheren Ruhepunkt nutzen (Pilgerzeichen)", wenn: (A) => A.merker.s4_route_bonus === "pilgerzeichen" && !A.merker.ruhepunkt, frage: "Das Zeichen zeigt eine Nische, in der kein Eis wächst.",
-          antwort: "Ihr ruht eine Weile im Schutz der Nische. Die Kälte lässt nach.", setzt: { ruhepunkt: true }, heilen: 0.5 },
+          antwort: "Ihr ruht eine Weile im Schutz der Nische. Die Kälte lässt nach.", setzt: { ruhepunkt: true }, heilen: 0.5, folge: "Das Pilgerzeichen hat euch eine Rast geschenkt. Ihr geht ausgeruhter auf den Platz." },
         { id: "los", text: "Den Platz betreten", weiter: "kampf_markt" },
       ],
     },
@@ -290,15 +292,17 @@
       kampf: (A) => ({ begegnung: "k_markt", karte: MARKT, keinAnfuehrer: true, namen: NAMEN, skalaMal: A.merker.bund_gewarnt ? 1.1 : 1,
         mechanik: { ziele: OBJEKTE.steine, sieg: { ziele: 2, art: "siegelstein", text: "Zwei Steine schweigen. Hinter den Fenstern erstarren die Gestalten wieder." },
           wellen: [{ id: "haeuser", name: "Die Hauszugänge", kurz: "aus den Häusern", quellen: [[3, 1], [9, 1], [3, 7], [9, 7]], gegner: [["eisgezeichneter", 0.35, 3, 0.5]], alle: 2, ab: A.merker.s4_route_bonus === "signalhorn" ? 5 : 3, max: 3, an: "kaelterufer", text: "Hinter den Türen kratzt Eis über Stein" }] },
-        sieg: { weiter: "markt_nach" }, verloren: { setzt: { markt_verloren: true }, glocke: 1, weiter: "markt_flucht" } }),
+        sieg: { weiter: "markt_nach", folge: "Zwei Siegelsteine schweigen. Die Stadt schläft wieder, und was hinter den Fenstern steht, bleibt dort." }, verloren: { setzt: { markt_verloren: true }, glocke: 1, weiter: "markt_flucht", folge: "Die Siegelsteine leuchten weiter. Veyrholm ist wach: Am Gletscherbruch warten mehr Gegner auf euch." } }),
     },
     markt_nach: {
       art: "erzaehlung", abschnitt: 1, titel: "Stille", ort: "Veyrholm", weiter: "kammern_ruf", rastErlaubt: true,
-      text: ["Die Siegelsteine erlöschen, und mit ihnen das Kratzen hinter den Türen. Die Gestalten in den Fenstern stehen wieder still. Aber nicht alle sind aus Eis: Hinter einem der Häuser hört ihr Klopfen."],
+      text: (A) => ["Die Siegelsteine erlöschen, und mit ihnen das Kratzen hinter den Türen. Die Gestalten in den Fenstern stehen wieder still. Aber nicht alle sind aus Eis: Hinter einem der Häuser hört ihr Klopfen.",
+        A.merker.steine_bekannt ? "↳ Es war, wie ihr es an den Steinen gelesen habt: Zwei genügen, und der Platz schläft wieder ein." : ""],
     },
     markt_flucht: {
       art: "erzaehlung", abschnitt: 1, titel: "Durch die Gassen", ort: "Veyrholm", weiter: "kammern_ruf",
-      text: ["Ihr reißt euch los und flieht in eine Gasse. Hinter euch leuchten die Steine weiter, und mehr Gestalten lösen sich aus den Fenstern. Der Weg in die Stadt ist offen, aber Veyrholm ist jetzt wach. Im nächsten großen Kampf werden mehr auf euch warten."],
+      text: (A) => ["Ihr reißt euch los und flieht in eine Gasse. Hinter euch leuchten die Steine weiter, und mehr Gestalten lösen sich aus den Fenstern. Der Weg in die Stadt ist offen, aber Veyrholm ist jetzt wach. Im nächsten großen Kampf werden mehr auf euch warten.",
+        A.merker.steine_bekannt ? "↳ Ihr habt an den Steinen gelesen, was sie tun. Jetzt seht ihr es: Solange sie leuchten, wacht die Stadt weiter auf." : ""],
     },
     // ----- Optional: Die Kammern der Verschleppten (ersetzt den Glockenkeller) -----
     kammern_ruf: {
@@ -306,7 +310,7 @@
       text: ["Unter dem Pflaster klopft es. Dreimal, Pause, dreimal. Eine Treppe führt hinab in Gewölbe. Ylva hat gesagt, manche Bewohner wurden in den Untergrund verschleppt. Vielleicht lebt dort noch jemand. Stimmt ab."],
       optionen: [
         { id: "hinab", text: "Hinabsteigen", weiter: "kampf_kammern" },
-        { id: "weiter", text: "Weitergehen – wir haben keine Zeit", setzt: { s4_verschleppte: "nicht_betreten" }, weiter: "lager_akt1" },
+        { id: "weiter", text: "Weitergehen – wir haben keine Zeit", setzt: { s4_verschleppte: "nicht_betreten" }, folge: "Ihr geht weiter. Das Klopfen unter dem Pflaster wird leiser und hört irgendwann auf.", weiter: "lager_akt1" },
       ],
     },
     kampf_kammern: {
@@ -314,7 +318,10 @@
       text: ["Drei Menschen stecken in Eisblöcken, und sie leben noch. Schlagt das Eis auf (je zwei Aktionen direkt daneben), bevor sie erfrieren – ihr habt 6 Runden. Glasschwärmer kriechen aus den Rissen in den Wänden, ein Frostknecht hält den Gang."],
       kampf: () => ({ begegnung: "k_kammern", karte: KAMMERN, keinAnfuehrer: true, mischen: false,
         mechanik: { ziele: OBJEKTE.bloecke, zieleZuerst: true, wellen: [{ id: "risse", name: "Die Risse in den Wänden", kurz: "aus der Wand", quellen: [[6, 1], [1, 1], [11, 2]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 2, ab: 2, max: 3, text: "Es klirrt in den Wänden" }] },
-        nachher: (st) => ({ setzt: { s4_verschleppte: st.mech ? st.mech.gerettet : 0 } }),
+        nachher: (st) => { const n = st.mech ? st.mech.gerettet : 0; return { setzt: { s4_verschleppte: n }, folge: n >= 3 ? "Alle drei leben, weil ihr hinabgestiegen seid. Die Brückenwärterin kennt die Brücke, und der Wachmann geht mit euch bis vor den König."
+          : n === 2 ? "Zwei leben, weil ihr hinabgestiegen seid. Die Brückenwärterin weiß, welche Felder am Gletscherbruch tragen."
+          : n === 1 ? "Ein Kind lebt, weil ihr hinabgestiegen seid. Für die beiden anderen hat die Zeit nicht gereicht."
+          : "Ihr habt niemanden aus dem Eis geholt. Was die drei gewusst haben, erfahrt ihr nicht mehr." }; },
         sieg: { weiter: "kammern_nach" }, verloren: { glocke: 1, weiter: "kammern_nach" } }),
     },
     kammern_nach: {
@@ -325,15 +332,16 @@
           : n === 1 ? "Ein Kind, kaum sechs Jahre alt, sitzt zitternd in eurem Mantel. Es sagt, die Männer mit den leeren Kronen hätten einen Mann mit einem Buch dabeigehabt, der Runen vorlas, bis das Eis kam."
           : n === 2 ? "Zwei haben überlebt. Die alte Frau war Brückenwärterin, sagt sie, vor dreihundert Jahren oder gestern, sie weiß es nicht mehr. „Auf der Brücke tragen nur die Felder mit den Sternen im Eis. Merkt euch das.“"
           : "Alle drei leben. Die Brückenwärterin weiß, welche Felder auf der Brücke tragen. Und der Wachmann in der alten Rüstung salutiert. „Im Kronensaal wartet der König. Ich halte euch den Rücken frei, wenn es so weit ist.“",
-          n > 0 ? "Ihr bringt sie in ein Haus ohne Eis und macht Feuer. Sie werden warten, bis ihr zurückkommt." : ""];
+          n > 0 ? "Ihr bringt sie in ein Haus ohne Eis und macht Feuer. Sie werden warten, bis ihr zurückkommt." : "",
+          A.merker.sera_verschollen ? "↳ Ihr seht in jedes Gesicht hinter dem Eis. Sera Venn ist nicht darunter. Wohin die Jäger sie gebracht haben, weiß hier unten niemand." : ""];
       },
     },
     lager_akt1: {
       art: "lager", abschnitt: 1, titel: "Lagerfeuer in einem Haus ohne Eis", ort: "Veyrholm", aufstieg: 2, weiter: "bruecke_ankunft",
       text: (A) => [
         "Ein Haus am Rand des Platzes, in dem das Eis nur bis zur Türschwelle reicht. Ihr macht Feuer aus alten Möbeln. Draußen ist es still, so still, dass ihr euren Atem hört.",
-        A.merker.s4_verschleppte > 0 ? "Die Geretteten schlafen dicht am Feuer. Das Kind hält im Schlaf den Ärmel eines von euch fest." : "",
-        A.merker.anselm_spur ? "Ihr denkt an den Brief mit Anselms Siegel. Was sucht ein Abt aus Grauwacht in einer Stadt unter dem Eis?" : "",
+        A.merker.s4_verschleppte > 0 ? "↳ Die Geretteten schlafen dicht am Feuer. Das Kind hält im Schlaf den Ärmel eines von euch fest." : "",
+        A.merker.anselm_spur ? "↳ Ihr denkt an den Brief mit Anselms Siegel. Was sucht ein Abt aus Grauwacht in einer Stadt unter dem Eis?" : "",
         "Ihr seid stärker geworden. **Stufe 2.**",
       ],
     },
@@ -342,17 +350,18 @@
       art: "gespraech", abschnitt: 2, titel: "Der Gletscherbruch", ort: "Veyrholm",
       text: (A) => [
         "Zwischen der Unterstadt und dem Palastbezirk klafft ein Riss im Gletscher, so tief, dass unten nur Dunkelheit ist. Darüber eine Brücke aus Stein und Eis, drei Schritt breit. Auf der anderen Seite: Felsplattformen, und auf ihnen Maskierte mit Bögen. In der Mitte der Brücke liegt etwas Großes in Ketten und hebt den Kopf.",
-        A.merker.s4_verschleppte >= 2 ? "Die alte Brückenwärterin hat es euch gesagt: Nur die Felder mit den Sternen im Eis tragen. Ihr seht, welche brechen werden." : "",
-        A.merker.markt_verloren ? "Seit dem Marktplatz ist die Stadt wach. Mehr Augen hinter den Fenstern, mehr Bögen auf den Plattformen." : "",
+        A.merker.s4_verschleppte >= 2 ? "↳ Die alte Brückenwärterin hat es euch gesagt: Nur die Felder mit den Sternen im Eis tragen. Ihr seht, welche brechen werden." : "",
+        A.merker.markt_verloren ? "↳ Seit dem Marktplatz ist die Stadt wach. Mehr Augen hinter den Fenstern, mehr Bögen auf den Plattformen." : "",
+        A.merker.bund_bekannt ? "↳ Masken mit einer leeren Krone: der Bund der Hohlkrone, von dem Ylva gesprochen hat. Zwölf, vielleicht fünfzehn, hat sie gezählt. Hier stehen längst nicht alle." : "",
       ],
       optionen: [
-        { id: "spaehen", text: "Die Schützen ausspähen", frage: "Ihr legt euch flach an den Rand und beobachtet die Plattformen.",
+        { id: "spaehen", text: "Die Schützen ausspähen", wichtig: true, frage: "Ihr legt euch flach an den Rand und beobachtet die Plattformen.",
           probe: { name: "Wahrnehmung", attr: "WEI", sg: 13, geuebt: ["waldlaeufer", "schurke"], knapp: true,
-            erfolg: { text: "Sie wechseln die Wache. Wenn ihr jetzt lauft, sind sie nicht bereit.", setzt: { bruecke_ueberrascht: true } },
+            erfolg: { text: "Sie wechseln die Wache. Wenn ihr jetzt lauft, sind sie nicht bereit.", setzt: { bruecke_ueberrascht: true }, folge: "Ihr kennt den Wachwechsel. Auf der Brücke gehört der erste Zug euch." },
             knapp: { text: "Vier Schützen, eine Kettenbestie. Mehr erkennt ihr nicht." },
-            fehl: { text: "Ein Pfeil schlägt neben euch ins Eis. Sie haben euch gesehen.", glocke: 1 } } },
+            fehl: { text: "Ein Pfeil schlägt neben euch ins Eis. Sie haben euch gesehen.", glocke: 1, folge: "Die Schützen wissen, dass ihr da seid, und der Frost kriecht tiefer." } } },
         { id: "seil", text: "Ein Seil als Geländer spannen", wenn: (A) => Boolean(A.merker.seil && !A.merker.bruecke_seil), frage: "Ihr spannt Ylvas Seil am Brückenrand.",
-          antwort: "Es wird halten, wenn jemand stürzt. Vielleicht.", setzt: { bruecke_seil: true } },
+          antwort: "Es wird halten, wenn jemand stürzt. Vielleicht.", setzt: { bruecke_seil: true }, folge: "Ylvas Seil ist als Geländer gespannt. Ein Halt mehr über dem Abgrund." },
         { id: "los", text: "Über die Brücke", weiter: "kampf_bruecke" },
       ],
     },
@@ -364,12 +373,13 @@
         let mal = 1; if (A.merker.markt_verloren) mal *= 1.15; if (A.merker.bund_gewarnt) mal *= 1.05;
         return { begegnung: "k_bruecke", karte: BRUECKE, keinAnfuehrer: true, mischen: false, namen: NAMEN, skalaMal: mal, ueberraschung: Boolean(A.merker.bruecke_ueberrascht),
           mechanik: { ziele: OBJEKTE.gitter, eis: { felder: eis, proRunde: 2, ab: 2, max: 5, bekannt: A.merker.s4_verschleppte >= 2 }, ausgang: { felder: [[10, 3], [10, 4], [10, 5], [11, 3], [11, 4], [11, 5]], text: "Ihr seid drüben! Hinter euch bricht ein Stück der Brücke in die Tiefe." } },
-          sieg: { weiter: "bruecke_nach" }, verloren: { setzt: { zeit_verloren: true }, glocke: 1, weiter: "bruecke_flucht" } };
+          sieg: { weiter: "bruecke_nach", folge: "Ihr seid über den Gletscherbruch, bevor sich jemand auf euch einstellen konnte." }, verloren: { setzt: { zeit_verloren: true }, glocke: 1, weiter: "bruecke_flucht", folge: "Der Umweg hat Zeit gekostet. Was am Palasttor wartet, ist darüber stärker geworden." } };
       },
     },
     bruecke_nach: {
       art: "erzaehlung", abschnitt: 2, titel: "Der Palastbezirk", ort: "Veyrholm", weiter: "tor_ankunft", rastErlaubt: true,
-      text: ["Auf der anderen Seite ist die Luft kälter und stiller. Die Häuser sind größer, die Gestalten in den Fenstern tragen Schmuck. Vor euch steigt eine Prachtstraße zum Palast hinauf."],
+      text: (A) => ["Auf der anderen Seite ist die Luft kälter und stiller. Die Häuser sind größer, die Gestalten in den Fenstern tragen Schmuck. Vor euch steigt eine Prachtstraße zum Palast hinauf.",
+        A.merker.bruecke_seil ? "↳ Ylvas Seil hängt noch am Brückenrand, steif gefroren. Ihr knotet es los. „Bringt das Seil zurück“, hat sie gesagt." : ""],
     },
     bruecke_flucht: {
       art: "erzaehlung", abschnitt: 2, titel: "Der lange Weg", ort: "Veyrholm", weiter: "tor_ankunft",
@@ -379,38 +389,54 @@
       art: "gespraech", abschnitt: 2, titel: "Das Tor der Kronenwache", ort: "Vor dem Palast",
       text: (A) => [
         "Vor dem Palasttor steht der Eisenhirte: ein Wächter aus Stein und Eisen, doppelt so groß wie ein Mann. Auf seiner Brust pulsiert eine Rune, und ein schimmerndes Feld umgibt ihn. Links und rechts des Vorhofs ragen zwei Runensäulen auf.",
-        A.merker.s4_verschleppte >= 3 ? "Der gerettete Wachmann tritt neben euch. „Ich kenne ihn. Ich habe neben ihm Wache gestanden, vor dreihundert Jahren. Die Säulen nähren ihn. Ich fange bei der nördlichen an.“" : "",
+        A.merker.s4_verschleppte >= 3 ? "↳ Der gerettete Wachmann tritt neben euch. „Ich kenne ihn. Ich habe neben ihm Wache gestanden, vor dreihundert Jahren. Die Säulen nähren ihn. Ich fange bei der nördlichen an.“" : "",
+        A.merker.zeit_verloren ? "↳ Der Umweg hat Zeit gekostet: Die Rune auf seiner Brust brennt heller, als sie sollte. Jemand hat ihn auf euch vorbereitet." : "",
       ],
       optionen: [
-        { id: "runen", text: "Die Runen deuten", frage: "Ihr betrachtet die Zeichen an Säulen und Brust.",
+        { id: "runen", text: "Die Runen deuten", wichtig: true, frage: "Ihr betrachtet die Zeichen an Säulen und Brust.",
           probe: { name: "Runen lesen", attr: "INT", sg: 13, geuebt: ["zauberer", "kleriker"], knapp: true,
-            erfolg: { text: "Die Säulen speisen ihn. Sind beide aus, erstarrt er. Und vor jedem Bodenstoß hebt er die Fäuste: Wer dann zwei Schritt Abstand hält, bleibt verschont.", setzt: { runen_bekannt: true } },
+            erfolg: { text: "Die Säulen speisen ihn. Sind beide aus, erstarrt er. Und vor jedem Bodenstoß hebt er die Fäuste: Wer dann zwei Schritt Abstand hält, bleibt verschont.", setzt: { runen_bekannt: true }, folge: "Ihr kennt den Eisenhirten: Die Säulen speisen ihn, und vor dem Bodenstoß hebt er die Fäuste." },
             knapp: { text: "Die Säulen und die Brust gehören zusammen. Mehr seht ihr nicht." },
-            fehl: { text: "Die Zeichen verschwimmen vor euren Augen. Kälte kriecht in eure Finger.", glocke: 1 } } },
+            fehl: { text: "Die Zeichen verschwimmen vor euren Augen. Kälte kriecht in eure Finger.", glocke: 1, folge: "Die Runen haben euch nichts verraten, und der Frost kriecht tiefer." } } },
         { id: "los", text: "Den Vorhof betreten", weiter: "kampf_tor" },
       ],
     },
     kampf_tor: {
       art: "kampf", abschnitt: 2, stufe: 2, titel: "Das Tor der Kronenwache", ort: "Vor dem Palast",
-      text: ["Der Eisenhirte trägt ein Runenschild (halber Schaden, bricht nach genug Treffern für zwei Runden). Alle drei Runden kündigt er einen Bodenstoß an: Wer im Umkreis von zwei Feldern bleibt, wird getroffen. Schaltet die beiden Runensäulen ab (je zwei Aktionen in Ruhe) – dann erstarrt er. Oder besiegt ihn."],
+      text: (A) => ["Der Eisenhirte trägt ein Runenschild (halber Schaden, bricht nach genug Treffern für zwei Runden). Alle drei Runden kündigt er einen Bodenstoß an: Wer im Umkreis von zwei Feldern bleibt, wird getroffen. Schaltet die beiden Runensäulen ab (je zwei Aktionen in Ruhe) – dann erstarrt er. Oder besiegt ihn.",
+        A.merker.runen_bekannt ? "↳ Ihr habt die Runen gelesen: Hebt er die Fäuste, haltet zwei Schritt Abstand. Und sind beide Säulen aus, erstarrt er." : ""],
       kampf: (A) => ({ begegnung: "k_tor", karte: TOR, keinAnfuehrer: true, mischen: false, skalaMal: A.merker.zeit_verloren ? 1.1 : 1,
         mechanik: { ziele: OBJEKTE.saeulen.map((z) => Object.assign({}, z, A.gruppe.filter((f) => !A.zust[f].tot).length >= 5 ? { runden: 3 } : {}, A.merker.s4_verschleppte >= 3 && z.id === "r1" ? { start: 1 } : {})),
           schild: { art: "eisenhirte", ziele: ["r1", "r2"], halt: 18, pause: 2, text: "Runenschild" },
           sieg: { ziele: 2, art: "saeule", besiegt: { art: "eisenhirte", n: 1 }, text: "Der Eisenhirte erstarrt. Langsam, mit einem Knirschen wie Gletschereis, tritt er beiseite. Das Tor ist frei." } },
-        sieg: { weiter: "tor_nach" } }),
+        sieg: { weiter: "tor_nach", folge: "Das Tor der Kronenwache ist offen. Zwischen euch und dem Kronenherz liegt nur noch der Palast." } }),
     },
     tor_nach: {
       art: "erzaehlung", abschnitt: 2, titel: "Das offene Tor", ort: "Der Palast", weiter: "lager_akt2", rastErlaubt: true,
       text: ["Hinter dem Tor liegt der Palast, und unter ihm, irgendwo, das Kronenherz. Ihr spürt es: ein langsamer Puls im Boden, wie ein Herz im Schlaf. Im Palast brennt Licht. Jemand ist vor euch hier."],
     },
     lager_akt2: {
-      art: "lager", abschnitt: 2, titel: "Lagerfeuer in der Wachstube", ort: "Der Palast", aufstieg: 3, weiter: "archiv_ankunft",
+      art: "lager", abschnitt: 2, titel: "Lagerfeuer in der Wachstube", ort: "Der Palast", aufstieg: 3, weiter: "feuer_akt2",
       text: (A) => [
         "Die alte Wachstube neben dem Tor hat einen Kamin. Ihr verbrennt Speerschäfte und Stuhlbeine und wärmt euch, so gut es geht.",
-        A.merker.s4_route_bonus === "kernsplitter" ? "Der Kernsplitter pulsiert schneller, seit ihr im Palast seid. Er will nach Hause." : "",
-        A.merker.anselm_spur ? "An der Wand der Wachstube: ein frisches Zeichen, eine leere Krone, und darunter ein Kürzel. A." : "",
+        A.merker.s4_route_bonus === "kernsplitter" ? "↳ Der Kernsplitter pulsiert schneller, seit ihr im Palast seid. Er will nach Hause." : "",
+        A.merker.anselm_spur ? "↳ An der Wand der Wachstube: ein frisches Zeichen, eine leere Krone, und darunter ein Kürzel. A." : "",
         "Ihr seid stärker geworden. **Stufe 3.**",
       ],
+    },
+    // Heldenmoment: die letzte Rast vor dem Abstieg, jede Person bekommt ihre eigene Frage („weg“, siehe heldenmomente.js)
+    feuer_akt2: {
+      art: "geheim", abschnitt: 2, titel: "Die letzte Wache", ort: "Die Wachstube am Tor", verteilung: false,
+      text: (A) => [
+        "Das Feuer im Kamin brennt herunter. Unter dem Boden schlägt der Puls des Kronenherzens, langsam und schwer, und niemand schläft sofort. Morgen geht es unter den Palast, tiefer ins Eis, als je einer von euch war.",
+        A.merker.s4_verschleppte >= 3 ? "↳ Der Wachmann aus dem Eis sitzt an der Tür, den Speer über den Knien. „Vor dreihundert Jahren haben wir uns in dieser Stube dasselbe gefragt“, sagt er. „Jeder für sich.“"
+          : "An der Wand hängen noch die Haken für dreißig Mäntel. Wer hier zuletzt Wache hielt, hat sich wohl dasselbe gefragt wie ihr jetzt.",
+        "*Ein Heldenmoment: Jede Person bekommt ihre eigene Frage. Was ihr antwortet, hören danach alle am Feuer.*",
+      ],
+      frage: (A, h, fid) => h.feuerFrage(fid, "weg").frage,
+      antworten: (A, h, fid) => h.feuerFrage(fid, "weg").antworten,
+      abschluss: "Das letzte Stuhlbein fällt in die Glut. Jetzt weiß jeder vom anderen, warum er morgen mit hinabsteigt. Geschlafen wird trotzdem wenig.",
+      weiter: "archiv_ankunft",
     },
     /* ================= Akt III · Das Herz der Siegel ================= */
     archiv_ankunft: {
@@ -418,11 +444,12 @@
       text: (A) => [
         "Unter dem Palast liegt ein Archiv: Gang um Gang, Regal um Regal, und an den Enden drei steinerne Tafeln voller Namen. Ein Kälterufer steht vor der ersten und streicht mit der Hand darüber. Wo er streicht, verschwinden die Namen.",
         "Neben ihm ein Mann mit einem Buch, der Runen vorliest. Ein Runenleser. Er sieht euch und lächelt.",
-        A.merker.s4_route_bonus === "pilgerzeichen" ? "Das Pilgerzeichen in eurer Tasche wird warm: Hier gibt es einen Weg, den nur Pilger kennen." : "",
+        A.merker.s4_route_bonus === "pilgerzeichen" ? "↳ Das Pilgerzeichen in eurer Tasche wird warm: Hier gibt es einen Weg, den nur Pilger kennen." : "",
       ],
       optionen: [
         { id: "warum", text: "Den Runenleser ansprechen", wer: "Der Runenleser", frage: "„Warum löscht ihr die Namen?“",
-          antwort: (A) => `„Ein Name ist ein Siegel, das man vergessen kann“, sagt er. „Das Kronenherz hält die Siegel zusammen, weil es sich an alle erinnert. Wenn niemand sich erinnert, gehorcht es dem, der es hält.“ Er klappt das Buch zu.${A.merker.anselm_spur ? " „Grüße von Anselm übrigens.“" : ""}` },
+          antwort: (A) => `„Ein Name ist ein Siegel, das man vergessen kann“, sagt er. „Das Kronenherz hält die Siegel zusammen, weil es sich an alle erinnert. Wenn niemand sich erinnert, gehorcht es dem, der es hält.“ Er klappt das Buch zu.${A.merker.anselm_spur ? " „Grüße von Anselm übrigens.“" : ""}`,
+          folge: "Ihr wisst jetzt, was der Bund vorhat: Wenn sich niemand mehr an die Namen erinnert, gehorcht das Herz dem, der es hält." },
         { id: "los", text: "Die Tafeln sichern", weiter: "kampf_archiv" },
       ],
     },
@@ -432,7 +459,9 @@
       kampf: (A) => ({ begegnung: "k_archiv", karte: ARCHIV, keinAnfuehrer: true, namen: NAMEN,
         mechanik: { ziele: OBJEKTE.tafeln, sieg: { ziele: 2, art: "tafel", text: "Zwei Tafeln sind gesichert. Der Runenleser flucht und verschwindet in den Gängen." },
           wellen: [{ id: "kapseln", name: "Die Schriftkapseln", kurz: "aus den Kapseln", quellen: [[3, 1], [8, 1], [3, 7], [8, 7]], gegner: [["glasschwaermer", 0.3, 2, 0.5]], alle: 3, ab: A.merker.s4_route_bonus === "signalhorn" ? 5 : 3, max: 2, text: "In den Wänden klirrt Glas" }] },
-        nachher: (st) => ({ setzt: { tafeln: st.mech ? st.mech.ziele.filter((z) => z.fertig).length : 0 } }),
+        nachher: (st) => { const n = st.mech ? st.mech.ziele.filter((z) => z.fertig).length : 0; return { setzt: { tafeln: n }, folge: n >= 2 ? "Ihr habt die Tafeln gerettet. Was die Gründer über das Kronenherz wussten, könnt ihr jetzt lesen."
+          : n === 1 ? "Eine Tafel ist gerettet. Wozu das Herz gebaut wurde, stand auf den anderen."
+          : "Die Namen sind gelöscht. Vor dem Kronenherz werdet ihr ohne dieses Wissen entscheiden müssen." }; },
         sieg: { weiter: "archiv_nach" }, verloren: { glocke: 1, weiter: "archiv_nach" } }),
     },
     archiv_nach: {
@@ -446,10 +475,10 @@
     },
     frost_suche: {
       art: "probe", abschnitt: 3, titel: "Ein kalter Luftzug", ort: "Unter dem Palast",
-      text: (A) => ["Zwischen zwei Regalen zieht es eiskalt. Dahinter könnte ein Gang liegen. Eine Person sucht.", A.merker.s4_route_bonus === "pilgerzeichen" ? "Das Pilgerzeichen zeigt euch die Stelle: Vorteil." : ""],
+      text: (A) => ["Zwischen zwei Regalen zieht es eiskalt. Dahinter könnte ein Gang liegen. Eine Person sucht.", A.merker.s4_route_bonus === "pilgerzeichen" ? "↳ Das Pilgerzeichen zeigt euch die Stelle: Vorteil." : ""],
       probe: { name: "Suchen", attr: "WEI", sg: 13, geuebt: ["schurke", "waldlaeufer"], vorteil: (A) => (A.merker.s4_route_bonus === "pilgerzeichen" ? 1 : 0),
-        erfolg: { text: "Hinter dem Regal: eine Tür aus Eis, und dahinter eine Halle voller Säulen. In der Mitte, auf einem Thron aus Kristall, sitzt eine Frau aus Raureif. Die Frostmatrone. Sie herrscht über die Schwärmer – auch über die im Kronensaal.", weiter: "frost_wahl" },
-        fehl: { text: "Ihr findet nichts als kalte Steine. Was immer dort zieht, bleibt euch verborgen.", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "vor_kronensaal" } },
+        erfolg: { text: "Hinter dem Regal: eine Tür aus Eis, und dahinter eine Halle voller Säulen. In der Mitte, auf einem Thron aus Kristall, sitzt eine Frau aus Raureif. Die Frostmatrone. Sie herrscht über die Schwärmer – auch über die im Kronensaal.", weiter: "frost_wahl", folge: "Ihr habt die Frostkammer gefunden. Wer über die Schwärmer herrscht, sitzt jetzt vor euch." },
+        fehl: { text: "Ihr findet nichts als kalte Steine. Was immer dort zieht, bleibt euch verborgen.", setzt: { s4_frostmatrone: "nicht_gefunden" }, folge: "Ihr findet den Gang nicht. Was immer dort haust, bleibt in eurem Rücken.", weiter: "vor_kronensaal" } },
     },
     frost_wahl: {
       art: "wahl", abschnitt: 3, titel: "Die Frostmatrone", ort: "Die Frostkammer",
@@ -457,23 +486,23 @@
       optionen: [
         { id: "kampf", text: "Die Frostmatrone herausfordern", weiter: "kampf_frost" },
         { id: "reden", text: "Mit ihr reden", weiter: "frost_reden" },
-        { id: "gehen", text: "Leise wieder gehen", setzt: { s4_frostmatrone: "nicht_gefunden" }, weiter: "vor_kronensaal" },
+        { id: "gehen", text: "Leise wieder gehen", setzt: { s4_frostmatrone: "nicht_gefunden" }, folge: "Ihr lasst die Frostmatrone auf ihrem Thron. Ihre Schwärmer werden im Kronensaal auf euch warten.", weiter: "vor_kronensaal" },
       ],
     },
     frost_reden: {
       art: "probe", abschnitt: 3, titel: "Ein Handel im Eis", ort: "Die Frostkammer",
       text: ["„Ihr wollt zum Herzen“, sagt sie, und ihre Stimme klingt wie Eis, das bricht. „Was gebt ihr mir, wenn ich meine Kinder zurückhalte?“ Eine Person verhandelt."],
       probe: { name: "Verhandeln", attr: "CHA", sg: 15, geuebt: ["kleriker", "schurke"], knapp: true,
-        erfolg: { text: "Ihr versprecht ihr die Kammer, für immer, ohne Krone und ohne Bund. Sie neigt den Kopf. „Dann schweigen meine Kinder im Saal.“", setzt: { s4_frostmatrone: "verschont" }, weiter: "vor_kronensaal" },
-        knapp: { text: "Sie lacht. „Ein Teil meiner Kinder. Nicht alle.“", setzt: { s4_frostmatrone: "verschont", matrone_halb: true }, weiter: "vor_kronensaal" },
-        fehl: { text: "„Ihr habt nichts, was ich will.“ Die Nester glühen auf.", weiter: "kampf_frost" } },
+        erfolg: { text: "Ihr versprecht ihr die Kammer, für immer, ohne Krone und ohne Bund. Sie neigt den Kopf. „Dann schweigen meine Kinder im Saal.“", setzt: { s4_frostmatrone: "verschont" }, folge: "Die Frostmatrone hat ihr Wort gegeben: Ihre Schwärmer schweigen im Kronensaal. Dafür gehört die Kammer ihr.", weiter: "vor_kronensaal" },
+        knapp: { text: "Sie lacht. „Ein Teil meiner Kinder. Nicht alle.“", setzt: { s4_frostmatrone: "verschont", matrone_halb: true }, folge: "Ein halber Handel: Die Frostmatrone hält nur einen Teil ihrer Schwärmer zurück.", weiter: "vor_kronensaal" },
+        fehl: { text: "„Ihr habt nichts, was ich will.“ Die Nester glühen auf.", folge: "Der Handel ist geplatzt. Jetzt müsst ihr kämpfen.", weiter: "kampf_frost" } },
     },
     kampf_frost: {
       art: "kampf", abschnitt: 3, stufe: 3, titel: "Die Frostkammer", ort: "Die Frostkammer",
       text: ["Besiegt die Frostmatrone. Sie greift auf zwei Felder Entfernung, lässt Eiskorridore zwischen euch wachsen und speit Brut. Zwei Nester lassen Schwärmer schlüpfen."],
       kampf: () => ({ begegnung: "k_frost", karte: FROSTKAMMER, keinAnfuehrer: true, mischen: false,
         mechanik: { sieg: { besiegt: { art: "frostmatrone", n: 1 }, text: "Die Frostmatrone zerspringt wie ein Spiegel. Die Nester verstummen." } },
-        sieg: { setzt: { s4_frostmatrone: "besiegt" }, weiter: "frost_nach" }, verloren: { setzt: { s4_frostmatrone: "nicht_gefunden" }, glocke: 1, weiter: "vor_kronensaal" } }),
+        sieg: { setzt: { s4_frostmatrone: "besiegt" }, weiter: "frost_nach", folge: "Die Frostmatrone ist besiegt. Im Kronensaal kriecht kein Schwärmer mehr aus den Nestern." }, verloren: { setzt: { s4_frostmatrone: "nicht_gefunden" }, glocke: 1, weiter: "vor_kronensaal", folge: "Die Frostmatrone hat euch aus ihrer Kammer getrieben. Ihre Schwärmer warten im Kronensaal." } }),
     },
     frost_nach: {
       art: "erzaehlung", abschnitt: 3, titel: "Stille in der Kammer", ort: "Die Frostkammer", weiter: "vor_kronensaal", rastErlaubt: true,
@@ -483,17 +512,19 @@
       art: "gespraech", abschnitt: 3, titel: "Vor dem Kronensaal", ort: "Tief unter dem Palast",
       text: (A) => [
         "Eine Treppe führt tiefer, als der Gletscher dick sein kann. Unten eine Tür aus Gold und Eis, und dahinter ein Puls, langsam und schwer, der durch eure Stiefel in die Knochen geht. Das Kronenherz.",
-        A.merker.anselm_spur ? "Vor der Tür steht ein Mann in grauer Kutte, die Hände auf dem Rücken. Anselm, der Abt aus Grauwacht. Er sieht älter aus. Und zufrieden." : "",
-        A.merker.s4_verschleppte >= 3 ? "Der gerettete Wachmann ist euch gefolgt. „Ich halte die Seitengänge“, sagt er. „Solange ich kann.“" : "",
+        A.merker.anselm_spur ? "↳ Vor der Tür steht ein Mann in grauer Kutte, die Hände auf dem Rücken. Anselm, der Abt aus Grauwacht. Er sieht älter aus. Und zufrieden." : "",
+        A.merker.s4_verschleppte >= 3 ? "↳ Der gerettete Wachmann ist euch gefolgt. „Ich halte die Seitengänge“, sagt er. „Solange ich kann.“" : "",
       ],
       optionen: [
-        { id: "anselm", text: "Anselm zur Rede stellen", wenn: (A) => Boolean(A.merker.anselm_spur), wer: "Anselm", frage: "„Was tut Ihr hier?“",
+        { id: "anselm", text: "Anselm zur Rede stellen", wichtig: true, wenn: (A) => Boolean(A.merker.anselm_spur), wer: "Anselm", frage: "„Was tut Ihr hier?“",
           antwort: (A) => (A.merker.grauwacht === "verrat"
             ? "„Was ich in Grauwacht begonnen habe.“ Er lächelt. „Der Bund will das Herz brechen. Ich will es besitzen. Ihr werdet es für mich öffnen, ob ihr wollt oder nicht.“ Dann ist er fort, als hätte es ihn nie gegeben."
             : "„Ich warte.“ Er weicht eurem Blick aus. „Darauf, dass jemand die richtige Entscheidung trifft. Ich habe es nicht gekonnt.“ Er tritt beiseite und verschwindet die Treppe hinauf."),
-          setzt: (A) => (A.merker.grauwacht === "verrat" ? { anselm_gegner: true } : { anselm_gegangen: true }) },
+          setzt: (A) => (A.merker.grauwacht === "verrat" ? { anselm_gegner: true } : { anselm_gegangen: true }),
+          folge: (A) => (A.merker.grauwacht === "verrat" ? "Anselm will das Herz für sich. Im Kronensaal habt ihr einen Gegner mehr, auch wenn ihr ihn nicht seht." : "Anselm hat den Weg freigegeben. Er wartet darauf, was ihr entscheidet.") },
         { id: "splitter", text: "Den Kernsplitter an die Tür halten", wenn: (A) => A.merker.s4_route_bonus === "kernsplitter", wer: "Der Kernsplitter", frage: "Der Splitter zieht zur Tür.",
-          antwort: "Er pulsiert im Takt des Herzens. Wenn ihr ihn im Saal in die Höhe haltet, wird der Kristallschutz des Königs brechen. Für eine Weile." },
+          antwort: "Er pulsiert im Takt des Herzens. Wenn ihr ihn im Saal in die Höhe haltet, wird der Kristallschutz des Königs brechen. Für eine Weile.",
+          folge: "Ihr wisst, wozu der Splitter taugt: Im Saal bricht er den Kristallschutz des Königs, für eine Weile." },
         { id: "los", text: "Den Kronensaal betreten", weiter: "kampf_krone" },
       ],
     },
@@ -503,8 +534,9 @@
         "Der König ist nicht der König, sondern die Erinnerung, die das Herz an ihn bewahrt. Ein Kristallschutz fängt die Hälfte des Schadens ab. Alle drei Runden kündigt er einen Kronenschlag in einer Linie an.",
         "Phase II (unter zwei Dritteln): Die Ehrengarde kommt aus den Seitengängen, bis alle drei Runenpunkte geschlossen sind (je zwei Aktionen in Ruhe) – das bricht auch den Kristallschutz. Phase III (unter einem Drittel): Der Boden reißt auf.",
         "Besiegt ihn – oder legt die Hände auf das Kronenherz (drei Aktionen in Ruhe).",
-        A.merker.s4_route_bonus === "kernsplitter" ? "Der Kernsplitter bricht den Kristallschutz für die ersten drei Runden." : "",
-        A.merker.s4_frostmatrone === "besiegt" ? "Keine Schwärmer: Die Frostmatrone ist tot." : A.merker.s4_frostmatrone === "verschont" ? "Die Frostmatrone hält ihr Wort – fast alle Schwärmer bleiben in den Nestern." : "Aus den Nestern hinter euch kriechen Glasschwärmer.",
+        A.merker.s4_route_bonus === "kernsplitter" ? "↳ Der Kernsplitter bricht den Kristallschutz für die ersten drei Runden." : "",
+        A.merker.s4_frostmatrone === "besiegt" ? "↳ Keine Schwärmer: Die Frostmatrone ist tot." : A.merker.s4_frostmatrone === "verschont" ? "↳ Die Frostmatrone hält ihr Wort – fast alle Schwärmer bleiben in den Nestern." : "Aus den Nestern hinter euch kriechen Glasschwärmer.",
+        A.merker.runen_bekannt ? "↳ Die Zeichen an den Runenpunkten kennt ihr vom Tor: Sie nähren den Kristallschutz, wie die Säulen den Eisenhirten genährt haben." : "",
       ],
       kampf: (A) => {
         const m = A.merker; let mal = 1; if (m.archiv_wahrheit) mal *= 0.95; if (m.anselm_gegner) mal *= 1.05;
@@ -514,32 +546,33 @@
           mechanik: { ziele: OBJEKTE.runen.concat([OBJEKTE.herz]), wellen,
             schild: { art: "koenig", ziele: ["p1", "p2", "p3"], halt: 22, pause: 2, text: "Kristallschutz", startAus: m.s4_route_bonus === "kernsplitter" ? 3 : 0 },
             sieg: { ziele: 1, art: "herz", besiegt: { art: "koenig", n: 1 }, text: "Der König sinkt auf die Knie, und das Licht in ihm wird ruhig. Vor euch pulsiert das Kronenherz. Es wartet." } },
-          sieg: { weiter: "herz_entscheidung" } };
+          sieg: { weiter: "herz_entscheidung", folge: "Der König ist zur Ruhe gekommen. Das Kronenherz liegt offen vor euch." } };
       },
     },
     herz_entscheidung: {
       art: "wahl", abschnitt: 3, titel: "Das Herz der Siegel", ort: "Der Kronensaal",
-      text: (A) => [
+      text: (A, h) => [
         "Das Kronenherz ist ein Kristall, groß wie ein Mensch, und in ihm schlagen sieben Lichter, jedes für ein Siegel. Eines flackert, wo Grauwacht liegt. Eines brennt hell, wo Hochwacht ist. Ihr könnt es berühren. Ihr könnt es verändern.",
-        A.merker.archiv_wahrheit ? "Ihr wisst, was die Tafeln sagen: Wer das Herz hält, kann jedes Siegel öffnen. Die letzten Könige haben es versucht. Dann kam das Eis." : "Was die Gründer mit dem Herzen wollten, wisst ihr nicht. Ihr müsst euch auf euer Gefühl verlassen.",
+        h.stimme(A, "macht"),
+        A.merker.archiv_wahrheit ? "↳ Ihr wisst, was die Tafeln sagen: Wer das Herz hält, kann jedes Siegel öffnen. Die letzten Könige haben es versucht. Dann kam das Eis." : "↳ Was die Gründer mit dem Herzen wollten, wisst ihr nicht. Ihr müsst euch auf euer Gefühl verlassen.",
         "Stimmt ab.",
       ],
       optionen: [
-        { id: "stabil", text: "Stabilisieren: Das Herz beruhigen, die Siegel halten – die Bedrohung bleibt", setzt: { s4_kronenherz: "stabilisiert" }, weiter: "ende_stabil" },
-        { id: "siegel", text: "Versiegeln: Den Saal verschließen, niemand kommt mehr an das Herz – auch ihr nicht", setzt: { s4_kronenherz: "versiegelt" }, weiter: "ende_versiegelt" },
-        { id: "umleiten", text: "Umleiten: Die Kraft eines Siegels nutzen, um eine Gefahr abzuwenden – ein anderes gerät unter Druck", setzt: { s4_kronenherz: "umgeleitet" }, weiter: "ende_umgeleitet" },
+        { id: "stabil", text: "Stabilisieren: Das Herz beruhigen, die Siegel halten – die Bedrohung bleibt", setzt: { s4_kronenherz: "stabilisiert" }, folge: "Ihr habt das Herz beruhigt. Die Siegel halten, und das Herz bleibt erreichbar – für euch und für alle anderen.", weiter: "ende_stabil" },
+        { id: "siegel", text: "Versiegeln: Den Saal verschließen, niemand kommt mehr an das Herz – auch ihr nicht", setzt: { s4_kronenherz: "versiegelt" }, folge: "Ihr habt den Saal verschlossen. Niemand wird das Herz je wieder berühren, auch ihr nicht.", weiter: "ende_versiegelt" },
+        { id: "umleiten", text: "Umleiten: Die Kraft eines Siegels nutzen, um eine Gefahr abzuwenden – ein anderes gerät unter Druck", setzt: { s4_kronenherz: "umgeleitet" }, folge: "Ihr habt die Kraft eines Siegels umgelenkt. Eine Gefahr ist abgewendet, und anderswo trägt jemand die Last.", weiter: "ende_umgeleitet" },
       ],
     },
     ende_stabil: {
-      art: "ende", abschnitt: 3, titel: "Das Herz schlägt ruhig", ort: "Veyrholm",
+      art: "ende", abschnitt: 3, titel: "Das Herz schlägt ruhig", ort: "Veyrholm", rueckschau,
       text: (A) => ["Ihr legt die Hände auf den Kristall, und das Flackern wird ruhig. Sieben Lichter, gleichmäßig wie Atem. Über euch knirscht der Gletscher, aber er hält.", ...epilog(A), "Die Siegel halten. Aber der Bund der Hohlkrone weiß jetzt, wo das Herz liegt. Er wird wiederkommen."],
     },
     ende_versiegelt: {
-      art: "ende", abschnitt: 3, titel: "Die Stadt schläft", ort: "Veyrholm",
+      art: "ende", abschnitt: 3, titel: "Die Stadt schläft", ort: "Veyrholm", rueckschau,
       text: (A) => ["Ihr zieht die Tür aus Gold und Eis hinter euch zu, und der Gletscher schließt sich darüber wie eine Hand. Niemand wird das Herz je wieder berühren.", ...epilog(A), "Veyrholm bleibt verborgen. Wer das Netz der Siegel verstehen will, muss einen anderen Weg finden."],
     },
     ende_umgeleitet: {
-      art: "ende", abschnitt: 3, titel: "Ein Siegel entlastet, ein anderes bebt", ort: "Veyrholm",
+      art: "ende", abschnitt: 3, titel: "Ein Siegel entlastet, ein anderes bebt", ort: "Veyrholm", rueckschau,
       text: (A) => [`Ihr lenkt die Kraft um. Das flackernde Licht ${A.merker.grauwacht === "gebrochen" ? "von Grauwacht" : "im Osten"} wird hell und ruhig. Dafür beginnt ein anderes zu zittern, weit im Süden, wo ihr noch nie wart.`, ...epilog(A), "Irgendwo im Süden bebt ein Siegel. Die nächste Krise hat schon begonnen."],
     },
     krone_verloren: { art: "ende", abschnitt: 0, titel: "Unter dem Eis", ort: "", text: ["Das Eis schließt sich über euch. Irgendwann wird jemand durch die Fenster schauen und euch sehen, wie Fische im Winterteich."] },
@@ -549,15 +582,47 @@
   function epilog(A) {
     const m = A.merker, t = [];
     const weg = { sturmgrat: "über den Sturmgrat", stollen: "durch die Unterstollen", pilgerweg: "über die Pilgerstraße" }[m.s4_route];
-    if (weg) t.push(`Ihr seid ${weg} gekommen${m.s4_route_bonus && m.s4_route_bonus !== "keiner" ? `, und ${bonusName[m.s4_route_bonus]} hat euch begleitet` : ""}.`);
-    if (m.s4_verschleppte > 0) t.push(m.s4_verschleppte >= 3 ? "Die drei Geretteten gehen mit euch hinauf ans Licht. Das Kind fragt, ob es den Himmel noch gibt." : "Die Geretteten aus den Kammern warten oben am Feuer. Sie sind die ersten Bewohner Veyrholms seit dreihundert Jahren, die die Sonne sehen.");
-    else if (m.s4_verschleppte === 0) t.push("An die Eisblöcke unter dem Marktplatz denkt ihr noch lange.");
-    if (m.s4_frostmatrone === "verschont") t.push("Die Frostmatrone bleibt in ihrer Kammer. Sie hat ihr Wort gehalten. Ob sie es immer halten wird?");
-    if (m.anselm_gegner) t.push("Von Anselm findet ihr nur Fußspuren im Schnee, die nach Süden führen.");
-    else if (m.anselm_gegangen) t.push("Anselm wartet oben an der Treppe. Er fragt nicht, was ihr entschieden habt. Er sieht es in euren Gesichtern.");
-    if (m.hochwacht === "fackel") t.push("Als ihr Kaltbrunn erreicht, brennt im Süden ein Licht auf der Hochwarte. Sera weiß es schon.");
+    if (weg) t.push(`↳ Ihr seid ${weg} gekommen${m.s4_route_bonus && m.s4_route_bonus !== "keiner" ? `, und ${bonusName[m.s4_route_bonus]} hat euch begleitet` : ""}.`);
+    if (m.s4_verschleppte > 0) t.push(m.s4_verschleppte >= 3 ? "↳ Die drei Geretteten gehen mit euch hinauf ans Licht. Das Kind fragt, ob es den Himmel noch gibt." : "↳ Die Geretteten aus den Kammern warten oben am Feuer. Sie sind die ersten Bewohner Veyrholms seit dreihundert Jahren, die die Sonne sehen.");
+    else if (m.s4_verschleppte === 0) t.push("↳ An die Eisblöcke unter dem Marktplatz denkt ihr noch lange.");
+    if (m.s4_frostmatrone === "verschont") t.push("↳ Die Frostmatrone bleibt in ihrer Kammer. Sie hat ihr Wort gehalten. Ob sie es immer halten wird?");
+    if (m.anselm_gegner) t.push("↳ Von Anselm findet ihr nur Fußspuren im Schnee, die nach Süden führen.");
+    else if (m.anselm_gegangen) t.push("↳ Anselm wartet oben an der Treppe. Er fragt nicht, was ihr entschieden habt. Er sieht es in euren Gesichtern.");
+    if (m.seil) t.push("↳ In Kaltbrunn legt ihr Ylva ihr Seil auf den Tisch. „Hab ich nicht mit gerechnet“, sagt sie und meint nicht das Seil.");
+    if (m.hochwacht === "fackel") t.push("↳ Als ihr Kaltbrunn erreicht, brennt im Süden ein Licht auf der Hochwarte. Sera weiß es schon.");
+    if (m.sera_verschollen) t.push("↳ Von Sera Venn habt ihr in ganz Veyrholm keine Spur gefunden. Im Süden, wo die Hochwarte steht, bleibt der Himmel dunkel.");
     if (A.gefallen.length) t.push(`Am Rand des Gletschers schichtet ihr Steine für ${A.gefallen.map((f) => (FIG() ? FIG().FIGUREN[f].name : f)).join(", ")}.`);
     return t;
+  }
+  /** Rückschau: die wichtigsten Entscheidungen der Gruppe in einem Satz je Faden */
+  function rueckschau(A, h) {
+    const m = A.merker, t = [];
+    const weg = { sturmgrat: "über den Sturmgrat", stollen: "durch die Unterstollen", pilgerweg: "über die Pilgerstraße" }[m.s4_route];
+    const nutzen = { signalhorn: "Es hat euch am Marktplatz und im Archiv Luft verschafft.", kernsplitter: "Er hat im Kronensaal den Kristallschutz des Königs gebrochen.", pilgerzeichen: "Es hat euch Ruheplätze und verborgene Wege gezeigt." }[m.s4_route_bonus];
+    if (weg) t.push(nutzen ? `Ihr seid ${weg} nach Veyrholm gekommen und habt ${bonusName[m.s4_route_bonus]} erkämpft. ${nutzen}` : `Ihr seid ${weg} nach Veyrholm gekommen, mit leeren Händen. Was dort zu holen war, liegt noch dort.`);
+    t.push(m.markt_verloren && m.zeit_verloren ? "Am Marktplatz und am Gletscherbruch musstet ihr weichen. Veyrholm war wach und vorbereitet, als ihr vor dem Palast standet."
+      : m.markt_verloren ? "Am Marktplatz musstet ihr fliehen. Die Siegelsteine leuchteten weiter, und am Gletscherbruch warteten mehr Gegner."
+      : m.zeit_verloren ? "Den Marktplatz habt ihr beruhigt, aber am Gletscherbruch musstet ihr umkehren. Der Umweg hat das Palasttor stärker gemacht."
+      : "Ihr habt die Siegelsteine zum Schweigen gebracht und die Brücke im ersten Anlauf genommen. Die Stadt hatte keine Zeit, sich auf euch einzustellen.");
+    t.push(m.s4_verschleppte === "nicht_betreten" ? "Am Klopfen unter dem Pflaster seid ihr vorbeigegangen. Wer dort unten war, ist es noch."
+      : m.s4_verschleppte >= 3 ? "Ihr habt alle drei aus dem Eis geholt. Die Brückenwärterin zeigte euch die Brücke, der Wachmann hielt euch im Kronensaal den Rücken frei."
+      : m.s4_verschleppte === 2 ? "Ihr habt zwei aus dem Eis geholt. Die Brückenwärterin hat euch dafür gezeigt, wo der Gletscherbruch trägt."
+      : m.s4_verschleppte === 1 ? "Ihr habt ein Kind aus dem Eis geholt. Für die beiden anderen hat die Zeit nicht gereicht."
+      : m.s4_verschleppte === 0 ? "Ihr seid in die Kammern hinabgestiegen und kamt zu spät. Niemand hat das Eis verlassen." : "");
+    t.push(m.tafeln >= 2 ? "Ihr habt die Tafeln im Archiv gerettet. Vor dem Herzen wusstet ihr, was die letzten Könige damit versucht haben."
+      : m.tafeln === 1 ? "Eine Tafel habt ihr gerettet. Wozu das Herz gebaut wurde, blieb euch verborgen."
+      : "Die Namen im Archiv sind gelöscht. Vor dem Herzen habt ihr nach Gefühl entschieden.");
+    t.push(m.s4_frostmatrone === "besiegt" ? "Ihr habt die Frostmatrone besiegt. Im Kronensaal blieben die Nester still."
+      : m.s4_frostmatrone === "verschont" ? (m.matrone_halb ? "Mit der Frostmatrone habt ihr einen halben Handel geschlossen. Einen Teil ihrer Schwärmer hielt sie zurück." : "Ihr habt mit der Frostmatrone gehandelt, und sie hat Wort gehalten. Die Kammer gehört jetzt ihr.")
+      : "Was in der Frostkammer herrscht, habt ihr nicht bezwungen. Seine Schwärmer hattet ihr im Kronensaal im Rücken.");
+    if (m.anselm_gegner) t.push("Ihr habt Anselm zur Rede gestellt. Er will das Herz für sich, und er ist euch wieder entkommen.");
+    else if (m.anselm_gegangen) t.push("Ihr habt Anselm zur Rede gestellt. Er hat den Weg freigegeben und euch die Entscheidung überlassen.");
+    else if (m.anselm_spur) t.push("An Anselm seid ihr vor der goldenen Tür wortlos vorbeigegangen. Was er dort wollte, wisst ihr bis heute nicht.");
+    for (const f of h.lebende(A)) if (h.feuerEcho(A, f, "weg")) t.push(h.feuerEcho(A, f, "weg"));
+    t.push(m.s4_kronenherz === "stabilisiert" ? "Am Ende habt ihr das Herz beruhigt. Die Siegel halten, aber der Bund der Hohlkrone weiß jetzt, wo es liegt."
+      : m.s4_kronenherz === "versiegelt" ? "Am Ende habt ihr den Saal verschlossen. Das Herz ist sicher, auch vor euch."
+      : m.s4_kronenherz === "umgeleitet" ? "Am Ende habt ihr die Kraft umgelenkt. Ein Siegel ist entlastet, ein anderes bebt." : "");
+    return t.filter(Boolean);
   }
   const FIG = () => root.ABF || (typeof require === "function" ? require("../js/figuren.js") : null);
   const WISSEN = {
@@ -592,6 +657,11 @@
       { eyebrow: "III · Der Wettlauf", titel: "Die Hohlkrone", text: ["Ihr seid nicht die Einzigen, die das Licht gesehen haben. Der Bund der Hohlkrone sucht das Herz schon lange. Wer es hält, kann die Siegel lenken oder sie alle zugleich brechen.", "Drei Wege führen hinab: über den Sturmgrat, durch die Unterstollen oder entlang der alten Pilgerstraße. Ihr könnt nur einen davon gehen."] },
     ],
     kodexUhr: { titel: "Der Frost", text: ["Jede kurze Rast und mancher Umweg kosten Zeit. Mit der Zeit kriecht der <b>Frost</b> tiefer in die Stadt, bis zu sieben Stufen.", "Ab der dritten Stufe findet am Lagerfeuer niemand mehr richtig Schlaf: Eine lange Rast heilt dann nur noch bis drei Viertel der Trefferpunkte. Wer zügig vorankommt, steht dem König ausgeruhter gegenüber."] },
+    endeHinweise: {
+      ende_stabil: "Ein anderes Ende beginnt damit, dass ihr das Herz weiterschlagen lasst und nur beruhigt, was flackert.",
+      ende_versiegelt: "Ein anderes Ende beginnt damit, dass ihr die Tür hinter euch schließt, für alle und für immer.",
+      ende_umgeleitet: "Ein anderes Ende beginnt damit, dass ihr die Kraft des Herzens selbst in die Hand nehmt – und jemand anderes den Preis zahlt.",
+    },
     abschnitte_namen: { 1: "Der Eintritt in die Stadt", 2: "Die Stadt erwacht", 3: "Das Herz der Siegel" },
     // Ziel-Siegquote je Kampf für tools/kampagne.js (kaempfe --kalibrieren); fehlt ein Kampf, gilt 0,8
     zielquoten: { kampf_grat: 0.85, kampf_stollen: 0.85, kampf_pilger: 0.85, kampf_markt: 0.8, kampf_kammern: 0.88, kampf_bruecke: 0.8, kampf_tor: 0.8, kampf_archiv: 0.8, kampf_frost: 0.85, kampf_krone: 0.78 },

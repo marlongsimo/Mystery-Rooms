@@ -146,7 +146,8 @@
       <ul>
         <li><b>Normal:</b> Niemand stirbt endgültig. Lagerfeuer und Rückzug bringen alle TP zurück, kurze Rasten sind erlaubt. Gut für die erste Runde und für alle, denen die Geschichte wichtiger ist als die Gefahr.</li>
         <li><b>Hardcore:</b> Wer fällt, würfelt um sein Leben, und der Tod ist endgültig. Keine kurze Rast, kein Rückzug. Für Gruppen, die die Kämpfe schon kennen.</li>
-      </ul>` },
+      </ul>
+      <p><b>Hardcore wird gerade überarbeitet</b> und lässt sich vorerst nicht neu wählen. Bereits begonnene Hardcore-Kampagnen laufen normal weiter.</p>` },
     { id: "woerter", titel: "Kleines Wörterbuch", html: `
       <table class="hilfe-tabelle">
         <tr><td><b>W20, W8 …</b></td><td>Würfel mit 20, 8 … Seiten</td></tr>

@@ -107,7 +107,11 @@
     }, 55);
   };
 
-  // Schwierigkeit
+  // Schwierigkeit (Hardcore ist vorerst abgeschaltet: Knopf weg, Auswahl steht auf Normal)
+  if (!window.ABF.HARDCORE) {
+    document.querySelectorAll('[data-schwer-wahl="hardcore"]').forEach((b) => { const n = document.createElement("p"); n.className = "note"; n.textContent = "Hardcore wird gerade überarbeitet und kommt später zurück."; b.replaceWith(n); });
+    const s = AB.SETUP(); if (s.schwierigkeit !== "normal") { s.schwierigkeit = "normal"; try { localStorage.setItem("ab_setup", JSON.stringify(s)); } catch (e) { /* privat */ } }
+  }
   document.querySelectorAll("[data-schwer-wahl]").forEach((b) => {
     b.onclick = () => {
       document.querySelectorAll("[data-schwer-wahl]").forEach((x) => x.classList.toggle("an", x === b));

@@ -401,7 +401,10 @@
     5: { name: "Legendär", stufe: 8, charakter: "Endgame-Herausforderung" },
   };
 
-  const API = { KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
+  /** Hardcore ist vorerst abgeschaltet: Der Modus wird neu entwickelt, sobald alles andere steht. Neue Kampagnen und Kämpfe
+   *  starten in Normal; bereits laufende Hardcore-Kampagnen spielen unverändert weiter. */
+  const HARDCORE = false;
+  const API = { HARDCORE, KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
     STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, BESSER, stufenpfad, SCHWIERIGKEIT,
     /** höchste Stufe des geltenden Modells (für „alle Fähigkeiten dieser Figur“) */
     maxStufe: () => (STUFEN10.aktiv ? 10 : 3) };

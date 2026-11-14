@@ -40,7 +40,7 @@
   let SETUP = { gruppe: [], stufe: 1, schwierigkeit: "normal", begegnung: "garten", abenteuer: "grauwacht" };
   /** Kenndaten des gewählten Abenteuers (Titel, Mindestgröße der Gruppe, Texte) */
   const META = () => (window.ABS && window.ABS.metaVon ? window.ABS.metaVon(SETUP.abenteuer) : { min: 3, gruppe: "Die Gemeinschaft von Grauwacht", aufbruch: "Aufbruch nach Halmbruck", niederlage: "Grauwacht behält euch", uhr: { rueckzug: "Die Glocke schlägt." } });
-  try { const s = JSON.parse(localStorage.getItem(SETUP_KEY) || "null"); if (s && Array.isArray(s.gruppe)) SETUP = Object.assign(SETUP, s, { gruppe: s.gruppe.filter((f) => F.FIGUREN[f]).slice(0, 6) }); } catch (e) { /* privat */ }
+  try { const s = JSON.parse(localStorage.getItem(SETUP_KEY) || "null"); if (s && Array.isArray(s.gruppe)) SETUP = Object.assign(SETUP, s, { gruppe: s.gruppe.filter((f) => F.FIGUREN[f]).slice(0, 6) }); if (!F.HARDCORE) SETUP.schwierigkeit = "normal"; } catch (e) { /* privat */ }
   const setupMerken = () => { try { localStorage.setItem(SETUP_KEY, JSON.stringify(SETUP)); } catch (e) { /* privat */ } };
 
   /* ---------- Live-Zustand ---------- */
@@ -258,7 +258,7 @@
       <div class="wahl-fuss">
         <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (${MIN}–6)` : `Gruppe · ${n} von ${MIN}–6 Figuren`}</h2>
         <p class="note">${status}</p>
-        <div class="einstellungen"><div><span class="eyebrow">Schwierigkeit</span><div class="seg">${[["normal", "Normal"], ["hardcore", "Hardcore"]].map(([v, t]) => `<button data-schwer="${v}" class="${SETUP.schwierigkeit === v ? "an" : ""}">${t}</button>`).join("")}</div></div>
+        <div class="einstellungen"><div><span class="eyebrow">Schwierigkeit</span><div class="seg">${[["normal", "Normal"], ["hardcore", "Hardcore"]].filter(([v]) => v === "normal" || F.HARDCORE).map(([v, t]) => `<button data-schwer="${v}" class="${SETUP.schwierigkeit === v ? "an" : ""}">${t}</button>`).join("")}</div></div>
           <p class="note">${SETUP.schwierigkeit === "hardcore" ? "<b>Hardcore:</b> Wer fällt, würfelt um sein Leben. Tote bleiben tot." : "<b>Normal:</b> Am Boden ist das Schlimmste, was passieren kann."}</p></div>
         <div class="knoepfe"><button class="btn gross" id="abenteuer-los" ${n < MIN ? "disabled" : ""}>${esc(META().aufbruch || "Aufbrechen")}</button>${live ? `<button class="btn ghost" id="lobby-ende">Sitzung beenden</button>` : `<button class="btn ghost" id="zurueck">Zurück</button>`}</div>
         <details class="uebung"><summary>Übungskampf ohne Geschichte</summary>

@@ -1572,3 +1572,11 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .held-pfad .pf-werte { color: #a99f88; font-size: 13px; }
 .held-pfad tr.neu th, .held-pfad tr.meister th { color: #ffd98a; }
 .held-pfad tr.meister { background: rgba(217,180,106,.08); }
+
+/* Heldenstufen: Ampel in der Heldenwahl (Gruppenstufe gegen die Empfehlung der Kampagne) */
+.stufen-ampel { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 8px 0 10px; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(217,180,106,.25); background: rgba(0,0,0,.25); font: 400 13.5px "Inter", sans-serif; color: #d9d0bd; }
+.stufen-ampel b { color: #f1e3bf; font-weight: 600; }
+.stufen-ampel i { width: 11px; height: 11px; border-radius: 50%; align-self: center; flex: none; background: #7a7468; }
+.stufen-ampel.gruen { border-color: rgba(120,190,120,.5); } .stufen-ampel.gruen i { background: #6fc37a; box-shadow: 0 0 8px rgba(111,195,122,.7); }
+.stufen-ampel.gelb { border-color: rgba(232,196,106,.6); } .stufen-ampel.gelb i { background: #e8c46a; box-shadow: 0 0 8px rgba(232,196,106,.7); }
+.stufen-ampel.rot { border-color: rgba(224,67,79,.7); background: rgba(224,67,79,.1); } .stufen-ampel.rot i { background: #e0434f; box-shadow: 0 0 8px rgba(224,67,79,.8); }

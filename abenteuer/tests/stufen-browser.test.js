@@ -32,6 +32,14 @@ async function seite(b, mit007) {
     const karte = await p.evaluate(() => ({ kopf: document.querySelector("article.held .sm-stufe").textContent, kachel: document.querySelector('.fkarte[data-fid="schildwaechter"] .sm-stufe').textContent, tp: document.querySelector(".held-kern b").textContent, jetzt: (document.querySelector(".held-pfad tr.aktuell th") || {}).textContent, an: window.ABF.STUFEN10.aktiv }));
     check(/Stufe 6/.test(karte.kopf) && /Stufe 6/.test(karte.kachel) && karte.tp === String(await p.evaluate(() => { const F = window.ABF; F.STUFEN10.aktiv = true; const t = F.tpVon("schildwaechter", 6); F.STUFEN10.aktiv = false; return t; })) && /6/.test(karte.jetzt) && !karte.an, `Heldenkarte: Stufe 6 mit Balken, Leben der Stufe (${karte.tp}), Zeile „jetzt“ in der Stufentabelle`);
     check(await p.evaluate(() => (window.ABSAMMLUNG.heldenUebersichtHtml().match(/data-held-stufe/g) || []).length === 15), "Profil „Meine Helden“: alle 15 Helden mit Stufe (das Menü selbst gibt es nur mit Konto)");
+    // Ampel in der Heldenwahl: Gruppenstufe gegen die Empfehlung der Kampagne
+    const ampel = await p.evaluate(async () => {
+      const lies = async (ab, gruppe) => { window.AB.abenteuerWaehlen(ab); const s = window.AB.SETUP(); s.gruppe = gruppe; await window.ABSAMMLUNG.tischLaden(null); window.AB.zeigeSetup(); await new Promise((r) => setTimeout(r, 400)); const e = document.querySelector(".stufen-ampel"); return e ? e.className.replace("stufen-ampel", "").trim() + " | " + e.textContent : "fehlt"; };
+      return { krone: await lies("krone", ["schildwaechter", "lichtbringer", "wildnislaeufer"]), kroneSchwach: await lies("krone", ["wildnislaeufer", "trickser", "elementarist"]), weidenhain: await lies("weidenhain", ["schildwaechter", "lichtbringer", "wildnislaeufer"]), leer: await lies("krone", []) };
+    });
+    check(/^gelb \| Empfohlene Heldenstufe: 6.*3,3 im Schnitt/.test(ampel.krone) && /^rot /.test(ampel.kroneSchwach) && /^gruen .*Empfohlene Heldenstufe: 1/.test(ampel.weidenhain) && /Empfohlene Heldenstufe: 6/.test(ampel.leer),
+      "Heldenwahl: Ampel gelb (Krone, Schnitt 3,3 von 6), rot (drei Stufe-1-Helden), grün (Weidenhain); ohne Gruppe nur die Empfehlung");
+    await p.screenshot({ path: (process.env.SHOT_DIR || "/tmp") + "/ampel.png", fullPage: true });
     // Neue Kampagne (Solo): Zehn-Stufen-Modell, eigene Stufe je Held, Anhebung auf Empfehlung − 2
     const start = await p.evaluate(async () => {
       window.AB.abenteuerWaehlen("krone"); const s = window.AB.SETUP(); s.gruppe = ["schildwaechter", "lichtbringer", "wildnislaeufer"];

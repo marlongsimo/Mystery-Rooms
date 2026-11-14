@@ -247,6 +247,20 @@
     const status = live
       ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Es spielen die Figuren der Handys${(SETUP.tisch || []).length ? ` und ${SETUP.tisch.length} vom Tisch gesteuerte` : ""}${n < MIN ? ` – mindestens ${MIN}, noch ${MIN - n}. Zu wenige Handys? Lasst weitere Helden vom Tisch spielen` : ""}.`
       : n < MIN ? `Wählt mindestens ${MIN} Figuren – noch ${MIN - n}.` : "Solo-Mode: Eine Person steuert alle Figuren auf diesem Gerät.";
+    // Heldenstufen: Gruppenstufe gegen die empfohlene Stufe der Kampagne (Ampel). Starten darf die Gruppe immer.
+    const ampel = (() => {
+      const SM = window.ABSAMMLUNG, S = window.ABS; if (!SM || !SM.tischStufen || !S || !S.empfStufe) return "";
+      const lv = SM.tischStufen(SETUP.gruppe, (fid) => Boolean(live && LIVE.besitz[fid])); if (!lv.da) return "";
+      const empf = S.empfStufe(SETUP.abenteuer), kopf = `<b>Empfohlene Heldenstufe: ${empf}</b>`;
+      if (!n) return `<div class="stufen-ampel">${kopf}<span>Die Kämpfe dieser Kampagne sind auf Helden dieser Stufe ausgelegt.</span></div>`;
+      const stufen = SETUP.gruppe.map((f) => (lv.stufen[f] != null ? lv.stufen[f] : empf)), schnitt = stufen.reduce((a, b) => a + b, 0) / stufen.length, fehlt = empf - schnitt;
+      const art = fehlt >= 3 ? "rot" : fehlt >= 1 ? "gelb" : "gruen";
+      const schwach = SETUP.gruppe.filter((f) => lv.stufen[f] != null && empf - lv.stufen[f] >= 3).map((f) => F.FIGUREN[f].name);
+      const text = art === "rot" ? "Eure Gruppe liegt weit unter der Empfehlung. Ihr dürft aufbrechen, aber die Kämpfe werden sehr hart. Leichtere Kampagnen bringen eure Helden schneller voran."
+        : art === "gelb" ? "Eure Gruppe liegt unter der Empfehlung. Das wird fordernd – dafür bekommen eure Helden mehr Erfahrung."
+          : schnitt - empf >= 2 ? "Eure Gruppe liegt klar über der Empfehlung. Das wird leicht, und es gibt weniger Erfahrung." : "Eure Gruppe passt zu dieser Kampagne.";
+      return `<div class="stufen-ampel ${art}"><i aria-hidden="true"></i>${kopf}<span>Eure Gruppe: Stufe ${schnitt.toFixed(1).replace(".", ",")} im Schnitt. ${text}${schwach.length && art !== "rot" ? ` Deutlich zu schwach: ${schwach.map(esc).join(", ")}.` : ""}</span></div>`;
+    })();
     const gegner = (() => { const g = R.gegnerFuer(SETUP.begegnung, Math.max(3, n), SETUP.stufe); return g.map((x) => `${x.anzahl} × ${R.GEGNER[x.art].name}${Math.abs(x.tpFaktor - 1) > 0.04 ? ` (${Math.round(R.GEGNER[x.art].tp * x.tpFaktor)} TP)` : ""}`).join(", "); })();
     el.innerHTML = `
       <div class="wahl-kopf"><div><p class="eyebrow">${esc(META().gruppe || META().titel)}</p><h1>Wählt eure Helden</h1></div>${HL.plaetze(SETUP.gruppe, namen)}</div>
@@ -259,6 +273,7 @@
       <div class="wahl-fuss">
         <h2 class="klein">${live ? `Gruppe · ${n} ${n === 1 ? "Person" : "Personen"} (${MIN}–6)` : `Gruppe · ${n} von ${MIN}–6 Figuren`}</h2>
         <p class="note">${status}</p>
+        ${ampel}
         <div class="einstellungen"><div><span class="eyebrow">Schwierigkeit</span><div class="seg">${[["normal", "Normal"], ["hardcore", "Hardcore"]].filter(([v]) => v === "normal" || F.HARDCORE).map(([v, t]) => `<button data-schwer="${v}" class="${SETUP.schwierigkeit === v ? "an" : ""}">${t}</button>`).join("")}</div></div>
           <p class="note">${SETUP.schwierigkeit === "hardcore" ? "<b>Hardcore:</b> Wer fällt, würfelt um sein Leben. Tote bleiben tot." : "<b>Normal:</b> Am Boden ist das Schlimmste, was passieren kann."}</p></div>
         <div class="knoepfe"><button class="btn gross" id="abenteuer-los" ${n < MIN ? "disabled" : ""}>${esc(META().aufbruch || "Aufbrechen")}</button>${live ? `<button class="btn ghost" id="lobby-ende">Sitzung beenden</button>` : `<button class="btn ghost" id="zurueck">Zurück</button>`}</div>

@@ -371,7 +371,7 @@
       seiteZeigen("welt", `<button class="hub-zurueck klein" data-welt="">← Alle Abenteuer</button>
         <h1 class="hub-gruss">${esc(m.titel)}</h1><p class="hub-untertitel">${esc(m.untertitel || "")}</p>
         <img class="hub-welt-bild" src="${titelbild(m)}" alt="" ${BILD_ERSATZ}>
-        <ul class="hub-fakten"><li>Schwierigkeit <b>${esc(schwer(m.schwierigkeit))}</b></li><li><b>${m.min}–${m.max}</b> Heldinnen und Helden</li><li><b>${esc(m.dauer || "")}</b></li><li><b>${esc(m.abschnitte || 2)}</b> Abschnitte</li><li><b>${esc(m.enden || 4)}</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
+        <ul class="hub-fakten"><li>Schwierigkeit <b>${esc(schwer(m.schwierigkeit))}</b></li><li>Empfohlene Heldenstufe <b>${(window.ABF.SCHWIERIGKEIT[m.schwierigkeit || 1] || {}).stufe || 1}</b></li><li><b>${m.min}–${m.max}</b> Heldinnen und Helden</li><li><b>${esc(m.dauer || "")}</b></li><li><b>${esc(m.abschnitte || 2)}</b> Abschnitte</li><li><b>${esc(m.enden || 4)}</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
         <div class="hub-text einleitung">${(m.einleitung || []).map((p) => `<article class="seite"><p class="eyebrow">${esc(p.eyebrow || "")}</p><h2>${esc(p.titel)}</h2>${p.text.map((t) => `<p>${esc(t)}</p>`).join("")}</article>`).join("")}</div>
         <button class="my-knopf rot hub-welt-start" data-neu-start="${m.id}">Kampagne starten</button>`);
       return;

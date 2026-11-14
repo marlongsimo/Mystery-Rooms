@@ -201,7 +201,7 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
   - **Obergrenze je Tag (festgelegt):** Nur die ersten **5 Partien** eines Tages bringen Belohnungen, und jeder Held sammelt im Modus höchstens **150 XP am Tag**. Was darüber hinausginge, verfällt. Für Helden auf der Stufe der Partie greift die Zahl der Partien (fünf Siege bringen 125 XP). Die XP-Grenze bremst Helden, die weit unter der Stufe der Partie liegen (95 XP je Sieg): Sie sind nach zwei Siegen am Tag fertig. Weitere Partien lassen sich spielen und werden aufgezeichnet, geben aber weder XP noch die Chance auf einen Helden. So liegt der Fokus nicht auf dem Modus, und abgesprochene Partien lohnen sich kaum. Der Tag wechselt um Mitternacht (mitteleuropäische Zeit); gezählt wird auf dem Server.
 - **Heldenchance (festgelegt):** Bei **jedem Sieg** besteht eine Chance von **8 %**, einen neuen Helden freizuschalten – wie nach einem neuen Kampagnen-Ende als **Wahl aus drei Helden, die noch fehlen**.
   - Gewürfelt wird auf dem Server, zusammen mit der XP-Vergabe. Das Angebot nutzt die vorhandene Heldenwahl (`rpg_hero_offers`, neue Art „duell“) und wartet wie die anderen Belohnungen auf der Startseite, wenn man nicht sofort wählt.
-  - Zählt nur für Siege innerhalb der Obergrenze je Tag. Ein Sieg durch Aufgabe oder Abbruch des Gegners zählt nicht für die Heldenchance (Vorschlag), sonst ließe sie sich durch abgesprochenes Aufgeben abgreifen.
+  - Zählt nur für Siege innerhalb der Obergrenze je Tag. Ein Sieg durch Aufgabe oder Abbruch des Gegners zählt nicht für die Heldenchance, sonst ließe sie sich durch abgesprochenes Aufgeben abgreifen.
   - Wer schon alle 15 Helden hat, bekommt nichts stattdessen.
   - **Einordnung:** Bei 5 Partien am Tag und der Hälfte davon gewonnen kommt im Schnitt etwa alle 5 Tage ein neuer Held dazu. Über die Kampagnen sind es insgesamt 17 Enden für 12 fehlende Helden. Der Modus ist damit ein zweiter, langsamerer Weg zur vollen Sammlung; die neuen Enden der Kampagnen bleiben der Hauptweg.
 - **Titel und Erfolge**, zum Beispiel „Artefaktträger“ oder „Wächterbezwinger“.
@@ -224,13 +224,17 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 | Der Umbau der Engine bricht die Kampagnen | Alle bestehenden Testläufe müssen nach jedem Schritt grün sein; der Modus läuft hinter einem Schalter |
 | Der Modus zieht Zeit von den Kampagnen ab | Phase 0 zuerst; nach Phase 5 eine ehrliche Entscheidung |
 
-## 12. Offene Entscheidungen
+## 12. Entscheidungen
 
-1. **Derselbe Held auf beiden Seiten** erlaubt (Vorschlag) oder nicht?
-2. **Belohnungen im Modus:** Staffelung und Obergrenze (5 Partien und 150 XP je Held am Tag) sind bestätigt. Soll ein Sieg durch Aufgabe des Gegners für die Heldenchance zählen?
-3. **Verstecken:** für den Anfang hinnehmen, dass es technisch nicht vollständig geschützt ist?
-4. **Reihenfolge:** Soll der Modus vor oder nach dem Neubau von Hardcore kommen?
-5. **Auswertung:** nur für Admins (Vorschlag) oder später auch eine öffentliche Seite mit Siegquoten je Held?
+**Entschieden (14. November 2026):**
+1. **Derselbe Held darf auf beiden Seiten stehen.** Jeder spielt mit seiner eigenen Sammlung.
+2. **Ein Sieg durch Aufgabe oder Abbruch des Gegners bringt nur XP,** keine Heldenchance.
+3. **Verstecken:** Für den Anfang wird hingenommen, dass es über das Internet technisch nicht vollständig geheim ist.
+4. **Reihenfolge:** Der Modus kommt **vor** dem Neubau von Hardcore.
+5. Staffelung der XP und Obergrenze (5 Partien und 150 XP je Held am Tag), Heldenchance 8 %.
+
+**Noch offen:**
+- **Auswertung:** nur für Admins (Vorschlag) oder später auch eine öffentliche Seite mit Siegquoten je Held?
 
 ## 13. Messgrößen für Phase 5
 

@@ -111,6 +111,8 @@
     },
     gletscherrand: {
       art: "gespraech", abschnitt: 1, titel: "Am Rand des Gletschers", ort: "Kaltbrunn, das letzte Dorf",
+      // Begrenzte Zeit: 4 Fragen, danach kostet jede weitere einen Schritt der Uhr
+      fragen: 4, ueberzug: true, draengt: "Ylva sieht zum Himmel. „Das Wetter hält nicht mehr lange. Was ihr jetzt nicht wisst, erfahrt ihr unterwegs oder gar nicht.“",
       text: (A) => [
         "Kaltbrunn sind sieben Häuser am Rand eines Gletschers, so groß, dass er bis an den Himmel zu reichen scheint. In der einzigen Stube mit Feuer sitzt Ylva Hallgrim, Eisschneiderin, und mustert euch, als zähle sie, wie viele von euch zurückkommen.",
         "„Ihr wollt nach Veyrholm“, sagt sie. „Wie die Maskierten vor zwei Tagen. Ich sag euch, was ich denen auch gesagt habe: Es gibt drei Wege hinein. Keiner ist gut.“",

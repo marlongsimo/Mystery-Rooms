@@ -168,6 +168,8 @@
     },
     halmbruck: {
       art: "gespraech", abschnitt: 1, titel: "Am Brunnen", ort: "Halmbruck", rastErlaubt: false,
+      // Begrenzte Zeit: 4 Fragen, danach kostet jede weitere einen Schritt der Uhr
+      fragen: 4, ueberzug: true, draengt: "Über dem Dorf schlägt die Glocke. Die Leute ziehen die Köpfe ein, und die ersten Läden klappen zu.",
       beimEintritt: (A, h) => (h.hat(A, "wanderheiler") && !A.merker.anselm_durchschaut ? { setzt: { anselm_durchschaut: true }, folge: "Brogar hat es gesehen: Anselm stirbt, und er sagt es niemandem. Dieser Mann verschweigt mehr als seinen Husten." } : null),
       text: (A, h) => [
         "Wenna hält die Laterne höher. Der Mönch auf der Bank heißt Bruder Anselm, sagt sie. Er ist der Letzte, der noch weiß, wie es unter der Abtei aussieht.",

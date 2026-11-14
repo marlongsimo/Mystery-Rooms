@@ -137,6 +137,8 @@
     },
     dorf: {
       art: "gespraech", abschnitt: 1, titel: "Der Dorfplatz", ort: "Rabenmoor",
+      // Begrenzte Zeit: 4 Fragen, danach kostet jede weitere einen Schritt der Uhr
+      fragen: 4, ueberzug: true, draengt: "Die Fackeln rücken näher zusammen. Bertold hebt die Stimme: „Genug geredet. Entweder ihr geht jetzt, oder wir gehen.“",
       beimEintritt: (A, h) => (h.klasse(A, "zauberer") && !A.merker.legende ? { setzt: { legende: "halb" } } : null),
       text: (A, h) => [
         "Die Fackeln knistern. Der Schulze wartet nicht gern, das sieht man ihm an. Noch habt ihr Zeit.",
@@ -252,6 +254,8 @@
     },
     hedda: {
       art: "gespraech", abschnitt: 1, titel: "Mutter Hedda", ort: "Heddas Hütte",
+      // Begrenzte Zeit: 3 Fragen, danach kostet jede weitere einen Schritt der Uhr
+      fragen: 3, ueberzug: true, draengt: "Draußen schlägt ein Hund an. Zwischen den Erlen flackert Fackelschein. Viel Zeit bleibt euch hier nicht mehr.",
       text: (A, h) => [
         "Mutter Hedda ist kleiner, als ihr gedacht habt, und älter. Ihre Hütte riecht nach getrockneter Minze und nassem Holz. Sie stellt Becher auf den Tisch, ohne zu fragen, ob ihr trinken wollt.",
         "„Ihr kommt aus dem Dorf“, sagt sie. „Mit Fackeln oder ohne?“",

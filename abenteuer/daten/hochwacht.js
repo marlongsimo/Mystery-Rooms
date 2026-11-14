@@ -149,6 +149,8 @@
     },
     wegstation: {
       art: "gespraech", abschnitt: 1, titel: "Die Wegstation", ort: "Am Fuß des Passes",
+      // Begrenzte Zeit: 3 Fragen, danach kostet jede weitere einen Schritt der Uhr
+      fragen: 3, ueberzug: true, draengt: "Sera zieht den Mantel enger. „Wenn wir vor der Dunkelheit an der Schutzhütte sein wollen, müssen wir los.“",
       text: (A) => [
         "In einer verlassenen Wegstation am Fuß des Passes wartet eine Frau, als hätte sie gewusst, dass ihr kommt. Ihr Mantel ist voller Schnee, in ihren Händen glimmt etwas, warm wie Glut und hell wie ein Stern.",
         "„Sera Venn“, sagt sie. „Botin des Wachtordens. Und ihr seid spät.“",

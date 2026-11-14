@@ -188,29 +188,31 @@
   const SKALA = { 1: { 3: 1.03, 4: 1.07, 5: 0.95, 6: 1.07 }, 2: { 3: 0.95, 4: 1.11, 5: 1.05, 6: 1.11 }, 3: { 3: 0.81, 4: 0.91, 5: 0.93, 6: 0.79 } };
   const SKALA_HARDCORE = { 1: { 3: 1.16, 4: 1.11, 5: 1.11, 6: 1.09 }, 2: { 3: 0.89, 4: 1.03, 5: 0.89, 6: 0.91 }, 3: { 3: 0.81, 4: 0.81, 5: 0.81, 6: 0.73 } };
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
-  /* Zehn-Stufen-Modell: eigene Faktoren je Begegnung und Gruppengröße (Helden auf der empfohlenen Stufe der Kampagne,
+  /* Zehn-Stufen-Modell: eigene Faktoren je Kampf („kampagne:szene“) und Gruppengröße (Helden auf der empfohlenen Stufe der Kampagne,
    * Gegner mit Bedrohung). Geschrieben von tools/kampagne.js kaempfe <id> --kalibrieren --modell10 – nicht von Hand pflegen. */
-  /*SKALA10*/ const SKALA10 = {"w_speicher":{"3":1.43,"4":1.4,"5":1.93,"6":1.93},"w_muehle":{"3":1.78,"4":1.6,"5":2.67,"6":2.6},"w_unke":{"3":1.22,"4":1.55,"5":1.51,"6":1.78},"f_kette":{"3":3.14,"4":3.41,"5":3.41,"6":3.8},"f_faehre":{"3":7.89,"4":7.89,"5":7.89,"6":7.89},"f_furt":{"3":3.6,"4":3.8,"5":4.85,"6":6.36},"f_turm":{"3":2.46,"4":3.41,"5":3.6,"6":3.7},"moor_rand":{"3":2.04,"4":3.9,"5":4.72,"6":7.68},"moor_kroeten":{"3":0.96,"4":1.78,"5":1.88,"6":2.33},"moor_kroeten2":{"3":1.04,"4":1.4,"5":1.6,"6":1.88},"moor_tote":{"3":0.37,"4":0.77,"5":1.19,"6":1.51},"moor_schrein":{"3":0.25,"4":0.71,"5":0.83,"6":1.69},"garten":{"3":2.46,"4":3.7,"5":4.23,"6":4.59},"kobolde":{"3":1.29,"4":2.15,"5":2.6,"6":3.7},"gruft":{"3":1.6,"4":1.78,"5":1.73,"6":2.09},"pilze":{"3":3.14,"4":4.47,"5":5.4,"6":5.86},"netz":{"3":0.9,"4":1.4,"5":1.43,"6":1.93},"undefined":{"3":0.25,"4":0.25,"5":0.25,"6":0.25},"halle":{"3":0.3,"4":0.42,"5":0.45,"6":0.5},"halle_asche":{"3":0.57,"4":0.54,"5":0.54,"6":0.71},"siegel":{"3":0.67,"4":0.86,"5":1.06,"6":1.09},"pass":{"3":3.6,"4":4.72,"5":4.85,"6":5.26},"tor":{"3":2.21,"4":2.6,"5":3.41,"6":3.06},"archiv":{"3":2.98,"4":4.35,"5":4.72,"6":4.47},"wacht":{"3":1.29,"4":2.15,"5":1.98,"6":2.46},"hauptmann":{"3":2.6,"4":3.41,"5":3.8,"6":5.4},"wehrgang":{"3":1.47,"4":2.21,"5":1.6,"6":2.33},"finale":{"3":0.73,"4":1.19,"5":1.69,"6":2.15},"k_grat":{"3":1.25,"4":1.93,"5":2.6,"6":3.14},"k_stollen":{"3":1.36,"4":1.98,"5":2.67,"6":3.6},"k_pilger":{"3":4.01,"4":7.89,"5":6.02,"6":7.08}}; /*/SKALA10*/
-  /*SKALA10_HC*/ const SKALA10_HC = {"w_speicher":{"3":0.75,"4":0.77,"5":1.15,"6":1.29},"w_muehle":{"3":1.12,"4":1.25,"5":1.64,"6":1.6},"w_unke":{"3":0.59,"4":0.77,"5":0.9,"6":0.9},"f_kette":{"3":2.67,"4":2.6,"5":2.9,"6":3.14},"f_faehre":{"3":7.89,"4":7.89,"5":7.89,"6":7.89},"f_furt":{"3":3.7,"4":3.32,"5":5.12,"6":7.48},"f_turm":{"3":2.09,"4":2.98,"5":2.9,"6":3.14},"moor_rand":{"3":1.78,"4":3.41,"5":3.5,"6":4.85},"moor_kroeten":{"3":1.47,"4":1.98,"5":2.27,"6":2.75},"moor_kroeten2":{"3":0.98,"4":1.51,"5":1.19,"6":1.55},"moor_tote":{"3":0.5,"4":0.83,"5":0.96,"6":1.36},"moor_schrein":{"3":0.25,"4":0.57,"5":0.67,"6":1.15}}; /*/SKALA10_HC*/
-  const modell10 = () => Boolean(FD.STUFEN10 && FD.STUFEN10.aktiv);
+  /*SKALA10*/ const SKALA10 = {}; /*/SKALA10*/
+    const modell10 = () => Boolean(FD.STUFEN10 && FD.STUFEN10.aktiv);
   /** Bedrohung: so viele Stufen liegen die Gegner über ihrem bisherigen Wert (kann auch darunter liegen).
-   *  Je Stufe +12 % Leben, je 2 Stufen +1 Angriff und +1 Schaden, je 3 Stufen +1 Rettungswurf-SG, je 4 Stufen +1 RK. */
+   *  Je Stufe +12 % Gegnermasse (zuerst mehr Gegner, der Rest als Leben), je 2 Stufen +1 Angriff und +1 Schaden,
+   *  je 3 Stufen +1 Rettungswurf-SG, je 4 Stufen +1 RK. */
   const bedTp = (st) => Math.pow(1.12, st.bed || 0);
-  const bedTeil = (st, je) => Math.trunc((st.bed || 0) / je);
+  const bedTeil = (st, je) => Math.floor((st.bed || 0) / je);
   function skalaK(begId, n, stufe, skala, hardcore) {
     const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, s = stufe || b.stufe, tab = hardcore ? SKALA_HARDCORE : SKALA;
     // Begegnungen mit eigener Tabelle (z. B. im Moor, spielbar ab 2 Helden): Faktor je Gruppengröße 2–6
     const eigen = hardcore ? b.skalaHC || b.skala : b.skala;
-    const t10 = modell10() && skala == null ? (hardcore ? SKALA10_HC[begId] || SKALA10[begId] : SKALA10[begId]) : null;
-    let k = t10 && t10[Math.max(3, Math.min(6, n))] ? t10[Math.max(3, Math.min(6, n))] : skala != null ? skala : eigen ? eigen[Math.max(2, Math.min(6, n))] || 1 : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
+    let k = skala != null ? skala : eigen ? eigen[Math.max(2, Math.min(6, n))] || 1 : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
     if (b.faktor) k *= b.faktor[Math.max(3, Math.min(6, n))] || 1;
     return k;
   }
-  function gegnerFuer(begId, n, stufe, skala, hardcore) {
+  function gegnerFuer(begId, n, stufe, skala, hardcore, bed) {
     const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, k = skalaK(begId, n, stufe, skala, hardcore);
     // [Art, Anzahl je Figur, höchstens, Grundwert]: z. B. genau eine Alwine, deren Leben nur leicht mit der Gruppe wächst (Grundwert + je Figur)
     // Negativer Grundwert: Diese Art kommt erst ab einer gewissen Gruppengröße (sonst gar nicht)
-    return b.gegner.map(([art, je, max, basis]) => { const soll = (basis || 0) + je * n, anzahl = Math.min(max || Infinity, Math.max(basis < 0 ? 0 : 1, Math.round(soll))); return { art, anzahl, tpFaktor: anzahl ? k * soll / anzahl : k }; }).filter((g) => g.anzahl > 0);
+    return b.gegner.map(([art, je, max, basis]) => { const soll = (basis || 0) + je * n, anzahl = Math.min(max || Infinity, Math.max(basis < 0 ? 0 : 1, Math.round(soll))); 
+      // Bedrohung: Die zusätzliche Masse kommt als weitere Gegner (Einzelgegner wie Bosse bleiben allein und werden zäher)
+      const mehr = bed > 0 && anzahl && max !== 1 ? Math.min(Math.round((max || Infinity) * Math.pow(1.12, bed)), Math.max(anzahl, Math.round(anzahl * Math.pow(1.12, bed)))) : anzahl;
+      return { art, anzahl: mehr, tpFaktor: anzahl ? k * soll / mehr : k }; }).filter((g) => g.anzahl > 0);
   }
 
   /* ---------- Karte ---------- */
@@ -356,7 +358,7 @@
     // Allgemeiner Faktor für das Leben aller Gegner (Ausgleich zur Klassenbalance)
     const tpGlobal = (opts.tpGlobal != null ? opts.tpGlobal : GEGNER_TP.wert) * bedTp(st);
     // Ein zusätzlicher Gegner der häufigsten Art (nicht bei fest vorgegebenen Gegnern wie im Duell)
-    const basis = opts.gegner ? opts.gegner : gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore").map((g) => Object.assign({}, g));
+    const basis = opts.gegner ? opts.gegner : gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore", st.bed).map((g) => Object.assign({}, g));
     const zusatzN = opts.zusatzGegner != null ? opts.zusatzGegner : opts.schwierigkeit === "hardcore" ? 0 : GEGNER_TP.zusatz; // Zusatzgegner nur in Normal
     // Begegnungen mit „zusatzAb“ (Moor): der Zusatzgegner erst ab dieser Gruppengröße – bei 2 Helden zählt jeder Gegner doppelt
     const begZ = BEGEGNUNGEN[opts.begegnung || "garten"] || {};
@@ -2065,7 +2067,7 @@
     };
   }
 
-  const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

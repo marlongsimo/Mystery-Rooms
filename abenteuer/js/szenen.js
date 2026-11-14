@@ -52,11 +52,17 @@
   /** Empfohlene Heldenstufe einer Kampagne – aus ihrer Schwierigkeit (1 Leicht → 1, 2 Normal → 3, 3 → 4, 4 → 6, 5 → 8) */
   const empfStufe = (id) => (F.SCHWIERIGKEIT[metaVon(id).schwierigkeit || 1] || F.SCHWIERIGKEIT[1]).stufe;
   /** Bedrohung eines Kampfes: Die Kampagne wird nach hinten schwerer (Abschnitt 1 = empfohlene Stufe, dann je Abschnitt +1).
-   *  Zurück kommt der Abstand zu dem Wert, auf den die Begegnung bisher ausgelegt war (alte Stufe 1/2/3 ≈ Heldenstufe 1/3/5). */
+   *  Zurück kommt der Abstand zu dem Wert, auf den die Begegnung bisher ausgelegt war (alte Stufe 1/2/3 ≈ Heldenstufe 1/3/6). */
   function bedrohung(A, s, k) {
     if (!modell10()) return 0;
     const alt = Math.max(1, Math.min(3, (s && s.stufe) || (R.BEGEGNUNGEN[k && k.begegnung] || {}).stufe || 1));
-    return Math.min(F.STUFEN10.max, empfStufe(A.abenteuer) + alt - 1) - [1, 3, 5][alt - 1];
+    return Math.min(F.STUFEN10.max, empfStufe(A.abenteuer) + alt - 1) - [1, 3, 6][alt - 1];
+  }
+  /** Abgestimmter Lebensfaktor dieses Kampfes im Zehn-Stufen-Modell (je Szene und Gruppengröße), falls vorhanden */
+  function skala10(A, o) {
+    if (!modell10()) return;
+    const t = (R.SKALA10 || {})[(A.abenteuer || "grauwacht") + ":" + A.szene], k = t && t[Math.max(3, Math.min(6, (o.figuren || []).length))];
+    if (k) o.skala = k;
   }
 
   function neu(seed, opts = {}) {
@@ -482,6 +488,7 @@
     const k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
     const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, bedrohung: bedrohung(A, s, k) }, k, { mischen: false, anfuehrer: false });
     if (A.kampfMod) o.skalaMal = (o.skalaMal || 1) * A.kampfMod;
+    skala10(A, o);
     const st = R.neuesSpiel(1, o), arten = [], W = DATEN(A).WISSEN || {};
     for (const g of R.gegnerFiguren(st)) {
       let a = arten.find((x) => x.art === g.art);
@@ -504,6 +511,7 @@
     // Abwechslung: gemischte Startplätze, in etwa jedem dritten Kampf ein Anführer (nicht im Duell und nicht beim Endgegner)
     if (!o.gegner && !o.boss) { o.mischen = k.mischen !== false; o.anfuehrer = anfuehrerFestlegen(A, k); } // feste Plätze (z. B. Nester): mischen: false
     if (A.kampfMod) { o.skalaMal = (o.skalaMal || 1) * A.kampfMod; }
+    skala10(A, o);
     return o;
   }
   /** Nach dem Kampf: Ergebnis übernehmen und weiter */

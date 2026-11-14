@@ -250,7 +250,7 @@ function kaempfe(id, N = 150, o = {}) {
     if (o.kalibrieren) {
       const tab = {}, warnungen = []; let beg = null;
       for (const n of GR) {
-        let lo = 0.25, hi = 8;
+        let lo = o.modell10 ? 0.1 : 0.25, hi = 8;
         for (let it = 0; it < 7; it++) { const mid = Math.sqrt(lo * hi), e = messen(sid, n, mid, Math.max(40, Math.round(N / 2))); beg = e.begegnung; if (e.sieg > ziel(sid)) lo = mid; else hi = mid; }
         tab[n] = +Math.sqrt(lo * hi).toFixed(2);
         // Nachmessen und warnen, wenn der Faktor allein das Ziel nicht sinnvoll erreicht
@@ -264,9 +264,11 @@ function kaempfe(id, N = 150, o = {}) {
       if (!tab[2]) tab[2] = tab[Math.min(...GR)];
       const datei = path.join(WURZEL, "js/regeln.js"); let txt = fs.readFileSync(datei, "utf8");
       if (o.modell10) { // Zehn-Stufen-Modell: eigene Tabelle, das heutige Spiel bleibt unberührt
-        const marke = o.hardcore ? "SKALA10_HC" : "SKALA10", re10 = new RegExp(`/\\*${marke}\\*/ const ${marke} = (\\{.*?\\}); /\\*/${marke}\\*/`);
+        const marke = "SKALA10", re10 = new RegExp(`/\\*${marke}\\*/ const ${marke} = (\\{.*?\\}); /\\*/${marke}\\*/`);
         const m10 = re10.exec(txt); if (!m10) { ergebnis.push({ sid, fehler: `Tabelle ${marke} in js/regeln.js nicht gefunden` }); continue; }
-        const alle = JSON.parse(m10[1]); alle[beg] = {}; for (const n of [3, 4, 5, 6]) alle[beg][n] = tab[n] != null ? tab[n] : tab[Math.max(...GR)];
+        const alle = JSON.parse(m10[1]), schluessel = id + ":" + sid; alle[schluessel] = {};
+        // Faktoren am Rand des Suchbereichs sind kein Ergebnis (Kampf wird über ein Ziel gewonnen oder hängt nicht am Leben): dort gilt der bisherige Wert
+        for (const n of GR) if (tab[n] > 0.12 && tab[n] < 5) alle[schluessel][n] = tab[n];
         fs.writeFileSync(datei, txt.replace(re10, () => `/*${marke}*/ const ${marke} = ${JSON.stringify(alle)}; /*/${marke}*/`));
         ergebnis.push({ sid, begegnung: beg, kalibriert: tab, feld: marke, warnungen }); continue;
       }

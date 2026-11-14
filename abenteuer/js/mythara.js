@@ -504,7 +504,7 @@
       o.hidden = true; toast(`${n} ${n === 1 ? "Einladung" : "Einladungen"} gesendet.`);
     };
   }
-  /** Neue Kampagne: zuerst das Abenteuer wählen. Name und Freunde kommen später im Einladen-Schritt (Spieltisch + Handys). */
+  /** Neue Kampagne: zuerst das Abenteuer wählen. Name und Freunde kommen später im Einladen-Schritt (Coop-Mode). */
   function neueKampagne() {
     const o = fenster("Neue Kampagne starten", `<p class="note">Welches Abenteuer wollt ihr spielen?</p>
       <div class="hub-welt-liste neu-wahl">${ABENTEUER().map((m) => abenteuerKachel(m, "data-neu-abenteuer")).join("")}</div>`);

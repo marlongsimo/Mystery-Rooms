@@ -268,7 +268,7 @@
   }
 
 
-  /* ---------- Einladen: nach „Spieltisch + Handys“, vor der Heldenwahl ---------- */
+  /* ---------- Einladen: nach „Coop-Mode“, vor der Heldenwahl ---------- */
   // Freunde (Konto), Gäste per Kampagnen-Code (handy.html?k=…) und auf Wunsch ein anderes Gerät als Spieltisch (index.html?tisch=…)
   let einl = null; // { gast, tisch, uhr, freunde, offen, mitglieder }
   const linkUrl = (pfad) => new URL(pfad, location.href).href;
@@ -329,7 +329,7 @@
     const tisch = einl.tisch
       ? codeBox(linkUrl("index.html?tisch=" + encodeURIComponent(einl.tisch) + "&ab=" + encodeURIComponent(window.AB.SETUP().abenteuer || "grauwacht")), einl.tisch, "Code für das Tisch-Gerät", `Auf dem Gerät, das in der Mitte liegen soll, QR-Code scannen – oder <b>${esc(kurzUrl("index.html"))}</b> öffnen, „Als Spieltisch verbinden“ wählen und den Code eingeben. Der Code gilt einmal.`) + `<p class="note ei-warte">Warte auf das Tisch-Gerät …</p>`
       : `<p class="note">Dieses Gerät ist der Spieltisch. Soll ein anderes Gerät (z. B. ein Tablet oder Fernseher) in der Mitte liegen, verbinde es mit einem Tisch-Code.</p>`;
-    el.innerHTML = `<div class="ei-kopf"><div><p class="eyebrow">Spieltisch + Handys</p><h1>Wer spielt mit?</h1></div>
+    el.innerHTML = `<div class="ei-kopf"><div><p class="eyebrow">Coop-Mode</p><h1>Wer spielt mit?</h1></div>
         ${istHost() ? `<label class="ei-titel">Name der Kampagne <input id="ei-titel" maxlength="80" value="${esc(K.titel || "")}"></label>` : `<p class="note">${esc(K.titel || "")}</p>`}</div>
       <div class="ei-raster">
         <section class="ei-karte"><h2>Freunde</h2>${freunde}</section>

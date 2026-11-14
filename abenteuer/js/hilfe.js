@@ -9,7 +9,7 @@
     { id: "kurz", titel: "Das Wichtigste in einer Minute", html: `
       <ul>
         <li><b>Mythara ist ein Strategie-Rollenspiel.</b> Gekämpft wird rundenweise, Zug um Zug. Es kommt nicht auf schnelle Finger an, sondern darauf, wo ihr steht, wen ihr zuerst angreift und wie ihr eure Helden zusammenspielen lasst. Ihr habt für jeden Zug so viel Zeit, wie ihr braucht.</li>
-        <li><b>Ein Gerät ist der Spieltisch.</b> Es erzählt die Geschichte, zeigt die Karte und würfelt. Jede Person spielt ihren Helden auf dem eigenen Handy. Allein oder zu zweit geht es auch auf einem Gerät.</li>
+        <li><b>Ein Gerät ist der Spieltisch.</b> Es erzählt die Geschichte, zeigt die Karte und würfelt. Jede Person spielt ihren Helden auf dem eigenen Handy. Das ist der <b>Coop-Mode</b>. Im <b>Solo-Mode</b> steuert eine Person alle Helden auf einem Gerät, mit den Helden aus der eigenen Sammlung.</li>
         <li><b>Ihr entscheidet, die Würfel entscheiden mit.</b> Immer wenn etwas schiefgehen kann, wird ein zwanzigseitiger Würfel geworfen.</li>
         <li><b>Hoch ist gut.</b> Je höher der Wurf, desto besser. Was euer Held gut kann, bekommt einen Bonus obendrauf.</li>
         <li><b>Ihr müsst nichts rechnen.</b> Das Spiel rechnet alles aus und schreibt es in die Chronik. Diese Seite erklärt nur, was dort steht.</li>

@@ -59,7 +59,7 @@ const R = require('../js/regeln.js'), F = R.FD;
     check(await p.isVisible('[data-schwer-wahl="normal"]') && !(await p.$('[data-schwer-wahl="hardcore"]')) && !(await p.isVisible('#start')), `${vp.width}px: Schritt Schwierigkeit (eigene Seite), Hardcore abgeschaltet`);
     await p.click('[data-schwer-wahl="normal"]');
     await p.click('#kodex-weiter');
-    check(await p.isVisible('#start') && await p.isVisible('#live'), `${vp.width}px: Schritt Spielweise: ein Gerät oder Spieltisch + Handys`);
+    check(await p.isVisible('#start') && await p.isVisible('#live') && /Solo-Mode/.test(await p.textContent('#start')) && /Coop-Mode/.test(await p.textContent('#live')), `${vp.width}px: Schritt Spielweise: Solo-Mode oder Coop-Mode`);
     if (process.env.SHOT_DIR && vp.width === 1280) await p.screenshot({ path: process.env.SHOT_DIR + '/kodex-ende.png' });
     await p.click('#start');
     check((await p.$$('.banner[data-klasse]')).length === 5 && (await p.$$('.banner img')).length === 15, `${vp.width}px: Schritt 1: fünf Klassenbanner mit den 15 Helden`);

@@ -199,11 +199,12 @@
     zeigeSektion("lobby");
     if (liveAn()) LIVE.phase = "lobby";
     zeichneSetup(); veroeffentlichen();
-    // Heldensammlung (Open Beta): Welche Helden darf der Tisch stellen? Mit Kampagne die des Hosts, sonst die eigene.
+    // Heldensammlung (Open Beta): Welche Helden darf der Tisch stellen? Im Coop-Mode mit Kampagne die des Hosts,
+    // im Solo-Mode immer die Sammlung des angemeldeten Benutzers (ohne Konto: die Starter-Helden).
     const SM = window.ABSAMMLUNG;
     if (SM) {
       const k = window.KAMPAGNE && window.KAMPAGNE.aktuell && window.KAMPAGNE.aktuell();
-      SM.tischLaden(k && k.id).then(() => {
+      SM.tischLaden(liveAn() ? k && k.id : null).then(() => {
         if ($("#lobby").hidden) return;
         const vorher = JSON.stringify([SETUP.gruppe, SETUP.tisch]);
         SETUP.tisch = (SETUP.tisch || []).filter((f) => SM.tischFrei(f));
@@ -245,7 +246,7 @@
     const handys = live ? LIVE.client.players.filter((p) => !p.is_host) : [];
     const status = live
       ? (handys.length ? `Verbunden: ${handys.map((p) => esc(p.player_name)).join(", ")}. ` : "Noch kein Handy verbunden. ") + `Es spielen die Figuren der Handys${(SETUP.tisch || []).length ? ` und ${SETUP.tisch.length} vom Tisch gesteuerte` : ""}${n < MIN ? ` – mindestens ${MIN}, noch ${MIN - n}. Zu wenige Handys? Lasst weitere Helden vom Tisch spielen` : ""}.`
-      : n < MIN ? `Wählt mindestens ${MIN} Figuren – noch ${MIN - n}.` : "Eine Person steuert alle Figuren auf diesem Gerät.";
+      : n < MIN ? `Wählt mindestens ${MIN} Figuren – noch ${MIN - n}.` : "Solo-Mode: Eine Person steuert alle Figuren auf diesem Gerät.";
     const gegner = (() => { const g = R.gegnerFuer(SETUP.begegnung, Math.max(3, n), SETUP.stufe); return g.map((x) => `${x.anzahl} × ${R.GEGNER[x.art].name}${Math.abs(x.tpFaktor - 1) > 0.04 ? ` (${Math.round(R.GEGNER[x.art].tp * x.tpFaktor)} TP)` : ""}`).join(", "); })();
     el.innerHTML = `
       <div class="wahl-kopf"><div><p class="eyebrow">${esc(META().gruppe || META().titel)}</p><h1>Wählt eure Helden</h1></div>${HL.plaetze(SETUP.gruppe, namen)}</div>

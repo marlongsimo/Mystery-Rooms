@@ -7,6 +7,8 @@ Stand: 14. November 2026 · Status: **Konzept, noch nichts gebaut**
 - **Immer ein Spieler gegen einen anderen.** Jeder wählt drei Helden aus seiner Sammlung und steuert sie allein.
 - **Die Helden spielen auf ihrer erarbeiteten Stufe.** Aus den drei Helden wird eine Durchschnittsstufe berechnet. Der Gegner muss mit seinem Team innerhalb einer festen Spanne um diesen Wert liegen.
 - **Spielen über das Internet soll möglich sein.**
+- **Spanne ±1,0** bei der Teamstufe. **Keine Grenze je Held** – zunächst ist jede Aufstellung erlaubt, die im Durchschnitt passt.
+- **Kein großes Balancing vorab.** Der Modus startet mit den Helden, wie sie sind. Stattdessen zeichnet ein Auswertungswerkzeug jede Partie auf (Aufstellung, Stufen, Ergebnis). Nachgezogen wird, wenn die Zahlen es zeigen.
 
 ---
 
@@ -38,12 +40,12 @@ Der Modus gibt der Heldensammlung und den erarbeiteten Stufen einen zweiten Zwec
 ### Stufen und faire Paarung
 
 - **Teamstufe** = Durchschnitt der drei Heldenstufen, auf eine Nachkommastelle.
-- **Spanne:** Die Teamstufen zweier Gegner dürfen höchstens **1,0** auseinanderliegen (Vorschlag). Beispiel: Team mit Stufen 4, 5, 6 (Teamstufe 5,0) spielt gegen Teams von 4,0 bis 6,0.
-- **Grenze je Held:** Kein Held darf mehr als **2 Stufen** über der eigenen Teamstufe liegen (Vorschlag). Sonst trägt ein Stufe-10-Held zwei Stufe-1-Helden durch die Paarung.
+- **Spanne:** Die Teamstufen zweier Gegner dürfen höchstens **1,0** auseinanderliegen. Beispiel: Team mit Stufen 4, 5, 6 (Teamstufe 5,0) spielt gegen Teams von 4,0 bis 6,0.
+- **Keine Grenze je Held.** Auch 10, 1, 1 (Teamstufe 4,0) ist erlaubt. Ob solche Aufstellungen zu stark sind, zeigt die Auswertung (Abschnitt 7).
 - **Wer nicht passt:** Bei einer Herausforderung unter Freunden zeigt das Spiel vorher an, ob die Teams in der Spanne liegen, und lässt die Aufstellung ändern. Bei der Suche nach einem Gegner wird nur innerhalb der Spanne gepaart.
 - **Die Monster richten sich nach der höheren der beiden Teamstufen** (Bedrohung wie in den Kampagnen).
 
-Der Stufenunterschied innerhalb der Spanne ist gewollt spürbar, soll aber nicht entscheiden. Wie viel eine Stufe Vorsprung ausmacht, wird in Phase 2 gemessen. Ziel: Bei einer Stufe Unterschied gewinnt das stärkere Team höchstens 60 % der simulierten Partien. Reicht die Spanne dafür nicht, wird sie enger.
+Der Stufenunterschied innerhalb der Spanne ist gewollt spürbar. Wie viel er ausmacht, wird nicht vorab abgestimmt, sondern aus den echten Partien abgelesen.
 
 ### Der Modus „Wettlauf um das Artefakt“
 
@@ -76,16 +78,16 @@ Die Fähigkeiten sind für den Kampf gegen Monster gebaut. Gegen Spieler brauche
 | Verstecken | Der Gegner sieht versteckte Helden nicht. Über das Internet ist das echt verdeckt, am selben Gerät nicht spielbar | Jeder hat seinen eigenen Bildschirm |
 | Spott | zwingt auch Helden, aber nur für 1 Runde | Bleibt nützlich, ohne zu lähmen |
 
-Diese Liste ist ein Startpunkt und wird in Phase 2 und 4 mit Messungen und Testpartien nachgezogen.
+Das sind keine Balance-Anpassungen, sondern Regeln, ohne die ein Duell nicht spielbar wäre. Alles Weitere wird erst nach den Zahlen der Auswertung angefasst.
 
 ## 5. Voraussetzungen
 
 Bevor der Modus gebaut wird, muss im Hauptspiel stehen:
 
 1. **Stufenmodell am Tisch erprobt.** Es ist seit dem 14. November 2026 eingeschaltet, aber noch nie mit einer Gruppe gespielt worden.
-2. **Heldenbalance enger.** In den späteren Kampagnen liegen Orin, Vex und Faye bis zu 8 Punkte hinter den Kriegern. Weil die Helden im Modus mit ihren echten Stufen und Verbesserungen antreten, wiegt das hier schwerer als in den Kampagnen. Ziel ist eine Spanne von höchstens 4 Punkten.
-3. **Verbesserungen und Meisterschaften abgestimmt.** Die 45 Verbesserungen sind bisher nicht gegeneinander ausbalanciert. Im Modus treffen sie direkt aufeinander.
-4. **Lücken im Stufenmodell geschlossen:** Warnung vor zu schweren Kampagnen, Ersatz für den Aufstieg am Lagerfeuer.
+2. **Lücken im Stufenmodell geschlossen:** Warnung vor zu schweren Kampagnen, Ersatz für den Aufstieg am Lagerfeuer.
+
+Die Heldenbalance und die 45 Verbesserungen werden **nicht** vorab für den Modus abgestimmt. Bekannt ist: In den späteren Kampagnen liegen Orin, Vex und Faye bis zu 8 Punkte hinter den Kriegern, und die Verbesserungen sind untereinander nicht ausbalanciert. Im Duell treffen sie direkt aufeinander. Das wird hingenommen und über die Auswertung beobachtet.
 
 ## 6. Spielen über das Internet
 
@@ -111,22 +113,50 @@ Das kommt ohne eigenen Spielserver aus und baut auf dem auf, was schon da ist (S
 
 **Nur mit Konto.** Gäste haben keine Sammlung und keine Stufen.
 
-## 7. Phasen
+## 7. Auswertung: jede Partie wird aufgezeichnet
+
+Statt vorab zu balancieren, sammelt der Modus von der ersten Partie an Zahlen.
+
+**Was je Partie gespeichert wird (auf dem Server, beim Melden des Ergebnisses):**
+- beide Aufstellungen: je drei Helden mit ihrer Stufe, dazu die Teamstufe
+- Sieger, Art des Siegs (Artefakt, Siegpunkte, Aufgabe, Abbruch), Siegpunkte beider Seiten
+- Rundenzahl und Dauer, Startseite jedes Spielers
+- je Held: wie oft zu Boden gegangen, Schaden an Helden und an Monstern, Heilung, letzter Schlag gegen den Wächter
+- Karte und Modus, Version der Regeln (damit sich Zahlen vor und nach einer Änderung trennen lassen)
+
+**Was die Auswertung zeigt (Seite nur für Admins, wie die Code-Übersicht):**
+
+| Auswertung | Frage dahinter |
+|---|---|
+| Siegquote je Held, mit Zahl der Partien | Wer ist zu stark, wer zu schwach? |
+| Wahlquote je Held | Wen nimmt jeder, wen niemand? |
+| Siegquote je Aufstellung (drei Helden) und je Heldenpaar | Gibt es eine Kombination, gegen die nichts hilft? |
+| Siegquote je Klassenmischung (z. B. zwei Kleriker) | Entscheidet Heilung oder Kontrolle die Partie? |
+| Siegquote nach Unterschied der Teamstufe (0 bis 1,0) | Passt die Spanne? |
+| Siegquote nach Verteilung der Stufen (z. B. 10, 1, 1 gegen 4, 4, 4) | Braucht es doch eine Grenze je Held? |
+| Siegquote je Startseite | Ist die Karte fair? |
+| Art des Siegs, Dauer, Abbrüche | Trägt der Modus, hält die Technik? |
+
+Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien werden als unsicher markiert, damit niemand aus zehn Spielen einen Schluss zieht.
+
+**Nebenbei:** Dieselbe Aufzeichnung lässt sich später für die Kampagnen nutzen (welche Helden werden gewählt, welche Kämpfe enden im Rückzug). Das ist nicht Teil dieser Roadmap, die Tabellen werden aber so angelegt, dass es möglich bleibt.
+
+## 8. Phasen
 
 | Phase | Inhalt | Ergebnis | Abbruchkriterium |
 |---|---|---|---|
-| **0 · Fundament** | Voraussetzungen aus Abschnitt 5 | Hauptspiel stabil, Balance in der Zielspanne | – |
+| **0 · Fundament** | Voraussetzungen aus Abschnitt 5 | Hauptspiel stabil | – |
 | **1 · Regelkern** | Zwei Spielerseiten in der Engine, Zugfolge, Zielwahl der Monster, Artefakt, Siegpunkte, Rückkehr am Startpunkt | Simulierte Partien laufen durch | Eine Startseite gewinnt dauerhaft über 55 % |
-| **2 · Balance in der Simulation** | Zwei KI-Spieler gegeneinander, Regeln aus Abschnitt 4, Messung je Held, je Aufstellung und je Stufenunterschied | Kein Held über 56 % oder unter 44 %; eine Stufe Vorsprung höchstens 60 %; Spanne festgelegt | Kontrolle, Heilung oder Stufenvorsprung lassen sich nicht einfangen |
+| **2 · Spielbarkeit in der Simulation** | Zwei KI-Spieler gegeneinander, Regeln aus Abschnitt 4. Kein Feinschliff: Es wird nur geprüft, dass Partien enden, im Zeitrahmen bleiben und keine Seite der Karte klar im Vorteil ist | Partien enden in 8–12 Runden, Startseiten 45–55 % | Partien enden nicht oder kippen immer in dieselbe Richtung |
 | **3 · Netzwerk** | Züge übertragen, Prüfwert vergleichen, Würfel vom Server, Aufstellung prüfen, Zeitlimit, Aufgabe und Abbruch | Zwei Browser spielen eine Partie über das Internet | Die Engine rechnet auf zwei Geräten nicht zuverlässig gleich |
-| **4 · Prototyp** | Eine Karte, ein Modus, Freund herausfordern, Aufstellung mit Spannenanzeige, Bildschirm für einen Spieler mit drei Helden | Spielbare Partie für zwei Konten | – |
-| **5 · Testrunden** | Ausgewählte Spieler, Fragebogen nach der Partie | Entscheidung: weiterbauen, umbauen oder einstellen | Weniger als die Hälfte will eine zweite Partie |
+| **4 · Prototyp mit Aufzeichnung** | Eine Karte, ein Modus, Freund herausfordern, Aufstellung mit Spannenanzeige, Bildschirm für einen Spieler mit drei Helden. Jede Partie wird aufgezeichnet (Abschnitt 7), die Auswertungsseite für Admins steht | Spielbare Partie für zwei Konten, Zahlen ab der ersten Partie | – |
+| **5 · Testrunden** | Ausgewählte Spieler, Fragebogen nach der Partie. Erste Anpassungen nach den Zahlen der Auswertung | Entscheidung: weiterbauen, umbauen oder einstellen | Weniger als die Hälfte will eine zweite Partie |
 | **6 · Veröffentlichung** | Zweite Karte, Belohnungen (Titel, Erfolge), Hilfe-Seite, Einstieg im Hub | Modus für alle Konten sichtbar | – |
 | **7 · Ausbau (optional)** | Gegnersuche, Wertung, Modus „Gebietskontrolle“, weitere Karten | – | Nur, wenn der Modus gespielt wird |
 
 **Wertung und Ranglisten** stehen in Phase 7 und nicht früher: Sie lohnen sich erst mit einer Gegnersuche und genug Spielern, und sie ziehen Dauerpflege nach sich (Betrugsmeldungen, Saisons, Rückstufungen).
 
-## 8. Was technisch dafür nötig ist
+## 9. Was technisch dafür nötig ist
 
 **Vorhanden und wiederverwendbar:**
 - Ziele auf der Karte, Verstärkungswellen, Bosse mit Phasen und Schild, angekündigte Flächenangriffe, Rückstoß.
@@ -142,6 +172,7 @@ Das kommt ohne eigenen Spielserver aus und baut auf dem auf, was schon da ist (S
 | Zweite Spielerseite in der Engine | groß | Heute gibt es „Spieler“ und „Gegner“. Angriffe, Flächenzauber, Heilung, Reaktionen und Sicht müssen wissen, wer zu wem gehört. Der größte Eingriff. |
 | Gleiches Rechnen auf zwei Geräten | groß | Alle Würfe über eine Quelle, kein Zufall an anderer Stelle, Prüfwert des Spielstands. Muss gründlich getestet werden. |
 | Würfel und Partien auf dem Server | mittel | Neue Migration: Partien, Aufstellungen, Würfelfolge, Ergebnis. Du führst das SQL aus. |
+| Aufzeichnung und Auswertungsseite | mittel | Tabellen für Partie und Heldenwerte, Abfragen für die Auswertungen aus Abschnitt 7, Seite nur für Admins |
 | Aufstellung prüfen (Sammlung, Stufen, Spanne) | klein | Auf dem Server, mit den vorhandenen Tabellen |
 | Zielwahl der Monster zwischen zwei Spielern | mittel | Regel aus Abschnitt 3, mit Anzeige |
 | Artefakt tragen, fallen lassen | klein | Baut auf den Zielen auf |
@@ -152,43 +183,43 @@ Das kommt ohne eigenen Spielserver aus und baut auf dem auf, was schon da ist (S
 | Herausfordern, Aufstellung, Wartebildschirm | mittel | Baut auf der Freundesliste auf |
 | Karte für zwei Startseiten | mittel | Spiegelgleich, damit keine Seite im Vorteil ist; ein neues Kartenbild |
 
-## 9. Belohnungen
+## 10. Belohnungen
 
 - **XP:** Vorschlag: 25 XP je Held für eine beendete Partie, höchstens dreimal am Tag, Sieg und Niederlage gleich. Vergeben wird auf dem Server, nur für Partien, die beide Geräte gleich gemeldet haben. So bleibt der Modus kein Level-Abkürzer, und abgesprochene Partien lohnen sich nicht.
 - **Titel und Erfolge**, zum Beispiel „Artefaktträger“ oder „Wächterbezwinger“.
 - **Kosmetisches** erst, wenn es dafür überhaupt ein System im Spiel gibt.
 
-## 10. Risiken
+## 11. Risiken
 
 | Risiko | Gegenmaßnahme |
 |---|---|
-| Stufenvorsprung entscheidet die Partie | Spanne, Grenze je Held, Messung in Phase 2; notfalls engere Spanne |
+| Stufenvorsprung oder einzelne Helden entscheiden die Partie | Bewusst nicht vorab gelöst. Die Auswertung zeigt es; dann Spanne, Grenze je Held oder einzelne Fähigkeiten nachziehen |
+| Zu wenige Partien für belastbare Zahlen | Zahlen mit wenigen Partien als unsicher markieren; erst handeln, wenn ein Muster über viele Partien steht |
 | Zu wenige Spieler für eine Gegnersuche in der Spanne | Zuerst nur Herausforderung unter Freunden; Suche erst in Phase 7 |
 | Schummeln über das Internet | Beide Geräte rechnen, Würfel und Aufstellung vom Server, Ergebnis nur bei Übereinstimmung |
 | Die Engine rechnet auf zwei Geräten verschieden | Eigene Tests in Phase 3: dieselbe Partie auf zwei Geräten, Prüfwert nach jedem Zug |
 | Verbindungsabbruch und Wegbleiben | Zeitlimit je Zug, Wiedereinstieg, Niederlage nach zwei Minuten |
-| Kontrolle und Heilung kippen die Partie | Regeln aus Abschnitt 4, Messung, Abbruchkriterium |
+| Kontrolle und Heilung kippen die Partie | Regeln aus Abschnitt 4; Auswertung je Klassenmischung |
 | Wartezeit zwischen den Zügen | Nur zwei Spieler, Zeitlimit, Monsterzüge schnell abgespielt |
 | Ein Spieler fühlt sich von den Monstern benachteiligt | Feste, sichtbare Zielregel mit Anzeige |
 | Schneeballeffekt: Wer führt, gewinnt | Rückkehr am Startpunkt, Monster bevorzugen bei Gleichstand den Führenden, Artefakt macht langsam |
 | Der Umbau der Engine bricht die Kampagnen | Alle bestehenden Testläufe müssen nach jedem Schritt grün sein; der Modus läuft hinter einem Schalter |
 | Der Modus zieht Zeit von den Kampagnen ab | Phase 0 zuerst; nach Phase 5 eine ehrliche Entscheidung |
 
-## 11. Offene Entscheidungen
+## 12. Offene Entscheidungen
 
-1. **Spanne der Teamstufe:** ±1,0 (Vorschlag) oder weiter? Weiter heißt: leichter einen Gegner finden, aber größerer Vorteil für das stärkere Team.
-2. **Grenze je Held:** höchstens 2 Stufen über der eigenen Teamstufe (Vorschlag) oder gar keine?
-3. **Derselbe Held auf beiden Seiten** erlaubt (Vorschlag) oder nicht?
-4. **XP im Modus:** der kleine Betrag aus Abschnitt 9 oder gar keine?
-5. **Verstecken:** für den Anfang hinnehmen, dass es technisch nicht vollständig geschützt ist?
-6. **Reihenfolge:** Soll der Modus vor oder nach dem Neubau von Hardcore kommen?
+1. **Derselbe Held auf beiden Seiten** erlaubt (Vorschlag) oder nicht?
+2. **XP im Modus:** der kleine Betrag aus Abschnitt 10 oder gar keine?
+3. **Verstecken:** für den Anfang hinnehmen, dass es technisch nicht vollständig geschützt ist?
+4. **Reihenfolge:** Soll der Modus vor oder nach dem Neubau von Hardcore kommen?
+5. **Auswertung:** nur für Admins (Vorschlag) oder später auch eine öffentliche Seite mit Siegquoten je Held?
 
-## 12. Messgrößen für Phase 5
+## 13. Messgrößen für Phase 5
 
 - Dauer einer Partie: Ziel 20–35 Minuten.
 - Anteil der Partien, die über das Artefakt enden (nicht über das Rundenlimit): Ziel über 50 %.
 - Anteil der Züge, die durch das Zeitlimit enden: Ziel unter 10 %.
 - Siegquote der Startseiten: Ziel 45–55 %.
-- Siegquote des Teams mit der höheren Teamstufe: Ziel höchstens 60 %.
+- Siegquote des Teams mit der höheren Teamstufe: wird beobachtet, kein festes Ziel vorab.
 - Abgebrochene Partien (Verbindung, abweichender Prüfwert): Ziel unter 5 %.
 - Anteil der Tester, die sofort eine zweite Partie spielen wollen: Ziel über 50 %.

@@ -227,7 +227,7 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 ## 12. Offene Entscheidungen
 
 1. **Derselbe Held auf beiden Seiten** erlaubt (Vorschlag) oder nicht?
-2. **Belohnungen im Modus:** Staffelung (10 XP mehr je Stufe darunter, 5 XP weniger je Stufe darüber) und Obergrenze (5 Partien und 150 XP je Held am Tag) bestätigen. Soll ein Sieg durch Aufgabe des Gegners für die Heldenchance zählen?
+2. **Belohnungen im Modus:** Staffelung und Obergrenze (5 Partien und 150 XP je Held am Tag) sind bestätigt. Soll ein Sieg durch Aufgabe des Gegners für die Heldenchance zählen?
 3. **Verstecken:** für den Anfang hinnehmen, dass es technisch nicht vollständig geschützt ist?
 4. **Reihenfolge:** Soll der Modus vor oder nach dem Neubau von Hardcore kommen?
 5. **Auswertung:** nur für Admins (Vorschlag) oder später auch eine öffentliche Seite mit Siegquoten je Held?

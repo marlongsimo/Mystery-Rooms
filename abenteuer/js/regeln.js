@@ -79,6 +79,9 @@
 
   /* ---------- Gegner (Grauwacht) ---------- */
   const GEGNER = {
+    // Arena: Helden und Wölfe des anderen Spielers, solange der eigene am Zug ist (keine eigenen Angriffe, keine Sonderregeln)
+    arenaheld: { name: "Held", tp: 1, rk: 10, werte: { STR: 10, GES: 10, KON: 10, INT: 10, WEI: 10, CHA: 10 }, xp: 0 },
+    arenawolf: { name: "Wolf", tp: 1, rk: 10, werte: { STR: 10, GES: 10, KON: 10, INT: 10, WEI: 10, CHA: 10 }, xp: 0 },
     rostkaefer: { name: "Rostkäfer", tp: 9, rk: 13, werte: { STR: 12, GES: 12, KON: 13, INT: 1, WEI: 10, CHA: 3 }, angriff: { name: "Biss", bonus: 3, schaden: "1W6+1" }, rost: true, xp: 25 },
     schattenkobold: { name: "Schattenkobold", tp: 7, rk: 13, werte: { STR: 8, GES: 15, KON: 10, INT: 10, WEI: 8, CHA: 8 }, angriff: { name: "Dolch", bonus: 4, schaden: "1W4+2" }, flieht: 3, xp: 25 },
     knochenwaechter: { name: "Knochenwächter", tp: 13, rk: 13, werte: { STR: 10, GES: 14, KON: 15, INT: 6, WEI: 8, CHA: 5 }, angriff: { name: "Kurzschwert", bonus: 4, schaden: "1W6+2" }, untot: true, anfaellig: "wucht", xp: 50 },
@@ -334,7 +337,7 @@
     const fids = (opts.figuren && opts.figuren.length ? opts.figuren : ["schildwaechter", "elementarist", "lichtbringer"]).slice(0, 6);
     fids.forEach((fid, i) => {
       const [x, y] = k.start.spieler[i];
-      const f = neueFigur(fid, i, (opts.stufen && opts.stufen[fid]) || st.stufe, x, y);
+      const f = neueFigur(fid, i, (opts.stufenListe && opts.stufenListe[i]) || (opts.stufen && opts.stufen[fid]) || st.stufe, x, y);
       const v = opts.vorher && opts.vorher[fid];
       const extra = opts.ausruestung && opts.ausruestung[fid];
       if (extra) { f.rk += extra.rk || 0; f.rkBasis += extra.rk || 0; f.ausruestung = extra.name; st.log.push({ t: `${f.name} trägt ${extra.name}: RK ${f.rk}.`, art: "gut" }); }
@@ -563,6 +566,10 @@
 
   /* ---------- Schaden, Heilung, Ende ---------- */
   function schaden(st, z, n, opts = {}) {
+    if (!st.arena) return schadenKern(st, z, n, opts);
+    const vor = z.tp; schadenKern(st, z, n, opts); arenaPunkte(st, z, vor);
+  }
+  function schadenKern(st, z, n, opts = {}) {
     if (z.tot) return;
     if (z.seite === "gegner" && z.schild) n = schildAbfangen(st, z, n);
     if (z.seite === "spieler" && z.tp <= 0) {
@@ -611,6 +618,7 @@
   }
   function pruefeEnde(st) {
     if (st.ende) return st.ende;
+    if (st.arena) return arenaPruefen(st);
     if (st.mech) { mechSiegPruefen(st); if (st.ende) return st.ende; }
     const sp = spielerFiguren(st), ge = gegnerFiguren(st);
     // Eskorte mit „jaegerSieg“: Sind alle Jäger besiegt, ist die Begleiterin in Sicherheit
@@ -1094,6 +1102,7 @@
   /* ---------- Zugwechsel ---------- */
   function beginneZug(st) {
     for (let schutz = 0; schutz < 40; schutz++) {
+      if (st.arena) { if (arenaZugbeginn(st)) continue; if (st.ende) return; }
       const f = aktiv(st);
       if (f.seite === "gegner") {
         if (f.tp <= 0) { weiter(st, true); continue; }
@@ -1154,9 +1163,11 @@
   }
   function weiter(st, still) {
     const f = aktiv(st); if (f && !still) tick(f);
+    if (st.arena) arenaSicht(st, 0); // zwischen den Zügen sind alle Helden wieder „Spieler“ (für Monster, Flächen und Rundenwechsel)
     st.am++;
     if (st.am >= st.reihe.length) {
       st.am = 0; st.runde++;
+      if (st.arena && st.runde > st.arena.runden) { arenaEnde(st, "Die Zeit ist um."); return; }
       st.zonen = st.zonen.filter((z) => z.bis > st.runde);
       st.brand = st.brand.filter((b) => b.bis > st.runde);
       const verblasst = st.figuren.filter((g) => g.z && g.z.segen && g.z.segenBis <= st.runde);
@@ -1248,6 +1259,74 @@
     const sichtbar = alle.filter((f) => !f.z.versteckt);
     return sichtbar.length ? sichtbar : alle;
   }
+  /* ---------- Arena: zwei Spieler mit je drei Helden und Monster auf derselben Karte ----------
+   * Der Regelkern kennt nur „Spieler“ und „Gegner“. Darum wechselt in der Arena die Sicht mit dem Zug:
+   * Ist ein Held von Team 1 am Zug, gelten die Helden von Team 2 für diesen Zug als Gegner (und umgekehrt).
+   * Zwischen den Zügen und wenn Monster ziehen, sind alle Helden wieder „Spieler“ – Monster greifen beide Teams an.
+   * Niemand scheidet aus: Wer zu Boden geht, kehrt nach zwei Runden an seinen Startplatz zurück.
+   * Punkte: Monster besiegt 1 (Endgegner 3), gegnerischen Helden zu Boden gebracht 2. Ende: alle Monster besiegt oder Rundenlimit. */
+  const teamVon = (st, f) => (f ? f.team || (f.besitzer && (fig(st, f.besitzer) || {}).team) || 0 : 0);
+  function arenaSicht(st, team) {
+    for (const h of st.figuren) {
+      const t = teamVon(st, h); if (!t) continue;
+      const fremd = team && t !== team;
+      if (fremd && h.seite !== "gegner") { h.seite = "gegner"; h.artA = h.art || null; h.art = h.artA === "wolf" ? "arenawolf" : "arenaheld"; if (h.fid) { h.fidA = h.fid; delete h.fid; } }
+      else if (!fremd && h.seite !== "spieler") { h.seite = "spieler"; if (h.artA) h.art = h.artA; else delete h.art; delete h.artA; if (h.fidA) { h.fid = h.fidA; delete h.fidA; } }
+    }
+    st.arena.sicht = team || 0;
+  }
+  /** Zu Beginn eines Zugs: Sicht setzen; wer am Boden liegt, wartet oder kehrt zurück. true = dieser Zug wird übersprungen */
+  function arenaZugbeginn(st) {
+    arenaSicht(st, 0);
+    const f = aktiv(st), t = teamVon(st, f);
+    if (t && f.team && f.tp <= 0) {
+      f.arenaUnten = (f.arenaUnten || 0) + 1;
+      if (f.arenaUnten >= 2) {
+        const [sx, sy] = f.arenaStart, ziel = !belegt(st, sx, sy, f) ? { x: sx, y: sy } : freiesFeldNahe(st, [sx, sy], 4) || { x: sx, y: sy };
+        f.x = ziel.x; f.y = ziel.y; f.tp = Math.ceil(f.tpMax / 2); f.arenaUnten = 0; f.todes = { e: 0, f: 0 }; f.stabil = false; delete f.z.liegend;
+        st.log.push({ t: `${f.name} kehrt an den Startplatz zurück (${f.tp} TP).`, art: "gut" });
+      } else { st.log.push({ t: `${f.name} liegt am Boden und kehrt in der nächsten Runde zurück.` }); weiter(st, true); return true; }
+    }
+    arenaSicht(st, t);
+    return false;
+  }
+  function arenaPunkte(st, z, vor) {
+    if (!(vor > 0) || z.tp > 0) return;
+    const wer = aktiv(st), t = teamVon(st, wer), zt = teamVon(st, z);
+    if (!t) return;                                  // Monster bringen niemandem Punkte
+    if (zt && zt !== t && z.fidA) { st.arena.punkte[t] += 2; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +2 Punkte (${z.name} am Boden).`, art: "gut" }); }
+    else if (!zt && z.seite === "gegner" && GEGNER[z.art]) { const p = GEGNER[z.art].boss ? 3 : 1; st.arena.punkte[t] += p; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +${p} ${p === 1 ? "Punkt" : "Punkte"} (${z.name}).`, art: "gut" }); }
+  }
+  const arenaMonster = (st) => st.figuren.filter((f) => !teamVon(st, f) && f.seite === "gegner");
+  function arenaPruefen(st) {
+    if (st.ende) return st.ende;
+    if (arenaMonster(st).length && arenaMonster(st).every((f) => f.tp <= 0)) arenaEnde(st, "Alle Monster sind besiegt.");
+    return st.ende;
+  }
+  function arenaEnde(st, grund) {
+    arenaSicht(st, 0);
+    const p = st.arena.punkte, leben = (t) => st.figuren.filter((f) => f.team === t).reduce((a, f) => a + Math.max(0, f.tp) / f.tpMax, 0);
+    const sieger = p[1] !== p[2] ? (p[1] > p[2] ? 1 : 2) : leben(1) !== leben(2) ? (leben(1) > leben(2) ? 1 : 2) : 2; // Gleichstand: mehr Leben, sonst der Nachziehende
+    st.arena.sieger = sieger; st.arena.grund = grund; st.ende = "arena";
+    st.log.push({ t: `${grund} ${st.arena.namen[0]} ${p[1]} : ${p[2]} ${st.arena.namen[1]} – Sieg für ${st.arena.namen[sieger - 1]}.`, art: "ende" });
+  }
+  /** Neue Arena-Partie. o: { teams: [[{fid, stufe} × 3], [{fid, stufe} × 3]], namen: [a, b], karte, begegnung, bedrohung, runden } */
+  function neueArena(seed, o) {
+    const k = o.karte, alle = o.teams[0].concat(o.teams[1]), mitte = { x: (k.b - 1) / 2, y: (k.h - 1) / 2 };
+    const s1 = k.start.spieler.slice(0, 3), schwer = { x: s1.reduce((a, p) => a + p[0], 0) / 3, y: s1.reduce((a, p) => a + p[1], 0) / 3 };
+    // Team 2 startet so weit wie möglich von Team 1 entfernt, die Monster stehen dazwischen
+    const fern = k.start.gegner.slice().sort((a, b) => (Math.abs(b[0] - schwer.x) + Math.abs(b[1] - schwer.y)) - (Math.abs(a[0] - schwer.x) + Math.abs(a[1] - schwer.y)));
+    const s2 = fern.slice(0, 3), rest = fern.slice(3).sort((a, b) => (Math.abs(a[0] - mitte.x) + Math.abs(a[1] - mitte.y)) - (Math.abs(b[0] - mitte.x) + Math.abs(b[1] - mitte.y)));
+    const karte = Object.assign({}, k, { start: Object.assign({}, k.start, { spieler: s1.concat(s2), gegner: rest.length ? rest : k.start.gegner, wolf: (k.start.wolf || []).concat(fern.slice(3)) }) });
+    const st = neuesSpiel(seed, { figuren: alle.map((h) => h.fid), stufenListe: alle.map((h) => h.stufe), karte, begegnung: o.begegnung, bedrohung: o.bedrohung || 0, mischen: false, anfuehrer: false, zusatzGegner: 0 });
+    const helden = st.figuren.filter((f) => /^f\d+$/.test(f.id));
+    helden.forEach((f, i) => { f.team = i < 3 ? 1 : 2; f.arenaStart = [f.x, f.y]; });
+    st.arena = { punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || 10, sicht: 0, sieger: null };
+    st.schwierigkeit = "normal"; st.ende = null;
+    beginneZug(st);
+    return st;
+  }
+
   /* ---------- Klügere Gegner (nur im Zehn-Stufen-Modell; laufende Kampagnen im bisherigen Modell spielen wie bisher) ----------
    * Statt stur zum nächsten Helden zu laufen, wägt ein Gegner ab: Wen erreiche ich in diesem Zug? Wer ist angeschlagen
    * oder schlecht gerüstet? Wer macht sich gerade an einem Ziel zu schaffen? Auf wen gehen meine Verbündeten schon?
@@ -2153,7 +2232,7 @@
   }
 
   const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
-    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, gegnerZug, autoZug,
+    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, neueArena, teamVon, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;

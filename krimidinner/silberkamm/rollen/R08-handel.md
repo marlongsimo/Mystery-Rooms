@@ -78,5 +78,5 @@ Kommt das heraus, bist du in der Schweiz erledigt. Bestechung eines Vermittlers,
 
 ## Runde 4 · Die Wahrheit
 
-- Jetzt kann die Bestechung herauskommen, wenn jemand nachbohrt. Du entscheidest, wie lange du sie leugnest. Sie hat mit dem Mord nichts zu tun, und das kannst du sagen.
+- Jetzt kann die Bestechung herauskommen, wenn jemand nachbohrt. Du entscheidest, wie lange du ausweichst. Ausdrücklich bestreiten darfst du sie nicht. Sie hat mit dem Mord nichts zu tun, und das kannst du sagen.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

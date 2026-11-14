@@ -71,7 +71,7 @@ Kommt das heraus, verlierst du die Approbation und alles, was du seither aufgeba
 
 - Das Unglück von 1921 kommt auf den Tisch, und mit ihm **dein Name im Urteil**. Jetzt wird man dich ansehen.
 - **Was du zugeben kannst:** dass du Wendt untersucht hast, als [Vertragsärztin / Vertragsarzt] der Bahn, und dass Auen dich nach Zürich bestellt hat, damit du das Gutachten bestätigst. Das ist peinlich, aber nicht strafbar.
-- **Was du nicht zugeben willst:** das Kuvert. Wenn jemand davon weiß (wer hat um 19:50 zugehört?), streite es ab, solange es geht: „Ich habe gerochen, was ich gerochen habe.“
+- **Was du nicht zugeben willst:** das Kuvert. Wenn jemand davon weiß (wer hat um 19:50 zugehört?), weich aus, solange es geht: „Ich habe gerochen, was ich gerochen habe.“ Dass es das Kuvert gab, darfst du verschweigen, aber nicht ausdrücklich bestreiten.
 - **Was du über andere weißt:**
   - {R06: Die Baronin / Der Baron} von Steinach hat beim Dinner kein Wort mit Auen gewechselt, aber ihn die ganze Zeit angestarrt.
   - {R04: Frau / Herr} Sattler war schon um acht betrunken und hat laut über „Sperrvermerke“ geredet.

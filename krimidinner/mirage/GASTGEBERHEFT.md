@@ -1,6 +1,6 @@
 # Vorhang aus Lügen – Gastgeberheft
 
-*Für die Spielleitung. Teil A darfst du jederzeit lesen, auch wenn du selbst mitspielst. **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
+*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
 ---
 
@@ -14,6 +14,10 @@ Du bist Erzählstimme, Zeitwächter und Beweisausgabe:
 - Du achtest darauf, dass der Abend im Fluss bleibt.
 
 Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Welche Rolle du hast, auch ob es die Täterrolle ist, siehst du erst in deinem Rollenblatt.
+
+**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
+
+**Wenn du die Täterrolle hast:** Du leitest genauso weiter. Du liest jeden Text vollständig vor und nennst jedes Losungswort zur vorgesehenen Zeit. Stockt das Gespräch, nimmst du den ersten Impuls der Phase, wörtlich, auch wenn er dir schadet. Als Spielleitung bist du unparteiisch, als Figur verteidigst du dich.
 
 ## A2 · Vorbereitung (eine Woche bis zwei Tage vorher)
 

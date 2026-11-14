@@ -79,7 +79,7 @@ Gelesen hast du ihn nicht. Das tust du nie.
 ## Runde 2 · Die Vergangenheit kehrt zurück
 
 - In dieser Runde taucht der **Brief an Notar Odermatt** auf (Beweis B7). Vielleicht wird verlangt, dass du deine Taschen leerst, vielleicht erinnert sich jemand, dich um 21:50 mit Auen gesehen zu haben. Wenn die Gruppe fragt, ob Auen dir etwas gegeben hat, gib den Brief heraus. Lügen über Beweisstücke bringt dich in Teufels Küche.
-- Für die fünfzig Schilling kannst du lügen („ein Trinkgeld“) oder die Wahrheit sagen. Du entscheidest.
+- Nach den fünfzig Schilling gefragt, kannst du ausweichen („Das war eine Sache zwischen Herrn von Auen und mir“) oder die Wahrheit sagen. Du entscheidest. Etwas anderes erfinden darfst du nicht.
 - Der Brief selbst ist wichtig: Auen schreibt, das Original reise mit ihm. Wo ist es jetzt?
 - **Was du über andere weißt:**
   - {R06: Die Baronin / Der Baron} von Steinach hat dich am Bahnsteig in Wien gefragt, in welchem Abteil Auen reist.

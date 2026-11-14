@@ -49,7 +49,7 @@ window.MR_SEITEN = {
       mehr: "Bis zu zehn Figuren mit Geheimnissen, drei Ermittlungsrunden und ein Finale. Rollen per Handy oder ausgedruckt, Gastgeberheft mit Ablauf und Vorlesetexten.",
     },
     "krimidinner-silberkamm": {
-      intro: "Februar 1929: Der Silberkamm-Express steckt im Schnee fest, im Salonabteil liegt ein toter Fabrikant, und die Uhr zeigt eine Zeit, zu der fast alle ein Alibi haben.",
+      intro: "Februar 1929: Der Silberkamm-Express steckt im Schnee fest, im Salonabteil liegt ein toter Fabrikant, und die Reiseuhr im Abteil ist um 22:41 stehen geblieben.",
       wen: "Für Runden, die gern mit Uhrzeiten und Alibis knobeln.",
       team: "6–8 Personen am Tisch, die Spielleitung spielt mit.",
       tipp: "Mode der späten Zwanziger: Weste, Hut, Perlenkette.",

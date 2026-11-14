@@ -17,7 +17,7 @@
 
 ## Charakter · Deine Vorgeschichte
 
-1946 habt ihr, Varn und du, gemeinsam das Spiegelkabinett gebaut: Spiegelwände, eine verborgene Rückkammer, eine Versenkung mit Handkurbel unter Klappe 3. Das Publikum liebte „Den doppelten Mann“. Drei Jahre lang wart ihr die Attraktion von Nordhafen.
+1946 habt ihr, Varn und du, gemeinsam die Nummer „Der doppelte Mann“ entwickelt, eine Illusion mit einem Spiegelkabinett. Das Publikum liebte sie. Drei Jahre lang wart ihr die Attraktion von Nordhafen.
 
 Im März 1949 endete das mit einem Unglück auf der Bühne, bei dem ein junger Artist ums Leben kam. Die Zeitungen schrieben deinen Namen. Varns Name stand nur als „Direktor, tief erschüttert“ darin. Seitdem trittst du in Kurhäusern und auf Kinderfesten an der Ostsee auf. Zauberei mit Tüchern und Karten, keine Kabinette mehr.
 
@@ -50,6 +50,8 @@ Im März 1949 endete das mit einem Unglück auf der Bühne, bei dem ein junger A
 ## Vertraulich · Dein Geheimnis — STRENG VERTRAULICH
 
 **Du hast Aurel Varn getötet.**
+
+**Was du über das Kabinett weißt:** Du hast es 1946 mit Varn selbst gebaut: Spiegelwände, eine verborgene Rückkammer, eine Versenkung mit Handkurbel unter Klappe 3. Wenn du dich vorstellst, sagst du davon nichts.
 
 **Was 1949 wirklich geschah:** Am 12. März 1949 ließ Varn die Sicherung von Klappe 3 entfernen, damit der Wechsel des Doubles schneller ging. Er schrieb die Anweisung auf einen Werkstattzettel: „Sicherung Klappe 3 entfernen – schneller Wechsel. A.V.“ Der Lehrling {R05: Rafaela / Rafael} Dorne, damals siebzehn, führte sie aus und flüsterte dir vor der Vorstellung zu: „Die Sicherung ist raus.“
 

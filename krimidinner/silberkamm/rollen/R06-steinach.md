@@ -19,7 +19,7 @@ verwitwet, aus altem Kärntner Adel, Schloss Steinach bei Villach
 
 Du hast mit [deinem Mann Albrecht / deiner Frau Marie] fünfundzwanzig Jahre auf Schloss Steinach gelebt. Kinder hattet ihr keine. Am 3. März 1921 fuhr [Albrecht / Marie] mit dem Personenzug nach Innsbruck, zu einem Notar. [Er / Sie] kam nie an.
 
-Seitdem verwaltest du allein ein Gut, das zu groß für dich ist und zu teuer. Du erzählst allen, du reist zu deiner Schwester nach Zürich.
+Seitdem verwaltest du allein ein Gut, das zu groß für dich ist und zu teuer. Vor der Abfahrt hast du allen erzählt, du reist zu deiner Schwester nach Zürich.
 
 ## Kleidung · Deine Kleidung
 
@@ -35,7 +35,7 @@ Seitdem verwaltest du allein ein Gut, das zu groß für dich ist und zu teuer. D
 
 ## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-Das Gut ist **verschuldet bis zum letzten Stein**. Wenn die Bank im März die Hypothek kündigt, verlierst du das Schloss, in dem [Albrecht / Marie] geboren wurde. Die Reise „zur Schwester“ ist erfunden.
+Das Gut ist **verschuldet bis zum letzten Stein**. Wenn die Bank im März die Hypothek kündigt, verlierst du das Schloss, in dem [Albrecht / Marie] geboren wurde. Die Reise „zur Schwester“ ist erfunden. Am Tisch wiederholst du sie nicht: Fragt jemand nach dem Grund deiner Reise, weichst du aus („Familiäres“).
 
 Du fährst nach Zürich, um den Käufern der Auenwerke eine Forderung vorzulegen: **Entschädigung für den Tod [deines Mannes / deiner Frau]**, 80.000 Schilling. Du hast Auen achtmal geschrieben, er hat nie geantwortet. Der Verkauf ist deine letzte Gelegenheit. Neue Eigentümer wollen keinen Skandal.
 

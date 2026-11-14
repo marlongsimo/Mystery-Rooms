@@ -54,7 +54,7 @@ Nur die **Täterrolle** darf über ihre eigenen Handlungen zur Tatzeit bewusst f
 | **1 · Abfahrt** | Alle stellen ihre Figur vor. | ca. 15 Min. |
 | **2 · Der Tote im Abteil** | Der Fund, die ersten Beweise. Jede Person sagt, wo sie in der Nacht war. | ca. 35 Min. |
 | **3 · Die Vergangenheit kehrt zurück** | Ein altes Unglück kommt ans Licht. Befragt einander. | ca. 40 Min. |
-| **4 · Die falsche Zeit** | Etwas stimmt mit der Uhrzeit nicht. Alle Alibis werden neu geprüft. | ca. 40 Min. |
+| **4 · Neue Befunde** | Der Tatort wird noch einmal untersucht. Geht die Nacht Schritt für Schritt durch. | ca. 40 Min. |
 | **5 · Die Wahrheit** | Die letzten Beweise. Setzt die Teile zusammen. | ca. 30 Min. |
 | **Finale · Anklage und Auflösung** | Jede Person gibt verdeckt ab, wen sie anklagt. Dann wird aufgelöst. | 20–30 Min. |
 
@@ -88,7 +88,7 @@ Danach legt die Täterrolle ihr Rollenblatt offen, der letzte Beweis wird geöff
 - **Spiel deine Figur, nicht dich selbst.** Es ist erlaubt, eitel, misstrauisch oder gekränkt zu sein.
 - **Frag nach Uhrzeiten.** In einem Zug hängt alles an Minuten.
 - **Zeichne mit.** Ein Zettel mit einer Zeitleiste hilft mehr als jede Vermutung.
-- **Prüft, was zu gut passt.** Ein Alibi kann auch zu perfekt sein.
+- **Fragt nach, woher jemand etwas weiß.** Selbst gesehen, gehört oder nur vermutet?
 - **Nicht jede Person, die lügt, hat gemordet.** Fast alle haben etwas zu verbergen.
 - **Die Täterrolle darf sich gut verteidigen.** Ein Fall ist erst dann schön gelöst, wenn er nicht zu leicht war.
 - Wer die Täterrolle hat: Du gewinnst nicht durch Schweigen, sondern durch eine Geschichte, die lange hält.

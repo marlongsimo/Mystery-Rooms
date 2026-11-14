@@ -1,6 +1,6 @@
 # Nebenan – Der stille Kreis – Gastgeberheft
 
-*Für die Spielleitung. Teil A darfst du jederzeit lesen, auch wenn du selbst mitspielst. **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
+*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
 ---
 
@@ -16,6 +16,10 @@ Du bist Erzählstimme, Zeitwächter und Beweisausgabe:
 Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Welche Rolle du hast, auch ob es die Täterrolle ist, siehst du erst in deinem Rollenblatt.
 
 **Eine Besonderheit dieses Falls:** Einige Figuren gehören zu einer Gemeinschaft, von der die anderen noch nichts wissen. Das ist gewollt. Verrate in Phase 1 und 2 nichts, auch wenn du es aus deinem eigenen Rollenblatt weißt.
+
+**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) öffnest du erst in der Phase, zu der der Impuls gehört. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
+
+**Wenn du die Täterrolle hast:** Du leitest genauso weiter. Du liest jeden Text vollständig vor und nennst jedes Losungswort zur vorgesehenen Zeit. Stockt das Gespräch, nimmst du den ersten Impuls der Phase, wörtlich, auch wenn er dir schadet. Als Spielleitung bist du unparteiisch, als Figur verteidigst du dich.
 
 ## A2 · Vorbereitung (eine Woche bis zwei Tage vorher)
 
@@ -46,7 +50,7 @@ Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine 
   - **B21** in einen weißen Umschlag mit der Aufschrift „K. – persönlich“.
   - Den Hausplan einmal pro Person drucken.
   - Teil B dieses Hefts in einen eigenen Umschlag.
-- [ ] **Am Abend bereitlegen:** Zettel und Stifte, Anklagezettel, eine gut sichtbare Uhr. Wenn möglich: eine Papierlaterne, eine Spendendose, ein Schlüsselbund mit drei Schlüsseln, ein Stück dunkelgrüne Wolle.
+- [ ] **Am Abend bereitlegen:** Zettel und Stifte, Anklagezettel, eine gut sichtbare Uhr. Wenn möglich: eine Papierlaterne, eine Spendendose, ein Schlüsselbund mit drei Schlüsseln.
 
 ## A3 · Besetzung und Zusatzkarten
 
@@ -67,6 +71,8 @@ Die Rollen werden in dieser Reihenfolge besetzt. Nicht besetzte Rollen sind **Ne
 |---|---|
 | B19 Wiesners Aussage | mit FADEN, **nur wenn R09 fehlt** |
 | B20 Özdemirs Aussage | mit FADEN, **nur wenn R07 fehlt** |
+
+Aussagekarten für Nebenfiguren gibt es in diesem Fall nicht. Was von Wiesner und Özdemir gebraucht wird, steht auf B19 und B20.
 
 **Wielands Kamera (B22)** liegt immer auf dem Tisch. Spielt niemand Wieland, legt Kranz sie in Runde 4 vor.
 
@@ -157,7 +163,7 @@ Dann sagt {R02: Beate / Benedikt} Kranz, wenn besetzt in eigenen Worten, sonst l
 - die Beweise B9 Zwei Formulare · B10 Mitgliederkarte und Folie · B11 Eingangsbuch · B13 Briefwechsel Seifert · B14 Das grüne Heft,
 - in jedem Rollenblatt **Runde 3**.
 
-**Hinweis:** Die Streifen (B12) sind noch nicht dabei. Sie bringt {R04: Karla / Karl} Seifert selbst auf den Tisch, sobald {R04: ihr / ihm} das Geräusch von 20:49 einfällt (siehe **Streifen**). Ist das nach der ersten Besprechung von B9 bis B11 noch nicht geschehen, frag Seifert: „Du hast vorhin von einem Geräusch im Flur erzählt. Was war das?“
+**Hinweis:** Die Streifen (B12) sind noch nicht dabei. Sie bringt {R04: Karla / Karl} Seifert selbst auf den Tisch, sobald {R04: ihr / ihm} das Geräusch von 20:49 einfällt (siehe **Streifen**). Ist das nach der ersten Besprechung von B9 bis B11 noch nicht geschehen, frag Seifert: „Ist dir heute Abend im Flur etwas aufgefallen, vielleicht ein Geräusch?“
 
 **Tipp:** Lasst B9, B10 und B11 nebeneinander liegen. Wer die Folie auf die Karte legt, sieht mehr.
 

@@ -66,7 +66,7 @@ Drei Jahre später stand Varn vor deiner Tür und bot dir eine Stelle an, „aus
 
 ## Runde 2 · Was 1949 geschah
 
-- Der Zeitungsbericht von 1949 liegt auf dem Tisch. Jetzt weiß jeder, dass Lukas dein Bruder war.
+- Der Zeitungsbericht von 1949 liegt auf dem Tisch. Spätestens jetzt weiß jeder, dass Lukas dein Bruder war.
 - **Was du sagen kannst:** wie Lukas war, was man dir 1949 erzählt hat und was der alte Bühnenarbeiter vor einem Monat gesagt hat: „Fragen Sie Varn mal, wer die Sicherung abgenommen hat.“
 - Zu Velten: Du darfst wütend sein, und du darfst Fragen stellen. Beides ist menschlich.
 - Deine Schulden bei Varn verschweigst du, solange es geht.

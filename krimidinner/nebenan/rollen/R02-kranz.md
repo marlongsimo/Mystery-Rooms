@@ -68,6 +68,7 @@ Von Hannos Donnerstagsrunde im Beratungsraum weißt du nur, dass es sie gibt. Er
 - Du übernimmst den Abend. Leg deine **Fundskizze** (B1) und die **Vorderseite deiner Notizen** (B2) vor.
 - **Physische Anweisung:** Zeig nur die Vorderseite. Falte das Blatt danach einmal genau in der Mitte, sodass die Rückseite innen liegt, und behalte es bei dir. Niemand liest die Rückseite.
 - Sag wahrheitsgemäß: „Ich war ab 20:38 draußen am Auto; telefoniert habe ich von 20:41 bis 20:51.“ Mit wem, musst du nicht sagen.
+- Das Fadenende in Hannos Hand hast du so eingezeichnet, wie du es um 21:15 gesehen hast: ein kleines Stück zwischen den Fingern. Auf die Farbe hast du nicht geachtet, und wo es geblieben ist, weißt du nicht.
 
 ## Runde 2 · Das Hinterzimmer
 

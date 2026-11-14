@@ -89,3 +89,5 @@ Du bist an die Schweigepflicht gebunden. Wenn du das Testament vor der Zeit offe
 - **Trumpf:** die Abschrift in deiner Mappe. Spiel sie aus, wenn das Gespräch über Marwitz’ Ansprüche festfährt. Sie beweist, dass Sander seine Schuld eingestehen wollte.
 
 ## Runde 3 · Die letzte Ermittlung
+
+- **Phase 4 (Protokoll):** Das Zutrittsprotokoll (B9) bestätigt dich: 21:07 in den Ostflügel, 21:21 zurück, dazwischen war die Tür verriegelt. Zeig darauf. Und hast du Rademachers Bitte aus dem Frühjahr (Inventarliste „ohne die Karten 41–48“) noch nicht erzählt, dann jetzt.

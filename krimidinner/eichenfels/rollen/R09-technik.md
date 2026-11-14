@@ -45,11 +45,11 @@ Die anderen kennst du aus dem Alltag: Rademacher aus dem Archiv, mit {R08: der /
 
 ## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofotos**, die du verkaufst, obwohl Sander es verboten hat. Heute läuft seit 20 Uhr eine Aufnahme, und Sander will nach seiner Rede „die Kuppel prüfen“. **Du hast vor, kurz nach der Rede am Kuppelpult den Not-Aus zu drücken.** Der Strom ist dann ein paar Minuten weg, und das Nutzungsprotokoll des Teleskops ist gelöscht. Den Gästen sagst du: Sturmschaden.
+Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofotos**, die du verkaufst, obwohl Sander es verboten hat. Heute läuft seit 20 Uhr eine Aufnahme, und Sander will nach seiner Rede „die Kuppel prüfen“. **Du hast vor, kurz nach der Rede am Kuppelpult den Not-Aus zu drücken.** Der Strom ist dann ein paar Minuten weg, und das Nutzungsprotokoll des Teleskops ist gelöscht. Im Festsaal willst du danach nur kurz „Sturmschaden“ rufen und hoffen, dass niemand nachfragt.
 
 ## Vertraulich · Deine Ziele
 
-1. **Persönlich:** Das Teleskop-Geschäft geheim halten. Fragt jemand nach dem Strom: Sturmschaden.
+1. **Persönlich:** Das Teleskop-Geschäft geheim halten. Fragt jemand nach dem Strom, weichst du aus: „Er ist wieder da, darum habe ich mich gekümmert.“ Eine Ursache behauptest du nicht (Regel 2).
 2. **Zu einer anderen Person:** Marwitz hast du heute Nachmittag stolz den alten Refraktor gezeigt. Jetzt hoffst du, dass {R02: sie / er} heute Abend nicht in der Kuppel herumsteht, wenn du dort zu tun hast.
 3. **Zum Fall:** Die Technik dieses Hauses kennst du als [Einzige / Einziger]. Wenn heute etwas passiert, wird man dich fragen.
 
@@ -79,7 +79,7 @@ Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofot
 
 **Was du sagen darfst:** Deinen Aufenthaltsort und deine Handlungen musst du wahrheitsgemäß angeben (Regel 2). Das heißt: Wenn man dich fragt, musst du zugeben, dass du in der Kuppel warst und den Not-Aus gedrückt hast. **Warum**, darfst du verschweigen.
 
-- **Phase 2 (Mord):** Erkläre den Stromausfall zuerst als Sturmschaden. Wenn jemand direkt fragt, wo du warst, gilt Regel 2: Kuppel, dann Keller.
+- **Phase 2 (Mord):** Zur Ursache des Stromausfalls sagst du von dir aus nichts. „Sturmschaden“ hast du um 21:22 im Festsaal gerufen. Am Tisch wiederholst du das nicht als Tatsache: Hält es dir jemand vor, darfst du schweigen oder ausweichen („Das habe ich im ersten Moment gesagt“), aber nicht darauf bestehen. Wenn jemand direkt fragt, wo du warst oder was du getan hast, gilt Regel 2: Kuppel, Not-Aus, dann Keller.
 
 ## Runde 2 · Jetzt fällt dir ein
 

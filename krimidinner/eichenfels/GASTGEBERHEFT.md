@@ -1,6 +1,6 @@
 # Der letzte Gast – Gastgeberheft
 
-*Für die Spielleitung. Teil A darfst du jederzeit lesen, auch wenn du selbst mitspielst. **Teil B enthält die Lösung** und ist versiegelt: Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
+*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt: Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
 ---
 
@@ -9,6 +9,10 @@
 ## A1 · Deine Aufgabe
 
 Du bist Erzählstimme, Zeitwächter und Beweisausgabe. Du liest zu Beginn jeder Phase einen kurzen Text vor, gibst die Beweise frei und achtest darauf, dass der Abend im Fluss bleibt. Den Fall löst du nicht – das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Wer welche Rolle hat, siehst du nicht, auch nicht, ob du selbst die Täterrolle hast, bevor du dein Blatt öffnest.
+
+**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
+
+**Wenn du die Täterrolle hast:** Du leitest genauso weiter. Du liest jeden Text vollständig vor und nennst jedes Losungswort zur vorgesehenen Zeit. Stockt das Gespräch, nimmst du den ersten Impuls der Phase, wörtlich, auch wenn er dir schadet. Als Spielleitung bist du unparteiisch, als Figur verteidigst du dich.
 
 ## A2 · Vorbereitung (eine Woche bis zwei Tage vorher)
 
@@ -124,7 +128,7 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 1. Alle füllen verdeckt einen **Anklagezettel** aus (Vorlage unten). Auch die Täterrolle gibt einen ab.
 2. Zettel einsammeln, der Reihe nach vorlesen. Noch nichts kommentieren.
-3. **Jetzt Teil B öffnen.**
+3. **Losungswort MORGENGRAUEN** öffnet B13 (Transportkiste) und B14 (Redemanuskript). Die App fragt vorher nach, ob alle ihre Anklage abgegeben haben. **Jetzt Teil B öffnen.**
 
 **Anklagezettel (Vorlage, A6):**
 ```
@@ -175,7 +179,7 @@ Diese Impulse helfen weiter, ohne etwas zu verraten. Nimm höchstens einen pro P
 ## B-1 · Ablauf der Auflösung
 
 1. **Die Täterrolle steht auf** und legt ihr Rollenblatt offen: Dr. {R08: Judith / Julius} Rademacher, Archivleitung.
-2. Du öffnest den Umschlag mit **B13** (Transportkiste) und **B14** (Redemanuskript) und liest beide vor.
+2. Du liest **B13** (Transportkiste) und **B14** (Redemanuskript) vor. In der App hat MORGENGRAUEN sie geöffnet, in der Druckversion liegen sie im Umschlag.
 3. Du liest die **Auflösung** vor.
 4. Danach erzählt jede Person reihum ihr Geheimnis und ob sie ihre Ziele erreicht hat.
 5. Punkte zählen (wenn gewünscht).

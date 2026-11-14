@@ -142,7 +142,7 @@ window.MR_GAMES = [
     subtitle: "Krimidinner · Fall 02",
     category: "crime",
     categoryLabel: "Crime & Mystery · Krimidinner",
-    teaser: "Februar 1929, der Silberkamm-Express von Wien nach Zürich bleibt im Schnee stecken. Im Salonabteil liegt ein toter Fabrikant, und die Uhr zeigt eine Zeit, zu der fast alle ein Alibi haben. Jede und jeder am Tisch spielt eine Rolle mit einem Geheimnis.",
+    teaser: "Februar 1929, der Silberkamm-Express von Wien nach Zürich bleibt im Schnee stecken. Im Salonabteil liegt ein toter Fabrikant, und die Reiseuhr im Abteil ist um 22:41 stehen geblieben. Jede und jeder am Tisch spielt eine Rolle mit einem Geheimnis.",
     duration: "ca. 3½ Std.",
     difficulty: 3,
     players: "6–8 Personen",

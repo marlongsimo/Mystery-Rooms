@@ -33,7 +33,7 @@ Seit 1998 führst du die Ablage des Vereins, das Eingangsbuch und den Schlüssel
 | **Requisit fürs Spiel (Pflicht)** | **eine lange dunkelgrüne Strickjacke** (an der linken Manschette einen Faden herausziehen oder eine kleine Schlaufe andeuten) | **dasselbe** |
 | **zweites Requisit** | ein Schlüsselbund | dasselbe |
 
-*Die Strickjacke ist wichtig. Trag sie den ganzen Abend. Wer die Täterrolle hat, darf sich nicht durch ein fehlendes Requisit verraten. Fragt jemand nach deinem linken Ärmel, zeigst du ihn.*
+*Die Strickjacke ist wichtig. Trag sie den ganzen Abend. Wer die Täterrolle hat, darf sich nicht durch ein fehlendes Requisit verraten. Den linken Ärmel zeigst du erst, wenn in Runde 4 der Faden (B18) auf dem Tisch liegt und jemand danach fragt.*
 
 ## Vertraulich · Dein Spickzettel
 
@@ -93,7 +93,7 @@ Seit 1998 führst du die Ablage des Vereins, das Eingangsbuch und den Schlüssel
 - **Lügen darfst du nur über deine eigenen Aufenthaltsorte und Handlungen zwischen 20:40 und 20:57** (Regel 2). Das ist dein Spielraum: Küche, Kaffee, später die Spendendose.
 - **Die Fälschung darfst du verschweigen,** aber du darfst nicht über andere lügen. Sag nie, Hanno oder jemand anderes habe die Akte gemacht. Zeig auf das, was auf den Karten steht, und lass die anderen ihre Schlüsse ziehen.
 - **Beweiskarten** darfst du deuten, nicht bestreiten.
-- Wer konkret nach deinem linken Ärmel fragt, bekommt ihn gezeigt. Du darfst sagen: „Die Jacke ist alt.“
+- Solange der Faden (B18) nicht auf dem Tisch liegt, musst du deinen linken Ärmel nicht vorzeigen. Du darfst sagen: „Die Jacke ist alt.“ Liegt der Faden auf dem Tisch und fragt jemand konkret, zeigst du den Ärmel.
 
 ## Vertraulich · Der Stille Kreis
 

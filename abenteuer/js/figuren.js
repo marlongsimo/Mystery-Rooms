@@ -394,17 +394,35 @@
   }
   /** Schwierigkeit einer Kampagne → empfohlene Heldenstufe und Charakter (für die Anpassung der Kampagnen an das Level-System) */
   const SCHWIERIGKEIT = {
-    1: { name: "Leicht", stufe: 1, charakter: "Einstieg und Kennenlernen" },
-    2: { name: "Normal", stufe: 3, charakter: "Erste taktische Herausforderungen" },
-    3: { name: "Anspruchsvoll", stufe: 4, charakter: "Anspruchsvolle Kämpfe und Entscheidungen" },
-    4: { name: "Schwer", stufe: 6, charakter: "Fortgeschrittene Helden erforderlich" },
-    5: { name: "Legendär", stufe: 8, charakter: "Endgame-Herausforderung" },
+    1: { name: "Leicht", xp: 100, stufe: 1, charakter: "Einstieg und Kennenlernen" },
+    2: { name: "Normal", xp: 200, stufe: 3, charakter: "Erste taktische Herausforderungen" },
+    3: { name: "Anspruchsvoll", xp: 300, stufe: 4, charakter: "Anspruchsvolle Kämpfe und Entscheidungen" },
+    4: { name: "Schwer", xp: 450, stufe: 6, charakter: "Fortgeschrittene Helden erforderlich" },
+    5: { name: "Legendär", xp: 600, stufe: 8, charakter: "Endgame-Herausforderung" },
   };
+
+  /* ---------- Erfahrung (XP) – Regeln, noch ohne Speicherung ----------
+   * XP gibt es nur für den erfolgreichen Abschluss einer Kampagne, bei jedem Abschluss, für jeden Helden der Gruppe.
+   * Grundwert aus der Schwierigkeit der Kampagne; wer unter der empfohlenen Stufe liegt, bekommt mehr, wer darüber liegt, weniger.
+   * So zieht ein starker Held schwächere in einer mittleren Kampagne schnell hoch. */
+  const XP_BIS = [0, 100, 150, 250, 350, 500, 700, 900, 1200, 1500]; // XP_BIS[s]: so viel braucht es von Stufe s auf s + 1
+  const XP_FAKTOR = { "-3": 2, "-2": 1.6, "-1": 1.3, 0: 1, 1: 0.7, 2: 0.45, 3: 0.25, 4: 0.1 }; // Heldenstufe minus empfohlene Stufe
+  /** XP eines Helden für den Abschluss einer Kampagne dieser Schwierigkeit */
+  function xpFuer(schwierigkeit, heldenstufe) {
+    const s = SCHWIERIGKEIT[schwierigkeit] || SCHWIERIGKEIT[1], d = Math.max(-3, Math.min(4, (heldenstufe || 1) - s.stufe));
+    return (heldenstufe || 1) >= STUFEN10.max ? 0 : Math.round(s.xp * XP_FAKTOR[d]);
+  }
+  /** Gesamte XP eines Helden → { stufe, xp (in dieser Stufe), bis (bis zur nächsten, 0 auf Stufe 10) } */
+  function stufeAusXp(gesamt) {
+    let s = 1, rest = Math.max(0, Math.floor(gesamt || 0));
+    while (s < STUFEN10.max && rest >= XP_BIS[s]) { rest -= XP_BIS[s]; s++; }
+    return { stufe: s, xp: s >= STUFEN10.max ? 0 : rest, bis: s >= STUFEN10.max ? 0 : XP_BIS[s] };
+  }
 
   /** Hardcore ist vorerst abgeschaltet: Der Modus wird neu entwickelt, sobald alles andere steht. Neue Kampagnen und Kämpfe
    *  starten in Normal; bereits laufende Hardcore-Kampagnen spielen unverändert weiter. */
   const HARDCORE = false;
-  const API = { HARDCORE, KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
+  const API = { HARDCORE, XP_BIS, XP_FAKTOR, xpFuer, stufeAusXp, KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
     STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, BESSER, stufenpfad, SCHWIERIGKEIT,
     /** höchste Stufe des geltenden Modells (für „alle Fähigkeiten dieser Figur“) */
     maxStufe: () => (STUFEN10.aktiv ? 10 : 3) };

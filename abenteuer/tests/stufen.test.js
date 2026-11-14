@@ -46,6 +46,9 @@ check(Boolean(akt(o3.f, "laehmbolzen")) && !akt(o2.f, "laehmbolzen"), "Orin: Lä
   const g1 = R.gegnerFiguren(stB)[0], g0 = R.gegnerFiguren(st0).find((x) => x.art === g1.art);
   check(ko.bedrohung === 5 && stB.bed === 5 && g1.tpMax > g0.tpMax * 1.5 && g1.rk === g0.rk + 1, "Krone, erster Kampf: Bedrohung +5 – Gegner mit mehr Leben und RK +1");
   Wd.szene = "kampf_speicher"; check(S.kampfOptionen(Wd).bedrohung === 0, "Weidenhain, erster Kampf: Bedrohung 0 (Gegner wie bisher)"); }
+// Erfahrung: Grundwert aus der Schwierigkeit, mehr unter und weniger über der empfohlenen Stufe
+check(F.xpFuer(2, 3) === 200 && F.xpFuer(2, 1) === 320 && F.xpFuer(2, 5) === 90 && F.xpFuer(1, 10) === 0, "XP: Schwierigkeit 2 gibt 200 auf Stufe 3, 320 auf Stufe 1, 90 auf Stufe 5; Stufe 10 sammelt nichts mehr");
+{ const a = F.stufeAusXp(99), b = F.stufeAusXp(100), c = F.stufeAusXp(5650), d = F.stufeAusXp(260); check(a.stufe === 1 && b.stufe === 2 && c.stufe === 10 && c.bis === 0 && d.stufe === 3 && d.xp === 10, "XP: 100 → Stufe 2, 260 → Stufe 3 (10 von 250), 5650 → Stufe 10"); }
 F.STUFEN10.aktiv = false;
 { const K = S.neu(5, { abenteuer: "krone", gruppe: ["schildwaechter", "lichtbringer", "wildnislaeufer"] }); K.szene = "kampf_markt"; check(K.stufe === 1 && !S.kampfOptionen(K).bedrohung && R.neuesSpiel(3, Object.assign(S.kampfOptionen(K), { bedrohung: 4 })).bed === 0, "Schalter aus: Kampagnen starten auf Stufe 1, keine Bedrohung"); }
 check(F.tpVon("schildwaechter", 3) === F.tpAlt("schildwaechter", 3) && !F.faehigVon("kopfgeldjaeger", 3).some((a) => a.nur10 || a.besser), "Schalter aus: bisheriges Modell unverändert, keine neuen Fähigkeiten");

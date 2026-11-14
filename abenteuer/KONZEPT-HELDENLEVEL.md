@@ -21,7 +21,12 @@
 | 4 – Schwer | 6 | Fortgeschrittene Helden erforderlich |
 | 5 – Legendär | 8 | Endgame-Herausforderung |
 
-- **Wie XP verteilt werden, wird als Nächstes ausgearbeitet.** Abschnitt 7 ist bis dahin ein Vorschlag.
+- **XP (festgelegt am 14. November 2026, ersetzt Abschnitt 7):**
+  - XP gibt es **nur für den erfolgreichen Abschluss** einer Kampagne, **bei jedem Abschluss** (auch Wiederholungen, ohne Abzug), für **jeden Helden** der Gruppe – auch für Tisch-Helden.
+  - Der Grundwert hängt an der Schwierigkeit der Kampagne. Ein Held auf der empfohlenen Stufe bekommt genau den Grundwert, ein Held darunter mehr, ein Held darüber weniger. So zieht ein starker Held im Solo-Mode schwächere in einer mittleren Kampagne schnell hoch.
+  - Im Coop-Mode kommen Tisch-Helden aus der Sammlung des Gastgebers (ist so umgesetzt); ihre XP gehen an die Helden des Gastgebers.
+  - Zahlen (Vorschlag, in `js/figuren.js`: `SCHWIERIGKEIT[n].xp`, `XP_FAKTOR`, `XP_BIS`): Grundwert 100 / 200 / 300 / 450 / 600 für Schwierigkeit 1–5. Faktor nach Abstand zur empfohlenen Stufe: −3 und tiefer ×2, −2 ×1,6, −1 ×1,3, 0 ×1, +1 ×0,7, +2 ×0,45, +3 ×0,25, +4 und höher ×0,1. Bis zur nächsten Stufe: 100, 150, 250, 350, 500, 700, 900, 1200, 1500 (zusammen 5650 bis Stufe 10).
+  - Noch nicht gebaut: Speicherung am Konto und Vergabe auf dem Server.
 
 **Umgesetzt:**
 - `js/figuren.js`: Zehn-Stufen-Modell hinter dem Schalter `STUFEN10.aktiv` (aus): Lebenspunkte, Zauberplätze, Übungsbonus, Rüstungsklasse +1 ab Stufe 6, Hauptattribut +2 ab Stufe 4, Fähigkeiten auf Stufe 3 und 7. Dazu `AUFSTIEG` (Verbesserungen und Meistertitel im Wortlaut), `stufenpfad(fid)` und `SCHWIERIGKEIT`.

@@ -93,6 +93,22 @@
   const erloesbar = (A) => Boolean(A.merker.alwine_name && (A.merker.hedda_dabei || A.merker.bertold_dabei || A.merker.lied));
   /** Wie viele Kinder kommen nach Hause? Mira nur, wenn nicht zu viele Lichter brennen oder ihre Pfeife sie weckt */
   const miraWacht = (A) => A.glocke < 6 || Boolean(A.merker.pfeife);
+  /** Rückschau: die Entscheidungen im Moor */
+  function rueckschau(A, h) {
+    const m = A.merker, t = [], summer = A.gruppe.filter((f) => m["gehoert_" + f] && !A.zust[f].tot), trinker = A.gruppe.filter((f) => m["klarblick_" + f] && !A.zust[f].tot);
+    t.push(m.alwine_name ? "Ihr habt im Dorf lange genug gefragt, um einen Namen zu erfahren: Alwine." : "Den Namen der Stummen habt ihr nie erfahren. Im Dorf hätte ihn nur noch eine gewusst.");
+    t.push(m.pfeife ? "Ihr habt Miras Pfeife mit ins Moor genommen." : "Mit Miras Mutter habt ihr nicht gesprochen. Ihre Pfeife blieb im Dorf.");
+    t.push(m.hedda_ausgeliefert ? "Ihr habt Hedda dem Dorf ausgeliefert." : m.huette_brennt ? "Heddas Hütte ist verbrannt, aber ihr habt Hedda mitgenommen." : m.mob_ruhig ? "Ihr habt die Männer mit den Fackeln nach Hause geschickt." : m.hedda_dabei ? "Hedda ist mit euch ins Moor gegangen." : "");
+    t.push(m.bertold_gestanden ? "Bertold hat vor dem ganzen Dorf gestanden, was sein Vater getan hat." : m.bertold_schuld ? "Ihr habt gesehen, dass Bertold etwas weiß. Vor dem Dorf zur Rede gestellt habt ihr ihn nicht." : "");
+    if (summer.length) t.push(`${h.namen(A, summer)} ${summer.length === 1 ? "hat" : "haben"} am Ufer zurückgesummt. Alwine hat ${summer.length === 1 ? "diese Stimme" : "diese Stimmen"} am Schrein wiedererkannt.`);
+    if (trinker.length) t.push(`${h.namen(A, trinker)} ${trinker.length === 1 ? "hat" : "haben"} Heddas Tee getrunken und die Lichter gesehen, wie sie sind.`);
+    t.push(m.wahrheit ? "Hedda hat euch die Wahrheit über ihre Schwester anvertraut." : "");
+    t.push(m.schrein_weg ? "Ihr wusstet von Hedda, wo der versunkene Schrein liegt." : "");
+    t.push(m.bertold_bringt ? "Bertold hat Jannik und Fenna selbst nach Hause getragen. Es war das Erste, was er in dieser Nacht richtig gemacht hat." : "");
+    t.push(m.toten_ruhig ? "Die Toten auf dem Pfad habt ihr in den Schlaf gesungen, statt sie zu erschlagen." : "");
+    for (const f of h.lebende(A)) if (h.feuerEcho(A, f, "nacht")) t.push(h.feuerEcho(A, f, "nacht"));
+    return t.filter(Boolean);
+  }
   function epilog(A, h) {
     const m = A.merker, t = [];
     t.push(A.glocke <= 2 ? "Über dem Schwarzmoor hängt in dieser Nacht kein einziges Licht. Die Frösche fangen wieder an zu rufen, erst einer, dann alle." : A.glocke <= 5 ? "Ein paar Lichter treiben noch über dem Wasser, schwach und ziellos. Bis zum Morgen sind sie fort." : "Das Moor ist voller Lichter, als ihr zurückkehrt. Sie verlöschen eins nach dem anderen, langsam, als täten sie es ungern.");
@@ -318,14 +334,25 @@
       ],
     },
     lager: {
-      art: "lager", abschnitt: 1, titel: "Lagerfeuer auf dem Steg", ort: "Schwarzmoor", aufstieg: 2, weiter: (A, h) => h.ereignis(A, 2, "lichterweg"),
+      art: "lager", abschnitt: 1, titel: "Lagerfeuer auf dem Steg", ort: "Schwarzmoor", aufstieg: 2, weiter: "nachtwache",
       text: (A) => [
-        A.merker.huette_brennt ? "Ihr macht Feuer auf den verkohlten Planken. Es riecht nach Rauch und Minze." : A.merker.hedda_ausgeliefert ? "Ihr macht Feuer in Heddas leerer Hütte. Ihr Becher steht noch auf dem Tisch." : "Hedda kocht Suppe, und eine Weile ist es fast gemütlich.",
-        A.merker.bertold_dabei ? "Bertold sitzt etwas abseits, die Amtskette in der Faust. Er isst nichts." : "",
-        A.merker.hedda_dabei && !A.merker.hedda_ausgeliefert ? "Spät in der Nacht summt Hedda leise ein Lied. Ein altes, ohne Worte. „Das hat Alwine immer gesummt“, sagt sie, als sie merkt, dass ihr zuhört. „Wenn ich es ihr vorsumme, erkennt sie mich vielleicht.“" : "",
+        A.merker.huette_brennt ? "↳ Ihr macht Feuer auf den verkohlten Planken. Es riecht nach Rauch und Minze." : A.merker.hedda_ausgeliefert ? "↳ Ihr macht Feuer in Heddas leerer Hütte. Ihr Becher steht noch auf dem Tisch." : "Hedda kocht Suppe, und eine Weile ist es fast gemütlich.",
+        A.merker.bertold_dabei ? "↳ Bertold sitzt etwas abseits, die Amtskette in der Faust. Er isst nichts." : "",
+        A.merker.hedda_dabei && !A.merker.hedda_ausgeliefert ? "↳ Spät in der Nacht summt Hedda leise ein Lied. Ein altes, ohne Worte. „Das hat Alwine immer gesummt“, sagt sie, als sie merkt, dass ihr zuhört. „Wenn ich es ihr vorsumme, erkennt sie mich vielleicht.“" : "",
         "Ihr seid stärker geworden. **Stufe 2.**",
       ].filter(Boolean),
       beimEintritt: (A) => (A.merker.hedda_dabei && !A.merker.hedda_ausgeliefert ? { setzt: { lied: true } } : null),
+    },
+    nachtwache: {
+      art: "geheim", abschnitt: 1, titel: "Die stille Stunde", ort: "Schwarzmoor, Nacht", verteilung: false, weiter: (A, h) => h.ereignis(A, 2, "lichterweg"),
+      text: (A) => [
+        "Das Feuer brennt herunter. Draußen über dem Wasser stehen die Lichter und rühren sich nicht. Im Moor ist es so still, dass jede Person ihre eigenen Gedanken hört, deutlicher, als ihr lieb ist.",
+        A.gruppe.some((f) => A.merker["gehoert_" + f]) ? "↳ Wer am Ufer zurückgesummt hat, hört das Summen jetzt wieder, ganz leise, wie von innen." : "",
+        "*Ein Heldenmoment: Jede Person bekommt ihre eigene Frage. Was ihr euch eingesteht, erfahren am Morgen die anderen.*",
+      ],
+      frage: (A, h, fid) => h.feuerFrage(fid, "nacht").frage,
+      antworten: (A, h, fid) => h.feuerFrage(fid, "nacht").antworten,
+      abschluss: "Der Morgen kommt grau und ohne Sonne. Ihr packt schweigend. Jeder von euch hat in dieser Nacht etwas über sich gelernt, und nicht alles davon war willkommen.",
     },
 
     /* ================= Abschnitt 2 · Das tiefe Moor ================= */
@@ -462,7 +489,7 @@
       kampf: { begegnung: "moor_schrein", karte: SCHREIN, keinAnfuehrer: true, beute: false, sieg: { weiter: "ende_besiegt" } },
     },
     ende_erloest: {
-      art: "ende", abschnitt: 2, titel: "Der Name im Wasser", ort: "Rabenmoor",
+      art: "ende", abschnitt: 2, titel: "Der Name im Wasser", ort: "Rabenmoor", rueckschau,
       text: (A, h) => [
         "Als ihr mit Mira zurück ins Dorf kommt, steht ganz Rabenmoor am Damm. Niemand trägt eine Fackel.",
         A.merker.hedda_dabei || A.merker.hedda_bleibt ? "Hedda bleibt noch eine Weile am Schrein. Als sie zurückkommt, hat sie geweint, und sie sieht jünger aus." : "",
@@ -471,7 +498,7 @@
       ],
     },
     ende_besiegt: {
-      art: "ende", abschnitt: 2, titel: "Stille über dem Moor", ort: "Rabenmoor",
+      art: "ende", abschnitt: 2, titel: "Stille über dem Moor", ort: "Rabenmoor", rueckschau,
       text: (A, h) => [
         "Alwine zerfließt wie Nebel in der Morgensonne. Ihr letzter Blick gilt nicht euch, sondern Mira. Dann ist sie fort, und mit ihr die Lichter.",
         A.merker.hedda_dabei ? "Hedda kniet am Altar und legt die Hand auf den kalten Stein. „Jetzt ist sie wirklich tot“, sagt sie. Sie sagt es ohne Vorwurf. Das macht es schlimmer." : "",

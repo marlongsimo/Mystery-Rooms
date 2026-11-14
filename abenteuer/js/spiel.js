@@ -107,7 +107,7 @@
     if (v.typ === "ende") { wahl = null; R.zugEnde(st); antwort(null); render(); gegnerSchleife(); veroeffentlichen(); return; }
     if (v.typ === "aktion") {
       const r = R.handeln(st, String(v.aktion), String(v.ziel || akt.id));
-      antwort(r.fehler); wahl = null; render(); veroeffentlichen(); return;
+      antwort(r.fehler); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return;
     }
     antwort("Unbekannter Wunsch."); veroeffentlichen();
   }
@@ -658,10 +658,10 @@
     if (wahl) {
       const z = R.ziele(st, wahl).find((f) => f.x === x && f.y === y);
       if (!z) { $("#hinweis").textContent = "Dort ist kein gültiges Ziel."; return; }
-      R.handeln(st, wahl, z.id); wahl = null; tipp = null; render(); veroeffentlichen(); return;
+      R.handeln(st, wahl, z.id); wahl = null; tipp = null; render(); veroeffentlichen(); gegnerSchleife(); return;
     }
     const r = R.bewegen(st, x, y);
-    if (r.fehler) $("#hinweis").textContent = r.fehler; else { tipp = null; render(); veroeffentlichen(); }
+    if (r.fehler) $("#hinweis").textContent = r.fehler; else { tipp = null; render(); veroeffentlichen(); gegnerSchleife(); }
   }
 
   function zeigeSektion(id) {
@@ -763,7 +763,7 @@
     if (l === "faehig") { const el = $("#aktionen"); if (el) { el.scrollIntoView({ behavior: "smooth", block: "nearest" }); el.classList.remove("blink"); void el.offsetWidth; el.classList.add("blink"); } return; }
     const id = b.dataset.a; if (!id) return;
     const h = R.findeAktion(akt, id);
-    if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); return; }
+    if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
     wahl = wahl === id ? null : id; render();
   });
   $("#aktionen").addEventListener("click", (ev) => {
@@ -773,7 +773,7 @@
     tipp = null;
     const id = b.dataset.a; if (!id) return;
     const akt = R.aktiv(st), h = R.findeAktion(akt, id);
-    if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); return; }
+    if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
     wahl = wahl === id ? null : id; render();
   });
   $("#start").onclick = () => { if (!SETUP.gruppe.length) SETUP.gruppe = []; zeigeSetup(); };

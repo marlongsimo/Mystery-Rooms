@@ -190,7 +190,7 @@
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
   /* Zehn-Stufen-Modell: eigene Faktoren je Kampf („kampagne:szene“) und Gruppengröße (Helden auf der empfohlenen Stufe der Kampagne,
    * Gegner mit Bedrohung). Geschrieben von tools/kampagne.js kaempfe <id> --kalibrieren --modell10 – nicht von Hand pflegen. */
-  /*SKALA10*/ const SKALA10 = {"weidenhain:kampf_speicher":{"3":1.12,"4":1.42,"5":1.8,"6":1.74},"weidenhain:kampf_muehle":{"3":1.63,"4":1.42,"5":1.74,"6":2.14},"weidenhain:kampf_unke":{"3":2.22,"4":1.52,"5":1.87,"6":1.8},"graufurt:kampf_kette":{"3":2.07,"4":2,"5":2.37,"6":2.22},"graufurt:kampf_faehre":{},"graufurt:kampf_furt":{"3":2.63,"4":2.63,"5":3.02,"6":4.55},"graufurt:kampf_turm":{"3":2,"4":2.37,"5":2.29,"6":2.72},"rabenmoor:kampf_bohlen":{"3":2.14,"4":2.72,"5":3.12},"rabenmoor:kampf_ried":{"3":0.97,"4":1.52,"5":2,"6":2},"rabenmoor:verirrt":{"3":1.69,"4":1.69,"5":2.07,"6":2},"rabenmoor:kampf_toten":{"3":0.91,"4":1.16,"5":1.69,"6":2},"rabenmoor:kampf_schrein":{"3":0.3,"4":1.16,"5":2.07,"6":2.37},"grauwacht:garten":{"3":1.8,"4":2,"5":2.54,"6":3.23},"grauwacht:turm_kampf":{"3":1.12,"4":1.87,"5":3.7,"6":4.55},"grauwacht:turm_kampf_ueberrascht":{"3":1.12,"4":2.07,"5":2.54,"6":2.91},"grauwacht:turm_kampf_still":{"3":1.24,"4":1.63,"5":2.63,"6":2.63},"grauwacht:gruft_kampf":{"3":0.79,"4":1.24,"5":1.69,"6":1.69},"grauwacht:gruft_kampf_klein":{"3":0.94,"4":1.16,"5":1.8,"6":1.69},"grauwacht:raetsel_waechter":{"3":0.94,"4":1.16,"5":1.69,"6":1.93},"grauwacht:pfad_kampf":{"3":1.93,"4":2.29,"5":3.02},"grauwacht:lager_falle":{"3":0.37,"4":1.57,"5":1.24,"6":1.87},"grauwacht:schacht_kampf":{"3":0.56,"4":0.94,"5":0.72,"6":0.88},"grauwacht:halle_duell":{"3":0.37,"4":0.41,"5":0.33,"6":0.33},"grauwacht:halle_kampf":{"3":0.25,"4":0.35,"5":0.46,"6":0.56},"grauwacht:halle_kampf_asche":{"3":0.6,"4":0.62,"5":0.6,"6":0.67},"grauwacht:abt_kampf":{"3":1.12,"4":1.01,"5":1.08,"6":1.47},"hochwacht:kampf_pass":{"3":2.14,"4":2.14,"5":2.54,"6":2.63},"hochwacht:kampf_lager":{"3":2.29,"4":2.46,"5":2.91,"6":3.23},"hochwacht:kampf_tor":{"3":1.16,"4":1.87,"5":1.93,"6":2.46},"hochwacht:kampf_archiv":{"3":2.29,"4":2.14,"5":2.63,"6":2.82},"hochwacht:kampf_wacht":{"3":0.46,"4":1.42,"5":1.47,"6":1.87},"hochwacht:kampf_hauptmann":{"3":1.87,"4":2.72,"5":2.63,"6":3.23},"hochwacht:kampf_wehrgang":{"3":1.63,"4":1.63,"5":1.57,"6":2},"hochwacht:kampf_finale":{"3":0.82,"4":1.33,"5":1.63,"6":1.74},"krone:kampf_grat":{"3":0.69,"4":1.12,"5":1.2,"6":1.69},"krone:kampf_stollen":{"3":0.97,"4":1.24,"5":2.07,"6":2.22},"krone:kampf_pilger":{"3":2.63,"4":4.39,"5":4.71},"krone:kampf_markt":{"4":0.94,"5":0.97,"6":1.16},"krone:kampf_kammern":{"3":1.37,"4":1.87,"5":2.46,"6":3.58},"krone:kampf_bruecke":{"3":0.77,"4":1.28,"5":1.52,"6":2.22},"krone:kampf_tor":{"3":0.97,"4":1.47,"5":1.42,"6":1.69},"krone:kampf_archiv":{"3":1.87,"4":2.14,"5":2.37,"6":2.82},"krone:kampf_frost":{"3":0.94,"4":1.57,"5":1.63,"6":2.22},"krone:kampf_krone":{"3":1.01,"4":2.07,"5":1.57,"6":1.87}}; /*/SKALA10*/
+  /*SKALA10*/ const SKALA10 = {"weidenhain:kampf_speicher":{"3":1.24,"4":1.69,"5":2.07,"6":1.74},"weidenhain:kampf_muehle":{"3":1.63,"4":1.93,"5":1.69,"6":2.14},"weidenhain:kampf_unke":{"3":1.8,"4":1.63,"5":1.87,"6":1.8},"graufurt:kampf_kette":{"3":1.16,"4":2,"5":2,"6":2.14},"graufurt:kampf_faehre":{"3":3.02,"4":2.63,"5":3.46,"6":4.25},"graufurt:kampf_furt":{"3":2.22,"4":2.22,"5":3.12},"graufurt:kampf_turm":{"3":1.42,"4":2.14,"5":1.8,"6":2.46},"rabenmoor:kampf_bohlen":{"3":2.22,"4":2.72,"5":2.91,"6":4.25},"rabenmoor:kampf_ried":{"3":1.08,"4":1.52,"5":1.87,"6":2.07},"rabenmoor:verirrt":{"3":1.69,"4":1.69,"5":2.07,"6":1.93},"rabenmoor:kampf_toten":{"3":0.82,"4":0.97,"5":1.37,"6":1.8},"rabenmoor:kampf_schrein":{"3":0.15,"4":0.97,"5":1.8,"6":2},"grauwacht:garten":{"3":1.04,"4":1.87,"5":2.37,"6":2.37},"grauwacht:turm_kampf":{"3":0.91,"4":1.24,"5":4.25},"grauwacht:turm_kampf_ueberrascht":{"3":1.33,"4":1.52,"5":1.37,"6":2.07},"grauwacht:turm_kampf_still":{"3":1.01,"4":1.42,"5":2.29,"6":2.54},"grauwacht:gruft_kampf":{"4":0.94,"5":1.16,"6":1.33},"grauwacht:gruft_kampf_klein":{"3":0.41,"4":0.56,"5":0.94,"6":1.37},"grauwacht:raetsel_waechter":{"3":0.65,"4":0.94,"5":1.08,"6":1.16},"grauwacht:pfad_kampf":{"3":1.87,"4":1.93,"5":2.46,"6":4.55},"grauwacht:lager_falle":{"3":0.53,"4":0.62,"5":1.16,"6":1.87},"grauwacht:schacht_kampf":{"3":0.36,"4":0.65,"5":0.58,"6":0.91},"grauwacht:halle_duell":{"3":0.37,"4":0.3,"5":0.3,"6":0.28},"grauwacht:halle_kampf":{"3":0.2,"4":0.47,"5":0.41,"6":0.53},"grauwacht:halle_kampf_asche":{"3":0.56,"4":0.51,"5":0.54,"6":0.62},"grauwacht:abt_kampf":{"3":0.82,"4":0.67,"5":0.91,"6":1.04},"hochwacht:kampf_pass":{"3":2.37,"4":2.14,"5":2,"6":2.54},"hochwacht:kampf_lager":{"3":2.22,"4":2.37,"5":2.63,"6":2.82},"hochwacht:kampf_tor":{"3":1.2,"4":1.57,"5":1.93,"6":2},"hochwacht:kampf_archiv":{"3":2.14,"4":2.14,"5":2.54,"6":2.91},"hochwacht:kampf_wacht":{"3":0.46,"4":1.42,"5":1.33,"6":1.57},"hochwacht:kampf_hauptmann":{"3":1.87,"4":2.46,"5":2.54,"6":3.23},"hochwacht:kampf_wehrgang":{"3":1.63,"4":1.63,"5":1.63,"6":1.93},"hochwacht:kampf_finale":{"3":0.82,"4":1.33,"5":1.63,"6":1.74},"krone:kampf_grat":{"3":0.39,"4":1.12,"5":0.97,"6":1.57},"krone:kampf_stollen":{"3":0.91,"4":0.97,"5":1.8,"6":2.46},"krone:kampf_pilger":{"3":3.58,"4":3.97,"5":4.1,"6":4.71},"krone:kampf_markt":{"4":0.79,"5":0.79,"6":1.01},"krone:kampf_kammern":{"3":1.52,"4":1.93,"5":2.46,"6":3.7},"krone:kampf_bruecke":{"3":0.72,"4":1.16,"5":1.57,"6":1.87},"krone:kampf_tor":{"3":0.77,"4":1.57,"5":1.16,"6":1.74},"krone:kampf_archiv":{"3":2.22,"4":1.42,"5":2.14,"6":2.63},"krone:kampf_frost":{"3":0.67,"4":1.24,"5":1.63,"6":2.14},"krone:kampf_krone":{"3":0.97,"4":1.33,"5":1.16,"6":1.69}}; /*/SKALA10*/
     const modell10 = () => Boolean(FD.STUFEN10 && FD.STUFEN10.aktiv);
   /** Bedrohung: so viele Stufen liegen die Gegner über ihrem bisherigen Wert (kann auch darunter liegen).
    *  Je Stufe +12 % Gegnermasse (zuerst mehr Gegner, der Rest als Leben), je 2 Stufen +1 Angriff und +1 Schaden,
@@ -1159,6 +1159,15 @@
     }
     if (!st.ende) beginneZug(st);
   }
+  /** Geht eine Figur in ihrem eigenen Zug zu Boden (Gelegenheitsangriff, Feuer, Rückstoß …), endet ihr Zug von selbst:
+   *  Sie könnte ihn sonst nicht mehr beenden, und der Kampf bliebe stehen. */
+  const mitZugende = (fn) => function (st) {
+    const wer = aktiv(st), erg = fn.apply(this, arguments);
+    if (!st.ende && wer && wer.seite === "spieler" && wer.art !== "begleiter" && aktiv(st) === wer && wer.tp <= 0) {
+      st.log.push({ t: `${wer.name} geht zu Boden. Der Zug endet.`, art: "schlecht" }); zugEnde(st);
+    }
+    return erg;
+  };
   function zugEnde(st) {
     if (st.ende) return;
     const f = aktiv(st);
@@ -1229,6 +1238,45 @@
     const alle = st.figuren.filter((f) => f.seite === "spieler" && lebt(f));
     const sichtbar = alle.filter((f) => !f.z.versteckt);
     return sichtbar.length ? sichtbar : alle;
+  }
+  /* ---------- Klügere Gegner (nur im Zehn-Stufen-Modell; laufende Kampagnen im bisherigen Modell spielen wie bisher) ----------
+   * Statt stur zum nächsten Helden zu laufen, wägt ein Gegner ab: Wen erreiche ich in diesem Zug? Wer ist angeschlagen
+   * oder schlecht gerüstet? Wer macht sich gerade an einem Ziel zu schaffen? Auf wen gehen meine Verbündeten schon?
+   * Ein wenig Zufall bleibt, damit nicht jeder Kampf gleich abläuft und nicht immer dieselbe Figur alles abbekommt. */
+  const kiKlug = (st) => modell10() && !st.kiAlt;
+  function kiWert(st, g, f, erreicht) {
+    const d = GEGNER[g.art], sch = d.angriff ? parse(d.angriff.schaden) : null, erwartet = sch ? sch.n * (sch.s + 1) / 2 + sch.b : 4;
+    let w = 0;
+    if (g.z.spott === f.id) w += 100;                                  // Spott zwingt
+    if (erreicht) w += 30; else w -= abstand(g, f) * 2;                // lieber jemanden, den ich jetzt treffe
+    w += (1 - f.tp / (f.tpMax || f.tp || 1)) * 18;                     // Angeschlagene
+    if (f.tp <= erwartet) w += 14;                                     // ein Treffer könnte reichen
+    w += Math.max(0, Math.min(8, 17 - (f.rk || 12))) * 1.5;            // leicht Gerüstete
+    if (f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].beistand) w += 5; // Heiler
+    if (st.mech && st.mech.ziele.some((z) => !z.fertig && !z.verloren && abstand(f, z) <= 1)) w += st.mech.ziele.some((z) => !z.fertig && z.fortschritt > 0 && abstand(f, z) <= 1) ? 26 : 14; // wer am Ziel arbeitet
+    if (st.kiFokus && st.kiFokus.runde === st.runde && st.kiFokus.id === f.id) w += 7; // gemeinsam auf ein Ziel
+    if (f.art === "wolf") w -= 8;
+    return w + st.r() * 6;
+  }
+  /** Bestes Ziel und (für Nahkämpfer) das beste Feld daneben. Zurück: { ziel, feld | null } */
+  function kiWahl(st, g, lebende, reichweite) {
+    const m = erreichbar(st, g, st.zug.bewegung), felder = [[key(g.x, g.y), 0]].concat([...m]);
+    const gefahr = (x, y) => (st.brand.some((b) => b.x === x && b.y === y) ? 20 : 0) + (st.zonen.some((z) => z.art !== "rauch" && Math.max(Math.abs(z.x - x), Math.abs(z.y - y)) <= z.radius) ? 12 : 0);
+    let best = null;
+    for (const f of lebende) {
+      let feld = null;
+      for (const [k, c] of felder) {
+        const [x, y] = k.split(",").map(Number), p = { x, y };
+        if (reichweite > 1 ? !(abstand(p, f) <= reichweite && sicht(st, Object.assign({}, g, p), f)) : abstand(p, f) > 1) continue;
+        const nachbarn = lebende.filter((o) => o !== f && abstand(p, o) <= 1).length;
+        // Nahkämpfer: nicht ins Feuer, nicht mitten zwischen mehrere Helden. Fernkämpfer: Abstand halten, niemanden neben sich.
+        const wert = -gefahr(x, y) - nachbarn * (reichweite > 1 ? 9 : 3) - c * 0.2 + (reichweite > 1 ? Math.min(abstand(p, f), reichweite) * 1.5 : 0);
+        if (!feld || wert > feld.wert) feld = { x, y, wert };
+      }
+      const w = kiWert(st, g, f, Boolean(feld)) + (feld ? feld.wert * 0.5 : 0);
+      if (!best || w > best.w) best = { ziel: f, feld, w };
+    }
+    return best;
   }
   function gegnerZug(st) {
     const g = aktiv(st);
@@ -1314,6 +1362,16 @@
     const rw = d.angriff && d.angriff.reichweite > 1 ? d.angriff.reichweite : 0;
     if (rw) {
       const trifft = (pos, f) => abstand(pos, f) <= rw && sicht(st, Object.assign({}, g, pos), f);
+      // Klug: Ziel und Standort gemeinsam wählen (Abstand halten, niemanden neben sich, lohnendes Ziel)
+      const wahl = kiKlug(st) && !d.jaeger && !g.z.spott ? kiWahl(st, g, lebende, rw) : null;
+      if (wahl && wahl.feld) {
+        if (wahl.feld.x !== g.x || wahl.feld.y !== g.y) { g.x = wahl.feld.x; g.y = wahl.feld.y; brandFeld(st, g); }
+        fangschuss(st, g, startX, startY);
+        if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return; }
+        const zk = lebt(wahl.ziel) && trifft(g, wahl.ziel) ? wahl.ziel : null;
+        if (zk) { st.kiFokus = { runde: st.runde, id: zk.id }; gegnerAngriff(st, g, zk); if (!st.ende) weiter(st); return; }
+        lebende = zieleFuerGegner(st, g);
+      } else
       if (!trifft(g, ziel) && st.zug.bewegung > 0) {
         const m = erreichbar(st, g, st.zug.bewegung); let best = null;
         for (const [k, c] of m) {
@@ -1330,6 +1388,19 @@
       if (!z && d.jaeger) z = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && f.art !== "begleiter" && trifft(g, f)).sort((a, b) => a.tp - b.tp)[0];
       if (z) gegnerAngriff(st, g, z);
       if (!st.ende) weiter(st); return;
+    }
+    // Klug: Ziel abwägen statt stur den Nächsten zu nehmen; das Feld daneben mit Bedacht wählen
+    if (kiKlug(st) && d.angriff && !d.jaeger && !g.z.spott) {
+      const wahl = kiWahl(st, g, lebende, 1);
+      if (wahl && wahl.feld) {
+        if (wahl.feld.x !== g.x || wahl.feld.y !== g.y) { g.x = wahl.feld.x; g.y = wahl.feld.y; brandFeld(st, g); }
+        if (!lebt(g)) { if (!st.ende) weiter(st); return; }
+        fangschuss(st, g, startX, startY);
+        if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return; }
+        if (lebt(wahl.ziel) && abstand(g, wahl.ziel) <= 1) { st.kiFokus = { runde: st.runde, id: wahl.ziel.id }; gegnerAngriff(st, g, wahl.ziel); }
+        if (!st.ende) weiter(st); return;
+      }
+      if (wahl) ziel = wahl.ziel; // niemand in Reichweite: auf das lohnendste Ziel zulaufen (unten)
     }
     // Bewegen und angreifen
     if (abstand(g, ziel) > 1 && st.zug.bewegung > 0) {
@@ -2072,7 +2143,7 @@
   }
 
   const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
-    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen, ziele, grund, verfuegbar, handeln, zugEnde, gegnerZug, autoZug,
+    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;

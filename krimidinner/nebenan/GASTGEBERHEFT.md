@@ -288,6 +288,10 @@ Diese Impulse helfen weiter, ohne etwas zu verraten. Nimm höchstens einen pro P
 >
 > Linde nahm die Prüfnotiz und die Kopien, ging über den leeren Flur in den Beratungsraum und ließ den Aktenvernichter laufen, bis {R06: Fenja / Hauke} Rabe an die Tür klopfte. Um 20:53 schloss Linde ab, ging ins WC und um 20:57 in die Küche, blass, den linken Ärmel in der Hand.
 >
+> Die Leiter war nicht schuld. {R09: Edda / Enno} Wiesner hatte die oberste Stufe am Freitag neu vernietet und geprüft, nur der Warnzettel hing noch. Die drei ovalen Flecken außen an Hannos rechtem Oberarm stammen von Lindes rechter Hand. {R02: Beate / Benedikt} Kranz hatte ihn um 20:25 im Streit gepackt, aber am linken Arm. Den Faden nahm {R04: Karla / Karl} Seifert um 21:32 aus Hannos rechter Hand und behielt ihn bis heute Nacht für sich.
+>
+> Lindes Küche hielt nicht: Linde ging um 20:38 hinaus und kam erst um 20:57 zurück, und den Kaffee schaltete {R05: Svenja / Sören} Hollmann um 21:07 ein. Auch die Spendendose war nie im Beratungsraum. Sie stand auf dem Büfett und lag von 20:35 bis 21:05 bei Hollmann an der Kassenecke.
+>
 > Hanno hatte Menschen geholfen und ihre Geheimnisse benutzt. Am Montag wollte er allen ihre Wahrheit zurückgeben. Linde wollte nur, dass er aufhört.“
 
 ## B-3 · Wie man es herausfinden konnte

@@ -59,15 +59,18 @@ Deine Kamera stempelt jedes Bild mit der Uhrzeit.
 
 - Sag: „Ich bin für den Jubiläumsartikel hier.“ Das stimmt.
 - Die Kamera liegt bei Kranz. Du verlangst sie noch nicht zurück.
+- **Dein Auftrag in dieser Runde:** Frag nach, wie Reporter fragen: Wer hat Hanno wann zuletzt gesehen? Schreib die Uhrzeiten auf deinen Block und lies sie am Ende der Runde vor.
 
 ## Runde 2 · Das Hinterzimmer
 
 - Jetzt kommt heraus, was donnerstags im Hinterzimmer geschah. Das ist deine Geschichte von 2002, nur viel größer. Halte dich zurück. Wer hier Reporter ist, bekommt keine Antworten.
+- **Dein Auftrag in dieser Runde:** Sprich {R04: Karla / Karl} Seifert leise an. Frag, wie es {R04: ihr / ihm} seit 2002 ergangen ist. Dass {R04: sie / er} deine Quelle war, sagst du dabei nicht laut.
 
 ## Runde 3 · Die Akten
 
 - Im grünen Heft (B14) steht: „J. S. (aus W. S.): Artikel erscheint nicht, Quelle war K. S. über V. W.“ **Jetzt weißt du, warum dein Artikel gestoppt wurde:** Hanno hat deinen Chefredakteur über dessen eigene Frau unter Druck gesetzt.
 - Du darfst erzählen, dass du der Reporter von 2002 bist. Ob du Seifert als Quelle nennst, entscheidest du. {R04: Sie / Er} steht ohnehin im Heft.
+- **Dein Auftrag in dieser Runde:** Erklär dem Tisch den zweiten Vorgang im grünen Heft: V. W. bist du, J. S. ist dein Chefredakteur Joost Sauer, und der Artikel war fertig gesetzt, als er gestoppt wurde.
 
 ## Runde 4 · Der Stoß
 

@@ -78,6 +78,7 @@ Das ist Unfallflucht, und sie ist noch nicht verjährt.
 - Sag: „Ab 20:42 war ich am Basteltisch.“ Das stimmt und ist dein Schutz.
 - Die Bürotür um 20:28 und die Person im Flur um 20:40 behältst du für dich. Fragt dich jemand konkret, ob du vor 20:42 im Flur warst, sag die Wahrheit oder schweig.
 - Du bist nervös. Das darf man sehen.
+- **Dein Auftrag in dieser Runde:** Frag {R02: Beate / Benedikt} Kranz, was die Polizei morgen um neun von euch wissen will und ob sie im Haus noch etwas mitgenommen hat. Du musst nicht sagen, warum dich das beschäftigt.
 
 ## Runde 2 · Das Hinterzimmer
 

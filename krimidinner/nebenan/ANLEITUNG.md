@@ -92,4 +92,5 @@ Danach wird aufgelöst. Dann folgt eine zweite, gemeinsame Entscheidung, die das
 - **Zeichne mit.** Eine Zeitleiste und der Hausplan helfen mehr als jede Vermutung.
 - **Leg Papiere nebeneinander.** Manche Dokumente verraten erst etwas, wenn man sie vergleicht.
 - **Nicht jede Person, die schweigt, hat gemordet.** Fast alle haben etwas zu verbergen, und nicht alle aus demselben Grund.
+- **Die Täterrolle sitzt am Tisch.** Figuren, die bei euch niemand spielt, kommen als Täter nicht in Frage.
 - Wer die Täterrolle hat: Du gewinnst nicht durch Schweigen, sondern durch eine Geschichte, die lange hält.

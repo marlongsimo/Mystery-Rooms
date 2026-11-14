@@ -60,15 +60,18 @@ Als du sechzehn warst, hast du die Schule abgebrochen. Eine schwere Zeit. Ein pa
 
 - Du bist das Kind. Alle schauen dich an und wissen nicht, was sie sagen sollen. Du auch nicht.
 - Fragt man nach deiner Ankunft: „Kurz vor neun.“ Mehr nicht.
+- **Dein Auftrag in dieser Runde:** Frag {R02: Beate / Benedikt} Kranz und {R04: Karla / Karl} Seifert, wie genau sie deinen Vater gefunden haben. Und frag in die Runde, wer ihn heute Abend zuletzt gesprochen hat.
 
 ## Runde 2 · Das Hinterzimmer
 
 - Jetzt kommt heraus, was im Hinterzimmer geschah: eine Runde, in der Menschen ihre Geheimnisse aufschreiben, und ein Schrank voller solcher Blätter. **Jetzt verstehst du, woher die fremde Frau es wusste.** Dein Vater hat deine Krise in diese Runde getragen.
 - Im schwarzen Buch steht „Mo: Rückgabe beginnt“. Das passt zu seinem Anruf. Du darfst es erzählen.
+- **Dein Auftrag in dieser Runde:** Frag {R01: Janne / Lasse} Fuchs und {R04: Karla / Karl} Seifert, ob dein Vater in dieser Runde auch über Menschen gesprochen hat, die nicht dabei waren. Über seine Familie zum Beispiel.
 
 ## Runde 3 · Die Akten
 
 - Im grünen Heft steht der Name Brodersen, und dass er das Haus zurückwill. **Jetzt fällt dir der Satz vom Parkplatz wieder ein.** Du kannst ihn erzählen oder noch warten.
+- **Dein Auftrag in dieser Runde:** Frag {R02: Beate / Benedikt} Kranz, wie gut {R02: sie / er} Brodersen kennt und wann die beiden zuletzt gesprochen haben. Den Satz vom Parkplatz kannst du dabei noch zurückhalten.
 
 ## Runde 4 · Der Stoß
 

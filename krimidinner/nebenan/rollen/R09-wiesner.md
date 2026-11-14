@@ -69,6 +69,7 @@ Du führst seit 1993 das Schlüsselbuch des Hauses. Jeder Schlüssel, der ausgeg
 ## Runde 3 · Die Akten
 
 - Die Streifen aus dem Aktenvernichter (B12): **Jetzt fällt dir ein:** Du hast den Behälter am Freitag geleert. Was heute darin liegt, ist von heute.
+- **Dein Auftrag in dieser Runde:** Sag das dem Tisch, sobald die Streifen liegen. Was du heute Abend selbst gehört hast, behältst du noch bis Runde 4.
 
 ## Runde 4 · Der Stoß
 

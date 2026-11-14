@@ -57,6 +57,7 @@ Seit 2003 führst du die Kasse, weil {R02: Beate / Benedikt} Kranz dich gefragt 
 
 - Du bist die freundliche Kasse. Hilf, wo du kannst.
 - Sag: „Ich war die meiste Zeit an der Kassenecke.“ Das stimmt.
+- **Dein Auftrag in dieser Runde:** Frag {R02: Beate / Benedikt} Kranz, ob die Kassenprüfung am Montag nach diesem Abend überhaupt stattfindet und wann ihr heute Nacht die Kasse fertig zählt.
 
 ## Runde 2 · Das Hinterzimmer
 
@@ -67,6 +68,7 @@ Seit 2003 führst du die Kasse, weil {R02: Beate / Benedikt} Kranz dich gefragt 
 
 - Im grünen Heft (B14) steht, woher Hanno es wusste: aus der Wahrheit von Bente Ottsen. Bente arbeitet bei der Sparkasse und hat in dein Konto geschaut. Und darunter: **„Wenn S. H. nicht kommt: Montag Kassenprüfung offen, Kranz informieren.“**
 - Du hattest also eine Frist. Das sieht schlecht für dich aus, und du weißt es.
+- **Dein Auftrag in dieser Runde:** Frag {R01: Janne / Lasse} Fuchs und {R04: Karla / Karl} Seifert, ob in der Donnerstagsrunde öfter Dinge über Menschen erzählt wurden, die gar nicht dabei waren. So wie über dich.
 
 ## Runde 4 · Der Stoß
 

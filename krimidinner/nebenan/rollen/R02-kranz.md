@@ -82,6 +82,7 @@ Von Hannos Donnerstagsrunde im Beratungsraum weißt du nur, dass es sie gibt. Er
 
 - Das grüne Heft (B14): Brodersen wurde 2001 von Hanno erpresst. **Jetzt verstehst du:** Brodersen hat dich benutzt, um sich zu rächen. Dein Deal war seine Rache.
 - {R03: Merle / Mattis} Linde wird erzählen, {R03: sie / er} habe um 20:24 gehört, wie du sagtest: „Dann bist du raus, Hanno. So oder so.“ Das stimmt. Du musst dich erklären.
+- **Dein Auftrag in dieser Runde:** Im grünen Heft steht „Montag Kassenprüfung offen, Kranz informieren“. Frag {R05: Svenja / Sören} Hollmann, was du über die Kasse hättest erfahren sollen.
 - Behalte das gefaltete Blatt weiterhin bei dir.
 
 ## Runde 4 · Der Stoß

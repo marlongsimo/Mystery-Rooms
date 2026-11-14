@@ -59,6 +59,7 @@ Seit acht Jahren arbeitest du im Viertel. Du kennst die Familien, die Schulden, 
 
 - Sag: „Ich war in der Küche.“ Das stimmt.
 - Beobachte, wer wie reagiert. Du musst noch nichts sagen.
+- **Dein Auftrag in dieser Runde:** Sprich {R01: Janne / Lasse} Fuchs an. {R01: Sie / Er} zittert seit dem Fund. Frag, wovor {R01: sie / er} Angst hat. Was du hörst, musst du nicht weitersagen.
 
 ## Runde 2 · Das Hinterzimmer
 

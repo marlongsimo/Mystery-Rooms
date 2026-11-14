@@ -69,6 +69,7 @@ Du hast noch einen alten Schlüssel zum Archivschrank aus deiner Verwaltungszeit
 
 - Verteidige Hanno und den Verein. „Er stand auf jeder Leiter, die es im Haus gibt. Wie oft haben wir ihm gesagt …“
 - Sag: „Ich war an der Tombola.“
+- **Dein Auftrag in dieser Runde:** Frag {R09: Edda / Enno} Wiesner nach der Leiter: Seit wann wackelt die Stufe, und warum stand die Leiter noch im Büro?
 
 ## Runde 2 · Das Hinterzimmer
 
@@ -79,6 +80,7 @@ Du hast noch einen alten Schlüssel zum Archivschrank aus deiner Verwaltungszeit
 
 - **Das grüne Heft (B14) trifft dich ins Mark:** „2001 L. B. (aus B. K., Schwager): Mietvertrag Anger, 20 Jahre.“ B. K., das bist du. **Das Haus, in dem ihr sitzt, steht auf deiner Wahrheit.** Hanno hat sie benutzt, um deinen Schwager zu erpressen. Du wusstest nichts davon.
 - Ab jetzt zweifelst du an allem. Ob du deine Wahrheit erzählst, entscheidest du.
+- **Dein Auftrag in dieser Runde:** Auf der letzten Seite steht „L. B. ruft Kranz an. Er will das Haus zurück.“ Frag {R02: Beate / Benedikt} Kranz, was Brodersen {R02: ihr / ihm} dafür versprochen hat.
 
 ## Runde 4 · Der Stoß
 

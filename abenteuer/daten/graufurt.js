@@ -434,7 +434,7 @@
     zoellner: { klassen: ["kleriker", "zauberer"], text: "Untot, und Knochen brechen unter Wucht. Bevor er Münzen schleudert, hebt er sie eine Runde lang: Die Felder leuchten rot. Wer auseinander steht, verliert weniger." },
   };
   const META = {
-    id: "graufurt", schwierigkeit: 1, reihe: 2, titel: "Die Fähre von Graufurt", kurz: "Graufurt", untertitel: "Ein Kurzabenteuer an der Wehre, auf dem Weg nach Grauwacht",
+    id: "graufurt", schwierigkeit: 2, reihe: -1, titel: "Die Fähre von Graufurt", kurz: "Graufurt", untertitel: "Ein Kurzabenteuer an der Wehre, auf dem Weg nach Grauwacht",
     kurztext: "Kobolde haben den Sohn der Fährfrau verschleppt. Im Norden läutet zum ersten Mal die Glocke von Grauwacht.",
     // Hinweise ohne Spoiler auf das Ende, das die Gruppe nicht gesehen hat
     endeHinweise: { ende_norden: "Ein anderes Ende beginnt damit, dass ihr den grauen Stein nicht hergebt.", ende_wehre: "Ein anderes Ende beginnt damit, dass der Fluss den grauen Stein bekommt." },

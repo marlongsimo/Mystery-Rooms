@@ -188,11 +188,21 @@
   const SKALA = { 1: { 3: 1.03, 4: 1.07, 5: 0.95, 6: 1.07 }, 2: { 3: 0.95, 4: 1.11, 5: 1.05, 6: 1.11 }, 3: { 3: 0.81, 4: 0.91, 5: 0.93, 6: 0.79 } };
   const SKALA_HARDCORE = { 1: { 3: 1.16, 4: 1.11, 5: 1.11, 6: 1.09 }, 2: { 3: 0.89, 4: 1.03, 5: 0.89, 6: 0.91 }, 3: { 3: 0.81, 4: 0.81, 5: 0.81, 6: 0.73 } };
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
+  /* Zehn-Stufen-Modell: eigene Faktoren je Begegnung und Gruppengröße (Helden auf der empfohlenen Stufe der Kampagne,
+   * Gegner mit Bedrohung). Geschrieben von tools/kampagne.js kaempfe <id> --kalibrieren --modell10 – nicht von Hand pflegen. */
+  /*SKALA10*/ const SKALA10 = {"w_speicher":{"3":1.43,"4":1.4,"5":1.93,"6":1.93}}; /*/SKALA10*/
+  /*SKALA10_HC*/ const SKALA10_HC = {}; /*/SKALA10_HC*/
+  const modell10 = () => Boolean(FD.STUFEN10 && FD.STUFEN10.aktiv);
+  /** Bedrohung: so viele Stufen liegen die Gegner über ihrem bisherigen Wert (kann auch darunter liegen).
+   *  Je Stufe +12 % Leben, je 2 Stufen +1 Angriff und +1 Schaden, je 3 Stufen +1 Rettungswurf-SG, je 4 Stufen +1 RK. */
+  const bedTp = (st) => Math.pow(1.12, st.bed || 0);
+  const bedTeil = (st, je) => Math.trunc((st.bed || 0) / je);
   function skalaK(begId, n, stufe, skala, hardcore) {
     const b = BEGEGNUNGEN[begId] || BEGEGNUNGEN.garten, s = stufe || b.stufe, tab = hardcore ? SKALA_HARDCORE : SKALA;
     // Begegnungen mit eigener Tabelle (z. B. im Moor, spielbar ab 2 Helden): Faktor je Gruppengröße 2–6
     const eigen = hardcore ? b.skalaHC || b.skala : b.skala;
-    let k = skala != null ? skala : eigen ? eigen[Math.max(2, Math.min(6, n))] || 1 : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
+    const t10 = modell10() && skala == null ? (hardcore ? SKALA10_HC[begId] || SKALA10[begId] : SKALA10[begId]) : null;
+    let k = t10 && t10[Math.max(3, Math.min(6, n))] ? t10[Math.max(3, Math.min(6, n))] : skala != null ? skala : eigen ? eigen[Math.max(2, Math.min(6, n))] || 1 : (tab[s] && tab[s][Math.max(3, Math.min(6, n))]) || 1;
     if (b.faktor) k *= b.faktor[Math.max(3, Math.min(6, n))] || 1;
     return k;
   }
@@ -308,7 +318,8 @@
    */
   function neuesSpiel(seed, opts = {}) {
     const st = { sparen: opts.sparen != null ? opts.sparen : 1, seed, rs: seed >>> 0 || 1, karte: null, figuren: [], log: [], runde: 1, reihe: [], am: 0, zug: null, ende: null, xp: 0, zonen: [], brand: [],
-      stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [], boss: opts.boss ? JSON.parse(JSON.stringify(opts.boss)) : null, siegel: [] };
+      stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [], boss: opts.boss ? JSON.parse(JSON.stringify(opts.boss)) : null, siegel: [],
+      bed: modell10() ? Math.max(-3, Math.min(9, Math.round(opts.bedrohung || 0))) : 0 };
     zufall(st);
     const r = st.r; let k = opts.karte || KARTE_GARTEN;
     st.siegel = k.hindernisse.filter(([t]) => t === "Z").map(([, x, y]) => ({ x, y, beruehrt: false }));
@@ -343,7 +354,7 @@
     // Gemischte Startplätze der Gegner (Abwechslung)
     if (opts.mischen) { const g = k.start.gegner.slice(); for (let i = g.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [g[i], g[j]] = [g[j], g[i]]; } k = Object.assign({}, k, { start: Object.assign({}, k.start, { gegner: g }) }); }
     // Allgemeiner Faktor für das Leben aller Gegner (Ausgleich zur Klassenbalance)
-    const tpGlobal = opts.tpGlobal != null ? opts.tpGlobal : GEGNER_TP.wert;
+    const tpGlobal = (opts.tpGlobal != null ? opts.tpGlobal : GEGNER_TP.wert) * bedTp(st);
     // Ein zusätzlicher Gegner der häufigsten Art (nicht bei fest vorgegebenen Gegnern wie im Duell)
     const basis = opts.gegner ? opts.gegner : gegnerFuer(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore").map((g) => Object.assign({}, g));
     const zusatzN = opts.zusatzGegner != null ? opts.zusatzGegner : opts.schwierigkeit === "hardcore" ? 0 : GEGNER_TP.zusatz; // Zusatzgegner nur in Normal
@@ -366,7 +377,7 @@
       }
       const nr = gruppen.length === 1 || g.anzahl > 1 ? " " + (i + 1) : "";
       const gtp = Math.max(1, Math.round(d.tp * (g.tpFaktor || 1)));
-      st.figuren.push({ id: "g" + gi, seite: "gegner", art: g.art, name: ((opts.namen && opts.namen[g.art]) || g.name || d.name) + nr, x, y, tp: gtp, tpMax: gtp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true });
+      st.figuren.push({ id: "g" + gi, seite: "gegner", art: g.art, name: ((opts.namen && opts.namen[g.art]) || g.name || d.name) + nr, x, y, tp: gtp, tpMax: gtp, rk: d.rk + bedTeil(st, 4), rkBasis: d.rk + bedTeil(st, 4), werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true });
       gi++;
     }
     // Mechaniken: Leben der Verstärkung wie die Begegnung; Gegner mit Sonderzügen brauchen den Mechanik-Zustand auch ohne Ziele
@@ -531,6 +542,7 @@
   }
   /** Rettungswurf: {erfolg, w, total} */
   function rettung(st, z, attr, sg) {
+    if (z.seite === "spieler" && st.bed) sg += bedTeil(st, 3); // Bedrohung: Zauber und Flächen der Gegner sind schwerer abzuschütteln
     let v = 0; if (attr === "GES" && z.z.festgehalten) v = -1;
     if (((attr === "STR" || attr === "KON") && hatDing(z, "baerenguertel")) || (attr === "GES" && hatDing(z, "katzenbrosche"))) v += 1;
     let { w } = w20(st, v);
@@ -629,18 +641,19 @@
     const kritAb = spec.krit || 20;
     let { w } = w20(st, v);
     const segen = () => (a.z.segen ? W(st.r, 4) : 0);
-    let total = w + spec.bonus + segen();
+    const bedA = a.seite === "gegner" ? bedTeil(st, 2) : 0; // Bedrohung: Gegner treffen besser und härter
+    let total = w + spec.bonus + bedA + segen();
     let treffer = w !== 1 && (w >= kritAb || total >= rk);
     // Glückspilz (Trickserin): eigener knapper Fehlwurf
     if (!treffer && istFig(a, "trickser") && rk - total <= 5 && (a.genutzt.glueckspilz || 0) < (hs(a) >= 7 ? 2 : 1)) {
-      a.genutzt.glueckspilz = (a.genutzt.glueckspilz || 0) + 1; w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
+      a.genutzt.glueckspilz = (a.genutzt.glueckspilz || 0) + 1; w = w20(st, v).w; total = w + spec.bonus + bedA + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
       st.log.push({ t: `${a.name} hat Glück und versucht es noch einmal.` });
     }
     // Gedankenstütze
-    if (!treffer && a.seite === "spieler" && w !== 1) { const g = gedankenstuetze(st, a, rk - total); if (g) { w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk); st.log.push({ t: `${g.name}: Gedankenstütze – ${a.name} würfelt noch einmal.`, art: "gut" }); } }
+    if (!treffer && a.seite === "spieler" && w !== 1) { const g = gedankenstuetze(st, a, rk - total); if (g) { w = w20(st, v).w; total = w + spec.bonus + bedA + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk); st.log.push({ t: `${g.name}: Gedankenstütze – ${a.name} würfelt noch einmal.`, art: "gut" }); } }
     // Glückspilz: Gegner trifft die Trickserin
     if (treffer && w < kritAb && istFig(z, "trickser") && a.seite === "gegner" && (z.genutzt.glueckspilz || 0) < (hs(z) >= 7 ? 2 : 1)) {
-      z.genutzt.glueckspilz = (z.genutzt.glueckspilz || 0) + 1; w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
+      z.genutzt.glueckspilz = (z.genutzt.glueckspilz || 0) + 1; w = w20(st, v).w; total = w + spec.bonus + bedA + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
       st.log.push({ t: `${z.name} weicht im letzten Moment aus: ${a.name} muss neu würfeln.` });
     }
     // Schutzglyphe (Gelehrte): knapper Treffer, der viel kosten würde
@@ -664,7 +677,7 @@
     const vtext = v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : "";
     let erg = { treffer, krit, w, total, schaden: 0 };
     if (treffer) {
-      let s = roll(st.r, spec.schaden, krit).total + (spec.fest || 0);
+      let s = Math.max(1, roll(st.r, spec.schaden, krit).total + (spec.fest || 0) + bedA);
       const extra = (spec.extra || []).slice();
       if (spec.hinterhalt && (!st.zug.hinterhalt || spec.hinterhaltImmer) && (v > 0 || (v === 0 && st.figuren.some((o) => o.seite === a.seite && o !== a && lebt(o) && abstand(o, z) <= 1)))) { extra.push(spec.hinterhalt); st.zug.hinterhalt = true; }
       for (const e of extra) s += roll(st.r, e, krit).total;
@@ -1363,7 +1376,7 @@
     for (let r2 = 1; r2 <= 3 && !feld; r2++) for (let dx = -r2; dx <= r2 && !feld; dx++) for (let dy = -r2; dy <= r2 && !feld; dy++) { const x = g.x + dx, y = g.y + dy; if (!blockiert(st, x, y) && !belegt(st, x, y)) feld = { x, y }; }
     if (!feld) return;
     st.gerufen = (st.gerufen || 0) + 1;
-    const n = { id: "r" + st.gerufen, seite: "gegner", art, name: d.name + " (gerufen)", x: feld.x, y: feld.y, tp: d.tp, tpMax: d.tp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, ini: 0 };
+    const n = { id: "r" + st.gerufen, seite: "gegner", art, name: d.name + " (gerufen)", x: feld.x, y: feld.y, tp: Math.round(d.tp * bedTp(st)), tpMax: Math.round(d.tp * bedTp(st)), rk: d.rk + bedTeil(st, 4), rkBasis: d.rk + bedTeil(st, 4), werte: d.werte, z: {}, reaktion: 1, genutzt: {}, ini: 0 };
     st.figuren.push(n); st.reihe.splice(st.am + 1, 0, n.id);
     st.log.push({ t: `${g.name} reißt die Hand hoch. Aus dem Boden steigt ein Knochenwächter.`, art: "schlecht" });
   }
@@ -1429,7 +1442,7 @@
   function neuerGegner(st, art, feld, zusatz) {
     const d = GEGNER[art]; st.gerufen = (st.gerufen || 0) + 1;
     const tp = Math.max(1, Math.round(d.tp * ((st.mech && st.mech.tpk) || 1)));
-    const g = { id: "r" + st.gerufen, seite: "gegner", art, name: d.name + (zusatz ? ` (${zusatz})` : ""), x: feld.x, y: feld.y, tp, tpMax: tp, rk: d.rk, rkBasis: d.rk, werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true, ini: 0 };
+    const g = { id: "r" + st.gerufen, seite: "gegner", art, name: d.name + (zusatz ? ` (${zusatz})` : ""), x: feld.x, y: feld.y, tp, tpMax: tp, rk: d.rk + bedTeil(st, 4), rkBasis: d.rk + bedTeil(st, 4), werte: d.werte, z: {}, reaktion: 1, genutzt: {}, atemBereit: true, ini: 0 };
     st.figuren.push(g); st.reihe.push(g.id);
     return g;
   }

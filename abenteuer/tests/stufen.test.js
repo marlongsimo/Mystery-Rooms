@@ -39,6 +39,14 @@ check(JSON.stringify(v.f.plaetze) === "[5,3]" && akt(v.f, "geschoss").anzahl ===
 check(fy.st.figuren.find((x) => x.art === "wolf").tpMax === 22, "Faye Stufe 5: Grau hat 10 Lebenspunkte mehr");
 check(d.st.falle && d.st.falle.meister && !fig("schattenlaeufer", 6).st.falle, "Darian: Falle ab Stufe 7, Meisterfalle auf Stufe 10");
 check(Boolean(akt(o3.f, "laehmbolzen")) && !akt(o2.f, "laehmbolzen"), "Orin: Lähmender Bolzen ab Stufe 3");
+// Gegner wachsen mit: Bedrohung aus der Schwierigkeit der Kampagne
+{ const K = S.neu(5, { abenteuer: "krone", gruppe: ["schildwaechter", "lichtbringer", "wildnislaeufer"] }), Wd = S.neu(5, { abenteuer: "weidenhain", gruppe: ["schildwaechter", "lichtbringer", "wildnislaeufer"] });
+  check(S.empfStufe("krone") === 6 && K.stufe === 6 && Wd.stufe === 1, "Krone (Schwierigkeit 4) spielt auf Heldenstufe 6, Weidenhain auf Stufe 1");
+  K.szene = "kampf_markt"; const ko = S.kampfOptionen(K), stB = R.neuesSpiel(3, ko), st0 = R.neuesSpiel(3, Object.assign({}, ko, { bedrohung: 0 }));
+  const g1 = R.gegnerFiguren(stB)[0], g0 = R.gegnerFiguren(st0).find((x) => x.art === g1.art);
+  check(ko.bedrohung === 5 && stB.bed === 5 && g1.tpMax > g0.tpMax * 1.5 && g1.rk === g0.rk + 1, "Krone, erster Kampf: Bedrohung +5 – Gegner mit mehr Leben und RK +1");
+  Wd.szene = "kampf_speicher"; check(S.kampfOptionen(Wd).bedrohung === 0, "Weidenhain, erster Kampf: Bedrohung 0 (Gegner wie bisher)"); }
 F.STUFEN10.aktiv = false;
+{ const K = S.neu(5, { abenteuer: "krone", gruppe: ["schildwaechter", "lichtbringer", "wildnislaeufer"] }); K.szene = "kampf_markt"; check(K.stufe === 1 && !S.kampfOptionen(K).bedrohung && R.neuesSpiel(3, Object.assign(S.kampfOptionen(K), { bedrohung: 4 })).bed === 0, "Schalter aus: Kampagnen starten auf Stufe 1, keine Bedrohung"); }
 check(F.tpVon("schildwaechter", 3) === F.tpAlt("schildwaechter", 3) && !F.faehigVon("kopfgeldjaeger", 3).some((a) => a.nur10 || a.besser), "Schalter aus: bisheriges Modell unverändert, keine neuen Fähigkeiten");
 console.log(ok ? "\nHELDENSTUFEN IN ORDNUNG" : "\nHELDENSTUFEN FEHLER"); process.exit(ok ? 0 : 1);

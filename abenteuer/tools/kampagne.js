@@ -217,8 +217,10 @@ function durchlauf(id, N = 200, o = {}) {
 
 /* ---------- Kämpfe ---------- */
 function kaempfe(id, N = 150, o = {}) {
-  if (o && o.stufe) F.STUFEN10.aktiv = true; // Messung im Zehn-Stufen-Modell
+  if (o && (o.stufe || o.modell10)) F.STUFEN10.aktiv = true; // Messung im Zehn-Stufen-Modell
   const D = daten(id), GR = [];
+  // --modell10: Helden auf der empfohlenen Stufe der Kampagne (aus ihrer Schwierigkeit), --ab=N verschiebt sie um N Stufen
+  if (o.modell10) o.stufe = Math.max(1, Math.min(10, S.empfStufe(id) + (o.ab || 0)));
   for (let n = Math.max(2, D.META.min || 3); n <= (D.META.max || 6); n++) GR.push(n);
   const liste = Object.keys(D.SZENEN).filter((s) => D.SZENEN[s].art === "kampf" && (!o.nur || !o.nur.length || o.nur.includes(s)));
   const ziel = (s) => (D.META.zielquoten && D.META.zielquoten[s]) || 0.8;
@@ -261,6 +263,13 @@ function kaempfe(id, N = 150, o = {}) {
       }
       if (!tab[2]) tab[2] = tab[Math.min(...GR)];
       const datei = path.join(WURZEL, "js/regeln.js"); let txt = fs.readFileSync(datei, "utf8");
+      if (o.modell10) { // Zehn-Stufen-Modell: eigene Tabelle, das heutige Spiel bleibt unberührt
+        const marke = o.hardcore ? "SKALA10_HC" : "SKALA10", re10 = new RegExp(`/\\*${marke}\\*/ const ${marke} = (\\{.*?\\}); /\\*/${marke}\\*/`);
+        const m10 = re10.exec(txt); if (!m10) { ergebnis.push({ sid, fehler: `Tabelle ${marke} in js/regeln.js nicht gefunden` }); continue; }
+        const alle = JSON.parse(m10[1]); alle[beg] = {}; for (const n of [3, 4, 5, 6]) alle[beg][n] = tab[n] != null ? tab[n] : tab[Math.max(...GR)];
+        fs.writeFileSync(datei, txt.replace(re10, () => `/*${marke}*/ const ${marke} = ${JSON.stringify(alle)}; /*/${marke}*/`));
+        ergebnis.push({ sid, begegnung: beg, kalibriert: tab, feld: marke, warnungen }); continue;
+      }
       const feld = o.hardcore ? "skalaHC" : "skala", neu = `${feld}: { ${[2, 3, 4, 5, 6].map((n) => `${n}: ${tab[n] != null ? tab[n] : tab[Math.max(...GR)]}`).join(", ")} }`;
       const re = new RegExp(`(    ${beg}: \\{[^\\n]*?)${feld}: \\{[^}]*\\}`);
       if (!re.test(txt)) { ergebnis.push({ sid, fehler: `Begegnung ${beg}: kein Feld ${feld} in js/regeln.js gefunden – bitte einmal von Hand anlegen` }); continue; }
@@ -383,7 +392,7 @@ if (require.main === module) {
     }
   } else if (befehl === "kaempfe") {
     for (const id of welche) {
-      const k = kaempfe(id, N || 150, { hardcore: flag("hardcore"), helden: flag("helden"), kalibrieren: flag("kalibrieren"), nur: wert("nur").split(",").filter(Boolean), stufe: +wert("stufe") || 0 });
+      const k = kaempfe(id, N || 150, { hardcore: flag("hardcore"), helden: flag("helden"), kalibrieren: flag("kalibrieren"), nur: wert("nur").split(",").filter(Boolean), stufe: +wert("stufe") || 0, modell10: flag("modell10"), ab: +wert("ab") || 0 });
       console.log(`\n${daten(id).META.titel} · ${flag("hardcore") ? "Hardcore" : "Normal"} · ${flag("kalibrieren") ? "Kalibrierung" : (N || 150) + " Kämpfe je Größe"} · Sieg % (übriges Leben %, Runden)`);
       for (const e of k.ergebnis) {
         if (e.fehler) { console.log(`  ✗ ${e.sid}: ${e.fehler}`); schlecht = true; continue; }

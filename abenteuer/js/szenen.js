@@ -47,6 +47,18 @@
   const m = (A, k) => A.merker[k];
   const name = (A, fid) => F.FIGUREN[fid].name;
 
+  /* ---------- Zehn-Stufen-Modell (nur wenn F.STUFEN10.aktiv): Helden bringen ihre Stufe mit, Gegner wachsen mit ---------- */
+  const modell10 = () => Boolean(F.STUFEN10 && F.STUFEN10.aktiv);
+  /** Empfohlene Heldenstufe einer Kampagne – aus ihrer Schwierigkeit (1 Leicht → 1, 2 Normal → 3, 3 → 4, 4 → 6, 5 → 8) */
+  const empfStufe = (id) => (F.SCHWIERIGKEIT[metaVon(id).schwierigkeit || 1] || F.SCHWIERIGKEIT[1]).stufe;
+  /** Bedrohung eines Kampfes: Die Kampagne wird nach hinten schwerer (Abschnitt 1 = empfohlene Stufe, dann je Abschnitt +1).
+   *  Zurück kommt der Abstand zu dem Wert, auf den die Begegnung bisher ausgelegt war (alte Stufe 1/2/3 ≈ Heldenstufe 1/3/5). */
+  function bedrohung(A, s, k) {
+    if (!modell10()) return 0;
+    const alt = Math.max(1, Math.min(3, (s && s.stufe) || (R.BEGEGNUNGEN[k && k.begegnung] || {}).stufe || 1));
+    return Math.min(F.STUFEN10.max, empfStufe(A.abenteuer) + alt - 1) - [1, 3, 5][alt - 1];
+  }
+
   function neu(seed, opts = {}) {
     const A = {
       seed, rs: seed >>> 0 || 1, abenteuer: opts.abenteuer || "grauwacht", szene: null, merker: {}, glocke: 0, stufe: 1,
@@ -54,6 +66,8 @@
       gruppe: (opts.gruppe || []).slice(0, 6), zust: null, lagerZust: null, lagerSzene: null,
       gewaehlt: {}, stimmen: {}, geheim: {}, probe: null, ergebnis: null, protokoll: [], gefallen: [],
     };
+    // Zehn-Stufen-Modell: Die Gruppe spielt die ganze Kampagne auf ihrer Heldenstufe (bis zur Speicherung am Konto: die empfohlene)
+    if (modell10()) A.stufe = Math.max(1, Math.min(F.STUFEN10.max, opts.heldenstufe || empfStufe(A.abenteuer)));
     R.zufall(A);
     A.zust = startZustand(A);
     geheZu(A, DATEN(A).START);
@@ -335,7 +349,7 @@
 
   /* ---------- Lagerfeuer ---------- */
   function lagerfeuer(A, s) {
-    if (s.aufstieg && A.stufe < s.aufstieg) {
+    if (s.aufstieg && A.stufe < s.aufstieg && !modell10()) {
       const von = A.stufe; A.stufe = s.aufstieg; notiz(A, `Aufstieg: Die Gruppe erreicht Stufe ${A.stufe}.`, "gut");
       // Was jede Figur dazugewinnt (für den Aufstiegsbildschirm)
       A.aufstieg = { von, auf: A.stufe, helden: {} };
@@ -466,7 +480,7 @@
   function gegnerVorschau(A) {
     const s = szene(A); if (s.art !== "kampf") return null;
     const k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
-    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit }, k, { mischen: false, anfuehrer: false });
+    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, bedrohung: bedrohung(A, s, k) }, k, { mischen: false, anfuehrer: false });
     if (A.kampfMod) o.skalaMal = (o.skalaMal || 1) * A.kampfMod;
     const st = R.neuesSpiel(1, o), arten = [], W = DATEN(A).WISSEN || {};
     for (const g of R.gegnerFiguren(st)) {
@@ -486,7 +500,7 @@
   function kampfOptionen(A) {
     const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
     const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: A.stufe });
-    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher }, k);
+    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, schwierigkeit: A.schwierigkeit, vorher, bedrohung: bedrohung(A, s, k) }, k);
     // Abwechslung: gemischte Startplätze, in etwa jedem dritten Kampf ein Anführer (nicht im Duell und nicht beim Endgegner)
     if (!o.gegner && !o.boss) { o.mischen = k.mischen !== false; o.anfuehrer = anfuehrerFestlegen(A, k); } // feste Plätze (z. B. Nester): mischen: false
     if (A.kampfMod) { o.skalaMal = (o.skalaMal || 1) * A.kampfMod; }
@@ -530,7 +544,7 @@
       A.zust = JSON.parse(JSON.stringify(A.lagerZust || startZustand(A)));
       // Bekam das letzte Lagerfeuer nachträglich einen Stufenaufstieg (laufende Spielstände), wird er hier nachgeholt
       const ls = A.lagerSzene && DATEN(A).SZENEN[A.lagerSzene];
-      if (ls && ls.aufstieg && A.stufe < ls.aufstieg) {
+      if (ls && ls.aufstieg && A.stufe < ls.aufstieg && !modell10()) {
         A.stufe = ls.aufstieg; notiz(A, `Aufstieg: Die Gruppe erreicht Stufe ${A.stufe}.`, "gut");
         for (const fid of A.gruppe) { const z = A.zust[fid]; if (z && !z.tot) A.zust[fid] = Object.assign(frisch(fid, A.stufe), { rucksack: z.rucksack }); }
         A.lagerZust = JSON.parse(JSON.stringify(A.zust));
@@ -584,7 +598,7 @@
   function speichern(A) { const o = Object.assign({}, A); delete o.r; return JSON.parse(JSON.stringify(o)); }
   function laden(o) { return R.zufall(JSON.parse(JSON.stringify(o))); }
 
-  const API = { metaVon, datenVon, wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { metaVon, empfStufe, bedrohung, datenVon, wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, gegnerVorschau, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

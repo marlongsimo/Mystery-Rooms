@@ -206,7 +206,9 @@
   const ENTWURF = new URLSearchParams(location.search).has("entwurf");
   const ABENTEUER = () => Object.values(window.ABD_ALLE || {}).map((d) => window.ABS.metaVon(d.META ? d.META.id : "grauwacht")).filter((m) => ENTWURF || !m.entwurf).sort((a, b) => (a.schwierigkeit || 1) - (b.schwierigkeit || 1) || (a.reihe || 0) - (b.reihe || 0)); // leichtere Abenteuer zuerst
   const titelbild = (m) => (m.bild || "img/mythara/karte-kampagnen.webp");
-  const abenteuerKachel = (m, attr) => `<button class="hub-kachel welt" ${attr}="${m.id}"><img src="${titelbild(m)}" alt="" ${BILD_ERSATZ}><b>${esc(m.titel)}</b><small>${esc(m.kurztext || "")} <span class="hub-schwer">Schwierigkeit: Stufe ${esc(m.schwierigkeit || 1)}</span> · ${m.min}–${m.max} Helden.</small>${attr === "data-welt" ? `<span class="hub-mehr">Zur Beschreibung →</span>` : ""}</button>`;
+  /** Schwierigkeit einer Kampagne in Worten: „2 – Normal“ */
+  const schwer = (n) => { const s = (window.ABF.SCHWIERIGKEIT || {})[n || 1]; return (n || 1) + (s ? " – " + s.name : ""); };
+  const abenteuerKachel = (m, attr) => `<button class="hub-kachel welt" ${attr}="${m.id}"><img src="${titelbild(m)}" alt="" ${BILD_ERSATZ}><b>${esc(m.titel)}</b><small>${esc(m.kurztext || "")} <span class="hub-schwer">Schwierigkeit: ${esc(schwer(m.schwierigkeit))}</span> · ${m.min}–${m.max} Helden.</small>${attr === "data-welt" ? `<span class="hub-mehr">Zur Beschreibung →</span>` : ""}</button>`;
   const vor = (t) => {
     const s = Math.max(0, (Date.now() - new Date(t).getTime()) / 1000);
     if (s < 90) return "gerade eben"; if (s < 3600) return `vor ${Math.round(s / 60)} Minuten`; if (s < 86400) return `vor ${Math.round(s / 3600)} Stunden`;
@@ -369,7 +371,7 @@
       seiteZeigen("welt", `<button class="hub-zurueck klein" data-welt="">← Alle Abenteuer</button>
         <h1 class="hub-gruss">${esc(m.titel)}</h1><p class="hub-untertitel">${esc(m.untertitel || "")}</p>
         <img class="hub-welt-bild" src="${titelbild(m)}" alt="" ${BILD_ERSATZ}>
-        <ul class="hub-fakten"><li>Schwierigkeit <b>Stufe ${esc(m.schwierigkeit || 1)}</b></li><li><b>${m.min}–${m.max}</b> Heldinnen und Helden</li><li><b>${esc(m.dauer || "")}</b></li><li><b>${esc(m.abschnitte || 2)}</b> Abschnitte</li><li><b>${esc(m.enden || 4)}</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
+        <ul class="hub-fakten"><li>Schwierigkeit <b>${esc(schwer(m.schwierigkeit))}</b></li><li><b>${m.min}–${m.max}</b> Heldinnen und Helden</li><li><b>${esc(m.dauer || "")}</b></li><li><b>${esc(m.abschnitte || 2)}</b> Abschnitte</li><li><b>${esc(m.enden || 4)}</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
         <div class="hub-text einleitung">${(m.einleitung || []).map((p) => `<article class="seite"><p class="eyebrow">${esc(p.eyebrow || "")}</p><h2>${esc(p.titel)}</h2>${p.text.map((t) => `<p>${esc(t)}</p>`).join("")}</article>`).join("")}</div>
         <button class="my-knopf rot hub-welt-start" data-neu-start="${m.id}">Kampagne starten</button>`);
       return;
@@ -377,7 +379,7 @@
     seiteZeigen("welt", `<button class="hub-zurueck klein" data-welt="">← Alle Abenteuer</button>
       <h1 class="hub-gruss">Das Siegel von Grauwacht</h1><p class="hub-untertitel">Das erste Abenteuer in den Splitterlanden</p>
       <img class="hub-welt-bild" src="${titelbild(window.ABS.metaVon("grauwacht"))}" alt="" ${BILD_ERSATZ}>
-      <ul class="hub-fakten"><li>Schwierigkeit <b>Stufe ${esc(window.ABS.metaVon("grauwacht").schwierigkeit || 2)}</b></li><li><b>3–6</b> Heldinnen und Helden</li><li>etwa <b>3 Stunden</b></li><li><b>3</b> Abschnitte</li><li><b>5</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
+      <ul class="hub-fakten"><li>Schwierigkeit <b>${esc(schwer(window.ABS.metaVon("grauwacht").schwierigkeit || 2))}</b></li><li><b>3–6</b> Heldinnen und Helden</li><li>etwa <b>3 Stunden</b></li><li><b>3</b> Abschnitte</li><li><b>5</b> Enden</li><li>ab <b>12</b> Jahren</li></ul>
       <div class="hub-text einleitung">${kopie("#einl-grauwacht .seite")}</div>
       <button class="my-knopf rot hub-welt-start" data-neu-start="grauwacht">Kampagne starten</button>`);
   }

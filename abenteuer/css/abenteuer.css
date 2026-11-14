@@ -1629,3 +1629,17 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .arena-ende-lohn { font: 600 18px "Inter", sans-serif; color: #e6dcff; margin: 12px 0 6px; } .arena-ende-lohn i { font-style: normal; color: #b9a6ff; } .arena-ende-lohn.held { color: #f6dc9c; }
 .arena-ende-note { color: #b9ad94; font-size: 14px; }
 .arena-xp { text-align: left; margin: 10px auto; }
+
+/* Heldenkarte: noch gesperrte Fähigkeiten mit Schloss und Stufe; verbesserte Fähigkeiten markiert */
+.held-faehig.gesperrt li.zu { position: relative; padding-left: 40px; opacity: .72; border-style: dashed; }
+.held-faehig.gesperrt li.zu b { color: #cfc6b2; }
+.held-faehig.gesperrt li.zu .typ { color: #d9b46a; }
+.held-schloss { position: absolute; left: 11px; top: 12px; width: 18px; height: 18px; fill: rgba(217,180,106,.25); stroke: #d9b46a; }
+.held-faehig li.besser { border-color: rgba(246,220,156,.55); }
+/* Startseite auf dem Handy: Logo oben, darunter Währung, Profil, Glocke und Einstellungen in einer Zeile */
+@media (max-width: 560px) {
+  .hub-kopf { grid-template-columns: 1fr; row-gap: 10px; }
+  .hub-logo { grid-column: 1; justify-self: center; width: min(230px, 60vw); }
+  .hub-profil { grid-column: 1; justify-self: center; flex-wrap: wrap; justify-content: center; }
+  .arena-waehrung.kopf { margin-right: 0; }
+}

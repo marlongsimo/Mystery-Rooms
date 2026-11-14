@@ -43,7 +43,7 @@
   function klassenFaehig(k, alle) {
     const kl = F.KLASSEN[k], [mName, ...mText] = (kl.merkmal || "").split(": ");
     const marken = (kl.merkmal ? [`<b class="marke merkmal">${esc(mName)}</b>`] : [])
-      .concat(F.KLASSE_FAEHIG[k].filter((a) => alle || a.ab === 1).map((a) => `<b class="marke">${esc(a.name)}${a.ab > 1 ? ` <small>ab Stufe ${a.ab}</small>` : ""}</b>`));
+      .concat(F.KLASSE_FAEHIG[k].filter((a) => alle || a.ab === 1).map((a) => `<b class="marke">${esc(a.name)}${a.ab > 1 ? ` <small>ab Stufe ${window.ABSAMMLUNG && window.ABSAMMLUNG.zustand && window.ABSAMMLUNG.zustand().stufenDa ? F.neuAb(a.ab) : a.ab}</small>` : ""}</b>`));
     return `<span class="klassen-faehig" style="--k:${kl.farbe}"><i>Klassenfähigkeiten</i><span class="marken">${marken.join("")}</span>${kl.merkmal ? `<span class="merkmal-text"><b>${esc(mName)}:</b> ${esc(mText.join(": "))}</span>` : ""}</span>`;
   }
   /** Schritt 1: fünf Klassenbanner mit kurzen Angaben. o.gruppe markiert, wer schon dabei ist */
@@ -89,9 +89,12 @@
   function detail(fid, stufe = 1, knopf = "", o = {}) {
     // Eigener Fortschritt (Konto mit Heldenstufen): Die Karte zeigt den Helden auf seiner echten Stufe – außer in einer laufenden Kampagne (o.fest)
     const SM = window.ABSAMMLUNG, fo = !o.fest && SM && SM.fortschritt ? SM.fortschritt(fid) : null;
-    if (!fo) return detailHtml(fid, stufe, knopf, null);
+    // Ohne eigenen Fortschritt (Gast, gesperrter Held): außerhalb einer Kampagne die Karte der Stufe 1 im Zehn-Stufen-Modell,
+    // sobald es Heldenstufen gibt – so stehen überall dieselben Stufenangaben
+    const zehn = !o.fest && SM && SM.zustand && SM.zustand().stufenDa;
+    if (!fo && !zehn) return detailHtml(fid, stufe, knopf, null);
     const vorher = F.STUFEN10.aktiv; F.STUFEN10.aktiv = true;
-    try { return detailHtml(fid, fo.stufe, knopf, fo); } finally { F.STUFEN10.aktiv = vorher; }
+    try { return detailHtml(fid, fo ? fo.stufe : 1, knopf, fo); } finally { F.STUFEN10.aktiv = vorher; }
   }
   function detailHtml(fid, stufeRoh, knopf, fo) {
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], pr = PROFIL[fid], SM = window.ABSAMMLUNG;
@@ -101,13 +104,24 @@
     const eigene = d.faehig.filter((a) => a.ab <= stufe), spaeter = d.faehig.filter((a) => a.ab > stufe);
     const kl = F.KLASSE_FAEHIG[d.klasse].filter((a) => a.ab <= stufe);
     const balken = ACHSEN.map((n, i) => `<div class="achse"><span>${n}</span><i>${Array.from({ length: 5 }, (_, j) => `<b class="${j < pr.p[i] ? "an" : ""}"></b>`).join("")}</i></div>`).join("");
-    const werte = ["STR", "GES", "KON", "INT", "WEI", "CHA"].map((a) => `<span class="${d.werte[a] >= 16 ? "haupt" : ""}"><small>${a}</small><b>${d.werte[a]}</b><em>${vorz(R.mod(d.werte[a]))}</em></span>`).join("");
-    const fae = (a) => `<li><b>${esc(a.name)}</b><span class="typ">${a.typ === "passiv" ? "immer" : a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion"}${(() => { const gz = R.grenze({ stufe }, a); return gz ? ` · ${gz.n}× je ${gz.je}` : ""; })()}</span><p>${esc(a.text)}</p></li>`;
+    const wv = m10 ? F.werteVon(fid, heldenstufe) : d.werte; // Hauptattribut +2 ab Stufe 4
+    const werte = ["STR", "GES", "KON", "INT", "WEI", "CHA"].map((a) => `<span class="${wv[a] >= 16 ? "haupt" : ""}"><small>${a}</small><b>${wv[a]}</b><em>${vorz(R.mod(wv[a]))}</em></span>`).join("");
+    // Zehn-Stufen-Modell: die Fähigkeiten genau so, wie der Held sie auf seiner Stufe hat (mit Verbesserungen),
+    // darunter mit Schloss, was noch kommt, und ab welcher Stufe
+    const jetzt = m10 ? F.faehigVon(fid, heldenstufe) : null;
+    const SCHLOSS = `<svg class="held-schloss" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke-width="2"/></svg>`;
+    const gesperrt = m10 ? F.stufenpfad(fid).filter((z) => z.stufe > heldenstufe).flatMap((z) => [
+      ...z.neu.map((n) => ({ ab: z.stufe, art: "Neue Fähigkeit", name: n.name, text: n.text || "" })),
+      z.verbesserung ? { ab: z.stufe, art: "Verbesserung", name: z.verbesserung, text: "" } : null,
+      z.meister ? { ab: z.stufe, art: "Meisterschaft", name: z.meister, text: z.titel ? `Meistertitel: „${d.name}, ${z.titel}“` : "" } : null,
+    ].filter(Boolean)) : [];
+    const zu = (g) => `<li class="zu">${SCHLOSS}<b>${esc(g.name)}</b><span class="typ">${esc(g.art)} · ab Stufe ${g.ab}</span>${g.text ? `<p>${esc(g.text)}</p>` : ""}</li>`;
+    const fae = (a) => `<li${a.besser ? ' class="besser"' : ""}><b>${esc(a.name)}</b><span class="typ">${a.typ === "passiv" ? "immer" : a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion"}${(() => { const gz = R.grenze(m10 ? { stufe: heldenstufe, seite: "spieler", fid } : { stufe }, a); return gz ? ` · ${gz.n}× je ${gz.je}` : ""; })()}</span><p>${esc(a.text)}</p></li>`;
     return `<article class="held" style="--k:${k.farbe}">
       <div class="held-bild"><img src="${F.bild(fid)}" alt="${esc(d.name)}"><span class="held-klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span></div>
       <div class="held-text">
         <p class="eyebrow">${esc(d.rolle)} · ${"●".repeat(pr.anspruch)}${"○".repeat(3 - pr.anspruch)} ${ANSPRUCH[pr.anspruch]}</p>
-        <h2>${esc(d.name)}</h2><p class="held-titel">${esc(d.titel)}</p>${fo && SM ? SM.stufeHtml(fid) : m10 ? `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${heldenstufe}</b><span>in dieser Kampagne</span></div></div>` : ""}
+        <h2>${esc(d.name)}</h2><p class="held-titel">${esc(d.titel)}</p>${fo && SM ? SM.stufeHtml(fid) : m10 ? `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${heldenstufe}</b><span>${window.ABT && window.ABT.A && window.ABT.A() ? "in dieser Kampagne" : "so beginnt jeder Held"}</span></div></div>` : ""}
         <blockquote>„${esc(d.spruch)}“</blockquote>
         <p class="held-spielweise">${esc(pr.spielweise)}</p>
         <div class="held-achsen">${balken}</div>
@@ -116,8 +130,9 @@
         ${knopf}
         <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="stufen">Stufen</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>
         <div class="held-tafel" data-tafel="faehig">
-          <ul class="held-faehig">${k.merkmal ? (([n, ...t]) => `<li class="klassen-merkmal"><b>${esc(n)}</b><span class="typ">Klassenmerkmal · immer</span><p>${esc(t.join(": "))}</p></li>`)(k.merkmal.split(": ")) : ""}${eigene.map(fae).join("")}${kl.map(fae).join("")}</ul>
-          ${spaeter.length ? `<p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${abText(a.ab)})`).join(" · ")}</p>` : ""}
+          <ul class="held-faehig">${k.merkmal ? (([n, ...t]) => `<li class="klassen-merkmal"><b>${esc(n)}</b><span class="typ">Klassenmerkmal · immer</span><p>${esc(t.join(": "))}</p></li>`)(k.merkmal.split(": ")) : ""}${jetzt ? jetzt.map(fae).join("") : eigene.map(fae).join("") + kl.map(fae).join("")}</ul>
+          ${m10 ? (gesperrt.length ? `<p class="held-spaeter">Noch gesperrt – das kommt mit höheren Stufen:</p><ul class="held-faehig gesperrt">${gesperrt.map(zu).join("")}</ul>` : `<p class="held-spaeter">Alles freigeschaltet: ${esc(d.name)} hat die höchste Stufe erreicht.</p>`)
+            : spaeter.length ? `<p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${abText(a.ab)})`).join(" · ")}</p>` : ""}
         </div>
         <div class="held-tafel" data-tafel="stufen" hidden>${(() => {
           const pf = F.stufenpfad(fid);

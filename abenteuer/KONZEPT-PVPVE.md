@@ -185,7 +185,19 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 
 ## 10. Belohnungen
 
-- **XP:** Vorschlag: 25 XP je Held für eine beendete Partie, höchstens dreimal am Tag, Sieg und Niederlage gleich. Vergeben wird auf dem Server, nur für Partien, die beide Geräte gleich gemeldet haben. So bleibt der Modus kein Level-Abkürzer, und abgesprochene Partien lohnen sich nicht.
+- **XP (festgelegt am 14. November 2026):** Eine Partie gibt den Helden etwas Erfahrung, aber weniger als eine Kampagne. Gestaffelt nach Stufe wie in den Kampagnen. **Bei einer Niederlage bekommt jeder Held ein Drittel.**
+  - **Stufe der Partie** = die höhere der beiden Teamstufen, gerundet (nach ihr richten sich auch die Monster).
+  - **Grundwert bei einem Sieg** = 25 × Stufe der Partie (Vorschlag). Das ist etwa ein Drittel dessen, was eine Kampagne dieser Stufe gibt:
+
+    | Stufe der Partie | 1 | 3 | 4 | 6 | 8 | 10 |
+    |---|---|---|---|---|---|---|
+    | Sieg | 25 | 75 | 100 | 150 | 200 | 250 |
+    | Niederlage | 8 | 25 | 33 | 50 | 67 | 83 |
+    | Kampagne dieser Stufe zum Vergleich | 100 | 200 | 300 | 450 | 600 | – |
+
+  - **Staffelung je Held** wie in den Kampagnen: Ein Held auf der Stufe der Partie bekommt den Grundwert, ein Held darunter mehr (bis ×2), ein Held darüber weniger (bis ×0,1). In der Aufstellung 10, 1, 1 (Stufe der Partie 4) bekommen die beiden Stufe-1-Helden also das Doppelte, der Stufe-10-Held fast nichts.
+  - Vergeben wird auf dem Server, nur für Partien, die beide Geräte gleich gemeldet haben. Aufgabe und Abbruch zählen für den, der bleibt, als Sieg; wer aufgibt oder wegbleibt, bekommt nichts.
+  - **Offen:** Ohne Obergrenze könnten zwei Freunde Partien absprechen und schnell hintereinander aufgeben, um Helden hochzuziehen. Gegenmittel wären eine Mindestdauer (z. B. 6 Runden) oder eine Obergrenze je Tag. Die Auswertung zeigt, ob das vorkommt.
 - **Titel und Erfolge**, zum Beispiel „Artefaktträger“ oder „Wächterbezwinger“.
 - **Kosmetisches** erst, wenn es dafür überhaupt ein System im Spiel gibt.
 
@@ -209,7 +221,7 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 ## 12. Offene Entscheidungen
 
 1. **Derselbe Held auf beiden Seiten** erlaubt (Vorschlag) oder nicht?
-2. **XP im Modus:** der kleine Betrag aus Abschnitt 10 oder gar keine?
+2. **XP im Modus:** Grundwert 25 × Stufe der Partie (Vorschlag) bestätigen; Mindestdauer oder Obergrenze je Tag gegen abgesprochene Partien?
 3. **Verstecken:** für den Anfang hinnehmen, dass es technisch nicht vollständig geschützt ist?
 4. **Reihenfolge:** Soll der Modus vor oder nach dem Neubau von Hardcore kommen?
 5. **Auswertung:** nur für Admins (Vorschlag) oder später auch eine öffentliche Seite mit Siegquoten je Held?

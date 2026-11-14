@@ -54,7 +54,7 @@
     reliquie: { name: "Reliquie der Brüder", sym: "✝", verbrauch: true, nurHardcore: true, text: "Nach einem Kampf, nicht währenddessen: holt eine gefallene Figur mit halben Trefferpunkten zurück. Einmal." },
     heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
-  const TIERE = new Set(["rostkaefer", "netzweber", "aschehund", "schlammkroete"]);
+  const TIERE = new Set(["rostkaefer", "netzweber", "aschehund", "schlammkroete", "alte_unke"]);
   const GEGNER_TP = { wert: 1.05, zusatz: 1 }; // alle Gegner +5 % Leben; in Normal ein Gegner mehr je Kampf
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
@@ -87,6 +87,9 @@
     irrlicht: { name: "Irrlicht", tp: 6, rk: 14, werte: { STR: 1, GES: 18, KON: 10, INT: 6, WEI: 12, CHA: 10 }, angriff: { name: "Kalter Funke", bonus: 4, schaden: "1W6+1", reichweite: 4 }, bewegung: 6, xp: 25 },
     moorleiche: { name: "Moorleiche", tp: 16, rk: 10, werte: { STR: 14, GES: 7, KON: 15, INT: 3, WEI: 6, CHA: 3 }, angriff: { name: "Nasser Griff", bonus: 4, schaden: "1W8+2" }, untot: true, bewegung: 4, xp: 50 },
     schlammkroete: { name: "Schlammkröte", tp: 18, rk: 11, werte: { STR: 15, GES: 12, KON: 14, INT: 2, WEI: 10, CHA: 3 }, angriff: { name: "Zunge", bonus: 4, schaden: "1W8+2", reichweite: 2 }, xp: 50 },
+    // Weidenhain: Die alte Unke kündigt ihren Zungenschlag an (eine Reihe Felder leuchtet, getroffen wird beim nächsten Zug)
+    alte_unke: { name: "Die alte Unke", tp: 34, rk: 12, werte: { STR: 17, GES: 10, KON: 16, INT: 3, WEI: 12, CHA: 5 }, angriff: { name: "Zunge", bonus: 5, schaden: "1W8+3", reichweite: 2 },
+      flaeche: { name: "Zungenschlag", form: "linie", reichweite: 5, schaden: "2W6+2", sg: 12, rettung: "GES", alle: 2 }, xp: 150 },
     alwine: { name: "Alwine", tp: 52, rk: 13, werte: { STR: 8, GES: 14, KON: 14, INT: 12, WEI: 16, CHA: 18 }, angriff: { name: "Kalte Hand", bonus: 5, schaden: "2W6+2", reichweite: 4 }, atem: { name: "Wehklage", schaden: "3W6", sg: 13, alle: 3, rettung: "WEI" }, bewegung: 5, xp: 700 },
     // Die letzte Fackel von Hochwacht: Jäger haben es auf die Begleiterin abgesehen (jaeger: true)
     siegeljaeger: { name: "Siegeljäger", tp: 12, rk: 13, werte: { STR: 13, GES: 14, KON: 12, INT: 10, WEI: 12, CHA: 8 }, angriff: { name: "Hakenschwert", bonus: 4, schaden: "1W6+2" }, jaeger: true, bewegung: 6, xp: 50 },
@@ -168,8 +171,8 @@
     f_turm: { name: "Der Zöllner zählt", stufe: 1, zusatzAb: 99, gegner: [["knochenwaechter", 0.2, 2, 0.7], ["schattenkobold", 1.1, 7, 0.3]], skala: { 2: 0.9, 3: 2.46, 4: 2.4, 5: 3.8, 6: 4.59 }, skalaHC: { 2: 0.9, 3: 2.04, 4: 2.4, 5: 2.9, 6: 3.41 } },
     // Das Erntefest von Weidenhain (Einsteiger-Kurzabenteuer, Heldenstufe 1, die Unke mit Stufe 2, 2–6 Helden). Faktoren: tools/kampagne.js kaempfe weidenhain --kalibrieren
     w_speicher: { name: "Kröten im Korn", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 1.1, 7, 0.2]], skala: { 2: 1.12, 3: 1.19, 4: 1.4, 5: 1.93, 6: 1.98 }, skalaHC: { 2: 1.04, 3: 0.75, 4: 0.88, 5: 1.15, 6: 1.29 } },
-    w_muehle: { name: "Am Mühlgraben", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0.6, 4, 0.3], ["irrlicht", 0.5, 3, -0.5]], skala: { 2: 1.43, 3: 3.9, 4: 3.23, 5: 4.47, 6: 4.47 }, skalaHC: { 2: 0.96, 3: 2.46, 4: 1.93, 5: 2.9, 6: 2.67 } },
-    w_unke: { name: "Die alte Unke", stufe: 2, zusatzAb: 99, gegner: [["schlammkroete", 0, 1, 1], ["irrlicht", 1.2, 7, -0.6]], skala: { 2: 1.55, 3: 2.6, 4: 4.6, 5: 6.19, 6: 5.55 }, skalaHC: { 2: 1.51, 3: 2.15, 4: 2.75, 5: 4.59, 6: 3.32 } },
+    w_muehle: { name: "Am Mühlgraben", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0.6, 4, 0.3], ["irrlicht", 0.5, 3, -0.5]], skala: { 2: 0.67, 3: 1.69, 4: 1.6, 5: 2.67, 6: 2.6 }, skalaHC: { 2: 0.53, 3: 1.12, 4: 1.32, 5: 1.64, 6: 1.6 } },
+    w_unke: { name: "Die alte Unke", stufe: 2, zusatzAb: 99, gegner: [["alte_unke", 0, 1, 1], ["irrlicht", 1.2, 7, -0.6], ["schlammkroete", 0.6, 3, -1.3]], skala: { 2: 1.9, 3: 2.9, 4: 2.5, 5: 2.7, 6: 2.6 }, skalaHC: { 2: 1.69, 3: 2.9, 4: 2.67, 5: 2.67, 6: 2.67 } },
     siegel: { name: "Valdric, der Abt ohne Namen", stufe: 3, gegner: [["abt", 0.25], ["knochenwaechter", 0.5]], faktor: { 3: 2.0, 4: 3.3, 5: 3.4, 6: 2.4 } },
   };
   /**

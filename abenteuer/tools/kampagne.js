@@ -157,10 +157,10 @@ function loadEndenDatei() {
 /* ---------- Durchlauf ---------- */
 function durchlauf(id, N = 200, o = {}) {
   const D = daten(id), min = Math.max(2, D.META.min || 3), max = D.META.max || 6;
-  const besucht = new Set(), enden = {}, fehler = [], durch = {};
+  const besucht = new Set(), enden = {}, fehler = [], durch = {}, stat = { kaempfe: 0, rueckzuege: 0, amBoden: 0, uhr: 0, laeufe: 0 };
   function spiel(seed, n) {
     const r = R.rng(seed), z = (k) => Math.floor(r() * k);
-    const A = S.neu(seed, { gruppe: F.REIHE.slice().sort(() => r() - 0.5).slice(0, n), schwierigkeit: o.hardcore ? "hardcore" : "normal", abenteuer: id });
+    const A = S.neu(seed, { gruppe: o.gruppe ? o.gruppe(r, n) : F.REIHE.slice().sort(() => r() - 0.5).slice(0, n), schwierigkeit: o.hardcore ? "hardcore" : "normal", abenteuer: id });
     for (let schritt = 0; schritt < 500; schritt++) {
       const s = S.szene(A); besucht.add(A.szene);
       // Jede Szene muss sich anzeigen lassen: Text nur aus Zeichenketten (fängt z. B. vertauschte Hilfsfunktionen ab)
@@ -168,7 +168,7 @@ function durchlauf(id, N = 200, o = {}) {
       if (A.beute) { const d = A.beute.dinge[0], f = S.lebende(A).find((x) => S.darfTragen(A, x, d)); if (f) S.beuteGeben(A, d, f); else S.beuteLassen(A); continue; }
       if (A.aufstieg) A.aufstieg = null;
       if (A.ersatzOffen && A.ersatzOffen.length && s.art === "lager") { for (const alt of A.ersatzOffen.slice()) S.ersatz(A, alt, S.freieFiguren(A)[0]); continue; }
-      if (s.art === "ende") return A.szene;
+      if (s.art === "ende") { stat.uhr += A.glocke; stat.laeufe++; return A.szene; }
       if (s.art === "erzaehlung" || s.art === "lager") { if (s.rastErlaubt && r() < 0.3) S.kurzeRast(A); S.weiter(A); continue; }
       if (s.art === "gespraech") {
         if (A.zwischenprobe) { const f = S.lebende(A)[z(S.lebende(A).length)]; S.probeWer(A, f); S.probeWurf(A, f); continue; }
@@ -198,7 +198,7 @@ function durchlauf(id, N = 200, o = {}) {
           else R.autoZug(st);
         }
         if (!st.ende) throw new Error("Kampf endet nicht: " + A.szene + " · Runde " + st.runde + " · " + st.figuren.filter((f) => f.tp > 0).map((f) => `${f.name}@${f.x},${f.y} ${f.tp}TP${Object.keys(f.z || {}).length ? " [" + Object.keys(f.z).join(",") + "]" : ""}`).join("; ") + " · zuletzt: " + st.log.slice(-6).map((l) => l.t).join(" / "));
-        S.kampfEnde(A, st); continue;
+        { const e = S.kampfEnde(A, st); stat.kaempfe++; if (e && e.ergebnis === "rueckzug") stat.rueckzuege++; stat.amBoden += R.spielerFiguren(st).filter((f) => f.tp <= 0).length; } continue;
       }
       throw new Error("Unbekannte Szenenart " + s.art + " in " + A.szene);
     }
@@ -212,7 +212,7 @@ function durchlauf(id, N = 200, o = {}) {
   // Niederlage-Szene erreicht man im Normalmodus nur, wenn das Abenteuer sie dort vorsieht: nicht als Fehler werten
   const nie = Object.keys(D.SZENEN).filter((x) => !besucht.has(x) && x !== D.NIEDERLAGE);
   const fehlendeEnden = endenVon(id).map((e) => e.id).filter((e) => !enden[e]);
-  return { id, N, enden, durch, nie, fehlendeEnden, fehler };
+  return { id, N, enden, durch, nie, fehlendeEnden, fehler, stat };
 }
 
 /* ---------- Kämpfe ---------- */

@@ -230,8 +230,19 @@
     },
     kampf_muehle: {
       art: "kampf", abschnitt: 1, titel: "Am Mühlgraben", ort: "Die alte Mühle",
-      text: (A) => ["Der Graben teilt die Wiese. Nur über den Steg in der Mitte kommt man hinüber. Über dem Wasser tanzt ein kleines Licht.", A.merker.ueberraschung ? "↳ Ihr seid zuerst da. Die Kröten haben euch noch nicht bemerkt." : ""].filter(Boolean),
-      kampf: (A) => ({ begegnung: "w_muehle", karte: MUEHLE, keinAnfuehrer: true, ueberraschung: Boolean(A.merker.ueberraschung), sieg: { weiter: "muehle_innen" } }),
+      text: (A) => [
+        "Der Graben teilt die Wiese. Nur über den Steg in der Mitte kommt man hinüber. Über dem Wasser tanzt ein kleines Licht.",
+        "Drüben, am unteren Ende des Grabens, steht das alte Schleusenbrett offen. Solange es offen ist, steht der Graben voll, und aus dem Wasser kommen immer neue Kröten.",
+        A.merker.ueberraschung ? "↳ Ihr seid zuerst da. Die Kröten haben euch noch nicht bemerkt." : "",
+        "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Kröten besiegt sind – oder sobald jemand die Schleuse schließt. Dafür muss eine Figur neben dem Schleusenbrett stehen und zweimal ihre Aktion einsetzen. Die anderen halten ihr so lange den Rücken frei.*",
+      ].filter(Boolean),
+      kampf: (A) => ({ begegnung: "w_muehle", karte: MUEHLE, keinAnfuehrer: true, ueberraschung: Boolean(A.merker.ueberraschung),
+        mechanik: {
+          ziele: [{ id: "schleuse", name: "Das Schleusenbrett", art: "schleuse", x: 8, y: 7, runden: 2, aktion: "Schleuse schließen", fertigText: "Das Brett fährt knirschend herunter", wirkung: { welleAus: "graben" } }],
+          sieg: { ziele: 1, art: "schleuse", text: "Das Wasser im Graben fällt, als hätte jemand einen Stöpsel gezogen. Die Kröten sitzen plötzlich im Schlamm, sehen sich um und fliehen flussabwärts." },
+          wellen: [{ id: "graben", name: "Der Mühlgraben", kurz: "aus dem Graben", quellen: [[8, 2], [8, 5]], gegner: [["schlammkroete", 0.2, 1, 0.3]], alle: 3, ab: 3, max: 2, text: "Im Graben blubbert es" }],
+        },
+        sieg: { weiter: "muehle_innen" } }),
     },
     muehle_innen: {
       art: "erzaehlung", abschnitt: 1, titel: "In der Mühle", ort: "Die alte Mühle", weiter: "lager",
@@ -320,8 +331,11 @@
     },
     kampf_unke: {
       art: "kampf", abschnitt: 1, titel: "Die alte Unke", ort: "Das alte Wehr",
-      text: ["Die Unke ist zäh und ihre Zunge reicht weit. Die Irrlichter bleiben auf Abstand und werfen kalte Funken: Fernkämpfer und Zauber holen sie herunter."],
-      kampf: { begegnung: "w_unke", karte: WEHR, keinAnfuehrer: true, namen: { schlammkroete: "Die alte Unke" }, sieg: { weiter: "unke_schicksal" } },
+      text: [
+        "Die Unke ist zäh. Die Irrlichter bleiben auf Abstand und werfen kalte Funken: Fernkämpfer und Zauber holen sie herunter.",
+        "*Achtet auf die Unke: Wenn sie Luft holt, leuchtet eine Reihe von Feldern rot auf. Dorthin schlägt bei ihrem nächsten Zug die Zunge. Wer bis dahin von den roten Feldern heruntergeht, bleibt unverletzt.*",
+      ],
+      kampf: { begegnung: "w_unke", karte: WEHR, keinAnfuehrer: true, sieg: { weiter: "unke_schicksal" } },
     },
     unke_schicksal: {
       art: "wahl", abschnitt: 1, titel: "Die Unke am Boden", ort: "Das alte Wehr",
@@ -407,6 +421,7 @@
   const EREIGNISSE = [{ id: "e_ziege", punkte: [1] }, { id: "e_kraeuterweib", punkte: [1] }];
   const WISSEN = {
     schlammkroete: { klassen: ["waldlaeufer"], text: "Ein Tier: Wolfszahn trifft sie härter. Ihre Zunge reicht 2 Felder weit, über Wasser hinweg." },
+    alte_unke: { klassen: ["waldlaeufer", "kleriker"], text: "Ein Tier, alt und zäh. Bevor sie mit der Zunge durch eine ganze Reihe schlägt, holt sie eine Runde lang Luft: Die Felder leuchten rot. Wer herausgeht, bleibt heil." },
     irrlicht: { klassen: ["zauberer", "waldlaeufer"], text: "Flink und schwer zu treffen (RK 14): Es wirft kalte Funken über 4 Felder und bleibt auf Abstand. Fernkämpfer und Zauber holen es herunter." },
   };
   const META = {
@@ -429,7 +444,7 @@
     // Hinweise ohne Spoiler auf das Ende, das die Gruppe nicht gesehen hat
     endeHinweise: { ende_nacht: "Ein anderes Ende beginnt damit, dass ihr dem Jungen aus Rabenmoor noch in derselben Nacht folgt.", ende_fest: "Ein anderes Ende beginnt damit, dass ihr dem Dorf noch eine Nacht schenkt." },
     // Ziel-Siegquote je Kampf (Einsteiger: freundlich)
-    zielquoten: { kampf_speicher: 0.92, kampf_muehle: 0.88, kampf_unke: 0.85 },
+    zielquoten: { kampf_speicher: 0.92, kampf_muehle: 0.88, kampf_unke: 0.94 }, // die Unke bewusst etwas leichter, damit der Kampf nicht über 10 Runden geht
   };
   const API = { META, EREIGNISSE, WISSEN, START: "prolog", NIEDERLAGE: "weidenhain_verloren", SZENEN, KARTEN };
   root.ABD_ALLE = root.ABD_ALLE || {}; root.ABD_ALLE.weidenhain = API;

@@ -44,7 +44,8 @@
   GEGNER.funkenhund = () => GEGNER.aschehund().replace('fill="#3a2a24"', 'fill="#4a2a1a"');
   /** Gemalte Gegner-Porträts (img/gegner/<art>.jpg); ohne Bild bleibt das gezeichnete Symbol */
   const BILDER = new Set("rostkaefer schattenkobold knochenwaechter pilzbrut netzweber aschehund grabritter abt irrlicht moorleiche schlammkroete alwine siegeljaeger jaegerschuetze wachkonstrukt jaegerhauptmann funkenhund fackelzehrer frostknecht eisgezeichneter glasschwaermer glasnest kaelterufer runenleser kettenbestie splitterbrutmutter eidwaechter frostmatrone eisenhirte koenig".split(" "));
-  const gegnerBild = (art) => (BILDER.has(art) ? `img/gegner/${art}.jpg` : null);
+  const BILD_WIE = { alte_unke: "schlammkroete" }; // Gegner ohne eigenes Porträt nutzen das eines Verwandten
+  const gegnerBild = (art) => (BILDER.has(BILD_WIE[art] || art) ? `img/gegner/${BILD_WIE[art] || art}.jpg` : null);
   /** Gegner im SVG (Koordinaten -26…26): rundes Porträt mit rotem Rand, sonst Symbol */
   const gegner = (art, grau) => {
     const b = gegnerBild(art);

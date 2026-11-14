@@ -350,7 +350,10 @@
     const i = $("#dlg-sm-code-feld"); if (i) i.focus();
   }
   function regelnSeite() {
-    seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">So wird Mythara gespielt – zum Nachlesen.</p><div class="hub-text kodex">${kopie('#kodex .seite:not([data-seite="6"])')}</div>`);
+    // Grundlagen in einfachen Worten (js/hilfe.js); ohne das Modul bleibt der Kodex als Ersatz
+    const H = window.ABHILFE;
+    seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">Die Grundlagen, einfach erklärt. Ihr müsst nichts davon auswendig können: Das Spiel rechnet für euch.</p>${H ? `<div class="hub-text hilfe">${H.html()}</div>` : `<div class="hub-text kodex">${kopie('#kodex .seite:not([data-seite="6"])')}</div>`}`);
+    if (H) H.binden(document);
   }
   function weltSeite(abenteuer) {
     if (!abenteuer) {

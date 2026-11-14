@@ -19,6 +19,10 @@
   // Das Glockenseil hängt mitten im Raum: Der Kobold muss es erreichen und eine Runde dort ausharren, bevor er zieht
   const SEIL = { art: "schattenkobold", feld: [6, 4], ereignis: "alarm", nah: 0, warten: true };
   const kurz = (A) => A.gruppe.length;
+  /* Taktische Kämpfe (nur im Zehn-Stufen-Modell, laufende Kampagnen im bisherigen Modell bleiben unverändert):
+   * mitZiel hängt die Mechanik an, zielText den erklärenden Absatz. */
+  const mitZiel = (A, kampf, mechanik) => (A.modell10 ? Object.assign(kampf, { mechanik }) : kampf);
+  const zielText = (A, s) => (A.modell10 ? s : "");
   // Gruft der Brüder als gemaltes Bild: Steinsärge geben Deckung, Nischen und Pfeiler sind Wand
   const GRUFT = (() => {
     const X = (x, y) => ["X", x, y], h = [];
@@ -221,8 +225,13 @@
     },
     garten: {
       art: "kampf", abschnitt: 1, titel: "Der Klostergarten", ort: "Abtei Grauwacht",
-      text: ["Rostkäfer, groß wie Hunde, kriechen aus dem Moos. Ihre Fühler zittern, als sie das Metall eurer Rüstungen riechen."],
-      kampf: (A, h) => ({ begegnung: "garten", ueberraschung: Boolean(h.klasse(A, "waldlaeufer")), sieg: { weiter: "garten_danach", tranke: Math.ceil(kurz(A) / 2) } }),
+      text: (A) => ["Rostkäfer, groß wie Hunde, kriechen aus dem Moos. Ihre Fühler zittern, als sie das Metall eurer Rüstungen riechen.",
+        zielText(A, "Mitten zwischen den Gräbern liegt eine Grabplatte schief. Darunter gähnt ein Loch, aus dem es kratzt und schabt: das Nest."),
+        zielText(A, "*Ein Kampf mit einer Wahl: Aus dem Nest kommen immer wieder neue Käfer. Wer neben der Grabplatte steht und zweimal seine Aktion einsetzt, schiebt sie über das Loch. Danach kommt nichts mehr nach.*")].filter(Boolean),
+      kampf: (A, h) => mitZiel(A, { begegnung: "garten", ueberraschung: Boolean(h.klasse(A, "waldlaeufer")), sieg: { weiter: "garten_danach", tranke: Math.ceil(kurz(A) / 2) } }, {
+        ziele: [{ id: "platte", name: "Die Grabplatte", art: "tafel", x: 7, y: 5, runden: 2, aktion: "Grabplatte zuschieben", fertigText: "Die Platte schabt über den Stein und fällt mit einem dumpfen Schlag über das Loch", wirkung: { welleAus: "nest" } }],
+        wellen: [{ id: "nest", name: "Das Käfernest", kurz: "aus dem Nest", quellen: [[7, 4], [6, 5]], gegner: [["rostkaefer", 0.25, 2, 0.3]], alle: 3, ab: 3, max: 3, text: "Unter der Grabplatte kratzt es lauter" }],
+      }),
     },
     garten_danach: {
       art: "erzaehlung", abschnitt: 1, titel: "Zwischen den Gräbern", ort: "Klostergarten", weiter: (A, h) => h.ereignis(A, 1, "turm"), rastErlaubt: true,
@@ -378,8 +387,14 @@
     },
     gruft_kampf: {
       art: "kampf", abschnitt: 2, titel: "Kampf in der Gruft", ort: "Gruft der Brüder",
-      text: ["Knochenwächter schieben sich aus den Nischen. Ihre Schwerter sind rostig, aber scharf. Wuchtige Waffen zerschlagen sie leichter."],
-      kampf: (A) => ({ begegnung: "gruft", karte: KARTEN.GRUFT, sieg: { weiter: "gruft_raetsel" } }),
+      text: (A) => ["Knochenwächter schieben sich aus den Nischen. Ihre Schwerter sind rostig, aber scharf. Wuchtige Waffen zerschlagen sie leichter.",
+        zielText(A, "Am Kopf der Gruft stehen zwei Totenlichter der Brüder, links und rechts des Gangs. Beide sind erloschen, seit die Glocke läutet."),
+        zielText(A, "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Wächter zerschlagen sind – oder sobald beide Totenlichter wieder brennen. Für jedes muss eine Figur daneben stehen und zweimal ihre Aktion einsetzen. Die Lichter stehen hinter den Wächtern.*")].filter(Boolean),
+      kampf: (A) => mitZiel(A, { begegnung: "gruft", karte: KARTEN.GRUFT, sieg: { weiter: "gruft_raetsel" } }, {
+        ziele: [{ id: "licht_l", name: "Das linke Totenlicht", art: "grablicht", x: 5, y: 2, runden: 2, aktion: "Totenlicht anzünden", fertigText: "Die Flamme fängt und brennt ruhig" },
+          { id: "licht_r", name: "Das rechte Totenlicht", art: "grablicht", x: 6, y: 2, runden: 2, aktion: "Totenlicht anzünden", fertigText: "Die Flamme fängt und brennt ruhig" }],
+        sieg: { ziele: 2, art: "grablicht", text: "Als das zweite Licht brennt, bleiben die Wächter stehen. Einer nach dem anderen legen sie die Schwerter ab und kehren in ihre Nischen zurück." },
+      }),
     },
     gruft_kampf_klein: {
       art: "kampf", abschnitt: 2, titel: "Zwei, die nicht ruhen", ort: "Gruft der Brüder",
@@ -440,8 +455,13 @@
     },
     pfad_kampf: {
       art: "kampf", abschnitt: 2, titel: "Die Pilzkammer", ort: "Schmugglerpfad",
-      text: ["Pilzbrut. Sie bewegt sich nicht, aber ihre Sporen brennen in der Lunge. Dazwischen huschen Schattenkobolde, die hier leben."],
-      kampf: (A) => ({ begegnung: "pilze", karte: KARTEN.PILZE, sieg: { weiter: A.merker.blutschuld ? "lager_falle" : "koboldlager" } }),
+      text: (A) => ["Pilzbrut. Sie bewegt sich nicht, aber ihre Sporen brennen in der Lunge. Dazwischen huschen Schattenkobolde, die hier leben.",
+        zielText(A, "Am anderen Ende der Kammer versperrt Geröll den Durchgang, durch den die Schmuggler früher gingen."),
+        zielText(A, "*Ein Kampf mit einem Ziel: Ihr müsst die Pilzbrut nicht ausrotten. Ihr gewinnt auch, sobald der Durchgang frei ist. Dafür muss eine Figur neben dem Geröll stehen und dreimal ihre Aktion einsetzen – mitten in den Sporen.*")].filter(Boolean),
+      kampf: (A) => mitZiel(A, { begegnung: "pilze", karte: KARTEN.PILZE, sieg: { weiter: A.merker.blutschuld ? "lager_falle" : "koboldlager" } }, {
+        ziele: [{ id: "geroell", name: "Das Geröll im Durchgang", art: "haufen", x: 10, y: 5, runden: 3, aktion: "Geröll wegräumen", fertigText: "Der letzte Brocken rollt zur Seite" }],
+        sieg: { ziele: 1, art: "haufen", text: "Der Durchgang ist frei. Ihr schlüpft hindurch und lasst die Pilzkammer mit ihren Sporen hinter euch." },
+      }),
     },
     koboldlager: {
       art: "wahl", abschnitt: 2, titel: "Das Koboldlager", ort: "Schmugglerpfad",
@@ -461,8 +481,13 @@
     },
     lager_falle: {
       art: "kampf", abschnitt: 2, titel: "Die Rache der Kobolde", ort: "Schmugglerpfad",
-      text: ["Das Lager ist nicht verlassen. Es ist eine Falle. Die Kobolde haben gesehen, was ihr im Turm getan habt."],
-      kampf: (A) => ({ begegnung: "kobolde", karte: KARTEN.PILZE, sieg: { weiter: "schacht", tranke: 1 } }),
+      text: (A) => ["Das Lager ist nicht verlassen. Es ist eine Falle. Die Kobolde haben gesehen, was ihr im Turm getan habt.",
+        zielText(A, "Einer von ihnen bläst in ein krummes Horn, das an einem Pfahl mitten im Lager hängt. Aus den Gängen antwortet Getrappel."),
+        zielText(A, "*Ein Kampf mit einer Wahl: Solange das Horn hängt, kommen aus den Gängen immer neue Kobolde. Wer neben dem Pfahl steht und seine Aktion einsetzt, reißt es herunter. Danach kommt niemand mehr nach.*")].filter(Boolean),
+      kampf: (A) => mitZiel(A, { begegnung: "kobolde", karte: KARTEN.PILZE, sieg: { weiter: "schacht", tranke: 1 } }, {
+        ziele: [{ id: "horn", name: "Das Koboldhorn", art: "horn", x: 7, y: 5, runden: 1, aktion: "Horn herunterreißen", fertigText: "Das Horn kracht auf den Boden und zerspringt", wirkung: { welleAus: "gaenge" } }],
+        wellen: [{ id: "gaenge", name: "Die Gänge", kurz: "aus den Gängen", quellen: [[9, 1], [8, 7]], gegner: [["schattenkobold", 0.34, 2, 0]], alle: 2, ab: 2, max: 4, text: "In den Gängen trappelt es" }],
+      }),
     },
     /* ----- Beide Wege: Der Schacht ----- */
     schacht: {
@@ -477,8 +502,14 @@
     },
     schacht_kampf: {
       art: "kampf", abschnitt: 2, titel: "Der Netzweber", ort: "Der Schacht",
-      text: ["Der Netzweber klettert aus dem Schacht. Seine Netze halten fest, wen sie treffen. Knochenwächter, die in den Netzen hingen, lösen sich und fallen auf die Plattform."],
-      kampf: (A) => ({ begegnung: "netz", karte: KARTEN.SCHACHT, ueberraschung: Boolean(A.merker.weg_pfad), sieg: { weiter: "tam" } }),
+      text: (A) => ["Der Netzweber klettert aus dem Schacht. Seine Netze halten fest, wen sie treffen. Knochenwächter, die in den Netzen hingen, lösen sich und fallen auf die Plattform.",
+        zielText(A, "Das große Netz über dem Schacht hängt an zwei Tragseilen, die an der hinteren Wand verankert sind."),
+        zielText(A, "*Ein Kampf mit einer Wahl: Aus den Netzen fallen immer wieder Knochenwächter. Wer neben einem Tragseil steht und seine Aktion einsetzt, kappt es. Sind beide Seile gekappt, stürzt das Netz in den Schacht und nichts fällt mehr herab.*")].filter(Boolean),
+      kampf: (A) => mitZiel(A, { begegnung: "netz", karte: KARTEN.SCHACHT, ueberraschung: Boolean(A.merker.weg_pfad), sieg: { weiter: "tam" } }, {
+        ziele: [{ id: "seil_l", name: "Das linke Tragseil", art: "kette", x: 4, y: 1, runden: 1, aktion: "Tragseil kappen", fertigText: "Das Seil reißt, ein Teil des Netzes sackt in die Tiefe", wirkung: { welleAusAlle: "netze" } },
+          { id: "seil_r", name: "Das rechte Tragseil", art: "kette", x: 7, y: 1, runden: 1, aktion: "Tragseil kappen", fertigText: "Das Seil reißt, ein Teil des Netzes sackt in die Tiefe", wirkung: { welleAusAlle: "netze" } }],
+        wellen: [{ id: "netze", name: "Die Netze über dem Schacht", kurz: "aus den Netzen", quellen: [[8, 3], [8, 5]], gegner: [["knochenwaechter", 0.25, 2, 0.3]], alle: 3, ab: 3, max: 3, text: "Über euch reißt eine Masche" }],
+      }),
     },
     tam: {
       art: "wahl", abschnitt: 2, titel: "Tam", ort: "Der Schacht",
@@ -627,7 +658,8 @@
         A.merker.coldric_zoegert ? "↳ Coldric kämpft, aber jeder Hieb kommt einen Herzschlag zu spät." : "Coldric kommt auf euch zu, langsam, unaufhaltsam. Die Hunde aus Asche jagen voraus.",
         A.merker.nisk_verrat ? "↳ Sie haben auf euch gewartet. Nisk hat sie gewarnt." : "",
         A.merker.duell_verloren ? "↳ Das Duell ist verloren. Die Hunde, die sich für Isolde niedergelegt hatten, stehen wieder auf." : "",
-      ],
+        zielText(A, A.merker.glut_aus ? "↳ Die Glutbecken sind kalt. Aus ihnen steigt kein neuer Hund mehr." : "*Ein Kampf mit einer Wahl: Aus den beiden Glutbecken links und rechts steigen immer neue Hunde aus Asche. Wer neben einem Becken steht und seine Aktion einsetzt, erstickt die Glut. Sind beide Becken kalt, kommt kein Hund mehr nach.*"),
+      ].filter(Boolean),
       kampf: (A) => {
         const m = A.merker; let mal = 1;
         if (m.glut_aus) mal *= 0.85;
@@ -635,14 +667,23 @@
         if (m.nisk_verrat) mal *= 1.15;
         if (m.nisk_dabei && !m.nisk_verrat && (m.nisk_vertrauen || 0) >= 2) mal *= 0.8;
         else if (m.nisk_frei) mal *= 0.9;
-        return { begegnung: "halle", karte: KARTEN.HALLE, skalaMal: mal, namen: { grabritter: "Coldric" }, ueberraschung: Boolean(m.halle_ueberrascht || (m.nisk_dabei && !m.nisk_verrat && (m.nisk_vertrauen || 0) >= 2)),
-          zusatz: m.blutschuld ? [{ art: "schattenkobold", anzahl: 2, tpFaktor: 1 }] : [], sieg: { weiter: "halle_danach", tranke: 1 } };
+        return mitZiel(A, { begegnung: "halle", karte: KARTEN.HALLE, skalaMal: mal, namen: { grabritter: "Coldric" }, ueberraschung: Boolean(m.halle_ueberrascht || (m.nisk_dabei && !m.nisk_verrat && (m.nisk_vertrauen || 0) >= 2)),
+          zusatz: m.blutschuld ? [{ art: "schattenkobold", anzahl: 2, tpFaktor: 1 }] : [], sieg: { weiter: "halle_danach", tranke: 1 } }, {
+        ziele: A.merker.glut_aus ? [] : [{ id: "glut_l", name: "Das linke Glutbecken", art: "grablaterne", x: 3, y: 4, runden: 1, aktion: "Glut ersticken", fertigText: "Die Glut zischt und erlischt", wirkung: { welleAusAlle: "glut" } },
+          { id: "glut_r", name: "Das rechte Glutbecken", art: "grablaterne", x: 8, y: 4, runden: 1, aktion: "Glut ersticken", fertigText: "Die Glut zischt und erlischt", wirkung: { welleAusAlle: "glut" } }],
+        wellen: A.merker.glut_aus ? [] : [{ id: "glut", name: "Die Glutbecken", kurz: "aus der Glut", quellen: [[4, 4], [7, 4]], gegner: [["aschehund", 0.2, 1, 0.3]], alle: 4, ab: 4, max: 2, text: "In den Glutbecken regt sich etwas" }],
+        });
       },
     },
     halle_kampf_asche: {
       art: "kampf", abschnitt: 3, titel: "Die Hunde aus Asche", ort: "Halle der Asche",
-      text: ["Coldric steht still, das Schwert gesenkt. Aber die Hunde springen auf, die Augen voller Glut. Sie gehorchen einem anderen Herrn."],
-      kampf: (A) => ({ begegnung: "halle_asche", karte: KARTEN.HALLE, skalaMal: A.merker.glut_aus ? 0.85 : 1, zusatz: A.merker.blutschuld ? [{ art: "schattenkobold", anzahl: 2, tpFaktor: 1 }] : [], sieg: { weiter: "halle_danach", tranke: 1 } }),
+      text: (A) => ["Coldric steht still, das Schwert gesenkt. Aber die Hunde springen auf, die Augen voller Glut. Sie gehorchen einem anderen Herrn.",
+        zielText(A, A.merker.glut_aus ? "↳ Die Glutbecken sind kalt. Aus ihnen steigt kein neuer Hund mehr." : "*Ein Kampf mit einer Wahl: Aus den beiden Glutbecken links und rechts steigen immer neue Hunde aus Asche. Wer neben einem Becken steht und seine Aktion einsetzt, erstickt die Glut. Sind beide Becken kalt, kommt kein Hund mehr nach.*")].filter(Boolean),
+      kampf: (A) => mitZiel(A, { begegnung: "halle_asche", karte: KARTEN.HALLE, skalaMal: A.merker.glut_aus ? 0.85 : 1, zusatz: A.merker.blutschuld ? [{ art: "schattenkobold", anzahl: 2, tpFaktor: 1 }] : [], sieg: { weiter: "halle_danach", tranke: 1 } }, {
+        ziele: A.merker.glut_aus ? [] : [{ id: "glut_l", name: "Das linke Glutbecken", art: "grablaterne", x: 3, y: 4, runden: 1, aktion: "Glut ersticken", fertigText: "Die Glut zischt und erlischt", wirkung: { welleAusAlle: "glut" } },
+          { id: "glut_r", name: "Das rechte Glutbecken", art: "grablaterne", x: 8, y: 4, runden: 1, aktion: "Glut ersticken", fertigText: "Die Glut zischt und erlischt", wirkung: { welleAusAlle: "glut" } }],
+        wellen: A.merker.glut_aus ? [] : [{ id: "glut", name: "Die Glutbecken", kurz: "aus der Glut", quellen: [[4, 4], [7, 4]], gegner: [["aschehund", 0.2, 1, 0.3]], alle: 4, ab: 4, max: 2, text: "In den Glutbecken regt sich etwas" }],
+      }),
     },
     halle_danach: {
       art: "erzaehlung", abschnitt: 3, titel: "Vor der Eisentür", ort: "Halle der Asche", weiter: (A) => (A.merker.coldric_frieden && !A.merker.coldric_schild ? "coldric_schild" : "siegel_vor"), rastErlaubt: true,

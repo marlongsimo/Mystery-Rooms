@@ -1,5 +1,5 @@
 /*
- * Die Fähre von Graufurt – Kurzabenteuer (1 Abschnitt, Stufe 1, 2–6 Helden, etwa 60 Minuten)
+ * Die Fähre von Graufurt – Kurzabenteuer (1 Abschnitt, Stufe 1, 3–6 Helden, etwa 60 Minuten)
  * Spielt nach „Das Moor der stummen Lichter“ und vor „Das Siegel von Grauwacht“: Auf dem Weg nach Norden
  * hören die Helden zum ersten Mal die Glocke von Grauwacht. Gebaut nach KAMPAGNEN-BAUKASTEN.md:
  * nur vorhandene Gegner (Rostkäfer, Schattenkobolde, Knochenwächter) und vorhandene Bausteine (gefesselte Begleitung aus Hochwacht).
@@ -440,7 +440,7 @@
     endeHinweise: { ende_norden: "Ein anderes Ende beginnt damit, dass ihr den grauen Stein nicht hergebt.", ende_wehre: "Ein anderes Ende beginnt damit, dass der Fluss den grauen Stein bekommt." },
     ehrentitel: "Freund von Graufurt", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     abschnitte_namen: { 1: "Graufurt" },
-    min: 2, max: 6, stufen: "1", dauer: "etwa 1 Stunde", abschnitte: 1, enden: 2,
+    min: 3, max: 6, stufen: "1", dauer: "etwa 1 Stunde", abschnitte: 1, enden: 2,
     // Bilder siehe BILDER-GRAUFURT.md (alle eingebaut)
     bild: "img/graufurt/titel.webp", vorschau: "img/graufurt/vorschau.webp", abschnittBilder: { 1: "img/graufurt/abschnitt-1.webp" },
     uhr: { name: "Pegel", symbol: "≈", max: 7, mehr: "Die Wehre steigt.", weniger: "Der Fluss fällt ein wenig.", unruhe: "das Rauschen des Flusses lässt niemanden ganz schlafen", rueckzug: "Die Wehre steigt." },

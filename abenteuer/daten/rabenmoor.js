@@ -1,6 +1,6 @@
 /*
  * Das Moor der stummen Lichter – Szenen (Abschnitt 1: Rabenmoor, Abschnitt 2: Das tiefe Moor)
- * Ein kürzeres Abenteuer für 2–6 Heldinnen und Helden, Stufe 1–2, etwa 1,5 bis 2 Stunden.
+ * Ein kürzeres Abenteuer für 3–6 Heldinnen und Helden, Stufe 1–2, etwa 1,5 bis 2 Stunden.
  * Aufbau wie daten/grauwacht.js. text: Absätze (Array) oder Funktion (A, h) → Array; h.hat(A, fid), h.klasse(A, k), h.name(A, fid)
  * Die „Uhr“ dieses Abenteuers sind die Lichter über dem Moor (A.glocke, 0–7): Mit jedem Licht schlafen die Kinder tiefer.
  * Karten ohne Bild: Die Hindernisse werden gezeichnet (T Baum/Schilf, Q Wasser, M Stein, K Stumpf). Sobald ein gemaltes
@@ -591,10 +591,10 @@
     // Hinweise ohne Spoiler auf das Ende, das die Gruppe nicht gesehen hat
     endeHinweise: { ende_erloest: "Ein anderes Ende braucht einen Namen, den im Dorf nur noch eine alte Frau kennt, und jemanden, der am Schrein für die Tote spricht.", ende_besiegt: "Ein anderes Ende ist der Kampf am Schrein: Die Kinder kommen frei, aber das Moor bleibt, wie es ist." },
     ehrentitel: "Kenner des Schwarzmoors", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
-    id: "rabenmoor", schwierigkeit: 1, titel: "Das Moor der stummen Lichter", kurz: "Rabenmoor", untertitel: "Ein Abenteuer im Schwarzmoor, für kleine und große Gruppen",
+    id: "rabenmoor", schwierigkeit: 1, titel: "Das Moor der stummen Lichter", kurz: "Rabenmoor", untertitel: "Ein Abenteuer im Schwarzmoor",
     kurztext: "Drei Kinder sind stummen Lichtern ins Moor gefolgt. Das Dorf will die Kräuterfrau verbrennen.",
     abschnitte_namen: { 1: "Rabenmoor", 2: "Das tiefe Moor" },
-    min: 2, max: 6, stufen: "1–2", dauer: "1,5–2 Stunden", abschnitte: 2, enden: 4,
+    min: 3, max: 6, stufen: "1–2", dauer: "1,5–2 Stunden", abschnitte: 2, enden: 4,
     // Bilder (siehe BILDER-RABENMOOR.md): fehlt ein Abschnittsbild, zeigt die Liste die Vorschau des Titelbilds
     bild: "img/rabenmoor/titel.webp", vorschau: "img/rabenmoor/vorschau.webp", abschnittBilder: { 1: "img/rabenmoor/abschnitt-1.webp", 2: "img/rabenmoor/abschnitt-2.webp" },
     uhr: { name: "Lichter", symbol: "✦", klasse: "lichter", max: 7, mehr: "Ein weiteres Licht steigt über dem Moor auf.", weniger: "Ein Licht über dem Moor erlischt.", unruhe: "die Lichter lassen niemanden ganz schlafen", rueckzug: "Ein weiteres Licht steigt auf." },

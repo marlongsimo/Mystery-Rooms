@@ -69,7 +69,7 @@ const R = require('../js/regeln.js'), F = R.FD;
     check((await p.$$('.platz.leer')).length === 6, `${vp.width}px: 6 leere Plätze`);
     await p.click('[data-klasse="krieger"]');
     check(await p.isVisible('.held h2') && (await p.$$('.fkarte')).length === 3 && /Krieger/.test(await p.textContent('.klassen-kopf')), `${vp.width}px: Schritt 2: drei Krieger, Vorstellung des ersten`);
-    await p.click('[data-reiter="werte"]'); check(await p.isVisible('.held-attr') && !(await p.isVisible('.held-faehig')), `${vp.width}px: Reiter Attribute in der Vorstellung`);
+    await p.click('[data-reiter="stufen"]'); check(await p.isVisible('.held-pfad') && !(await p.isVisible('.held-faehig')) && (await p.evaluate(() => document.querySelectorAll('.held-pfad tbody tr').length)) === 10, `${vp.width}px: Reiter Stufen zeigt den Stufenpfad 1–10`);
     for (const f of ['schildwaechter', 'elementarist', 'lichtbringer', 'tiergefaehrte', 'trickser']) await nimm(p, f);
     await zu(p, 'schildwaechter'); await p.click('[data-fid="schildwaechter"]'); await p.click('#f-waehlen');
     check(!(await p.$eval('[data-fid="schildwaechter"]', (x) => x.classList.contains('an'))), `${vp.width}px: Figur abwählen`);

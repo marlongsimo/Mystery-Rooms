@@ -102,17 +102,28 @@
         <blockquote>„${esc(d.spruch)}“</blockquote>
         <p class="held-spielweise">${esc(pr.spielweise)}</p>
         <div class="held-achsen">${balken}</div>
-        <div class="held-kern"><span><b>${F.tpVon(fid, stufe)}</b><small>Trefferpunkte</small></span><span><b>${d.rk[stufe - 1]}</b><small>Rüstungsklasse</small></span><span><b>${d.bewegung || k.bewegung || 6}</b><small>Felder Bewegung</small></span>${k.plaetze ? `<span><b>${F.PLAETZE[stufe][0] + F.PLAETZE[stufe][1]}</b><small>Zauberplätze</small></span>` : ""}${d.wolf ? `<span><b>🐺</b><small>Wolf ${esc(d.wolf.name)}</small></span>` : ""}</div>
+        <div class="held-kern"><span><b>${F.tpVon(fid, stufe)}</b><small>Trefferpunkte</small></span><span><b>${F.rkVon(fid, stufe)}</b><small>Rüstungsklasse</small></span><span><b>${d.bewegung || k.bewegung || 6}</b><small>Felder Bewegung</small></span>${k.plaetze ? `<span><b>${F.plaetzeVon(stufe)[0] + F.plaetzeVon(stufe)[1]}</b><small>Zauberplätze</small></span>` : ""}${d.wolf ? `<span><b>🐺</b><small>Wolf ${esc(d.wolf.name)}</small></span>` : ""}</div>
         <div class="held-werte">${werte}</div>
         ${knopf}
-        <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="werte">Attribute</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>
+        <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="stufen">Stufen</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>
         <div class="held-tafel" data-tafel="faehig">
           <ul class="held-faehig">${k.merkmal ? (([n, ...t]) => `<li class="klassen-merkmal"><b>${esc(n)}</b><span class="typ">Klassenmerkmal · immer</span><p>${esc(t.join(": "))}</p></li>`)(k.merkmal.split(": ")) : ""}${eigene.map(fae).join("")}${kl.map(fae).join("")}</ul>
           ${spaeter.length ? `<p class="held-spaeter">Später: ${spaeter.map((a) => `<b>${esc(a.name)}</b> (Stufe ${a.ab})`).join(" · ")}</p>` : ""}
         </div>
-        <div class="held-tafel" data-tafel="werte" hidden><ul class="held-attr">${["STR", "GES", "KON", "INT", "WEI", "CHA"].map((a) => `<li class="${d.werte[a] >= 16 ? "haupt" : ""}"><span>${ATTR_NAME[a]}</span><b>${d.werte[a]}</b><em>${vorz(R.mod(d.werte[a]))}</em></li>`).join("")}</ul>
-          <p class="held-spaeter">Rettungswürfe der Klasse: ${k.rettung.map((a) => ATTR_NAME[a]).join(", ")} · Lebenswürfel W${k.wuerfel}</p></div>
-        <div class="held-tafel" data-tafel="aussen" hidden><p class="held-aussen"><b>${esc(d.aussen.name)}:</b> ${esc(d.aussen.text)}</p><p class="held-spaeter">Rolle in der Gruppe: ${esc(d.rolle)}</p></div>
+        <div class="held-tafel" data-tafel="stufen" hidden>${(() => {
+          const pf = F.stufenpfad(fid);
+          return `<p class="held-spaeter">So wächst ${esc(d.name)} von Stufe 1 bis 10. Der Weg ist fest, es gibt nichts auszuwählen.</p>
+          <table class="held-pfad"><thead><tr><th>Stufe</th><th>Leben</th><th>Was dazukommt</th></tr></thead><tbody>${pf.map((z) => `<tr class="${z.neu.length ? "neu" : ""} ${z.verbesserung ? "besser" : ""} ${z.meister ? "meister" : ""}"><th>${z.stufe}</th><td>${z.tp}</td><td>${[
+            z.stufe === 1 ? "<span>Grundfähigkeiten und Grundwerte</span>" : "",
+            ...z.neu.map((n) => `<span class="pf-neu"><b>Neue Fähigkeit: ${esc(n.name)}</b><small>${esc(n.text || "")}</small></span>`),
+            z.verbesserung ? `<span class="pf-besser"><b>Verbesserung:</b> ${esc(z.verbesserung)}</span>` : "",
+            z.meister ? `<span class="pf-meister"><b>Meisterschaft:</b> ${esc(z.meister)}</span>` : "",
+            z.titel ? `<span class="pf-titel">Meistertitel: „${esc(d.name)}, ${esc(z.titel)}“</span>` : "",
+            z.werte.length ? `<span class="pf-werte">${z.werte.map(esc).join(" · ")}</span>` : "",
+          ].filter(Boolean).join("") || "<span class=\"pf-werte\">mehr Leben</span>"}</td></tr>`).join("")}</tbody></table>
+          <p class="held-spaeter">Die Heldenstufen kommen mit dem Level-System. Bis dahin steigt die Gruppe wie bisher innerhalb einer Kampagne auf.</p>`;
+        })()}</div>
+        <div class="held-tafel" data-tafel="aussen" hidden><p class="held-aussen"><b>${esc(d.aussen.name)}:</b> ${esc(d.aussen.text)}</p><p class="held-spaeter">Rolle in der Gruppe: ${esc(d.rolle)}</p><p class="held-spaeter">Rettungswürfe der Klasse: ${k.rettung.map((a) => ATTR_NAME[a]).join(", ")} · Lebenswürfel W${k.wuerfel}</p></div>
       </div></article>`;
   }
   /** Gruppenplätze (3 Pflicht, 3 frei) */

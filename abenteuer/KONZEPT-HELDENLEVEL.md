@@ -1,8 +1,38 @@
 # MYTHARA – Heldenlevel: Aufstieg außerhalb der Kampagnen
 
-**Status:** Konzept, **nicht umgesetzt**. Geplant für den **Launch** (nach der Open Beta).
+**Status:** In Arbeit. Die Grundlage im Regelkern steht (ausgeschaltet), der Stufenpfad wird auf der Heldenkarte angezeigt. Siehe „Stand der Umsetzung“ direkt hierunter.
 **Stand:** 13. November 2026, Fassung 2 (Fähigkeiten auf Stufe 3 und 7, sonst Verbesserungen, Meistertitel auf Stufe 10). Grundlage: Abstimmung im Projekt vom 13. November 2026, Simulationen mit der heutigen Engine (`tools/stufen-sim.js`, `tools/balance-helden.js`).
 **Baut auf:** [KONZEPT-HELDENFREISCHALTUNG.md](KONZEPT-HELDENFREISCHALTUNG.md). Die Freischaltung kommt zur Open Beta, das Heldenlevel zum Launch.
+
+---
+
+## Stand der Umsetzung (14. November 2026)
+
+**Festgelegt (ändert das Konzept unten):**
+- **Alle Kampagnen ab drei Helden.** Auch Weidenhain, das Moor und Graufurt. Wer zu zweit spielt, nimmt einen dritten Helden dazu, den der Tisch steuert.
+- **Keine Auswahl beim Aufstieg** (wie in 5.1).
+- **Schwierigkeit und empfohlene Heldenstufe** ersetzen die Rangtabelle in 6.1. Jede Kampagne trägt ihre Schwierigkeit schon in `META.schwierigkeit`:
+
+| Schwierigkeit | Empfohlene Stufe | Charakter der Kampagne |
+|---|---|---|
+| 1 – Leicht | 1 | Einstieg und Kennenlernen |
+| 2 – Normal | 3 | Erste taktische Herausforderungen |
+| 3 – Anspruchsvoll | 4 | Anspruchsvolle Kämpfe und Entscheidungen |
+| 4 – Schwer | 6 | Fortgeschrittene Helden erforderlich |
+| 5 – Legendär | 8 | Endgame-Herausforderung |
+
+- **Wie XP verteilt werden, wird als Nächstes ausgearbeitet.** Abschnitt 7 ist bis dahin ein Vorschlag.
+
+**Umgesetzt:**
+- `js/figuren.js`: Zehn-Stufen-Modell hinter dem Schalter `STUFEN10.aktiv` (aus): Lebenspunkte, Zauberplätze, Übungsbonus, Rüstungsklasse +1 ab Stufe 6, Hauptattribut +2 ab Stufe 4, Fähigkeiten auf Stufe 3 und 7. Dazu `AUFSTIEG` (Verbesserungen und Meistertitel im Wortlaut), `stufenpfad(fid)` und `SCHWIERIGKEIT`.
+- `js/regeln.js`, `js/szenen.js`, `js/handy.js`, `js/helden.js`: lesen Stufenwerte nur noch über diese Funktionen. Mit ausgeschaltetem Schalter verhält sich alles wie bisher (per Messung geprüft).
+- Heldenkarte: Der Reiter „Attribute“ ist durch „Stufen“ ersetzt, eine Tabelle von Stufe 1 bis 10 mit Leben, neuen Fähigkeiten, Verbesserungen und Meistertitel.
+- Werkzeug: `node abenteuer/tools/kampagne.js kaempfe <id> --stufe=N` misst Kämpfe mit Helden der Stufe N.
+
+**Offen:**
+- Die Wirkung der 45 Verbesserungen und der drei neuen Fähigkeiten im Kampf (bisher nur als Text in der Anzeige).
+- Gegner mit Bedrohungsstufe und die Anpassung der Kampagnen an die Tabelle oben.
+- XP, Speicherung am Konto (Migration 007), Kampagnen-Segen statt Aufstieg am Lagerfeuer, Oberfläche zum Launch.
 
 ---
 

@@ -283,13 +283,14 @@
 
   const mod = (v) => Math.floor((v - 10) / 2);
   /** TP: Stufe 1 = Würfel + KON, je weitere Stufe halber Würfel + 1 + KON */
-  function tpVon(fid, stufe) {
+  function tpAlt(fid, stufe) {
     const d = FIGUREN[fid], w = KLASSEN[d.klasse].wuerfel, kon = mod(d.werte.KON);
     return w + kon + (stufe - 1) * (w / 2 + 1 + kon) - (d.tpMinus || 0) + (KLASSEN[d.klasse].tpJeStufe || 0) * stufe;
   }
+  const tpVon = (fid, stufe) => (STUFEN10.aktiv ? tp10(fid, stufe) : tpAlt(fid, stufe));
   /** Alle Fähigkeiten der Figur bis zur Stufe (Klasse + eigene), in Anzeige-Reihenfolge */
-  function faehigVon(fid, stufe = 3) {
-    const d = FIGUREN[fid];
+  function faehigVon(fid, stufeRoh = 3) {
+    const d = FIGUREN[fid], stufe = altStufe(stufeRoh);
     let k = KLASSE_FAEHIG[d.klasse].slice();
     if (d.gerissenAb) k = k.map((x) => (x.gerissen ? Object.assign({}, x, { ab: d.gerissenAb }) : x));
     const eigen = d.faehig.filter((x) => x.ab <= stufe), klasse = k.filter((x) => x.ab <= stufe);
@@ -297,7 +298,83 @@
   }
   const bild = (fid) => "img/figuren/" + fid + ".jpg";
 
-  const API = { KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod };
+
+  /* ============ Heldenstufen 1–10 (KONZEPT-HELDENLEVEL.md) ============
+   * Dauerhafte Stufe je Held, außerhalb der Kampagnen. Solange STUFEN10.aktiv = false ist, gilt überall das bisherige
+   * Modell (Stufe 1–3 innerhalb einer Kampagne) – am Spiel ändert sich nichts. Eingeschaltet wird für Simulation
+   * (tools/kampagne.js … --stufe=N) und später für alle.
+   *
+   * Der Weg ist je Held fest, ohne Auswahl:
+   *   Stufe 3 und 7: neue Fähigkeit (das, was es bisher auf Stufe 2 und 3 gab)
+   *   Stufe 5 und 8: Verbesserung einer vorhandenen Fähigkeit, Stufe 10: Meisterverbesserung und Meistertitel
+   *   Stufe 4: Hauptattribut +2 · Stufe 5: Übungsbonus +3 · Stufe 6: RK +1 · Stufe 9: Übungsbonus +4
+   *   Lebenspunkte: je Stufe die Hälfte des bisherigen Zuwachses */
+  const STUFEN10 = { aktiv: false, max: 10 };
+  /** Heldenstufe → bisherige Stufe (1–3): bestimmt, welche Fähigkeiten und Tabellenwerte gelten */
+  const altStufe = (s) => (!STUFEN10.aktiv ? s : s >= 7 ? 3 : s >= 3 ? 2 : 1);
+  /** Bisherige Stufe, ab der es eine Fähigkeit gab → Heldenstufe, ab der es sie künftig gibt */
+  const neuAb = (ab) => (ab >= 3 ? 7 : ab === 2 ? 3 : 1);
+  const uebung = (s) => (!STUFEN10.aktiv ? 2 : s >= 9 ? 4 : s >= 5 ? 3 : 2);
+  const PLAETZE10 = { 1: [3, 0], 2: [3, 0], 3: [4, 0], 4: [4, 0], 5: [4, 0], 6: [4, 0], 7: [4, 2], 8: [4, 2], 9: [4, 3], 10: [5, 3] };
+  const plaetzeVon = (s) => (STUFEN10.aktiv ? PLAETZE10[Math.max(1, Math.min(10, s))] : PLAETZE[s]) || [0, 0];
+  /** Lebenspunkte im Zehn-Stufen-Modell: Stufe 1 wie bisher, je weitere Stufe der halbe bisherige Zuwachs */
+  function tp10(fid, s) { const t1 = tpAlt(fid, 1), zuwachs = tpAlt(fid, 2) - t1; return Math.round(t1 + (Math.max(1, Math.min(10, s)) - 1) * zuwachs / 2 + 1e-9); }
+  const rkVon = (fid, s) => { const d = FIGUREN[fid]; return d.rk[altStufe(s) - 1] + (STUFEN10.aktiv && s >= 6 ? 1 : 0); };
+  /** Hauptattribut (das höchste) – steigt auf Stufe 4 um 2, höchstens bis 20 */
+  const hauptAttr = (fid) => Object.entries(FIGUREN[fid].werte).sort((a, b) => b[1] - a[1])[0][0];
+  const werteVon = (fid, s) => { const w = FIGUREN[fid].werte; if (!STUFEN10.aktiv || s < 4) return w; const h = hauptAttr(fid); return Object.assign({}, w, { [h]: Math.min(20, w[h] + 2) }); };
+
+  /** Verbesserungen (Stufe 5 und 8), Meisterverbesserung und Meistertitel (Stufe 10) je Held – Wortlaut für die Anzeige.
+   *  Die Wirkung im Kampf folgt mit dem Einschalten des Level-Systems (Phase 2 des Konzepts). */
+  const AUFSTIEG = {
+    schildwaechter: { 5: "Spott 2× je Rast", 8: "Schildstoß 2× je Kampf, stößt 2 Felder weit", 10: "Schutzhaltung auch für Verbündete in 2 Feldern, dreimal je Runde", titel: "Schild von Grauwacht" },
+    berserker: { 5: "Raserei 2× je Rast", 8: "Blutrausch schon unter ¾ der Lebenspunkte", 10: "Rücksichtsloser Angriff trifft einmal je Runde alle Gegner neben ihm", titel: "Der Unbeugsame" },
+    duellant: { 5: "Finte 3× je Rast", 8: "Entwaffnen 2× je Kampf, wirkt 3 Runden", 10: "Parade zweimal je Runde, Parade-Treffer kritisch bei 17–20", titel: "Erste Klinge des Nordens" },
+    gelehrter: { 5: "Analyse wirkt auf zwei Ziele", 8: "Schutzglyphe +7 statt +5 RK, einmal je Kampf ohne Zauberplatz", 10: "Zeitriss trifft auch alle Gegner in 2 Feldern um das Ziel", titel: "Hüterin der Ordnung" },
+    elementarist: { 5: "Glutpfeil: Das Feld brennt 2 Runden lang (1W6)", 8: "Magisches Geschoss mit 4 statt 3 Lichtpfeilen", 10: "Glutsphäre einmal je Rast ohne Zauberplatz, Radius +1", titel: "Herr der Elemente" },
+    schattenmagier: { 5: "Furcht trifft zwei Ziele", 8: "Spiegelbilder: 4 statt 3", 10: "Albtraum verängstigt zusätzlich alle Gegner in 2 Feldern um das Ziel", titel: "Die aus dem Schatten" },
+    schattenlaeufer: { 5: "Rauchbombe 2× je Rast", 8: "Schattenwirbel 3× je Rast", 10: "Fallen machen doppelten Schaden und halten fest", titel: "Der Unsichtbare" },
+    trickser: { 5: "Schmutziger Trick: ein Einsatz mehr, Reichweite 2 Felder", 7: { name: "Glückssträhne", text: "Glückspilz 2× je Kampf, Platztausch 2× je Rast." }, 8: "Zweiter Dolch mit vollem Schaden", 10: "Hinterhalt mit jedem Dolch, nicht nur einmal je Zug", titel: "Königin der Gassen" },
+    assassine: { 5: "Gift 3× je Rast", 8: "Todesstoß: Vorteil aus dem Versteck in jeder Runde", 10: "Hinrichtung +2W6 statt 1W6; Gegner (keine Bosse) unter 8 Lebenspunkten fallen bei einem Treffer", titel: "Die letzte Klinge" },
+    lichtbringer: { 5: "Segen auf 4 Verbündete", 8: "Strahlende Aura wirkt in 2 Feldern", 10: "Schutzkreis +3 RK und heilt jede Runde 1W6", titel: "Licht von Grauwacht" },
+    wanderheiler: { 5: "Lebenshauch 2× je Kampf", 8: "Bewahren verteilt 6 × Stufe statt 5 × Stufe", 10: "Massenheilwort heilt alle Verbündeten in 6 Feldern", titel: "Der Barmherzige" },
+    inquisitor: { 5: "Brandmal 2× je Kampf ohne Zauberplatz", 8: "Befehl „Flieh!“ trifft zwei Ziele", 10: "Gerechter Zorn +3W6, und das Brandmal-Ziel kann nicht fliehen", titel: "Hammer der Wahrheit" },
+    wildnislaeufer: { 5: "Jägermal +1W8 statt +1W6", 7: { name: "Pfeilregen", text: "Aktion, 1× je Rast: ein Angriff gegen jeden Gegner in einem Kreis mit 1 Feld." }, 8: "Fesselnder Pfeil 3× je Rast", 10: "Doppelschuss trifft drei Ziele", titel: "Falke des Nordens" },
+    tiergefaehrte: { 5: "Grau hat 10 Lebenspunkte mehr", 8: "Grau: Umreißen 3× je Rast", 10: "Grau greift zweimal je Zug an", titel: "Herrin der Wölfe" },
+    kopfgeldjaeger: { 3: { name: "Lähmender Bolzen", text: "Aktion, 2× je Rast: Treffer, und das Ziel ist 1 Runde verlangsamt." }, 5: "Netz mit 8 Feldern Reichweite, Befreien gegen SG +2", 8: "Fangschuss zweimal je Runde", 10: "Erlegen 2× je Kampf, +4W6 statt +2W6", titel: "Der Unentrinnbare" },
+  };
+  /** Der Stufenpfad eines Helden für die Anzeige: zehn Zeilen { stufe, tp, werte: [..], neu: [{name, text}], verbesserung, meister, titel } */
+  function stufenpfad(fid) {
+    const d = FIGUREN[fid], k = KLASSEN[d.klasse], auf = AUFSTIEG[fid] || {}, haupt = hauptAttr(fid);
+    let alle = d.faehig.slice(), kl = KLASSE_FAEHIG[d.klasse].slice();
+    if (d.gerissenAb) kl = kl.map((x) => (x.gerissen ? Object.assign({}, x, { ab: d.gerissenAb }) : x));
+    alle = alle.concat(kl);
+    const NAME = { STR: "Stärke", GES: "Geschicklichkeit", KON: "Konstitution", INT: "Intelligenz", WEI: "Weisheit", CHA: "Charisma" };
+    const zeilen = [];
+    for (let s = 1; s <= 10; s++) {
+      const werte = [];
+      if (s === 4) werte.push(`${NAME[haupt]} +2`);
+      if (s === 5) werte.push("Übungsbonus +3");
+      if (s === 6) werte.push("Rüstungsklasse +1");
+      if (s === 9) werte.push("Übungsbonus +4");
+      if (k.plaetze && s > 1) { const a = PLAETZE10[s - 1], b = PLAETZE10[s]; if (a[0] !== b[0] || a[1] !== b[1]) werte.push(b[1] > a[1] ? (a[1] ? `${b[1]} starke Zauberplätze` : `${b[1]} starke Zauberplätze (2. Grad)`) : `${b[0]} Zauberplätze`); }
+      const neu = alle.filter((x) => neuAb(x.ab) === s && s > 1).map((x) => ({ name: x.name, text: x.text }));
+      if (auf[s] && typeof auf[s] === "object") neu.push(auf[s]);
+      zeilen.push({ stufe: s, tp: tp10(fid, s), werte, neu, verbesserung: (s === 5 || s === 8) && typeof auf[s] === "string" ? auf[s] : "", meister: s === 10 ? auf[10] || "" : "", titel: s === 10 ? auf.titel || "" : "" });
+    }
+    return zeilen;
+  }
+  /** Schwierigkeit einer Kampagne → empfohlene Heldenstufe und Charakter (für die Anpassung der Kampagnen an das Level-System) */
+  const SCHWIERIGKEIT = {
+    1: { name: "Leicht", stufe: 1, charakter: "Einstieg und Kennenlernen" },
+    2: { name: "Normal", stufe: 3, charakter: "Erste taktische Herausforderungen" },
+    3: { name: "Anspruchsvoll", stufe: 4, charakter: "Anspruchsvolle Kämpfe und Entscheidungen" },
+    4: { name: "Schwer", stufe: 6, charakter: "Fortgeschrittene Helden erforderlich" },
+    5: { name: "Legendär", stufe: 8, charakter: "Endgame-Herausforderung" },
+  };
+
+  const API = { KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
+    STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, stufenpfad, SCHWIERIGKEIT };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABF = API;
 })(typeof window !== "undefined" ? window : globalThis);

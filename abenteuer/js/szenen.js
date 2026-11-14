@@ -66,7 +66,7 @@
   }
   function frisch(fid, stufe) {
     const k = F.KLASSEN[F.FIGUREN[fid].klasse];
-    return { stufe, tp: F.tpVon(fid, stufe), tot: false, plaetze: k.plaetze ? F.PLAETZE[stufe].slice() : [0, 0], genutzt: {}, rucksack: [{ id: "heiltrank", n: 1 }] };
+    return { stufe, tp: F.tpVon(fid, stufe), tot: false, plaetze: k.plaetze ? F.plaetzeVon(stufe).slice() : [0, 0], genutzt: {}, rucksack: [{ id: "heiltrank", n: 1 }] };
   }
   const szene = (A) => DATEN(A).SZENEN[A.szene];
   const text = (A, s = szene(A)) => (typeof s.text === "function" ? s.text(A, hilfen) : s.text || []).filter(Boolean);
@@ -344,7 +344,7 @@
         const alt = F.faehigVon(fid, von).map((a) => a.id), neu = F.faehigVon(fid, A.stufe).filter((a) => !alt.includes(a.id));
         const k = F.KLASSEN[F.FIGUREN[fid].klasse];
         A.aufstieg.helden[fid] = { tp: [F.tpVon(fid, von), F.tpVon(fid, A.stufe)], neu: neu.map((a) => ({ name: a.name, text: a.text, typ: a.typ })),
-          plaetze: k.plaetze ? [F.PLAETZE[von], F.PLAETZE[A.stufe]] : null };
+          plaetze: k.plaetze ? [F.plaetzeVon(von), F.plaetzeVon(A.stufe)] : null };
       }
     }
     // Normal: Das Lagerfeuer heilt immer ganz. Hardcore: bei fortgeschrittener Uhr (ab 3) nur bis ¾.

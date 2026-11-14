@@ -1555,3 +1555,20 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .fz-kerben i.weg { background: rgba(217,180,106,.14); box-shadow: none; border: 1px solid rgba(217,180,106,.3); }
 .btn.frage.kostet { border-color: rgba(220,120,90,.55); }
 .fz-preis { color: #f0a08c !important; }
+
+/* ---------- Heldenkarte: Stufenpfad 1–10 ---------- */
+.held-pfad { width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0 10px; }
+.held-pfad th, .held-pfad td { text-align: left; vertical-align: top; padding: 7px 8px; border-bottom: 1px solid rgba(217,180,106,.16); }
+.held-pfad thead th { color: #d9b46a; font: 600 11.5px "Inter", sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.held-pfad tbody th { font: 600 17px "Cinzel", serif; color: #f1e3bf; width: 46px; }
+.held-pfad td:nth-child(2) { width: 54px; color: #e9dfc6; white-space: nowrap; }
+.held-pfad td span { display: block; margin-bottom: 3px; color: #cfc5ad; }
+.held-pfad td span:last-child { margin-bottom: 0; }
+.held-pfad small { display: block; color: #a99f88; font-size: 12.5px; line-height: 1.35; }
+.held-pfad .pf-neu b { color: #f6ecd6; }
+.held-pfad .pf-besser b { color: #9fd0f0; }
+.held-pfad .pf-meister b, .held-pfad .pf-titel { color: #ffd98a; }
+.held-pfad .pf-titel { font-style: italic; }
+.held-pfad .pf-werte { color: #a99f88; font-size: 13px; }
+.held-pfad tr.neu th, .held-pfad tr.meister th { color: #ffd98a; }
+.held-pfad tr.meister { background: rgba(217,180,106,.08); }

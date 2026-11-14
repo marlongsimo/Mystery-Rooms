@@ -14,7 +14,7 @@ const D = require('../daten/rabenmoor.js');
   const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) ok = false; };
   const until = async (p, fn, arg, ms = 20000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await p.evaluate(fn, arg).catch(() => false)) return true; await p.waitForTimeout(250); } return false; };
   // 1. Engine
-  try { const out = execFileSync('node', [__dirname + '/../tools/kampagne.js', 'durchlauf', 'rabenmoor', '200'], { encoding: 'utf8' }); check(/alle Szenen erreicht/.test(out) && /alle regulären Enden erreicht/.test(out), 'Engine: 200 Durchläufe mit 2–6 Helden ohne Fehler, Szenen erreichbar · ' + out.split('\n').filter((z) => /Enden:/.test(z)).join('').trim()); }
+  try { const out = execFileSync('node', [__dirname + '/../tools/kampagne.js', 'durchlauf', 'rabenmoor', '200'], { encoding: 'utf8' }); check(/alle Szenen erreicht/.test(out) && /alle regulären Enden erreicht/.test(out), 'Engine: 200 Durchläufe mit 3–6 Helden ohne Fehler, Szenen erreichbar · ' + out.split('\n').filter((z) => /Enden:/.test(z)).join('').trim()); }
   catch (e) { check(false, 'Engine-Durchlauf: ' + (e.stdout || e.message).slice(0, 400)); }
 
   try { const out = execFileSync('node', [__dirname + '/../tools/karten-pruefen.js', 'rabenmoor'], { encoding: 'utf8' }); check(true, 'Karten: alle Startplätze erreichbar · ' + out.trim().split('\n').map((z) => z.split(':')[0]).join(', ')); }
@@ -27,7 +27,7 @@ const D = require('../daten/rabenmoor.js');
   await p.click('#my-gast-start'); await p.click('.hub-nav-punkt[data-hub="welt"]');
   check(await until(p, () => Boolean(document.querySelector('[data-welt="rabenmoor"]'))), 'Kampagnenwelt listet das Moor');
   await p.click('[data-welt="rabenmoor"]');
-  check(await until(p, () => /Drei Nächte, drei Kinder/.test(document.body.textContent) && /2–6/.test(document.body.textContent)), 'Moor-Seite: Einleitung und 2–6 Helden');
+  check(await until(p, () => /Drei Nächte, drei Kinder/.test(document.body.textContent) && /3–6/.test(document.body.textContent)), 'Moor-Seite: Einleitung und 3–6 Helden');
   await p.click('[data-neu-start="rabenmoor"]');
   await p.waitForSelector('#kodex:not([hidden])');
   check(await p.evaluate(() => /Die Lichter/.test(document.querySelector('#kodex .seite[data-seite="3"]').textContent)), 'Kodex erklärt die Lichter statt der Glocke');
@@ -35,8 +35,8 @@ const D = require('../daten/rabenmoor.js');
   await p.click('#start');
   check(await p.evaluate(() => /Retter von Rabenmoor/.test(document.querySelector('#lobby').textContent)), 'Heldenwahl fürs Moor');
   const zu = async (fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
-  for (const f of ['schildwaechter', 'lichtbringer']) { await zu(f); await p.click(`[data-fid="${f}"]`); await p.click('#f-waehlen'); }
-  check(await p.evaluate(() => !document.querySelector('#abenteuer-los').disabled && /Ins Schwarzmoor/.test(document.querySelector('#abenteuer-los').textContent)), 'Zwei Helden reichen: „Ins Schwarzmoor“ ist frei');
+  for (const f of ['schildwaechter', 'lichtbringer', 'wildnislaeufer']) { await zu(f); await p.click(`[data-fid="${f}"]`); await p.click('#f-waehlen'); }
+  check(await p.evaluate(() => !document.querySelector('#abenteuer-los').disabled && /Ins Schwarzmoor/.test(document.querySelector('#abenteuer-los').textContent)), 'Mit drei Helden ist „Ins Schwarzmoor“ frei');
   await p.click('#abenteuer-los');
   check(await until(p, () => !document.querySelector('#einleitung').hidden && /Drei Nächte, drei Kinder/.test(document.querySelector('#einleitung').textContent) && !/Grauwacht/.test(document.querySelector('#einleitung').textContent)), 'Einleitung des Moors (nicht Grauwacht)');
   await p.click('#einl-skip');

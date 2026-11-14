@@ -1,5 +1,5 @@
 /*
- * Das Erntefest von Weidenhain – Einsteiger-Kurzabenteuer (1 Abschnitt, Stufe 1–2 (Aufstieg am Lagerfeuer vor der Unke), 2–6 Helden, etwa 1 Stunde)
+ * Das Erntefest von Weidenhain – Einsteiger-Kurzabenteuer (1 Abschnitt, Stufe 1–2 (Aufstieg am Lagerfeuer vor der Unke), 3–6 Helden, etwa 1 Stunde)
  * Spielt vor „Das Moor der stummen Lichter“: Die Gruppe findet auf einem Dorffest zusammen, erlebt jede Szenenart
  * einmal in ruhigem Tempo (Gespräch, Abstimmung, Probe, Kampf, Lager, geheime Entscheidung) und sieht zum ersten Mal
  * die stummen Lichter über dem Schwarzmoor. Gebaut nach KAMPAGNEN-BAUKASTEN.md: nur vorhandene Gegner (Schlammkröte, Irrlicht).
@@ -430,7 +430,7 @@
     kurztext: "Kröten plündern den Kornspeicher, mitten im Erntefest. Der beste Einstieg in Mythara.",
     ehrentitel: "Retter von Weidenhain", // Kampagnentitel für alle gefundenen Enden (Heldensammlung)
     abschnitte_namen: { 1: "Weidenhain" },
-    min: 2, max: 6, stufen: "1–2", dauer: "etwa 1 Stunde", abschnitte: 1, enden: 2,
+    min: 3, max: 6, stufen: "1–2", dauer: "etwa 1 Stunde", abschnitte: 1, enden: 2,
     // Bilder siehe BILDER-WEIDENHAIN.md (alle eingebaut)
     bild: "img/weidenhain/titel.webp", vorschau: "img/weidenhain/vorschau.webp", abschnittBilder: { 1: "img/weidenhain/abschnitt-1.webp" },
     uhr: { name: "Nacht", symbol: "☾", max: 7, mehr: "Die Nacht schreitet voran.", weniger: "Ihr habt etwas Zeit gewonnen.", unruhe: "das Quaken vom Graben lässt niemanden ganz schlafen", rueckzug: "Die Nacht schreitet voran." },

@@ -1,5 +1,5 @@
 /*
- * Moor live: Tisch + zwei Handys (gegen die echte Datenbank, ohne Kampagne). Zwei Handys reichen für das Moor,
+ * Moor live: Tisch + drei Handys (gegen die echte Datenbank, ohne Kampagne). Drei Helden sind die Mindestgruppe,
  * die Handys zeigen „Lichter“ statt „Glocke“, eine Abstimmung läuft über beide Handys.
  * Aufruf: python3 -m http.server 8765 &  ·  node abenteuer/tests/live-moor.test.js
  */
@@ -18,22 +18,22 @@ const { chromium } = require('playwright');
     await T.waitForSelector('#kodex:not([hidden])'); for (let i = 0; i < 6; i++) await T.click('#kodex-weiter');
     await T.click('#live'); await until(T, () => Boolean(document.querySelector('.beitritt .code')));
     const code = (await T.textContent('.beitritt .code')).trim();
-    for (const [n, fid] of [['Anna', 'wildnislaeufer'], ['Ben', 'inquisitor']]) {
+    for (const [n, fid] of [['Anna', 'wildnislaeufer'], ['Ben', 'inquisitor'], ['Cara', 'trickser']]) {
       const P = H[n] = await page({ width: 390, height: 844 }, n);
       await P.goto(BASE + '/abenteuer/handy.html#' + code); await P.fill('#name', n); await P.click('#rein');
       await until(P, () => document.querySelectorAll('.banner[data-klasse]').length === 5);
       await zu(P, fid); await P.click(`[data-fid="${fid}"]`); await P.click('#f-spielen');
       await until(P, () => Boolean(document.querySelector('.bogen')));
     }
-    check(await until(T, () => window.AB.SETUP().gruppe.length === 2 && !document.querySelector('#abenteuer-los').disabled), 'Moor: zwei Handys reichen, Start frei');
+    check(await until(T, () => window.AB.SETUP().gruppe.length === 3 && !document.querySelector('#abenteuer-los').disabled), 'Moor: mit drei Handys ist der Start frei');
     await T.click('#abenteuer-los'); await T.click('#einl-skip');
     check(await until(H.Anna, () => /Lichter 0\/7/.test(document.body.textContent)), 'Handy zeigt „Lichter 0/7“');
     // bis zur Abstimmung über den Weg: Dorfplatz → aufbrechen → geheime Entscheidung am Ufer (beide Handys) → Wegwahl
     await until(T, () => window.ABT.A().szene === 'prolog'); await T.click('#sz-weiter');
     await T.click('[data-opt="aufbrechen"]');
-    for (const n of ['Anna', 'Ben']) { await until(H[n], () => Boolean(document.querySelector('[data-gantwort]'))); await H[n].click('[data-gantwort="schweigen"]'); }
+    for (const n of ['Anna', 'Ben', 'Cara']) { await until(H[n], () => Boolean(document.querySelector('[data-gantwort]'))); await H[n].click('[data-gantwort="schweigen"]'); }
     check(await until(T, () => window.ABT.A().szene === 'wegwahl'), 'Geheime Entscheidung am Ufer über beide Handys');
-    for (const n of ['Anna', 'Ben']) { await until(H[n], () => Boolean(document.querySelector('[data-stimme="ried"]'))); await H[n].click('[data-stimme="ried"]'); }
+    for (const n of ['Anna', 'Ben', 'Cara']) { await until(H[n], () => Boolean(document.querySelector('[data-stimme="ried"]'))); await H[n].click('[data-stimme="ried"]'); }
     check(await until(T, () => window.ABT.A().szene === 'ried'), 'Abstimmung: beide fürs Ried');
     await T.evaluate(() => window.AB.LIVE.client.leave().catch(() => {}));
   } catch (e) { check(false, 'Ablauf: ' + e.message); }

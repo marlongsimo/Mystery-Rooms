@@ -27,7 +27,8 @@
   }
   const mittel = (expr) => { const p = parse(expr); return p.n * (p.s + 1) / 2 + p.b; };
   const mod = (v) => Math.floor((v - 10) / 2);
-  const UEBUNG = 2;
+  const UEBUNG = 2; // bisheriges Modell; mit Heldenstufen 1–10 wächst der Übungsbonus (ueb)
+  const ueb = (f) => (FD.uebung ? FD.uebung((f && f.stufe) || 1) : UEBUNG);
   /* ---------- Gegenstände (Beute): getragen im Rucksack, wirken im Kampf ---------- */
   const GEGENSTAENDE = {
     stiefel: { name: "Stiefel des Wanderers", sym: "🥾", text: "+1 Feld Bewegung je Zug." },
@@ -59,7 +60,7 @@
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
   const RAUCH_DING = { id: "rauchbeutel", name: "Rauchbeutel werfen", typ: "aktion", art: "rauch", ding: "rauchbeutel", radius: 1, dauer: 2, text: GEGENSTAENDE.rauchbeutel.text };
-  const SG = (f, attr) => 8 + UEBUNG + mod(f.werte[attr]) + (hatDing(f, "stab") ? 1 : 0);
+  const SG = (f, attr) => 8 + ueb(f) + mod(f.werte[attr]) + (hatDing(f, "stab") ? 1 : 0);
 
   /* ---------- Gegenstände ---------- */
   const DINGE = {
@@ -290,10 +291,10 @@
 
   function neueFigur(fid, i, stufe, x, y) {
     const d = FD.FIGUREN[fid], k = FD.KLASSEN[d.klasse], tp = FD.tpVon(fid, stufe);
-    const pl = k.plaetze ? FD.PLAETZE[stufe].slice() : [0, 0];
+    const pl = k.plaetze ? FD.plaetzeVon(stufe).slice() : [0, 0];
     return {
       id: "f" + i, seite: "spieler", fid, klasse: d.klasse, name: d.name, titel: d.titel, stufe, x, y,
-      tp, tpMax: tp, rk: d.rk[stufe - 1], rkBasis: d.rk[stufe - 1], metall: Boolean(d.metall), werte: d.werte,
+      tp, tpMax: tp, rk: FD.rkVon(fid, stufe), rkBasis: FD.rkVon(fid, stufe), metall: Boolean(d.metall), werte: FD.werteVon(fid, stufe),
       plaetze: pl, plaetzeMax: pl.slice(), genutzt: {}, rucksack: [{ id: "heiltrank", n: 1 }], z: {}, todes: { e: 0, f: 0 }, reaktion: 1,
     };
   }
@@ -326,7 +327,7 @@
       const wd = FD.FIGUREN[fid].wolf;
       if (wd) {
         const frei = k.start.wolf.find(([wx, wy]) => !belegt(st, wx, wy));
-        st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[st.stufe - 1], tpMax: wd.tp[st.stufe - 1], rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
+        st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[FD.altStufe(st.stufe) - 1], tpMax: wd.tp[FD.altStufe(st.stufe) - 1], rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
       }
     });
     // Eskorte: eine Begleiterin (z. B. Sera Venn) als eigene Figur auf Heldenseite – ohne Spielerzug, sie läuft in der Begleiterphase
@@ -388,7 +389,7 @@
     if (st.schwierigkeit === "hardcore") st.log.push({ t: "Hardcore: Wer am Boden liegt, würfelt Todeswürfe. Der Tod ist endgültig.", art: "schlecht" });
     if (opts.ueberraschung) st.log.push({ t: "Überraschung! Die Gegner setzen die erste Runde aus.", art: "gut" });
     // Jagdvorbereitung: Kopfgeldjäger ab Stufe 2 beginnt mit einem markierten Gegner
-    for (const f of spielerFiguren(st)) if (istFig(f, "kopfgeldjaeger") && f.stufe >= 1) {
+    for (const f of spielerFiguren(st)) if (istFig(f, "kopfgeldjaeger") && FD.altStufe(f.stufe) >= 1) {
       const z = gegnerFiguren(st).sort((a, b) => b.tp - a.tp)[0];
       if (z) { z.z.mal_jaeger = f.id; f.malZiel = z.id; st.log.push({ t: `${f.name} hat ${z.name} schon im Visier (Jagdvorbereitung).` }); }
     }
@@ -445,7 +446,7 @@
     if (a.id === "brandmal") return Infinity; // erster frei, danach Platz
     if (!a.pro) return Infinity;
     const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange;
-    const n = Array.isArray(v) ? v[f.stufe - 1] : v;
+    const n = Array.isArray(v) ? v[FD.altStufe(f.stufe) - 1] : v;
     return n - gen;
   }
   /** Platz finden: kleinster passender Grad, Rückgabe Index oder -1 */
@@ -521,7 +522,7 @@
   /** Gedankenstütze der Gelehrten: knapp misslungenen W20 eines Verbündeten wiederholen (2× je Rast) */
   function gedankenstuetze(st, wer, fehlt) {
     if (wer.seite !== "spieler" || fehlt > 3 || fehlt <= 0) return null;
-    const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.stufe >= 2 && (o.genutzt.gedankenstuetze || 0) < 2 && abstand(o, wer) <= 12);
+    const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && FD.altStufe(o.stufe) >= 2 && (o.genutzt.gedankenstuetze || 0) < 2 && abstand(o, wer) <= 12);
     if (!g) return null;
     g.genutzt.gedankenstuetze = (g.genutzt.gedankenstuetze || 0) + 1;
     return g;
@@ -531,7 +532,7 @@
     let v = 0; if (attr === "GES" && z.z.festgehalten) v = -1;
     if (((attr === "STR" || attr === "KON") && hatDing(z, "baerenguertel")) || (attr === "GES" && hatDing(z, "katzenbrosche"))) v += 1;
     let { w } = w20(st, v);
-    const bon = () => mod(z.werte[attr]) + (z.seite === "spieler" && z.klasse && FD.KLASSEN[z.klasse].rettung.includes(attr) ? UEBUNG : 0);
+    const bon = () => mod(z.werte[attr]) + (z.seite === "spieler" && z.klasse && FD.KLASSEN[z.klasse].rettung.includes(attr) ? ueb(z) : 0);
     // Klassenmerkmal Kleriker: Beistand – Verbündete direkt neben einem Kleriker +1
     const glueck = (hatDing(z, "gluecksbringer") ? 1 : 0) + (z.seite === "spieler" && st.figuren.some((k) => k !== z && k.seite === "spieler" && lebt(k) && FD.KLASSEN[k.klasse] && FD.KLASSEN[k.klasse].beistand && abstand(k, z) <= 1) ? 1 : 0);
     let total = w + bon() + glueck + (z.z.segen ? W(st.r, 4) : 0);
@@ -689,7 +690,7 @@
 
   /** Angriff einer Spielerfigur mit einer Waffe oder einem Angriffszauber */
   function spielerAngriff(st, f, a, z, opt = {}) {
-    let bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") ? 1 : 0);
+    let bonus = mod(f.werte[a.attr]) + ueb(f) + (a.bogen && istFig(f, "wildnislaeufer") ? 1 : 0);
     bonus += abstand(f, z) <= 1 ? (hatDing(f, "ring") ? 1 : 0) : (hatDing(f, "feder") ? 1 : 0);
     // Klassenregler für Waffenangriffe (Stärke oder Geschick): fester Bonus/Malus und Zusatzwürfel
     const kl = FD.KLASSEN[f.klasse] || {}, waffe = a.attr === "STR" || a.attr === "GES";
@@ -699,20 +700,20 @@
     let krit = 20, zusatz = "";
     if (f.z.raserei && a.attr === "STR") extra.push("0W1+1");
     // Darian, Schattenstoß (ab Stufe 2): Angriff aus dem Versteck +1W6 und kritisch ab 19
-    const schattenstoss = istFig(f, "schattenlaeufer") && f.stufe >= 2 && f.z.versteckt;
+    const schattenstoss = istFig(f, "schattenlaeufer") && FD.altStufe(f.stufe) >= 2 && f.z.versteckt;
     if (schattenstoss) extra.push("1W6");
-    if (istFig(f, "berserker") && f.tp < f.tpMax / 2) extra.push(f.stufe >= 3 ? "0W1+2" : "0W1+1");
+    if (istFig(f, "berserker") && f.tp < f.tpMax / 2) extra.push(FD.altStufe(f.stufe) >= 3 ? "0W1+2" : "0W1+1");
     if (f.z.finte) extra.push("1W6");
     if (hatDing(f, "silberdolch") && GEGNER[z.art] && GEGNER[z.art].untot) extra.push("1W4");
     if (hatDing(f, "wolfszahn") && TIERE.has(z.art)) extra.push("1W4");
     if (abstand(f, z) <= 1 ? hatDing(f, "schleifstein") : hatDing(f, "eisenspitzen")) extra.push("0W1+1");
-    if (f.z.gift) extra.push(f.stufe >= 2 ? "2W6" : "1W6");
+    if (f.z.gift) extra.push(FD.altStufe(f.stufe) >= 2 ? "2W6" : "1W6");
     if (z.z.mal_jaeger === f.id) extra.push(FD.FIGUREN[f.fid].malWuerfel || "1W6");
-    if (z.z.brandmal === f.id) extra.push(f.stufe >= 3 ? "2W6" : "1W4");
-    if (istFig(f, "elementarist") && a.id === "glutpfeil" && f.stufe >= 2) extra.push("1W6");
-    if (istFig(f, "assassine") && f.stufe >= 3 && z.tp < z.tpMax / 2) extra.push("1W6");
-    if (istFig(f, "kopfgeldjaeger") && f.stufe >= 3 && z.z.mal_jaeger === f.id && z.tp < z.tpMax / 2 && !(f.genutzt.erlegen)) { extra.push("2W6"); f.genutzt.erlegen = 1; zusatz = " Erlegen!"; }
-    if (istFig(f, "duellant") && f.stufe >= 3) krit = 19;
+    if (z.z.brandmal === f.id) extra.push(FD.altStufe(f.stufe) >= 3 ? "2W6" : "1W4");
+    if (istFig(f, "elementarist") && a.id === "glutpfeil" && FD.altStufe(f.stufe) >= 2) extra.push("1W6");
+    if (istFig(f, "assassine") && FD.altStufe(f.stufe) >= 3 && z.tp < z.tpMax / 2) extra.push("1W6");
+    if (istFig(f, "kopfgeldjaeger") && FD.altStufe(f.stufe) >= 3 && z.z.mal_jaeger === f.id && z.tp < z.tpMax / 2 && !(f.genutzt.erlegen)) { extra.push("2W6"); f.genutzt.erlegen = 1; zusatz = " Erlegen!"; }
+    if (istFig(f, "duellant") && FD.altStufe(f.stufe) >= 3) krit = 19;
     if (schattenstoss) krit = Math.min(krit, 19);
     if (hatDing(f, "wetzstein")) krit = Math.min(krit, 19);
     if (istFig(f, "kopfgeldjaeger") && z.z.mal_jaeger === f.id) krit = 19;
@@ -720,7 +721,7 @@
     const spec = {
       name: a.name, bonus, schaden: a.schaden, fest, extra, krit, nah: abstand(f, z) <= 1, fern: Boolean(a.fern) || (a.wurfwaffe && abstand(f, z) > 1),
       magisch: Boolean(a.magisch), wucht: Boolean(a.wucht), ruecksichtslos: Boolean(a.ruecksichtslos), zusatzText: zusatz,
-      hinterhalt: f.klasse === "schurke" ? (f.stufe >= 2 ? "2W6" : "1W6") : null,
+      hinterhalt: f.klasse === "schurke" ? (FD.altStufe(f.stufe) >= 2 ? "2W6" : "1W6") : null,
       nachTreffer: () => {
         if (giftAktiv && lebt(z)) { z.z.vergiftet = 1; delete f.z.gift; }
         if (a.fesseln && lebt(z)) { const r = rettung(st, z, "STR", SG(f, "GES")); if (!r.erfolg) { z.z.festgehalten = { rest: 2, flucht: SG(f, "GES") }; st.log.push({ t: `${z.name} ist festgenagelt (Rettungswurf ${r.total}).` }); } }
@@ -1014,10 +1015,10 @@
     }
     if (abstand(w, z) > 1) { st.log.push({ t: `${w.name} kommt nicht an ${z.name} heran.` }); return; }
     const wd = FD.FIGUREN[f.fid].wolf, extra = [];
-    if (f.stufe >= 3 && z.z.mal_jaeger === f.id) extra.push("1W6");
+    if (FD.altStufe(f.stufe) >= 3 && z.z.mal_jaeger === f.id) extra.push("1W6");
     if (st.zug) st.zug.wolfBiss = true;
     angriffswurf(st, w, z, {
-      name: umreissen ? "Biss (Umreißen)" : "Biss", bonus: wd.angriff[f.stufe - 1], schaden: wd.schaden, fest: wd.plus, extra, nah: true,
+      name: umreissen ? "Biss (Umreißen)" : "Biss", bonus: wd.angriff[FD.altStufe(f.stufe) - 1], schaden: wd.schaden, fest: wd.plus, extra, nah: true,
       nachTreffer: () => { if (umreissen && lebt(z)) { const rw = rettung(st, z, "STR", 12); if (!rw.erfolg) { z.z.liegend = true; st.log.push({ t: `${z.name} wird umgerissen.` }); } } },
     });
   }
@@ -1074,7 +1075,7 @@
     }
     const f = aktiv(st);
     f.gehandelt = true;
-    f.reaktion = istFig(f, "schildwaechter") && f.stufe >= 3 ? 2 : 1;
+    f.reaktion = istFig(f, "schildwaechter") && FD.altStufe(f.stufe) >= 3 ? 2 : 1;
     delete f.z.ruecksichtslos;
     let bew = f.seite === "gegner" ? Math.round((GEGNER[f.art].bewegung != null ? GEGNER[f.art].bewegung : 6) * (st.gegnerTempo || 1)) : bewegungVon(f);
     const basis = bew;
@@ -1121,7 +1122,7 @@
     if (st.ende) return;
     const f = aktiv(st);
     // Eingespielt: Grau beißt ohne Befehl
-    if (istFig(f, "tiergefaehrte") && f.stufe >= 2 && !st.zug.wolfBiss) {
+    if (istFig(f, "tiergefaehrte") && FD.altStufe(f.stufe) >= 2 && !st.zug.wolfBiss) {
       const w = wolfVon(st, f);
       const z = w && lebt(w) && gegnerFiguren(st).find((o) => lebt(o) && abstand(w, o) <= 1 && st.zug.getroffen.includes(o.id));
       if (z) wolfBeisst(st, f, z, false);
@@ -1668,7 +1669,7 @@
   /* ---------- Steuerung ohne Spieler (Tests, „Tisch steuert“) ---------- */
   function erwarteterSchaden(st, f, a, z) {
     if (a.art === "angriff") {
-      const bonus = mod(f.werte[a.attr]) + UEBUNG, v = vorteil(st, f, z, { fern: a.fern, ruecksichtslos: a.ruecksichtslos }).v;
+      const bonus = mod(f.werte[a.attr]) + ueb(f), v = vorteil(st, f, z, { fern: a.fern, ruecksichtslos: a.ruecksichtslos }).v;
       let p = Math.max(0.05, Math.min(0.95, (21 - (rkEff(st, z, f, { fern: a.fern }) - bonus)) / 20));
       if (v > 0) p = 1 - (1 - p) ** 2; if (v < 0) p = p * p;
       let dmg = mittel(a.schaden) + (a.ohneMod ? 0 : mod(f.werte[a.attr]));
@@ -1917,7 +1918,7 @@
     if (!h || !z) return { p: null, art: null, text: "" };
     const a = h.a, klemm = (x) => Math.max(0.05, Math.min(0.95, x));
     if (a.art === "angriff") {
-      const bonus = mod(f.werte[a.attr]) + UEBUNG + (a.bogen && istFig(f, "wildnislaeufer") ? 1 : 0);
+      const bonus = mod(f.werte[a.attr]) + ueb(f) + (a.bogen && istFig(f, "wildnislaeufer") ? 1 : 0);
       const spec = { fern: Boolean(a.fern) || (a.wurfwaffe && abstand(f, z) > 1), ruecksichtslos: a.ruecksichtslos };
       const v = vorteil(st, f, z, spec).v, rk = rkEff(st, z, f, spec);
       let p = klemm((21 - (rk - bonus)) / 20);

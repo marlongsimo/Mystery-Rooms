@@ -217,6 +217,7 @@ function durchlauf(id, N = 200, o = {}) {
 
 /* ---------- Kämpfe ---------- */
 function kaempfe(id, N = 150, o = {}) {
+  if (o && o.stufe) F.STUFEN10.aktiv = true; // Messung im Zehn-Stufen-Modell
   const D = daten(id), GR = [];
   for (let n = Math.max(2, D.META.min || 3); n <= (D.META.max || 6); n++) GR.push(n);
   const liste = Object.keys(D.SZENEN).filter((s) => D.SZENEN[s].art === "kampf" && (!o.nur || !o.nur.length || o.nur.includes(s)));
@@ -227,8 +228,9 @@ function kaempfe(id, N = 150, o = {}) {
     const A = S.neu(9e5 + i * 17 + n, { gruppe, abenteuer: id, schwierigkeit: o.hardcore ? "hardcore" : "normal" });
     // Stufe: aus der Szene, sonst die der Begegnung (so stark ist die Gruppe dort im echten Spiel)
     A.szene = sid; A.stufe = D.SZENEN[sid].stufe || (R.BEGEGNUNGEN[S.kampfOptionen(A).begegnung] || {}).stufe || A.stufe || 1;
+    if (o.stufe) A.stufe = o.stufe; // --stufe=N: Heldenstufe 1–10 (schaltet das Zehn-Stufen-Modell für diese Messung ein)
     // Helden ausgeruht auf dieser Stufe (volle TP und Zauberplätze der Stufe, wie nach dem Aufstieg im echten Spiel)
-    for (const f of gruppe) Object.assign(A.zust[f], { stufe: A.stufe, tp: F.tpVon(f, A.stufe), plaetze: F.KLASSEN[F.FIGUREN[f].klasse].plaetze ? F.PLAETZE[A.stufe].slice() : [0, 0] });
+    for (const f of gruppe) Object.assign(A.zust[f], { stufe: A.stufe, tp: F.tpVon(f, A.stufe), plaetze: F.KLASSEN[F.FIGUREN[f].klasse].plaetze ? F.plaetzeVon(A.stufe).slice() : [0, 0] });
     const opt = S.kampfOptionen(A); if (skala != null) opt.skala = skala;
     const st = R.neuesSpiel(7e6 + i * 31 + n * 7 + sid.length, opt), unten = {}; let k = 0;
     while (!st.ende && k++ < 4000) { if (R.aktiv(st).seite === "gegner") R.gegnerZug(st); else R.autoZug(st); if (zaehlen) for (const f of R.spielerFiguren(st)) if (f.tp <= 0) unten[f.fid] = true; }
@@ -285,7 +287,7 @@ function aufbau(id, N = 60, o = {}) {
     const r = R.rng(sid.length * 7919 + n * 104729 + i), gruppe = F.REIHE.slice().sort(() => r() - 0.5).slice(0, n);
     const A = S.neu(9e5 + i * 17 + n, { gruppe, abenteuer: id, schwierigkeit: o.hardcore ? "hardcore" : "normal" });
     A.szene = sid; A.stufe = D.SZENEN[sid].stufe || (R.BEGEGNUNGEN[S.kampfOptionen(A).begegnung] || {}).stufe || 1;
-    for (const f of gruppe) Object.assign(A.zust[f], { stufe: A.stufe, tp: F.tpVon(f, A.stufe), plaetze: F.KLASSEN[F.FIGUREN[f].klasse].plaetze ? F.PLAETZE[A.stufe].slice() : [0, 0] });
+    for (const f of gruppe) Object.assign(A.zust[f], { stufe: A.stufe, tp: F.tpVon(f, A.stufe), plaetze: F.KLASSEN[F.FIGUREN[f].klasse].plaetze ? F.plaetzeVon(A.stufe).slice() : [0, 0] });
     const opt = S.kampfOptionen(A); opt.skala = skala;
     const st = R.neuesSpiel(7e6 + i * 31 + n * 7 + sid.length, opt); let k = 0;
     while (!st.ende && k++ < 4000) { if (R.aktiv(st).seite === "gegner") R.gegnerZug(st); else R.autoZug(st); }
@@ -381,7 +383,7 @@ if (require.main === module) {
     }
   } else if (befehl === "kaempfe") {
     for (const id of welche) {
-      const k = kaempfe(id, N || 150, { hardcore: flag("hardcore"), helden: flag("helden"), kalibrieren: flag("kalibrieren"), nur: wert("nur").split(",").filter(Boolean) });
+      const k = kaempfe(id, N || 150, { hardcore: flag("hardcore"), helden: flag("helden"), kalibrieren: flag("kalibrieren"), nur: wert("nur").split(",").filter(Boolean), stufe: +wert("stufe") || 0 });
       console.log(`\n${daten(id).META.titel} · ${flag("hardcore") ? "Hardcore" : "Normal"} · ${flag("kalibrieren") ? "Kalibrierung" : (N || 150) + " Kämpfe je Größe"} · Sieg % (übriges Leben %, Runden)`);
       for (const e of k.ergebnis) {
         if (e.fehler) { console.log(`  ✗ ${e.sid}: ${e.fehler}`); schlecht = true; continue; }

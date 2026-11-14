@@ -292,8 +292,8 @@
   function viewBogen(app, fid) {
     const s = H.spiel, d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse], fd = figDaten(fid), ab = s.abenteuer, az = ab && ab.zust && ab.zust[fid];
     const stufe = (fd && fd.stufe) || (ab && ab.stufe) || s.stufe || 1;
-    const tpMax = fd ? fd.tpMax : F.tpVon(fid, stufe), tp = fd ? fd.tp : az ? az.tp : tpMax, rk = fd ? fd.rk : d.rk[stufe - 1];
-    const plMax = fd && fd.plaetzeMax ? fd.plaetzeMax : k.plaetze ? F.PLAETZE[stufe] : [0, 0], pl = fd && fd.plaetze ? fd.plaetze : az ? az.plaetze : plMax;
+    const tpMax = fd ? fd.tpMax : F.tpVon(fid, stufe), tp = fd ? fd.tp : az ? az.tp : tpMax, rk = fd ? fd.rk : F.rkVon(fid, stufe);
+    const plMax = fd && fd.plaetzeMax ? fd.plaetzeMax : k.plaetze ? F.plaetzeVon(stufe) : [0, 0], pl = fd && fd.plaetze ? fd.plaetze : az ? az.plaetze : plMax;
     const dran = Boolean(fd && s.phase === "kampf" && !s.ende && s.aktiv === fd.id && fd.tp > 0);
     const meinName = (s.namen || {})[ich()] || "";
     const zust = fd ? fd.zustaende || [] : [];
@@ -343,7 +343,7 @@
     if (a.schaden) teile.push(`${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}${a.art === "angriff" && !a.ohneMod ? " + " + R.mod(d.werte[a.attr]) : a.plusAttr ? " + " + R.mod(d.werte[a.attr]) : a.plus ? " + " + a.plus : ""}`);
     if (a.heilung) teile.push(`heilt ${a.heilung}`);
     if (a.platz) teile.push(a.platz === 2 ? "Platz vom 2. Grad" : "1 Zauberplatz");
-    if (a.pro) { const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange, n = Array.isArray(v) ? v[stufe - 1] : v; teile.push(`${n}× je ${a.pro.kampf != null ? "Kampf" : a.pro.rast != null ? "Rast" : "lange Rast"}`); }
+    if (a.pro) { const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange, n = Array.isArray(v) ? v[F.altStufe(stufe) - 1] : v; teile.push(`${n}× je ${a.pro.kampf != null ? "Kampf" : a.pro.rast != null ? "Rast" : "lange Rast"}`); }
     return teile.join(" · ");
   }
 

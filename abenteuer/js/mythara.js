@@ -638,5 +638,7 @@
     const t = $("#hub-titel"); if (t && istKonto()) t.textContent = (smAktiv() && SM.titelText()) || "Spieler";
     if (istKonto() && !$("#mythara").hidden) kontoZeichnen();
   });
-  window.MYTHARA = { KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto() };
+  /** Die Kampagne, die in der Übersicht nach dieser kommt (für „Weiter mit der nächsten Kampagne“) */
+  const naechstesAbenteuer = (id) => { const l = ABENTEUER(), i = l.findIndex((m) => m.id === id); return i >= 0 && l[i + 1] ? l[i + 1] : null; };
+  window.MYTHARA = { KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
 })();

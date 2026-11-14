@@ -270,6 +270,7 @@
     r.xp = xp && xp.konto ? xp.helden || [] : [];
     const xpNeu = r.xp.some((h) => h.neu);
     await laden(true);
+    if (o.roh) return r;                            // Abschlussbildschirm: Der Aufrufer zeigt das Ergebnis selbst
     if (r.schon_gemeldet && !r.angebot && !xpNeu) return r; // schon gemeldet und nichts mehr offen: nichts erneut zeigen
     if (o.still && !r.neu && !xpNeu) return r;               // Nachholen: ein bekanntes Ende nicht nachträglich anzeigen
     if (o.knopf) { endeErgebnis = { kampagne, r }; endePlatzFuellen(); if (r.neu) toast(r.angebot ? "Neues Ende entdeckt: Ein neuer Held wartet auf dich!" : "Neues Ende entdeckt!"); return r; }
@@ -292,11 +293,42 @@
     if (r.angebot && !(S.angebote || []).some((a) => a.id === r.angebot.id)) r.angebot = null;
     belohnung(r, { fertig: endePlatzFuellen });
   });
+  /* ---------- Abschlussbildschirm nach einer Kampagne (Spieltisch) ----------
+   * Zeigt die Belohnungen (Erfahrung und Aufstiege, neues Ende, Heldenwahl) und darunter, wie es weitergeht:
+   * „Zur Startseite“ oder „Weiter mit der nächsten Kampagne“.
+   * o: { kampagne, abenteuer, start(), weiter() | null, weiterTitel } */
+  function schlussKnoepfe(o) {
+    return { html: `<button class="btn ghost gross" id="sm-start">Zur Startseite</button>${o.weiter && o.weiterTitel ? `<button class="btn gross" id="sm-naechste">Weiter: ${esc(o.weiterTitel)}</button>` : ""}`,
+      binden: (el) => { el.querySelector("#sm-start").onclick = () => { schliessen(); o.start(); }; const n = el.querySelector("#sm-naechste"); if (n) n.onclick = () => { schliessen(); o.weiter(); }; } };
+  }
+  function schlussSchirm(sch, r = {}) {
+    const el = rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen</p><h1 class="sm-gross">${esc(r.gross || "Sieg")}</h1>${r.titel ? `<p class="sm-unter">${esc(r.titel)}.</p>` : ""}
+      ${r.text ? `<div class="sm-box">${r.text}</div>` : ""}<div class="sm-knoepfe">${sch.html}</div>`, { kopf: r.kopf || r.titel || "Kampagne", bild: r.bild });
+    sch.binden(el);
+  }
+  async function abschluss(o) {
+    const K = KAMPAGNEN[o.abenteuer] || { titel: "" }, bild = bildVon(o.abenteuer), sch = schlussKnoepfe(o);
+    rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen</p><h1 class="sm-gross">Sieg</h1><p class="sm-unter">Eure Belohnungen werden gezählt …</p>`, { kopf: K.titel || "Kampagne", bild });
+    document.documentElement.classList.add("sm-offen");
+    let r = endeErgebnis && o.kampagne && endeErgebnis.kampagne === o.kampagne ? endeErgebnis.r : null;
+    if (!r && o.kampagne) { try { r = await endeMelden(o.kampagne, { roh: true, versuche: 4 }); } catch (e) { r = null; } }
+    if (r && r.konto) {
+      // Ist das Angebot inzwischen gewählt (z. B. auf einem anderen Gerät), zeigt laden() es nicht mehr als offen
+      if (r.angebot && !(S.angebote || []).some((a) => a.id === r.angebot.id)) r.angebot = null;
+      return belohnung(r, { schluss: sch });
+    }
+    const text = !S.konto ? "Als Gast sammelst du keine Erfahrung und keine neuen Helden. Mit einem Spielerkonto steigen deine Helden mit jedem Abschluss auf."
+      : "Dieser Abschluss bringt keine Belohnung. Gewertet werden Kampagnen, die ein reguläres Ende erreichen und mindestens 15 Minuten gedauert haben.";
+    schlussSchirm(sch, { kopf: K.titel, titel: K.titel, bild, text });
+  }
   /** Ergebnis von rpg_claim_ending (oder ein offenes Angebot) zeigen */
   function belohnung(r, o = {}) {
     const K = KAMPAGNEN[r.abenteuer] || { titel: "", enden: {} }, endName = K.enden[r.ende] || "";
     const bild = bildVon(r.abenteuer), kopf = K.titel || "Kampagne";
-    const zu = () => { schliessen(); if (o.fertig) o.fertig(); };
+    // o.schluss (Abschlussbildschirm am Spieltisch): statt „Weiter“ die Knöpfe „Zur Startseite“ und „Nächste Kampagne“
+    const endKnopf = () => (o.schluss ? o.schluss.html : `<button class="btn gross" id="sm-zu">Weiter</button>`);
+    const endBinden = (el) => { if (o.schluss) o.schluss.binden(el); else el.querySelector("#sm-zu").onclick = zu; };
+    const zu = () => { if (o.schluss) return schlussSchirm(o.schluss, { kopf, bild, titel: K.titel }); schliessen(); if (o.fertig) o.fertig(); };
     const fortschritt = () => `${r.gefunden} von ${r.gesamt} Enden`;
     const alleEnden = r.gesamt && r.gefunden >= r.gesamt;
     const titelHtml = () => alleEnden
@@ -319,8 +351,8 @@
         const el = rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen${endName ? " · Ende: " + esc(endName) : ""}</p><h1 class="sm-gross">Sieg</h1><p class="sm-unter">${esc(K.titel)}.</p>
           <div class="sm-box">Dieses Ende hast du schon einmal erreicht. Einen neuen Helden gibt es nur für ein Ende, das du zum ersten Mal erreichst. ${rest <= 0 ? `Alle Enden von „${esc(K.titel)}“ hast du schon entdeckt.` : `In „${esc(K.titel)}“ wartet noch ${rest === 1 ? "ein weiteres Ende" : rest + " weitere Enden"}.`}</div>
           ${xpHtml()}
-          <div class="sm-knoepfe"><button class="btn gross" id="sm-zu">Weiter</button></div>`, { kopf, bild });
-        el.querySelector("#sm-zu").onclick = zu; return;
+          <div class="sm-knoepfe">${endKnopf()}</div>`, { kopf, bild });
+        endBinden(el); return;
       }
       const voll = !r.angebot;
       const el = rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen${endName ? " · Ende: " + esc(endName) : ""}</p><h1 class="sm-gross">Sieg</h1><p class="sm-unter">${esc(K.titel)} · ${fortschritt()} entdeckt.</p>
@@ -333,8 +365,8 @@
       const el = rahmen(`<p class="sm-eyebrow">Sammlung vollständig · alle 15 Helden</p><h1 class="sm-gross">${alleEnden ? "Alle Enden gefunden" : "Neues Ende entdeckt"}</h1>
         ${alleEnden ? titelHtml() : `<div class="sm-siegel"><div class="sm-zeichen">✦</div><b>${esc(endName)}</b><small>${esc(K.titel)} · ${fortschritt()}</small></div>
         <p class="sm-unter">Wer alle ${r.gesamt} Enden dieser Kampagne findet, bekommt den Titel „${esc(TITEL[r.abenteuer] || "")}“. Deinen Fortschritt siehst du unter Charaktere.</p>`}
-        <div class="sm-knoepfe"><button class="btn gross" id="sm-zu">Weiter</button></div>`, { kopf, bild });
-      el.querySelector("#sm-zu").onclick = zu;
+        <div class="sm-knoepfe">${endKnopf()}</div>`, { kopf, bild });
+      endBinden(el);
     };
     const schrittWahl = () => {
       const a = r.angebot;
@@ -355,9 +387,9 @@
       const el = rahmen(`<p class="sm-eyebrow">Neu in deiner Sammlung</p><h1 class="sm-gross">${esc(d.name)}</h1><div class="sm-reihe">${karte(fid, "eingebucht")}</div>
         <p class="sm-unter">${S.helden.length} von 15 Helden. In der nächsten Kampagne steht ${esc(d.name)} zur Wahl.</p>
         ${alleEnden ? titelHtml() : ""}
-        <div class="sm-knoepfe"><button class="btn gross" id="sm-zu">Weiter</button></div>`, { kopf, bild });
+        <div class="sm-knoepfe">${endKnopf()}</div>`, { kopf, bild });
       aufdecken(el); karteBinden(el, null);
-      el.querySelector("#sm-zu").onclick = zu;
+      endBinden(el);
     };
     if (o.direktWahl && r.angebot) schrittWahl(); else schritt0();
   }
@@ -438,7 +470,7 @@
     netzSetzen: (fn) => { netzQuelle = fn; },
     laden, frei, anzahl, zustand: () => S, beiAenderung: (fn) => { hoerer.add(fn); return () => hoerer.delete(fn); },
     aktiv: () => S.geladen && S.installiert && !S.offline,
-    tischLaden, tischFrei, tischBekannt, tischStufen, fortschritt, stufeHtml, heldenUebersichtHtml, tischAlleFrei: () => !T.frei,
+    tischLaden, tischFrei, tischBekannt, tischStufen, fortschritt, stufeHtml, heldenUebersichtHtml, abschluss, tischAlleFrei: () => !T.frei,
     registrierung, endeMelden, offeneBelohnung, nachholen, codeEinloesen,
     detail, schliessen, endenHtml, chronikHtml, gesperrtText, titelText, endeKnopf,
     istAdmin, adminCodes, adminErstellen, adminSperren,

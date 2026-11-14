@@ -49,6 +49,15 @@ async function seite(b, mit007) {
     const xp = await p.evaluate(() => [...document.querySelectorAll(".sm-xp .sm-xp-zeile")].map((z) => (z.classList.contains("auf") ? "AUF " : "") + z.textContent.replace(/\s+/g, " ").trim()));
     check(xp.length === 3 && /^AUF .*Kael.*\+320 XP.*Aufstieg: Stufe 1 → 3/.test(xp[0]) && /^AUF .*\+200 XP.*Stufe 3 → 4/.test(xp[1]) && !/^AUF/.test(xp[2]) && /\+50 XP.*Stufe 6/.test(xp[2]), "Belohnung: XP je Held, Balken und Aufstieg (" + xp[0].slice(0, 70) + " …)");
     await p.screenshot({ path: (process.env.SHOT_DIR || "/tmp") + "/xp-belohnung.png" });
+    // Abschlussbildschirm am Spieltisch: Belohnungen und darunter „Zur Startseite“ / „Weiter: nächste Kampagne“
+    await p.evaluate(() => document.querySelector("#sm-zu").click());
+    const ziel = await p.evaluate(() => new Promise((res) => { window.ABSAMMLUNG.abschluss({ kampagne: "00000000-0000-0000-0000-000000000002", abenteuer: "weidenhain", start: () => res("start"), weiterTitel: window.MYTHARA.naechstesAbenteuer("weidenhain").titel, weiter: () => res("weiter") });
+      const warte = () => { const n = document.querySelector("#sm-naechste"), s = document.querySelector("#sm-start"), xp = document.querySelectorAll(".sm-xp .sm-xp-zeile").length; if (n && s && xp === 3) { window.__knopf = n.textContent; n.click(); } else setTimeout(warte, 100); }; warte(); }));
+    check(ziel === "weiter" && /Weiter: Das Moor der stummen Lichter/.test(await p.evaluate(() => window.__knopf)) && await p.evaluate(() => document.querySelector("#sm-buehne").hidden), "Abschluss: XP-Übersicht, darunter „Zur Startseite“ und „Weiter: Das Moor der stummen Lichter“; der Knopf führt weiter");
+    // Im Spiel: Endszene → „Weiter zu den Belohnungen“ → „Zur Startseite“ landet im Hub, nicht in der Heldenwahl
+    const hub = await p.evaluate(() => new Promise((res) => { const A = window.ABT.A(); A.szene = "ende_stabil"; window.ABT.render(); const b = document.querySelector("#sz-schluss"), text = b.textContent; b.click();
+      const warte = () => { const s = document.querySelector("#sm-start"); if (s) { s.click(); setTimeout(() => res({ text, hub: !document.querySelector("#hub").hidden, lobby: !document.querySelector("#lobby").hidden, A: Boolean(window.ABT.A()) }), 300); } else setTimeout(warte, 100); }; warte(); }));
+    check(/Belohnungen/.test(hub.text) && hub.hub && !hub.lobby && !hub.A, "Endszene: „Weiter zu den Belohnungen“ → „Zur Startseite“ führt auf die Startseite (nicht in die Heldenwahl)");
     check(!fehler.length, "keine Skriptfehler" + (fehler.length ? ": " + fehler.join(" | ") : ""));
     await p.close();
   }

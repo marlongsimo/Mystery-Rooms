@@ -296,9 +296,16 @@
     const d = FIGUREN[fid], stufe = altStufe(stufeRoh);
     let k = KLASSE_FAEHIG[d.klasse].slice();
     if (d.gerissenAb) k = k.map((x) => (x.gerissen ? Object.assign({}, x, { ab: d.gerissenAb }) : x));
+    // Texte, die eine spätere Stufe nennen („+1W6 (ab Stufe 2 +2W6)“): im Zehn-Stufen-Modell passend zur Heldenstufe –
+    // ist die Stufe erreicht, steht gleich der bessere Wert da; sonst die richtige neue Stufe (3 bzw. 7)
+    const stufenText = (text) => String(text || "")
+      // Wert mit späterer Steigerung: „+1W6 Gift (ab Stufe 2 +2W6)“
+      .replace(/(\+\d+W\d+)((?: [A-Za-zÄÖÜäöüß]+)?) \(ab Stufe ([23]) (\+[^)]+)\)/g, (alles, wert, wort, n, dann) => (stufeRoh >= neuAb(Number(n)) ? dann + wort : `${wert}${wort} (ab Stufe ${neuAb(Number(n))} ${dann})`))
+      // Zusatz ab einer Stufe: „mit Nachteil (ab Stufe 3 zweimal je Runde)“
+      .replace(/ \(ab Stufe ([23]) ([^)+][^)]*)\)/g, (alles, n, dann) => (stufeRoh >= neuAb(Number(n)) ? `, ${dann}` : ` (ab Stufe ${neuAb(Number(n))} ${dann})`));
     const besser = (x) => {
       if (!STUFEN10.aktiv) return x;
-      let y = x;
+      let y = /\(ab Stufe [23] /.test(x.text || "") ? Object.assign({}, x, { text: stufenText(x.text) }) : x;
       for (const [ab, id, patch] of BESSER[fid] || []) if (id === x.id && stufeRoh >= ab) y = Object.assign({}, y, patch, { besser: true, text: y.text + " ★ " + (AUFSTIEG[fid][ab] || "verbessert") + "." });
       return y;
     };

@@ -626,7 +626,8 @@
     const zieleOffen = st.mech && st.mech.zieleZuerst && st.mech.ziele.some(zielOffen);
     if ((ge.every((f) => f.tp <= 0) && !zieleOffen) || jaegerWeg) {
       st.ende = "sieg"; st.xp = ge.reduce((a, g) => a + GEGNER[g.art].xp, 0);
-      st.log.push({ t: `Sieg! Alle Gegner sind besiegt. Jede Figur erhält ${Math.floor(st.xp / sp.length)} EP.`, art: "ende" });
+      // Ohne EP-Angabe: Erfahrung gibt es für den Abschluss der Kampagne, nicht für einzelne Kämpfe
+      st.log.push({ t: "Sieg! Alle Gegner sind besiegt.", art: "ende" });
     } else if (sp.every((f) => f.tp <= 0)) {
       if (st.schwierigkeit === "hardcore") {
         st.ende = "niederlage";

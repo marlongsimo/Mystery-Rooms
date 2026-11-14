@@ -249,10 +249,15 @@
       art: "kampf", abschnitt: 1, titel: "Kröten im Ried", ort: "Das Ried",
       text: [
         "Schlammkröten schieben sich aus dem Wasser, drei, vier, mehr. Zwischen den Schilfinseln liegen tiefe Furten: Wer darüber will, muss außen herum.",
-        "Hinter ihnen, im flachen Wasser, glänzt ein Haufen Laich, so groß wie ein Wagenrad. Es bewegt sich darin.",
-        "*Achtet auf den Krötenlaich: Solange er liegt, schlüpfen alle paar Runden neue Kröten. Er wehrt sich nicht. Wer ihn zuerst zerschlägt, hat danach nur noch die Kröten vor sich, die schon da sind.*",
+        "Mitten im Ried, im flachen Wasser, glänzt ein Haufen Laich, so groß wie ein Wagenrad. Es bewegt sich darin.",
+        "*Ein Kampf mit einem Ziel: Solange der Laich liegt, schlüpfen neue Kröten. Wer daneben steht und zweimal seine Aktion einsetzt, zertritt ihn. Danach habt ihr nur noch die Kröten vor euch, die schon da sind.*",
       ],
-      kampf: { begegnung: "moor_kroeten", karte: RIED, sieg: { weiter: "ried_still" } },
+      kampf: { begegnung: "moor_kroeten", karte: RIED,
+        mechanik: {
+          ziele: [{ id: "laich", name: "Der Krötenlaich", art: "laich", x: 7, y: 5, runden: 2, aktion: "Laich zertreten", fertigText: "Es platscht und schmatzt, dann ist es still", wirkung: { welleAus: "laich" } }],
+          wellen: [{ id: "laich", name: "Der Krötenlaich", kurz: "frisch geschlüpft", quellen: [[8, 5], [6, 5]], gegner: [["schlammkroete", 0.2, 1, 0.3]], alle: 3, ab: 3, max: 2, text: "Im Laich zuckt es" }],
+        },
+        sieg: { weiter: "ried_still" } },
     },
     kahnfahrt: {
       art: "erzaehlung", abschnitt: 1, titel: "Joosts Kahn", ort: "Schwarzmoor", weiter: "hedda",
@@ -438,7 +443,7 @@
           ziele: [{ id: "g1", name: "Grablaterne am Damm", art: "grablaterne", x: 9, y: 2, runden: 2, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } },
             { id: "g2", name: "Grablaterne am Tümpel", art: "grablaterne", x: 9, y: 6, runden: 2, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } }],
           sieg: { ziele: 2, art: "grablaterne", text: "Als das zweite Licht erlischt, bleiben die Ertrunkenen stehen. Einer nach dem anderen lassen sie sich zurück ins Wasser sinken, langsam, fast dankbar." },
-          wellen: [{ id: "tuempel", name: "Die Tümpel", kurz: "aus den Tümpeln", quellen: [[6, 4], [8, 5]], gegner: [["moorleiche", 0.2, 1, 0.3]], alle: 3, ab: 2, max: 3, text: "Im Schein der Grablaternen brodelt das Wasser" }],
+          wellen: [{ id: "tuempel", name: "Die Tümpel", kurz: "aus den Tümpeln", quellen: [[6, 4], [8, 5]], gegner: [["moorleiche", 0.2, 1, 0.3]], alle: 3, ab: 3, max: 2, text: "Im Schein der Grablaternen brodelt das Wasser" }],
         },
         sieg: { weiter: "kinder" } },
     },
@@ -580,7 +585,6 @@
     irrlicht: { klassen: ["zauberer", "waldlaeufer"], text: "Flink und schwer zu treffen (RK 14): Es wirft kalte Funken über 4 Felder und bleibt auf Abstand. Fernkämpfer und Zauber holen es herunter." },
     schlammkroete: { klassen: ["waldlaeufer"], text: "Ein Tier: Wolfszahn trifft sie härter. Ihre Zunge reicht 2 Felder weit, über Wasser hinweg." },
     moorleiche: { klassen: ["kleriker", "zauberer"], text: "Untot und langsam (4 Felder): Untote vertreiben und strahlende Aura wirken. Wer Abstand hält, wird selten erwischt." },
-    kroetenlaich: { klassen: ["waldlaeufer"], text: "Wehrt sich nicht und bewegt sich nicht. Solange er liegt, schlüpfen alle drei Runden neue Kröten, höchstens zwei." },
     alwine: { klassen: ["kleriker", "zauberer", "waldlaeufer"], text: "Solange Mira schläft, schützt ihr Traum Alwine: Jeder Treffer wirkt nur halb. Wer Mira weckt, nimmt ihr den Schutz. Ihre kalte Hand reicht 4 Felder. Alle drei Runden stößt sie die Wehklage aus: Kälte im Kegel von 3 Feldern (3W6, WEI-Rettung halbiert). Nicht hintereinander stehen." },
   };
   const META = {

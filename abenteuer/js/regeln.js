@@ -212,7 +212,11 @@
     return b.gegner.map(([art, je, max, basis]) => { const soll = (basis || 0) + je * n, anzahl = Math.min(max || Infinity, Math.max(basis < 0 ? 0 : 1, Math.round(soll))); 
       // Bedrohung: Die zusätzliche Masse kommt als weitere Gegner (Einzelgegner wie Bosse bleiben allein und werden zäher)
       const mehr = bed > 0 && anzahl && max !== 1 ? Math.min(Math.round((max || Infinity) * Math.pow(1.12, bed)), Math.max(anzahl, Math.round(anzahl * Math.pow(1.12, bed)))) : anzahl;
-      return { art, anzahl: mehr, tpFaktor: anzahl ? k * soll / mehr : k }; }).filter((g) => g.anzahl > 0);
+      // Zehn-Stufen-Modell: keine zähen Brocken – wer mehr als das 1,7-Fache an Leben hätte, kommt stattdessen zu mehreren
+      // (höchstens doppelt so viele, höchstens 12 je Art; Bosse und Einzelgegner bleiben allein)
+      let zahl = mehr; const tf = anzahl ? k * soll / mehr : k;
+      if (modell10() && zahl && max !== 1 && !GEGNER[art].boss && tf > 1.7) zahl = Math.max(zahl, Math.min(zahl * 2, 12, Math.ceil(zahl * tf / 1.7)));
+      return { art, anzahl: zahl, tpFaktor: anzahl ? k * soll / zahl : k }; }).filter((g) => g.anzahl > 0);
   }
 
   /* ---------- Karte ---------- */

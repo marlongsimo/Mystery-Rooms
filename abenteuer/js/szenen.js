@@ -62,7 +62,9 @@
   function skala10(A, o) {
     if (!modell10()) return;
     const t = (R.SKALA10 || {})[(A.abenteuer || "grauwacht") + ":" + A.szene], k = t && t[Math.max(3, Math.min(6, (o.figuren || []).length))];
-    if (k) o.skala = k;
+    if (!k) return;
+    // Fest vorgegebene Gegner (z. B. das Duell): der Faktor wirkt direkt auf ihr Leben
+    if (o.gegner && !o.begegnung) { o.gegner = o.gegner.map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * k })); o.skala10 = k; } else o.skala = k;
   }
 
   function neu(seed, opts = {}) {

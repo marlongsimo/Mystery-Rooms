@@ -233,7 +233,8 @@ function kaempfe(id, N = 150, o = {}) {
     if (o.stufe) A.stufe = o.stufe; // --stufe=N: Heldenstufe 1–10 (schaltet das Zehn-Stufen-Modell für diese Messung ein)
     // Helden ausgeruht auf dieser Stufe (volle TP und Zauberplätze der Stufe, wie nach dem Aufstieg im echten Spiel)
     for (const f of gruppe) Object.assign(A.zust[f], { stufe: A.stufe, tp: F.tpVon(f, A.stufe), plaetze: F.KLASSEN[F.FIGUREN[f].klasse].plaetze ? F.plaetzeVon(A.stufe).slice() : [0, 0] });
-    const opt = S.kampfOptionen(A); if (skala != null) opt.skala = skala;
+    const opt = S.kampfOptionen(A);
+    if (skala != null) { if (opt.gegner && !opt.begegnung) opt.gegner = opt.gegner.map((g) => Object.assign({}, g, { tpFaktor: (g.tpFaktor || 1) * skala / (opt.skala10 || 1) })); else opt.skala = skala; }
     const st = R.neuesSpiel(7e6 + i * 31 + n * 7 + sid.length, opt), unten = {}; let k = 0;
     while (!st.ende && k++ < 4000) { if (R.aktiv(st).seite === "gegner") R.gegnerZug(st); else R.autoZug(st); if (zaehlen) for (const f of R.spielerFiguren(st)) if (f.tp <= 0) unten[f.fid] = true; }
     const sp = R.spielerFiguren(st), sieg = st.ende === "sieg";

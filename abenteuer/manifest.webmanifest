@@ -1,7 +1,7 @@
 {
-  "name": "Mythara – Das digitale Rollenspiel",
+  "name": "Mythara – Das Strategie-Rollenspiel",
   "short_name": "Mythara",
-  "description": "Das digitale Rollenspiel für den Spieltisch: Kampagnen, Helden und Kämpfe im Browser.",
+  "description": "Das Strategie-Rollenspiel für den Spieltisch: rundenweise Taktik, Kampagnen mit Entscheidungen und 15 Helden im Browser.",
   "lang": "de",
   "start_url": "./index.html",
   "scope": "./",

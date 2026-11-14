@@ -214,11 +214,11 @@
       text: [
         "Rund um euch ist nur Wasser. Wer am Rand steht, steht den Kobolden am nächsten.",
         "Marit ist von der Winde zurückgewichen, das Beil in beiden Händen. „Kurbelt!“, ruft sie. „Solange wir mitten im Fluss stehen, kommen immer mehr!“",
-        "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Kobolde besiegt sind – oder sobald die Fähre das Ufer erreicht. Dafür muss jemand an der Winde in der Mitte des Decks stehen und dreimal seine Aktion einsetzen. Bis dahin klettern Kobolde nach.*",
+        "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Kobolde besiegt sind – oder sobald die Fähre das Ufer erreicht. Dafür muss jemand an der Winde stehen und viermal seine Aktion einsetzen. Kurbeln geht nur, wenn kein Kobold neben der Winde steht: Haltet sie frei. Bis dahin klettern Kobolde nach.*",
       ],
       kampf: { begegnung: "f_faehre", karte: FAEHRE,
         mechanik: {
-          ziele: [{ id: "winde", name: "Die Winde", art: "winde", x: 6, y: 2, runden: 3, aktion: "An der Winde kurbeln", fertigText: "Die Fähre ruckt ein Stück weiter", wirkung: { welleAus: "rand" } }],
+          ziele: [{ id: "winde", name: "Die Winde", art: "winde", x: 6, y: 2, runden: 4, ruhe: true, aktion: "An der Winde kurbeln", fertigText: "Die Fähre ruckt ein Stück weiter", wirkung: { welleAus: "rand" } }],
           sieg: { ziele: 1, art: "winde", text: "Die Fähre knirscht auf den Kies des Nordufers. Die Kobolde springen kreischend ab und verschwinden im Schilf." },
           wellen: [{ id: "rand", name: "Die Bordwand", kurz: "über die Bordwand", quellen: [[3, 2], [3, 6], [8, 2], [8, 6]], gegner: [["schattenkobold", 0.25, 2, 0.3]], alle: 2, ab: 2, max: 3, text: "Nasse Hände krallen sich an den Rand" }],
         },

@@ -431,12 +431,12 @@
       text: [
         "Moorleichen waten aus den Tümpeln, langsam, aber zäh. Über ihnen tanzen Irrlichter. Der Damm ist schmal: Haltet die Linie.",
         "Am Pfad stehen zwei Grablaternen, in denen ein grünes Licht brennt, das niemand angezündet hat. Wo ihr Schein hinfällt, bewegt sich das Wasser.",
-        "*Ein Kampf mit einem Ziel: Solange die Grablaternen brennen, steigen neue Ertrunkene auf. Ihr gewinnt, wenn alle Gegner besiegt sind – oder sobald beide Laternen gelöscht sind. Dafür muss je eine Figur daneben stehen und ihre Aktion einsetzen.*",
+        "*Ein Kampf mit einem Ziel: Solange die Grablaternen brennen, steigen neue Ertrunkene auf. Ihr gewinnt, wenn alle Gegner besiegt sind – oder sobald beide Laternen gelöscht sind. Dafür muss je eine Figur daneben stehen und zweimal ihre Aktion einsetzen. Beide Laternen stehen hinter den Ertrunkenen.*",
       ],
       kampf: { begegnung: "moor_tote", karte: TOTENPFAD,
         mechanik: {
-          ziele: [{ id: "g1", name: "Grablaterne am Damm", art: "grablaterne", x: 7, y: 2, runden: 1, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } },
-            { id: "g2", name: "Grablaterne am Tümpel", art: "grablaterne", x: 5, y: 6, runden: 1, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } }],
+          ziele: [{ id: "g1", name: "Grablaterne am Damm", art: "grablaterne", x: 9, y: 2, runden: 2, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } },
+            { id: "g2", name: "Grablaterne am Tümpel", art: "grablaterne", x: 9, y: 6, runden: 2, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } }],
           sieg: { ziele: 2, art: "grablaterne", text: "Als das zweite Licht erlischt, bleiben die Ertrunkenen stehen. Einer nach dem anderen lassen sie sich zurück ins Wasser sinken, langsam, fast dankbar." },
           wellen: [{ id: "tuempel", name: "Die Tümpel", kurz: "aus den Tümpeln", quellen: [[6, 4], [8, 5]], gegner: [["moorleiche", 0.2, 1, 0.3]], alle: 3, ab: 2, max: 3, text: "Im Schein der Grablaternen brodelt das Wasser" }],
         },

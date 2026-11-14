@@ -13,7 +13,7 @@ const { chromium } = require('playwright');
   const p = await neu({ width: 1280, height: 900 });
   await p.goto(BASE + '/abenteuer/index.html'); await p.evaluate(() => localStorage.clear()); await p.reload();
   check(await p.isVisible('#mythara') && !(await p.isVisible('#intro')), 'Start: Mythara-Bildschirm, Abenteuer-Titel verborgen');
-  check(await p.title() === 'Mythara – Das digitale Rollenspiel | Case Unlocked', 'Seitentitel Mythara');
+  check(await p.title() === 'Mythara – Das Strategie-Rollenspiel für den Spieltisch | Case Unlocked', 'Seitentitel Mythara');
   check(await p.evaluate(() => { const i = document.querySelector('.my-logo img'); return i.complete && i.naturalWidth > 0; }), 'Logo geladen');
   check(await p.isVisible('#my-name') && await p.isVisible('#my-gast-start'), 'Anmeldung und „Als Gast spielen“ sichtbar');
   // Einladungscode

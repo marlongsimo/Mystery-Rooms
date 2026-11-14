@@ -190,8 +190,8 @@
   /** Gegnerliste für eine Begegnung und Gruppengröße: [{ art, anzahl, tpFaktor }] */
   /* Zehn-Stufen-Modell: eigene Faktoren je Begegnung und Gruppengröße (Helden auf der empfohlenen Stufe der Kampagne,
    * Gegner mit Bedrohung). Geschrieben von tools/kampagne.js kaempfe <id> --kalibrieren --modell10 – nicht von Hand pflegen. */
-  /*SKALA10*/ const SKALA10 = {"w_speicher":{"3":1.43,"4":1.4,"5":1.93,"6":1.93}}; /*/SKALA10*/
-  /*SKALA10_HC*/ const SKALA10_HC = {}; /*/SKALA10_HC*/
+  /*SKALA10*/ const SKALA10 = {"w_speicher":{"3":1.43,"4":1.4,"5":1.93,"6":1.93},"w_muehle":{"3":1.78,"4":1.6,"5":2.67,"6":2.6},"w_unke":{"3":1.22,"4":1.55,"5":1.51,"6":1.78},"f_kette":{"3":3.14,"4":3.41,"5":3.41,"6":3.8},"f_faehre":{"3":7.89,"4":7.89,"5":7.89,"6":7.89},"f_furt":{"3":3.6,"4":3.8,"5":4.85,"6":6.36},"f_turm":{"3":2.46,"4":3.41,"5":3.6,"6":3.7},"moor_rand":{"3":2.04,"4":3.9,"5":4.72,"6":7.68},"moor_kroeten":{"3":0.96,"4":1.78,"5":1.88,"6":2.33},"moor_kroeten2":{"3":1.04,"4":1.4,"5":1.6,"6":1.88},"moor_tote":{"3":0.37,"4":0.77,"5":1.19,"6":1.51}}; /*/SKALA10*/
+  /*SKALA10_HC*/ const SKALA10_HC = {"w_speicher":{"3":0.75,"4":0.77,"5":1.15,"6":1.29},"w_muehle":{"3":1.12,"4":1.25,"5":1.64,"6":1.6},"w_unke":{"3":0.59,"4":0.77,"5":0.9,"6":0.9},"f_kette":{"3":2.67,"4":2.6,"5":2.9,"6":3.14},"f_faehre":{"3":7.89,"4":7.89,"5":7.89,"6":7.89},"f_furt":{"3":3.7,"4":3.32,"5":5.12,"6":7.48},"f_turm":{"3":2.09,"4":2.98,"5":2.9,"6":3.14}}; /*/SKALA10_HC*/
   const modell10 = () => Boolean(FD.STUFEN10 && FD.STUFEN10.aktiv);
   /** Bedrohung: so viele Stufen liegen die Gegner über ihrem bisherigen Wert (kann auch darunter liegen).
    *  Je Stufe +12 % Leben, je 2 Stufen +1 Angriff und +1 Schaden, je 3 Stufen +1 Rettungswurf-SG, je 4 Stufen +1 RK. */

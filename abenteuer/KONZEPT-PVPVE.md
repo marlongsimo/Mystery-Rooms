@@ -198,12 +198,12 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 
   - **Staffelung je Held** wie in den Kampagnen: Ein Held auf der Stufe der Partie bekommt den Grundwert, ein Held darunter mehr (bis ×2), ein Held darüber weniger (bis ×0,1). In der Aufstellung 10, 1, 1 (Stufe der Partie 4) bekommen die beiden Stufe-1-Helden also das Doppelte, der Stufe-10-Held fast nichts.
   - Vergeben wird auf dem Server, nur für Partien, die beide Geräte gleich gemeldet haben. Aufgabe und Abbruch zählen für den, der bleibt, als Sieg; wer aufgibt oder wegbleibt, bekommt nichts.
-  - **Obergrenze je Tag (festgelegt):** Nur die ersten **3 Partien** eines Tages bringen Belohnungen (Zahl ist ein Vorschlag). Weitere Partien lassen sich spielen und werden aufgezeichnet, geben aber weder XP noch die Chance auf einen Helden. So liegt der Fokus nicht auf dem Modus, und abgesprochene Partien lohnen sich kaum. Der Tag wechselt um Mitternacht (mitteleuropäische Zeit); gezählt wird auf dem Server.
+  - **Obergrenze je Tag (festgelegt):** Nur die ersten **5 Partien** eines Tages bringen Belohnungen, und jeder Held sammelt im Modus höchstens **150 XP am Tag**. Was darüber hinausginge, verfällt. Auf niedrigen Stufen greift zuerst die Zahl der Partien (Stufe 1: fünf Siege bringen 125 XP), auf hohen Stufen die XP-Grenze (Stufe 6: ein Sieg bringt schon 150 XP). Weitere Partien lassen sich spielen und werden aufgezeichnet, geben aber weder XP noch die Chance auf einen Helden. So liegt der Fokus nicht auf dem Modus, und abgesprochene Partien lohnen sich kaum. Der Tag wechselt um Mitternacht (mitteleuropäische Zeit); gezählt wird auf dem Server.
 - **Heldenchance (festgelegt):** Bei **jedem Sieg** besteht eine Chance von **8 %**, einen neuen Helden freizuschalten – wie nach einem neuen Kampagnen-Ende als **Wahl aus drei Helden, die noch fehlen**.
   - Gewürfelt wird auf dem Server, zusammen mit der XP-Vergabe. Das Angebot nutzt die vorhandene Heldenwahl (`rpg_hero_offers`, neue Art „duell“) und wartet wie die anderen Belohnungen auf der Startseite, wenn man nicht sofort wählt.
   - Zählt nur für Siege innerhalb der Obergrenze je Tag. Ein Sieg durch Aufgabe oder Abbruch des Gegners zählt nicht für die Heldenchance (Vorschlag), sonst ließe sie sich durch abgesprochenes Aufgeben abgreifen.
   - Wer schon alle 15 Helden hat, bekommt nichts stattdessen.
-  - **Einordnung:** Bei 3 Partien am Tag und der Hälfte davon gewonnen kommt im Schnitt etwa alle 8 Tage ein neuer Held dazu. Über die Kampagnen sind es insgesamt 17 Enden für 12 fehlende Helden. Der Modus ist damit ein zweiter, langsamerer Weg zur vollen Sammlung; die neuen Enden der Kampagnen bleiben der Hauptweg.
+  - **Einordnung:** Bei 5 Partien am Tag und der Hälfte davon gewonnen kommt im Schnitt etwa alle 5 Tage ein neuer Held dazu. Über die Kampagnen sind es insgesamt 17 Enden für 12 fehlende Helden. Der Modus ist damit ein zweiter, langsamerer Weg zur vollen Sammlung; die neuen Enden der Kampagnen bleiben der Hauptweg.
 - **Titel und Erfolge**, zum Beispiel „Artefaktträger“ oder „Wächterbezwinger“.
 - **Kosmetisches** erst, wenn es dafür überhaupt ein System im Spiel gibt.
 
@@ -227,7 +227,7 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 ## 12. Offene Entscheidungen
 
 1. **Derselbe Held auf beiden Seiten** erlaubt (Vorschlag) oder nicht?
-2. **Belohnungen im Modus:** Grundwert 25 × Stufe der Partie und Obergrenze von 3 Partien je Tag bestätigen. Soll ein Sieg durch Aufgabe des Gegners für die Heldenchance zählen?
+2. **Belohnungen im Modus:** Grundwert 25 × Stufe der Partie bestätigen. Die Obergrenze (5 Partien und 150 XP je Held am Tag) ist meine Lesart von „4–5 Partien, also 150 XP“ – bitte prüfen. Soll ein Sieg durch Aufgabe des Gegners für die Heldenchance zählen?
 3. **Verstecken:** für den Anfang hinnehmen, dass es technisch nicht vollständig geschützt ist?
 4. **Reihenfolge:** Soll der Modus vor oder nach dem Neubau von Hardcore kommen?
 5. **Auswertung:** nur für Admins (Vorschlag) oder später auch eine öffentliche Seite mit Siegquoten je Held?

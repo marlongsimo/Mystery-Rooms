@@ -146,7 +146,9 @@ const R = require('../js/regeln.js'), S = require('../js/szenen.js'), D = requir
   const endeArt = await p.evaluate(() => { const A = window.ABT.A(); return A && window.ABS.szene(A).art === 'ende' ? A.szene : null; });
   check(/^ende_|grauwacht_behaelt/.test(endeArt || ''), `Abschnitte 1 bis 3 im Browser durchgespielt bis „${ende.trim()}“ (${gesehen.size - 3} Szenen, ${kaempfe} Kämpfe)`);
   check(['Die Halle der Asche', 'Die Siegelkammer', 'Das Flüstern', 'Valdric'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Abschnitt 3: Halle der Asche, Siegelkammer, Flüstern und Endkampf gesehen');
-  check(beuteGenommen > 0 && gesehen.has('Aufstieg'), `Browser: Beute verteilt (${beuteGenommen}×) und Aufstiegsbildschirm gesehen`);
+  // Mit Heldenstufen (Migration 007) bringen die Helden ihre Stufe mit: Dann gibt es am Lagerfeuer keinen Aufstieg mehr
+  const m10 = await p.evaluate(() => Boolean(window.ABT.A() && window.ABT.A().modell10));
+  check(beuteGenommen > 0 && (m10 ? !gesehen.has('Aufstieg') : gesehen.has('Aufstieg')), `Browser: Beute verteilt (${beuteGenommen}×), ${m10 ? 'Zehn-Stufen-Modell: kein Aufstieg am Lagerfeuer' : 'Aufstiegsbildschirm gesehen'}`);
   check(raetselGeloest || /behält/.test(ende) || !gesehen.has('Das Glockenjoch'), 'Glockenrätsel über die Glocken am Tisch gelöst');
   check(['Der Abstieg', 'Der Schacht', 'Tam', 'Lagerfeuer in der Bibliothek', 'Anselms Tagebuch'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Abschnitt 2: Abstieg, Schacht, Tam, Bibliothek, Tagebuch gesehen');
   check(['Am Brunnen', 'Der bittere Brunnen', 'Der Klostergarten', 'Der Glockenturm', 'Nisk', 'Lagerfeuer im Kreuzgang'].every((t) => gesehen.has(t)) || /behält/.test(ende), 'Gespräch, geheime Entscheidung, Kampf, Abstimmung und Lagerfeuer gesehen');

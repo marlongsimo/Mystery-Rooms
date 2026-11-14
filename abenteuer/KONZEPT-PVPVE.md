@@ -8,7 +8,7 @@ Stand: 14. November 2026 · Status: **Konzept, noch nichts gebaut**
 - **Die Helden spielen auf ihrer erarbeiteten Stufe.** Aus den drei Helden wird eine Durchschnittsstufe berechnet. Der Gegner muss mit seinem Team innerhalb einer festen Spanne um diesen Wert liegen.
 - **Spielen über das Internet soll möglich sein.**
 - **Spanne ±1,0** bei der Teamstufe. **Keine Grenze je Held** – zunächst ist jede Aufstellung erlaubt, die im Durchschnitt passt.
-- **Belohnungen:** XP gestaffelt nach Stufe, bei Niederlage ein Drittel; Obergrenze je Tag; bei jedem Sieg 15 % Chance auf eine Heldenwahl aus drei fehlenden Helden (Abschnitt 10).
+- **Belohnungen:** XP gestaffelt nach Stufe, bei Niederlage ein Drittel; Obergrenze je Tag; bei jedem Sieg 8 % Chance auf eine Heldenwahl aus drei fehlenden Helden (Abschnitt 10).
 - **Kein großes Balancing vorab.** Der Modus startet mit den Helden, wie sie sind. Stattdessen zeichnet ein Auswertungswerkzeug jede Partie auf (Aufstellung, Stufen, Ergebnis). Nachgezogen wird, wenn die Zahlen es zeigen.
 
 ---
@@ -199,11 +199,11 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
   - **Staffelung je Held** wie in den Kampagnen: Ein Held auf der Stufe der Partie bekommt den Grundwert, ein Held darunter mehr (bis ×2), ein Held darüber weniger (bis ×0,1). In der Aufstellung 10, 1, 1 (Stufe der Partie 4) bekommen die beiden Stufe-1-Helden also das Doppelte, der Stufe-10-Held fast nichts.
   - Vergeben wird auf dem Server, nur für Partien, die beide Geräte gleich gemeldet haben. Aufgabe und Abbruch zählen für den, der bleibt, als Sieg; wer aufgibt oder wegbleibt, bekommt nichts.
   - **Obergrenze je Tag (festgelegt):** Nur die ersten **3 Partien** eines Tages bringen Belohnungen (Zahl ist ein Vorschlag). Weitere Partien lassen sich spielen und werden aufgezeichnet, geben aber weder XP noch die Chance auf einen Helden. So liegt der Fokus nicht auf dem Modus, und abgesprochene Partien lohnen sich kaum. Der Tag wechselt um Mitternacht (mitteleuropäische Zeit); gezählt wird auf dem Server.
-- **Heldenchance (festgelegt):** Bei **jedem Sieg** besteht eine Chance von **15 %**, einen neuen Helden freizuschalten – wie nach einem neuen Kampagnen-Ende als **Wahl aus drei Helden, die noch fehlen**.
+- **Heldenchance (festgelegt):** Bei **jedem Sieg** besteht eine Chance von **8 %**, einen neuen Helden freizuschalten – wie nach einem neuen Kampagnen-Ende als **Wahl aus drei Helden, die noch fehlen**.
   - Gewürfelt wird auf dem Server, zusammen mit der XP-Vergabe. Das Angebot nutzt die vorhandene Heldenwahl (`rpg_hero_offers`, neue Art „duell“) und wartet wie die anderen Belohnungen auf der Startseite, wenn man nicht sofort wählt.
   - Zählt nur für Siege innerhalb der Obergrenze je Tag. Ein Sieg durch Aufgabe oder Abbruch des Gegners zählt nicht für die Heldenchance (Vorschlag), sonst ließe sie sich durch abgesprochenes Aufgeben abgreifen.
   - Wer schon alle 15 Helden hat, bekommt nichts stattdessen.
-  - **Einordnung:** Bei 3 Partien am Tag und der Hälfte davon gewonnen kommt im Schnitt etwa alle 4 bis 5 Tage ein neuer Held dazu. Über die Kampagnen sind es insgesamt 17 Enden für 12 fehlende Helden. Der Modus wird damit zu einem zweiten, auf Dauer ergiebigeren Weg zur vollen Sammlung.
+  - **Einordnung:** Bei 3 Partien am Tag und der Hälfte davon gewonnen kommt im Schnitt etwa alle 8 Tage ein neuer Held dazu. Über die Kampagnen sind es insgesamt 17 Enden für 12 fehlende Helden. Der Modus ist damit ein zweiter, langsamerer Weg zur vollen Sammlung; die neuen Enden der Kampagnen bleiben der Hauptweg.
 - **Titel und Erfolge**, zum Beispiel „Artefaktträger“ oder „Wächterbezwinger“.
 - **Kosmetisches** erst, wenn es dafür überhaupt ein System im Spiel gibt.
 

@@ -32,9 +32,22 @@
 - **Verbesserungen im Kampf:** Alle 45 Verbesserungen und die drei neuen Fähigkeiten (Lähmender Bolzen, Pfeilregen, Glückssträhne) wirken im Zehn-Stufen-Modell. Einfache Änderungen (Einsätze, Reichweite, Ziele) stehen als Daten in `figuren.js` (`BESSER`), der Rest als Regel in `regeln.js` (`hs(f) >= Stufe`). Darians Fallensteller hat dabei zum ersten Mal eine Wirkung im Kampf bekommen. Test: `node abenteuer/tests/stufen.test.js`.
 - **Auslegung, wo das Konzept offen war:** „Furcht trifft zwei Ziele“ und „Befehl trifft zwei Ziele“ wirken auf das Ziel und die Gegner daneben (Radius 2 bzw. 1). Pfeilregen ist ein Flächenangriff mit GES-Rettung. „Todesstoß in jeder Runde“ heißt: Vorteil gegen Gegner, die in dieser Runde noch nicht gehandelt haben. Vex' Meisterschaft fällt keine Anführer und Bosse.
 
+- **Gegner wachsen mit (Bedrohung), Kampagnen nach der Tabelle oben.** Nur im Zehn-Stufen-Modell (Schalter aus):
+  - Die Gruppe spielt die ganze Kampagne auf ihrer Heldenstufe (bis zur Speicherung am Konto: auf der empfohlenen). Der Aufstieg am Lagerfeuer entfällt dann.
+  - Bedrohung eines Kampfes = empfohlene Stufe + Abschnitt − 1 (höchstens 10), gemessen gegen den Wert, auf den die Begegnung bisher ausgelegt war (alte Stufe 1/2/3 ≈ Heldenstufe 1/3/6). Sie kann auch negativ sein.
+  - Je Bedrohungsstufe +12 % Gegnermasse – zuerst als zusätzliche Gegner, bei Einzelgegnern als Leben. Je 2 Stufen +1 Angriff und Schaden, je 3 Stufen +1 Rettungswurf-SG, je 4 Stufen +1 RK (`js/regeln.js`: `st.bed`).
+  - Keine zähen Brocken: Hätte ein Gegner mehr als das 1,7-Fache seines Lebens, kommen mehr von seiner Art (höchstens doppelt so viele, höchstens 12; Bosse bleiben allein).
+  - Abgestimmte Faktoren je Kampf und Gruppengröße in `SKALA10` (`js/regeln.js`, Schlüssel „kampagne:szene“). Neu schreiben mit `node abenteuer/tools/kampagne.js kaempfe <id> 100 --modell10 --kalibrieren`, messen mit `… --modell10 --helden` (`--ab=N` verschiebt die Heldenstufe).
+  - Graufurt hat Schwierigkeit 2 (empfohlene Stufe 3).
+- **Messung (14. November 2026, Normal, 3–6 Helden auf empfohlener Stufe):** Siegquoten fast überall höchstens 10 Punkte neben dem Ziel. Heldenvergleich: Spanne zwischen bestem und schwächstem Helden 4 Punkte (Weidenhain), 5 (Moor), 8 (Graufurt, Grauwacht, Krone), 10 (Hochwacht).
+- **Hardcore ist vorerst abgeschaltet** (`figuren.js`: `HARDCORE = false`) und wird neu entwickelt, sobald alles andere steht. Im Zehn-Stufen-Modell ist Hardcore nicht abgestimmt.
+
+**Zum Feinjustieren (bewusst offen gelassen, „annähernd reicht“):**
+- Zu lange Kämpfe in der Simulation: Grauwacht Turm (bis 30 Runden bei 5–6 Helden) und Pfad (14–21 Runden); Krone Pilger und Frostkammer bei 5–6 Helden (15–27 Runden); Graufurt Furt und Moorrand bei 6 Helden (15–17 Runden). Mehrere davon werden über ein Ziel gewonnen, das die simulierten Helden kaum nutzen.
+- Zu leicht: Graufurt Fähre (93–98 %), Grauwacht Pfad bei 6 Helden (100 %).
+- Heldenvergleich: Orin, Vex und Faye liegen in den späteren Kampagnen meist hinten, Krieger und Morwen vorn (Ziel aus 6.3: höchstens 4 Punkte neben dem Schnitt).
+
 **Offen:**
-- Die Verbesserungen sind noch nicht gegeneinander abgestimmt (Heldenvergleich je Stufe nach Abschnitt 6.3).
-- Gegner mit Bedrohungsstufe und die Anpassung der Kampagnen an die Tabelle oben.
 - XP, Speicherung am Konto (Migration 007), Kampagnen-Segen statt Aufstieg am Lagerfeuer, Oberfläche zum Launch.
 
 ---

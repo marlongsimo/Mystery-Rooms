@@ -128,6 +128,7 @@ Eine Kampagne wirkt nur dann erzählerisch, wenn die Gruppe merkt, was ihre Ents
 | `folge: "…"` | Option, Probenergebnis, geheime Antwort, Kampfsieg | Kurze Zeile, was das bewirkt. Erscheint sofort im Gespräch oder als „Nachhall“ über der nächsten Szene, steht im Verlauf und in der Rückschau |
 | Text mit `↳ ` vorn | Absatz in `text` | Absatz, der nur wegen einer früheren Entscheidung dasteht. Wird als „Eure Spur“ hervorgehoben |
 | `wichtig: true` | Gesprächsoption | Mit ✦ markiert; wer weitergeht, ohne sie zu nutzen, wird gefragt |
+| `fragen: 3` | Gesprächsszene | Begrenzte Zeit: so viele Fragen sind möglich, goldene Punkte zählen herunter. `ueberzug: true` erlaubt weitere Fragen für je einen Schritt der Uhr, `draengt: "…"` ist der Satz, wenn die Zeit um ist, `frei: true` an einer Option zählt nicht mit. In solchen Gesprächen gibt es kein ✦ |
 | `kurz: "…"` | geheime Antwort | Kurzform für die Verteilung („2 × für das Dorf“). `verteilung: false` an der Szene blendet die Verteilung aus |
 | `h.geheimWer(A, szene, antwort)`, `h.namen(A, fids)` | in Texten | Greift später auf, wer im Geheimen was gesagt hat |
 | `rueckschau(A, h)` | Ende-Szene | „Was ihr getan habt“ in wenigen Zeilen. Ohne Angabe: die gesammelten Folgen |
@@ -154,3 +155,11 @@ Die Texte dazu stehen für alle 15 Helden in `js/heldenmomente.js`. Eine Kampagn
 | `h.feuerEcho(A, fid)` | Was die Figur am Feuer erzählt hat, für Ende und Rückschau |
 
 Jede Lage sollte je Kampagnenreihe nur einmal vorkommen, sonst wiederholen sich die Zeilen. Für neue Lagen in `heldenmomente.js` je Figur eine Zeile ergänzen.
+
+### Begrenzte Gesprächszeit
+
+Ohne Grenze stellt jede Gruppe alle Fragen, und alle erfahren dasselbe. Mit `fragen: N` (Faustregel: etwa zwei Drittel der Optionen) muss sich die Gruppe einigen. Worauf zu achten ist:
+
+- Kein Ende darf unerreichbar werden, nur weil die Gruppe die „falschen“ Fragen gestellt hat. Hängt ein Ende an einer Kette aus mehreren Fragen, entweder `ueberzug: true` setzen oder die Kette über zwei Gespräche verteilen.
+- Jede Frage sollte etwas Eigenes wert sein (Wissen, ein Vorteil, eine Beziehung). Eine Frage ohne Folge wählt niemand.
+- Der Satz in `draengt` erklärt, warum die Zeit um ist: Die Lage drängt, nicht das Spiel.

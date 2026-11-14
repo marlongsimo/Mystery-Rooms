@@ -142,11 +142,13 @@
     },
     festplatz: {
       art: "gespraech", abschnitt: 1, titel: "Der Dorfplatz", ort: "Weidenhain",
+      // Begrenzte Zeit: drei Fragen, danach kostet jede weitere eine Stunde der Nacht (im Speicher wird weitergefressen)
+      fragen: 3, ueberzug: true, draengt: "Im Speicher kracht ein Regal um. Hanne sieht euch an: „Wollt ihr reden oder helfen?“",
       text: (A, h) => [
         "Die Musik bricht ab. Hanne Kalk, die Bürgermeisterin, eine breite Frau mit Mehl an den Händen, kommt auf euch zu. „Ihr da. Ihr seht aus, als könntet ihr kämpfen. Könnt ihr?“",
         h.klasse(A, "kleriker") ? "Sie sieht das heilige Zeichen und nickt erleichtert." : "",
         "Hinter ihr steht die Magd, bleich, die Schürze voller Korn. Am Feuer hat sich die alte Frau nicht umgedreht.",
-        "*Hört euch um, bevor ihr geht. Was ihr hier erfahrt, verändert, was später geschieht. Mit ✦ markiert ist, was ihr nicht auslassen solltet.*",
+        "*Hört euch um, bevor ihr geht. Was ihr hier erfahrt, verändert, was später geschieht. Aber im Speicher wird gefressen: Die Zeit reicht nicht für alle.*",
       ],
       optionen: [
         { id: "was", text: "Hanne fragen, was passiert ist", wer: "Hanne", frage: "„Was ist im Speicher?“", wichtig: true,

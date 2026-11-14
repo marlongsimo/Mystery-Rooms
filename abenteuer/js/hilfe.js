@@ -131,7 +131,9 @@
       </ul>` },
     { id: "entscheiden", titel: "Entscheidungen und ihre Folgen", html: `
       <ul>
-        <li><b>Gespräche:</b> Ihr könnt in beliebiger Reihenfolge fragen. Ein <b>✦</b> markiert, was ihr nicht auslassen solltet. Mit dem goldenen Knopf geht es weiter; was ihr nicht gefragt habt, erfahrt ihr dann nicht mehr.</li>
+        <li><b>Gespräche:</b> Ihr könnt in beliebiger Reihenfolge fragen. Mit dem goldenen Knopf geht es weiter; was ihr nicht gefragt habt, erfahrt ihr dann nicht mehr.</li>
+        <li><b>Begrenzte Zeit:</b> In manchen Gesprächen zeigen goldene Punkte, wie viele Fragen noch gehen. Die Zeit reicht dann nicht für alle: Einigt euch, wen ihr fragt. Manchmal dürft ihr trotzdem weiterfragen, dann rückt die Uhr vor.</li>
+        <li><b>Ohne Zeitgrenze</b> markiert ein <b>✦</b>, was ihr nicht auslassen solltet.</li>
         <li><b>Abstimmungen:</b> Jede Person stimmt auf ihrem Handy ab, die Mehrheit entscheidet. Bei Gleichstand entscheidet der Würfel.</li>
         <li><b>Geheime Entscheidungen:</b> Jede Person entscheidet für sich. Die anderen sehen nur, wie die Gruppe insgesamt entschieden hat, nicht wer was gewählt hat. Manches davon kommt später ans Licht.</li>
         <li><b>„Das hat Folgen“:</b> Diese Zeile erscheint, wenn eine Entscheidung später zählt.</li>

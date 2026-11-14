@@ -1545,3 +1545,13 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .hilfe-marke.gut { color: #9fe39a; background: rgba(90,190,110,.14); border: 1px solid rgba(90,190,110,.45); }
 .hilfe-marke.schlecht { color: #f0a08c; background: rgba(220,90,70,.13); border: 1px solid rgba(220,90,70,.45); }
 @media (max-width: 560px) { .hilfe-text { font-size: 15px; } .hilfe-tabelle { font-size: 13.5px; } .hilfe-tabelle th, .hilfe-tabelle td { padding: 6px 6px; } }
+
+/* ---------- Gespräch mit begrenzter Zeit: Kerben und Preis ---------- */
+.fragen-zeit { display: flex; gap: 12px; align-items: center; margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(217,180,106,.35); background: rgba(217,180,106,.08); font: 400 14.5px/1.45 "Inter", sans-serif; color: #e2dac8; }
+.fragen-zeit b { color: #f6ecd6; }
+.fragen-zeit.um { border-color: rgba(220,120,90,.5); background: rgba(220,90,70,.09); }
+.fz-kerben { display: flex; gap: 6px; flex: none; }
+.fz-kerben i { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(180deg, #ffe6a8, #d9b46a); box-shadow: 0 0 8px rgba(255,200,110,.5); transition: .3s; }
+.fz-kerben i.weg { background: rgba(217,180,106,.14); box-shadow: none; border: 1px solid rgba(217,180,106,.3); }
+.btn.frage.kostet { border-color: rgba(220,120,90,.55); }
+.fz-preis { color: #f0a08c !important; }

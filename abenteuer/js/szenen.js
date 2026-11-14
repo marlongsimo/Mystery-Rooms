@@ -19,7 +19,10 @@
  *                       Erscheint sofort (im Gespräch) oder als „Nachhall“ über der nächsten Szene, steht im Verlauf
  *                       und in der Rückschau am Ende. Auch als Funktion (A, hilfen[, fid]) möglich.
  *   Text mit „↳ “ vorn  Absatz, der nur wegen einer früheren Entscheidung dasteht – wird als Folge hervorgehoben.
- *   wichtig: true       Gesprächsoption, die man nicht versehentlich überspringen soll.
+ *   wichtig: true       Gesprächsoption, die man nicht versehentlich überspringen soll (nur in Gesprächen ohne Zeitgrenze markiert).
+ *   fragen: 3           Gespräch mit begrenzter Zeit: so viele Fragen sind möglich (Zahl oder Funktion). Danach drängt die Lage weiter.
+ *                       ueberzug: true – weitere Fragen sind erlaubt, kosten aber je einen Schritt der Uhr.
+ *                       draengt: "…" – Satz, der erscheint, wenn die Zeit um ist. frei: true an einer Option – zählt nicht mit.
  *   rueckschau(A, h)    an einer Ende-Szene: Zeilen „Was ihr getan habt“. Ohne Angabe: die gesammelten Folgen.
  *   META.endeHinweise   { endeId: "Hinweis ohne Spoiler" } – am Ende für die Enden, die man nicht gesehen hat.
  */
@@ -163,10 +166,17 @@
     if (s.art === "raetsel") A.raetsel = { folge: [] };
     if (s.art === "kampf") anfuehrerFestlegen(A, typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf);
   }
+  /** Gespräch mit begrenzter Zeit: { max, genutzt, rest, ueberzug, draengt } – oder null, wenn die Szene keine Grenze hat */
+  function gespraechStand(A) {
+    const s = szene(A); if (!s || s.art !== "gespraech") return null;
+    const max = typeof s.fragen === "function" ? s.fragen(A, hilfen) : s.fragen; if (!(max > 0)) return null;
+    const genutzt = (A.gewaehlt[A.szene] || []).filter((id) => { const o = (s.optionen || []).find((x) => x.id === id); return o && !o.weiter && !o.frei; }).length;
+    return { max, genutzt, rest: Math.max(0, max - genutzt), ueberzug: Boolean(s.ueberzug), draengt: (typeof s.draengt === "function" ? s.draengt(A, hilfen) : s.draengt) || "" };
+  }
   /** Optionen, die gerade sichtbar sind */
   function optionen(A) {
-    const s = szene(A), schon = A.gewaehlt[A.szene] || [];
-    return (s.optionen || []).filter((o) => (!o.wenn || o.wenn(A, hilfen)) && !(s.art === "gespraech" && (!o.weiter || o.einmal) && schon.includes(o.id)));
+    const s = szene(A), schon = A.gewaehlt[A.szene] || [], st = gespraechStand(A), zu = st && st.rest === 0 && !st.ueberzug;
+    return (s.optionen || []).filter((o) => (!o.wenn || o.wenn(A, hilfen)) && !(s.art === "gespraech" && (!o.weiter || o.einmal) && schon.includes(o.id)) && !(zu && !o.weiter && !o.frei));
   }
   function ziel(A, w) { const z = typeof w.weiter === "function" ? w.weiter(A, hilfen) : w.weiter; if (z) geheZu(A, z); }
 
@@ -187,6 +197,9 @@
     const s = szene(A), o = optionen(A).find((x) => x.id === optId);
     if (!o) return { fehler: "Diese Möglichkeit gibt es gerade nicht." };
     if (s.art === "gespraech") {
+      // Zeit um, aber Nachfragen erlaubt: Jede weitere Frage kostet einen Schritt der Uhr
+      const st = gespraechStand(A);
+      if (st && st.rest === 0 && !o.weiter && !o.frei) { notiz(A, "Ihr nehmt euch die Zeit für eine weitere Frage.", "schlecht"); glocke(A, 1); }
       A.gewaehlt[A.szene].push(o.id);
       A.antwort = typeof o.antwort === "function" ? o.antwort(A, hilfen) : o.antwort || null;
       A.dialog = A.dialog || {}; A.dialog[A.szene] = A.dialog[A.szene] || [];
@@ -550,8 +563,9 @@
       glocke: A.glocke, stufe: A.stufe, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
       nachhall: A.nachhall || null,
       offen: s.art === "gespraech" ? optionen(A).filter((o) => !o.weiter).map((o) => ({ text: o.text, wichtig: Boolean(o.wichtig) })) : null,
+      fragen: gespraechStand(A),
       rueckschau: s.art === "ende" ? rueckschau(A, s) : null,
-      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wichtig: Boolean(o.wichtig), wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: sgVon(A, o.probe) } : null, weiter: Boolean(o.weiter) })),
+      optionen: optionen(A).map((o) => ({ id: o.id, text: o.text, wichtig: Boolean(o.wichtig), kostet: Boolean(!o.weiter && !o.frei && gespraechStand(A) && gespraechStand(A).rest === 0), wer: o.wer || null, probe: o.probe ? { name: o.probe.name, attr: typeof o.probe.attr === "string" ? o.probe.attr : "", sg: sgVon(A, o.probe) } : null, weiter: Boolean(o.weiter) })),
       stimmen: s.art === "wahl" ? A.stimmen : null,
       geheimFrage: s.art === "geheim" ? { frage: typeof s.frage === "string" ? s.frage : "Jede Person entscheidet für sich.", antworten: Array.isArray(s.antworten) ? s.antworten.map((a) => ({ id: a.id, text: a.text })) : [],
         proFigur: Object.fromEntries(lebende(A).map((f) => { const q = geheimFuer(A, f); return [f, { frage: q.frage, antworten: q.antworten.map((a) => ({ id: a.id, text: a.text })) }]; })), fertig: Object.keys(A.geheim) } : null,

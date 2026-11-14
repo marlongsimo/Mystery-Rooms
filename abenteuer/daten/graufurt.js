@@ -131,12 +131,14 @@
     },
     faehrhaus: {
       art: "gespraech", abschnitt: 1, titel: "Das Fährhaus", ort: "Graufurt",
+      // Begrenzte Zeit: drei Fragen, danach kostet jede weitere einen Schritt des Pegels
+      fragen: 3, ueberzug: true, draengt: "Draußen klatscht das Wasser gegen den Anleger. Marit steht schon an der Tür.",
       text: (A, h) => [
         "Marit Wehrlin, die Fährfrau, öffnet die Tür nur einen Spalt. Sie hat ein Beil in der Hand. Als sie sieht, dass ihr keine Kobolde seid, lässt sie euch herein.",
         "„Mein Sohn ist drüben“, sagt sie, bevor ihr fragen könnt. „Pim. Elf Jahre. Er wollte die Kette flicken, gestern Nacht. Dann kamen sie und haben ihn mitgenommen. Rüber, zum alten Zollturm.“",
         h.klasse(A, "kleriker") ? "Sie sieht das heilige Zeichen an eurem Hals und atmet aus. „Gut. Vielleicht hilft das gegen die da.“" : "",
         "Auf dem Tisch stehen zwei Teller. Einer ist unberührt. Das Beil legt sie nicht weg.",
-        "*Hört euch um, bevor ihr geht. Mit ✦ markiert ist, was später einen Unterschied macht.*",
+        "*Hört euch um, bevor ihr geht. Was ihr hier erfahrt, zählt später. Aber der Fluss steigt: Die Zeit reicht nicht für alles.*",
       ],
       optionen: [
         { id: "kobolde", text: "Nach den Kobolden fragen", wer: "Marit", frage: "„Wer hat ihn geholt?“",
@@ -285,10 +287,12 @@
     },
     pim: {
       art: "gespraech", abschnitt: 1, titel: "Pim", ort: "Der Zollturm",
+      // Pim ist erschöpft: zwei Fragen, mehr schafft er nicht
+      fragen: 2, draengt: "Pim gähnt mitten im Satz und reibt sich die Augen. Mehr bekommt ihr heute nicht aus ihm heraus.",
       text: (A) => [
         "Pim reibt sich die Handgelenke und sieht sich im Turm um, als gehöre er jetzt ihm. Auf dem Tisch liegen Brannicks Münzen, in umgestürzten Stapeln. Mitten darin liegt etwas Graues, das nicht dazugehört.",
         A.merker.zeichen_gesehen ? "↳ Ein Stück grauer Stein. Dasselbe Zeichen wie am Ufer: ein Kreis mit sieben Strichen. Die beiden Stücke passen aneinander." : "Ein Stück grauer Stein, so groß wie eine Hand. Ein Zeichen ist hineingeritzt: ein Kreis mit sieben Strichen.",
-        "*Pim war eine Nacht lang hier. Er hat mehr gesehen als ihr.*",
+        "*Pim war eine Nacht lang hier. Er hat mehr gesehen als ihr. Aber er hält sich kaum noch auf den Beinen.*",
       ],
       optionen: [
         { id: "kobolde", text: "Pim fragen, was die Kobolde hier wollten", wer: "Pim", frage: "„Was haben sie hier gemacht?“",

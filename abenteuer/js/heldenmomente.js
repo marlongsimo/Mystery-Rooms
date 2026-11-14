@@ -244,6 +244,314 @@
       },
     },
   };
+  /* ---------- Zweite und dritte Fragerunde, weitere Lagen ----------
+   *   nacht   eine Frage, die sich die Figur in einer stillen Nacht selbst stellt (aus ihrer „Versuchung“)
+   *   weg     warum sie morgen weitergeht
+   *   Lagen:  wasser (ein Fluss, eine Überfahrt) · gefangen (jemand wird befreit) · tote (Gräber, Wiedergänger)
+   *           kaelte (Frost, Erschöpfung) · schutz (jemand Schwächeres hängt an euch) · macht (etwas Mächtiges in Reichweite) */
+  const MEHR = {
+    schildwaechter: {
+      nacht: { frage: "Die Glut ist fast aus. Du denkst an die, die du verloren hast. Wenn dir jemand anböte, einen von ihnen zurückzuholen: Würdest du nach dem Preis fragen?",
+        antworten: [
+          { id: "nein", text: "Nein. Ich würde ihn holen.", echo: "Torvald hat in der Nacht lange wach gelegen. Am Morgen hat er gesagt, es gebe Dinge, bei denen er nicht nach dem Preis fragen würde. Er hat es wie eine Warnung gesagt." },
+          { id: "ja", text: "Ja. Und ich hätte Angst vor der Antwort.", echo: "Torvald hat in der Nacht lange wach gelegen. Am Morgen hat er gesagt, man müsse die Toten tot sein lassen. Es hat ihn sichtlich etwas gekostet." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "diese", text: "Wegen der Leute neben mir. Diesmal verliere ich keinen.", echo: "Torvald hat gesagt, er gehe weiter, damit diesmal alle zurückkommen. Er hat jeden von euch dabei angesehen, einzeln." },
+          { id: "schuld", text: "Weil ich etwas gutzumachen habe.", echo: "Torvald hat gesagt, er habe etwas gutzumachen. Was, hat er nicht gesagt. Aber er trägt seinen Schild seither, als wöge er weniger." },
+        ] },
+      stimmen: {
+        wasser: "Torvald geht als Letzter aufs Wasser. In Kette und Schild schwimmt niemand, das weiß er genau. Er geht trotzdem.",
+        gefangen: "Torvald bricht den Riegel mit der Schildkante, bevor jemand nach einem Schlüssel suchen kann. „Hinter mich“, sagt er. Er sagt es zu jedem, den er befreit.",
+        tote: "Torvald liest die Namen auf den Steinen, einen nach dem anderen, halblaut. Bei manchen bleibt er stehen, als kenne er sie.",
+        kaelte: "Torvalds Kettenhemd ist so kalt, dass es brennt. Er zieht es nicht aus. Er stellt sich nur so, dass er den anderen den Wind nimmt.",
+        schutz: "Torvald geht einen halben Schritt schräg vor ihr, den Schild auf ihrer Seite. Er hat es nicht entschieden. Er steht einfach immer dort.",
+        macht: "Torvald sieht es an und denkt nicht an sich. Er denkt an eine Tür, die er einmal zu spät erreicht hat. Dann macht er die Faust zu.",
+      },
+    },
+    berserker: {
+      nacht: { frage: "Die Glut ist fast aus. Du erinnerst dich an das letzte Mal, als du Angst hattest. Fehlt sie dir?",
+        antworten: [
+          { id: "ja", text: "Ja. Wer keine Angst hat, hat auch sonst nicht mehr viel.", echo: "Ragnar hat in der Nacht gesagt, er vermisse es, sich zu fürchten. Niemand wusste, was man darauf sagt. Er hat es auch nicht erwartet." },
+          { id: "nein", text: "Nein. Ohne sie bin ich schneller.", echo: "Ragnar hat in der Nacht gesagt, Angst mache nur langsam. Dann hat er sehr lange die eigenen Hände angesehen, ob sie zittern. Sie haben nicht gezittert." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "kampf", text: "Weil dort etwas ist, das zurückschlägt.", echo: "Ragnar hat gesagt, er gehe weiter, weil dort endlich etwas warte, das sich wehrt. Er hat sich darauf gefreut. Das war das Unheimliche daran." },
+          { id: "ihr", text: "Weil ihr ohne mich draufgeht.", echo: "Ragnar hat gesagt, ohne ihn kämt ihr nicht weit. Er hat gegrinst dabei, und zum ersten Mal sah es nicht nach Kampf aus." },
+        ] },
+      stimmen: {
+        wasser: "Ragnar steht am Bug und lässt sich das Wasser ins Gesicht schlagen. „Kalt“, sagt er zufrieden, als wäre das ein Geschenk.",
+        gefangen: "Ragnar zerschlägt die Kette mit zwei Hieben und hält dann inne, die Axt noch erhoben, weil der Befreite vor ihm zurückweicht. Er lässt die Axt sehr langsam sinken.",
+        tote: "Ragnar hat keine Angst vor den Toten. Er betrachtet sie eher neidisch: Die haben es hinter sich.",
+        kaelte: "Ragnar hat den Mantel offen. „Solange es wehtut, erfriert man nicht“, sagt er. Seine Lippen sind blau.",
+        schutz: "Ragnar ist kein Beschützer. Er stellt sich einfach dorthin, wo es zuerst kracht. Dass sie dadurch hinter ihm steht, scheint ihn selbst zu überraschen.",
+        macht: "Ragnar streckt die Hand aus und zieht sie zurück. „Das fühlt sich an wie kurz vor der Raserei“, sagt er. „Nur ohne das Danach.“",
+      },
+    },
+    duellant: {
+      nacht: { frage: "Die Glut ist fast aus. Du denkst an den einen Kampf, den du verloren hast. Würdest du ihn tauschen gegen alle, die du gewonnen hast?",
+        antworten: [
+          { id: "ja", text: "Sofort.", echo: "Isolde hat in der Nacht gesagt, sie gäbe jeden Sieg für den einen her, der ihr fehlt. Sie hat dabei die Klinge gewetzt, die längst scharf war." },
+          { id: "nein", text: "Nein. Die Niederlage hat mich besser gemacht als jeder Sieg.", echo: "Isolde hat in der Nacht gesagt, ihre eine Niederlage sei das Beste, das ihr je beigebracht wurde. Sie klang, als höre sie sich das selbst zum ersten Mal sagen." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "gegner", text: "Weil dort ein Gegner wartet, der es wert ist.", echo: "Isolde hat gesagt, sie gehe weiter, weil dort ein würdiger Gegner warte. Sie hat die Handschuhe dabei sehr sorgfältig angezogen." },
+          { id: "wort", text: "Weil ich es zugesagt habe.", echo: "Isolde hat gesagt, sie habe ihr Wort gegeben, und mehr Grund brauche sie nicht. Es war die kürzeste Antwort am Feuer und die, die niemand angezweifelt hat." },
+        ] },
+      stimmen: {
+        wasser: "Isolde steht auf dem schwankenden Holz, als wäre es eine Fechtbahn: Gewicht tief, Knie weich. Sie ist die Einzige, die nicht nach einem Halt greift.",
+        gefangen: "Isolde durchtrennt die Fesseln mit einem einzigen Schnitt und ritzt dabei nicht einmal die Haut. Sie nickt dem Befreiten zu, knapp, wie nach einem Gefecht.",
+        tote: "Isolde erkennt an den Knochen, wie diese Leute gestorben sind. Die meisten von hinten. Das macht sie zornig.",
+        kaelte: "Isolde bewegt die Finger der Schwerthand, unablässig, damit sie nicht steif werden. Sie hat schon Kämpfe gesehen, die an kalten Fingern verloren gingen.",
+        schutz: "Isolde bringt ihr im Gehen bei, wie man fällt, ohne sich etwas zu brechen. „Das Erste, was man lernt“, sagt sie. „Und das Letzte, was man vergisst.“",
+        macht: "Isolde betrachtet es wie einen Gegner, der zu leicht zu schlagen wäre. „Was man geschenkt bekommt“, sagt sie, „hat man nicht.“",
+      },
+    },
+    gelehrter: {
+      nacht: { frage: "Die Glut ist fast aus. Wenn es ein Wissen gäbe, das du nie wieder vergessen und nie jemandem sagen könntest: Würdest du die Seite umblättern?",
+        antworten: [
+          { id: "ja", text: "Ja. Ich könnte nicht anders.", echo: "Lyra hat in der Nacht zugegeben, dass sie jede Seite umblättern würde, auch die, vor der man sie warnt. Sie hat sich nicht dafür entschuldigt." },
+          { id: "nein", text: "Nein. Wissen, das man nicht teilen kann, ist nur eine Last.", echo: "Lyra hat in der Nacht gesagt, Wissen ohne jemanden, dem man es erzählen kann, sei nichts wert. Sie hat dabei das Buch zugeklappt und euch angesehen." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "wissen", text: "Weil ich wissen muss, was dort ist.", echo: "Lyra hat gesagt, sie gehe weiter, weil sie es wissen müsse. Nicht wolle. Müsse. Sie hat den Unterschied selbst betont." },
+          { id: "zeuge", text: "Weil jemand aufschreiben muss, was wirklich geschehen ist.", echo: "Lyra hat gesagt, jemand müsse aufschreiben, was hier wirklich geschieht, bevor es andere falsch erzählen. Seitdem achtet ihr ein wenig darauf, was ihr in ihrer Nähe sagt." },
+        ] },
+      stimmen: {
+        wasser: "Lyra rechnet halblaut: Strömung, Breite, Gewicht. Das Ergebnis behält sie für sich. Es würde niemanden beruhigen.",
+        gefangen: "Lyra fragt den Befreiten als Erstes nach seinem Namen und schreibt ihn auf. „Damit es jemand weiß“, sagt sie, „falls es wieder passiert.“",
+        tote: "Lyra liest die Inschriften und stockt. Zwei der Jahreszahlen können nicht stimmen. Oder die Toten liegen nicht dort, wo ihre Steine stehen.",
+        kaelte: "Lyra kann das Buch nicht mehr aufschlagen, die Finger gehorchen nicht. Es ist das erste Mal seit Jahren, dass sie eine Stunde lang nichts liest. Sie zählt stattdessen Schritte.",
+        schutz: "Lyra erklärt ihr unterwegs die Sternbilder, auch die, die man gerade nicht sieht. Es dauert eine Weile, bis ihr merkt, dass sie das nicht für sich tut.",
+        macht: "Lyra liest die Zeichen darauf, und ihre Lippen bewegen sich mit. Jemand muss sie am Ärmel zurückziehen. Sie bedankt sich nicht. Später schon.",
+      },
+    },
+    elementarist: {
+      nacht: { frage: "Die Glut ist fast aus. Du könntest sie mit einem Gedanken wieder anfachen. Hast du Angst, dass du eines Tages nicht mehr aufhören kannst?",
+        antworten: [
+          { id: "ja", text: "Jeden Tag.", echo: "Vaelin hat in der Nacht gesagt, er fürchte den Tag, an dem sein Feuer nicht mehr aufhört. Er hat die Glut ausgehen lassen und im Dunkeln gesessen, um es sich zu beweisen." },
+          { id: "nein", text: "Nein. Es gehört mir, nicht umgekehrt.", echo: "Vaelin hat in der Nacht gesagt, das Feuer gehorche ihm und nicht er dem Feuer. In seiner Hand hat dabei etwas geglommen, das er nicht bemerkt hat." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "brennen", text: "Weil dort etwas ist, das brennen muss.", echo: "Vaelin hat gesagt, er gehe weiter, weil dort etwas warte, das brennen müsse. Er hat nicht gesagt, ob er das Ding meint oder sich selbst." },
+          { id: "licht", text: "Weil ihr dort unten Licht braucht.", echo: "Vaelin hat gesagt, jemand müsse euch dort leuchten. Er hat dabei eine Flamme hochgehalten, klein und ruhig, wie man sie sonst nie bei ihm sieht." },
+        ] },
+      stimmen: {
+        wasser: "Vaelin hasst Wasser. Er sitzt genau in der Mitte, die Hände in den Ärmeln, und redet kein Wort, bis wieder Land unter dem Kiel ist.",
+        gefangen: "Vaelin legt zwei Finger an das Schloss. Es glüht kurz auf und fällt als Tropfen zu Boden. „Schlüssel“, sagt er, „werden überschätzt.“",
+        tote: "Vaelin würde sie am liebsten alle verbrennen, sauber, wie es sich gehört. Dass hier niemand verbrannt wurde, findet er das eigentlich Unheimliche.",
+        kaelte: "Vaelin hält die Hände um eine Flamme, die kaum größer ist als ein Daumennagel. Mehr gibt die Kälte nicht her. Er teilt sie reihum.",
+        schutz: "Vaelin lässt ein Fünkchen neben ihr herschweben, auf Schulterhöhe. „Wenn es ausgeht, ruf“, sagt er. Es geht nicht aus.",
+        macht: "Vaelin spürt es, bevor er es sieht: wie Hitze hinter einer Tür. Er weicht einen Schritt zurück. Er weiß am besten, was mit Dingen geschieht, die nicht aufhören.",
+      },
+    },
+    schattenmagier: {
+      nacht: { frage: "Die Glut ist fast aus, und im Halbdunkel sieht dich niemand genau. Gibt es noch jemanden, der weiß, wer du wirklich bist?",
+        antworten: [
+          { id: "nein", text: "Nein. Und so ist es sicherer.", echo: "Morwen hat in der Nacht gesagt, es wisse niemand mehr, wer sie sei, und das sei gut so. Sie saß dabei näher am Feuer als sonst." },
+          { id: "einer", text: "Einen. Ich habe ihn lange nicht gesehen.", echo: "Morwen hat in der Nacht von jemandem gesprochen, der sie kennt, wie sie ist. Für die Dauer dieses Satzes hat ihr Gesicht nicht geflimmert." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "sehen", text: "Weil dort etwas ist, das sich besser verbirgt als ich.", echo: "Morwen hat gesagt, sie wolle sehen, was sich dort verbirgt. Bisher habe sich noch nichts vor ihr verstecken können. Es klang nach Neugier und ein wenig nach Kränkung." },
+          { id: "gesehen", text: "Weil ihr mich angesehen habt und geblieben seid.", echo: "Morwen hat gesagt, ihr hättet sie angesehen und wärt trotzdem geblieben. Mehr hat sie nicht gesagt. Sie hat danach eine ganze Stunde lang keine Gestalt gewechselt." },
+        ] },
+      stimmen: {
+        wasser: "Morwen sieht ins Wasser und findet kein Spiegelbild, das ihr gefällt. Sie lässt es so, dieses eine Mal.",
+        gefangen: "Der Befreite blinzelt Morwen an und fragt, ob sie wirklich da sei. „Meistens“, sagt sie und hält ihm die Hand hin, damit er es prüfen kann.",
+        tote: "Morwen spürt die Toten wie einen Zug im Nacken. Sie kennt Schatten. Diese hier sind keine: Sie wollen gesehen werden.",
+        kaelte: "Morwen legt ein Trugbild von Feuer über das Lager. Es wärmt nicht. Aber für eine Weile vergisst der Körper, dass er friert, und das ist auch etwas wert.",
+        schutz: "Morwen lässt sie für die Augen der anderen ein wenig größer aussehen, ein wenig breiter in den Schultern. „Die meisten greifen nicht an, was stark aussieht“, sagt sie.",
+        macht: "Morwen sieht, was es wirklich ist, unter dem, was es zeigt. Sie sagt es nicht. Aber sie stellt sich zwischen das Ding und denjenigen von euch, der es am längsten ansieht.",
+      },
+    },
+    schattenlaeufer: {
+      nacht: { frage: "Die Glut ist fast aus. Du bist als Einziger noch wach, wie immer. Wenn dich morgen niemand mehr finden könnte, nie wieder: Wäre das Freiheit?",
+        antworten: [
+          { id: "ja", text: "Ja. Das wollte ich immer.", echo: "Darian hat in der Nacht gesagt, unauffindbar zu sein sei das Einzige, was er sich je gewünscht habe. Er hat dabei mitten im Feuerschein gesessen, wo ihn jeder sah." },
+          { id: "nein", text: "Nein. Nicht mehr.", echo: "Darian hat in der Nacht gesagt, er wolle gefunden werden können, wenn es darauf ankommt. Er hat es so leise gesagt, dass es fast nicht zählte. Es hat trotzdem jeder gehört." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "weg", text: "Weil hinter mir nichts ist, wohin ich zurück könnte.", echo: "Darian hat gesagt, er gehe weiter, weil es für ihn kein Zurück gebe. Er hat es ohne Bitterkeit gesagt, wie eine Wegbeschreibung." },
+          { id: "voraus", text: "Weil jemand vorausgehen muss, und mich hört keiner.", echo: "Darian hat gesagt, er gehe voraus, weil ihn niemand höre. Er ist dann wirklich vorausgegangen, und zum ersten Mal hat er sich nach euch umgedreht." },
+        ] },
+      stimmen: {
+        wasser: "Darian ist plötzlich am anderen Ende, ohne dass jemand gesehen hat, wie er über das nasse Holz gekommen ist. Er hält das Seil schon in der Hand.",
+        gefangen: "Das Schloss ist offen, bevor jemand merkt, dass Darian sich davor gekniet hat. Er steckt die Dietriche weg und sagt nichts. Der Befreite auch nicht. Sie verstehen sich.",
+        tote: "Darian geht an den Gräbern vorbei, ohne einen Stein zu berühren und ohne einen Laut. Die Toten sind die Einzigen, vor denen er sich nie verstecken musste.",
+        kaelte: "Darian ist die Kälte gewohnt; wer nie am Feuer sitzt, lernt sie kennen. Er gibt seinen Mantel weiter, wortlos, und tut, als brauche er ihn nicht.",
+        schutz: "Sie merkt erst nach einer Stunde, dass Darian die ganze Zeit drei Schritte hinter ihr geht. Sie erschrickt. Dann geht sie ruhiger als vorher.",
+        macht: "Darians Finger zucken. Es ist die Sorte Ding, die man einsteckt und mit der man verschwindet, für immer. Er schiebt die Hände in die Taschen und lässt sie dort.",
+      },
+    },
+    trickser: {
+      nacht: { frage: "Die Glut ist fast aus. Wenn dir von morgen an jeder alles glauben würde: Wüsstest du dann noch, wer dich wirklich mag?",
+        antworten: [
+          { id: "egal", text: "Wäre mir gleich. Glauben reicht.", echo: "Silra hat in der Nacht gesagt, ihr reiche es, wenn man ihr glaubt, gemocht werden müsse sie nicht. Niemand hat ihr das geglaubt, und darüber war sie seltsam erleichtert." },
+          { id: "nein", text: "Nein. Und das wäre das Schlimmste.", echo: "Silra hat in der Nacht gesagt, sie wolle lieber einmal durchschaut als immer geglaubt werden. Es war der einzige Satz des Abends, den sie nicht mit einem Witz beendet hat." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "geschichte", text: "Weil das die beste Geschichte wird, die ich je erzählt habe.", echo: "Silra hat gesagt, sie gehe weiter, weil daraus eine Geschichte werde, die ihr niemand glauben wird. Sie probt schon die ersten Sätze." },
+          { id: "wahr", text: "Weil ich bei euch nicht lügen muss.", echo: "Silra hat gesagt, bei euch müsse sie nicht lügen. Dann hat sie sofort behauptet, das sei gelogen gewesen. Es war nicht gelogen." },
+        ] },
+      stimmen: {
+        wasser: "Silra erzählt während der ganzen Überfahrt eine Geschichte von einem Fährmann, der nicht schwimmen konnte. Sie hat kein gutes Ende. Sie erfindet eines, als sie die Gesichter sieht.",
+        gefangen: "Silra hat den Schlüssel längst in der Hand; niemand weiß, wem sie ihn abgenommen hat. „Der hing da so rum“, sagt sie.",
+        tote: "Silra macht einen Witz über die Toten, zu laut. Dann entschuldigt sie sich, leise, bei einem der Steine.",
+        kaelte: "Silra behauptet, ihr sei warm. Es ist die schlechteste Lüge, die sie je erzählt hat. Ihre Zähne klappern mitten im Satz.",
+        schutz: "Silra bringt ihr bei, wie man eine Münze verschwinden lässt. Nutzlos, hier draußen. Aber sie übt es stundenlang und denkt dabei an nichts anderes.",
+        macht: "Silra pfeift durch die Zähne. „Damit würde mir jeder alles glauben.“ Sie überlegt. „Dann wüsste ich nie wieder, ob ich gut bin.“ Sie lässt es liegen.",
+      },
+    },
+    assassine: {
+      nacht: { frage: "Die Glut ist fast aus. Wenn du einen Namen nennen könntest, und der Mensch wäre fort, ohne Spur, ohne Schuld: Hättest du einen Namen?",
+        antworten: [
+          { id: "ja", text: "Ja. Seit Jahren.", echo: "Vex hat in der Nacht zugegeben, dass er seit Jahren einen Namen mit sich trägt. Er hat ihn nicht genannt. Aber er hat gesagt, dass er ihn nicht mehr nennen will." },
+          { id: "nein", text: "Nein. Meine Arbeit mache ich selbst.", echo: "Vex hat in der Nacht gesagt, was er zu tun habe, tue er mit eigenen Händen und trage es auch selbst. Für seine Verhältnisse war das beinahe ein Bekenntnis." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "auftrag", text: "Weil es der erste Auftrag ist, den ich mir selbst gegeben habe.", echo: "Vex hat gesagt, dies sei der erste Auftrag, für den ihn niemand bezahle. Er hat hinzugefügt, er wisse noch nicht, wie man so etwas zu Ende bringt." },
+          { id: "zaehlen", text: "Weil ich wissen will, ob ich auch etwas retten kann.", echo: "Vex hat gesagt, er wolle wissen, ob seine Hände auch etwas anderes können. Dann hat er die Klinge gereinigt, wie jeden Abend, nur langsamer." },
+        ] },
+      stimmen: {
+        wasser: "Vex setzt sich mit dem Rücken zur Bordwand, wo er alle sieht. Gewohnheit. Erst auf halber Strecke merkt er, dass er zum ersten Mal niemanden im Boot als Ziel betrachtet.",
+        gefangen: "Vex schneidet die Fesseln durch, ohne dem Befreiten in die Augen zu sehen. Er hat schon Leute losgebunden. Nie, damit sie weglaufen konnten.",
+        tote: "Vex zählt die Gräber, ohne es zu wollen. Er zählt immer. Die Zahl hier ist kleiner als seine eigene.",
+        kaelte: "Vex friert nicht sichtbar. Wer lange stillhalten musste, in Dachsparren, in Schnee, verlernt das Zittern. Er merkt nur, dass er den Griff seines Messers nicht mehr spürt.",
+        schutz: "Vex zeigt ihr, wohin man sticht, wenn man nur einen Versuch hat. Dann zeigt er ihr, wohin man läuft, und sagt, das Zweite sei wichtiger.",
+        macht: "Vex sieht es an und weiß sofort, wen er damit töten würde. Das Bild ist so klar, dass er einen Schritt zurücktritt.",
+      },
+    },
+    lichtbringer: {
+      nacht: { frage: "Die Glut ist fast aus. Du denkst an jemanden, den dein Licht nicht retten konnte. Wenn du diesen Tod rückgängig machen könntest und dafür ein anderer Unschuldiger stürbe: Würdest du wählen?",
+        antworten: [
+          { id: "nein", text: "Nein. Das steht mir nicht zu.", echo: "Elara hat in der Nacht gesagt, es stehe ihr nicht zu, ein Leben gegen ein anderes zu wiegen. Sie hat dabei geweint, ohne es zu verbergen." },
+          { id: "ja", text: "Ich weiß es nicht. Und das erschreckt mich.", echo: "Elara hat in der Nacht zugegeben, sie wisse nicht, was sie täte, wenn sie einen Tod ungeschehen machen könnte. Sie hat danach lange gebetet, und es klang wie eine Frage." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "licht", text: "Weil dort jemand im Dunkeln sitzt.", echo: "Elara hat gesagt, sie gehe weiter, weil dort unten jemand im Dunkeln sei. Sie meinte damit nicht nur die, die ihr sucht." },
+          { id: "pruefung", text: "Weil ich wissen muss, ob mein Licht auch dort noch brennt.", echo: "Elara hat gesagt, sie müsse wissen, ob ihr Licht auch an so einem Ort noch brenne. Es war das erste Mal, dass sie einen Zweifel laut ausgesprochen hat." },
+        ] },
+      stimmen: {
+        wasser: "Elara hält ihr Zeichen über das Wasser. Es spiegelt sich nicht. Sie spricht den Segen trotzdem zu Ende, etwas schneller als sonst.",
+        gefangen: "Elara kniet sich hin, noch bevor die Fesseln ab sind, und sieht zuerst nach den Handgelenken. „Es ist vorbei“, sagt sie. Sie sagt es so, dass man es glaubt.",
+        tote: "Elara spricht ein Gebet für die Toten. Mitten im Satz hält sie inne: Irgendwo hat jemand mitgesprochen.",
+        kaelte: "Elaras Licht wärmt nicht, das hat es nie. Aber alle rücken näher, als sie es entzündet, und das wärmt dann doch.",
+        schutz: "Elara geht neben ihr und fragt nicht, wie es ihr geht. Sie fragt, was sie als Kind am liebsten gegessen hat. Zwei Meilen lang reden sie über Apfelkuchen.",
+        macht: "Elaras Zeichen wird heiß an ihrer Brust. Sie nimmt es in die Hand und hält es fest, bis die Knöchel weiß sind. „Nicht ansehen“, sagt sie. „Bitte.“",
+      },
+    },
+    wanderheiler: {
+      nacht: { frage: "Die Glut ist fast aus. Wenn du jede Wunde schließen könntest, und jede davon ginge bei dir selbst wieder auf: Wie lange würdest du es tun?",
+        antworten: [
+          { id: "immer", text: "Solange ich stehen kann.", echo: "Brogar hat in der Nacht gesagt, er würde jede fremde Wunde nehmen, solange er noch stehen könne. Niemand hat daran gezweifelt, und genau das hat euch Sorgen gemacht." },
+          { id: "nicht", text: "Gar nicht. Ein toter Heiler heilt niemanden.", echo: "Brogar hat in der Nacht gesagt, ein Heiler, der sich aufopfert, sei am nächsten Tag keiner mehr. Er hat es wie etwas gesagt, das er auf die harte Art gelernt hat." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "wunden", text: "Weil ihr dort bluten werdet.", echo: "Brogar hat gesagt, er gehe weiter, weil ihr dort unten bluten werdet und jemand das Nähzeug dabeihaben müsse. Er hat es freundlich gesagt." },
+          { id: "bleiben", text: "Weil ich diesmal nicht derjenige sein will, der weiterzieht.", echo: "Brogar hat gesagt, diesmal wolle er bleiben, bis es vorbei ist. Wer ihn kennt, weiß, dass er das noch nie zu jemandem gesagt hat." },
+        ] },
+      stimmen: {
+        wasser: "Brogar hält seine Tasche über den Kopf, während ihm das Wasser um die Knie spült. Nasse Verbände taugen nichts. Nasse Füße verträgt er.",
+        gefangen: "Brogar hat schon Salbe an den Fingern, bevor die Fesseln ab sind. „Das brennt jetzt“, sagt er. „Dann wird es besser. So ist es mit fast allem.“",
+        tote: "Brogar betrachtet die Gräber mit dem Blick eines Mannes, der wissen will, woran sie gestorben sind. Bei dreien hätte er etwas tun können. Er sagt es nicht.",
+        kaelte: "Brogar sieht sich reihum die Finger und Zehen an, ungefragt, und reibt, wo es nötig ist. „Weiß ist schlecht“, erklärt er. „Rot ist gut. Jammern ist am besten.“",
+        schutz: "Brogar gibt ihr etwas zu tragen: die leichteste seiner Taschen, mit den Kräutern. „Wichtig“, sagt er. Sie trägt sie den ganzen Tag wie etwas Zerbrechliches.",
+        macht: "Brogar denkt an jedes Bett, an dem er zu spät kam. Er streckt die Hand halb aus. Dann sieht er seine eigenen Finger an, rissig, alt, ehrlich, und nimmt sie zurück.",
+      },
+    },
+    inquisitor: {
+      nacht: { frage: "Die Glut ist fast aus. Wenn du jede Lüge sehen könntest, die man dir je erzählt hat, auch die gnädigen: Würdest du hinsehen?",
+        antworten: [
+          { id: "ja", text: "Ja. Die Wahrheit ist nie zu teuer.", echo: "Seran hat in der Nacht gesagt, er würde jede Lüge sehen wollen, auch die, die ihn schonen sollte. Er hat nicht ausgesehen wie jemand, der sich darauf freut." },
+          { id: "nein", text: "Nein. Manche Lügen waren Geschenke.", echo: "Seran hat in der Nacht gesagt, manche Lügen seien Geschenke gewesen, und er wolle sie behalten. Aus seinem Mund war das beinahe eine Beichte." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "wahrheit", text: "Weil dort unten jemand gelogen hat, und ich will wissen, wer.", echo: "Seran hat gesagt, an diesem Ort sei gelogen worden, vor langer Zeit, und er gehe nicht, bevor er wisse, von wem. Er hat es gesagt wie ein Urteil, das noch aussteht." },
+          { id: "urteil", text: "Weil ich einmal falsch geurteilt habe.", echo: "Seran hat gesagt, er habe einmal falsch geurteilt. Nur diesen einen Satz. Er hat danach niemanden mehr so angesehen, als wisse er schon alles." },
+        ] },
+      stimmen: {
+        wasser: "Seran fragt den Fährmann, ob das Boot hält. „Ja“, sagt der. Seran nickt langsam und setzt sich dorthin, wo man am schnellsten hinauskommt.",
+        gefangen: "Seran stellt dem Befreiten eine einzige Frage: „Wer?“ Er bekommt einen Namen. Er wiederholt ihn nicht. Er vergisst ihn auch nicht.",
+        tote: "Seran liest auf einem der Steine „in Frieden entschlafen“ und bleibt stehen. Sein Blick wird hart. Auch Grabsteine können lügen.",
+        kaelte: "Seran geht aufrecht, als friere er nicht. Es ist gelogen, und er weiß es. Er hält es trotzdem durch, weil sonst die anderen aufgeben.",
+        schutz: "Seran sagt ihr die Wahrheit: wie weit es noch ist, wie gefährlich. Alle anderen finden das grausam. Sie nicht. Sie geht danach schneller.",
+        macht: "Seran hört es flüstern und erkennt den Tonfall sofort: So klingt jemand, der die Wahrheit sagt, um zu betrügen. „Jedes Wort stimmt“, sagt er. „Fasst es nicht an.“",
+      },
+    },
+    wildnislaeufer: {
+      nacht: { frage: "Die Glut ist fast aus. Du sitzt ein Stück abseits, wie immer. Wenn du nie wieder jemanden verlieren könntest, weil du niemanden mehr heranlässt: Wäre es das wert?",
+        antworten: [
+          { id: "ja", text: "Ja. Ich habe genug begraben.", echo: "Kael hat in der Nacht gesagt, er habe genug Leute begraben und wolle keinen mehr nah genug heranlassen. Er saß dabei so weit weg vom Feuer, dass man ihn kaum hörte." },
+          { id: "nein", text: "Nein. Aber ich kann es noch nicht.", echo: "Kael hat in der Nacht gesagt, allein zu sein sei es nicht wert, aber er könne es noch nicht anders. Dann ist er ein Stück näher ans Feuer gerückt. Ein kleines Stück." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "spur", text: "Weil die Spur dorthin führt. Ich gehe Spuren zu Ende.", echo: "Kael hat gesagt, er gehe jeder Spur bis ans Ende nach, das sei alles. Er hat es zu sachlich gesagt, als dass es alles sein könnte." },
+          { id: "rudel", text: "Weil ich seit Langem wieder mit jemandem gehe.", echo: "Kael hat gesagt, er gehe zum ersten Mal seit Jahren nicht allein. Er hat dabei auf seine Stiefel gesehen. Mehr braucht man bei ihm nicht zu erwarten." },
+        ] },
+      stimmen: {
+        wasser: "Kael liest das Wasser wie einen Pfad: wo es bricht, wo es zieht, wo etwas darunter liegt. „Links halten“, sagt er. Niemand fragt, warum.",
+        gefangen: "Kael hat die Fährte der Wächter schon gelesen, bevor die Fesseln ab sind. „Zwei sind fort, einer kommt zurück“, sagt er. „Wir haben nicht lange.“",
+        tote: "Kael kniet sich hin. Zwischen den Gräbern ist das Gras niedergetreten, frisch, von innen nach außen. Er steht langsam wieder auf.",
+        kaelte: "Kael zeigt euch, wie man Schnee festtritt, wo man ihn schmilzt, an welcher Seite eines Felsens man schläft. Er redet an diesem Abend mehr als in der ganzen Woche davor.",
+        schutz: "Kael zeigt ihr, wie man leise auftritt: Ferse, Kante, Ballen. Sie macht es nach. „Besser als die anderen“, sagt er, laut genug, dass die anderen es hören.",
+        macht: "Kael sieht kein Ding. Er sieht eine Falle: zu offen, zu leicht, kein Tier in der Nähe. Er hat zu viele Schlingen gelegt, um in eine zu treten.",
+      },
+    },
+    tiergefaehrte: {
+      nacht: { frage: "Die Glut ist fast aus, und Grau schläft, den Kopf auf deinem Fuß. Wenn er nie sterben müsste, aber nicht mehr dein Wolf wäre: Würdest du es annehmen?",
+        antworten: [
+          { id: "nein", text: "Nein. Er soll alt werden dürfen.", echo: "Faye hat in der Nacht gesagt, Grau solle alt werden und sterben dürfen wie ein Wolf. Sie hat ihn dabei nicht angesehen. Er sie schon." },
+          { id: "ja", text: "Ich würde ihn fragen. Und seine Antwort fürchten.", echo: "Faye hat in der Nacht gesagt, sie würde Grau selbst entscheiden lassen, wenn er könnte. Der Wolf hat im Schlaf mit den Pfoten gezuckt, als renne er irgendwohin." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "grau", text: "Weil Grau schon vorausgelaufen ist.", echo: "Faye hat gesagt, sie gehe weiter, weil Grau längst vorausgelaufen sei. „Er entscheidet so etwas. Ich hole nur meinen Mantel.“" },
+          { id: "rudel", text: "Weil ein Rudel niemanden zurücklässt.", echo: "Faye hat gesagt, ein Rudel lasse niemanden zurück, und Grau habe euch längst dazugezählt. Der Wolf hat reihum an jedem geschnüffelt, wie zur Bestätigung." },
+        ] },
+      stimmen: {
+        wasser: "Grau will nicht aufs Wasser. Faye redet leise auf ihn ein, die Stirn an seiner Stirn. Dann springt er, und sie sieht aus, als hätte sie selbst den Mut erst jetzt gefunden.",
+        gefangen: "Grau ist als Erster bei dem Gefangenen und leckt ihm die Hände, bevor Faye die Fesseln löst. „Er mag dich“, sagt sie. „Das tut er nicht bei jedem.“",
+        tote: "Grau hat das Nackenfell gesträubt und geht keinen Schritt weiter. Faye bleibt neben ihm stehen. „Er riecht etwas, das nicht tot genug ist“, sagt sie.",
+        kaelte: "Faye schläft an Graus Flanke und lädt mit einer Kopfbewegung ein, wer will. Am Morgen liegen vier Leute um einen Wolf, und keiner spricht darüber.",
+        schutz: "Grau geht den ganzen Tag neben ihr, die Schulter an ihrem Knie. Faye lässt ihn. „Er hat sie sich ausgesucht“, sagt sie. „Ich wurde nicht gefragt.“",
+        macht: "Grau winselt und drängt Faye mit dem ganzen Körper zurück. Sie legt ihm die Hand in den Nacken. „Ja“, sagt sie. „Ich höre es auch. Es redet von dir.“",
+      },
+    },
+    kopfgeldjaeger: {
+      nacht: { frage: "Die Glut ist fast aus. Du ziehst den einen Steckbrief aus der Tasche, den du nie eingelöst hast. Wenn dir jemand den Mann brächte, jetzt, hierher: Wüsstest du, was du mit ihm tust?",
+        antworten: [
+          { id: "ja", text: "Ja. Seit Jahren.", echo: "Orin hat in der Nacht gesagt, er wisse seit Jahren genau, was er mit dem Einen tun werde. Dann hat er den Steckbrief wieder eingesteckt, sehr sorgfältig, an derselben Stelle wie immer." },
+          { id: "nein", text: "Nein. Ich glaube, ich jage ihn, damit ich etwas zu jagen habe.", echo: "Orin hat in der Nacht gesagt, vielleicht wolle er den Einen gar nicht finden. Er hat den Steckbrief lange über die Glut gehalten. Er hat ihn nicht losgelassen. Noch nicht." },
+        ] },
+      weg: { frage: "Morgen geht es weiter, tiefer hinein. Warum gehst du mit?",
+        antworten: [
+          { id: "preis", text: "Weil die Bezahlung stimmt.", echo: "Orin hat gesagt, er gehe weiter, weil die Bezahlung stimme. Es zahlt ihn aber niemand mehr. Darauf hat ihn keiner hingewiesen." },
+          { id: "finden", text: "Weil dort jemand ist, den ich zurückbringen will. Lebend.", echo: "Orin hat gesagt, er wolle diesmal jemanden lebend zurückbringen, ohne Kopfgeld. Er hat hinzugefügt, das solle sich bloß nicht herumsprechen." },
+        ] },
+      stimmen: {
+        wasser: "Orin schätzt den Fährmann ab, das Boot, die Strömung, und nennt halblaut eine Zahl. Es ist der Preis, für den er selbst nicht hinüberfahren würde. Er fährt trotzdem.",
+        gefangen: "Orin hat in seinem Leben mehr Leute gefesselt als befreit. Er löst die Knoten trotzdem am schnellsten: Er weiß genau, wie man sie macht.",
+        tote: "Orin erkennt auf einem der Steine einen Namen, den er einmal auf einem Steckbrief hatte. Den Lohn hat er damals bekommen. Er nimmt den Hut ab.",
+        kaelte: "Orin hat schon Männer durch schlimmeres Wetter verfolgt. Die Verfolgten sind dabei immer zuerst liegen geblieben. Er achtet seitdem darauf, wer von euch langsamer wird.",
+        schutz: "Orin hat sein Leben lang Leute irgendwohin gebracht, die nicht dorthin wollten. Jemanden zu begleiten, der mitkommen will, ist ihm neu. Er geht, wie man neben einer offenen Tür geht.",
+        macht: "Orin weiß, was das wert ist. Er kennt drei Leute, die ein Fürstentum dafür gäben. Er nennt die Zahl nicht. Zum ersten Mal ist ihm eine Zahl zu groß.",
+      },
+    },
+  };
+  for (const [fid, x] of Object.entries(MEHR)) { M[fid].nacht = x.nacht; M[fid].weg = x.weg; Object.assign(M[fid].stimmen, x.stimmen); }
   root.ABHM = M;
   if (typeof module !== "undefined" && module.exports) module.exports = M;
 })(typeof window !== "undefined" ? window : globalThis);

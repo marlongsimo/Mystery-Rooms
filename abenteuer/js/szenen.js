@@ -102,14 +102,15 @@
     }
     return "☙" + fid + "|" + moment(fid, lage);
   }
-  /** Persönliche Lagerfeuer-Frage einer Figur: { frage, antworten } für eine geheime Szene. Die Antwort steht danach in merker.feuer_<fid>. */
-  function feuerFrage(fid) {
-    const f = (HM[fid] || {}).feuer;
-    if (!f) return { frage: "Was erzählst du am Feuer von dir?", antworten: [{ id: "wenig", text: "„Nicht viel.“", echo: `${F.FIGUREN[fid].name} hat am Feuer wenig gesagt und viel zugehört.`, setzt: () => ({ ["feuer_" + fid]: "wenig" }) }] };
-    return { frage: f.frage, antworten: f.antworten.map((a) => ({ id: a.id, text: a.text, echo: a.echo, setzt: () => ({ ["feuer_" + fid]: a.id }) })) };
+  /** runde: "feuer" (Weidenhain, Tebbe fragt), "nacht" (eine Frage an sich selbst), "weg" (warum man weitergeht).
+   *  Persönliche Lagerfeuer-Frage einer Figur: { frage, antworten } für eine geheime Szene. Die Antwort steht danach in merker.feuer_<fid>. */
+  function feuerFrage(fid, runde) {
+    const rd = runde || "feuer", f = (HM[fid] || {})[rd];
+    if (!f) return { frage: "Was erzählst du am Feuer von dir?", antworten: [{ id: "wenig", text: "„Nicht viel.“", echo: `${F.FIGUREN[fid].name} hat am Feuer wenig gesagt und viel zugehört.`, setzt: () => ({ [rd + "_" + fid]: "wenig" }) }] };
+    return { frage: f.frage, antworten: f.antworten.map((a) => ({ id: a.id, text: a.text, echo: a.echo, setzt: () => ({ [rd + "_" + fid]: a.id }) })) };
   }
   /** Was eine Figur am Feuer erzählt hat (der Satz für die anderen), oder "" */
-  const feuerEcho = (A, fid) => { const f = (HM[fid] || {}).feuer, a = f && f.antworten.find((x) => x.id === A.merker["feuer_" + fid]); return a ? a.echo : ""; };
+  const feuerEcho = (A, fid, runde) => { const rd = runde || "feuer", f = (HM[fid] || {})[rd], a = f && f.antworten.find((x) => x.id === A.merker[rd + "_" + fid]); return a ? a.echo : ""; };
   const hilfen = { hat, m, name, namen, ereignis, klasse, geheimAntwort, geheimWer, moment, stimme: heldenStimme, feuerFrage, feuerEcho, lebende: (A) => lebende(A) };
 
   function notiz(A, t, art) { A.protokoll.push({ t, art: art || "" }); if (A.protokoll.length > 200) A.protokoll.shift(); }

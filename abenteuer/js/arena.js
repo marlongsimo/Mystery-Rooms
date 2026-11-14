@@ -1,0 +1,216 @@
+/*
+ * Mythara – Arena: ein Spieler gegen einen anderen, jeder mit drei Helden aus seiner Sammlung, dazu schwache Monster.
+ * Übersicht (offene Kämpfe mit Name und Durchschnittsstufe), Kampf erstellen oder beitreten (Heldenwahl mit Schnitt),
+ * Aufstellung beider Seiten vor dem Start, Kampf über die Live-Verbindung, Ergebnis mit Belohnungen.
+ *
+ * Datenbank: Migration 008 (rpg_arena_*). Gibt es sie nicht, bleibt die Arena unsichtbar.
+ * Technik: Das Gerät des Erstellers rechnet den Kampf (js/regeln.js, neueArena) und schreibt den Stand unter „spiel“
+ * in eine Live-Sitzung; der Beigetretene zeigt ihn an und schickt seine Züge unter „zug:<eigene Kennung>“.
+ * Globaler Name: window.ARENA
+ */
+(function () {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const F = window.ABF, R = window.ABR;
+  const WAEHRUNG = "Seelensplitter", ZEICHEN = "◈";
+  const komma = (n) => Number(n).toFixed(1).replace(".", ",");
+  const rpc = async (name, args = {}) => { const c = window.AB.liveClient(); await c.ensureUser(); return c.rpc(name, args); };
+  const fehlt = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
+  const sm = () => window.ABSAMMLUNG;
+  const stufe = (fid) => { const p = sm() && sm().fortschritt ? sm().fortschritt(fid) : null; return p ? p.stufe : 1; };
+
+  // Z: Zustand der Arena-Seite
+  const Z = { da: null, liste: null, match: null, fehler: "", laedt: false, wahl: [], modus: null, ziel: null, uhr: null, kampf: null };
+  const seiteOffen = () => { const s = $("#hub-seite"); return Boolean(s && !s.hidden && s.querySelector("[data-arena]")); };
+
+  /** Gibt es die Arena in der Datenbank, und wie viel Währung hat das Konto? Ergebnis wird gemerkt. */
+  async function pruefen(neu) {
+    if (Z.da != null && !neu) return Z.da;
+    try { const r = await rpc("rpg_my_wallet", {}); Z.da = Boolean(r && r.konto); Z.waehrung = (r && r.waehrung) || 0; }
+    catch (e) { Z.da = false; }
+    return Z.da;
+  }
+  const waehrungHtml = () => `<span class="arena-waehrung" title="${WAEHRUNG}: Belohnung für Siege in der Arena"><i>${ZEICHEN}</i>${Z.waehrung || 0}</span>`;
+
+  /* ---------- Übersicht ---------- */
+  async function laden() {
+    Z.laedt = true; Z.fehler = "";
+    try {
+      const r = await rpc("rpg_arena_list", {});
+      Z.liste = r; if (r && r.konto) { Z.waehrung = r.waehrung || 0; Z.match = r.mein || null; }
+      if (window.MYTHARA && window.MYTHARA.waehrungZeigen) window.MYTHARA.waehrungZeigen(Z.waehrung);
+    } catch (e) { Z.fehler = fehlt(e) ? "Die Arena ist noch nicht freigeschaltet." : e.message; }
+    Z.laedt = false;
+  }
+  function seite(html) { window.MYTHARA.seite("arena", `<div data-arena>${html}</div>`); }
+  async function zeigen() {
+    stoppUhr(); Z.modus = null;
+    seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">Einen Moment …</p>`);
+    if (sm()) await sm().laden(true);
+    await laden();
+    if (!seiteOffen()) return;
+    if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match);
+    zeichneListe();
+    if (Z.match) pollen(8000, async () => { await laden(); if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match); if (seiteOffen() && !Z.modus) zeichneListe(); });
+  }
+  function zeichneListe() {
+    const L = Z.liste || {}, offen = L.offen || [], m = Z.match;
+    if (!L.konto) return seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">${esc(Z.fehler || "Die Arena gibt es nur mit einem Spielerkonto: Hier treten deine eigenen Helden mit ihren Stufen an.")}</p>`);
+    const eigene = sm().zustand().helden.length;
+    seite(`<div class="arena-kopf"><div><h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">Du gegen einen anderen Spieler, jeder mit drei Helden. Dazwischen ein paar Monster.</p></div>
+        <div class="arena-kopf-rechts">${waehrungHtml()}<button class="btn ghost klein" id="arena-neu-laden">↻ Aktualisieren</button></div></div>
+      <p class="note">Belohnungen heute: ${L.heute || 0} von 5 Kämpfen. Ein Sieg bringt 25 ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
+      ${Z.fehler ? `<p class="fb">${esc(Z.fehler)}</p>` : ""}
+      ${m ? `<div class="arena-mein"><div><b>Dein Kampf wartet auf einen Gegner</b><small>Durchschnittsstufe ${komma(m.host.schnitt)} · ${m.host.team.map((h) => esc(F.FIGUREN[h.held].name) + " (" + h.stufe + ")").join(", ")}</small></div><button class="btn ghost klein" id="arena-verwerfen">Verwerfen</button></div>`
+        : `<div class="knoepfe"><button class="btn gross" id="arena-erstellen" ${eigene < 3 ? "disabled" : ""}>Kampf erstellen</button></div>${eigene < 3 ? `<p class="note">Du brauchst mindestens drei Helden in deiner Sammlung.</p>` : ""}`}
+      <h2 class="hub-zwischen">Offene Kämpfe</h2>
+      ${offen.length ? `<ul class="arena-liste">${offen.map((o) => `<li><div><b>${esc(o.name)}</b><small>Durchschnittsstufe ${komma(o.schnitt)}</small></div><button class="btn klein" data-arena-bei="${o.id}" data-schnitt="${o.schnitt}" ${m ? "disabled" : ""}>Beitreten</button></li>`).join("")}</ul>`
+        : `<p class="note">Gerade wartet niemand. Erstelle selbst einen Kampf – andere sehen ihn nach dem Aktualisieren.</p>`}`);
+    const nl = $("#arena-neu-laden"); if (nl) nl.onclick = async () => { nl.disabled = true; await laden(); if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match); zeichneListe(); };
+    const er = $("#arena-erstellen"); if (er) er.onclick = () => heldenWahl({ titel: "Kampf erstellen", knopf: "Kampf erstellen", fertig: erstellen });
+    const vw = $("#arena-verwerfen"); if (vw) vw.onclick = async () => { vw.disabled = true; try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { Z.fehler = e.message; } Z.match = null; zeigen(); };
+    document.querySelectorAll("[data-arena-bei]").forEach((b) => { b.onclick = () => heldenWahl({ titel: "Kampf beitreten", knopf: "Beitreten", gegner: Number(b.dataset.schnitt), fertig: (team) => beitreten(b.dataset.arenaBei, team) }); });
+  }
+
+  /* ---------- Heldenwahl: drei eigene Helden, oben der Schnitt ---------- */
+  function heldenWahl(o) {
+    stoppUhr(); Z.modus = "wahl"; Z.wahl = []; Z.fehler = "";
+    const helden = F.REIHE.filter((f) => sm().zustand().helden.includes(f));
+    const zeichne = () => {
+      const st = Z.wahl.map(stufe), schnitt = st.length ? st.reduce((a, b) => a + b, 0) / st.length : 0, voll = Z.wahl.length === 3;
+      const passt = o.gegner == null || !voll || Math.abs(Math.round(schnitt * 10) / 10 - o.gegner) <= 1.0001;
+      seite(`<h1 class="hub-gruss">${esc(o.titel)}</h1>
+        <div class="arena-schnitt ${voll ? (passt ? "gut" : "schlecht") : ""}"><b>${Z.wahl.length} von 3 Helden</b><span>Durchschnittsstufe: <strong>${Z.wahl.length ? komma(schnitt) : "–"}</strong>${o.gegner != null ? ` · Gegner: ${komma(o.gegner)} (erlaubt ist höchstens eine Stufe Unterschied)` : ""}</span></div>
+        ${Z.fehler ? `<p class="fb">${esc(Z.fehler)}</p>` : ""}
+        <div class="arena-helden">${helden.map((f) => { const d = F.FIGUREN[f], an = Z.wahl.includes(f);
+          return `<button class="arena-held ${an ? "an" : ""}" data-arena-held="${f}" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(f)}" alt="" loading="lazy"><b>${esc(d.name)}</b><small>${esc(F.KLASSEN[d.klasse].name)}</small><em>Stufe ${stufe(f)}</em></button>`; }).join("")}</div>
+        <div class="knoepfe"><button class="btn gross" id="arena-wahl-ok" ${voll && passt ? "" : "disabled"}>${esc(o.knopf)}</button><button class="btn ghost" id="arena-wahl-zurueck">Zurück</button></div>
+        ${voll && !passt ? `<p class="note">Dein Team liegt mehr als eine Stufe vom Gegner entfernt. Tausche einen Helden.</p>` : ""}`);
+      document.querySelectorAll("[data-arena-held]").forEach((b) => { b.onclick = () => { const f = b.dataset.arenaHeld; if (Z.wahl.includes(f)) Z.wahl = Z.wahl.filter((x) => x !== f); else if (Z.wahl.length < 3) Z.wahl.push(f); zeichne(); }; });
+      $("#arena-wahl-zurueck").onclick = zeigen;
+      $("#arena-wahl-ok").onclick = async () => { $("#arena-wahl-ok").disabled = true; try { await o.fertig(Z.wahl.slice()); } catch (e) { Z.fehler = e.message; zeichne(); } };
+    };
+    zeichne();
+  }
+  async function erstellen(team) { Z.match = await rpc("rpg_arena_create", { p_team: team }); Z.modus = null; await zeigen(); }
+  async function beitreten(id, team) { const m = await rpc("rpg_arena_join", { p_match_id: id, p_team: team }); Z.match = m; Z.modus = null; aufstellung(m); }
+
+  /* ---------- Aufstellung beider Seiten, dann der Kampf ---------- */
+  const KARTE = (k) => (k === "garten" ? R.KARTE_GARTEN : ((window.ABD_ALLE || {}).grauwacht || { KARTEN: {} }).KARTEN[String(k || "").toUpperCase()]) || R.KARTE_GARTEN;
+  const teamHtml = (t, name, mein) => `<div class="arena-team ${mein ? "mein" : "gegner"}"><h3>${esc(name)}${mein ? " (du)" : ""}<span>Ø ${komma(t.schnitt)}</span></h3><div class="arena-team-helden">${t.team.map((h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
+    return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b><em>Stufe ${h.stufe}</em></div>`; }).join("")}</div></div>`;
+  function aufstellung(m) {
+    stoppUhr(); Z.modus = "aufstellung"; Z.match = m;
+    const ich = m.seite, karte = KARTE(m.karte), beg = (R.BEGEGNUNGEN[m.begegnung] || {}).name || "Monster";
+    seite(`<h1 class="hub-gruss">Die Aufstellung</h1><p class="hub-untertitel">${esc(karte.name || "Arena")} · ${esc(beg)} · Kampfstufe ${m.kampfstufe}</p>
+      <div class="arena-gegenueber">${teamHtml(m.host, m.host.name, ich === 1)}<span class="arena-vs">gegen</span>${teamHtml(m.gast, m.gast.name, ich === 2)}</div>
+      <p class="note" id="arena-status">${ich === 1 ? "Die Verbindung wird aufgebaut …" : "Warte auf den Ersteller des Kampfes …"}</p>
+      <div class="knoepfe"><button class="btn ghost klein" id="arena-abbrechen">Abbrechen</button></div>`);
+    $("#arena-abbrechen").onclick = async () => { stoppUhr(); try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon beendet */ } await trennen(); Z.match = null; zeigen(); };
+    verbinden(m).catch((e) => { const s = $("#arena-status"); if (s) s.textContent = "Die Verbindung ist fehlgeschlagen: " + e.message; });
+  }
+  function pollen(ms, fn) { stoppUhr(); Z.uhr = setInterval(() => { if (!document.hidden) Promise.resolve(fn()).catch(() => {}); }, ms); }
+  function stoppUhr() { clearInterval(Z.uhr); Z.uhr = null; }
+
+  /* ---------- Verbindung und Kampf ---------- */
+  let T = null; // Live-Sitzung nur für diesen Kampf
+  const transport = () => (T = T || window.RPGNetz.connect({ gameSlug: new URLSearchParams(location.search).get("liveslug") || "abenteuer", maxPlayers: 2, storeKey: "ab_arena" }));
+  async function trennen() { stoppUhr(); const t = T; T = null; if (t && t.session) { try { await t.leave(); } catch (e) { /* schon zu */ } } }
+  async function verbinden(m) {
+    const t = transport(), status = (s) => { const el = $("#arena-status"); if (el) el.textContent = s; };
+    if (m.seite === 1) {
+      // Ersteller: Sitzung anlegen, Code hinterlegen, auf den Gegner warten, dann rechnen
+      await t.create(m.host.name);
+      await rpc("rpg_arena_room", { p_match_id: m.id, p_code: t.session.room_code });
+      status("Warte auf " + m.gast.name + " …");
+      const los = () => { if (Z.kampf || t.players.length < 2) return; stoppUhr(); kampf(m, t); };
+      t.on("players", los); los();
+      pollen(4000, async () => { await t.refresh(); los(); const g = await rpc("rpg_arena_get", { p_match_id: m.id }); if (g.status === "abgebrochen" || g.status === "beendet") { await trennen(); Z.match = null; zeigen(); } });
+    } else {
+      // Beigetretener: warten, bis der Ersteller den Code hinterlegt hat
+      const versuch = async () => {
+        const g = await rpc("rpg_arena_get", { p_match_id: m.id });
+        if (g.status === "abgebrochen" || g.status === "beendet") { await trennen(); Z.match = null; return zeigen(); }
+        if (!g.room_code || Z.kampf) return;
+        stoppUhr(); await t.join(g.room_code, m.gast.name); kampf(g, t);
+      };
+      pollen(2500, versuch); await versuch();
+    }
+  }
+  function kampf(m, t) {
+    if (Z.kampf) return; Z.kampf = { m, gemeldet: false }; Z.modus = "kampf";
+    const ich = m.seite, uid = t.user && t.user.id;
+    F.STUFEN10.aktiv = true;
+    const ende = (st) => ergebnisMelden(m, st, t);
+    if (ich === 1) {
+      const beg = R.BEGEGNUNGEN[m.begegnung] ? m.begegnung : "garten", alt = Math.max(1, Math.min(3, R.BEGEGNUNGEN[beg].stufe || 1));
+      const st = R.neueArena(m.seed || 1, { teams: [m.host.team, m.gast.team].map((tm) => tm.map((h) => ({ fid: h.held, stufe: h.stufe }))), namen: [m.host.name, m.gast.name],
+        karte: KARTE(m.karte), begegnung: beg, bedrohung: Math.max(0, m.kampfstufe - [1, 3, 6][alt - 1]) });
+      // Stand schreiben: immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig
+      let schreibt = false, wartend = null;
+      const publish = (json) => { wartend = json; if (schreibt) return; schreibt = true;
+        const lauf = () => { const j = wartend; wartend = null; j.log = (j.log || []).slice(-60); t.writeOwn("spiel", { arena: true, at: Date.now(), st: j }).catch(() => {}).then(() => { if (wartend) lauf(); else schreibt = false; }); }; lauf(); };
+      const erledigt = {};
+      t.on("state", (row) => { const k = row.state_key || ""; if (!k.startsWith("zug:")) return; const von = k.slice(4); if (row.updated_by && row.updated_by !== von) return; if (von === uid) return;
+        const v = row.state || {}; if (!v.n || v.n <= (erledigt[von] || 0)) return; erledigt[von] = v.n; window.AB.arenaWunsch(v); });
+      window.AB.arenaStart({ st, seite: 1, publish, ende });
+    } else {
+      let n = 0;
+      t.on("state", (row) => { if (row.state_key === "spiel" && row.state && row.state.arena && row.state.st) window.AB.arenaStand(row.state.st); });
+      window.AB.arenaStart({ st: null, seite: 2, gast: true, sende: (w) => { t.writeOwn("zug:" + uid, Object.assign({}, w, { n: ++n, at: Date.now() })).catch(() => {}); }, ende });
+      const da = t.states && t.states.spiel; if (da && da.st) window.AB.arenaStand(da.st);
+    }
+    aufgebenKnopf(m, t);
+    // Hat der andere aufgegeben oder die Verbindung verloren?
+    pollen(6000, async () => { const g = await rpc("rpg_arena_get", { p_match_id: m.id }); if ((g.status === "beendet" || g.status === "abgebrochen") && !Z.kampf.gemeldet) { Z.kampf.gemeldet = true; ergebnisZeigen(g, t); } });
+    t.on("lost", () => { if (Z.kampf && !Z.kampf.gemeldet) rpc("rpg_arena_get", { p_match_id: m.id }).then((g) => { if (g.status === "laeuft") return rpc("rpg_arena_cancel", { p_match_id: m.id }).then((x) => x, () => g); return g; }).then((g) => { if (!Z.kampf || Z.kampf.gemeldet) return; Z.kampf.gemeldet = true; ergebnisZeigen(g, t); }).catch(() => {}); });
+  }
+  function aufgebenKnopf(m, t) {
+    let b = $("#arena-aufgeben"); if (!b) { b = document.createElement("button"); b.id = "arena-aufgeben"; b.className = "btn ghost klein arena-aufgeben"; b.textContent = "Aufgeben"; document.body.appendChild(b); }
+    b.hidden = false;
+    b.onclick = async () => { if (!confirm("Kampf aufgeben? Dein Gegner gewinnt, und du bekommst keine Belohnung.")) return; b.disabled = true;
+      try { const g = await rpc("rpg_arena_cancel", { p_match_id: m.id }); Z.kampf.gemeldet = true; ergebnisZeigen(g, t); } catch (e) { b.disabled = false; } };
+  }
+  async function ergebnisMelden(m, st, t) {
+    if (!Z.kampf || Z.kampf.gemeldet) return; Z.kampf.gemeldet = true; stoppUhr();
+    const a = st.arena, grund = /am Boden/.test(a.grund || "") ? "team" : "punkte";
+    schirm(`<p class="arena-ende-eyebrow">Der Kampf ist vorbei</p><h1>${a.sieger === m.seite ? "Sieg" : "Niederlage"}</h1><p>Das Ergebnis wird gewertet …</p>`, a.sieger === m.seite);
+    let g = null;
+    try {
+      g = await rpc("rpg_arena_report", { p_match_id: m.id, p_sieger: a.sieger, p_grund: grund, p_punkte: a.punkte, p_runden: st.runde });
+      // auf die Meldung der anderen Seite warten (höchstens 20 Sekunden)
+      for (let i = 0; i < 10 && g.status === "laeuft"; i++) { await new Promise((r) => setTimeout(r, 2000)); g = await rpc("rpg_arena_get", { p_match_id: m.id }); }
+    } catch (e) { g = { status: "fehler", fehler: e.message, seite: m.seite, sieger: a.sieger, punkte: a.punkte, host: m.host, gast: m.gast }; }
+    ergebnisZeigen(Object.assign({ punkteLokal: a.punkte }, g), t);
+  }
+
+  /* ---------- Ergebnis: Sieg oder Niederlage, Belohnungen, zurück zur Startseite ---------- */
+  function schirm(html, sieg) {
+    let e = $("#arena-ende"); if (!e) { e = document.createElement("div"); e.id = "arena-ende"; document.body.appendChild(e); }
+    e.className = "arena-ende " + (sieg ? "sieg" : "niederlage"); e.hidden = false; e.innerHTML = `<div class="arena-ende-inhalt">${html}</div>`;
+    return e;
+  }
+  function ergebnisZeigen(g, t) {
+    stoppUhr(); const ab = $("#arena-aufgeben"); if (ab) ab.hidden = true;
+    const gewertet = g.status === "beendet", sieg = gewertet ? g.sieger === g.seite : g.sieger === g.seite, b = g.belohnung || null, p = g.punkte || g.punkteLokal || null;
+    const xp = b && b.xp && b.xp.length ? `<div class="arena-xp">${b.xp.map((h) => { const d = F.FIGUREN[h.held]; if (!d) return ""; const f = F.stufeAusXp(h.gesamt || 0), auf = h.stufe > h.vorher, voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
+      return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>+${h.xp} XP</span></div><i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</small></div></div>`; }).join("")}</div>` : "";
+    const text = g.status === "abgebrochen" ? "Der Kampf wurde ohne Wertung beendet." : g.status === "fehler" ? "Das Ergebnis konnte nicht gemeldet werden: " + esc(g.fehler || "") : g.status === "laeuft" ? "Dein Gegner hat das Ergebnis noch nicht bestätigt. Sobald er es tut, wird gewertet."
+      : g.grund === "aufgabe" ? (sieg ? "Dein Gegner hat aufgegeben." : "Du hast aufgegeben.") : g.grund === "team" ? (sieg ? "Das gegnerische Team liegt am Boden." : "Dein Team liegt am Boden.") : "Nach Punkten entschieden.";
+    const lohn = !b ? "" : !b.gewertet ? (g.grund === "aufgabe" && !sieg ? "" : `<p class="arena-ende-note">Für heute hast du schon fünf gewertete Kämpfe. Dieser bringt keine Belohnung mehr.</p>`)
+      : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}${xp}${b.angebot ? `<p class="arena-ende-lohn held">★ Ein neuer Held will sich dir anschließen!</p>` : ""}`;
+    const e = schirm(`<p class="arena-ende-eyebrow">${esc(g.host ? g.host.name : "")} gegen ${esc(g.gast ? g.gast.name : "")}</p><h1>${g.status === "abgebrochen" ? "Abgebrochen" : sieg ? "Sieg" : "Niederlage"}</h1>
+      ${p ? `<p class="arena-ende-punkte">${p[1] != null ? p[1] : p["1"]} : ${p[2] != null ? p[2] : p["2"]}</p>` : ""}<p>${text}</p>${lohn}
+      <div class="knoepfe mitte"><button class="btn gross" id="arena-ende-zu">${b && b.angebot ? "Helden wählen" : "Zur Startseite"}</button></div>`, sieg && g.status !== "abgebrochen");
+    $("#arena-ende-zu").onclick = async () => {
+      e.hidden = true; e.innerHTML = ""; window.AB.arenaEnde(); Z.kampf = null; Z.match = null; Z.modus = null; await trennen();
+      await pruefen(true); if (window.MYTHARA.waehrungZeigen) window.MYTHARA.waehrungZeigen(Z.waehrung);
+      if (sm()) await sm().laden(true);
+      window.MYTHARA.zeigeHub();
+      if (b && b.angebot && sm() && sm().offeneBelohnung) sm().offeneBelohnung(() => window.MYTHARA.zeigeHub());
+    };
+  }
+
+  window.ARENA = { pruefen, zeigen, waehrung: () => Z.waehrung || 0, WAEHRUNG, ZEICHEN, zustand: () => Z };
+})();

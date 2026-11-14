@@ -46,8 +46,13 @@
   /* ---------- Live-Zustand ---------- */
   const LIVE = { client: null, phase: null, besitz: {}, frueher: {}, erledigt: {}, antwort: null, schreibt: false, nochmal: false, sperre: null };
   const liveAn = () => Boolean(LIVE.client && LIVE.client.session);
+  /* ---------- Arena (Spieler gegen Spieler): Dieses Gerät rechnet (Ersteller) oder spiegelt nur den Stand (Beigetretener) ----------
+   * ARENA: { seite: 1 | 2, gast: bool, sende(wunsch), publish(stand), ende(st) } – gesetzt von js/arena.js, sonst null */
+  let ARENA = null;
+  const heldA = (f) => Boolean(f && (f.fidA || f.art === "arenaheld" || f.art === "arenawolf")); // Held oder Wolf des anderen Spielers
+  const wolfA = (f) => f.art === "wolf" || f.art === "arenawolf";
   const spielerName = (uid) => (LIVE.client && LIVE.client.playerName(uid)) || "Handy";
-  const besitzerVon = (f) => (liveAn() && f && f.fid ? LIVE.besitz[f.fid] : null);
+  const besitzerVon = (f) => (!ARENA && liveAn() && f && f.fid ? LIVE.besitz[f.fid] : null);
 
   function speichern() {
     if (!liveAn()) return;
@@ -60,6 +65,7 @@
 
   /** Öffentlichen Stand an alle Handys (immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig) */
   function veroeffentlichen() {
+    if (ARENA) { if (!ARENA.gast && st) ARENA.publish(R.speichern(st)); return; }
     if (window.KAMPAGNE) window.KAMPAGNE.geaendert();
     if (!liveAn()) { soloMerken(); return; }
     if (!LIVE.client.session.is_host) return;
@@ -443,9 +449,14 @@
     const m = teil.match(/<ellipse class="fig-schatten"[^>]*\/>/);
     return (m ? m[0] : "") + `<g class="fig-schweb">${m ? teil.replace(m[0], "") : teil}</g>`;
   }
-  const farbeVon = (f) => (f.art === "wolf" ? "#3f7a3a" : F.KLASSEN[f.klasse].farbe);
+  const farbeVon = (f) => (wolfA(f) ? "#3f7a3a" : F.KLASSEN[f.klasse].farbe);
 
   function render() {
+    // Arena: Jedes Gerät sieht die Karte aus seiner Sicht (eigene Helden als Helden, die des Gegners rot) – danach zurückstellen
+    if (st && st.arena && ARENA) { const alt = st.arena.sicht; if (alt !== ARENA.seite) { R.arenaSicht(st, ARENA.seite); try { return renderKern(); } finally { R.arenaSicht(st, alt); } } }
+    return renderKern();
+  }
+  function renderKern() {
     const svg = $("#karte"), k = st.karte, akt = R.aktiv(st);
     svg.setAttribute("viewBox", `0 0 ${k.b * Z} ${k.h * Z}`);
     const spielerDran = akt.seite === "spieler" && !st.ende && akt.tp > 0;
@@ -512,7 +523,7 @@
       try {
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
-      if (f.seite === "gegner" && unten) { o += B.gegnerBild(f.art) ? `<g transform="translate(${cx} ${cy}) scale(.8)" opacity=".45">${B.gegner(f.art, true)}</g>` : `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
+      if (f.seite === "gegner" && unten && !heldA(f)) { o += B.gegnerBild(f.art) ? `<g transform="translate(${cx} ${cy}) scale(.8)" opacity=".45">${B.gegner(f.art, true)}</g>` : `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
       if (!unten) o += `<ellipse class="fig-schatten" cx="${cx}" cy="${cy + 22}" rx="24" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="27" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" stroke="${f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
       if (!unten && f.schild && f.schild.aktiv) o += `<circle class="schild-ring" cx="${cx}" cy="${cy}" r="33" fill="#8fd0ff" fill-opacity=".12" stroke="#8fd0ff" stroke-width="3" stroke-dasharray="5 3"><title>${esc(f.schild.text)}: fängt die Hälfte des Schadens ab</title></circle>`;
       if (f === akt && !st.ende) o += `<circle class="aktiv-ring" cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#C5A267" stroke-width="3.5"/><circle cx="${cx}" cy="${cy}" r="33" fill="none" stroke="#C5A267" stroke-opacity=".35" stroke-width="5"/>`;
@@ -523,7 +534,7 @@
         if (c.p != null && f !== akt) o += `<g transform="translate(${cx} ${cy - 34 < 12 ? cy + 42 : cy - 34})"><rect x="-26" y="-11" width="52" height="18" rx="9" fill="#1b1612" stroke="${c.p >= 0.6 ? "#7fe07a" : c.p >= 0.35 ? "#d6a23a" : "#ff7a5a"}" stroke-width="1.5"/><text y="3" text-anchor="middle" font-size="12" font-weight="700" fill="#ece4d4">${Math.round(c.p * 100)} %</text></g>`;
       }
       if (tipp && tipp.ziel === f.id && !wahl) o += `<circle class="tipp-ring" cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#f2d35a" stroke-width="3"/>`;
-      if (f.seite === "gegner") {
+      if (f.seite === "gegner" && !heldA(f)) {
         o += `<g transform="translate(${cx} ${cy})">${titel}${B.gegner(f.art)}</g>`;
         const nr = (f.name.match(/\d+$/) || [""])[0];
         if (nr) o += `<g transform="translate(${cx + 17} ${cy - 17})"><circle r="10" fill="#1b1612" stroke="#d79a7d" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#f0d0c0">${esc(nr)}</text></g>`;
@@ -537,8 +548,8 @@
           o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="#e8c46a"/>`;
           continue;
         }
-        const href = f.art === "wolf" ? "img/figuren/wolf.jpg" : F.bild(f.fid);
-        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, f.art === "wolf" ? 17 : 21, farbeVon(f), "c" + f.id, unten)}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
+        const href = wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fid || f.fidA);
+        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, wolfA(f) ? 17 : 21, heldA(f) ? "#c0444e" : farbeVon(f), "c" + f.id, unten)}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
         if (f.tot) o += `<text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="22" fill="#fff">✝</text>`;
         else if (unten) o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${st.schwierigkeit === "hardcore" && f.art !== "wolf" ? (f.stabil ? "stabil" : `${f.todes.e}✓ ${f.todes.f}✗`) : "am Boden"}</text>`;
       }
@@ -554,11 +565,11 @@
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect class="feld" data-x="${x}" data-y="${y}" x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="transparent"/>`;
     svg.innerHTML = o;
 
-    const mini = (f) => f.seite === "gegner" ? `<svg class="mini" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(f.art)}</svg>` : `<img class="mini" src="${F.bild(f.fid)}" alt="">`;
-    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${f.seite === "gegner" ? "g" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${esc(f.name)}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
+    const mini = (f) => heldA(f) ? `<img class="mini" src="${wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fidA)}" alt="">` : f.seite === "gegner" ? `<svg class="mini" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(f.art)}</svg>` : `<img class="mini" src="${F.bild(f.fid)}" alt="">`;
+    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${f.seite === "gegner" ? "g" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${esc(f.name)}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
 
     if (st.ende) { $("#aktiv").innerHTML = ""; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
-    else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
+    else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">${heldA(akt) ? "(Gegner) " : ""}ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
     else {
       const b = besitzerVon(akt), zust = R.zustaende(st, akt);
       const pl = akt.plaetzeMax && (akt.plaetzeMax[0] + akt.plaetzeMax[1]) ? ` · Plätze ${"●".repeat(akt.plaetze[0])}${akt.plaetzeMax[1] ? " | " + "◆".repeat(akt.plaetze[1]) : ""}` : "";
@@ -583,7 +594,8 @@
     zeigeWurf();
     schwebeZahlen();
     zeichneLiveBar();
-    if (st.ende) zeigeEnde(); else $("#ende").hidden = true;
+    if (st.ende && ARENA) { $("#ende").hidden = true; const a = ARENA; if (!a.fertig) { a.fertig = true; a.ende(st); } }
+    else if (st.ende) zeigeEnde(); else $("#ende").hidden = true;
     if (window.ABFX) window.ABFX.nach(st, R);
   }
 
@@ -658,7 +670,7 @@
 
   function gegnerSchleife() {
     clearTimeout(gegnerTimer);
-    if (!st || RASTER) return;
+    if (!st || RASTER || (ARENA && ARENA.gast)) return;
     if (st.ende) { veroeffentlichen(); return; }
     const a = R.aktiv(st);
     if (a.seite === "gegner") gegnerTimer = setTimeout(() => { R.gegnerZug(st); render(); veroeffentlichen(); gegnerSchleife(); }, tempo());
@@ -673,8 +685,10 @@
     if (wahl) {
       const z = R.ziele(st, wahl).find((f) => f.x === x && f.y === y);
       if (!z) { $("#hinweis").textContent = "Dort ist kein gültiges Ziel."; return; }
+      if (ARENA && ARENA.gast) { ARENA.sende({ typ: "aktion", aktion: wahl, ziel: z.id }); wahl = null; tipp = null; render(); return; }
       R.handeln(st, wahl, z.id); wahl = null; tipp = null; render(); veroeffentlichen(); gegnerSchleife(); return;
     }
+    if (ARENA && ARENA.gast) { if (R.bewegungsfelder(st, R.aktiv(st)).has(x + "," + y)) ARENA.sende({ typ: "bewegen", x, y }); return; }
     const r = R.bewegen(st, x, y);
     if (r.fehler) $("#hinweis").textContent = r.fehler; else { tipp = null; render(); veroeffentlichen(); gegnerSchleife(); }
   }
@@ -726,6 +740,12 @@
   function zeichneGegnerInfo() {
     const el = $("#gegner-info"), g = gegnerInfo && R.fig(st, gegnerInfo);
     if (!g || g.tp <= 0) { gegnerInfo = null; el.hidden = true; el.innerHTML = ""; return; }
+    if (heldA(g)) { // Arena: Held des anderen Spielers – nur das, was man am Tisch auch sähe
+      const an = Math.max(0, g.tp / g.tpMax), zz = R.zustaende(st, g); el.hidden = false;
+      el.innerHTML = `<div class="gi-kopf"><img class="gi-bild" src="${wolfA(g) ? "img/figuren/wolf.jpg" : F.bild(g.fidA)}" alt=""><div><b>${esc(g.name)}</b><small>Gegnerischer Held${g.stufe ? " · Stufe " + g.stufe : ""}</small></div><button class="link" id="gi-zu" aria-label="Schließen">✕</button></div>
+        <div class="gi-tp"><i style="width:${an * 100}%"></i><span>❤ ${g.tp} / ${g.tpMax}</span></div><ul class="gi-werte"><li><span>Rüstungsklasse</span><b>${R.rkEff ? R.rkEff(st, g) : g.rk}</b></li></ul>${zz.length ? `<p class="gi-zust">${zz.map(esc).join(" · ")}</p>` : ""}`;
+      return;
+    }
     const d = R.GEGNER[g.art], anteil = Math.max(0, g.tp / g.tpMax), z = R.zustaende(st, g);
     const eig = Object.keys(GEGNER_INFO).filter((k) => d[k]).map((k) => `<li>${esc(GEGNER_INFO[k])}</li>`).join("");
     el.hidden = false;
@@ -737,7 +757,7 @@
   /** Aktionsleiste unter der Karte: Bewegen · Angreifen · Fähigkeit · Gegenstand · Zug beenden */
   function zeichneLeiste(akt, dran) {
     const el = $("#leiste");
-    if (!st || st.ende || !akt || akt.seite !== "spieler") { el.innerHTML = st && !st.ende && akt ? `<div class="l-wer"><span class="l-warte">${esc(akt.name)} ist am Zug …</span></div>` : ""; return; }
+    if (!st || st.ende || !akt || akt.seite !== "spieler") { el.innerHTML = st && !st.ende && akt ? `<div class="l-wer"><span class="l-warte">${esc(akt.name)}${heldA(akt) ? " (Gegner)" : ""} ist am Zug …</span></div>` : ""; return; }
     const alle = R.aktionenVon(akt, st), frei = (a) => a && !R.grund(st, a.id);
     const angriff = alle.find((a) => (a.typ || "aktion") === "aktion" && a.schaden && !a.platz && R.rest(akt, a) === Infinity);
     const trank = alle.find((a) => a.art === "trank" && !a.gross) || alle.find((a) => a.art === "trank");
@@ -748,6 +768,32 @@
     if (wahl) { const b = el.querySelector(`[data-a="${wahl}"]`); if (b) b.classList.add("gewaehlt"); }
   }
   /** Kampf aus dem Abenteuer heraus: opts für neuesSpiel, cb(st) nach dem Ende */
+  /** Arena: Kampf anzeigen. o: { st (Ersteller: frischer Stand) | null, seite, gast, sende, publish, ende } */
+  function arenaStart(o) {
+    clearTimeout(gegnerTimer); F.STUFEN10.aktiv = true;
+    ARENA = { seite: o.seite, gast: Boolean(o.gast), sende: o.sende || (() => {}), publish: o.publish || (() => {}), ende: o.ende || (() => {}), fertig: false };
+    st = o.st || null; window.AB.st = st; kampfEnde = null; wahl = null; tipp = null; letzteTP = {}; letzterLog = st ? st.log.length : 0;
+    zeigeSpiel(); if (st) { render(); veroeffentlichen(); gegnerSchleife(); }
+  }
+  /** Arena (Beigetretener): neuen Stand vom Ersteller übernehmen */
+  function arenaStand(json) {
+    if (!ARENA || !ARENA.gast || !json) return;
+    st = R.laden(json); window.AB.st = st; wahl = null; render();
+  }
+  /** Arena (Ersteller): Wunsch des Beigetretenen ausführen. Zurück: Fehlertext oder null */
+  function arenaWunsch(v) {
+    if (!ARENA || ARENA.gast || !st || st.ende || !v) return "Der Kampf läuft nicht.";
+    const akt = R.aktiv(st);
+    if (R.teamVon(st, akt) !== 3 - ARENA.seite || akt.seite !== "spieler") return "Du bist gerade nicht am Zug.";
+    let r = null;
+    if (v.typ === "bewegen") r = R.bewegen(st, Number(v.x), Number(v.y));
+    else if (v.typ === "aktion") r = R.handeln(st, String(v.aktion), String(v.ziel || akt.id));
+    else if (v.typ === "ende") R.zugEnde(st);
+    else return "Unbekannter Zug.";
+    render(); veroeffentlichen(); gegnerSchleife();
+    return (r && r.fehler) || null;
+  }
+  function arenaEnde() { clearTimeout(gegnerTimer); ARENA = null; st = null; window.AB.st = null; }
   function kampfStarten(opts, cb) {
     clearTimeout(gegnerTimer);
     st = R.neuesSpiel(Math.floor(Math.random() * 1e9), opts);
@@ -774,21 +820,21 @@
     const b = ev.target.closest("button[data-l]"); if (!b || b.disabled || !st) return;
     const akt = R.aktiv(st), l = b.dataset.l; tipp = null;
     if (l === "bewegen") { wahl = null; render(); return; }
-    if (l === "ende") { wahl = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
+    if (l === "ende") { wahl = null; if (ARENA && ARENA.gast) { ARENA.sende({ typ: "ende" }); return; } R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
     if (l === "faehig") { const el = $("#aktionen"); if (el) { el.scrollIntoView({ behavior: "smooth", block: "nearest" }); el.classList.remove("blink"); void el.offsetWidth; el.classList.add("blink"); } return; }
     const id = b.dataset.a; if (!id) return;
     const h = R.findeAktion(akt, id);
-    if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
+    if (h && SELBST.has(h.a.art)) { if (ARENA && ARENA.gast) { ARENA.sende({ typ: "aktion", aktion: id, ziel: akt.id }); wahl = null; return; } R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
     wahl = wahl === id ? null : id; render();
   });
   $("#aktionen").addEventListener("click", (ev) => {
     const b = ev.target.closest("button"); if (!b || b.disabled || b.tagName !== "BUTTON") return;
-    if (b.id === "ende-zug") { wahl = null; tipp = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
+    if (b.id === "ende-zug") { wahl = null; tipp = null; if (ARENA && ARENA.gast) { ARENA.sende({ typ: "ende" }); return; } R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife(); return; }
     if (b.id === "tipp") { tipp = R.vorschlag(st) || { text: "Gerade kein Vorschlag." }; wahl = null; render(); return; }
     tipp = null;
     const id = b.dataset.a; if (!id) return;
     const akt = R.aktiv(st), h = R.findeAktion(akt, id);
-    if (h && SELBST.has(h.a.art)) { R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
+    if (h && SELBST.has(h.a.art)) { if (ARENA && ARENA.gast) { ARENA.sende({ typ: "aktion", aktion: id, ziel: akt.id }); wahl = null; return; } R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
     wahl = wahl === id ? null : id; render();
   });
   $("#start").onclick = () => { if (!SETUP.gruppe.length) SETUP.gruppe = []; zeigeSetup(); };
@@ -836,7 +882,7 @@
   }
 
   // Für automatische Tests
-  window.AB = { st: null, R, LIVE, SETUP: () => SETUP, META, liveClient, frueherSetzen,
+  window.AB = { arenaStart, arenaStand, arenaWunsch, arenaEnde, arenaAn: () => Boolean(ARENA), st: null, R, LIVE, SETUP: () => SETUP, META, liveClient, frueherSetzen,
     /** Neues Abenteuer wählen (Spielerseite → Neue Kampagne): Daten, Mindestgröße und Texte für Einleitung und Kodex */
     abenteuerWaehlen(id) { SETUP.abenteuer = id || "grauwacht"; setupMerken(); if (window.ABE && window.ABE.abenteuerTexte) window.ABE.abenteuerTexte(META()); }, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
     liveBeenden: async () => { try { await LIVE.client.leave(); } catch (e) { /* schon zu */ } LIVE.phase = null; vergessen(); zeichneLiveBar(); },

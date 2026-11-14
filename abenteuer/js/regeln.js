@@ -1313,7 +1313,9 @@
     const fern = k.start.gegner.slice().sort((a, b) => (Math.abs(b[0] - schwer.x) + Math.abs(b[1] - schwer.y)) - (Math.abs(a[0] - schwer.x) + Math.abs(a[1] - schwer.y)));
     const s2 = fern.slice(0, 3), rest = fern.slice(3).sort((a, b) => (Math.abs(a[0] - mitte.x) + Math.abs(a[1] - mitte.y)) - (Math.abs(b[0] - mitte.x) + Math.abs(b[1] - mitte.y)));
     const karte = Object.assign({}, k, { start: Object.assign({}, k.start, { spieler: s1.concat(s2), gegner: rest.length ? rest : k.start.gegner, wolf: (k.start.wolf || []).concat(fern.slice(3)) }) });
-    const st = neuesSpiel(seed, { figuren: alle.map((h) => h.fid), stufenListe: alle.map((h) => h.stufe), karte, begegnung: o.begegnung, bedrohung: o.bedrohung || 0, mischen: false, anfuehrer: false, zusatzGegner: 0, skala: o.skala != null ? o.skala : 0.6 }); // Monster bewusst schwach
+    const st = neuesSpiel(seed, { figuren: alle.map((h) => h.fid), stufenListe: alle.map((h) => h.stufe), karte, begegnung: o.begegnung, bedrohung: 0, mischen: false, anfuehrer: false, zusatzGegner: 0,
+      // Monster bewusst wenige und schwach (so viele wie für zwei Helden, 60 % Leben, ohne Bedrohung): Der Kampf der Spieler steht im Mittelpunkt
+      gegner: gegnerFuer(o.begegnung, 2, null, o.skala != null ? o.skala : 0.6, false, 0) });
     const helden = st.figuren.filter((f) => /^f\d+$/.test(f.id));
     helden.forEach((f, i) => { f.team = i < 3 ? 1 : 2; f.arenaStart = [f.x, f.y]; });
     st.arena = { punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || 15, sicht: 0, sieger: null };
@@ -2199,7 +2201,7 @@
   /* ---------- Speichern und öffentliche Ansicht ---------- */
   function speichern(st) {
     const o = Object.assign({}, st); delete o.r;
-    o.karte = { name: st.karte.name, b: st.karte.b, h: st.karte.h, hindernisse: st.karte.hindernisse, start: st.karte.start };
+    o.karte = { name: st.karte.name, b: st.karte.b, h: st.karte.h, bild: st.karte.bild || null, boden: st.karte.boden || null, hindernisse: st.karte.hindernisse, start: st.karte.start };
     return JSON.parse(JSON.stringify(o));
   }
   function laden(o) {
@@ -2227,7 +2229,7 @@
   }
 
   const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
-    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, neueArena, teamVon, gegnerZug, autoZug,
+    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, neueArena, teamVon, arenaSicht, KARTE_GARTEN, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;

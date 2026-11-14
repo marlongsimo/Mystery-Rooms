@@ -399,10 +399,11 @@
     $("#hub-gruss").textContent = konto ? `Willkommen zurück, ${name}!` : "Willkommen in Mythara!";
     const gh = $("#hub-gast-hinweis"); gh.hidden = konto;
     if (!konto) gh.innerHTML = `<span>Du spielst als <b>Gast</b>. Deine Kampagnen sind an diesen Browser gebunden. Mit einem Konto hast du sie auf jedem Gerät.</span><span class="hub-gast-knoepfe"><button class="my-link" data-profil="registrieren">Konto erstellen</button><button class="my-link" data-profil="anmelden">Anmelden</button></span>`;
-    $("#hub-profil").innerHTML = `<button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small id="hub-titel">${konto ? esc((smAktiv() && SM.titelText()) || "Spieler") : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
+    $("#hub-profil").innerHTML = `<span class="arena-waehrung kopf" id="hub-waehrung" hidden></span><button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small id="hub-titel">${konto ? esc((smAktiv() && SM.titelText()) || "Spieler") : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
       <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
+    arenaKachel();
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-einst").onclick = () => { const t = $("#titel-einst"); if (t) t.click(); };
     const gl = $("#hub-glocke"); if (gl) gl.onclick = anfragenZeigen;
@@ -595,7 +596,22 @@
     if (was === "welt") return weltSeite();
     if (was === "regeln") return regelnSeite();
     if (was === "beitreten") return beitretenDialog();
+    if (was === "arena") return window.ARENA ? window.ARENA.zeigen() : toast("Die Arena ist gerade nicht verfügbar.");
   });
+  /* ---------- Arena (Migration 008): Gibt es sie, steht auf der Startseite „Arena“ statt „Kampagne beitreten“ ---------- */
+  function waehrungZeigen(n) {
+    const el = $("#hub-waehrung"); if (!el || !window.ARENA) return;
+    el.hidden = !(profil && profil.konto); el.title = window.ARENA.WAEHRUNG + ": Belohnung für Siege in der Arena";
+    el.innerHTML = `<i>${window.ARENA.ZEICHEN}</i>${Number(n) || 0}`;
+  }
+  let kachelAlt = null;
+  async function arenaKachel() {
+    const k = document.querySelector('.hub-kachel[data-hub="beitreten"], .hub-kachel[data-hub="arena"]'); if (!k || !window.ARENA) return;
+    if (kachelAlt == null) kachelAlt = k.innerHTML;
+    const da = Boolean(profil && profil.konto) && await window.ARENA.pruefen();
+    if (da) { k.dataset.hub = "arena"; const b = k.querySelector("b"), s = k.querySelector("small"); if (b) b.textContent = "Arena"; if (s) s.textContent = "Tritt mit drei deiner Helden gegen einen anderen Spieler an."; waehrungZeigen(window.ARENA.waehrung()); }
+    else { k.dataset.hub = "beitreten"; k.innerHTML = kachelAlt; }
+  }
 
   /* ---------- Zur Startseite (MYTHARA oben rechts und das Logo) ---------- */
   const SPIELANSICHT = ["szene", "spiel", "ende", "lobby", "einleitung", "einladen", "kodex", "intro"];
@@ -640,5 +656,5 @@
   });
   /** Die Kampagne, die in der Übersicht nach dieser kommt (für „Weiter mit der nächsten Kampagne“) */
   const naechstesAbenteuer = (id) => { const l = ABENTEUER(), i = l.findIndex((m) => m.id === id); return i >= 0 && l[i + 1] ? l[i + 1] : null; };
-  window.MYTHARA = { KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
+  window.MYTHARA = { seite: seiteZeigen, waehrungZeigen, KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
 })();

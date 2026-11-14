@@ -155,6 +155,12 @@
   /** Kopfleiste: Kampagne, Kapitel, Uhr (Glocke/Kälte/Frost …), Runde, Stufe */
   function kopf(st) {
     const el = $("#kampf-kopf"); if (!el) return;
+    if (st.arena) { // Arena: Namen, Karte, Runde und Punktestand
+      el.innerHTML = `<div class="kk-logo">MYTHARA</div><div class="kk-trenner"></div>
+        <div class="kk-titel"><b>Arena</b><span>${esc(st.arena.namen[0])} gegen ${esc(st.arena.namen[1])} · ${esc(st.karte.name || "")}</span></div>
+        <div class="kk-rechts"><div class="kk-chip">Runde <b>${st.runde}</b> von ${st.arena.runden}</div><div class="kk-chip">Punkte <b>${st.arena.punkte[1]} : ${st.arena.punkte[2]}</b></div></div>`;
+      return;
+    }
     const D = window.ABD_ALLE && window.ABD_ALLE[kampagne()], m = (D && D.META) || {}, i = window.ABT && window.ABT.info ? window.ABT.info() : null;
     const kap = i && m.abschnitte_namen ? m.abschnitte_namen[i.abschnitt] : "", rom = ["", "I", "II", "III", "IV"][i ? i.abschnitt : 0] || "";
     const uhr = m.uhr, g = i ? i.glocke || 0 : 0, max = (uhr && uhr.max) || 7;

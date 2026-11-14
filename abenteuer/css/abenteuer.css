@@ -1590,3 +1590,42 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .segen-leiste.handy span { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; border-radius: 10px; padding: 7px 10px; cursor: default; }
 .segen-leiste.handy b { color: #f1e3bf; font-weight: 600; }
 .segen-leiste.handy em { grid-column: 2; font-style: normal; color: #b9ad94; font-size: 12px; }
+
+/* ---------- Arena ---------- */
+.arena-waehrung { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(160,140,255,.5); background: rgba(120,100,220,.16); color: #e6dcff; font: 600 14px "Inter", sans-serif; }
+.arena-waehrung i { font-style: normal; color: #b9a6ff; }
+.arena-waehrung.kopf { margin-right: 8px; }
+.arena-kopf { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px; }
+.arena-kopf-rechts { display: flex; align-items: center; gap: 10px; }
+.arena-mein, .arena-liste li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(217,180,106,.25); background: rgba(0,0,0,.28); margin: 8px 0; }
+.arena-mein { border-color: rgba(246,220,156,.6); background: rgba(217,180,106,.1); }
+.arena-liste { list-style: none; margin: 0; padding: 0; }
+.arena-mein b, .arena-liste b { display: block; font: 600 16px "Cinzel", serif; color: #f1e3bf; }
+.arena-mein small, .arena-liste small { color: #b9ad94; font: 400 13px "Inter", sans-serif; }
+.arena-schnitt { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(217,180,106,.3); background: rgba(0,0,0,.3); margin: 8px 0 12px; position: sticky; top: 6px; z-index: 5; color: #d9d0bd; font: 400 14px "Inter", sans-serif; }
+.arena-schnitt b { color: #f1e3bf; } .arena-schnitt strong { color: #f6dc9c; font-size: 17px; }
+.arena-schnitt.gut { border-color: rgba(111,195,122,.6); } .arena-schnitt.schlecht { border-color: rgba(224,67,79,.7); background: rgba(224,67,79,.1); }
+.arena-helden { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.arena-held { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px 10px; border-radius: 12px; border: 2px solid rgba(255,255,255,.12); background: rgba(0,0,0,.3); color: #ece4d4; cursor: pointer; font: inherit; }
+.arena-held img { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; object-position: top; border: 2px solid var(--k, #d9b46a); }
+.arena-held b { font: 600 14px "Cinzel", serif; } .arena-held small { color: #b9ad94; font-size: 12px; } .arena-held em { font-style: normal; color: #f6dc9c; font: 600 12px "Inter", sans-serif; }
+.arena-held.an { border-color: #f6dc9c; background: rgba(217,180,106,.16); box-shadow: 0 0 0 2px rgba(246,220,156,.25); }
+.arena-held.fest { cursor: default; }
+.arena-gegenueber { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: center; margin: 14px 0; }
+.arena-team { padding: 12px; border-radius: 14px; border: 1px solid rgba(111,195,122,.45); background: rgba(0,0,0,.28); }
+.arena-team.gegner { border-color: rgba(224,67,79,.55); }
+.arena-team h3 { display: flex; justify-content: space-between; margin: 0 0 10px; font: 600 16px "Cinzel", serif; color: #f1e3bf; } .arena-team h3 span { color: #f6dc9c; font: 600 14px "Inter", sans-serif; }
+.arena-team-helden { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .arena-team-helden .arena-held img { width: 64px; height: 64px; }
+.arena-vs { font: 600 14px "Cinzel", serif; color: #d9b46a; letter-spacing: .1em; text-transform: uppercase; }
+@media (max-width: 720px) { .arena-gegenueber { grid-template-columns: 1fr; } .arena-vs { text-align: center; } }
+.arena-aufgeben { position: fixed; right: 12px; bottom: 12px; z-index: 60; opacity: .8; }
+.arena-ende { position: fixed; inset: 0; z-index: 950; display: grid; place-items: center; overflow-y: auto; padding: 24px 16px; color: #ece4d4; text-align: center; background: radial-gradient(ellipse at 50% 20%, rgba(217,180,106,.35), rgba(10,8,6,.96) 60%), #0b0906; }
+.arena-ende.niederlage { background: radial-gradient(ellipse at 50% 20%, rgba(160,40,50,.4), rgba(10,8,6,.97) 60%), #0b0906; }
+.arena-ende-inhalt { max-width: 560px; width: 100%; }
+.arena-ende h1 { font: 700 clamp(48px, 12vw, 96px) "Cinzel", serif; margin: 6px 0 4px; color: #f6dc9c; text-shadow: 0 4px 30px rgba(246,220,156,.45); letter-spacing: .04em; }
+.arena-ende.niederlage h1 { color: #e58a8f; text-shadow: 0 4px 30px rgba(224,67,79,.45); }
+.arena-ende-eyebrow { font: 600 12px "Inter", sans-serif; letter-spacing: .16em; text-transform: uppercase; color: #d9b46a; margin: 0; }
+.arena-ende-punkte { font: 600 30px "Cinzel", serif; color: #f1e3bf; margin: 0 0 6px; }
+.arena-ende-lohn { font: 600 18px "Inter", sans-serif; color: #e6dcff; margin: 12px 0 6px; } .arena-ende-lohn i { font-style: normal; color: #b9a6ff; } .arena-ende-lohn.held { color: #f6dc9c; }
+.arena-ende-note { color: #b9ad94; font-size: 14px; }
+.arena-xp { text-align: left; margin: 10px auto; }

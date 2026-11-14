@@ -11,6 +11,17 @@ Stand: 14. November 2026 · Status: **Konzept, noch nichts gebaut**
 - **Belohnungen:** XP gestaffelt nach Stufe, bei Niederlage ein Drittel; Obergrenze je Tag; bei jedem Sieg 8 % Chance auf eine Heldenwahl aus drei fehlenden Helden (Abschnitt 10).
 - **Kein großes Balancing vorab.** Der Modus startet mit den Helden, wie sie sind. Stattdessen zeichnet ein Auswertungswerkzeug jede Partie auf (Aufstellung, Stufen, Ergebnis). Nachgezogen wird, wenn die Zahlen es zeigen.
 
+**Stand der Umsetzung (14. November 2026) – erste spielbare Fassung „Arena“:**
+- **Gebaut:** Regelkern für zwei Teams (`js/regeln.js`: `neueArena`), Migration `supabase/008_rpg_arena.sql` (Kämpfe, Belohnungen, Währung), Arena-Seite (`js/arena.js`), Kampf zwischen zwei Geräten über die Live-Verbindung, Ergebnisbildschirm, Währung „Seelensplitter“ neben dem Profilbild. Auf der Startseite steht „Arena“ statt „Kampagne beitreten“, sobald die Migration läuft.
+- **Abweichungen vom Konzept unten (bewusst, für die erste Fassung):**
+  - **Sieg:** kein Artefakt. Es endet, sobald ein Team vollständig am Boden liegt (das andere gewinnt), spätestens nach 15 Runden (dann nach Punkten: gegnerischer Held zu Boden 5, Monster 1, Endgegner 2). Der Kampf der Spieler steht im Mittelpunkt, die Monster sind wenige und schwach (so viele wie für zwei Helden, 60 % Leben).
+  - **Kein Wiederkehren am Startpunkt:** Wer am Boden liegt, kann wie gewohnt von Verbündeten aufgerichtet oder geheilt werden.
+  - **Technik:** Das Gerät des Erstellers rechnet den Kampf, das andere zeigt den Stand und schickt seine Züge (wie Tisch und Handys). Mitrechnen auf beiden Geräten und Würfel vom Server fehlen noch – der Ersteller könnte theoretisch schummeln. Beide Seiten melden das Ergebnis; gewertet wird nur bei Übereinstimmung und frühestens nach zwei Minuten.
+  - **Regeln gegen Helden (Abschnitt 4) sind nicht umgesetzt.** Während ein Spieler zieht, gelten die Helden des anderen für die Regeln als Gegner: Schadenszauber und Angriffe wirken normal, viele Kontrolleffekte halten gegen Helden nicht an, und Reaktionen der gegnerischen Helden (Schutzhaltung, Parade) greifen in fremden Zügen nicht.
+  - **Kein Zeitlimit je Zug, keine Aufzeichnung für die Auswertung** (Abschnitt 7) – beides folgt.
+  - **Karten:** die sieben Karten aus Grauwacht (unverändert, 12 × 9). Die Startseiten sind nicht spiegelgleich; in der Simulation gewinnt der Ersteller etwas öfter (57 % von 150 Partien).
+- **Geprüft:** Datenbankfunktionen lokal (`supabase/tests/008_rpg_arena_test.sql`), Regelkern in 150 simulierten Partien ohne Fehler oder Hänger, der ganze Ablauf mit zwei Browsern (`tests/arena.test.js`, Datenbank nachgebildet, Live-Verbindung echt). Nicht geprüft: gegen die echte Datenbank und von Hand gespielt.
+
 ---
 
 ## 1. Leitidee

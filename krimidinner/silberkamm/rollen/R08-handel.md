@@ -51,6 +51,7 @@ Kommt das heraus, bist du in der Schweiz erledigt. Bestechung eines Vermittlers,
 
 - **20:00–20:30** Dinner, du sitzt neben Auen. Du sagst zu ihm: „Wenn Paragraph 9 bleibt, platzt alles.“ Paragraph 9 heißt „Altlasten 1921“: Der Verkäufer haftet für alle Ansprüche aus dem Unglück.
 - **21:40–21:55** In Salon 6. Auen streicht Paragraph 9 mit Bleistift und sagt: „Entweder so, oder ich unterschreibe nicht.“ Du sagst, die Schweizer werden das nie akzeptieren. Er lacht: „Das Original reist in meiner Mappe. Zürich bekommt nur, was ich ihnen gebe.“ In dem Moment serviert {R07: die Stewardess / der Steward} Cognac.
+- **gegen 21:50** Auen tritt kurz mit einem Kuvert auf den Gang und winkt {R02: die Zugbegleiterin / den Zugbegleiter} heran. Nach einer Minute ist er zurück, ohne Kuvert.
 - **21:55** Du gehst. Wütend.
 
 ## Runde 1 · Der Tote im Abteil

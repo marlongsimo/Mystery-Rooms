@@ -1,6 +1,6 @@
 # Der letzte Gast – Beweiskarten B1–B14
 
-Stand: 1.0 · Grundlage: Fallbuch 0.6 (Abschnitt 5). **Die Karten B13 und B14 verraten die Lösung.**
+Stand: 1.0 · Grundlage: Fallbuch 0.10 (Abschnitt 5). **Die Karten B13 und B14 verraten die Lösung.**
 
 ---
 
@@ -157,6 +157,8 @@ Ein kleines **Funkmikrofon**, eingeschaltet, mit Klebeband unter der Tischplatte
 | Zeit | Karte | Tür |
 |---|---|---|
 | 20:44 | Sander | Verbindungstür West |
+| 20:46 | Rademacher | Verbindungstür Ost (in den Ostflügel) |
+| 20:47 | Rademacher | Archiv (hinein) |
 | 20:49 | Gast 02 (Marwitz) | Verbindungstür West |
 | 21:03 | Gast 04 (Lindner) | Verbindungstür West |
 | 21:03 | Rademacher | Archiv (hinaus) |
@@ -173,6 +175,8 @@ Ein kleines **Funkmikrofon**, eingeschaltet, mit Klebeband unter der Tischplatte
 | 21:30 | Rademacher | Verbindungstür Ost (in den Ostflügel) |
 | 21:31 | Rademacher | Archiv (hinein) |
 | 21:33 | Hollerbach | Verbindungstür West |
+
+*Der Auszug endet mit dem Fund um 21:35. Was danach gebucht wurde, ist nicht aufgeführt.*
 
 *Auf der gedruckten Karte ist keine Zeile hervorgehoben.*
 

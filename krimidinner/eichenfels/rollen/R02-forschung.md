@@ -9,7 +9,7 @@
 **Dr. [Irene / Ingo] Marwitz**, 61
 [Astrophysikerin / Astrophysiker], bis zum letzten Jahr am Observatorium Uppsala, Schweden, jetzt emeritiert
 
-**Beziehung zum Opfer:** Vor dreißig Jahren wart ihr ein Team. Zwei junge Leute in einer kalten Kuppel, die nachts den Nordhimmel kartierten. Dann bekam Sander die Professur und den Ruhm, und du bekamst eine Fußnote, die im Druck verschwand. Ihr habt euch 25 Jahre nicht gesehen.
+**Beziehung zum Opfer:** Vor dreißig Jahren wart ihr ein Team. Zwei junge Leute in einer kalten Kuppel, die nachts den Nordhimmel kartierten. Dann bekam Sander die Professur und den Ruhm, und du bekamst eine Fußnote, die im Druck verschwand. Ihr habt euch fast dreißig Jahre nicht gesehen.
 
 **Eigenschaften:** klug · direkt · nachtragend und weiß es · wird laut, wenn es um Wahrheit geht · hat Schwedisch gelernt, aber nie die deutsche Höflichkeit verlernt
 
@@ -23,7 +23,7 @@ Zwei Winter lang habt ihr fast jede klare Nacht in der Kuppel verbracht. Er beob
 
 1997 erschien der „Himmelsatlas von Eichenfels“ und machte Sander bekannt. Auf dem Titel stand ein Name. Im Vorwort dankte er „allen, die in kalten Nächten geholfen haben“. Im selben Jahr bekam er die Professur in Jena und die Leitung der Stiftung. Du hast ihn zur Rede gestellt. Er sagte: „Ein Atlas braucht einen Namen, nicht zwei. Du wirst deinen eigenen machen.“ Du bist nach Uppsala gegangen und hast nie wieder einen Atlas gemacht.
 
-Diesen Herbst kam ein Brief, mit der Hand geschrieben, nach 25 Jahren: „Komm zum Jubiläum. Ich schulde dir etwas, und ich habe nicht mehr viel Zeit, es zu bezahlen.“ Du bist gekommen, misstrauisch und voller Hoffnung, beides zugleich. Den Brief hast du zwanzigmal gelesen, auf dem Flug, im Zug, im Taxi.
+Diesen Herbst kam ein Brief, mit der Hand geschrieben, nach fast dreißig Jahren: „Komm zum Jubiläum. Ich schulde dir etwas, und ich habe nicht mehr viel Zeit, es zu bezahlen.“ Du bist gekommen, misstrauisch und voller Hoffnung, beides zugleich. Den Brief hast du zwanzigmal gelesen, auf dem Flug, im Zug, im Taxi.
 
 Heute um 20:49 bist du ihm in den Kartenraum gefolgt. Du wolltest es von ihm hören, sofort, unter vier Augen. Er sagte: „Um zehn. Vor allen. Wenn ich die Blätter dann noch habe.“ Du hast das für eine weitere Ausrede gehalten und bist laut geworden. Sehr laut.
 
@@ -71,7 +71,7 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 
 **Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Ja, das heißt: Du musst zugeben, dass du allein in der Kuppel warst, im Westflügel, zur Tatzeit.
 
-- **Phase 2 (Mord):** Alle haben den Streit gehört oder werden davon hören. Leugne ihn nicht, Regel 2. Sag, worum es ging, so viel du willst.
+- **Phase 2 (Mord):** Der Streit war laut, man wird davon hören. Leugne ihn nicht, Regel 2. Sag, worum es ging, so viel du willst.
 
 ## Runde 2 · Jetzt fällt dir ein
 
@@ -81,7 +81,7 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 - Rademacher wollte wissen, ob du „noch Unterlagen aus der Atlas-Zeit“ hast. Warum interessiert das das Archiv?
 
 - **Phase 3 (Geheimnisse):** Wenn die Archivliste (Karten 41–48) auf den Tisch kommt, ist das dein Moment. Das sind deine Karten. Überleg, ob du es jetzt sagst oder ob es dich verdächtiger macht.
-- **Wen du ansprechen solltest:** Faber (Ziel 2), Rademacher (warum die Frage nach den Unterlagen?), Ritter (hat Sander etwas über dich verfügt?).
+- **Wen du ansprechen solltest:** Faber (euer Alibi), Rademacher (warum die Frage nach den Unterlagen?), Ritter (hat Sander etwas über dich verfügt?).
 - **Was du vermeiden solltest:** dich in Wut zu reden. Genau das erwartet man von der Person, die es getan hat.
 - **Trumpf:** Faber war von 21:07 bis 21:14 bei dir in der Kuppel und hat den Strom von Hand abgeschaltet.
 

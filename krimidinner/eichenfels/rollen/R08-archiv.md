@@ -23,7 +23,7 @@ Fünfzehn Jahre später ist das Gehalt kaum gestiegen. Deine Mutter lebt seit dr
 
 Vor zwei Jahren hast du bei einer Auktion in Leipzig Falk kennengelernt, {R10: die großzügigste Förderin / den großzügigsten Förderer} der Stiftung, {R10: Sammlerin / Sammler} historischer Instrumente. Ihr habt über Sternkarten geredet, und irgendwann fiel der Satz, der alles änderte: „Für ein Original aus dem Eichenfelser Atlas würde ich jeden Preis zahlen. Kein Mensch merkt den Unterschied zu einem guten Faksimile.“
 
-Du hast es erst für einen Scherz gehalten. Dann hast du gerechnet. Im letzten Februar hast du die Sternkarten 41 bis 48 gegen Faksimiles getauscht, so gut gemacht, dass selbst Sander sie ein Jahr lang nicht bemerkte. In der Archivliste hast du die Inventarnummern geändert und mit „Abgleich: J. R.“ abgezeichnet. Ritter von der Kanzlei hast du gebeten, die Versicherungsliste „ohne die Karten 41–48, die sind in der Restaurierung“ zu unterschreiben. Falk zahlt 180 000 €. Abholung: morgen, Sonntag, 8 Uhr, in einer Transportkiste mit der Aufschrift „Leihgabe – Falk Collection“.
+Du hast es erst für einen Scherz gehalten. Dann hast du gerechnet. Im letzten Februar hast du die Sternkarten 41 bis 48 gegen Faksimiles getauscht, so gut gemacht, dass selbst Sander sie monatelang nicht bemerkte. In der Archivliste hast du die Inventarnummern geändert und mit „Abgleich: J. R.“ abgezeichnet. Ritter von der Kanzlei hast du gebeten, die Versicherungsliste „ohne die Karten 41–48, die sind in der Restaurierung“ zu unterschreiben. Falk zahlt 180 000 €. Abholung: morgen, Sonntag, 8 Uhr, in einer Transportkiste mit der Aufschrift „Leihgabe – Falk Collection“.
 
 Was du nicht wusstest: Auf genau diesen acht Blättern stehen am Rand Korrekturen, jede mit „I. M.“ abgezeichnet. Für dich waren es Kritzeleien. Für Sander waren sie das Letzte, was ihm wichtig war.
 
@@ -74,7 +74,7 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 
 **Zweite Linie – das Kleinere zugeben, um das Größere zu retten.** Nimm sie erst, wenn deine Geschichte wirklich nicht mehr hält: frühestens in Phase 3 und erst, wenn dich mindestens zwei Personen direkt beschuldigen. Dann erzählst du:
 
-„Also gut. Ja – ich habe die acht Blätter gegen Kopien getauscht und an Falk verkauft. Sander hatte mich für Viertel nach neun in den Kartenraum bestellt, ich war schon kurz nach neun da. Er hat mir gedroht, mit der Polizei, mit allem. Nach ein paar Minuten bin ich gegangen. **Da hat er noch gelebt.** Ich habe mich auf die Treppe gesetzt, im Dunkeln, ich konnte nicht mehr. Das Paket um zwanzig nach? Die Mappe mit den Kopien, die er mir hingeworfen hat. Ich wollte sie in die Restaurierung bringen, bevor sie jemand findet.“
+„Also gut. Ja – ich habe die acht Blätter gegen Kopien getauscht und an Falk verkauft. Sander hatte mich für Viertel nach neun in den Kartenraum bestellt, ich war schon kurz nach neun da. Er hat mir gedroht, mit der Polizei, mit allem. Nach ein paar Minuten bin ich gegangen. **Da hat er noch gelebt.** Ich habe mich auf die Treppe gesetzt, im Dunkeln, ich konnte nicht mehr. Das Paket um zwanzig nach? Die Mappe mit den Kopien, ich habe sie aus dem Kartenraum mitgenommen. Ich wollte sie in die Restaurierung bringen, bevor sie jemand findet.“
 
 - Ab jetzt gilt: **Den Verkauf gibst du zu, den Mord nie.** Bleib bis zum Finale dabei.
 - Falk gerät dadurch mit in den Verdacht. Das ist gewollt, denn jetzt muss die Gruppe zwischen euch beiden entscheiden.
@@ -90,9 +90,11 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 
 *Du kennst die Tat von Anfang an, damit du dich vorbereiten kannst. Im Spiel geschieht sie erst nach Sanders Rede. Beim Empfang spielst du, als wäre nichts.*
 
+- **Gestern, Freitag, 16 Uhr:** Sander hatte dich zur Inventur des Atlas bestellt und fragte nach den Karten 41 bis 48. Du hast auf den Vermerk verwiesen: „Faksimile, Original in Restaurierung“. Er sagte nichts dazu. In seinem Kalender steht dieser Termin unter „R.“.
 - **Nachmittag:** Sander kam ins Archiv, legte dir einen Zettel hin und ging wieder: „Kommen Sie um Viertel nach neun in den Kartenraum. Bringen Sie die Archivliste mit.“ Du wusstest sofort, dass er es entdeckt hatte.
 - **Beim Dinner** saßt du neben Falk. Hollerbach hatte den Sitzplan geändert. Falk sprach dich beim Hauptgang mit dem Vornamen an. Du hast {R10: sie / ihn} unter dem Tisch angestoßen.
 - **20:40** Sanders Rede. „Eine Person, die sich seit Jahren in Sicherheit wiegt.“ Du hast gelächelt und applaudiert.
+- **20:46** Verbindungstür Ost, **20:47** Archiv (deine Karte). Dort hast du gewartet.
 - **21:03** Archiv verlassen (Karte). **21:04** Verbindungstür Ost in den Mittelbau. **21:05** Verbindungstür West.
 - **21:05–21:08** Du hast im Flur vor dem Kartenraum gewartet. Drinnen sprach jemand mit Sander, Lindner von der Presse. Um 21:08 ging das Licht aus, Lindner kam heraus und lief an dir vorbei. Ob {R04: sie / er} dich gesehen hat, weißt du nicht.
 - **21:09** Kartenraum. Sander: „Sie sind früh.“ Er hielt dir die Archivliste hin. „Um zehn erfahren es alle. Morgen die Polizei.“ Du hast die Handschuhe angezogen, als wolltest du die Blätter zeigen. Dann hast du den Messingsockel der Armillarsphäre genommen und zugeschlagen. Einmal.
@@ -102,24 +104,24 @@ Seit Februar schläfst du schlecht. Jedes Mal, wenn Sander das Archiv betrat, ha
 
 ## Vertraulich · Beim Empfang
 
-**Regeln für dich:** Du darfst lügen, auch über Aufenthaltsort und Handlungen. Erfinde aber keine Beweisstücke, und behaupte nichts, was einem ausgeteilten Beweis direkt widerspricht, ohne eine Erklärung zu haben. Ein gutes Spiel braucht eine gute Verteidigung, kein Schweigen.
+**Regeln für dich:** Du darfst als einzige Person am Tisch über deine eigenen Aufenthaltsorte und Handlungen lügen. Erfinde aber keine Tatsachen über andere und keine Beweisstücke, und behaupte nichts, was einem ausgeteilten Beweis direkt widerspricht, ohne eine Erklärung zu haben. Ein gutes Spiel braucht eine gute Verteidigung, kein Schweigen.
 
 - **Phase 1 (Empfang):** Sei freundlich und hilfsbereit, erzähl gern vom Atlas. Wer viel über Sternkarten weiß, wirkt harmlos.
 
 ## Runde 1 · Nach dem Fund
 
-- **Phase 2 (Mord):** Wirk erschüttert, nicht überrascht. Erzähl deine Geschichte von Anfang an so, wie sie oben steht, mit Westflügel und Restaurierung. Dann passt sie später zum Protokoll. Erwähne beiläufig den Streit zwischen Marwitz und Sander.
+- **Phase 2 (Mord):** Wirk erschüttert, nicht überrascht. Erzähl deine Geschichte von Anfang an so, wie sie oben steht, mit Westflügel und Restaurierung. Dann passt sie später zum Protokoll. Kommt ein Streit zwischen Marwitz und Sander zur Sprache, halte das Thema am Leben.
 
 ## Runde 2 · Jetzt fällt dir ein
 
 **Was du über andere weißt:**
-- Marwitz hat Sander heute angeschrien, alle haben es gehört. {R02: Sie / Er} war danach lange verschwunden.
+- Marwitz und Sander hatten heute Abend Streit im Kartenraum. Selbst gehört hast du ihn nicht, du warst im Archiv. Greif auf, was andere davon erzählen. {R02: Sie / Er} war danach lange verschwunden.
 - Faber ist kurz vor dem Stromausfall in den Westflügel gegangen. Ein Sturmschaden genau zur richtigen Zeit?
 - Ritter heißt mit Nachnamen auf R., genau wie du. Und hat dieselben Initialen: J. R.
 - {R01: Leonie / Leon} Sander erbt, oder erbte.
 
-- **Phase 3 (Kalender und Archivliste):** Gefährlich. Das „R.“ und das „J. R.“ passen auch auf Ritter, nutze das, aber greif Ritter nicht zu offen an. Zur Archivliste: „Die Inventarnummern habe ich auf Anweisung geändert, als die Originale zur Restaurierung gingen. Das ist ein normaler Vorgang.“ Kippt es jetzt schon gegen dich, denk an die **zweite Linie** (Teil „Vertraulich“).
-- **Wen du ansprechen solltest:** Faber, um ihn wegen des Stromausfalls nervös zu machen. Marwitz, um {R02: sie / ihn} über den Streit reden zu lassen.
+- **Phase 3 (Kalender und Archivliste):** Gefährlich. Das „R.“ und das „J. R.“ passen auch auf Ritter, nutze das, aber greif Ritter nicht zu offen an. Zur Archivliste: „Die Inventarnummern habe ich geändert, als die Originale zur Restaurierung gingen. Das ist ein normaler Vorgang.“ Kippt es jetzt schon gegen dich, denk an die **zweite Linie** (Teil „Vertraulich“).
+- **Wen du ansprechen solltest:** Faber, um {R09: sie / ihn} wegen des Stromausfalls nervös zu machen. Marwitz, um {R02: sie / ihn} über den Streit reden zu lassen.
 - **Was du vermeiden solltest:** die Restaurierung zu erwähnen, bevor es jemand anderes tut. Mit Falk auffällig zu tuscheln.
 
 ## Runde 3 · Die letzte Ermittlung

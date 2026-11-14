@@ -58,7 +58,7 @@ Du führst seit 1993 das Schlüsselbuch des Hauses. Jeder Schlüssel, der ausgeg
 
 ## Runde 1 · Der Sturz
 
-- Zeig auf den Warnzettel und das Mängelbuch (B3). Sag ehrlich: „Ich wollte Hanno die Reparatur am Montag offiziell abnehmen lassen. Bis dahin ließ ich den Zettel hängen.“ Dass die Reparatur schon gemacht ist, behältst du zunächst für dich. Erst in Runde 4 sagst du es. Behaupte aber nie, die Leiter sei noch defekt gewesen.
+- Zeig auf den Warnzettel und das Mängelbuch (B3). Sag ehrlich: „Den Zettel habe ich am 01.10. selbst an die Leiter geklebt. Er hing heute Abend noch dran.“ Dass die Reparatur schon gemacht ist und warum der Zettel noch hing, behältst du zunächst für dich. Erst in Runde 4 sagst du es. Behaupte aber nie, die Leiter sei noch defekt gewesen.
 
 ## Runde 2 · Das Hinterzimmer
 
@@ -74,7 +74,7 @@ Du führst seit 1993 das Schlüsselbuch des Hauses. Jeder Schlüssel, der ausgeg
 
 **In dieser Runde legst du offen,** bevor die Anklagen abgegeben werden:
 
-- „Ich habe die Leiter am Freitag neu vernietet und geprüft. Hier ist die Quittung vom 15.10. Die oberste Stufe war fest.“
+- „Ich habe die Leiter am Freitag neu vernietet und geprüft. Hier ist die Quittung vom 15.10. Die oberste Stufe war fest. Den Zettel ließ ich hängen, weil ich Hanno die Reparatur am Montag offiziell abnehmen lassen wollte.“
 - „Um 20:46 habe ich ein dumpfes Poltern gehört. Von etwa 20:48 bis 20:52 lief nebenan im Beratungsraum der Aktenvernichter.“
 - Den Flachmann darfst du erwähnen oder nicht.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

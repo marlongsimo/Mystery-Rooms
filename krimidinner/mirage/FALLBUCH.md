@@ -73,7 +73,7 @@ Während der letzten Vorstellung des Palais Mirage liegt der Impresario längst 
 ```
 
 - **Der Illusionsweg** führt nur über Klappe A im Vorderraum. Vey verschwindet um 22:16 dort und erscheint im Balkon. Die Rückkammer berührt dieser Weg nie.
-- **Die Rückkammer** öffnet man von unten: ein **alter Riegelhebel** hinter dem Gegengewichtsschacht, dann fährt die **Versenkung** (Handkurbel, 2 Minuten) durch Klappe 3 nach oben. So kommt ein Körper in die Kammer, ohne dass ihn jemand hochheben muss. **[0.3]** Den Hebel kennen nur die, die „Der doppelte Mann“ gebaut haben: Varn und Velten. Dorne weiß, dass die Kammer existiert, hat den Hebel aber nie bedient. **[NEU]**
+- **Die Rückkammer** öffnet man von unten: ein **alter Riegelhebel** hinter dem Gegengewichtsschacht, dann fährt die **Versenkung** (Handkurbel, eine knappe Minute je Fahrt) durch Klappe 3 nach oben. So kommt ein Körper in die Kammer, ohne dass ihn jemand hochheben muss. **[0.3]** Den Hebel kennen nur die, die „Der doppelte Mann“ gebaut haben: Varn und Velten. Dorne weiß, dass die Kammer existiert, hat den Hebel aber nie bedient. **[NEU]**
 - **Die Rückwand** besteht aus Spiegelplatten, die von der Bühnenseite verschraubt sind. Beim Abbau löst Senn sie mit einem Schraubendreher. Ein Spezialschlüssel ist nicht nötig.
 - **Das Seidenband:** Nach der letzten Nummer bindet Senn um 22:28 ein weißes Seidenband um die vorderen Türen. Das ist ein Brauch des Hauses, „Das Kabinett schläft“. Das Band beweist nichts über die Zeit davor.
 
@@ -85,7 +85,7 @@ Während der letzten Vorstellung des Palais Mirage liegt der Impresario längst 
 - **Bühne:** Hauptbühne, Seitenbühne links mit **Tonkabine**, Seitenbühne rechts. Darüber die **Beleuchterbrücke** mit dem Lichtstellwerk.
 - **Hinter der Bühne:** Künstlergarderoben, **Requisitenraum** (hier hängt die Double-Jacke), Werkstatt, Varns Büro.
 - **Unterbühne:** vorne und hinten, dazwischen der Gegengewichtsschacht. Zugang über die Bühnentreppe rechts.
-- **Der alte Künstlergang [NEU]:** führt von einer Tapetentür hinter der Garderobe zur hinteren Unterbühne. Seit 1950 steht ein Garderobenständer davor. Im Gang gibt es einen frisch gekalkten Bogen, weil der Hausmeister im Oktober Wasserflecken übermalt hat. Kennen tun ihn nur Leute, die vor 1950 hier gearbeitet haben: Varn, Velten, Dorne.
+- **Der alte Künstlergang [NEU]:** führt von einer Tapetentür hinter der Garderobe zur hinteren Unterbühne. Seit 1950 steht ein Garderobenständer davor; Velten sieht ihn heute zum ersten Mal. Im Gang gibt es einen frisch gekalkten Bogen, weil der Hausmeister im Oktober Wasserflecken übermalt hat. Kennen tun ihn nur Leute, die vor 1950 hier gearbeitet haben: Varn, Velten, Dorne.
 
 Für alle Spieler gibt es `assets/theaterplan.svg` im Reiter „Theater“. Darauf ist der Künstlergang **nicht** eingezeichnet. Er taucht erst auf Karte B14 auf.
 
@@ -123,7 +123,7 @@ Für alle Spieler gibt es `assets/theaterplan.svg` im Reiter „Theater“. Dara
 | 19:40 | Zorn streitet im Salon mit Varn um Geld und um Lukas: „Sie haben ihn auf dem Gewissen, nicht nur Velten.“ |
 | 19:58 | Malven startet im Büro Varns ein verstecktes **Minifon** (Drahttongerät, läuft 30 Minuten bis 20:28). Malven hatte es um 18:30 hinter die Akten im Regal geschoben. |
 | 20:03–20:15 | Velten in Varns Büro, Malvens Minifon läuft. Velten: „Das Original ist hier im Haus. Nach dem letzten Vorhang sagen Sie, wer die Klappe öffnen ließ, oder die Presse bekommt es.“ Varn: „Dann zeigen Sie es mir. Um neun. Unten. Wo alles angefangen hat.“ **[0.3]** |
-| 20:15 | Varn lässt sich von Thier **5.000 DM** bar geben. Thier zählt sie in einen Lohnumschlag mit Banderole, Varn diktiert für das Kassenbuch: „für V.“ Varn steckt den Umschlag in die Innentasche seines Fracks und trägt in seinen Tischkalender ein: „21:00 V. unten. Zettel. 5.000 bar (Thier).“ **[0.3]** |
+| 20:15 | Varn lässt sich von Thier an der Kasse im Foyer **5.000 DM** bar geben (nicht im Büro, das Minifon nimmt davon nichts auf). Thier zählt sie in einen Lohnumschlag mit Banderole, Varn diktiert für das Kassenbuch: „für V.“ Varn steckt den Umschlag in die Innentasche seines Fracks und trägt in seinen Tischkalender ein: „21:00 V. unten. Zettel. 5.000 bar (Thier).“ **[0.3]** |
 | 20:20 | Ansprache im Foyer. Varn kündigt „die Wahrheit nach dem letzten Vorhang“ an. Er meint seine eigene Version von 1949: „Velten war betrunken.“ |
 | 20:30–20:42 | Varn mit Kest im Büro, letzte Vertragsfragen |
 | 20:45 | Varn zu Quell: „Die Ansage um 21:18 spreche ich selbst. Machen Sie Pause.“ |
@@ -141,14 +141,14 @@ Für alle Spieler gibt es `assets/theaterplan.svg` im Reiter „Theater“. Dara
 | 21:08–21:10 | Velten wartet hinter dem Vorhang der Seitenbühne. Quell ist noch in der Tonkabine. |
 | 21:09 | Licht wieder an. |
 | 21:10 | Quell geht zur Bar, wie Varn es gesagt hat. |
-| 21:11 | Velten in der leeren Tonkabine. Auf dem Regal liegt Varns **Reserveband** (Band 3, „Ansage A.V. – aufgen. 18.11.“). Velten kennt die Gewohnheit aus alter Zeit: Varn lässt jede Ansage doppelt aufnehmen. Velten legt das Band ein und wartet. |
+| 21:11 | Velten in der leeren Tonkabine. Sie ist von 1955 und für Velten neu; dass Varn von dort spricht, steht im Ablaufplan an der Bühnentür. Auf dem Regal liegt Varns **Reserveband** (Band 3, „Ansage A.V. – aufgen. 18.11.“). Velten kennt die Gewohnheit aus alter Zeit: Varn lässt jede Ansage doppelt aufnehmen. Velten legt das Band ein und wartet. |
 | 21:18 | Velten spielt das Band pünktlich über die Lautsprecher: „Meine Damen und Herren, die letzte Vorstellung kann beginnen …“ |
 | 21:19 | Velten hält die Maschine an und lässt das Band liegen, Zählwerk 0412. Über die Bühnentreppe geht es zurück. Rohn und Dorne haben die Brücke um 21:15 verlassen. |
 | 21:20 | Velten geht durch den Künstlergang zurück. Kalkstaub vom Bogen bleibt an der rechten Schulter. |
 | 21:22 | Velten wieder im Salon. Kest: „Bei dem Sturm draußen gewesen?“ Velten: „Unter dem Vordach geraucht.“ |
 | 21:25 | Quell zurück in der Tonkabine. Band 3 liegt auf der Maschine. Quell denkt: Varn hat es selbst gestartet. |
 | 21:40 | Vorstellung beginnt. Der engere Kreis sitzt in Reihe 1, Velten auf Platz 8 neben Kest. |
-| 21:55 | Velten verlässt den Platz („Toilette“). Im Requisitenraum hängt Senns **Double-Jacke** von Varn, in Mottenpulver. |
+| 21:55 | Velten verlässt den Platz („Toilette“). Im Requisitenraum hängt Senns **Double-Jacke** von Varn, in Mottenpulver. Velten erkennt den Schnitt von Varns Bühnenfrack. |
 | 21:58 | Velten zeigt sich in der Jacke kurz in der dunklen Loge 2 und hebt die Hand zu Varns berühmtem Gruß. Zorn sagt von der Bühne: „Unser Direktor grüßt!“ Viele sehen „Varn“. |
 | 22:01 | Velten hängt die Jacke zurück, schief am falschen Haken. Ein Veilchenblatt fällt in die Tasche. |
 | 22:06 | Velten wieder auf Platz 8. Kest riecht Mottenpulver. |
@@ -168,7 +168,7 @@ Für alle Spieler gibt es `assets/theaterplan.svg` im Reiter „Theater“. Dara
 
 Und der Zettel? Velten will ihn später anonym an die Presse geben. Die Wahrheit über 1949 soll herauskommen, aber nicht mit einem Mörder als Zeugen.
 
-**Was alle zuerst glauben:** Varn hat um 21:58 noch gegrüßt und um 22:34 lag er tot da. Also starb er zwischen 21:58 und 22:27, während der Vorstellung. Damit fällt der Verdacht auf alle, die hinter der Bühne waren.
+**Was alle zuerst glauben:** Varn hat um 21:58 noch gegrüßt und um 22:34 lag er tot da. Also starb er zwischen 21:58 und 22:27, während der Vorstellung; nach B2 (mindestens eine halbe Stunde vor 22:38) genauer bis etwa 22:08. Damit fällt der Verdacht auf alle, die hinter der Bühne waren.
 
 **Die Wahrheit:** Varn starb um 21:02. Die Stimme um 21:18 war ein Band, der Gruß um 21:58 eine Jacke.
 
@@ -216,7 +216,7 @@ Die Tabelle steht so in den Rollenheften. **Fett** ist, was die Rolle verschweig
 
 ### Runde 1 · Der Mann hinter dem Spiegel
 
-**Gestaffelt [0.3]:** VORHANG öffnet B1, B2 und B5. Nach der ersten Gesprächsrunde (etwa 15 Minuten) öffnet KULISSE B3 und B4. So kennt die Gruppe erst Fund, Zeit und Sichtung und die Figuren, bevor Haus und Ablauf dazukommen. Inhaltlich bleibt die Runde gleich.
+**Gestaffelt [0.3]:** VORHANG öffnet B1, B2 und B5. Nach der ersten Gesprächsrunde (etwa 20 Minuten) öffnet KULISSE B3 und B4. So kennt die Gruppe erst Fund, Zeit und Sichtung und die Figuren, bevor Haus und Ablauf dazukommen. Inhaltlich bleibt die Runde gleich.
 
 | Karte | Inhalt | Strang |
 |---|---|---|
@@ -250,7 +250,7 @@ Die Tabelle steht so in den Rollenheften. **Fett** ist, was die Rolle verschweig
 | Karte | Inhalt | Strang |
 |---|---|---|
 | **B14 · Der Künstlergang** | Hinter dem Garderobenständer eine Tapetentür, dahinter ein alter Gang zur hinteren Unterbühne. Im Staub **ein Paar Schuhspuren, hin und zurück**, am frisch gekalkten Bogen ein Wischer in Schulterhöhe. | B |
-| **B15 · Garderobe, Marke 17** | Lotte Harms: „Marke 17 ist der Mantel von {R06: Frau / Herrn} Velten.“ Am Jackett, das Velten trägt, Kalkstaub an der rechten Schulter. | B → Velten |
+| **B15 · Garderobe, Marke 17** | Lotte Harms: „Marke 17 ist der Mantel von {R06: Frau / Herrn} Velten.“ Abgegeben um 19:20, den ganzen Abend nicht abgeholt; der Garderobenständer vor der alten Tür stand schief. Den Kalk an Veltens Schulter nennt die Karte nicht, er kommt über Senn (Runde 4) und Kest. | B → Velten |
 | **B16a · Kassenbuch** (nur wenn R09 besetzt) | Thier legt das Kassenbuch vor: seit 1949 monatlich „Lehrlingsprämie R. Dorne, 40 DM“, heute 20:15 „5.000 DM bar an A.V. – für V. (diktiert)“. Thier: „Ich habe sie selbst in den Umschlag gezählt und die Banderole geklebt.“ | C, Ablenkung Dorne |
 | **B16b · Kassenbuch** (nur wenn R09 fehlt) | dasselbe, gefunden in Varns Büro | C |
 
@@ -290,7 +290,7 @@ Die Tabelle steht so in den Rollenheften. **Fett** ist, was die Rolle verschweig
 2. Ein Gast kommt nur über den alten Künstlergang unbemerkt in die Unterbühne (B14).
 3. Den Gang und den Hebel kennen nur Leute von vor 1950: Varn, Velten, Dorne.
 4. Dorne war von 20:50 bis 21:15 mit Rohn auf der Brücke.
-5. Der Kalk vom Bogen sitzt an Veltens Schulter (B15). Kest sah Velten um 21:22 damit zurückkommen.
+5. Der Kalk vom Bogen sitzt an Veltens Schulter: Senn sah ihn nach dem Fund im Salon, Kest sah Velten um 21:22 damit zurückkommen. B15 zeigt, dass Velten ohne Mantel „draußen“ war.
 
 **C · Das Motiv**
 1. Der Unfall von 1949 hat Velten die Karriere gekostet (B6).
@@ -473,7 +473,7 @@ Ein Probetisch steht aus.
 
 ## 19 · Nachtrag: Pläne (Stand 1.1)
 
-- **B4 / Reiter „Theater“** ist jetzt ein Bauamtsplan, Stand Umbau 1950:
+- **B4 (Zählung der Kartendatei; in Abschnitt 9: B3) / Reiter „Theater“** ist jetzt ein Bauamtsplan, Stand Umbau 1950:
   - Grundriss Erdgeschoss mit allen Türen. Dazu gehören die Bühnentür vom Salon in den Personalgang und die Logentür vom Personalgang in Loge 2. So sieht man, wie Velten um 21:58 aus dem Requisitenraum in die Loge kam.
   - Längsschnitt A–A durch Kabinett, Klappe A und 3, Versenkung und Schacht.
   - Änderungsfeld:
@@ -481,5 +481,5 @@ Ein Probetisch steht aus.
     - b: 06/1950, Garderobe: Rückwand neu verputzt
     - c: 10/1955, Tonkabine eingebaut
   - Bleistiftnotizen der Technik („Kl. A – Rohn prüft!“, „Lichttest 21:06 – nur hinten“, „4. Stufe knarrt“, „max. 2 Pers.! – R.D.“), Prüfstempel 12.6.1950.
-- **B15** enthält zusätzlich den **Bauplan von 1938 (Kellergeschoss)** aus dem untersten Fach des Planschranks. Er zeigt den Künstlergang von der Garderobe zur hinteren Unterbühne. Erst beide Pläne zusammen erklären „Rückwand neu verputzt“.
+- **B15 (Zählung der Kartendatei; in Abschnitt 9: B14)** enthält zusätzlich den **Bauplan von 1938 (Kellergeschoss)** aus dem untersten Fach des Planschranks. Er zeigt den Künstlergang von der Garderobe zur hinteren Unterbühne. Erst beide Pläne zusammen erklären „Rückwand neu verputzt“.
 - **Quelle:** `assets/plaene.py` zeichnet beide Pläne. Die Engine kann jetzt jeder Karte eine eigene Zeichnung geben (`cards.*.svg`).

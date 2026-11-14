@@ -45,7 +45,7 @@ Du warst [Buchhalterin / Buchhalter] in einer Reederei, bis die pleiteging. Das 
 
 ## Vertraulich · Bis 20:50
 
-- **20:15** Varn ruft dich ins Büro und verlangt **5.000 Mark bar** aus dem Tresor, sofort. Du zählst sie in einen Lohnumschlag und klebst die Banderole darüber. Varn diktiert dir für das Kassenbuch: „für V.“ Er steckt den Umschlag in die Innentasche seines Fracks. Wer V. ist, sagt er nicht.
+- **20:15** Varn kommt zu dir an die Kasse im Foyer und verlangt **5.000 Mark bar** aus dem Tresor, sofort. Du zählst sie in einen Lohnumschlag und klebst die Banderole darüber. Varn diktiert dir für das Kassenbuch: „für V.“ Er steckt den Umschlag in die Innentasche seines Fracks. Wer V. ist, sagt er nicht.
 - **20:20** Ansprache im Foyer.
 - **20:45** Im Salon mit {R08: Frau / Herrn} Kest, über Zahlen.
 

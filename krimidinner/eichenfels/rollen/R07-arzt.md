@@ -23,7 +23,7 @@ Im Sommer kam er mit Atemnot. Die Untersuchungen waren eindeutig: eine schwere H
 
 Er bat dich, niemandem etwas zu sagen. Nicht der Stiftung, nicht den Gästen, nicht einmal seinem Kind. „{R01: Leonie / Leon} soll nicht aus Mitleid kommen. Wenn {R01: sie / er} kommt, dann weil ich {R01: sie / ihn} gebeten habe.“
 
-In den letzten Wochen hast du gesehen, was er mit „aufräumen“ meinte. Er schrieb Briefe, viele, mit der Hand. Er bestellte die Kanzlei. Er erzählte dir beim Schach von {R02: einer jungen Kollegin / einem jungen Kollegen} von damals, Marwitz, „der ich etwas gestohlen habe, das man nicht zurückgeben kann, nur zugeben“. Und letzten Sonntag, mitten in der Partie, sagte er: „Im Archiv stimmt etwas nicht. Ich glaube, ich werde bestohlen, von jemandem, dem ich vertraut habe.“ Mehr wollte er nicht sagen.
+In den letzten Wochen hast du gesehen, was er mit „aufräumen“ meinte. Er schrieb Briefe, viele, mit der Hand. Er bestellte die Kanzlei. Er erzählte dir beim Schach von {R02: einer jungen Kollegin / einem jungen Kollegen} von damals, Marwitz, „{R02: der / dem} ich etwas gestohlen habe, das man nicht zurückgeben kann, nur zugeben“. Und letzten Sonntag, mitten in der Partie, sagte er: „Im Archiv stimmt etwas nicht. Ich glaube, ich werde bestohlen, von jemandem, dem ich vertraut habe.“ Mehr wollte er nicht sagen.
 
 Heute Abend hast du ihn zum letzten Mal gesehen, bei seiner Rede. Er war grau im Gesicht, und er hat dir zugezwinkert.
 

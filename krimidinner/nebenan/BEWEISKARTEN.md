@@ -2,14 +2,14 @@
 
 Stand 1.1 nach Fallbuch 0.3.5. **Die Karte B21 gehört ins Finale und wird erst nach der Anklage geöffnet.**
 
-Die Überschriften „Runde 1 … Runde 4“ und „Finale“ unten sind die Freigabestufen der Engine.
+Die Überschriften „Runde 1 … Runde 6“ und „Finale“ unten zählen die Freigabestufen der Engine durch (Stufe 4 = STREIFEN, 5 = FADEN, 6 = RÜCKSEITE). Am Tisch gilt die Runde aus der Tabelle und aus der Fußzeile jeder Karte: STREIFEN gehört zu Runde 3, FADEN und RÜCKSEITE zu Runde 4.
 
 | Stufe | Losungswort | Karten |
 |---|---|---|
 | Runde 1 · Der Sturz | LEITER | B1–B4 |
 | Runde 2 · Das Hinterzimmer | STILLE | B5–B8 |
 | Runde 3 · Die Akten | VORDRUCK | B9–B11, B13, B14 |
-| Runde 3 · Die Streifen | STREIFEN | B12 (erst wenn Seifert den Aktenvernichter erwähnt) |
+| Runde 3 · Die Streifen | STREIFEN | B12 (erst wenn Seifert die Streifen gebracht hat) |
 | Runde 4 · Der Stoß | FADEN | B15, B16, B18–B20, B22 |
 | Runde 4 · Die Rückseite | RÜCKSEITE | B17 (erst wenn Kranz das Blatt umdreht) |
 | Finale | ZURÜCK | B21 |
@@ -285,7 +285,7 @@ Dazu Streifen von Fotokopien: eine Mitgliederkarte und ein Formular.
 
 *Beim Druck: in Streifen geschnitten, in einem kleinen Papierbeutel. Seifert bringt ihn in Runde 3 auf den Tisch.*
 
-*Freigabe: Runde 3 (STREIFEN), wenn Seifert den Beutel auf den Tisch bringt*
+*Freigabe: Runde 3 (STREIFEN), erst wenn Seifert die Streifen gebracht hat*
 
 ---
 
@@ -358,7 +358,7 @@ Seifert hat es um 21:32 aus Hannos rechter Hand genommen.
 
 | Zeit | Bild |
 |---|---|
-| **20:41** | Küche, durch die offene Tür: {R07: Tamara / Tilo} Özdemir schneidet Kuchen, allein im Raum. Der Flur dahinter ist leer. |
+| **20:41** | Küche, durch die offene Tür: {R07: Tamara / Tilo} Özdemir schneidet Kuchen, allein im Raum. |
 | **20:42** | Saal, Basteltisch: {R01: Janne / Lasse} Fuchs mit Kindern und Laternen. |
 | **20:51** | Hof: {R04: Karla / Karl} Seifert steht rauchend am Hinterausgang. |
 

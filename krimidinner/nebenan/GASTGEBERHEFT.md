@@ -1,6 +1,6 @@
 # Nebenan – Der stille Kreis – Gastgeberheft
 
-*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
+*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 und A9 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
 ---
 
@@ -17,7 +17,7 @@ Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine 
 
 **Eine Besonderheit dieses Falls:** Einige Figuren gehören zu einer Gemeinschaft, von der die anderen noch nichts wissen. Das ist gewollt. Verrate in Phase 1 und 2 nichts, auch wenn du es aus deinem eigenen Rollenblatt weißt.
 
-**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) öffnest du erst in der Phase, zu der der Impuls gehört. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
+**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5 und A9. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) öffnest du erst in der Phase, zu der der Impuls gehört. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
 
 **Wenn du die Täterrolle hast:** Du leitest genauso weiter. Du liest jeden Text vollständig vor und nennst jedes Losungswort zur vorgesehenen Zeit. Stockt das Gespräch, nimmst du den ersten Impuls der Phase, wörtlich, auch wenn er dir schadet. Als Spielleitung bist du unparteiisch, als Figur verteidigst du dich.
 
@@ -109,6 +109,22 @@ Rechne mit 3 bis 3,5 Stunden. Lange Diskussionen sind gut, kürze dann eher beim
 >
 > Und jetzt: Willkommen im Haus am Anger.“
 
+## A9 · Wenn etwas schiefgeht
+
+**Jemand sagt vor dem Abend ab.** Am besten springt eine andere Person ein und bekommt den Code der absagenden Person. Geht das nicht, legst du den Abend mit der neuen Personenzahl neu an und verschickst neue Codes. Die Rollen werden dabei neu verteilt, die alten Codes passen nicht mehr zur Besetzung. Unter 5 Personen lässt sich der Fall nicht spielen: Dann verschiebt ihr.
+
+**Jemand kommt zu spät.** Phase 1 kann ohne die Person beginnen. Mit dem ersten Losungswort wartest du, bis alle am Tisch sitzen. Kommt jemand erst danach, nennst du der Person die bisherigen Losungswörter, sie liest nach und stellt sich kurz vor.
+
+**Jemand muss früher gehen.** Die Person beantwortet eine letzte Fragerunde und gibt ihre Anklage verdeckt bei dir ab. Ihr Rollenblatt bleibt zu. Ob sie die Täterrolle hatte, zeigt die Auflösung.
+
+**Das Essen.** Der Zeitplan in A4 rechnet damit, dass beim Spielen gegessen wird. Serviert wird zu Beginn der dort genannten Phase, bevor du vorliest. Das Losungswort nennst du erst, wenn alle sitzen. Dauert das Servieren länger, hängst du die Zeit hinten an, statt eine Phase zu kürzen. Wenn du mitspielst und kochst, nimm Gerichte, die fertig warten können.
+
+**Die Gruppe ist sich zu früh sicher.** Bestätige nichts. Die weiteren Runden öffnest du trotzdem: Für die Anklage braucht es auch Motiv und Beweis, und die anderen Geheimnisse sind noch offen. Du darfst die Phase kürzen.
+
+**Die Anklagen gehen auseinander.** Es wird nicht abgestimmt, jede Anklage zählt für sich. Aufgelöst wird in jedem Fall. Klagt niemand richtig an, hat die Täterrolle gewonnen, und ihr geht B-3 gemeinsam durch.
+
+**Jemandem wird ein Thema zu viel.** In diesem Fall kommen vor: ein gewaltsamer Tod, seelische Krisen und Trauer, Druck in einer Gruppe. Sag das bei der Einladung dazu. Am Abend darf jede Person jederzeit kurz aus der Rolle gehen. Dann macht ihr eine Pause und spielt danach weiter.
+
 ---
 
 ## Phase 1 · Nach dem Fest (ca. 15 Min.)
@@ -129,6 +145,8 @@ Rechne mit 3 bis 3,5 Stunden. Lange Diskussionen sind gut, kürze dann eher beim
 
 Dann sagt {R02: Beate / Benedikt} Kranz, wenn besetzt in eigenen Worten, sonst liest du vor: „Morgen erzählen zehn Leute zehn verschiedene Geschichten. Ich schließe nicht ab, bevor wir uns einig sind, was heute passiert ist.“
 
+**Weiter, wenn:** sich alle vorgestellt haben und du die Nebenfiguren genannt hast. Herausfinden muss hier noch niemand etwas.
+
 ---
 
 ## Phase 2 · Der Sturz (ca. 30 Min.)
@@ -141,6 +159,8 @@ Dann sagt {R02: Beate / Benedikt} Kranz, wenn besetzt in eigenen Worten, sonst l
 
 **Runde der Wege:** Jede Person sagt der Reihe nach, wo sie zwischen 20:40 und 21:00 war, so weit sie es sagen will. Erinnere an Regel 2: Schweigen ist erlaubt, Lügen nur einer Person.
 
+**Weiter, wenn:** jede Person gesagt hat, wo sie war, oder ausdrücklich geschwiegen hat, und alle die Karten dieser Runde gelesen haben.
+
 ---
 
 ## Phase 3 · Das Hinterzimmer (ca. 35 Min.)
@@ -152,6 +172,8 @@ Dann sagt {R02: Beate / Benedikt} Kranz, wenn besetzt in eigenen Worten, sonst l
 - in jedem Rollenblatt **Runde 2**.
 
 **Hinweis:** In dieser Phase schließt {R02: Beate / Benedikt} Kranz den Beratungsraum mit dem Ersatzring auf und sagt vorher, warum. Seifert bekommt den weißen Umschlag und lässt ihn zu. Mehrere Figuren legen jetzt Beilagen vor (eine Einladung, eine Einladungskarte, vielleicht einen gelben Durchschlag).
+
+**Weiter, wenn:** alle Karten dieser Runde besprochen sind und ein paar Minuten lang nichts Neues mehr kommt, spätestens wenn die Zeit um ist. Sag kurz vorher an: „Letzte Fragen, gleich geht es weiter.“
 
 ---
 
@@ -172,6 +194,8 @@ Dann sagt {R02: Beate / Benedikt} Kranz, wenn besetzt in eigenen Worten, sonst l
 > **Vorlesen, sobald Seifert den Beutel auf den Tisch legt:** „Im Auffangbehälter des Aktenvernichters liegen frische Papierstreifen. Freitag war der Behälter noch leer.“
 
 **Losungswort: STREIFEN.** Es öffnet B12 Die Streifen. Das Rollenblatt bleibt bei Runde 3. Gib das Wort erst, wenn Seifert die Streifen gebracht hat, nicht vorher.
+
+**Weiter zu Phase 5, wenn:** die Streifen (B12) auf dem Tisch liegen und besprochen sind, spätestens wenn die Zeit um ist.
 
 ---
 
@@ -199,7 +223,9 @@ Die Rückseite von Kranz' Notizen (B17) kommt erst, wenn Kranz das Blatt umdreht
 
 **Losungswort: RÜCKSEITE.** Es öffnet B17 Kranz' Notizen (Rückseite). Das Rollenblatt bleibt bei Runde 4. Gib das Wort erst, wenn Kranz das Blatt umgedreht hat.
 
-**Wenn es nicht vorangeht:** Bleibt eine Runde länger als zehn Minuten stehen, nimm einen Impuls aus A7. Hilft auch der zweite nicht, leite zur nächsten Phase über. Was eine Figur „in dieser Runde offenlegt“, kannst du dann direkt erfragen.
+**Wenn es nicht vorangeht:** Bleibt eine Runde länger als zehn Minuten stehen, nimm einen Impuls aus A7. Hilft er nicht, leite zur nächsten Phase über. Was eine Figur „in dieser Runde offenlegt“, kannst du dann direkt erfragen.
+
+**Weiter zum Finale, wenn:** das im Hinweis Genannte offengelegt ist und niemand mehr eine Frage hat, spätestens wenn die Zeit um ist. Kündige es an: „In fünf Minuten wird angeklagt.“
 
 ---
 
@@ -278,8 +304,8 @@ Keine Karte allein überführt Linde. Erst die drei Wege zusammen sind zwingend.
 7. Gegen Hanno als Fälscher: Seine Prüfnotiz (B12) fragt, wer die Vordrucke hatte.
 
 **Weg B · Die Wege**
-1. Linde sagte, ab 20:40 in der Küche gewesen zu sein. Özdemir oder B20: Linde ging um 20:38 und kam um 20:57 zurück. B16: Der Kaffee lief erst ab 21:07.
-2. „Die Spendendose aus dem Beratungsraum“: Sie stand auf dem Büfett (B4) und lag von 20:35 bis 21:05 bei Hollmann.
+1. Linde sagte: „Ich war ab 20:40 in der Küche und habe den Kaffee vorbereitet.“ Özdemir oder B20: Linde ging um 20:38 und kam um 20:57 zurück. B16: Der Kaffee lief erst ab 21:07.
+2. „Ich habe um 20:40 die Spendendose aus dem Beratungsraum geholt, danach war ich in der Küche.“ Die Dose stand auf dem Büfett (B4) und lag von 20:35 bis 21:05 bei Hollmann.
 3. Fuchs sah um 20:40 eine dunkle Strickjacke ins Büro gehen. Hollmann hörte um 20:44 den Streit.
 4. Aktenvernichter von 20:48 bis 20:52: Seifert, R06, Wiesner oder B19. Seifert sah um 20:53 die lange dunkle Strickjacke ins WC gehen.
 
@@ -292,8 +318,8 @@ Keine Karte allein überführt Linde. Erst die drei Wege zusammen sind zwingend.
 
 | Linde sagt | Was dagegen spricht |
 |---|---|
-| „Ich war ab 20:40 in der Küche.“ | Özdemir oder B20, B16 |
-| „Ich habe die Spendendose geholt.“ | B4, Hollmann |
+| „Ich war ab 20:40 in der Küche und habe den Kaffee vorbereitet.“ | Özdemir oder B20, B16 |
+| „Ich habe um 20:40 die Spendendose aus dem Beratungsraum geholt, danach war ich in der Küche.“ | B4, Hollmann |
 | „Hanno hat die Akte 2003 selbst eingesehen und bestätigt.“ | Das stimmt, aber er hat sie nicht gemacht (B12), und die Vordrucke hatte Linde (B15). |
 
 ## B-4 · Die übrigen Geheimnisse

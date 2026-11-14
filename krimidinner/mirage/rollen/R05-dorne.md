@@ -72,7 +72,7 @@ Heute steht Veltens Name auf der Gästeliste.
 - **21:15–21:35** Vorn auf der Bühne mit Rohn, Kabinettlicht einrichten.
 - **21:18** Die Ansage kommt aus den Lautsprechern. Du denkst nicht weiter darüber nach.
 - **21:40–22:27** Die ganze Vorstellung auf der Brücke. Um 21:58 ruft {R03: Frau / Herr} Zorn „Unser Direktor grüßt!“ Du siehst zur Loge 2, dort ist nur eine dunkle Gestalt, du hast keinen Scheinwerfer darauf.
-- **22:34** Ein Schrei vom Kabinett. Du bist als einer der Ersten unten.
+- **22:34** Ein Schrei vom Kabinett. Du bist sofort unten.
 
 - **Sag das so.** Die Zeit von 20:50 bis 21:15 mit Rohn ist dein bester Schutz, und sie ist wahr.
 - Die Rückkammer: Du weißt, dass es sie gibt, und dass sie seit 1949 stillgelegt ist. Sag das, wenn jemand fragt. Mehr nicht, noch nicht.

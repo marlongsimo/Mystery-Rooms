@@ -1,6 +1,6 @@
 # Vorhang aus Lügen – Gastgeberheft
 
-*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
+*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 und A9 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
 ---
 
@@ -15,7 +15,7 @@ Du bist Erzählstimme, Zeitwächter und Beweisausgabe:
 
 Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Welche Rolle du hast, auch ob es die Täterrolle ist, siehst du erst in deinem Rollenblatt.
 
-**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
+**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5 und A9. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
 
 **Wenn du die Täterrolle hast:** Du leitest genauso weiter. Du liest jeden Text vollständig vor und nennst jedes Losungswort zur vorgesehenen Zeit. Stockt das Gespräch, nimmst du den ersten Impuls der Phase, wörtlich, auch wenn er dir schadet. Als Spielleitung bist du unparteiisch, als Figur verteidigst du dich.
 
@@ -90,6 +90,22 @@ In jeder Besetzung liegen 17 Karten auf dem Tisch.
 >
 > Und jetzt: Vorhang auf.“
 
+## A9 · Wenn etwas schiefgeht
+
+**Jemand sagt vor dem Abend ab.** Am besten springt eine andere Person ein und bekommt den Code der absagenden Person. Geht das nicht, legst du den Abend mit der neuen Personenzahl neu an und verschickst neue Codes. Die Rollen werden dabei neu verteilt, die alten Codes passen nicht mehr zur Besetzung. Unter 6 Personen lässt sich der Fall nicht spielen: Dann verschiebt ihr.
+
+**Jemand kommt zu spät.** Phase 1 kann ohne die Person beginnen. Mit dem ersten Losungswort wartest du, bis alle am Tisch sitzen. Kommt jemand erst danach, nennst du der Person die bisherigen Losungswörter, sie liest nach und stellt sich kurz vor.
+
+**Jemand muss früher gehen.** Die Person beantwortet eine letzte Fragerunde und gibt ihre Anklage verdeckt bei dir ab. Ihr Rollenblatt bleibt zu. Ob sie die Täterrolle hatte, zeigt die Auflösung.
+
+**Das Essen.** Der Zeitplan in A4 rechnet damit, dass beim Spielen gegessen wird. Serviert wird zu Beginn der dort genannten Phase, bevor du vorliest. Das Losungswort nennst du erst, wenn alle sitzen. Dauert das Servieren länger, hängst du die Zeit hinten an, statt eine Phase zu kürzen. Wenn du mitspielst und kochst, nimm Gerichte, die fertig warten können.
+
+**Die Gruppe ist sich zu früh sicher.** Bestätige nichts. Die weiteren Runden öffnest du trotzdem: Für die Anklage braucht es auch Motiv und Beweis, und die anderen Geheimnisse sind noch offen. Du darfst die Phase kürzen.
+
+**Die Anklagen gehen auseinander.** Es wird nicht abgestimmt, jede Anklage zählt für sich. Aufgelöst wird in jedem Fall. Klagt niemand richtig an, hat die Täterrolle gewonnen, und ihr geht B-3 gemeinsam durch.
+
+**Jemandem wird ein Thema zu viel.** In diesem Fall kommen vor: ein gewaltsamer Tod, ein tödlicher Bühnenunfall, der Verlust eines Geschwisters. Sag das bei der Einladung dazu. Am Abend darf jede Person jederzeit kurz aus der Rolle gehen. Dann macht ihr eine Pause und spielt danach weiter.
+
 ---
 
 ## Phase 1 · Die letzte Vorstellung (ca. 15 Min.)
@@ -107,6 +123,8 @@ In jeder Besetzung liegen 17 Karten auf dem Tisch.
 
 *(R01–R06 sind immer besetzt.)*
 
+**Weiter, wenn:** sich alle vorgestellt haben und du die Nebenfiguren genannt hast. Herausfinden muss hier noch niemand etwas.
+
 ---
 
 ## Phase 2 · Der Mann hinter dem Spiegel (ca. 35 Min.)
@@ -119,15 +137,17 @@ In jeder Besetzung liegen 17 Karten auf dem Tisch.
 - die Beweise B1 Fundbericht · B2 Erste Einschätzung · B3 Notiz des Conférenciers,
 - in jedem Rollenblatt **Runde 1**, die eigene Nacht ab 20:50.
 
-**Runde der Alibis:** Jede Person sagt der Reihe nach, wo sie zwischen 21:58 und 22:27 war, denn das hält jetzt jeder für die Tatzeit. Erinnere an Regel 2.
+**Runde der Alibis:** Jede Person sagt der Reihe nach, wo sie zwischen 21:58 und 22:27 war, denn in dieser Zeit vermutet jetzt jeder die Tat. Nach B2 liegt sie eher in den ersten zehn Minuten davon, bis etwa 22:08. Erinnere an Regel 2.
 
-**Nach etwa 15 Minuten:** weiter zu **Kulisse**.
+**Nach etwa 20 Minuten:** weiter zu **Kulisse**.
 
 ## Kulisse · Das Haus und der Abend (innerhalb von Phase 2)
 
 > **Vorlesen:** „Aus dem Büro der Technik bringt jemand den Plan des Hauses, und von der Bühnentür reißt jemand den Ablaufplan des Abends.“
 
 **Losungswort: KULISSE.** Es öffnet B4 Theaterplan und B5 Ablaufplan. Das Rollenblatt bleibt bei Runde 1.
+
+**Weiter zu Phase 3, wenn:** alle Karten dieser Runde besprochen sind und ein paar Minuten lang nichts Neues mehr kommt, spätestens wenn die Zeit um ist. Sag kurz vorher an: „Letzte Fragen, gleich geht es weiter.“
 
 ---
 
@@ -139,11 +159,13 @@ In jeder Besetzung liegen 17 Karten auf dem Tisch.
 - die Beweise B6 Zeitungsbericht 1949 · B7 Kaufvertrag · B8 Tischkalender · **B9** Minifon (wenn R07 besetzt ist) oder **B10** Abschrift (wenn R07 fehlt),
 - in jedem Rollenblatt **Runde 2**.
 
+**Weiter, wenn:** alle Karten dieser Runde besprochen sind und ein paar Minuten lang nichts Neues mehr kommt, spätestens wenn die Zeit um ist. Sag kurz vorher an: „Letzte Fragen, gleich geht es weiter.“
+
 ---
 
 ## Phase 4 · Die Stimme aus dem Nichts (ca. 35 Min.)
 
-> **Vorlesen:** „Gegen dreiviertel eins sieht sich Dr. Wiel den Toten noch einmal an. In der Tonkabine liegt ein Band auf der Maschine, das niemand zurückgespult hat. Und im Requisitenraum hängt ein Frack am falschen Haken.“
+> **Vorlesen:** „Dr. Wiel hat sich den Toten um Viertel vor zwölf noch einmal angesehen und legt jetzt sein Ergebnis vor. In der Tonkabine liegt ein Band auf der Maschine, das niemand zurückgespult hat. Und im Requisitenraum hängt ein Frack am falschen Haken.“
 
 **Losungswort: TONBAND.** Es öffnet:
 - die Beweise B11 Band 3 · B12 Zweite Untersuchung · B13 Double-Jacke · B14 Sitzplan,
@@ -151,17 +173,21 @@ In jeder Besetzung liegen 17 Karten auf dem Tisch.
 
 **Tipp:** Jetzt gilt eine neue Tatzeit. **Jede Person sagt ihr Alibi für 20:50 bis 21:20 neu.** Schlag eine Zeitleiste in der Tischmitte vor.
 
+**Weiter, wenn:** jede Person ihr Alibi für die neue Zeit genannt hat und die Zeitleiste steht, spätestens wenn die Zeit um ist.
+
 ---
 
 ## Phase 5 · Der alte Weg (ca. 25 Min.)
 
-> **Vorlesen:** „Kurz vor eins rückt jemand den Garderobenständer im Foyer zur Seite. Dahinter ist eine Tür, die auf keinem Plan steht.“
+> **Vorlesen:** „Kurz vor eins rückt jemand den Garderobenständer im Foyer zur Seite. Dahinter ist eine Tür, die auf dem Plan des Hauses fehlt.“
 
 **Losungswort: VEILCHEN.** Es öffnet:
 - die Beweise B15 Künstlergang · B16 Garderobe · **B17** Kassenbuch (wenn R09 besetzt ist) oder **B18** Kassenbuch aus dem Büro (wenn R09 fehlt),
 - in jedem Rollenblatt **Runde 4**.
 
 **Hinweis:** In dieser Runde legt {R05: Rafaela / Rafael} Dorne verbindlich etwas offen. Wenn die Runde fast vorbei ist und das noch nicht geschehen ist, frag Dorne direkt: „Was weißt du über Klappe 3?“
+
+**Weiter zum Finale, wenn:** das im Hinweis Genannte offengelegt ist und niemand mehr eine Frage hat, spätestens wenn die Zeit um ist. Kündige es an: „In fünf Minuten wird angeklagt.“
 
 ---
 
@@ -260,7 +286,7 @@ Es gibt drei unabhängige Wege, und jeder führt allein zu Velten.
 **Weg B · Der alte Weg**
 1. Varn lag in der Kammer, die nur von unten erreichbar ist (B1, B4).
 2. Ein Gast kommt unbemerkt nur durch den alten Künstlergang nach unten (B15).
-3. Velten ging um 20:52 „raus“, ohne Mantel (B16), und kam um 21:22 mit Kalk an der Schulter zurück. Das bezeugen Senn und Kest.
+3. Velten ging um 20:52 „raus“, ohne Mantel (B16), und kam um 21:22 mit Kalk an der Schulter zurück. Das bezeugt Kest. Senn sah den Kalk nach dem Fund im Salon an Veltens Jackett.
 4. Rohn sah um 22:05 nur den alten Riegelhebel staubfrei. Den kennen nur Varn und Velten (Dorne).
 
 **Weg C · Das Motiv**

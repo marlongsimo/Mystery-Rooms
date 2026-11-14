@@ -9,7 +9,7 @@
 **[Eva / Egon] Falk**, 66
 [Unternehmerin / Unternehmer] im Ruhestand, früher Falk Präzisionsoptik in Jena, heute [Sammlerin / Sammler] historischer astronomischer Instrumente
 
-**Beziehung zum Opfer:** Du bist [die großzügigste Förderin / der großzügigste Förderer] der Stiftung. Die Restaurierung der Kuppel vor sechs Jahren hast du bezahlt, und dein Name steht auf einer Messingtafel neben der Treppe. Sander nannte dich „unsere Mäzenin [unser Mäzen]“ und meinte, er dulde dich. Ihr habt euch respektiert, gemocht habt ihr euch nicht.
+**Beziehung zum Opfer:** Du bist [die großzügigste Förderin / der großzügigste Förderer] der Stiftung. Die Restaurierung der Kuppel vor sechs Jahren hast du bezahlt, und dein Name steht auf einer Messingtafel neben der Treppe. Sander nannte dich „[unsere Mäzenin / unser Mäzen]“ und meinte, er dulde dich. Ihr habt euch respektiert, gemocht habt ihr euch nicht.
 
 **Eigenschaften:** großzügig · gewohnt, zu bekommen, was [sie / er] will · charmant mit einem Rest Härte aus vierzig Jahren Geschäft · Sammelleidenschaft bis zur Gier · ehrlicher, als man denkt, sobald man [sie / ihn] in die Enge treibt
 

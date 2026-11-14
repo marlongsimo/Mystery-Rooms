@@ -49,7 +49,7 @@ Um 20:35 hast du ihn im Gang vor Salon 6 angefleht, die Frist zu verlängern. Er
 
 - **20:00–20:30** Dinner, du hast mit allen geflirtet, nur nicht mit Auen.
 - **20:35** Der Streit im Gang.
-- **20:40–22:08** Speisewagen. {R06: Die Baronin / Der Baron} von Steinach saß in der Nähe. Ab 21:55 auch {R08: Frau / Herr} Reiter.
+- **20:40–22:08** Speisewagen. {R06: Die Baronin / Der Baron} von Steinach saß in der Nähe. Ab 22:00 auch {R08: Frau / Herr} Reiter.
 
 ## Runde 1 · Der Tote im Abteil
 
@@ -58,7 +58,7 @@ Um 20:35 hast du ihn im Gang vor Salon 6 angefleht, die Frist zu verlängern. Er
 - **22:15–22:17** Abteil 4. Du suchst die Noten.
 - **22:17** {R02: Frau / Herr} Hartmann holt deinen Pass. Ihr geht zusammen bis Wagen 2, dort klopft {R02: sie / er} an Salon 6. Du gehst weiter.
 - **22:22–22:40** Du spielst im Speisewagen: Chopin, dann Schlager. Zuhörer: Reiter, Steinach, ab 22:31 Dr. Hagen.
-- **22:40** Du gehst in dein Abteil. Allein, bis Hartmann um 23:10 alle weckt.
+- **22:40** Du gehst in dein Abteil. Allein, bis um 23:10 alle geweckt werden.
 
 - Für die angenommene Zeit (22:30–22:55) hast du ein schwaches Alibi: Ab 22:40 warst du allein.
 

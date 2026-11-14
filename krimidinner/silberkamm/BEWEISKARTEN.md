@@ -52,7 +52,7 @@ Konstantin von Auen sitzt zusammengesunken am Schreibtisch. Eine Wunde am Hinter
 
 ---
 
-### B3 · ☰ Passliste des Zugbegleiters
+### B3 · ☰ Passliste der Zugbegleitung
 *Grenze Buchs · geführt von {R02: Emilie / Emil} Hartmann*
 
 ```

@@ -50,7 +50,7 @@ Heute Abend hast du ihm den Brief persönlich gebracht. Darin steht der Satz: �
 ## Vertraulich · Bis 22 Uhr
 
 - **Am Bahnsteig in Wien** hast du {R02: die Zugbegleiterin / den Zugbegleiter} gefragt, in welchem Abteil Auen reist.
-- **20:00–20:30** Dinner. Du hast Auen angesehen und kein Wort mit ihm gesprochen.
+- **20:00–20:30** Dinner. Du hast Auen angesehen und kein Wort mit ihm gesprochen. {R08: Frau / Herrn} Reiter hast du gefragt, ob {R08: sie / er} eine Forderung an die Käufer weiterleiten würde. Eine Antwort hast du nicht bekommen.
 - **20:35** Aus deinem Abteil 8 hörst du einen Streit im Gang: {R03: Frau / Herr} Bell und Auen. Er ruft: „Keinen Groschen Aufschub!“ Danach tröstest du {R03: sie / ihn} im Speisewagen: „Er wird für alles bezahlen, mein Kind. Für alles.“
 - **20:50–21:00** In Salon 6. Du übergibst den Brief. Auen liest ihn im Stehen, faltet ihn und sagt: „[Ihr Mann / Ihre Frau] ist mit dem Zug gefahren. Das tun Leute auf eigene Gefahr.“ Du bist gegangen, bevor du etwas tust, das du bereust.
 - **21:00–22:05** Abteil 8.
@@ -70,7 +70,7 @@ Heute Abend hast du ihm den Brief persönlich gebracht. Darin steht der Satz: �
 - **Was du zugeben kannst:** die Forderung, den Brief, den Besuch um 20:50. „Ich wollte Geld. Ein toter Auen zahlt nicht.“
 - **Was du verschweigen willst:** den Ruin.
 - **Was du über andere weißt:**
-  - Dr. Hagen hat beim Dinner das Weinglas umgestoßen, als Auen „1921“ sagte.
+  - Dr. Hagen hat beim Dinner das Wasserglas umgestoßen, als Auen „1921“ sagte.
   - {R07: Die Stewardess / Der Steward} Brandl hat dir beim Dinner Wein nachgeschenkt und leise gesagt: „Mein Beileid, [Frau Baronin / Herr Baron].“ Woher wusste {R07: sie / er} das?
 
 ## Runde 3 · Die falsche Zeit

@@ -12,6 +12,8 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
 
 **6 bis 8 Personen · etwa 3 bis 3½ Stunden · eine Spielleitung, die mitspielen darf**
 
+*Themen des Abends: ein gewaltsamer Tod, ein Zugunglück mit Toten, ein Tod in Haft, Alkohol. Wer etwas davon nicht am Tisch haben möchte, sagt es der Spielleitung vorher.*
+
 ---
 
 ## Vor dem Abend
@@ -69,7 +71,7 @@ Im Finale schreibt jede und jeder verdeckt auf:
 2. **Warum?**
 3. **Welcher Beweis** überführt die Person?
 
-Danach legt die Täterrolle ihr Rollenblatt offen, der letzte Beweis wird geöffnet, und die Spielleitung liest vor, was wirklich geschah.
+Danach wird der letzte Beweis geöffnet, die Täterrolle legt ihr Rollenblatt offen, und die Spielleitung liest vor, was wirklich geschah.
 
 **Punkte (wenn ihr wollt):**
 

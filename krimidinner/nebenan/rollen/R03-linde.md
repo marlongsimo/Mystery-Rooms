@@ -7,7 +7,7 @@
 ## Charakter · Wer du bist
 
 **[Merle / Mattis] Linde**, 54
-Schriftführung im Verein „Miteinander Birkenhöhe e. V.“, zuständig für Ablage, Protokolle und Schlüssel
+Schriftführung im Verein „Miteinander Birkenhöhe e. V.“, zuständig für Ablage und Protokolle
 
 **Beziehung zum Opfer:** Hanno Rabe hat dich 1997 aufgefangen, als du nach einer Kündigung niemanden mehr hattest. Seitdem bist du die Person, die bei ihm alles in Ordnung hält. Er sagt gern: „Ohne [Merle / Mattis] wüsste ich nicht, wo meine eigene Unterschrift liegt.“
 
@@ -19,7 +19,7 @@ Schriftführung im Verein „Miteinander Birkenhöhe e. V.“, zuständig für A
 
 Bis 1996 hast du in der Registratur der Stadtverwaltung gearbeitet. Dann kam eine Kündigung wegen „Unregelmäßigkeiten in der Aktenführung“. Ein Jahr später stand Hanno vor deiner Tür, mit einer Tasche Lebensmittel und einem Angebot: Der Verein brauche jemanden, der Ordnung kann.
 
-Seit 1998 führst du die Ablage des Vereins, das Eingangsbuch und den Schlüsselkasten. Du bist stolz darauf, dass bei dir nichts verloren geht.
+Seit 1998 führst du die Ablage des Vereins und das Eingangsbuch. Du bist stolz darauf, dass bei dir nichts verloren geht.
 
 ## Kleidung · Deine Kleidung
 
@@ -37,7 +37,7 @@ Seit 1998 führst du die Ablage des Vereins, das Eingangsbuch und den Schlüssel
 
 ## Vertraulich · Dein Spickzettel
 
-> **Deine Geschichte:** „Um kurz vor halb neun war ich in der Küche und habe ab 20:40 den Kaffee vorbereitet. Hanno habe ich zuletzt am Nachmittag in Ruhe gesprochen.“
+> **Deine Geschichte:** „Ich war ab 20:40 in der Küche und habe den Kaffee vorbereitet.“
 >
 > **Gefährliche Punkte:** ① Özdemir weiß, dass du um 20:38 aus der Küche gegangen bist ② der Küchendienstplan: Kaffee erst um 21:07 durch Hollmann ③ die Streifen im Aktenvernichter ④ der Lieferschein der Druckerei ⑤ der Faden: Ein Stück deiner linken Manschette fehlt
 >
@@ -68,7 +68,7 @@ Seit 1998 führst du die Ablage des Vereins, das Eingangsbuch und den Schlüssel
 
 ## Vertraulich · Dein Abend
 
-- **18:30** Mit Hanno und Wiesner aufgeschlossen. Du hast wie jeden Donnerstag auch den Beratungsraum aufgeschlossen, mit deinem eigenen Schlüssel (seit März 1998).
+- **18:30** Mit Hanno und Wiesner aufgeschlossen. Du hast auch den Beratungsraum aufgeschlossen, mit deinem eigenen Schlüssel (seit März 1998), wie sonst jeden Donnerstag.
 - **19:15** Gruppenfoto, ein Sofortbild für den Aushang. Du stehst am Rand, in deiner grünen Strickjacke.
 - **20:10** Hanno leise zu dir: „Um 20:40 im Büro. Allein.“ Du wusstest sofort, worum es geht.
 - **20:24** Auf dem Weg zum WC hast du durch die Bürotür gehört, wie {R02: Beate / Benedikt} Kranz zu Hanno sagte: „Dann bist du raus, Hanno. So oder so.“ **Das ist wahr, und du darfst es benutzen.**
@@ -117,13 +117,13 @@ Die sieben Sätze, die alle Mitglieder kennen:
 ## Runde 1 · Der Sturz
 
 - Wirk erschüttert und praktisch: Tee kochen, Stühle rücken, nach Fuchs sehen.
-- **Deine Geschichte:** „Ich war ab kurz vor halb neun in der Küche und habe ab 20:40 den Kaffee vorbereitet.“ Das ist eine erlaubte Lüge über deinen eigenen Aufenthaltsort.
+- **Deine Geschichte:** „Ich war ab 20:40 in der Küche und habe den Kaffee vorbereitet.“ Das ist eine erlaubte Lüge über deinen eigenen Aufenthaltsort.
 - Zeig auf den Warnzettel an der Leiter: „Die oberste Stufe wackelt seit Wochen. Wie oft habe ich gesagt, er soll nicht allein da hochsteigen.“
 - Nicht auf andere zeigen. Noch nicht.
 
 ## Runde 2 · Das Hinterzimmer
 
-- Jetzt kommt der Kreis heraus. Du kannst ihn nicht mehr verbergen, also **schützt du ihn**: „Das war ein Gesprächskreis. Er hat Menschen gerettet. Fragt {R10: Bärbel / Bernd}.“
+- Jetzt kommt der Kreis heraus. Du kannst ihn nicht mehr verbergen, also **schützt du ihn**: „Das war ein Gesprächskreis. Er hat Menschen gerettet. {R10: Bärbel / Bernd} Klose zum Beispiel.“
 - Die Archivfassung von Fuchs (B8) mit „HR 08/04“: „Seht ihr? Hanno hat Texte verändert. Er hat sich das Recht genommen.“ Das stimmt.
 - Der Kalender „20:40 – unter vier Augen“: Schweig dazu oder sag: „Hanno hatte heute viele Termine.“
 - Dass du einen eigenen Schlüssel zum Beratungsraum hast, wissen die Mitglieder ohnehin. Leugne es nicht.

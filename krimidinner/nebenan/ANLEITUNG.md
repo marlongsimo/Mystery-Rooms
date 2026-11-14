@@ -12,6 +12,8 @@ Ihr seid die, die nach dem Fest geblieben sind. Jede und jeder von euch spielt e
 
 **5 bis 10 Personen · etwa 3 bis 3,5 Stunden · eine Spielleitung, die mitspielen darf**
 
+*Themen des Abends: ein gewaltsamer Tod, seelische Krisen und Trauer, Druck in einer Gruppe. Wer etwas davon nicht am Tisch haben möchte, sagt es der Spielleitung vorher.*
+
 ---
 
 ## Vor dem Abend

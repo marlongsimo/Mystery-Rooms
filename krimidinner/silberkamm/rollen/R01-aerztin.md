@@ -49,8 +49,8 @@ Kommt das heraus, verlierst du die Approbation und alles, was du seither aufgeba
 
 ## Vertraulich · Bis 22 Uhr
 
-- **19:50** Im Gang von Wagen 2 tritt Auen neben dich. Leise: „Morgen wiederholen Sie Ihr Gutachten vor den Anwälten der Käufer, [Frau / Herr] Doktor. Sonst erfährt die Ärztekammer, was es gekostet hat.“ Du hast nicht geantwortet. Ob jemand zugehört hat? [Die Stewardess / Der Steward] stand am Ende des Gangs.
-- **20:00–20:30** Dinner im Speisewagen. Du hast kaum gegessen.
+- **19:50** Im Gang von Wagen 2 tritt Auen neben dich. Leise: „Morgen wiederholen Sie Ihr Gutachten vor den Anwälten der Käufer, [Frau / Herr] Doktor. Sonst erfährt die Ärztekammer, was es gekostet hat.“ Du hast nicht geantwortet. Ob jemand zugehört hat? {R07: Die Stewardess / Der Steward} stand am Ende des Gangs.
+- **20:00–20:30** Dinner im Speisewagen. Du hast kaum gegessen. Als Auen „1921“ sagte, hast du dein Wasserglas umgestoßen.
 - **ab 20:30** In deinem Abteil 1, Wagen 1. Gelesen, nicht verstanden, was.
 
 ## Runde 1 · Der Tote im Abteil

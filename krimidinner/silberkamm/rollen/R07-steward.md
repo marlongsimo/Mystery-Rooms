@@ -55,13 +55,14 @@ Seit 1925 arbeitest du bei der Schlafwagengesellschaft. Du warst schnell die bes
 
 **Dein Vater** hieß Raimund Wendt. Am 3. März 1921 zeigte das Signal 14 bei Kilometer 212, nahe Hohenkamm, „Fahrt frei“, obwohl der Abschnitt besetzt war. Neun Menschen starben. Dein Vater wurde verurteilt: drei Jahre schwerer Kerker. Das Werk Auen schwor, seine Relais seien einwandfrei. {R01: Eine Ärztin / Ein Arzt}, Dr. Hagen, schwor, er habe nach Alkohol gerochen. Dein Vater hat nie getrunken.
 
-1924 starb er in der Haft. Sein letzter Brief an dich, von 1923, liegt seit sechs Jahren in deiner Brieftasche: „Ich habe das Signal richtig gestellt, mein Kind. Es war das Relais. Glaub mir.“ Du hast ihm immer geglaubt. Beweisen konntest du es nie.
+1924 starb er in der Haft. Sein letzter Brief an dich, von 1923, liegt seit sechs Jahren bei deinen Sachen, heute in deinem Dienstabteil: „Ich habe das Signal richtig gestellt, mein Kind. Es war das Relais. Glaub mir.“ Du hast ihm immer geglaubt. Beweisen konntest du es nie.
 
 Am 7. Februar sahst du auf der Platzkartenliste: „v. Auen, Salon 6, 14. II.“ Du hast mit einem Kollegen die Schicht getauscht. Du wolltest ihm in die Augen sehen. Mehr hattest du dir nicht vorgenommen. Das ist die Wahrheit, auch wenn sie dir jetzt nichts mehr nützt.
 
 **Was du sonst noch weißt:**
 - Um 19:50 hast du im Gang gehört, wie Auen zu Dr. Hagen sagte: „Morgen wiederholen Sie Ihr Gutachten. Sonst erfährt die Ärztekammer, was es gekostet hat.“ Hagen ist hier, im selben Zug. Du hast {R01: sie / ihn} heute Abend bedient und dir nichts anmerken lassen.
-- Um 20:35 hast du den Streit zwischen {R03: Frau / Herrn} Bell und Auen im Gang gehört, über Geld.
+- Um 20:35 hast du den Streit zwischen {R03: Frau / Herrn} Bell und Auen im Gang gehört, über Geld. Um 20:45 hast du {R03: ihr / ihm} ungefragt einen Cognac gebracht und gesagt: „Der Herr in Salon 6 hat das nicht zum ersten Mal gemacht.“
+- Beim Dinner hast du {R06: der Baronin / dem Baron} von Steinach Wein nachgeschenkt und leise gesagt: „Mein Beileid.“ Du kennst die Namen der Toten von 1921 auswendig. Fragt {R06: sie / er} dich, woher du es weißt: „Man liest Zeitung.“
 
 ## Vertraulich · Deine Ziele
 
@@ -110,8 +111,8 @@ Am 7. Februar sahst du auf der Platzkartenliste: „v. Auen, Salon 6, 14. II.“
 ## Runde 2 · Die Vergangenheit kehrt zurück
 
 - Jetzt liegt das Unglück am Signal 14 auf dem Tisch. **Der Name Wendt fällt.** Zeig Anteilnahme, wie sie jeder zeigen würde, aber keine Nähe. Sag nie „mein Vater“.
-- Das Gutachten von Dr. Hagen steht im Urteil. Das ist deine Gelegenheit. Frag ruhig nach: „Ein Gutachten über Alkoholgeruch, und die Ärztin reist mit dem Fabrikanten nach Zürich?“ Du darfst erzählen, was du um 19:50 gehört hast.
-- Der leere Aktendeckel: „Vielleicht hat der Herr ihn nie gefüllt.“ Dann lenk auf {R04: Frau / Herrn} Sattler, der den Bericht geschrieben hat, und auf {R05: Frau / Herrn} Lorenz, die oder der ihn drucken will.
+- Das Gutachten von Dr. Hagen steht im Urteil. Das ist deine Gelegenheit. Frag ruhig nach: „Ein Gutachten über Alkoholgeruch, und {R01: die Ärztin / der Arzt} reist mit dem Fabrikanten nach Zürich?“ Du darfst erzählen, was du um 19:50 gehört hast.
+- Der leere Aktendeckel: „Vielleicht hat der Herr ihn nie gefüllt.“ Dann lenk auf {R04: Frau / Herrn} Sattler, {R04: die / der} 1921 im Werk war, und auf {R05: Frau / Herrn} Lorenz, {R05: die / der} über das Unglück schreibt. **Vorsicht:** Wer den Bericht geschrieben hat, weißt du nur aus dem Original in deinem Wäschefach. Sag es nicht.
 
 ## Runde 3 · Die falsche Zeit
 
@@ -123,7 +124,7 @@ Am 7. Februar sahst du auf der Platzkartenliste: „v. Auen, Salon 6, 14. II.“
 
 - Für die nassen Hände um 22:30: „Ich hatte Cognac verschüttet, das klebt.“
 - Für die Stimmen, die Bell um 22:14 hörte: „Er hat mich angeschrien, weil das Eis fehlte. So war er.“
-- **Wo die zweite Linie verwundbar ist:** Wenn du um 22:14 gegangen bist, warum hat Auen um 22:20 nicht auf Hartmanns Klopfen geantwortet? Und warum warst du bis 22:33 nicht im Speisewagen, wie {R08: Frau / Herr} Reiter weiß?
+- **Wo die zweite Linie verwundbar ist:** Wenn du um 22:14 gegangen bist, warum hat Auen um 22:20 nicht auf Hartmanns Klopfen geantwortet? Und warum warst du bis 22:33 nicht im Speisewagen, wie {R08: Frau / Herr} Reiter weiß? Deine Antwort darauf: „Ich war im Dienstabteil und habe Gläser poliert.“ Bezeugen kann das niemand.
 
 ## Runde 4 · Die Wahrheit
 

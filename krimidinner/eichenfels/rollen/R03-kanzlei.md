@@ -19,13 +19,13 @@
 
 Du bist in Ilmenau aufgewachsen, keine zwanzig Kilometer von der Sternwarte entfernt. Als Kind warst du mit der Schulklasse einmal oben in der Kuppel, und der Mann, der euch damals den Saturn zeigte, war ein junger, ungeduldiger Assistent namens Theodor Sander. Du hast ihn daran nie erinnert.
 
-Vor zehn Jahren übernahm deine Kanzlei das Mandat der Stiftung. Es war ein Prestigeauftrag, aber kein angenehmer. Sander behandelte Juristen wie Handwerker, die man ruft, wenn etwas tropft. Er unterschrieb, ohne zu lesen, und beschwerte sich dann über das, was er unterschrieben hatte. Trotzdem hast du gelernt, ihn zu lesen: Wenn er leise wurde, meinte er es ernst. Seit drei Wochen trägst du die Abschrift seines Testaments mit dir herum wie etwas, das zu warm ist, um es lange festzuhalten.
+Vor zehn Jahren übernahm deine Kanzlei das Mandat der Stiftung. Es war ein Prestigeauftrag, aber kein angenehmer. Sander behandelte Juristen wie Handwerker, die man ruft, wenn etwas tropft. Er unterschrieb, ohne zu lesen, und beschwerte sich dann über das, was er unterschrieben hatte. Trotzdem hast du gelernt, ihn zu lesen: Wenn er leise wurde, meinte er es ernst. Seit drei Wochen trägst du sein neues Testament mit dir herum wie etwas, das zu warm ist, um es lange festzuhalten.
 
 Vor drei Wochen wurde er sehr leise. Er bestellte dich an einem Dienstag um zehn Uhr in sein Arbeitszimmer und diktierte dir ein neues Testament. Dabei sah er schlecht aus, grau im Gesicht, und er sagte einen Satz, den du seitdem nicht vergisst: „Ich habe nicht mehr viel Zeit für Ausreden, [Frau / Herr] Ritter. Weder für meine noch für die anderer.“
 
 Das neue Testament ist der Grund, warum du heute hier bist. Offiziell bist du als Vertretung der Stiftung zum Jubiläum geladen. Tatsächlich hat Sander dich gebeten, nach seiner Rede um 22:30 mit ihm und seinem Kind zusammenzusitzen. Er wollte, dass du dabei bist, „damit hinterher niemand behauptet, er habe etwas falsch verstanden“.
 
-Die anderen Gäste kennst du aus Akten: Dr. Rademacher aus dem Archiv, mit {R08: der / dem} du jedes Jahr die Inventarliste für die Versicherung abzeichnest. Faber von der Haustechnik, dessen Stundenzettel du zweimal zurückgeschickt hast. Falk, {R10: die großzügigste Förderin / der großzügigste Förderer} der Stiftung, über deren Verträge du wachst. Und {R01: Leonie / Leon} Sander, das Kind des Professors, das du heute zum ersten Mal persönlich triffst und dem du gleich nicht in die Augen sehen wirst.
+Die anderen Gäste kennst du aus Akten: Dr. Rademacher aus dem Archiv, mit {R08: der / dem} du jedes Jahr die Inventarliste für die Versicherung abzeichnest. Faber von der Haustechnik, {R09: deren / dessen} Stundenzettel du zweimal zurückgeschickt hast. Falk, {R10: die großzügigste Förderin / der großzügigste Förderer} der Stiftung, über deren Verträge du wachst. Und {R01: Leonie / Leon} Sander, das Kind des Professors, das du heute zum ersten Mal persönlich triffst und dem du gleich nicht in die Augen sehen wirst.
 
 ## Kleidung · Deine Kleidung
 
@@ -43,7 +43,7 @@ Die anderen Gäste kennst du aus Akten: Dr. Rademacher aus dem Archiv, mit {R08:
 
 ## Vertraulich · Dein Geheimnis — VERTRAULICH
 
-Das neue Testament, unterschrieben vor drei Wochen:
+Das neue Testament, diktiert vor drei Wochen, unterschrieben am Dienstag dieser Woche:
 - {R01: Leonie / Leon} Sander erhält **nur noch den Pflichtteil.**
 - Der Rest geht an die Stiftung, mit einer Auflage: Bei jeder künftigen Ausgabe des Himmelsatlas ist **Dr. {R02: Irene / Ingo} Marwitz als {R02: Mitautorin / Mitautor}** zu nennen.
 - Der Grund für die Enterbung steht in einem versiegelten Begleitbrief, den du gelesen hast: Sander hatte erfahren, dass sein Kind vor zwei Jahren **seine Unterschrift unter eine Bürgschaft gefälscht** hat.

@@ -1,6 +1,6 @@
 # Der letzte Gast – Gastgeberheft
 
-*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt: Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
+*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 und A9 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt: Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
 ---
 
@@ -10,13 +10,13 @@
 
 Du bist Erzählstimme, Zeitwächter und Beweisausgabe. Du liest zu Beginn jeder Phase einen kurzen Text vor, gibst die Beweise frei und achtest darauf, dass der Abend im Fluss bleibt. Den Fall löst du nicht – das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Wer welche Rolle hat, siehst du nicht, auch nicht, ob du selbst die Täterrolle hast, bevor du dein Blatt öffnest.
 
-**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
+**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5 und A9. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
 
 **Wenn du die Täterrolle hast:** Du leitest genauso weiter. Du liest jeden Text vollständig vor und nennst jedes Losungswort zur vorgesehenen Zeit. Stockt das Gespräch, nimmst du den ersten Impuls der Phase, wörtlich, auch wenn er dir schadet. Als Spielleitung bist du unparteiisch, als Figur verteidigst du dich.
 
 ## A2 · Vorbereitung (eine Woche bis zwei Tage vorher)
 
-- [ ] **Gäste einladen:** 4 bis 10 Personen, Dauer etwa 2½ Stunden plus Essen.
+- [ ] **Gäste einladen:** 4 bis 10 Personen, Dauer etwa 2 bis 2½ Stunden mit Essen.
 - [ ] **Namen und Rollenvarianten eintragen** (weiblich oder männlich dargestellt – jede Person wählt frei).
 - [ ] **Codes verteilen**, jeder Person ihren eigenen. Einen Code nur der jeweiligen Person geben, nie offen in eine Gruppe schreiben.
 - [ ] **Anleitung mitschicken** (`ANLEITUNG`), damit alle die fünf Regeln kennen.
@@ -65,6 +65,22 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 > „Bevor wir beginnen, die Regeln. Erstens: Ihr dürft eure Geheimnisse für euch behalten, ausweichen und schweigen. Zweitens: Über euren eigenen Aufenthaltsort und eure Handlungen zur Tatzeit dürft ihr nicht lügen, aber schweigen. Nur eine Person am Tisch darf darüber falsche Angaben machen, und sie weiß, dass sie gemeint ist. Und niemand erfindet etwas, das dem eigenen Rollenblatt widerspricht. Drittens: Was auf einer Beweiskarte steht, ist wahr. Ihr dürft bestreiten, was es bedeutet, aber nicht, was dort steht. Viertens: Trumpfkarten spielt ihr, wann ihr wollt. Fünftens: Den vertraulichen Teil und die Runden eures Rollenblatts zeigt ihr niemandem. Was eure Figur in der Mordnacht erlebt hat, erfahrt ihr erst im Lauf des Abends – mit den Losungswörtern, die ich vorlese. Und jetzt: Willkommen in Eichenfels.“
 
+## A9 · Wenn etwas schiefgeht
+
+**Jemand sagt vor dem Abend ab.** Am besten springt eine andere Person ein und bekommt den Code der absagenden Person. Geht das nicht, legst du den Abend mit der neuen Personenzahl neu an und verschickst neue Codes. Die Rollen werden dabei neu verteilt, die alten Codes passen nicht mehr zur Besetzung. Unter 4 Personen lässt sich der Fall nicht spielen: Dann verschiebt ihr.
+
+**Jemand kommt zu spät.** Phase 1 kann ohne die Person beginnen. Mit dem ersten Losungswort wartest du, bis alle am Tisch sitzen. Kommt jemand erst danach, nennst du der Person die bisherigen Losungswörter, sie liest nach und stellt sich kurz vor.
+
+**Jemand muss früher gehen.** Die Person beantwortet eine letzte Fragerunde und gibt ihre Anklage verdeckt bei dir ab. Ihr Rollenblatt bleibt zu. Ob sie die Täterrolle hatte, zeigt die Auflösung.
+
+**Das Essen.** Der Zeitplan in A4 rechnet damit, dass beim Spielen gegessen wird. Serviert wird zu Beginn der dort genannten Phase, bevor du vorliest. Das Losungswort nennst du erst, wenn alle sitzen. Dauert das Servieren länger, hängst du die Zeit hinten an, statt eine Phase zu kürzen. Wenn du mitspielst und kochst, nimm Gerichte, die fertig warten können.
+
+**Die Gruppe ist sich zu früh sicher.** Bestätige nichts. Die weiteren Runden öffnest du trotzdem: Für die Anklage braucht es auch Motiv und Beweis, und die anderen Geheimnisse sind noch offen. Du darfst die Phase kürzen.
+
+**Die Anklagen gehen auseinander.** Es wird nicht abgestimmt, jede Anklage zählt für sich. Aufgelöst wird in jedem Fall. Klagt niemand richtig an, hat die Täterrolle gewonnen, und ihr geht B-3 gemeinsam durch.
+
+**Jemandem wird ein Thema zu viel.** In diesem Fall kommen vor: ein gewaltsamer Tod, eine schwere Krankheit, Streit um ein Erbe. Sag das bei der Einladung dazu. Am Abend darf jede Person jederzeit kurz aus der Rolle gehen. Dann macht ihr eine Pause und spielt danach weiter.
+
 ---
 
 ## Phase 1 · Der Empfang (ca. 20 Min.)
@@ -80,13 +96,15 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 | R04 | „{R04: Clara / Carl} Lindner, Presse, schreibt eine Reportage zum Jubiläum.“ |
 | R05 | „{R05: Tessa / Tom} Hollerbach, die Eventagentur, überall und nirgends.“ |
 | R06 | „{R06: Mina / Emre} Yilmaz aus dem Landgasthof ‚Zum Kauz‘, heute in der Küche.“ |
-| R07 | „Dr. {R07: Nina / Nils} Seebach, seit zwanzig Jahren Sanders {R07: Ärztin / Arzt} und {R07: Schachpartnerin / Schachpartner}.“ |
+| R07 | „Dr. {R07: Nina / Nils} Seebach, seit zwanzig Jahren Sanders {R07: Ärztin / Arzt}, seit fünfzehn {R07: seine Schachpartnerin / sein Schachpartner}.“ |
 
 *(Die Rollen R02, R08, R09 und R10 sind immer besetzt.)*
 
 > **Vorlesen (Sanders Ansprache, 20:40 Uhr):** „Liebe Gäste. Es gibt Wahrheiten, die Jahrzehnte überdauern. Es gibt Menschen, die ihren Ruhm auf der Arbeit anderer aufgebaut haben. Und es gibt Geheimnisse, die heute Nacht nicht länger verborgen bleiben. Um 22 Uhr werde ich Ihnen die Wahrheit erzählen – über diese Sternwarte, über den Himmelsatlas und über eine Person, die sich seit Jahren in Sicherheit wiegt. Bis dahin: Genießen Sie das Essen.“
 
 **Tipp:** Lass nach der Ansprache einen Moment Stille. Wer reagiert wie?
+
+**Weiter, wenn:** sich alle vorgestellt haben und du die Nebenfiguren genannt und Sanders Ansprache vorgelesen hast. Herausfinden muss hier noch niemand etwas.
 
 ---
 
@@ -98,7 +116,9 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 **Losungswort: KUPPEL.** Es öffnet die Beweise B1 Tatortbericht · B2 Ärztliche Einschätzung · B3 Grundriss und Schließanlage · B4 Ablaufplan – und in jedem Rollenblatt den Abschnitt **Runde 1**: Was die eigene Figur zwischen 20:40 und 21:35 erlebt hat. Gib allen kurz Zeit zum Lesen.
 
-**Runde der Alibis:** Jede Person sagt der Reihe nach, wo sie zwischen 21:00 und 21:35 Uhr war. Erinnere an Regel 2. Für Nebenfiguren sagst du: „Das weiß im Moment niemand genau.“
+**Runde der Alibis:** Jede Person sagt der Reihe nach, wo sie zwischen 21:00 und 21:35 Uhr war. Erinnere an Regel 2. Für Nebenfiguren gilt, was auf ihrer Aussagekarte steht (A8). Hat eine Nebenfigur in dieser Runde keine: „Das weiß im Moment niemand genau.“
+
+**Weiter, wenn:** jede Person gesagt hat, wo sie war, oder ausdrücklich geschwiegen hat, und alle die Karten dieser Runde gelesen haben.
 
 ---
 
@@ -110,6 +130,8 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 
 **Freies Gespräch:** Die Gäste befragen einander, gehen zu zweit beiseite, schließen Bündnisse, spielen Trumpfkarten.
 
+**Weiter, wenn:** alle Karten dieser Runde besprochen sind und ein paar Minuten lang nichts Neues mehr kommt, spätestens wenn die Zeit um ist. Sag kurz vorher an: „Letzte Fragen, gleich geht es weiter.“
+
 ---
 
 ## Phase 4 · Die letzte Ermittlung (ca. 25 Min.)
@@ -119,6 +141,8 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7).
 **Losungswort: NEBEL.** Es öffnet B9 Zutrittsprotokoll · B10 Technikprotokoll · B11 Aussage aus der Küche · **B12**, wenn R04 nicht besetzt ist (sonst bei Bedarf mit **FUNK**) – und in jedem Rollenblatt **Runde 3**.
 
 **Tipp:** Schlag vor, gemeinsam eine Zeitleiste von 21:00 bis 21:35 aufzuschreiben, zum Beispiel auf einer Serviette in der Tischmitte.
+
+**Weiter zum Finale, wenn:** niemand mehr eine Frage hat oder die Zeit um ist. Kündige es an: „In fünf Minuten wird angeklagt.“
 
 ---
 

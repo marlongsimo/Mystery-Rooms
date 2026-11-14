@@ -318,7 +318,7 @@ Jede Karte hat diese Felder: **Runde**, **Bedingung**, **Fundort / Quelle**, **T
 - „Körper noch warm, keine Totenstarre. Tod vor etwa 15 bis 35 Minuten, also zwischen 22:30 und 22:55. Die stehengebliebene Uhr bestätigt das.“
 - *Strang:* A (die falsche Annahme)
 
-**B3 · Passliste des Zugbegleiters** — Runde 1 · immer · {R02: Emilie / Emil} Hartmann
+**B3 · Passliste der Zugbegleitung** — Runde 1 · immer · {R02: Emilie / Emil} Hartmann
 
 | Zeit | Abteil | Eintrag |
 |---|---|---|

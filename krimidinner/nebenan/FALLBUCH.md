@@ -380,10 +380,10 @@ Die vollständigen Vorgeschichten aus 0.3 bleiben gültig, soweit sie dieser Fas
 
 | Runde | Linie |
 |---|---|
-| 1 | Linde behauptet, seit 20:40 in der Küche gewesen zu sein. Diese falsche Aussage über die eigene Bewegung im Tatzeitfenster ist der Täterrolle erlaubt. Linde verweist auf den Warnzettel an der Leiter. |
+| 1 | Linde behauptet: „Ich war ab 20:40 in der Küche und habe den Kaffee vorbereitet.“ Diese falsche Aussage über die eigene Bewegung im Tatzeitfenster ist der Täterrolle erlaubt. Linde verweist auf den Warnzettel an der Leiter. |
 | 2 | „Der Kreis hat Menschen gerettet.“ Lenkt auf B8: „Hanno hat Texte verändert.“ |
 | 3 | „Da steht es doch: geführt von H. Rabe. Die Unterschrift ist die von Seifert. Und ich habe um 20:24 gehört, wie Kranz zu ihm sagte: ‚Dann bist du raus, Hanno. So oder so.‘“ Linde verweist auf echte Inhalte der Karte und verschweigt die eigene Fälschung; der letzte Teil ist wahr. |
-| 4 | Behauptet, die Spendendose aus dem Beratungsraum geholt. Wenn das widerlegt wird, weicht Linde aus: „Ich war für die Archivpflege zuständig. Hanno hat die Akte geprüft und unterschrieben. Mehr sage ich dazu nicht.“ Beide Sätze sind mit den Dokumenten vereinbar; Linde gesteht die Fälschung nicht ein. Nach dem Faden schweigt Linde. |
+| 4 | Behauptet: „Ich habe um 20:40 die Spendendose aus dem Beratungsraum geholt, danach war ich in der Küche.“ Wenn das widerlegt wird, weicht Linde aus: „Ich war für die Archivpflege zuständig. Hanno hat die Akte 2003 selbst eingesehen und bestätigt. Mehr sage ich dazu nicht.“ Beide Sätze sind mit den Dokumenten vereinbar; Linde gesteht die Fälschung nicht ein. Nach dem Faden schweigt Linde. |
 
 Linde darf über die eigenen Aufenthaltsorte und Handlungen im Tatzeitfenster lügen. Die eigene Fälschung darf Linde verschweigen, aber Linde darf nicht über fremde Handlungen lügen (also nie behaupten, Hanno oder jemand anderes habe die Akte gemacht). Linde darf keine Beweiskarte umdeuten oder deren Inhalt bestreiten.
 
@@ -416,7 +416,7 @@ Linde darf über die eigenen Aufenthaltsorte und Handlungen im Tatzeitfenster l�
 | R06 Rabe | Sagt bei Nachfrage wahrheitsgemäß „Kurz vor neun“ oder verweigert die genaue Zeit. Behauptet nicht, erst gegen 21 Uhr gekommen zu sein. | Runde 4: kam um 20:47, sah Kranz um 20:44 am Auto telefonieren, klopfte um 20:50 an der Bürotür und um 20:51 am Beratungsraum, hörte den Aktenvernichter. Finale: „Hanno sagte mir, er gebe alles zurück.“ |
 | R07 Özdemir | „Ich war in der Küche.“ | Runde 3: erkennt im Einsichtsbrief (B13) die eigene Formulierungshilfe für Seifert von 2003 wieder, ohne damals den Inhalt der Akte gekannt zu haben. Dazu eine unabhängige Beobachtung aus dem Viertel: Seit 2002 wurde Seifert von früheren Bekannten aus dem Verein auf der Straße nicht mehr gegrüßt, und Özdemir hat bei mehreren Ratsuchenden erlebt, dass sie nach Gesprächen „im Hinterzimmer“ plötzlich niemandem mehr etwas erzählen wollten. Den Namen oder die Regeln des Kreises kennt Özdemir nicht. Runde 4: Linde ging um 20:38 in der grünen Strickjacke aus der Küche und kam um 20:57 zurück, blass und mit festgehaltenem linken Ärmel. Hollmann kam um 21:05 in die Küche. |
 | R08 Wieland | „Jubiläumsartikel.“ | Runde 3: Der Artikel von 2002 wurde gestoppt. Runde 4: Fordert die eigene Digitalkamera bei Kranz zurück oder lässt Kranz die Kamera als verwahrtes Fundstück auf den Tisch legen. Präsentiert B22: Fotos 20:41 (Küche nur Özdemir), 20:42 (Fuchs am Basteltisch), 20:51 (Seifert im Hof). |
-| R09 Wiesner | Weist auf den Warnzettel hin, ohne zu behaupten, die Leiter sei noch defekt. Erklärt: „Ich wollte Hanno die Reparatur am Montag offiziell abnehmen lassen; bis dahin ließ ich den Zettel hängen.“ | Runde 4: Leiter am Freitag neu vernietet und geprüft (Quittung vom 15.10.), Aktenvernichter am Freitag geleert, Poltern um 20:46, Surren des Aktenvernichters 20:48–20:52. |
+| R09 Wiesner | Weist auf den Warnzettel hin, ohne zu behaupten, die Leiter sei noch defekt. Sagt nur: „Den Zettel habe ich am 01.10. selbst an die Leiter geklebt. Er hing heute Abend noch dran.“ Reparatur und Grund für den hängenden Zettel bleiben bis Runde 4 ungesagt. | Runde 4: Leiter am Freitag neu vernietet und geprüft (Quittung vom 15.10.), Zettel blieb bis zur Abnahme am Montag hängen, Aktenvernichter am Freitag geleert, Poltern um 20:46, Surren des Aktenvernichters 20:48–20:52. |
 | R10 Klose | Verteidigt Hanno und den Verein. | Runde 3: B14 trifft Klose ins Mark. Runde 4: „112a gab es nie“ und Lindes Wahrheit von 1997 (rückdatierter Antrag). |
 
 ---
@@ -561,7 +561,7 @@ Diese Zeitachse ist die maßgebliche Wahrheit für alle Rollenhefte, Hinweise un
 
 | Karte | Inhalt |
 |---|---|
-| **B5** Das schwarze Buch | Kranz findet es im Sakko, als er Hannos persönliche Dinge zusammenlegt. Darin stehen die sieben Sätze, 23 Vornamen ohne Patenangaben und die Kalenderseite „Sa 16.10.: 20:40 – unter vier Augen · 21:00 K. S. (Karte 2001!) · S. H. – 1.800 – Do?“ sowie „Mo: Rückgabe beginnt.“ Außerdem steckt im Sakko der weiße Umschlag „K. – persönlich“. |
+| **B5** Das schwarze Buch | Kranz findet es im Sakko, als er Hannos persönliche Dinge zusammenlegt. Darin stehen die sieben Sätze, 22 Vornamen ohne Patenangaben und die Kalenderseite „Sa 16.10.: 20:40 – unter vier Augen · 21:00 K. S. (Karte 2001!) · S. H. – 1.800 – Do?“ sowie „Mo: Rückgabe beginnt.“ Außerdem steckt im Sakko der weiße Umschlag „K. – persönlich“. |
 | **B6** Schlüsselbuch | Wiesners Buch, geführt seit 1993. Büro: Rabe, Kranz, Wiesner (General). Beratungsraum: Rabe, **Linde – seit 03/1998**, Klose, Wiesner (General). Archivschrank: Rabe, Linde, Klose (alter Schlüssel, nie zurückgegeben). **Ersatzring „Vorstand – Notfall“** (seit 1998) mit drei Schlüsseln: Beratungsraum, Archivschrank, Schublade. Er hängt im Schlüsselkasten im westlichen Flur; den Kastenschlüssel haben Vorsitz, stellvertretender Vorsitz und Hausmeisterei (Rabe, Kranz, Wiesner). |
 | **B7** Der Beratungsschrank | 23 Hängemappen mit Vornamen, Mitgliederkarten, Eingangsbuch, Patenblätter, Hilfebuch und leere Formulare G. Eine Schublade ist verschlossen; der kleinste Schlüssel am Ersatzring passt. Sie wird in Runde 3 geöffnet. |
 | **B8** Archivfassung Fuchs | Formular G vom 08.07.2004, abgeschwächter Satz, am Rand „HR 08/04“. |
@@ -651,9 +651,9 @@ Die Dokumente beweisen die Fälschung und führen zur Täterrolle. Sie beweisen 
 
 ### Weg B · Gelegenheit und Bewegung
 
-1. Linde behauptet, seit 20:40 in der Küche gewesen zu sein. B16 zeigt, dass der Kaffee erst um 21:07 durch Hollmann angesetzt wurde.
+1. Linde behauptet: „Ich war ab 20:40 in der Küche und habe den Kaffee vorbereitet.“ B16 zeigt, dass der Kaffee erst um 21:07 durch Hollmann angesetzt wurde.
 2. Özdemir oder B20 belegt, dass Linde die Küche um 20:38 verließ und erst um 20:57 zurückkam.
-3. Lindes zweite Erklärung („Spendendose aus dem Beratungsraum geholt“) widerspricht B4 und Hollmanns Aussage: Die Dose stand beim Fest zunächst auf dem Büfett und lag von 20:35 bis 21:05 bei Hollmann an der Kassenecke.
+3. Lindes zweite Erklärung („Ich habe um 20:40 die Spendendose aus dem Beratungsraum geholt, danach war ich in der Küche.“) widerspricht B4 und Hollmanns Aussage: Die Dose stand beim Fest zunächst auf dem Büfett und lag von 20:35 bis 21:05 bei Hollmann an der Kassenecke.
 4. Fuchs sieht um 20:40 eine dunkle Strickjacke am Büro. Hollmann hört um 20:44 Hanno sagen: „Um neun erfährt sie es. Von mir!“ Das passt zu dem vertraulichen Gespräch, das Linde mit Hanno führte.
 5. Seifert hört um 20:49 den Aktenvernichter und stößt in Runde 3 selbst den Fund der Streifen B12 an; R06 hört ihn um 20:51; Wiesner hört ihn durch die Wand von 20:48 bis 20:52.
 6. Seifert sieht um 20:53 eine lange dunkle Strickjacke vom Beratungsraum in Richtung WC verschwinden; Özdemir sieht Linde um 20:57 mit blassem Gesicht und festgehaltenem Ärmel. B22 bestätigt zusätzlich Seiferts Aufenthalt im Hof um 20:51.
@@ -676,8 +676,8 @@ Keine Karte allein überführt Linde. Die Täterthese wird zwingend, wenn Dokume
 
 | Nr. | Wer | Aussage / Auslassung | Tatsächlich | Art | Widerlegt oder bestätigt durch |
 |---|---|---|---|---|---|
-| 1 | Linde | „Seit 20:40 in der Küche, Kaffee.“ (1) | 20:40–20:47 Büro; 20:47–20:52 Beratungsraum; 20:53–20:55 WC; ab 20:57 Küche | erlaubte Täterlüge über eigenen Aufenthaltsort | B16, Özdemir/B20, Sichtungen |
-| 2 | Linde | „Ich habe die Spendendose aus dem Beratungsraum geholt.“ (4) | Die Dose war bei Hollmann an der Kassenecke. | Ausrede; tatsächliche Aussage muss als Täterlüge kenntlich sein | B4, Hollmann, R07/B20 |
+| 1 | Linde | „Ich war ab 20:40 in der Küche und habe den Kaffee vorbereitet.“ (1) | 20:40–20:47 Büro; 20:47–20:52 Beratungsraum; 20:53–20:55 WC; ab 20:57 Küche | erlaubte Täterlüge über eigenen Aufenthaltsort | B16, Özdemir/B20, Sichtungen |
+| 2 | Linde | „Ich habe um 20:40 die Spendendose aus dem Beratungsraum geholt, danach war ich in der Küche.“ (4) | Die Dose war bei Hollmann an der Kassenecke. | Ausrede; tatsächliche Aussage muss als Täterlüge kenntlich sein | B4, Hollmann, R07/B20 |
 | 3 | Linde | „Kranz sagte: ‚So oder so‘.“ (3) | stimmt, 20:24 | wahr | Kranz gibt den Streit in Runde 4 zu |
 | 4 | Linde | verweist auf „geführt von H. Rabe“ und verschweigt die eigene Fälschung (3) | Linde hat die Akte gefälscht | Auslassung. Linde sagt **nicht** „Hanno hat die Akte gemacht“: Das wäre eine Lüge über eine fremde Handlung außerhalb des Tatzeitfensters und ist nicht erlaubt. | B12, B15, Seiferts Erinnerung |
 | 5 | Kranz | „Ab 20:38 draußen; telefoniert von 20:41 bis 20:51.“ (1) | stimmt | wahr | Anrufliste (Gespräch mit Brodersen 20:41–20:51, 10 Min.), R06 sieht Kranz um 20:44 am Auto |

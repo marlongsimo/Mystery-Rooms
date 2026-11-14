@@ -12,6 +12,8 @@ Jede und jeder von euch spielt eine Figur mit eigener Geschichte, eigenen Geheim
 
 **4 bis 10 Personen · etwa 2 bis 2½ Stunden · eine Spielleitung, die mitspielen darf**
 
+*Themen des Abends: ein gewaltsamer Tod, eine schwere Krankheit, Streit um ein Erbe. Wer etwas davon nicht am Tisch haben möchte, sagt es der Spielleitung vorher.*
+
 ---
 
 ## Vor dem Abend

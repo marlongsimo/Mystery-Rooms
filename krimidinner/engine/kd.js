@@ -385,7 +385,7 @@
       return;
     }
     if (htab === "heft") {
-      pane.innerHTML = `<p class="note no-print">Wenn du mitspielst: Lies hier vorab nur die Vorbereitung (A1 bis A5). Die Phasen, „Wenn es stockt“ und die Aussagen der Nebenfiguren erst am Abend, Schritt für Schritt im Reiter <b>Ablauf</b>.</p><div class="hostdoc">${resolve(C.hostA, d.variants)}</div>`; filterNpcTable(pane, c);
+      pane.innerHTML = `<p class="note no-print">Wenn du mitspielst: Lies hier vorab nur die Vorbereitung (A1 bis A5 und A9). Die Phasen, „Wenn es stockt“ und die Aussagen der Nebenfiguren erst am Abend, Schritt für Schritt im Reiter <b>Ablauf</b>.</p><div class="hostdoc">${resolve(C.hostA, d.variants)}</div>`; filterNpcTable(pane, c);
       return;
     }
     if (htab === "druck") {

@@ -69,6 +69,7 @@ Dr. Rademacher, die Archivleitung der Sternwarte, hat acht Originalblätter des 
 | 19:30 | Dinner im Festsaal. Rademacher sitzt neben Falk – auf Sanders ausdrücklichen Wunsch (Hollerbach hat den Sitzplan am Nachmittag geändert). |
 | 20:40 | Sanders Ansprache: „Um 22 Uhr werde ich Ihnen allen die Wahrheit erzählen …“ |
 | 20:44 | Sander geht in den Kartenraum (Westflügel). |
+| 20:46–20:47 | Rademacher geht ins Archiv (Verbindungstür Ost, Archiv). |
 | 20:49 | Marwitz folgt ihm. Heftiger Streit über den Atlas. Hollerbach, über den Servicegang (ohne Kartenleser) im Westflügel unterwegs, hört um 20:55 im Flur: „… dann sage ich es heute Abend selbst, vor allen!“ |
 | 20:55 | Leonie Sander und Ritter reden in der Bibliothek über das Testament. |
 | 21:02 | Marwitz verlässt den Kartenraum und steigt zur Kuppel hinauf, wo sie vor dreißig Jahren mit Sander gearbeitet hat. |
@@ -174,6 +175,8 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 | Zeit | Karte | Tür |
 |---|---|---|
 | 20:44 | Sander | Verbindungstür West |
+| 20:46 | Rademacher | Verbindungstür Ost (in den Ostflügel) |
+| 20:47 | Rademacher | Archiv (hinein) |
 | 20:49 | Gast 02 (Marwitz) | Verbindungstür West |
 | 21:03 | Gast 04 (Lindner) | Verbindungstür West |
 | 21:03 | **Rademacher** | **Archiv (hinaus)** |
@@ -191,11 +194,13 @@ Ein kleines Funkmikrofon, eingeschaltet, mit Klebeband befestigt. *(Ist Lindner 
 | 21:31 | Rademacher | Archiv (hinein) |
 | 21:33 | Hollerbach | Verbindungstür West |
 
+*Der Auszug endet mit dem Fund um 21:35. Was danach gebucht wurde, ist nicht aufgeführt.*
+
 **B10 · Technikprotokoll der Hauptverteilung**
 „21:07 Anmeldung Kuppelpult: Karte Faber · **21:08 Unterbrechung ausgelöst: NOT-AUS Kuppelpult (manuell)** · 21:16 Neustart eingeleitet, Hauptverteilung Keller (Schalter halten, 4 Min.) · 21:20 Neustart abgeschlossen · 21:21 Abmeldung Hauptverteilung: Karte Faber. Teleskop: Nutzungsprotokoll gelöscht (Not-Aus).“ *Kein Sturm: Der Stromausfall wurde von Hand ausgelöst.*
 
 **B11 · Aussage aus der Küche** *(die Aushilfe Jo, kommt in Runde 3 immer, weil sie auch Fabers Weg belegt. Hat Yilmaz die Beobachtung schon erzählt, bestätigt B11 sie nur.)*
-„Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Um 21:21 kam er wieder hoch, ich hab auf die Küchenuhr geschaut, weil das Licht gerade wieder da war, und ging direkt in den Festsaal. Danach stand er die ganze Zeit dort bei den Gästen, ich hab ihn durch die Durchreiche gesehen. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen, und dann, um 21:22 – {R06: sie / er} hat genau in dem Moment {R06: ihrem / seinem} Bruder eine Nachricht geschrieben und mir hinterher die Uhrzeit auf dem Handy gezeigt –, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
+„Um Viertel nach kam Faber mit der Taschenlampe durch die Küche gerannt, runter in den Keller, ‚gleich ist der Strom wieder da‘. Um 21:21 kam {R09: sie / er} wieder hoch, ich hab auf die Küchenuhr geschaut, weil das Licht gerade wieder da war, und ging direkt in den Festsaal. Danach stand {R09: sie / er} die ganze Zeit dort bei den Gästen, ich hab {R09: sie / ihn} durch die Durchreiche gesehen. {R06: Mina / Emre} war von Viertel nach bis kurz vor halb zehn weg, im Vorratskeller. Hinterher hat {R06: sie / er} erzählt, {R06: sie / er} habe bei offener Kellertür die ganze Zeit auf den Gang und die Tür der Restaurierung geschaut, und da unten sei keine Menschenseele gewesen, und dann, um 21:22 – {R06: sie / er} hat genau in dem Moment {R06: ihrem / seinem} Bruder eine Nachricht geschrieben und mir hinterher die Uhrzeit auf dem Handy gezeigt –, sei jemand mit einem schweren Paket im Arm die Treppe herunter und zur Restaurierung gegangen. Es hat bei jedem Schritt leise geklirrt, wie Metall. Das Gesicht hat {R06: sie / er} nicht gesehen.“
 
 **B12 · Lindners Aufnahme, Abschrift** *(falls nicht schon von Lindner vorgelegt)*: wie auf dem Rollenblatt von Lindner.
 
@@ -366,6 +371,7 @@ Alle geben verdeckt ab: **Täter, Motiv und einen entscheidenden Beweis.** Danac
 - *(R10)* Rademacher zu Falk vor einigen Wochen: „Sander ahnt etwas. Aber er hat keine Beweise.“ Seebach sah Falk um 21:29 eine Nachricht lesen und blass werden.
 - *(R09)* Fabers Nebengeschäft heißt „Thüringer Nachthimmel“. Das Teleskop belichtete seit 20 Uhr den Pferdekopfnebel.
 - *(R01, R06)* Nebenfiguren mit Namen: Kim (Studienfreundin von R01, am Telefon), Deniz (Yilmaz’ Bruder), Jo (Küchenaushilfe), Marianne Sander (verstorbene Mutter).
+- *(R08)* Der Kalendereintrag „Fr 16:00 R. – Inventur Atlas“ (B5) war ein Termin mit Rademacher: Sander fragte nach den Karten 41–48, Rademacher verwies auf den Vermerk „Faksimile, Original in Restaurierung“. Den Streit im Kartenraum hat Rademacher nicht selbst gehört ({R08: sie / er} war ab 20:47 im Archiv).
 - *(R08)* Rademachers Motiv neben Geld: die Pflegekosten der Mutter, zweimal abgelehnte Gehaltserhöhung. Die Archivliste nahm {R08: sie / er} aus dem Kartenraum mit und zerriss sie um 21:31 im Archiv (deshalb B6 im Papierkorb).
 
 - *(Prüfung 0.3)* Faber geht um 21:15 durch die Küche zur Kellertreppe (Yilmaz und Jo sehen {R09: sie / ihn}), meldet sich um 21:21 an der Hauptverteilung ab und ist ab 21:22 im Festsaal. Die Originalblätter lagen seit Februar im Planschrank der Restaurierung. Yilmaz sah von 21:15 bis 21:22 niemanden im Gang oder vor der Restaurierung. R10 trägt ein Kettenarmband bzw. eine Taschenuhr an einer Kette.

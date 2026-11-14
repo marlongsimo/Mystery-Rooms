@@ -86,7 +86,7 @@ Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofot
 **Neues Ziel:** Den Stromausfall darfst du zugeben, wenn es nicht anders geht. Den Grund nicht unbedingt.
 
 - **Phase 3 (Geheimnisse):** Erkläre der Gruppe die Schließanlage (siehe oben). Das ist Wissen, das alle brauchen, und es lenkt von dir ab.
-- **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (wer außer euch beiden hat eine Karte für die Restaurierung? Niemand.), Yilmaz (der Servicegang).
+- **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (wer außer euch beiden und Sander hat eine Karte für die Restaurierung? Niemand.), Yilmaz (der Servicegang).
 - **Was du vermeiden solltest:** den Namen „Thüringer Nachthimmel“.
 - **Trumpf:** Dein Weg ist lückenlos: 21:07–21:14 Kuppel (Marwitz), 21:15 Küche (Yilmaz, Jo), 21:16–21:21 Hauptverteilung (B10), ab 21:22 Festsaal (Hollerbach). Und um 21:24 hat eine Karte die Restaurierung geöffnet, während du im Festsaal standest. Deine war es nicht.
 

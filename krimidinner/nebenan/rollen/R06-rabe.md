@@ -6,7 +6,7 @@
 
 ## Charakter · Wer du bist
 
-**[Fenja / Hauke] Rabe**, 33
+**[Fenja / Hauke] Rabe**, 22
 [Tontechnikerin / Tontechniker] beim Radio in Hamburg, [Tochter / Sohn] von Hanno Rabe
 
 **Beziehung zum Opfer:** Dein Vater. Für das ganze Viertel war er der Mann mit der offenen Tür. Für dich war er der Mann, der nie zu Hause war, weil irgendwer anders ihn gerade dringender brauchte.

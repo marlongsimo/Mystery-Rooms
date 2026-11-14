@@ -73,7 +73,7 @@ Varn sagte der Polizei, du hättest das Zeichen zu früh gegeben und getrunken. 
 
 *Du kennst die Tat von Anfang an, damit du dich vorbereiten kannst. Im Spiel beginnt der Abend um 22:50, nachdem Varn gefunden wurde.*
 
-- **19:20** Ankunft. Lotte Harms an der Garderobe nimmt deinen Mantel, Marke 17. Den Garderobenständer vor der alten Tapetentür gibt es immer noch.
+- **19:20** Ankunft. Lotte Harms an der Garderobe nimmt deinen Mantel, Marke 17. Vor der alten Tapetentür steht jetzt ein Garderobenständer.
 - **20:03–20:15** In Varns Büro. Du sagst: „Das Original ist hier im Haus. Nach dem letzten Vorhang sagen Sie, wer die Klappe öffnen ließ, oder die Presse bekommt es.“ Varn: „Dann zeigen Sie es mir. Um neun. Unten. Wo alles angefangen hat.“ Du weißt nicht, dass jemand mitschneidet.
 - **20:20** Varns Ansprache: „Nach dem letzten Vorhang die Wahrheit.“ Er sieht dich dabei an.
 - **20:52** Du sagst im Salon „frische Luft“ und gehst hinter die Garderobe, durch die Tapetentür in den alten Künstlergang. Am Bogen ist frische Kalkfarbe. Du merkst es nicht.
@@ -85,7 +85,7 @@ Varn sagte der Polizei, du hättest das Zeichen zu früh gegeben und getrunken. 
 - **21:03–21:05** Du denkst jetzt wie [eine Illusionistin / ein Illusionist]. Der alte Riegelhebel hinter dem Schacht lässt sich noch bewegen. Du ziehst Varn auf die Versenkung, kurbelst sie durch Klappe 3 nach oben in die stillgelegte Rückkammer, kurbelst sie leer zurück, legst den Riegel um. Eine Spiegelplatte hat sich dabei verschoben, das siehst du nicht.
 - **21:05** Das Gegengewicht wirfst du in den Schacht.
 - **21:06** Das Licht hinter der Bühne geht aus, der Lichttest aus dem Ablaufplan. Du steigst im Dunkeln die Bühnentreppe hinauf.
-- **21:07** Quer über die dunkle Hinterbühne zur Seitenbühne links. Irgendwo im Gang steht jemand. Du gehst weiter, ohne den Schritt zu ändern.
+- **21:07** Quer über die dunkle Hinterbühne zur Seitenbühne links. Die Tonkabine dort ist neu für dich, aber der Ablaufplan an der Bühnentür nennt sie: „Ansage A.V. – live, Mikrofon Tonkabine“. Irgendwo im Gang steht jemand. Du gehst weiter, ohne den Schritt zu ändern.
 - **21:08–21:10** Hinter dem Vorhang der Seitenbühne wartest du. In der Tonkabine sitzt noch {R10: die Tontechnikerin / der Tontechniker}. Um 21:10 geht {R10: sie / er} zur Bar.
 - **21:11** In der Tonkabine. Varn hat schon 1947 jede Ansage doppelt aufnehmen lassen. Auf dem Regal liegt Band 3: „Reserve – Ansage A.V. – aufgen. 18.11.“ Du legst es ein.
 - **21:18** Pünktlich wie im Ablaufplan: „Meine Damen und Herren, die letzte Vorstellung kann beginnen …“ Varns Stimme im ganzen Haus.
@@ -93,7 +93,7 @@ Varn sagte der Polizei, du hättest das Zeichen zu früh gegeben und getrunken. 
 - **21:20** Durch den Künstlergang zurück. Kalk an deiner rechten Schulter, ohne dass du es merkst.
 - **21:22** Im Salon. {R08: Frau / Herr} Kest fragt: „Bei dem Sturm draußen gewesen?“ Du: „Unter dem Vordach geraucht.“
 - **21:40** Vorstellung. Reihe 1, Platz 8, neben {R08: Frau / Herrn} Kest.
-- **21:55** „Toilette.“ Im Requisitenraum hängt eine Jacke, die du kennst: Varns Bühnenfrack, ein Double, in Mottenpulver.
+- **21:55** „Toilette.“ Im Requisitenraum hängt eine Jacke, deren Schnitt du sofort erkennst: Varns Bühnenfrack, als Double nachgeschneidert, in Mottenpulver.
 - **21:58** Loge 2, dunkel. Du hebst die Hand zu Varns berühmtem Gruß. Mit der linken, aus Gewohnheit. Von der Bühne ruft {R03: die Conférencière / der Conférencier}: „Unser Direktor grüßt!“
 - **22:01** Jacke zurück, in der Eile an den falschen Haken. Dein Veilchen hat ein Blatt verloren.
 - **22:06** Wieder auf Platz 8.
@@ -126,7 +126,7 @@ Varn sagte der Polizei, du hättest das Zeichen zu früh gegeben und getrunken. 
 - Den Zettel, das Foto und das Treffen um neun verschweigst du.
 - Jetzt darfst du lenken: Wer hat hinter der Bühne gearbeitet, als Varn noch lebte, um 21:58? {R02: Frau / Herr} Rohn war allein in der Unterbühne, {R04: Frau / Herr} Senn hatte eine Jacke wie Varns. Stell Fragen, keine Behauptungen.
 
-## Runde 3 · Die falsche Zeit
+## Runde 3 · Die Stimme aus dem Nichts
 
 - Das Band ist entlarvt, die Zeit rutscht auf etwa 21:00. Du warst nach eigener Aussage unter dem Vordach. Bleib dabei.
 - **Sobald die Jacke mit dem Veilchenblatt und der leere Platz 8 auf dem Tisch liegen, nimmst du die zweite Linie:**

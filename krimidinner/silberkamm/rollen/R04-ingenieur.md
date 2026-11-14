@@ -41,7 +41,7 @@ Jetzt wird das Werk verkauft, an Schweizer. Du fährst nach Zürich, um den neue
 
 Du hast damals geschwiegen. Dein Bericht verschwand im Archiv, und du hattest Angst. Als du 1922 doch reden wolltest, warst du die Stelle los. Vorher hast du heimlich Abschriften gemacht: den internen Brief Auens („Charge 7 wird trotz Prüfbefund ausgeliefert“) und die Lieferscheine. **Deinen eigenen Prüfbericht hast du nicht mehr bekommen.**
 
-Im Januar hast du eine Abschrift des Briefes für 300 Schilling an {R05: eine Journalistin / einen Journalisten} verkauft, {R05: Margot / Moritz} Lorenz. Du brauchtest das Geld. Den Rest willst du in Zürich den Käufern anbieten.
+Im Januar hast du eine Abschrift des Briefes für 300 Schilling an {R05: eine Journalistin / einen Journalisten} verkauft, {R05: Margot / Moritz} Lorenz. Du brauchtest das Geld. Ebenfalls im Januar hast du {R08: Frau / Herrn} Reiter geschrieben und „Beweise aus dem Werksarchiv“ angeboten, gegen Geld. Eine Antwort kam nie. Den Rest willst du in Zürich den Käufern anbieten.
 
 Dass du geschwiegen hast, frisst dich auf. Dass du Geld daraus machst, schämst du dich.
 

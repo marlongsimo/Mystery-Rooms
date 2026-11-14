@@ -37,7 +37,7 @@
 ## Vertraulich · Dein Abend
 
 Deine Kamera stempelt jedes Bild mit der Uhrzeit.
-- **20:41** Durch die Schwingtür in den Flur zur Küchentür. Foto: Özdemir schneidet Kuchen, allein in der Küche. Der Flur ist leer.
+- **20:41** Durch die Schwingtür in den Flur zur Küchentür. Foto: Özdemir schneidet Kuchen, allein in der Küche.
 - **20:42** Zurück im Saal. Foto: {R01: Janne / Lasse} Fuchs am Basteltisch mit Kindern.
 - **20:43** Über die Terrassentür in den Hof. Feuerkorb, Lichterkette, Stimmungsbilder.
 - **20:51** Foto: {R04: Karla / Karl} Seifert steht rauchend am Hinterausgang. Ihr nickt euch zu. Ihr habt seit 2002 nicht mehr miteinander gesprochen.

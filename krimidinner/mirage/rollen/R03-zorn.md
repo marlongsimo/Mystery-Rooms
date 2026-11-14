@@ -6,7 +6,7 @@
 
 ## Charakter · Wer du bist
 
-**[Mirelle / Marius] Zorn**, 36
+**[Mirelle / Marius] Zorn**, 39
 [Sängerin und Conférencière / Sänger und Conférencier] des Palais Mirage
 
 **Beziehung zum Opfer:** Aurel Varn hat dich 1952 ins Haus geholt und dir eine Bühne gegeben. Eine Zeit lang wart ihr mehr als Direktor und [Künstlerin / Künstler]. Heute schuldest du ihm Geld, und er schuldet dir eine Antwort.
@@ -54,7 +54,7 @@ Drei Jahre später stand Varn vor deiner Tür und bot dir eine Stelle an, „aus
 
 **Deine Nacht ab 20:50:**
 - **20:50–21:10** Allein in Garderobe 2. Schminke, Stimme einsingen.
-- **21:10–21:25** An der Bar im Foyer, ein Wasser. {R10: Frau / Herr} Quell kommt dazu, ihr redet über den Abend. Der Barkeeper bedient euch beide.
+- **21:10–21:25** An der Bar im Salon, ein Wasser. {R10: Frau / Herr} Quell kommt dazu, ihr redet über den Abend. Der Barkeeper bedient euch beide.
 - **21:18** Die Ansage aus dem Lautsprecher, an der Bar gehört.
 - **21:40** Du eröffnest die Vorstellung und führst durch den Abend. Zwischen den Nummern stehst du auf der Bühne oder seitlich.
 - **21:58** Du siehst in der dunklen Loge 2 eine Gestalt in Varns Frack, die die Hand zum Gruß hebt. Du improvisierst: **„Unser Direktor grüßt!“** Auf deiner Ablaufkarte notierst du es am Rand.

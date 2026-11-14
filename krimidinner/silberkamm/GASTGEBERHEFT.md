@@ -1,6 +1,6 @@
 # Abfahrt ins Dunkel – Gastgeberheft
 
-*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
+*Für die Spielleitung. Teil A enthält keine Lösung. Wenn du selbst mitspielst, lies vorab trotzdem nur A1 bis A5 und A9 (siehe A1). **Teil B enthält die Lösung** und ist versiegelt. Öffne ihn erst, wenn alle ihre Anklage abgegeben haben.*
 
 ---
 
@@ -15,7 +15,7 @@ Du bist Erzählstimme, Zeitwächter und Beweisausgabe:
 
 Den Fall löst du nicht, das machen die Gäste. **Du darfst mitspielen.** Deine Rolle öffnest du mit deinem eigenen Code wie alle anderen. Wer welche Rolle hat, siehst du nicht. Auch die Täterrolle kann dich treffen; das erfährst du erst, wenn du dein Blatt öffnest. Teil B mit der Lösung öffnest du trotzdem erst nach den Anklagen.
 
-**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
+**Wenn du mitspielst:** Lies vor dem Abend nur A1 bis A5 und A9. Die Phasen liest du erst am Abend, eine nach der anderen. Im Reiter „Ablauf“ der App siehst du immer nur den aktuellen Schritt. „Wenn es stockt“ (A7) und die Aussagen der Nebenfiguren (A8) öffnest du erst in der Phase, zu der sie gehören. Dort stehen Hinweise, die dir sonst das Mitraten nehmen. Die Druckversion bereitet am besten eine Person vor, die nicht mitspielt: Wer Karten sortiert, liest sie.
 
 **Wenn du die Täterrolle hast:** Du leitest genauso weiter. Du liest jeden Text vollständig vor und nennst jedes Losungswort zur vorgesehenen Zeit. Stockt das Gespräch, nimmst du den ersten Impuls der Phase, wörtlich, auch wenn er dir schadet. Als Spielleitung bist du unparteiisch, als Figur verteidigst du dich.
 
@@ -89,6 +89,22 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7). Bei s
 >
 > Und jetzt: Bitte einsteigen.“
 
+## A9 · Wenn etwas schiefgeht
+
+**Jemand sagt vor dem Abend ab.** Am besten springt eine andere Person ein und bekommt den Code der absagenden Person. Geht das nicht, legst du den Abend mit der neuen Personenzahl neu an und verschickst neue Codes. Die Rollen werden dabei neu verteilt, die alten Codes passen nicht mehr zur Besetzung. Unter 6 Personen lässt sich der Fall nicht spielen: Dann verschiebt ihr.
+
+**Jemand kommt zu spät.** Phase 1 kann ohne die Person beginnen. Mit dem ersten Losungswort wartest du, bis alle am Tisch sitzen. Kommt jemand erst danach, nennst du der Person die bisherigen Losungswörter, sie liest nach und stellt sich kurz vor.
+
+**Jemand muss früher gehen.** Die Person beantwortet eine letzte Fragerunde und gibt ihre Anklage verdeckt bei dir ab. Ihr Rollenblatt bleibt zu. Ob sie die Täterrolle hatte, zeigt die Auflösung.
+
+**Das Essen.** Der Zeitplan in A4 rechnet damit, dass beim Spielen gegessen wird. Serviert wird zu Beginn der dort genannten Phase, bevor du vorliest. Das Losungswort nennst du erst, wenn alle sitzen. Dauert das Servieren länger, hängst du die Zeit hinten an, statt eine Phase zu kürzen. Wenn du mitspielst und kochst, nimm Gerichte, die fertig warten können.
+
+**Die Gruppe ist sich zu früh sicher.** Bestätige nichts. Die weiteren Runden öffnest du trotzdem: Für die Anklage braucht es auch Motiv und Beweis, und die anderen Geheimnisse sind noch offen. Du darfst die Phase kürzen.
+
+**Die Anklagen gehen auseinander.** Es wird nicht abgestimmt, jede Anklage zählt für sich. Aufgelöst wird in jedem Fall. Klagt niemand richtig an, hat die Täterrolle gewonnen, und ihr geht B-3 gemeinsam durch.
+
+**Jemandem wird ein Thema zu viel.** In diesem Fall kommen vor: ein gewaltsamer Tod, ein Zugunglück mit Toten, ein Tod in Haft, Alkohol. Sag das bei der Einladung dazu. Am Abend darf jede Person jederzeit kurz aus der Rolle gehen. Dann macht ihr eine Pause und spielt danach weiter.
+
 ---
 
 ## Phase 1 · Abfahrt (ca. 15 Min.)
@@ -106,6 +122,8 @@ Lass dir Zeit, wenn das Gespräch gut läuft. Kürze, wenn es stockt (A7). Bei s
 
 **Tipp:** Lass die Gäste ein paar Minuten frei miteinander reden, so wie man beim Dinner im Zug ins Gespräch kommt. Der Abend bis 22 Uhr steht in ihren Rollenblättern.
 
+**Weiter, wenn:** sich alle vorgestellt haben und du die Nebenfiguren genannt hast. Herausfinden muss hier noch niemand etwas.
+
 ---
 
 ## Phase 2 · Der Tote im Abteil (ca. 35 Min.)
@@ -122,6 +140,8 @@ Gib allen kurz Zeit zum Lesen.
 
 **Runde der Alibis:** Jede Person sagt der Reihe nach, wo sie zwischen 22:30 und 22:55 war, denn das ist die Zeit, die alle für die Tatzeit halten. Erinnere an Regel 2. Für Nebenfiguren gelten die Aussagekarten (A8).
 
+**Weiter, wenn:** jede Person gesagt hat, wo sie war, oder ausdrücklich geschwiegen hat, und alle die Karten dieser Runde gelesen haben.
+
 ---
 
 ## Phase 3 · Die Vergangenheit kehrt zurück (ca. 40 Min.)
@@ -136,11 +156,13 @@ Gib allen kurz Zeit zum Lesen.
 
 **Hinweis:** B7 steckt in Hartmanns Uniform. Wenn die Person mit dieser Rolle den Brief nicht von sich aus zeigt, lass die Gruppe ruhig darauf kommen. Die Karte liegt aber in jedem Fall mit dieser Runde offen.
 
+**Weiter, wenn:** alle Karten dieser Runde besprochen sind und ein paar Minuten lang nichts Neues mehr kommt, spätestens wenn die Zeit um ist. Sag kurz vorher an: „Letzte Fragen, gleich geht es weiter.“
+
 ---
 
 ## Phase 4 · Die falsche Zeit (ca. 40 Min.)
 
-> **Vorlesen:** „Gegen halb eins sieht sich Dr. Hagen den Toten ein zweites Mal an. Und irgendjemand fragt, warum eine Reiseuhr, die jeden Abend aufgezogen wird, nach einer Dreiviertelstunde stehenbleibt.“
+> **Vorlesen:** „Es ist gegen halb eins. Um 23:50 hat sich Dr. Hagen den Toten ein zweites Mal angesehen, jetzt liegt der Befund auf dem Tisch. Und irgendjemand fragt, warum eine Reiseuhr, die jeden Abend aufgezogen wird, nach einer Dreiviertelstunde stehenbleibt.“
 
 **Losungswort: LÄUTWERK** (auch LAEUTWERK). Es öffnet:
 - die Beweise B9 Die Reiseuhr · B10 Dienstbuch und Heizregler · B11 Zweite ärztliche Untersuchung · B12 Läutwerkbuch · **B13** Notizblock aus Abteil 7 (nur wenn R05 nicht besetzt ist),
@@ -148,17 +170,21 @@ Gib allen kurz Zeit zum Lesen.
 
 **Tipp:** Schlag vor, gemeinsam eine Zeitleiste von 22:00 bis 22:30 aufzuschreiben, zum Beispiel auf einer Serviette in der Tischmitte. Jetzt gilt eine neue Tatzeit, und **jede Person sagt ihr Alibi für 22:05 bis 22:25 neu**.
 
+**Weiter, wenn:** jede Person ihr Alibi für die neue Zeit genannt hat und die Zeitleiste steht, spätestens wenn die Zeit um ist.
+
 ---
 
 ## Phase 5 · Die Wahrheit (ca. 30 Min.)
 
-> **Vorlesen:** „Es ist kurz nach eins. Draußen hat es aufgehört zu schneien. In der Passtasche des Zugbegleiters stecken noch die Pässe des Personals, und im Postbeutel liegt ein Brief, der in Buchs zur Post gehen sollte. Er wird Buchs nie erreichen.“
+> **Vorlesen:** „Es ist kurz nach eins. Draußen hat es aufgehört zu schneien. In der Passtasche {R02: der Zugbegleiterin / des Zugbegleiters} stecken noch die Pässe des Personals, und im Postbeutel liegt ein Brief, der in Buchs zur Post gehen sollte. Er wird Buchs nie erreichen.“
 
 **Losungswort: KILOMETER.** Es öffnet:
 - die Beweise B14 Pässe des Personals · B15 Brief an Frau Maria Brandl,
 - in jedem Rollenblatt **Runde 4**.
 
 **Hinweis zum Postbeutel:** Lass die Gruppe entscheiden, ob sie den Postbeutel öffnet. Die Karte B15 liegt mit dem Losungswort offen. Am Tisch darf trotzdem darum gerungen werden, ob man fremde Post lesen darf.
+
+**Weiter zum Finale, wenn:** niemand mehr eine Frage hat oder die Zeit um ist. Kündige es an: „In fünf Minuten wird angeklagt.“
 
 ---
 
@@ -217,8 +243,8 @@ Diese Impulse helfen weiter, ohne etwas zu verraten. Nimm höchstens einen pro P
 
 ## B-1 · Ablauf der Auflösung
 
-1. **Die Täterrolle steht auf** und legt ihr Rollenblatt offen: {R07: Pauline / Paul} Brandl, {R07: Erste Stewardess / Erster Steward}.
-2. Du liest **B16** vor (Durchsuchung des Dienstabteils).
+1. Du liest **B16** vor (Durchsuchung des Dienstabteils). SCHNEE hat die Karte geöffnet.
+2. **Die Täterrolle steht auf** und legt ihr Rollenblatt offen: {R07: Pauline / Paul} Brandl, {R07: Erste Stewardess / Erster Steward}.
 3. Du liest die **Auflösung** vor.
 4. Danach erzählt jede Person reihum ihr Geheimnis und ob sie ihre Ziele erreicht hat.
 5. Punkte zählen, wenn gewünscht.
@@ -229,7 +255,7 @@ Diese Impulse helfen weiter, ohne etwas zu verraten. Nimm höchstens einen pro P
 >
 > {R07: Pauline / Paul} Brandl wurde als {R07: Pauline / Paul} Wendt geboren. {R07: Ihr / Sein} Vater Raimund stellte am 3. März 1921 das Signal 14 richtig. Das Relais versagte, eines von elf fehlerhaften unter vierzig aus der Charge 7. Auen wusste es, ließ trotzdem ausliefern und sah zu, wie ein Unschuldiger verurteilt wurde. Raimund Wendt starb 1924 in der Haft.
 >
-> Als Brandl um 21:45 Cognac servierte, hörte {R07: sie / er} Auen sagen: ‚Das Original reist in meiner Mappe.‘ Um 22:12 stand {R07: sie / er} vor ihm und verlangte, dass er in Zürich die Wahrheit sagt. Auen lachte. ‚Ihr Vater war ein Säufer. Das hat sogar die Ärztin beschworen.‘ Dann ein Schlag mit der kleinen Lokomotive aus Messing.
+> Als Brandl um 21:45 Cognac servierte, hörte {R07: sie / er} Auen sagen: ‚Das Original reist in meiner Mappe.‘ Um 22:12 stand {R07: sie / er} vor ihm und verlangte, dass er in Zürich die Wahrheit sagt. Auen lachte. ‚Ihr Vater war ein Säufer. Das hat sogar {R01: die Ärztin / der Arzt} beschworen.‘ Dann ein Schlag mit der kleinen Lokomotive aus Messing.
 >
 > Es folgten fünf kalte Minuten. {R07: Sie / Er} nahm den Prüfbericht. {R07: Sie / Er} stellte die Reiseuhr auf 22:41 und blockierte sie mit einem Streichholzbriefchen aus dem Speisewagen, denn um 22:41 würde {R07: sie / er} mit Hartmann auf Tunnelrunde sein. {R07: Sie / Er} drehte mit dem Vierkant die Heizung auf, damit der Körper warm blieb. Um 22:20 klopfte Hartmann, und Brandl stand still neben dem Toten. Um 22:23 ging {R07: sie / er} und ließ die Tür offen.
 >
@@ -243,7 +269,7 @@ Für die Nachbesprechung. Es gibt **drei unabhängige Wege**, und jeder führt a
 1. Die Uhr wurde von Hand angehalten (B9). Die Heizung wurde verstellt (B10), und zwar mit dem Vierkant, den nur Hartmann und Brandl haben.
 2. Die wahre Tatzeit ist 22:05 bis 22:25 (B11). Das bestätigen das unbeantwortete Klopfen um 22:20 (B3) und der Schlag um 22:18 (Lorenz oder B13).
 3. Hartmann war von 22:14 bis 22:28 lückenlos auf Passrunde (B3), um 22:17 mit Bell.
-4. Bleibt Brandl, dessen Alibi genau die gefälschte Zeit 22:41 deckt.
+4. Bleibt Brandl, {R07: deren / dessen} Alibi genau die gefälschte Zeit 22:41 deckt.
 
 **Weg B · Brandl lügt über den letzten Besuch.**
 1. Brandl sagt: „Um 22:00 war ich zum letzten Mal drin.“ Das Läutwerkbuch zeigt 22:12 (B12).

@@ -21,7 +21,7 @@ Vor sechs Monaten lag ein Umschlag in deinem Briefkasten, ohne Absender. Darin e
 
 Du hast gefragt. In alten Jahrbüchern der Sternwarte fandest du 1995 ein Foto: zwei junge Menschen vor dem Refraktor, darunter „Th. Sander und I. Marwitz bei der Arbeit am Atlas“. Im Atlas selbst kommt der Name Marwitz nicht vor. Du hast Marwitz in Uppsala angeschrieben. Keine Antwort.
 
-Dann hast du gehört, dass das Archiv „Originale in die Restaurierung“ gegeben hat, die vorher nie restauriert werden mussten. Und dass ein vermögender Sammler, Falk, auffällig oft in Eichenfels zu Gast ist. Zwei Fäden, die vielleicht zusammengehören, vielleicht nicht.
+Dann hast du gehört, dass das Archiv „Originale in die Restaurierung“ gegeben hat, die vorher nie restauriert werden mussten. Und dass {R10: eine vermögende Sammlerin / ein vermögender Sammler}, Falk, auffällig oft in Eichenfels zu Gast ist. Zwei Fäden, die vielleicht zusammengehören, vielleicht nicht.
 
 Dein Chefredakteur hat dir drei Monate gegeben. Die sind seit zwei Wochen um. Wenn du aus Eichenfels ohne Geschichte zurückkommst, schreibst du im Frühjahr wieder über Gartenschauen. Du hast dir geschworen, dass dir das nicht passiert, und du hast angefangen, Regeln zu dehnen, die du früher anderen vorgehalten hast.
 

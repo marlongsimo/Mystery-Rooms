@@ -40,7 +40,7 @@ Du hast beim Stadttheater geschneidert, bis Varn dich 1951 abwarb, mit doppeltem
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Die Verkäufe und die Kopie des Fracks sollen niemandem auffallen.
-2. **Zum Haus:** Die letzte Vorstellung soll ohne eine einzige Kostümpanne laufen.
+2. **Zum Haus:** Auf Kostüm und Requisite soll an diesem letzten Abend nichts kommen. Erreicht, wenn am Ende niemand am Tisch dir Nachlässigkeit im Requisitenraum vorwirft.
 3. **Zu einer anderen Person:** {R01: Elara / Elian} Vey ist der Star und deine engste Verbündete im Haus. Halte {R01: ihr / ihm} den Rücken frei.
 
 ## Vertraulich · Bis 20:50
@@ -70,6 +70,7 @@ Du hast beim Stadttheater geschneidert, bis Varn dich 1951 abwarb, mit doppeltem
 - Von 1949 weißt du nur, was man im Haus erzählt: Die Rückkammer wurde nach einem Unglück stillgelegt, und hinten in der Unterbühne arbeitet keiner gern.
 - Die Spiegelplatten der Rückkammer waren immer von der Bühnenseite verschraubt. Das kannst du bezeugen: Wer Varn dort hineingebracht hat, kam nicht durch die Spiegel.
 - Der Kaufvertrag sagt: „Das Personal wird nicht übernommen.“ Das trifft auch dich.
+- **Dein Auftrag in dieser Runde:** Bring auf den Tisch, dass die Platten von der Bühnenseite verschraubt waren. Frag {R05: Frau / Herrn} Dorne und {R02: Frau / Herrn} Rohn, wie man sonst in die Rückkammer kommt.
 
 ## Runde 3 · Die Stimme aus dem Nichts
 

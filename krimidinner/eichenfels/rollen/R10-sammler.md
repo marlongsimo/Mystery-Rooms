@@ -73,7 +73,7 @@ Du hast mit Rademacher **den Kauf von acht Originalblättern des Atlas für 180 
 
 **Was du sagen darfst:** Deinen Aufenthaltsort musst du wahrheitsgemäß angeben (Regel 2). Den Handel darfst du verschweigen.
 
-- **Phase 2 (Mord):** Dein Alibi ist gut: Seebach. Nutz es.
+- **Phase 2 (Mord):** Dein Alibi ist gut: Seebach. Nutz es. Sitzt Seebach nicht am Tisch: Gib deine Zeiten trotzdem genau an, die Bestätigung kommt später als Karte.
 
 ## Runde 2 · Jetzt fällt dir ein
 
@@ -82,11 +82,12 @@ Du hast mit Rademacher **den Kauf von acht Originalblättern des Atlas für 180 
 - Rademacher hat vor ein paar Wochen gesagt: „Sander ahnt etwas. Aber er hat keine Beweise.“
 - Seebach war von 21:05 bis 21:25 bei dir, dein Alibi.
 
-- **Phase 3 (Geheimnisse):** Die Archivliste mit den Karten 41–48 wird dich nervös machen. Lass es dir nicht anmerken. Wenn Hollerbach den Sitzplan erwähnt, brauchst du eine Erklärung, warum du Rademacher beim Vornamen kennst: „Wir kennen uns von Auktionen. Fachleute unter sich.“
-- **Wen du ansprechen solltest:** Rademacher (Ziel 2, unter vier Augen), Seebach (dein Alibi), Ritter (was passiert rechtlich mit einem Käufer, der nichts wusste?).
+- **Phase 3 (Geheimnisse):** Die Archivliste mit den Karten 41–48 wird dich nervös machen. Lass es dir nicht anmerken. Wenn Hollerbach (oder eine Aussagekarte) den Sitzplan erwähnt, brauchst du eine Erklärung, warum du Rademacher beim Vornamen kennst: „Wir kennen uns von Auktionen. Fachleute unter sich.“
+- **Wen du ansprechen solltest:** Rademacher (Ziel 2, unter vier Augen), Seebach (dein Alibi), Ritter (was passiert rechtlich mit einem Käufer, der nichts wusste?). Sitzt Seebach nicht am Tisch: Verweise auf Seebachs Nachtrag (B8). Sitzt Ritter nicht am Tisch: Hör bei Marwitz heraus, was {R02: sie / er} über die Karten 41–48 weiß.
 - **Was du vermeiden solltest:** die Restaurierung oder die Kiste zu erwähnen, bevor es jemand anderes tut.
 - **Trumpf:** die SMS von 21:29. Sie zeigt, dass Rademacher wusste, dass es keine Rede geben würde, sechs Minuten bevor die Leiche gefunden wurde.
 
 ## Runde 3 · Die letzte Ermittlung
 
 - **Phase 4 (Protokoll):** Spätestens jetzt musst du entscheiden: die SMS zeigen und den Handel gestehen, oder schweigen und hoffen, dass es niemand herausfindet. Die Täterrolle wird versuchen, dich zum Schweigen zu bringen.
+- **Dein Auftrag in dieser Runde:** Sprich Rademacher noch einmal direkt auf die Nachricht von 21:29 an: Woher wusste {R08: sie / er}, dass es keine Rede geben würde? Beruhigt dich die Antwort nicht, leg die SMS auf den Tisch.

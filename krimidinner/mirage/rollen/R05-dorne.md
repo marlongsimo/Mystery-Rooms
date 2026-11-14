@@ -54,7 +54,7 @@ Heute steht Veltens Name auf der Gästeliste.
 
 1. **Persönlich:** Niemand soll erfahren, was du 1949 getan hast. Und gleichzeitig wünschst du dir nichts mehr, als dass es endlich herauskommt. Beides ist wahr.
 2. **Zu einer anderen Person:** {R03: Mirelle / Marius} Zorn hat ein Recht auf die Wahrheit über Lukas. Wenn sie heute ans Licht kommt, soll {R03: sie / er} sie hören.
-3. **Zum Haus:** Die Technik soll heute fehlerfrei laufen. Es ist die letzte Vorstellung.
+3. **Zum Haus:** Auf die Technik des Hauses soll an diesem letzten Abend nichts kommen. Erreicht, wenn am Ende niemand am Tisch der Technik von heute einen Fehler vorwirft.
 
 ## Vertraulich · Bis 20:50
 

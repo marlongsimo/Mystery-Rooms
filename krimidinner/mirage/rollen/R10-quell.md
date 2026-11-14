@@ -40,7 +40,7 @@ Du hast beim Rundfunk Hörspiele vertont, bis man dort Leute ohne Diplom nicht m
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Die Schallplatte soll heute kein Thema werden.
-2. **Zur Arbeit:** Der Ton der letzten Vorstellung soll perfekt sein.
+2. **Zur Arbeit:** Auf deinen Ton soll an diesem letzten Abend nichts kommen. Erreicht, wenn am Ende niemand am Tisch glaubt, du hättest an Bändern oder Ansagen etwas falsch gemacht.
 3. **Zu einer anderen Person:** {R03: Mirelle / Marius} Zorn ist der einzige Mensch im Haus, mit dem du über Varn lachen kannst.
 
 ## Vertraulich · Bis 20:50
@@ -66,6 +66,7 @@ Du hast beim Rundfunk Hörspiele vertont, bis man dort Leute ohne Diplom nicht m
 ## Runde 2 · Was 1949 geschah
 
 - Mit 1949 hast du nichts zu tun. Aber du kannst sagen, woher Varns Gewohnheit mit den doppelten Aufnahmen kam: „Das hat er von früher, sagen die Alten. Aus der Zeit, als er noch mit einem Partner auftrat.“
+- **Dein Auftrag in dieser Runde:** Bring das auf den Tisch und frag {R05: Frau / Herrn} Dorne, wer dieser Partner war und wie die beiden gearbeitet haben.
 
 ## Runde 3 · Die Stimme aus dem Nichts
 
@@ -80,4 +81,5 @@ Du hast beim Rundfunk Hörspiele vertont, bis man dort Leute ohne Diplom nicht m
 ## Runde 4 · Der alte Weg
 
 - Wenn deine Schallplatte zur Sprache kommt: Gib sie zu. Sie war frech, nicht gefährlich.
+- **Dein Auftrag in dieser Runde:** Frag {R03: Frau / Herrn} Zorn und {R05: Frau / Herrn} Dorne, wer außer dir und Varn von dem Reserveband auf dem Regal wissen konnte, und halt fest, wer davon zwischen 21:10 und 21:25 allein war.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

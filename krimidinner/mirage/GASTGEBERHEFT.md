@@ -270,6 +270,10 @@ Diese Impulse helfen weiter, ohne etwas zu verraten. Nimm höchstens einen pro P
 >
 > Doch Velten war nicht nur Varns Opfer. 1949 wusste Velten, dass die Sicherung fehlte, und gab trotzdem das Zeichen. Velten wollte, dass Varn heute die Wahrheit sagt, damit Velten sie nie selbst sagen muss.
 >
+> Band und Gruß hatten einen Zweck: Zeit gewinnen, die Tat in die Vorstellung verlegen und den Verdacht auf das Haus lenken. Erst Dr. Wiels zweite Untersuchung rückte den Tod auf die Zeit um neun. Das Minifon im Büro hatte die Verabredung aufgezeichnet, und die Gestalt, die um 21:07 über die dunkle Hinterbühne ging, war Velten auf dem Weg zur Tonkabine.
+>
+> Den Zettel hatte {R05: Rafaela / Rafael} Dorne neun Jahre lang versteckt. Dorne hatte 1949 als Lehrling die Sicherung entfernt, Schweigegeld genommen und Velten im Oktober ein Foto geschickt. Alles andere führte in die Irre: Der Kaufvertrag hat niemanden zum Täter gemacht, {R02: Nele / Niko} Rohn prüfte unter der Bühne nur Klappe A.
+>
 > Das Palais Mirage hat seine letzte Illusion gezeigt. Diesmal ist niemand zurückgekehrt.“
 
 ## B-3 · Wie man es herausfinden konnte

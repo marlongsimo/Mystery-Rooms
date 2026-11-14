@@ -42,7 +42,7 @@ Du hast die Sicherung danach selbst repariert. Aber wenn das herauskommt, sieht 
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Die gelöste Sicherung bei der Probe soll niemand erfahren.
-2. **Zur Bühne:** Veys Nummer soll heute sicher laufen. Du prüfst Klappe A vorher noch einmal.
+2. **Zur Bühne:** Auf deine Sicherheitsarbeit soll nichts kommen. Du prüfst Klappe A vor Veys Nummer noch einmal. Erreicht, wenn am Ende des Abends niemand am Tisch deiner Arbeit an den Klappen die Schuld an etwas gibt.
 3. **Zu einer anderen Person:** {R05: Rafaela / Rafael} Dorne ist [die einzige / der einzige] im Haus, [die / der] dich in Sicherheitsfragen ernst nimmt.
 
 ## Vertraulich · Bis 20:50
@@ -71,6 +71,7 @@ Du hast die Sicherung danach selbst repariert. Aber wenn das herauskommt, sieht 
 
 - Ein Unglück mit einer Klappe. Du verstehst sofort, wie es passiert sein muss: Eine Klappe ohne Sicherung öffnet sich, bevor die Versenkung oben ist. Du kannst das der Gruppe erklären.
 - Deine eigene gelöste Sicherung bei der Probe verschweigst du. Wenn jemand fragt, ob es heute Probleme mit dem Kabinett gab: „Klappe A war wackelig, ich habe sie repariert.“ Das ist wahr.
+- **Dein Auftrag in dieser Runde:** Erklär der Gruppe, wie eine Klappe ohne Sicherung aufgeht. Dann frag alle, die 1949 schon im Haus waren, wer damals für die Sicherung von Klappe 3 zuständig war.
 
 ## Runde 3 · Die Stimme aus dem Nichts
 
@@ -81,4 +82,5 @@ Du hast die Sicherung danach selbst repariert. Aber wenn das herauskommt, sieht 
 ## Runde 4 · Der alte Weg
 
 - Wenn Dorne vom Werkstattzettel erzählt, erkennst du: Was 1949 geschah, ist genau das, wovor du Varn gewarnt hast. Jetzt darfst du deine gelöste Sicherung zugeben. Sie erklärt, warum du so hartnäckig warst.
+- **Dein Auftrag in dieser Runde:** Bring den glänzenden Riegelhebel noch einmal auf den Tisch. Frag {R05: Frau / Herrn} Dorne, wer ihn je bedient hat, und stell dieselbe Frage dann der Person, die Dorne nennt.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

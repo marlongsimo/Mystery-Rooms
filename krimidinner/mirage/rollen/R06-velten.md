@@ -102,7 +102,7 @@ Varn sagte der Polizei, du hättest das Zeichen zu früh gegeben und getrunken. 
 **Warum du vertuscht hast, statt zu gehen:** Du hast 1949 erlebt, wie schnell Varn einen Schuldigen gefunden hatte. Ein zweites Mal sollte das nicht passieren.
 1. **Zeit gewinnen.** Wäre um 21:18 keine Ansage gekommen, hätte man Varn sofort gesucht, zuerst unten.
 2. **Die Zeit verschieben.** Lebt Varn um 21:58 noch, sitzt du zur „Tatzeit“ in Reihe 1. Die elf Minuten im dunklen Saal waren der Preis.
-3. **Den Verdacht ins Haus lenken.** Stirbt Varn während der Vorstellung, waren es die hinter der Bühne. Das trifft auch Dorne, der dir den Zettel zugespielt hat. Du weißt das. Es ist deine zweite Schuld.
+3. **Den Verdacht ins Haus lenken.** Stirbt Varn während der Vorstellung, waren es die hinter der Bühne. Das trifft auch Dorne, {R05: die / der} dir den Zettel zugespielt hat. Du weißt das. Es ist deine zweite Schuld.
 
 ## Vertraulich · Beim Spielbeginn
 
@@ -134,6 +134,7 @@ Varn sagte der Polizei, du hättest das Zeichen zu früh gegeben und getrunken. 
 „Ja. Ich habe die Jacke angezogen. Ich habe sie im Requisitenraum gesehen, und plötzlich war ich wieder dreißig und stand neben ihm. Ich wollte ihn ärgern. Seinen Gruß aus der Loge, vor seinem eigenen Publikum, eine Minute lang. Das war kindisch. Ich dachte, er lebt.“
 
 - **Wo die zweite Linie verwundbar ist:** Wer „ihn ärgern“ will, tut es, wenn er es sieht. Varn hätte es von der Bühne sehen müssen, aber er war nicht da. Und der Gruß kam mit der linken Hand.
+- **Wenn man fragt, was ein Gast im Requisitenraum sucht:** „Ich habe die Toilette gesucht und bin durch die Bühnentür in den falschen Gang geraten.“ Schwach: Du kanntest dieses Haus einmal zu gut, um dich darin zu verlaufen.
 
 ## Runde 4 · Der alte Weg
 
@@ -142,6 +143,8 @@ Varn sagte der Polizei, du hättest das Zeichen zu früh gegeben und getrunken. 
 „Ja. Ich war unten, um neun. Er wollte den Zettel sehen, er hat ihn aus dem Kasten genommen und angezündet. Ich bin gegangen. Durch den alten Gang, so wie ich gekommen war. Er lebte, als ich ging.“
 
 - Auf die Frage, warum dann Band und Jacke: Du hast **keine gute Antwort**. Du darfst schweigen. Du darfst sagen: „Ich wollte nicht, dass man mich mit ihm in Verbindung bringt.“ Das klingt dünn, und das weißt du.
+- **Wenn Mantel und trockenes Haar kommen, bevor du die dritte Linie nimmst:** „Für eine Zigarette unter dem Vordach hole ich keinen Mantel, und das Dach hält trocken.“ Schwach: eine halbe Stunde im Sturm ohne Mantel glaubt dir kaum jemand, und den Kalk erklärt es nicht.
+- **Wenn man nach den zwanzig Minuten zwischen dem Treffen und 21:22 fragt:** „Ich habe im Gang gestanden, bis ich mich im Salon wieder zeigen konnte.“ Schwach: Zwanzig Minuten sind lang, und genau in dieser Zeit lief das Band.
 - Wenn {R05: Frau / Herr} Dorne gesteht, das Foto geschickt zu haben, sieh {R05: sie / ihn} an. Du hast {R05: sie / ihn} in den Verdacht gezogen. Ob du dich entschuldigst, entscheidest du.
 - Bleib bei der dritten Linie, bis die Anklagen abgegeben sind.
 

@@ -48,7 +48,7 @@ Dass du geschwiegen hast, frisst dich auf. Dass du Geld daraus machst, schämst 
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Niemand soll erfahren, dass du die Abschrift verkauft hast.
-2. **Zu einer anderen Person:** Auen soll zugeben, was er getan hat. Wenigstens einmal.
+2. **Zu einer anderen Person:** Was Auen getan hat, soll ausgesprochen werden. Wenigstens einmal. Erreicht, wenn am Ende des Abends alle am Tisch wissen, dass er die gesperrte Charge 7 mit eigener Hand freigegeben hat.
 3. **Zum Abend:** Wenn du in Zürich ankommst, willst du mit den Käufern reden.
 
 ## Vertraulich · Bis 22 Uhr

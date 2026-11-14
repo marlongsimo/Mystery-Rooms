@@ -40,7 +40,7 @@ Dein Vater hatte einen Kurzwarenladen. Du hast daraus vier Kaufhäuser gemacht. 
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Der Kauf soll stattfinden, notfalls mit den Erben.
-2. **Zur Presse:** Die Recherche über 1949 soll versanden.
+2. **Zur Presse:** Die Recherche über 1949 soll versanden. Sitzt {R07: Frau / Herr} Malven nicht am Tisch: Erreicht, wenn am Ende niemand ankündigt, die Geschichte von 1949 in die Zeitung zu bringen.
 3. **Zu einer anderen Person:** Neben dir in Reihe 1 sitzt heute {R06: eine Frau / ein Herr} mit Veilchen im Knopfloch. Du weißt nicht, wer das ist. Finde es heraus.
 
 ## Vertraulich · Bis 20:50
@@ -62,6 +62,7 @@ Dein Vater hatte einen Kurzwarenladen. Du hast daraus vier Kaufhäuser gemacht. 
 - **22:34** Ein Schrei hinter der Bühne.
 
 - Erzähl, was du gesehen hast, wenn man dich fragt. Dass Velten um 20:52 ging und um 21:22 zurückkam, ist eine Uhrzeit wie jede andere.
+- **Dein Auftrag in dieser Runde:** Frag {R06: Frau / Herrn} Velten, was {R06: sie / ihn} mit dem Haus verbindet und warum Varn {R06: sie / ihn} heute eingeladen hat.
 
 ## Runde 2 · Was 1949 geschah
 

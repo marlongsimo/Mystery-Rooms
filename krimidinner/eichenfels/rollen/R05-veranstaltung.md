@@ -92,3 +92,4 @@ Du hast auf Sanders Anweisung den Sitzplan geändert, **damit Rademacher neben F
 ## Runde 3 · Die letzte Ermittlung
 
 - **Phase 4 (Protokoll):** Du kannst drei Alibis bestätigen: Lindner an der Bar (21:13), {R01: Leonie / Leon} Sander auf der Terrasse (21:15) und Faber im Festsaal (ab 21:22).
+- **Dein Auftrag in dieser Runde:** Bestätige diese drei Zeiten vor allen. Frag danach Falk und Rademacher direkt, woher sie sich kennen. Hast du den Sitzplan noch nicht gezeigt, überleg, ob jetzt der Moment ist.

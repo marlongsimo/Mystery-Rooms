@@ -45,7 +45,7 @@ Kommt das heraus, bist du in der Schweiz erledigt. Bestechung eines Vermittlers,
 
 1. **Persönlich:** Die 5.000 Franken dürfen nie bekannt werden.
 2. **Zum Geschäft:** Wenn irgend möglich, soll der Verkauf trotzdem stattfinden. Die Erben brauchen auch einen Käufer.
-3. **Zu einer anderen Person:** Was {R05: Frau / Herr} Lorenz weiß, ist gefährlich für dich. Finde es heraus.
+3. **Zu einer anderen Person:** Was {R05: Frau / Herr} Lorenz weiß, ist gefährlich für dich. Finde es heraus. Sitzt Lorenz nicht am Tisch: Finde stattdessen heraus, was {R04: Frau / Herr} Sattler aus dem Werksarchiv besitzt und wem {R04: sie / er} es schon angeboten hat.
 
 ## Vertraulich · Bis 22 Uhr
 
@@ -80,4 +80,5 @@ Kommt das heraus, bist du in der Schweiz erledigt. Bestechung eines Vermittlers,
 ## Runde 4 · Die Wahrheit
 
 - Jetzt kann die Bestechung herauskommen, wenn jemand nachbohrt. Du entscheidest, wie lange du ausweichst. Ausdrücklich bestreiten darfst du sie nicht. Sie hat mit dem Mord nichts zu tun, und das kannst du sagen.
+- **Dein Auftrag in dieser Runde:** Frag {R04: Frau / Herrn} Sattler, was genau im Original-Prüfbericht stand und wer außer {R04: ihr / ihm} den Wortlaut kennen kann. Und bring noch einmal auf den Tisch, wer außer dir im Salon war, als Auen um 21:45 sagte, das Original reise in seiner Mappe.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

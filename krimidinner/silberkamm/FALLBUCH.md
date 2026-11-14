@@ -1,4 +1,4 @@
-# Abfahrt ins Dunkel · Fallbuch 0.2
+# Abfahrt ins Dunkel · Fallbuch 0.3
 
 **Fall 02 der Krimidinner-Reihe** · Silberkamm-Express Wien → Zürich · Donnerstag, 14. Februar 1929
 **Spielerzahl:** 6–8 · **Runden:** 4 + Finale · **Dauer:** ca. 3½ Stunden
@@ -140,6 +140,7 @@ Als Spieler-Asset bekommt der Fall `assets/wagenplan.svg` statt eines Grundrisse
 | 21:25–21:32 | Sattler an der Tür von Salon 6. Auen schlägt die Tür zu. Hartmann geht vorbei und sieht es. |
 | 21:40–21:55 | Reiter in Salon 6. Auen verlangt, § 9 des Vertrags („Altlasten 1921“) zu streichen. |
 | 21:45 | Brandl serviert Cognac und hört Auen sagen: „Das Original reist in meiner Mappe. Zürich bekommt nur, was ich ihnen gebe.“ |
+| gegen 21:50 | Auen tritt kurz mit einem Kuvert auf den Gang und gibt es Hartmann: der Brief an Odermatt, dazu 50 Schilling. Reiter sieht ihn hinausgehen und ohne Kuvert zurückkommen. |
 | 22:00–22:04 | Brandl in Salon 6: bringt eine Karaffe Wasser, zieht die Reiseuhr auf, Heizung auf Stufe 2. Er trägt alles ins Dienstbuch ein. |
 | 22:05–22:08 | Brandl im Speisewagen, schenkt Reiter nach |
 | 22:08 | Brandl geht in sein Dienstabteil. Bell verlässt den Speisewagen, um Noten aus Abteil 4 zu holen. |
@@ -196,7 +197,7 @@ Diese Zeiten stehen so in den Rollenheften, aufgeteilt auf Teil „Vertraulich�
 |---|---|---|
 | 19:30–20:30 | Fahrkartenkontrolle, Dienst | — |
 | 21:25 | sieht Sattler an der Tür von Salon 6 | Sattler |
-| 21:50 | **nimmt Auens Brief an Odermatt an, 50 Schilling** | — |
+| 21:50 | **nimmt Auens Brief an Odermatt an, 50 Schilling** | Reiter (sieht Auen mit dem Kuvert hinausgehen) |
 | 22:14–22:28 | Passrunde, eingetragen in der Passliste B3 | Hagen, Sattler, Bell, Lorenz, Reiter, Steinach |
 | 22:20 | klopft an Salon 6, keine Antwort, Licht an | Bell |
 | 22:38–22:52 | Tunnelrunde mit Brandl | Brandl |
@@ -210,12 +211,12 @@ Diese Zeiten stehen so in den Rollenheften, aufgeteilt auf Teil „Vertraulich�
 | Zeit | Tätigkeit | Zeugen |
 |---|---|---|
 | 20:35 | **Streit mit Auen um den Schuldschein** | Steinach, Brandl (hören) |
-| 20:40–22:05 | Speisewagen | Reiter (ab 21:55), Steinach |
+| 20:40–22:08 | Speisewagen | Reiter (ab 22:00), Steinach |
 | 22:08 | holt Noten aus Abteil 4 | — |
 | 22:14 | hört an Salon 6 zwei Stimmen, Auen ruft „Raus!“ | — |
 | 22:17–22:19 | Pass an Hartmann, gehen gemeinsam | Hartmann |
 | 22:22–22:40 | spielt Klavier | Reiter, Steinach, Hagen |
-| 22:40–23:20 | Abteil 4, allein | — |
+| 22:40–23:10 | Abteil 4, allein | — |
 
 - **Verschweigt:** den Schuldschein und die Höhe der Schuld.
 - **Verdacht:** Bei der ersten Zeitannahme allein, also verdächtig. Bei der wahren Zeit mit Hartmann zusammen, also entlastet.
@@ -226,7 +227,7 @@ Diese Zeiten stehen so in den Rollenheften, aufgeteilt auf Teil „Vertraulich�
 |---|---|---|
 | 21:20 | sieht Lorenz aus Salon 6 kommen | Lorenz |
 | 21:25–21:32 | **an der Tür von Salon 6: „Ich habe die Sperrvermerke, Auen.“** | Hartmann |
-| 21:35–23:20 | Abteil 2, trinkt allein | Hartmann (Pass 22:16) |
+| 21:35–23:10 | Abteil 2, trinkt allein | Hartmann (Pass 22:16) |
 
 - **Verschweigt:** den Verkauf der Abschrift an Lorenz (300 Schilling) und den Plan, sie den Käufern anzubieten.
 - **Verdacht:** Bei beiden Zeitannahmen allein, über die ganze Partie ein guter Verdächtiger.
@@ -236,7 +237,7 @@ Diese Zeiten stehen so in den Rollenheften, aufgeteilt auf Teil „Vertraulich�
 | Zeit | Tätigkeit | Zeugen |
 |---|---|---|
 | 21:10–21:20 | **Interview mit Auen, Klagedrohung** | Sattler (sieht sie gehen) |
-| 21:20–23:20 | Abteil 7, schreibt | Hartmann (Pass 22:21) |
+| 21:20–23:10 | Abteil 7, schreibt | Hartmann (Pass 22:21) |
 | 22:18 | hört durch die Wand einen dumpfen Schlag und notiert „22.18 Koffer?“ | — |
 
 - **Verschweigt:** dass die Abschrift von Sattler gekauft ist.
@@ -249,7 +250,7 @@ Diese Zeiten stehen so in den Rollenheften, aufgeteilt auf Teil „Vertraulich�
 | 20:50–21:00 | **in Salon 6, Forderung: „Sie werden zahlen, so oder so.“** | — |
 | 21:00–22:05 | Abteil 8 | — |
 | 22:05–22:35 | Speisewagen | Reiter, Bell, Hartmann (Pass 22:24–22:28) |
-| 22:35–23:20 | Abteil 8, allein, direkt neben Salon 6 | — |
+| 22:35–23:10 | Abteil 8, allein, direkt neben Salon 6 | — |
 
 - **Verschweigt:** den drohenden Ruin; die Reise sei „zur Schwester“.
 - **Verdacht:** Bei der ersten Zeitannahme Hauptverdächtige(r), bei der wahren Zeit entlastet.
@@ -274,10 +275,11 @@ Diese Zeiten stehen so in den Rollenheften, aufgeteilt auf Teil „Vertraulich�
 | Zeit | Tätigkeit | Zeugen |
 |---|---|---|
 | 21:40–21:55 | **Salon 6, Streit um § 9** | Brandl (serviert 21:45) |
+| gegen 21:50 | sieht Auen kurz mit einem Kuvert auf den Gang treten und Hartmann heranwinken | Hartmann |
 | 22:00–22:50 | Speisewagen | Steinach, Bell, Hagen, Hartmann |
 | 22:05–22:08 | Brandl schenkt nach | Brandl |
 | 22:08–22:33 | **Brandl nicht im Speisewagen**; Reiter bedient sich selbst an der Bar | — |
-| 22:50–23:20 | Abteil 3 | — |
+| 22:50–23:10 | Abteil 3 | — |
 
 - **Verschweigt:** die 5.000 Franken von Auen und dass er oder sie vom Original wusste.
 - **Erinnert:** Die Abwesenheit des Stewards erst in Runde 3: „Komisch, um zehn nach zehn war niemand an der Bar.“
@@ -314,7 +316,7 @@ Jede Karte hat diese Felder: **Runde**, **Bedingung**, **Fundort / Quelle**, **T
 - Die Reiseuhr auf der Konsole steht auf **22:41**.
 - *Strang:* A (Uhr, Hitze), Grundlage
 
-**B2 · Erste ärztliche Untersuchung** — Runde 1 · immer · Dr. Hagen um 23:10
+**B2 · Erste ärztliche Einschätzung** — Runde 1 · immer · Dr. Hagen um 23:10
 - „Körper noch warm, keine Totenstarre. Tod vor etwa 15 bis 35 Minuten, also zwischen 22:30 und 22:55. Die stehengebliebene Uhr bestätigt das.“
 - *Strang:* A (die falsche Annahme)
 
@@ -349,7 +351,7 @@ Jede Karte hat diese Felder: **Runde**, **Bedingung**, **Fundort / Quelle**, **T
 - Aus dem Urteil: „Raimund Wendt, Stellwerkstechniker, drei Jahre schwerer Kerker. Gestützt auf das Werksgutachten der Auenwerke (Relais einwandfrei) und das ärztliche Gutachten Dr. H. Hagen (deutlicher Alkoholgeruch). Der Verurteilte hinterlässt Frau und ein Kind.“
 - *Strang:* C (Wendt), Ablenkung (Hagen, Steinach)
 
-**B6 · Abschrift eines internen Briefs, 1921** — Runde 2 · immer · {R05: Margot / Moritz} Lorenz
+**B6 · Abschrift eines internen Briefes, 1921** — Runde 2 · immer · {R05: Margot / Moritz} Lorenz
 - „Charge 7 wird trotz Prüfbefund ausgeliefert. Der Prüfbericht bleibt im Archiv und geht nicht an die Untersuchung. — K. v. A.“
 - Am Rand Sattlers Kürzel „Abschr. V. S. 1922“.
 - Die Abschrift nennt **keine Zahl**.
@@ -394,7 +396,7 @@ Jede Karte hat diese Felder: **Runde**, **Bedingung**, **Fundort / Quelle**, **T
 
 ### Runde 4 · Die Wahrheit
 
-**B14 · Pass des Personals** — Runde 4 · immer · Hartmanns Passtasche
+**B14 · Pässe des Personals** — Runde 4 · immer · Hartmanns Passtasche
 - „{R07: Pauline / Paul} Brandl, geb. 1906 in Linz. Vermerk: Familienname geändert von WENDT, Bezirkshauptmannschaft Linz, 1922.“
 - *Strang:* C
 
@@ -404,7 +406,7 @@ Jede Karte hat diese Felder: **Runde**, **Bedingung**, **Fundort / Quelle**, **T
 
 ### Finale · Das Dienstabteil
 
-**B16 · Durchsuchung des Steward-Dienstabteils** — Finale · immer · Losungswort SCHNEE
+**B16 · Das Steward-Dienstabteil** — Finale · immer · Losungswort SCHNEE
 - Im Wäschefach der **Original-Prüfbericht**: „Charge 7: elf von vierzig Relais fehlerhaft. Auslieferung gesperrt. — V. Sattler“. Darunter von Auens Hand: „Trotzdem ausliefern. K. v. A.“
 - Ein Brief von Raimund Wendt aus der Haft, 1923: „Ich habe das Signal richtig gestellt, mein Kind. Es war das Relais. Glaub mir.“
 - Im Wäschesack eine Manschette mit Blutfleck.
@@ -490,16 +492,17 @@ Jeder Strang führt für sich allein zu Brandl, ohne einen anderen Strang zu bra
 
 ### Aussagekarten für fehlende Rollen
 
-Nach dem Muster der Eichenfels-NPC-Tabelle:
+Nach dem Muster der Eichenfels-NPC-Tabelle. Stand wie GASTGEBERHEFT.md, A8 (maßgeblich). „Phase“ zählt wie dort: Phase 2 = Runde 1 … Phase 5 = Runde 4. Lorenz' Schlag um 22:18 kommt in Runde 3 als Karte B13; B6 liegt in Runde 2 immer offen.
 
 | Rolle | Phase | Zum Vorlesen |
 |---|---|---|
-| R05 | 2 | „Lorenz lässt ausrichten: Ich habe Auen um 21:10 interviewt. Er drohte mit Klage. Meine Abschrift lege ich vor.“ (gibt B6 frei) |
-| R05 | 3 | ersetzt durch B13 |
-| R05 | 4 | „Lorenz: Die Abschrift habe ich gekauft, von Sattler. Eine Zahl stand nie darin.“ |
-| R03 | 2 | „Bell gibt zu, um 20:35 mit Auen gestritten zu haben, über Geld, sonst nichts.“ |
-| R03 | 3 | „Bell erinnert sich: Um Viertel nach zehn hörte ich in Salon 6 zwei Stimmen. Auen rief ‚Raus!‘. Kurz darauf gab ich {R02: Frau / Herrn} Hartmann meinen Pass und ging mit ihr / ihm Richtung Speisewagen.“ |
-| R03 | 4 | „Bell: Gesehen habe ich niemanden. Aber die zweite Stimme war {R07: eine Frauenstimme / eine Männerstimme}, ruhig, fast höflich.“ |
+| R05 | 2 | „{R05: Margot / Moritz} Lorenz war ab 21:20 allein in Abteil 7, direkt neben Salon 6, und hat geschrieben. Um 22:21 hat {R05: sie / er} Hartmann den Pass gegeben.“ |
+| R05 | 3 | „Lorenz gibt zu: Um 21:10 hat {R05: sie / er} Auen in Salon 6 zu 1921 befragt. Auen drohte: ‚Wenn Sie ein Wort davon drucken, gehört Ihre Zeitung mir.‘“ |
+| R05 | 5 | „Lorenz gesteht: Die Abschrift hat {R05: sie / er} im Januar von Sattler gekauft, für 300 Schilling. Eine Zahl stand nie darin, nicht in der Abschrift, nicht in den Zeitungen, nicht im Urteil.“ |
+| R03 | 2 | „{R03: Lili / Leo} Bell ging um 22:08 in Abteil 4, um Noten zu holen. Um 22:17 gab {R03: sie / er} Hartmann den Pass, ging mit {R02: ihr / ihm} bis Wagen 2 und spielte von 22:22 bis 22:40 im Speisewagen Klavier. Danach war {R03: sie / er} allein in Abteil 4.“ |
+| R03 | 3 | „Bell gibt zu, um 20:35 im Gang mit Auen gestritten zu haben, über Geld. Auen rief: ‚Keinen Groschen Aufschub!‘“ |
+| R03 | 4 | „Bell erinnert sich: Um 22:14 kam {R03: sie / er} an Salon 6 vorbei. Drinnen waren zwei Stimmen. Auen rief: ‚Raus!‘“ |
+| R03 | 5 | „Bell: Die zweite Stimme war {R07: eine Frauenstimme / eine Männerstimme}, ruhig, fast höflich, wie jemand, der gewohnt ist, leise zu sprechen.“ |
 
 ### Pacing
 
@@ -532,11 +535,13 @@ Bei sechs Personen verkürzt sich Runde 2 um etwa 10 Minuten, weil B8 fehlt.
 
 ## 14 · Auflösung (Vorlesetext, Entwurf)
 
+*Maßgeblich ist die ausgearbeitete Fassung in GASTGEBERHEFT.md, B-2. Ablauf im Finale: Anklagen vorlesen → SCHNEE öffnet B16 → Teil B öffnen, Täterrolle legt offen → Auflösung.*
+
 > Konstantin von Auen starb nicht um 22:41. Er starb um 22:18, sechs Minuten nachdem {R07: die Erste Stewardess / der Erste Steward} sein Abteil betreten hatte. Das Läutwerkbuch hält es fest, in {R07: ihrer / seiner} eigenen Hand.
 >
 > {R07: Pauline / Paul} Brandl wurde als {R07: Pauline / Paul} Wendt geboren. Ihr / Sein Vater stellte 1921 das Signal 14 richtig. Das Relais aus Charge 7 versagte, eines von elf fehlerhaften unter vierzig. Auen wusste es und ließ einen Unschuldigen verurteilen.
 >
-> Heute Nacht hörte {R07: sie / er}, dass das Original in Auens Mappe reiste. {R07: Sie / Er} wollte ein Geständnis und bekam Hohn. Ein Schlag mit der Lokomotive aus Messing, dann sechs kalte Minuten: Uhr auf 22:41, Heizung hoch, Fenster zu, Tür offen. Um 22:41 würde {R07: sie / er} neben {R02: Frau / Herrn} Hartmann Fenster schließen. Ein vollkommenes Alibi, für die falsche Zeit.
+> Heute Nacht hörte {R07: sie / er}, dass das Original in Auens Mappe reiste. {R07: Sie / Er} wollte ein Geständnis und bekam Hohn. Ein Schlag mit der Lokomotive aus Messing, dann fünf kalte Minuten: Uhr auf 22:41, Heizung hoch, Fenster zu, Tür offen. Um 22:41 würde {R07: sie / er} neben {R02: Frau / Herrn} Hartmann Fenster schließen. Ein vollkommenes Alibi, für die falsche Zeit.
 >
 > Aber eine Uhr, die man aufzieht, bleibt nicht von allein stehen. Ein Klopfen um 22:20 bleibt unbeantwortet. Und wer in der Nacht „elf von vierzig“ schreibt, hat gelesen, was nur einer gelesen haben konnte.
 
@@ -617,7 +622,7 @@ Die Rollenhefte R01–R08 liegen unter `rollen/`, aufgebaut nach dem Eichenfels-
 | R06 | Auen sagt um 20:50: „Ihr Mann ist mit dem Zug gefahren. Das tun Leute auf eigene Gefahr.“ Die Forderung beträgt 80.000 Schilling. | Motiv |
 | R06 | Brandl spricht Steinach beim Dinner ungefragt sein Beileid aus. Woher wusste {R07: sie / er} davon? | leiser Hinweis auf Strang C |
 | R06 | Steinach wartet von kurz nach zehn bis 22:33 vergeblich auf Bedienung. | Strang B, zweite Stimme neben Reiter |
-| R07 | Auen sagt um 22:14: „Ihr Vater war ein Säufer. Das hat sogar die Ärztin beschworen.“ Das Streichholzbriefchen aus dem Speisewagen blockiert die Unruh (B9). | Tathergang |
+| R07 | Auen sagt um 22:14: „Ihr Vater war ein Säufer. Das hat sogar {R01: die Ärztin / der Arzt} beschworen.“ Das Streichholzbriefchen aus dem Speisewagen blockiert die Unruh (B9). | Tathergang |
 | R08 | Reiter sieht Brandl um 22:33 „blass, mit frisch gestärkten Manschetten“. Die Provision beträgt 3 %, das Bestechungsgeld wurde im Dezember gezahlt. | Strang B |
 
-**Unverändert offen:** Probetisch; Gastgeberheft, Beweiskarten-Datei, `fall.json`, Wagenplan-SVG.
+**Unverändert offen:** Probetisch. Gastgeberheft, Beweiskarten-Datei, `fall.json` und Wagenplan-SVG liegen inzwischen vor.

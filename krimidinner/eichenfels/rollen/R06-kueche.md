@@ -50,7 +50,7 @@ Du hast vor, heute Abend **zwei Flaschen 1990er Riesling aus dem Vorratskeller d
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Den Diebstahl geheim halten. Oder ihn selbst zugeben, bevor es jemand anderes tut. Das ist die bessere Variante, wenn es eng wird.
-2. **Zu einer anderen Person:** Hollerbach darf nicht schlecht über dich denken. Ihr seid seit drei Jahren ein Team.
+2. **Zu einer anderen Person:** Hollerbach darf nicht schlecht über dich denken. Ihr seid seit drei Jahren ein Team. Sitzt Hollerbach nicht am Tisch: Dann gilt dasselbe für Faber, {R09: die / den} du aus dem Haus kennst.
 3. **Zum Fall:** Halte die Augen offen. In der Küche und in den Gängen hört und sieht man mehr, als die Gäste denken.
 
 ## Vertraulich · Beim Empfang
@@ -80,10 +80,11 @@ Du hast vor, heute Abend **zwei Flaschen 1990er Riesling aus dem Vorratskeller d
 - Der Servicegang hat keinen Kartenleser. Wer ihn benutzt, taucht in keinem Protokoll auf, auch du nicht.
 
 - **Phase 3 (Geheimnisse):** Achte darauf, wer etwas trägt, das beim Gehen klirrt. Es sind mehrere. Sag es noch nicht.
-- **Wen du ansprechen solltest:** Hollerbach (Ziel 2), Faber (wer hat sonst Karten für die Restaurierung?), jede Person, die beim Gehen klirrt.
+- **Wen du ansprechen solltest:** Hollerbach (Ziel 2; sitzt Hollerbach nicht am Tisch: Faber), Faber (wer hat sonst Karten für die Restaurierung?), jede Person, die beim Gehen klirrt.
 - **Was du vermeiden solltest:** das Wort „Wein“.
 - **Trumpf:** die Nachricht an Deniz, 21:22, mit Zeitstempel. Sie beweist, wann du die Person gesehen hast. Und: Zwischen 21:15 und 21:22 war unten niemand. Wer behauptet, in dieser Zeit vor der Restaurierung gewartet zu haben, lügt.
 
 ## Runde 3 · Die letzte Ermittlung
 
 - **Phase 4 (Küche):** Spätestens wenn die Spielleitung die Aussage der Aushilfe Jo vorliest (B11), musst du dich entscheiden. Jo hat nur halb zugehört, du hast es selbst gesehen.
+- **Dein Auftrag in dieser Runde:** Wenn du dich fürs Reden entscheidest: Erzähl selbst, was du um 21:22 gesehen und gehört hast, und zeig die Uhrzeit deiner Nachricht an Deniz. Frag dann in die Runde, wer zwischen 21:15 und 21:22 unten vor der Restaurierung gewesen sein will.

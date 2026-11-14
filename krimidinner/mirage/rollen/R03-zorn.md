@@ -70,6 +70,7 @@ Drei Jahre später stand Varn vor deiner Tür und bot dir eine Stelle an, „aus
 - **Was du sagen kannst:** wie Lukas war, was man dir 1949 erzählt hat und was der alte Bühnenarbeiter vor einem Monat gesagt hat: „Fragen Sie Varn mal, wer die Sicherung abgenommen hat.“
 - Zu Velten: Du darfst wütend sein, und du darfst Fragen stellen. Beides ist menschlich.
 - Deine Schulden bei Varn verschweigst du, solange es geht.
+- **Dein Auftrag in dieser Runde:** Stell {R06: Frau / Herrn} Velten vor allen die Frage des alten Bühnenarbeiters: Wer hat die Sicherung abgenommen? Stell sie danach allen, die 1949 schon im Haus waren.
 
 ## Runde 3 · Die Stimme aus dem Nichts
 

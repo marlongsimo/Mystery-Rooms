@@ -80,4 +80,5 @@ Um 20:35 hast du ihn im Gang vor Salon 6 angefleht, die Frist zu verlängern. Er
 ## Runde 4 · Die Wahrheit
 
 - **Jetzt fällt dir noch etwas ein:** Die zweite Stimme um 22:14 war {R07: eine Frauenstimme / eine Männerstimme}, ruhig, fast höflich. Kein Fahrgast, eher jemand, der gewohnt ist, leise zu sprechen.
+- **Dein Auftrag in dieser Runde:** Erzähl der Gruppe, wie die zweite Stimme klang. Frag dann {R02: Frau / Herrn} Hartmann, wer um Viertel nach zehn in Wagen 2 Dienst hatte.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

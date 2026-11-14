@@ -95,3 +95,4 @@ Die ärztliche Schweigepflicht gilt auch über den Tod hinaus. Du darfst sie bre
 ## Runde 3 · Die letzte Ermittlung
 
 - **Phase 4 (Protokoll):** Du kannst Falk ein Alibi geben, 21:05–21:25. Aber du hast auch gesehen, wie Falk um 21:29 eine Nachricht las.
+- **Dein Auftrag in dieser Runde:** Bestätige Falks Zeit im Salon vor allen. Frag Falk danach offen nach der Nachricht von 21:29: Von wem kam sie, und was stand darin?

@@ -86,10 +86,11 @@ Du nutzt das große Teleskop der Stiftung **heimlich für deine eigenen Astrofot
 **Neues Ziel:** Den Stromausfall darfst du zugeben, wenn es nicht anders geht. Den Grund nicht unbedingt.
 
 - **Phase 3 (Geheimnisse):** Erkläre der Gruppe die Schließanlage (siehe oben). Das ist Wissen, das alle brauchen, und es lenkt von dir ab.
-- **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (wer außer euch beiden und Sander hat eine Karte für die Restaurierung? Niemand.), Yilmaz (der Servicegang).
+- **Wen du ansprechen solltest:** Marwitz (Ziel 2), Rademacher (wer außer euch beiden und Sander hat eine Karte für die Restaurierung? Niemand.), Yilmaz (der Servicegang). Sitzt Yilmaz nicht am Tisch: Halte dich an Yilmaz’ Aussagekarte (Vorratskeller ab 21:15) und erkläre selbst, dass der Servicegang keinen Kartenleser hat.
 - **Was du vermeiden solltest:** den Namen „Thüringer Nachthimmel“.
 - **Trumpf:** Dein Weg ist lückenlos: 21:07–21:14 Kuppel (Marwitz), 21:15 Küche (Yilmaz, Jo), 21:16–21:21 Hauptverteilung (B10), ab 21:22 Festsaal (Hollerbach). Und um 21:24 hat eine Karte die Restaurierung geöffnet, während du im Festsaal standest. Deine war es nicht.
 
 ## Runde 3 · Die letzte Ermittlung
 
 - **Phase 4 (Protokoll):** Du liest den Server aus. Dein Technikprotokoll (B10) zeigt „NOT-AUS Kuppelpult (manuell)“. Jetzt brauchst du eine Erklärung, und Marwitz.
+- **Dein Auftrag in dieser Runde:** Bitte Marwitz, eure gemeinsame Zeit in der Kuppel (21:07–21:14) vor allen zu bestätigen. Geh dann mit der Gruppe das Zutrittsprotokoll (B9) Zeile für Zeile durch und erkläre dazu die Schließanlage: Welche Tür ging während des Stromausfalls auf, welche nicht?

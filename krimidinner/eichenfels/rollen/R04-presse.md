@@ -96,3 +96,4 @@ Du bist **unter falschem Vorwand** hier, und unter dem Kartentisch klebt **dein 
 ## Runde 3 · Die letzte Ermittlung
 
 - **Phase 4 (Protokoll):** Vergleiche das Zutrittsprotokoll mit deiner Aufnahme. Wer war um 21:09 schon im Westflügel?
+- **Dein Auftrag in dieser Runde:** Stell genau diese Frage laut in die Runde und sprich jede Person, die das Protokoll um diese Zeit im Westflügel zeigt, einzeln an: Wo genau waren Sie um 21:09? Liegt deine Aufnahme noch nicht auf dem Tisch, entscheide jetzt, ob du sie selbst vorlegst.

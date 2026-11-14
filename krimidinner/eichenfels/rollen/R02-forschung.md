@@ -50,7 +50,7 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Deine Urheberschaft am Atlas soll heute anerkannt werden, vor allen, so wie Sander es versprochen hatte.
-2. **Zu einer anderen Person:** Lindner von der Presse hat dir vor Monaten nach Uppsala geschrieben. Du hast nie geantwortet. Finde heraus, was {R04: sie / er} weiß.
+2. **Zu einer anderen Person:** Lindner von der Presse hat dir vor Monaten nach Uppsala geschrieben. Du hast nie geantwortet. Finde heraus, was {R04: sie / er} weiß. Sitzt Lindner nicht am Tisch: Achte auf alles, was im Lauf des Abends von der Presse bekannt wird.
 3. **Zum Fall:** Herausfinden, was Sander mit „wenn ich die Blätter dann noch habe“ meinte. Wer hatte Grund, ihm die Blätter wegzunehmen?
 
 ## Vertraulich · Beim Empfang
@@ -81,10 +81,11 @@ Die anderen Gäste kennst du kaum. Faber von der Haustechnik hat dir heute Nachm
 - Rademacher wollte wissen, ob du „noch Unterlagen aus der Atlas-Zeit“ hast. Warum interessiert das das Archiv?
 
 - **Phase 3 (Geheimnisse):** Wenn die Archivliste (Karten 41–48) auf den Tisch kommt, ist das dein Moment. Das sind deine Karten. Überleg, ob du es jetzt sagst oder ob es dich verdächtiger macht.
-- **Wen du ansprechen solltest:** Faber (euer Alibi), Rademacher (warum die Frage nach den Unterlagen?), Ritter (hat Sander etwas über dich verfügt?).
+- **Wen du ansprechen solltest:** Faber (euer Alibi), Rademacher (warum die Frage nach den Unterlagen?), Ritter (hat Sander etwas über dich verfügt?). Sitzt Ritter nicht am Tisch: Achte auf Ritters Aussagekarten.
 - **Was du vermeiden solltest:** dich in Wut zu reden. Genau das erwartet man von der Person, die es getan hat.
 - **Trumpf:** Faber war von 21:07 bis 21:14 bei dir in der Kuppel und hat den Strom von Hand abgeschaltet.
 
 ## Runde 3 · Die letzte Ermittlung
 
 - **Phase 4 (Protokoll):** Das Protokoll zeigt, dass du um 21:26 aus dem Westflügel kamst. Das sieht schlecht aus. Fabers Technikprotokoll (B10) zeigt, dass Faber um 21:07 in der Kuppel war. Nutze das.
+- **Dein Auftrag in dieser Runde:** Leg das Technikprotokoll (B10) neben deine Aussage und bitte Faber, vor allen zu bestätigen, dass ihr von 21:07 bis 21:14 zusammen in der Kuppel wart. Frag danach Rademacher, warum sich das Archiv für deine Unterlagen aus der Atlas-Zeit interessiert.

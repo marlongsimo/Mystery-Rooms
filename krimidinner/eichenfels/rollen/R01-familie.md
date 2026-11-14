@@ -50,7 +50,7 @@ Vor zwei Jahren hast du **die Unterschrift deines Vaters unter eine Bürgschaft 
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Die Fälschung soll nicht öffentlich werden – zumindest nicht, bevor du sie selbst erklären kannst.
-2. **Zu einer anderen Person:** Von Ritter erfahren, was im neuen Testament steht.
+2. **Zu einer anderen Person:** Von Ritter erfahren, was im neuen Testament steht. Sitzt Ritter nicht am Tisch: Achte auf alles, was im Lauf des Abends aus der Kanzlei bekannt wird, und frag die anderen, was dein Vater ihnen für heute Abend angekündigt hat.
 3. **Zum Fall:** Wenn deinem Vater heute etwas zustößt, willst du wissen, wer es war. Du hast ihn nicht verstanden, aber du hast ihn geliebt.
 
 ## Vertraulich · Bis zur Rede um 20:40
@@ -82,10 +82,10 @@ Vor zwei Jahren hast du **die Unterschrift deines Vaters unter eine Bürgschaft 
 - Rademacher kennt jedes Blatt im Archiv. Als Kind durftest du bei {R08: ihr / ihm} mit weißen Handschuhen eine Sternkarte halten.
 
 - **Phase 3 (Geheimnisse):** Sobald das Testament Thema wird, schauen alle auf dich, denn du bist [die Erbin / der Erbe]. Bleib ruhig: Du warst nachweislich draußen.
-- **Wen du ansprechen solltest:** Ritter (Ziel 2), Hollerbach (dein Alibi), Seebach (warum diese Frage beim Dinner?).
+- **Wen du ansprechen solltest:** Ritter (Ziel 2), Hollerbach (dein Alibi), Seebach (warum diese Frage beim Dinner?). Sitzen sie nicht am Tisch: Verweise auf Hollerbachs Aussagekarte (Terrasse, 21:15) und sprich Rademacher an, {R08: die / der} dich seit deiner Kindheit kennt: Was wollte dein Vater heute Abend sagen?
 - **Was du vermeiden solltest:** das Wort „Bank“. Und Ritter vor allen nach dem Testament zu fragen. Das macht dich verdächtig.
 - **Trumpf:** Hollerbach hat dich um 21:15 auf der Terrasse gesehen. Dazu dein Anrufprotokoll.
 
 ## Runde 3 · Die letzte Ermittlung
 
-- **Phase 4 (Protokoll):** Das Zutrittsprotokoll entlastet dich nicht direkt, du warst nie an einem Kartenleser. Hollerbach kann es. Sprich {R05: sie / ihn} an.
+- **Phase 4 (Protokoll):** Das Zutrittsprotokoll entlastet dich nicht direkt, du warst nie an einem Kartenleser. Hollerbach kann es. Sprich {R05: sie / ihn} an. Sitzt Hollerbach nicht am Tisch: Zeig auf Hollerbachs Aussagekarte (Terrasse, 21:15) und auf dein Anrufprotokoll.

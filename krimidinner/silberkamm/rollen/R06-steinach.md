@@ -81,4 +81,5 @@ Heute Abend hast du ihm den Brief persönlich gebracht. Darin steht der Satz: �
 ## Runde 4 · Die Wahrheit
 
 - Wenn Wendt einen Namen und ein Gesicht bekommt, denk an [Albrecht / Marie]. Wendt wurde verurteilt, Auen nicht. Wer ist hier eigentlich das Opfer?
+- **Dein Auftrag in dieser Runde:** Frag {R04: Frau / Herrn} Sattler, was aus Wendts Familie geworden ist. Erzähl, falls noch nicht geschehen, vom „Mein Beileid“ beim Dinner und frag {R07: die Stewardess / den Steward}, woher {R07: sie / er} von [deinem Mann / deiner Frau] wusste. Und sprich {R08: Frau / Herrn} Reiter ein letztes Mal auf deine Forderung an.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

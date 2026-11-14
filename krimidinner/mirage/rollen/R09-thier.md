@@ -70,6 +70,7 @@ Du warst [Buchhalterin / Buchhalter] in einer Reederei, bis die pleiteging. Das 
 
 - Du warst die ganze Zeit mit Kest im Salon, dann in Reihe 1. Für jede der beiden Zeiten hast du Zeugen.
 - Wenn jemand nach Geldsorgen fragt: Du hast welche. Ob du deine Vorschüsse zugibst, entscheidest du.
+- **Dein Auftrag in dieser Runde:** Frag {R05: Frau / Herrn} Dorne, seit wann {R05: sie / er} im Haus ist und was {R05: sie / er} 1949 hier gemacht hat. Das Kassenbuch bleibt noch zu.
 
 ## Runde 4 · Der alte Weg
 

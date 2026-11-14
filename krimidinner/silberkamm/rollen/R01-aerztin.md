@@ -44,7 +44,7 @@ Kommt das heraus, verlierst du die Approbation und alles, was du seither aufgeba
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Das Gutachten von 1921 darf niemand mit Geld in Verbindung bringen. Dass du es geschrieben hast, steht in jedem Urteil. Warum du es so geschrieben hast, darf niemand erfahren.
-2. **Zu einer anderen Person:** Du möchtest wissen, was {R05: Frau / Herr} Lorenz von der *Wiener Abendpost* über 1921 weiß. Journalisten fragen nicht zufällig nach.
+2. **Zu einer anderen Person:** Du möchtest wissen, was {R05: Frau / Herr} Lorenz von der *Wiener Abendpost* über 1921 weiß. Journalisten fragen nicht zufällig nach. Sitzt Lorenz nicht am Tisch: Finde stattdessen heraus, was {R04: Frau / Herr} Sattler über 1921 weiß. {R04: Sie / Er} hat beim Dinner laut genug über die Auenwerke geredet.
 3. **Zum Abend:** Als [Ärztin / Arzt] wirst du gebraucht. Sei es. Gute Arbeit ist das Einzige, worauf du dich verlassen kannst.
 
 ## Vertraulich · Bis 22 Uhr

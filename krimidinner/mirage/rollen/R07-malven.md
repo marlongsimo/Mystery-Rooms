@@ -67,6 +67,7 @@ Heimlich aufzunehmen ist strafbar. Wenn es herauskommt, bist du deine Stelle los
 - **21:58** In der dunklen Loge 2 hebt „Varn“ die Hand zum Gruß. Du notierst: „21:58 A.V. Loge 2“.
 
 - Dass du hinter der Bühne warst, sagst du nur, wenn jemand fragt. Dann wahrheitsgemäß, das Minifon aber nicht.
+- **Dein Auftrag in dieser Runde:** Frag reihum, wer Varn nach der Ansprache um 20:20 noch gesehen hat, und schreib die Uhrzeiten mit.
 
 ## Runde 2 · Was 1949 geschah
 

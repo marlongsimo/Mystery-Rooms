@@ -82,5 +82,6 @@ Danach legt die Täterrolle ihr Rollenblatt offen, die letzten Beweise werden ge
 - **Frag nach Uhrzeiten.** Fast alles in diesem Fall hängt an Minuten.
 - **Zeichne mit.** Ein Zettel mit einer Zeitleiste hilft mehr als jede Vermutung.
 - **Nicht jede Person, die lügt, hat gemordet.** Fast alle haben etwas zu verbergen.
+- **Die Täterrolle sitzt am Tisch.** Figuren, die bei euch niemand spielt, kommen als Täter nicht in Frage.
 - **Die Täterrolle darf sich gut verteidigen.** Ein Fall ist erst dann schön gelöst, wenn er nicht zu leicht war.
 - Wer die Täterrolle hat: Du gewinnst nicht durch Schweigen, sondern durch eine Geschichte, die lange hält.

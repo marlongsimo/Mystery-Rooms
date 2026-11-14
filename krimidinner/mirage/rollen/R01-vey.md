@@ -42,7 +42,7 @@ Den Brief hast du in deiner Garderobe zerrissen. Die Fetzen liegen im Papierkorb
 ## Vertraulich · Deine Ziele
 
 1. **Persönlich:** Niemand darf von Hamburg erfahren, bevor du weißt, wie es weitergeht.
-2. **Zur Bühne:** Deine letzte Nummer in diesem Haus soll perfekt sein.
+2. **Zur Bühne:** Deine letzte Nummer in diesem Haus soll makellos in Erinnerung bleiben. Erreicht, wenn am Ende des Abends niemand am Tisch behauptet, an ihr sei etwas faul gewesen.
 3. **Zu einer anderen Person:** {R04: Klara / Klemens} Senn ist dein verlässlichster Mensch im Haus. Du schützt {R04: sie / ihn}.
 
 ## Vertraulich · Bis 20:50
@@ -71,6 +71,7 @@ Den Brief hast du in deiner Garderobe zerrissen. Die Fetzen liegen im Papierkorb
 - 1949 warst du noch beim Zirkus. Über das Unglück weißt du nur, was im Haus geflüstert wird: Klappe 3 sei verflucht.
 - In Varns Kalender steht „V.“. Du heißt Vey. Man wird dich ansehen. **Bleib ruhig:** Du hattest heute keine Verabredung mit Varn, und von einem „Zettel“ weißt du nichts.
 - Hamburg verschweigst du weiter, wenn es geht.
+- **Dein Auftrag in dieser Runde:** Frag in die Runde, wer außer dir mit „V.“ gemeint sein kann. Und frag {R05: Frau / Herrn} Dorne, warum Klappe 3 im Haus als verflucht gilt.
 
 ## Runde 3 · Die Stimme aus dem Nichts
 
@@ -82,4 +83,5 @@ Den Brief hast du in deiner Garderobe zerrissen. Die Fetzen liegen im Papierkorb
 
 - Den alten Künstlergang kennst du nicht. Du bist erst 1953 gekommen, als die Tapetentür schon zugestellt war.
 - Wenn man dich nach Hamburg fragt und die Fetzen in deinem Papierkorb gefunden werden: Jetzt ist es Zeit, es zu sagen.
+- **Dein Auftrag in dieser Runde:** Frag reihum, wer schon im Haus gearbeitet hat, bevor die Tapetentür zugestellt wurde, und wer die Tür deshalb kennen kann.
 - **Finale:** Gib deine Anklage nach bestem Wissen ab.

@@ -92,4 +92,5 @@ Danach legt die Täterrolle ihr Blatt offen, der letzte Beweis wird geöffnet, u
 - **Zeichne mit.** Eine Zeitleiste hilft mehr als jede Vermutung.
 - **Ein Theater lebt von Täuschung.** Prüft, was ihr wirklich gesehen habt.
 - **Nicht jede Person, die lügt, hat gemordet.** Fast alle haben etwas zu verbergen.
+- **Die Täterrolle sitzt am Tisch.** Figuren, die bei euch niemand spielt, kommen als Täter nicht in Frage.
 - Wer die Täterrolle hat: Du gewinnst nicht durch Schweigen, sondern durch eine Geschichte, die lange hält.

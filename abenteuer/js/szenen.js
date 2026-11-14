@@ -82,10 +82,10 @@
     if (modell10()) {
       A.modell10 = true; const empf = empfStufe(A.abenteuer);
       A.stufe = Math.max(1, Math.min(F.STUFEN10.max, opts.heldenstufe || empf));
-      // Eigene Stufe je Held (opts.heldStufen: echte Stufen vom Konto). Wer mehr als zwei Stufen unter der Empfehlung liegt,
-      // wird für diese Kampagne auf Empfehlung − 2 angehoben. Helden ohne bekannte Stufe (Gäste) spielen auf der empfohlenen.
+      // Eigene Stufe je Held (opts.heldStufen: echte Stufen vom Konto) – ohne Anhebung: Die Kampagne ist für alle gleich schwer,
+      // wer zu weit unter der Empfehlung liegt, schafft sie eben nicht. Helden ohne bekannte Stufe (Gäste) spielen auf der empfohlenen.
       if (opts.heldStufen) { A.heldStufe = {}; A.heldEcht = {};
-        for (const fid of A.gruppe) { const echt = opts.heldStufen[fid]; if (echt == null) continue; A.heldEcht[fid] = echt; A.heldStufe[fid] = Math.max(1, Math.min(F.STUFEN10.max, Math.max(echt, empf - 2))); } }
+        for (const fid of A.gruppe) { const echt = opts.heldStufen[fid]; if (echt == null) continue; A.heldEcht[fid] = echt; A.heldStufe[fid] = Math.max(1, Math.min(F.STUFEN10.max, echt)); } }
     }
     R.zufall(A);
     A.zust = startZustand(A);

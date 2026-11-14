@@ -1,7 +1,7 @@
 /*
  * Mythara – Heldenstufen im Browser (Migration 007), mit nachgebildeten Antworten des Servers:
  * Charaktere-Seite und Profil zeigen Stufe und XP-Balken, eine neue Kampagne spielt im Zehn-Stufen-Modell mit eigener
- * Stufe je Held (Anhebung auf Empfehlung − 2), ein Kampf läuft durch, die Belohnung zeigt XP und Aufstieg.
+ * Stufe je Held (ohne Anhebung), ein Kampf läuft durch, die Belohnung zeigt XP und Aufstieg.
  * Ohne die Funktionen in der Datenbank bleibt alles beim bisherigen Modell.
  * Aufruf: node abenteuer/tests/stufen-browser.test.js   (Webserver auf Port 8765)
  */
@@ -36,14 +36,14 @@ async function seite(b, mit007) {
     const start = await p.evaluate(async () => {
       window.AB.abenteuerWaehlen("krone"); const s = window.AB.SETUP(); s.gruppe = ["schildwaechter", "lichtbringer", "wildnislaeufer"];
       await window.ABSAMMLUNG.tischLaden(null); window.ABT.start(s); const A = window.ABT.A(), F = window.ABF;
-      return { m10: A.modell10, an: F.STUFEN10.aktiv, stufen: A.heldStufe, echt: A.heldEcht, tp: A.zust.schildwaechter.tp, soll: F.tpVon("schildwaechter", 6), tpK: A.zust.wildnislaeufer.tp, sollK: F.tpVon("wildnislaeufer", 4) };
+      return { m10: A.modell10, an: F.STUFEN10.aktiv, stufen: A.heldStufe, echt: A.heldEcht, tp: A.zust.schildwaechter.tp, soll: F.tpVon("schildwaechter", 6), tpK: A.zust.wildnislaeufer.tp, sollK: F.tpVon("wildnislaeufer", 1) };
     });
-    check(start.m10 && start.an && start.stufen.schildwaechter === 6 && start.stufen.lichtbringer === 4 && start.stufen.wildnislaeufer === 4 && start.echt.wildnislaeufer === 1 && start.tp === start.soll && start.tpK === start.sollK,
-      "Krone (empfohlen 6): Torvald auf Stufe 6, Elara und Kael von 3 und 1 auf Stufe 4 angehoben, Leben passend");
+    check(start.m10 && start.an && start.stufen.schildwaechter === 6 && start.stufen.lichtbringer === 3 && start.stufen.wildnislaeufer === 1 && start.tp === start.soll && start.tpK === start.sollK,
+      "Krone (empfohlen 6): jeder Held auf seiner echten Stufe (6, 3, 1), keine Anhebung, Leben passend");
     const kampf = await p.evaluate(() => { const A = window.ABT.A(); A.szene = "kampf_markt"; window.ABT.render(); document.querySelector("#sz-kampf").click(); return true; });
     await p.waitForFunction(() => window.AB.st);
     const k = await p.evaluate(() => { const st = window.AB.st, R = window.AB.R; const f = R.spielerFiguren(st).map((x) => x.fid + ":" + x.stufe).join(","); let n = 0; while (!st.ende && n++ < 4000) R.aktiv(st).seite === "gegner" ? R.gegnerZug(st) : R.autoZug(st); return { f, bed: st.bed, ende: st.ende }; });
-    check(/schildwaechter:6/.test(k.f) && /wildnislaeufer:4/.test(k.f) && k.bed === 5 && Boolean(k.ende), `Kampf: Figuren mit eigener Stufe (${k.f}), Bedrohung ${k.bed}, endet mit „${k.ende}“`);
+    check(/schildwaechter:6/.test(k.f) && /wildnislaeufer:1/.test(k.f) && k.bed === 5 && Boolean(k.ende), `Kampf: Figuren mit eigener Stufe (${k.f}), Bedrohung ${k.bed}, endet mit „${k.ende}“`);
     // Belohnung mit XP
     await p.evaluate(() => { window.ABSAMMLUNG.endeMelden("00000000-0000-0000-0000-000000000001", { versuche: 1 }); }); await p.waitForSelector(".sm-xp");
     const xp = await p.evaluate(() => [...document.querySelectorAll(".sm-xp .sm-xp-zeile")].map((z) => (z.classList.contains("auf") ? "AUF " : "") + z.textContent.replace(/\s+/g, " ").trim()));

@@ -29,7 +29,7 @@
   - **Kurzabenteuer** (Weidenhain, Graufurt) geben den halben Grundwert.
   - **Gebaut:** Migration `supabase/007_rpg_heldenlevel.sql` (Fortschritt je Konto und Held, Buchungen, Vergabe mit `rpg_award_xp` auf dem Server, Lesen mit `rpg_hero_levels` und `rpg_campaign_levels`; lokal geprüft mit `supabase/tests/pruefen.sh`).
   - **Einschalten:** Sobald die Migration in Supabase läuft, spielt jede **neu begonnene** Kampagne im Zehn-Stufen-Modell (`A.modell10`), jeder Held auf seiner eigenen Stufe (`A.heldStufe`). Laufende Kampagnen bleiben in ihrem Modell. Ohne die Migration bleibt alles wie bisher.
-  - **Wer spielt auf welcher Stufe:** eigene Helden auf ihrer Stufe; Tisch-Helden auf der Stufe des Gastgebers; Helden von Gästen auf der empfohlenen Stufe. Wer mehr als zwei Stufen unter der Empfehlung liegt, wird für die Kampagne auf Empfehlung − 2 angehoben (XP zählen nach der echten Stufe).
+  - **Wer spielt auf welcher Stufe:** eigene Helden auf ihrer Stufe; Tisch-Helden auf der Stufe des Gastgebers; Helden von Gästen auf der empfohlenen Stufe. **Keine Anhebung** (entgegen 9.3): Die Kampagne ist für alle gleich schwer und wächst nur mit der Gruppengröße. Wer zu weit unter der Empfehlung liegt, schafft sie nicht.
   - **Anzeige:** Stufe und XP-Balken auf den Heldenkacheln, der Heldenkarte (mit Markierung in der Stufentabelle), der Charaktere-Seite („Deine Helden“) und im Profil („Meine Helden“); nach der Kampagne zeigt die Belohnung XP und Aufstieg je Held.
   - Noch offen: Kampagnen-Segen am Lagerfeuer, Ampel vor dem Start, Meistertitel im Spiel.
 

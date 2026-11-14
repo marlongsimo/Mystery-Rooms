@@ -188,17 +188,17 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 
 - **XP (festgelegt am 14. November 2026):** Eine Partie gibt den Helden etwas Erfahrung, aber weniger als eine Kampagne. Gestaffelt nach Stufe wie in den Kampagnen. **Bei einer Niederlage bekommt jeder Held ein Drittel.**
   - **Stufe der Partie** = die höhere der beiden Teamstufen, gerundet (nach ihr richten sich auch die Monster).
-  - **Grundwert bei einem Sieg** = 25 × Stufe der Partie (Vorschlag). Das ist etwa ein Drittel dessen, was eine Kampagne dieser Stufe gibt:
+  - **Grundwert bei einem Sieg: 25 XP**, auf jeder Stufe gleich. Ein Held auf der Stufe der Partie bekommt genau diesen Wert.
+  - **Staffelung je Held:** für jede Stufe **unter** der Stufe der Partie 10 XP mehr (höchstens 100), für jede Stufe **darüber** 5 XP weniger (mindestens 5).
 
-    | Stufe der Partie | 1 | 3 | 4 | 6 | 8 | 10 |
+    | Partie auf Stufe 8, Held auf Stufe | 1 | 4 | 6 | 8 | 9 | 10 |
     |---|---|---|---|---|---|---|
-    | Sieg | 25 | 75 | 100 | 150 | 200 | 250 |
-    | Niederlage | 8 | 25 | 33 | 50 | 67 | 83 |
-    | Kampagne dieser Stufe zum Vergleich | 100 | 200 | 300 | 450 | 600 | – |
+    | Sieg | 95 | 65 | 45 | 25 | 20 | 15 |
+    | Niederlage (ein Drittel) | 32 | 22 | 15 | 8 | 7 | 5 |
 
-  - **Staffelung je Held** wie in den Kampagnen: Ein Held auf der Stufe der Partie bekommt den Grundwert, ein Held darunter mehr (bis ×2), ein Held darüber weniger (bis ×0,1). In der Aufstellung 10, 1, 1 (Stufe der Partie 4) bekommen die beiden Stufe-1-Helden also das Doppelte, der Stufe-10-Held fast nichts.
+  - Zum Vergleich: Eine Kampagne gibt 50 bis 450 XP, eine Stufe kostet 100 bis 1500 XP. Auf der eigenen Stufe ist der Modus also ein kleines Zubrot; spürbar hilft er Helden, die deutlich unter der Stufe der Partie liegen.
   - Vergeben wird auf dem Server, nur für Partien, die beide Geräte gleich gemeldet haben. Aufgabe und Abbruch zählen für den, der bleibt, als Sieg; wer aufgibt oder wegbleibt, bekommt nichts.
-  - **Obergrenze je Tag (festgelegt):** Nur die ersten **5 Partien** eines Tages bringen Belohnungen, und jeder Held sammelt im Modus höchstens **150 XP am Tag**. Was darüber hinausginge, verfällt. Auf niedrigen Stufen greift zuerst die Zahl der Partien (Stufe 1: fünf Siege bringen 125 XP), auf hohen Stufen die XP-Grenze (Stufe 6: ein Sieg bringt schon 150 XP). Weitere Partien lassen sich spielen und werden aufgezeichnet, geben aber weder XP noch die Chance auf einen Helden. So liegt der Fokus nicht auf dem Modus, und abgesprochene Partien lohnen sich kaum. Der Tag wechselt um Mitternacht (mitteleuropäische Zeit); gezählt wird auf dem Server.
+  - **Obergrenze je Tag (festgelegt):** Nur die ersten **5 Partien** eines Tages bringen Belohnungen, und jeder Held sammelt im Modus höchstens **150 XP am Tag**. Was darüber hinausginge, verfällt. Für Helden auf der Stufe der Partie greift die Zahl der Partien (fünf Siege bringen 125 XP). Die XP-Grenze bremst Helden, die weit unter der Stufe der Partie liegen (95 XP je Sieg): Sie sind nach zwei Siegen am Tag fertig. Weitere Partien lassen sich spielen und werden aufgezeichnet, geben aber weder XP noch die Chance auf einen Helden. So liegt der Fokus nicht auf dem Modus, und abgesprochene Partien lohnen sich kaum. Der Tag wechselt um Mitternacht (mitteleuropäische Zeit); gezählt wird auf dem Server.
 - **Heldenchance (festgelegt):** Bei **jedem Sieg** besteht eine Chance von **8 %**, einen neuen Helden freizuschalten – wie nach einem neuen Kampagnen-Ende als **Wahl aus drei Helden, die noch fehlen**.
   - Gewürfelt wird auf dem Server, zusammen mit der XP-Vergabe. Das Angebot nutzt die vorhandene Heldenwahl (`rpg_hero_offers`, neue Art „duell“) und wartet wie die anderen Belohnungen auf der Startseite, wenn man nicht sofort wählt.
   - Zählt nur für Siege innerhalb der Obergrenze je Tag. Ein Sieg durch Aufgabe oder Abbruch des Gegners zählt nicht für die Heldenchance (Vorschlag), sonst ließe sie sich durch abgesprochenes Aufgeben abgreifen.
@@ -227,7 +227,7 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 ## 12. Offene Entscheidungen
 
 1. **Derselbe Held auf beiden Seiten** erlaubt (Vorschlag) oder nicht?
-2. **Belohnungen im Modus:** Grundwert 25 × Stufe der Partie bestätigen. Die Obergrenze (5 Partien und 150 XP je Held am Tag) ist meine Lesart von „4–5 Partien, also 150 XP“ – bitte prüfen. Soll ein Sieg durch Aufgabe des Gegners für die Heldenchance zählen?
+2. **Belohnungen im Modus:** Staffelung (10 XP mehr je Stufe darunter, 5 XP weniger je Stufe darüber) und Obergrenze (5 Partien und 150 XP je Held am Tag) bestätigen. Soll ein Sieg durch Aufgabe des Gegners für die Heldenchance zählen?
 3. **Verstecken:** für den Anfang hinnehmen, dass es technisch nicht vollständig geschützt ist?
 4. **Reihenfolge:** Soll der Modus vor oder nach dem Neubau von Hardcore kommen?
 5. **Auswertung:** nur für Admins (Vorschlag) oder später auch eine öffentliche Seite mit Siegquoten je Held?

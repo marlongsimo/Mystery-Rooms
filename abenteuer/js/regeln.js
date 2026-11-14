@@ -1263,8 +1263,10 @@
    * Der Regelkern kennt nur „Spieler“ und „Gegner“. Darum wechselt in der Arena die Sicht mit dem Zug:
    * Ist ein Held von Team 1 am Zug, gelten die Helden von Team 2 für diesen Zug als Gegner (und umgekehrt).
    * Zwischen den Zügen und wenn Monster ziehen, sind alle Helden wieder „Spieler“ – Monster greifen beide Teams an.
-   * Niemand scheidet aus: Wer zu Boden geht, kehrt nach zwei Runden an seinen Startplatz zurück.
-   * Punkte: Monster besiegt 1 (Endgegner 3), gegnerischen Helden zu Boden gebracht 2. Ende: alle Monster besiegt oder Rundenlimit. */
+   * Der Kampf der beiden Spieler steht im Mittelpunkt, die Monster sind schwache Beigabe.
+   * Punkte: gegnerischen Helden zu Boden gebracht 5, Monster besiegt 1 (Endgegner 2).
+   * Ende: sobald ein Team vollständig am Boden liegt (das andere gewinnt) oder nach 15 Runden (mehr Punkte gewinnt).
+   * Wer am Boden liegt, kann wie gewohnt von Verbündeten aufgerichtet oder geheilt werden. */
   const teamVon = (st, f) => (f ? f.team || (f.besitzer && (fig(st, f.besitzer) || {}).team) || 0 : 0);
   function arenaSicht(st, team) {
     for (const h of st.figuren) {
@@ -1275,38 +1277,31 @@
     }
     st.arena.sicht = team || 0;
   }
-  /** Zu Beginn eines Zugs: Sicht setzen; wer am Boden liegt, wartet oder kehrt zurück. true = dieser Zug wird übersprungen */
+  /** Zu Beginn eines Zugs: Sicht auf das Team der aktiven Figur setzen. true = dieser Zug wird übersprungen (hier nie) */
   function arenaZugbeginn(st) {
     arenaSicht(st, 0);
-    const f = aktiv(st), t = teamVon(st, f);
-    if (t && f.team && f.tp <= 0) {
-      f.arenaUnten = (f.arenaUnten || 0) + 1;
-      if (f.arenaUnten >= 2) {
-        const [sx, sy] = f.arenaStart, ziel = !belegt(st, sx, sy, f) ? { x: sx, y: sy } : freiesFeldNahe(st, [sx, sy], 4) || { x: sx, y: sy };
-        f.x = ziel.x; f.y = ziel.y; f.tp = Math.ceil(f.tpMax / 2); f.arenaUnten = 0; f.todes = { e: 0, f: 0 }; f.stabil = false; delete f.z.liegend;
-        st.log.push({ t: `${f.name} kehrt an den Startplatz zurück (${f.tp} TP).`, art: "gut" });
-      } else { st.log.push({ t: `${f.name} liegt am Boden und kehrt in der nächsten Runde zurück.` }); weiter(st, true); return true; }
-    }
-    arenaSicht(st, t);
+    if (arenaPruefen(st)) return false;
+    arenaSicht(st, teamVon(st, aktiv(st)));
     return false;
   }
   function arenaPunkte(st, z, vor) {
     if (!(vor > 0) || z.tp > 0) return;
     const wer = aktiv(st), t = teamVon(st, wer), zt = teamVon(st, z);
     if (!t) return;                                  // Monster bringen niemandem Punkte
-    if (zt && zt !== t && z.fidA) { st.arena.punkte[t] += 2; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +2 Punkte (${z.name} am Boden).`, art: "gut" }); }
-    else if (!zt && z.seite === "gegner" && GEGNER[z.art]) { const p = GEGNER[z.art].boss ? 3 : 1; st.arena.punkte[t] += p; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +${p} ${p === 1 ? "Punkt" : "Punkte"} (${z.name}).`, art: "gut" }); }
+    if (zt && zt !== t && z.fidA) { st.arena.punkte[t] += 5; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +5 Punkte (${z.name} am Boden).`, art: "gut" }); }
+    else if (!zt && z.seite === "gegner" && GEGNER[z.art]) { const p = GEGNER[z.art].boss ? 2 : 1; st.arena.punkte[t] += p; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +${p} ${p === 1 ? "Punkt" : "Punkte"} (${z.name}).`, art: "gut" }); }
   }
   const arenaMonster = (st) => st.figuren.filter((f) => !teamVon(st, f) && f.seite === "gegner");
   function arenaPruefen(st) {
     if (st.ende) return st.ende;
-    if (arenaMonster(st).length && arenaMonster(st).every((f) => f.tp <= 0)) arenaEnde(st, "Alle Monster sind besiegt.");
+    const steht = (tm) => st.figuren.some((f) => f.team === tm && f.tp > 0 && !f.tot);
+    if (!steht(1) || !steht(2)) arenaEnde(st, `Das Team von ${st.arena.namen[steht(1) ? 1 : 0]} liegt am Boden.`, steht(1) ? 1 : 2);
     return st.ende;
   }
-  function arenaEnde(st, grund) {
+  function arenaEnde(st, grund, fest) {
     arenaSicht(st, 0);
     const p = st.arena.punkte, leben = (t) => st.figuren.filter((f) => f.team === t).reduce((a, f) => a + Math.max(0, f.tp) / f.tpMax, 0);
-    const sieger = p[1] !== p[2] ? (p[1] > p[2] ? 1 : 2) : leben(1) !== leben(2) ? (leben(1) > leben(2) ? 1 : 2) : 2; // Gleichstand: mehr Leben, sonst der Nachziehende
+    const sieger = fest || (p[1] !== p[2] ? (p[1] > p[2] ? 1 : 2) : leben(1) !== leben(2) ? (leben(1) > leben(2) ? 1 : 2) : 2); // Gleichstand: mehr Leben, sonst der Nachziehende
     st.arena.sieger = sieger; st.arena.grund = grund; st.ende = "arena";
     st.log.push({ t: `${grund} ${st.arena.namen[0]} ${p[1]} : ${p[2]} ${st.arena.namen[1]} – Sieg für ${st.arena.namen[sieger - 1]}.`, art: "ende" });
   }
@@ -1318,10 +1313,10 @@
     const fern = k.start.gegner.slice().sort((a, b) => (Math.abs(b[0] - schwer.x) + Math.abs(b[1] - schwer.y)) - (Math.abs(a[0] - schwer.x) + Math.abs(a[1] - schwer.y)));
     const s2 = fern.slice(0, 3), rest = fern.slice(3).sort((a, b) => (Math.abs(a[0] - mitte.x) + Math.abs(a[1] - mitte.y)) - (Math.abs(b[0] - mitte.x) + Math.abs(b[1] - mitte.y)));
     const karte = Object.assign({}, k, { start: Object.assign({}, k.start, { spieler: s1.concat(s2), gegner: rest.length ? rest : k.start.gegner, wolf: (k.start.wolf || []).concat(fern.slice(3)) }) });
-    const st = neuesSpiel(seed, { figuren: alle.map((h) => h.fid), stufenListe: alle.map((h) => h.stufe), karte, begegnung: o.begegnung, bedrohung: o.bedrohung || 0, mischen: false, anfuehrer: false, zusatzGegner: 0 });
+    const st = neuesSpiel(seed, { figuren: alle.map((h) => h.fid), stufenListe: alle.map((h) => h.stufe), karte, begegnung: o.begegnung, bedrohung: o.bedrohung || 0, mischen: false, anfuehrer: false, zusatzGegner: 0, skala: o.skala != null ? o.skala : 0.6 }); // Monster bewusst schwach
     const helden = st.figuren.filter((f) => /^f\d+$/.test(f.id));
     helden.forEach((f, i) => { f.team = i < 3 ? 1 : 2; f.arenaStart = [f.x, f.y]; });
-    st.arena = { punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || 10, sicht: 0, sieger: null };
+    st.arena = { punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || 15, sicht: 0, sieger: null };
     st.schwierigkeit = "normal"; st.ende = null;
     beginneZug(st);
     return st;

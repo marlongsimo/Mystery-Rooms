@@ -9,9 +9,11 @@
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fett = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\*(.+?)\*/g, "<i>$1</i>");
   /** Absatz der Erzählung; „↳ “ vorn markiert eine Folge früherer Entscheidungen */
-  const absatz = (p, i) => (/^↳\s/.test(p) ? `<p class="sz-folge" style="--i:${i}"><small>Eure Spur</small>${fett(p.replace(/^↳\s+/, ""))}</p>` : `<p style="--i:${i}">${fett(p)}</p>`);
+  const momentTeil = (p) => { const m = /^☙([a-z_]+)\|([\s\S]*)$/.exec(p); return m && F.FIGUREN[m[1]] ? { fid: m[1], t: m[2] } : null; };
+  const momentHtml = (mt, i) => `<p class="sz-moment" style="--i:${i || 0}">${B.marke(mt.fid, 34)}<span><small>${esc(F.FIGUREN[mt.fid].name)}</small>${fett(mt.t)}</span></p>`;
+  const absatz = (p, i) => (momentTeil(p) ? momentHtml(momentTeil(p), i) : /^↳\s/.test(p) ? `<p class="sz-folge" style="--i:${i}"><small>Eure Spur</small>${fett(p.replace(/^↳\s+/, ""))}</p>` : `<p style="--i:${i}">${fett(p)}</p>`);
   /** Nachhall: was die letzte Entscheidung bewirkt hat (über der Szene) */
-  const nachhallHtml = (n) => (n && n.length ? `<div class="sz-nachhall" role="status">${n.map((x) => `<p class="nh-${x.art}"><small>${{ entscheidung: "Eure Entscheidung", geheim: "Im Geheimen entschieden", abschluss: "", folge: "Das hat Folgen" }[x.art] || ""}</small>${fett(x.t)}</p>`).join("")}</div>` : "");
+  const nachhallHtml = (n) => (n && n.length ? `<div class="sz-nachhall" role="status">${n.map((x) => (x.art === "moment" && momentTeil(x.t) ? momentHtml(momentTeil(x.t)) : `<p class="nh-${x.art}"><small>${{ entscheidung: "Eure Entscheidung", geheim: "Im Geheimen entschieden", abschluss: "", folge: "Das hat Folgen" }[x.art] || ""}</small>${fett(x.t)}</p>`)).join("")}</div>` : "");
   /** Rückschau am Ende */
   const rueckschauHtml = (r) => (!r ? "" : `<div class="sz-rueckschau">${r.zeilen.length ? `<h3>Was ihr getan habt</h3><ul>${r.zeilen.map((z) => `<li>${fett(z)}</li>`).join("")}</ul>` : ""}${r.andere.length ? `<h3>Was hätte sein können</h3><ul class="andere">${r.andere.map((z) => `<li>${fett(z)}</li>`).join("")}</ul>` : ""}${r.enden > 1 ? `<p class="note">Diese Geschichte hat ${r.enden} Enden. Ihr habt eines davon erlebt.</p>` : ""}</div>`);
   const KEY = "ab_abenteuer";
@@ -19,7 +21,7 @@
   const SCHNELL = new URLSearchParams(location.search).has("schnell");
   const ABSCHNITTE = { 1: "Die Abtei", 2: "Die Krypta", 3: "Das Siegel" };
   let vorlesenAn = false; try { vorlesenAn = localStorage.getItem("ab_vorlesen") === "an"; } catch (e) { /* privat */ }
-  const ohneMarkup = (t) => String(t || "").replace(/\*\*?/g, "").replace(/[„“"]/g, "");
+  const ohneMarkup = (t) => String(t || "").replace(/^↳\s+/, "").replace(/^☙[a-z_]+\|/, "").replace(/\*\*?/g, "").replace(/[„“"]/g, "");
 
   /* ---------- Vorlesen (Browserstimme, experimentell) ---------- */
   const sprache = typeof window !== "undefined" && window.speechSynthesis ? window.speechSynthesis : null;

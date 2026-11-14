@@ -141,3 +141,16 @@ Regeln für neue Kampagnen:
 4. `kampagne.js pruefen <id>` meldet Merker, die gesetzt und nie gelesen werden, fehlende Folgen und fehlende Ende-Hinweise.
 
 Muster: `daten/weidenhain.js` (Tebbe, die Unke, das Müllergeld, das Lied des Spielmanns).
+
+## Heldenmomente: Was nur diese eine Figur sagt oder denkt
+
+Die Texte dazu stehen für alle 15 Helden in `js/heldenmomente.js`. Eine Kampagne ruft sie nur ab:
+
+| Aufruf | Wirkung |
+|---|---|
+| `h.stimme(A, "kind")` in `text` | Auftritt einer Figur aus der Gruppe zur Lage (reihum, damit jede drankommt). Lagen: `kind`, `gnade`, `angst`, `fremde`, `abschied` |
+| `h.moment(fid, "gold")` | Zeile einer bestimmten Figur, z. B. als persönlicher Gedanke in der Frage einer geheimen Szene |
+| `frage: (A, h, fid) => h.feuerFrage(fid).frage`, `antworten: (A, h, fid) => h.feuerFrage(fid).antworten` | Geheime Szene, in der jede Person ihre eigene Frage bekommt. Die Antworten hören danach alle (Nachhall mit Porträt) |
+| `h.feuerEcho(A, fid)` | Was die Figur am Feuer erzählt hat, für Ende und Rückschau |
+
+Jede Lage sollte je Kampagnenreihe nur einmal vorkommen, sonst wiederholen sich die Zeilen. Für neue Lagen in `heldenmomente.js` je Figur eine Zeile ergänzen.

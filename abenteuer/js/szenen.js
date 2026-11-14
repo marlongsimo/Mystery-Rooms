@@ -27,6 +27,7 @@
   "use strict";
   const R = root.ABR || (typeof require === "function" ? require("./regeln.js") : null);
   const F = R.FD;
+  const HM = root.ABHM || (typeof require === "function" ? require("./heldenmomente.js") : {});
   // Abenteuerdaten je Abenteuer (daten/<id>.js registriert sich in ABD_ALLE); ohne Angabe: Grauwacht
   const ALLE = () => root.ABD_ALLE || {};
   function datenVon(id) {
@@ -84,7 +85,32 @@
   const geheimWer = (A, szeneId, ant) => lebende(A).filter((f) => geheimAntwort(A, szeneId, f) === ant);
   /** Namen als Aufzählung: „Torvald“, „Torvald und Elara“, „Torvald, Elara und Pim“ */
   const namen = (A, fids) => { const n = fids.map((f) => name(A, f)); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + " und " + n[n.length - 1]; };
-  const hilfen = { hat, m, name, namen, ereignis, klasse, geheimAntwort, geheimWer, lebende: (A) => lebende(A) };
+  /* ---------- Heldenmomente (heldenmomente.js): was nur diese eine Figur sagt oder denkt ---------- */
+  /** Zeile einer Figur zu einer Lage (oder ""), z. B. moment("schildwaechter", "gold") */
+  const moment = (fid, lage) => ((HM[fid] || {}).stimmen || {})[lage] || "";
+  /** Auftritt einer Figur aus der Gruppe zu einer Lage – reihum, damit jede drankommt. Liefert einen Absatz „☙fid|Text“ (oder ""). */
+  function heldenStimme(A, lage) {
+    A.auftritte = A.auftritte || {}; A.rampe = A.rampe || {};
+    const key = A.szene + ":" + lage;
+    let fid = A.auftritte[key];
+    if (!fid || !hat(A, fid)) {
+      const kand = lebende(A).filter((f) => moment(f, lage));
+      if (!kand.length) return "";
+      const min = Math.min(...kand.map((f) => A.rampe[f] || 0)), erste = kand.filter((f) => (A.rampe[f] || 0) === min);
+      fid = erste[Math.floor(A.r() * erste.length)];
+      A.auftritte[key] = fid; A.rampe[fid] = (A.rampe[fid] || 0) + 1;
+    }
+    return "☙" + fid + "|" + moment(fid, lage);
+  }
+  /** Persönliche Lagerfeuer-Frage einer Figur: { frage, antworten } für eine geheime Szene. Die Antwort steht danach in merker.feuer_<fid>. */
+  function feuerFrage(fid) {
+    const f = (HM[fid] || {}).feuer;
+    if (!f) return { frage: "Was erzählst du am Feuer von dir?", antworten: [{ id: "wenig", text: "„Nicht viel.“", echo: `${F.FIGUREN[fid].name} hat am Feuer wenig gesagt und viel zugehört.`, setzt: () => ({ ["feuer_" + fid]: "wenig" }) }] };
+    return { frage: f.frage, antworten: f.antworten.map((a) => ({ id: a.id, text: a.text, echo: a.echo, setzt: () => ({ ["feuer_" + fid]: a.id }) })) };
+  }
+  /** Was eine Figur am Feuer erzählt hat (der Satz für die anderen), oder "" */
+  const feuerEcho = (A, fid) => { const f = (HM[fid] || {}).feuer, a = f && f.antworten.find((x) => x.id === A.merker["feuer_" + fid]); return a ? a.echo : ""; };
+  const hilfen = { hat, m, name, namen, ereignis, klasse, geheimAntwort, geheimWer, moment, stimme: heldenStimme, feuerFrage, feuerEcho, lebende: (A) => lebende(A) };
 
   function notiz(A, t, art) { A.protokoll.push({ t, art: art || "" }); if (A.protokoll.length > 200) A.protokoll.shift(); }
   /** Wirkung einer Option/eines Ergebnisses anwenden */
@@ -284,7 +310,11 @@
     if (s.verteilung !== false && Object.keys(zaehl).length) folge(A, Object.entries(zaehl).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${n} × ${texte[k]}`).join(" · "), "geheim");
     const ab = (typeof s.abschluss === "function" ? s.abschluss(A, hilfen) : s.abschluss) || "";
     if (ab) folge(A, ab, "abschluss");
-    for (const [fid, ant] of Object.entries(A.geheim)) { const a = geheimFuer(A, fid).antworten.find((x) => x.id === ant); if (a && a.folge) folge(A, typeof a.folge === "function" ? a.folge(A, hilfen, fid) : a.folge); }
+    for (const [fid, ant] of Object.entries(A.geheim)) {
+      const a = geheimFuer(A, fid).antworten.find((x) => x.id === ant); if (!a) continue;
+      if (a.folge) folge(A, typeof a.folge === "function" ? a.folge(A, hilfen, fid) : a.folge);
+      if (a.echo) folge(A, "☙" + fid + "|" + (typeof a.echo === "function" ? a.echo(A, hilfen, fid) : a.echo), "moment");
+    }
     notiz(A, ab || "Jede Person hat für sich entschieden.");
     ziel(A, s);
   }

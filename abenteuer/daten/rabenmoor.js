@@ -124,6 +124,7 @@
       beimEintritt: (A, h) => (h.klasse(A, "zauberer") && !A.merker.legende ? { setzt: { legende: "halb" } } : null),
       text: (A, h) => [
         "Die Fackeln knistern. Der Schulze wartet nicht gern, das sieht man ihm an. Noch habt ihr Zeit.",
+        h.stimme(A, "fremde"),
         h.klasse(A, "zauberer") ? `${h.name(A, h.klasse(A, "zauberer"))} kennt Geschichten über Moorlichter: Irrlichter flackern und summen. Stumme Lichter nicht. Stumme Lichter gehören einer Seele, die keinen Namen mehr hat.` : "",
         A.merker.mob_ruhig ? "Die Männer haben die Fackeln gesenkt. Ein paar sind schon nach Hause gegangen." : "",
       ],
@@ -160,8 +161,9 @@
     },
     uferstimme: {
       art: "geheim", abschnitt: 1, titel: "Am Ufer", ort: "Rand des Schwarzmoors", weiter: "wegwahl",
-      text: (A) => [
+      text: (A, h) => [
         "Am Ende des Damms beginnt das Moor. Nebel liegt auf dem Wasser, flach wie ein Tuch. Weit draußen hängt ein Licht. Es bewegt sich nicht.",
+        h.stimme(A, "angst"),
         "Und dann hört jede Person, jede für sich, eine Stimme aus dem Wasser. Keine Worte. Ein Summen, ein Kinderlied ohne Melodie. Es klingt einsam.",
         "Jede Person entscheidet auf ihrem Handy für sich.",
       ],

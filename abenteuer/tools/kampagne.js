@@ -163,6 +163,8 @@ function durchlauf(id, N = 200, o = {}) {
     const A = S.neu(seed, { gruppe: F.REIHE.slice().sort(() => r() - 0.5).slice(0, n), schwierigkeit: o.hardcore ? "hardcore" : "normal", abenteuer: id });
     for (let schritt = 0; schritt < 500; schritt++) {
       const s = S.szene(A); besucht.add(A.szene);
+      // Jede Szene muss sich anzeigen lassen: Text nur aus Zeichenketten (fängt z. B. vertauschte Hilfsfunktionen ab)
+      { const v = S.ansicht(A), kaputt = v.text.find((t) => typeof t !== "string"); if (kaputt !== undefined) throw new Error("Text ist keine Zeichenkette in " + A.szene + ": " + JSON.stringify(kaputt)); }
       if (A.beute) { const d = A.beute.dinge[0], f = S.lebende(A).find((x) => S.darfTragen(A, x, d)); if (f) S.beuteGeben(A, d, f); else S.beuteLassen(A); continue; }
       if (A.aufstieg) A.aufstieg = null;
       if (A.ersatzOffen && A.ersatzOffen.length && s.art === "lager") { for (const alt of A.ersatzOffen.slice()) S.ersatz(A, alt, S.freieFiguren(A)[0]); continue; }

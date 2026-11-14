@@ -1507,3 +1507,14 @@ body[data-stimmung="frost"] .szene .szene-kopf .glocke i.an, body[data-stimmung=
 body.handy .sz-nachhall p, body.handy .sz-rueckschau li { font-size: 16px; }
 .log li.folge { color: #e6cf94; }
 .erzaehlung p.sz-folge + p.sz-folge small { display: none; }
+
+/* ---------- Heldenmoment: was nur diese eine Figur sagt oder denkt ---------- */
+.sz-moment { display: flex; gap: 12px; align-items: flex-start; margin: 14px 0; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(217,180,106,.3); background: linear-gradient(120deg, rgba(40,32,20,.75), rgba(20,17,13,.55)); }
+.erzaehlung p.sz-moment::first-letter { font-size: inherit; float: none; color: inherit; font-family: inherit; padding: 0; margin: 0; line-height: inherit; }
+.sz-moment > span { flex: 1; font-family: "Cormorant Garamond", serif; font-size: 19px; line-height: 1.5; color: #efe4c8; font-style: italic; }
+.sz-moment small { display: block; font: 600 10.5px "Inter", sans-serif; font-style: normal; letter-spacing: .16em; text-transform: uppercase; color: #d9b46a; margin-bottom: 2px; }
+.sz-moment .marke, .sz-moment img { flex: none; }
+.sz-nachhall .sz-moment { margin: 8px 0 0; background: rgba(12,10,7,.45); }
+.sz-nachhall .sz-moment > span { font-size: 17px; }
+body.handy .sz-moment > span { font-size: 16px; }
+body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(217,180,106,.35), 0 0 18px rgba(217,180,106,.18); }

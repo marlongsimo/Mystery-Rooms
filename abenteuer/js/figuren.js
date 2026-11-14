@@ -419,10 +419,24 @@
     return { stufe: s, xp: s >= STUFEN10.max ? 0 : rest, bis: s >= STUFEN10.max ? 0 : XP_BIS[s] };
   }
 
+  /* ---------- Kampagnen-Segen (Zehn-Stufen-Modell) ----------
+   * Am Lagerfeuer steigt die Gruppe nicht mehr auf. Stattdessen wählt sie einen von drei Segen, der bis zum Ende der Kampagne gilt. */
+  const SEGEN = {
+    wachtfeuer: { name: "Wachtfeuer", zeichen: "🔥", text: "Alle beginnen jeden Kampf mit 3 Lebenspunkten mehr." },
+    atem: { name: "Ruhiger Atem", zeichen: "🌬", text: "Alle haben +1 auf Rettungswürfe." },
+    fell: { name: "Dickes Fell", zeichen: "🛡", text: "Der erste Schaden, den eine Figur in einem Kampf erleidet, wird halbiert." },
+    klingen: { name: "Scharfe Klingen", zeichen: "⚔", text: "Der erste Treffer jeder Figur in einem Kampf macht 1W6 Schaden mehr." },
+    vorraete: { name: "Vorräte", zeichen: "🧪", text: "Jede Figur bekommt sofort einen zusätzlichen Heiltrank." },
+    wind: { name: "Zweiter Wind", zeichen: "💨", text: "Einmal je Kampf bleibt eine Figur, die zu Boden gehen würde, mit 1 Lebenspunkt stehen." },
+    fuesse: { name: "Leichte Füße", zeichen: "👣", text: "Alle bewegen sich 1 Feld weiter." },
+    haende: { name: "Flinke Hände", zeichen: "✋", text: "Ziele im Kampf (Schleuse, Seil, Glutbecken …) brauchen eine Aktion weniger, mindestens eine." },
+    ortskunde: { name: "Ortskunde", zeichen: "🧭", text: "Die Gegnervorschau zeigt alle Schwächen, und in der ersten Runde jedes Kampfes bewegen sich alle 2 Felder weiter." },
+  };
+
   /** Hardcore ist vorerst abgeschaltet: Der Modus wird neu entwickelt, sobald alles andere steht. Neue Kampagnen und Kämpfe
    *  starten in Normal; bereits laufende Hardcore-Kampagnen spielen unverändert weiter. */
   const HARDCORE = false;
-  const API = { HARDCORE, XP_BIS, XP_FAKTOR, xpFuer, stufeAusXp, KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
+  const API = { HARDCORE, SEGEN, XP_BIS, XP_FAKTOR, xpFuer, stufeAusXp, KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
     STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, BESSER, stufenpfad, SCHWIERIGKEIT,
     /** höchste Stufe des geltenden Modells (für „alle Fähigkeiten dieser Figur“) */
     maxStufe: () => (STUFEN10.aktiv ? 10 : 3) };

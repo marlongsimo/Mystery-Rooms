@@ -7,7 +7,11 @@
 const ALLE = ["schildwaechter", "berserker", "duellant", "gelehrter", "elementarist", "schattenmagier", "schattenlaeufer", "trickser", "assassine",
   "lichtbringer", "wanderheiler", "inquisitor", "wildnislaeufer", "tiergefaehrte", "kopfgeldjaeger"];
 const MUSTER = /\/rest\/v1\/rpc\/rpg_(my_heroes|campaign_heroes)(\?|$)/;
+// Heldenstufen (Migration 007): Die Ablauftests sollen die Kampagnen durchspielen können, nicht an zu schwachen Helden scheitern.
+// Darum haben hier alle Helden Stufe 6 (1350 XP). Die Stufen selbst prüft tests/stufen-browser.test.js.
+const STUFEN = /\/rest\/v1\/rpc\/rpg_(hero_levels|campaign_levels)(\?|$)/, XP6 = Object.fromEntries(ALLE.map((f) => [f, 1350]));
 async function umleiten(ziel) {
+  await ziel.route(STUFEN, (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(/campaign_levels/.test(route.request().url()) ? { host: XP6, spieler: {} } : { konto: true, xp: XP6 }) }));
   await ziel.route(MUSTER, async (route) => {
     let body = {};
     try { const r = await route.fetch(); if (r.ok()) body = await r.json(); } catch (e) { /* ohne Datenbank: trotzdem alle frei */ }

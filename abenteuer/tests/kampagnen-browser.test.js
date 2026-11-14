@@ -35,7 +35,7 @@ const K = require('../tools/kampagne.js');
     console.log(`\n${META.titel} (${id})${META.entwurf ? ' · Entwurf' : ''}`);
     const p = await (await b.newContext({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: SHOTS ? 2 : 1 })).newPage();
     p.setDefaultTimeout(20000);
-    p.on('pageerror', (e) => errs.push(e.message)); p.on('dialog', (d) => d.accept());
+    p.on('pageerror', (e) => errs.push(e.message + ' @ ' + String(e.stack).split('\n').slice(1, 4).join(' < '))); p.on('dialog', (d) => d.accept());
     const shot = async (n) => { if (SHOTS) { await p.waitForTimeout(300); await p.screenshot({ path: `${SHOTS}/${id}-${n}.png` }); } };
     try {
       await p.goto(BASE + '/abenteuer/index.html?schnell&testlauf&entwurf'); await p.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await p.reload();

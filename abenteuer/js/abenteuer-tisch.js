@@ -116,7 +116,12 @@
     return `<div class="gruppe-leiste">${A.gruppe.map((fid) => { const z = A.zust[fid], d = F.FIGUREN[fid], max = F.tpVon(fid, S.hst(A, fid)), b = besitzer(fid);
       const dinge = (z.rucksack || []).filter((x) => R.GEGENSTAENDE[x.id] && x.n > 0).map((x) => `<i title="${esc(R.GEGENSTAENDE[x.id].name)}: ${esc(R.GEGENSTAENDE[x.id].text)}">${R.GEGENSTAENDE[x.id].sym}</i>`).join("");
       const rel = z.tot && S.reliquieTraeger(A) ? `<button class="btn klein reliquie-knopf" data-wiederbeleben="${fid}" title="Reliquie der Brüder nutzen">✝ Zurückholen</button>` : "";
-      return `<span class="${z.tot ? "tot" : ""}" data-held="${fid}" role="button" tabindex="0" title="${esc(d.name)} ansehen">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small>${rel}</span>`; }).join("")}</div>`;
+      return `<span class="${z.tot ? "tot" : ""}" data-held="${fid}" role="button" tabindex="0" title="${esc(d.name)} ansehen">${B.marke(fid, 34)}<b>${esc(d.name)}${dinge ? ` <em class="dinge">${dinge}</em>` : ""}</b><small>${z.tot ? "gefallen" : `${z.tp}/${max} TP`}${b ? " · 📱 " + esc(AB.spielerName(b)) : ""}</small>${rel}</span>`; }).join("")}</div>${segenHtml()}`;
+  }
+  /** Segen der Kampagne (Zehn-Stufen-Modell): kleine Zeile unter der Gruppe, mit Erklärung beim Antippen */
+  function segenHtml() {
+    const l = (A.segen || []).filter((id) => F.SEGEN[id]); if (!l.length) return "";
+    return `<div class="segen-leiste"><small>Segen</small>${l.map((id) => `<span title="${esc(F.SEGEN[id].text)}" tabindex="0"><i>${F.SEGEN[id].zeichen}</i>${esc(F.SEGEN[id].name)}</span>`).join("")}</div>`;
   }
   /** Heldenansicht im Abenteuer: alle Einzelheiten wie bei der Auswahl, auf der aktuellen Stufe, mit aktuellem Stand */
   function heldZeigen(fid) {
@@ -275,7 +280,7 @@
         <header><b>${esc(a.name)}</b>${a.anzahl > 1 ? `<span class="vs-anzahl">×${a.anzahl}</span>` : ""}${a.boss ? `<span class="vs-boss">Endgegner</span>` : ""}</header>
         <div class="vs-werte"><span title="Trefferpunkte">❤ ${leben(a.tp)}</span><span title="Rüstung">⛨ ${panzer(a.rk)}</span><span title="Bewegung">➜ ${a.bewegung ? a.bewegung + " Felder" : "steht still"}</span>${a.angriff ? `<span title="Angriff">⚔ ${esc(a.angriff.name)} ${esc(a.angriff.schaden)}${a.angriff.reichweite > 1 ? ` · ${a.angriff.reichweite} Felder` : ""}</span>` : ""}</div>
         ${a.zeichen.length ? `<div class="vs-zeichen">${a.zeichen.map((z) => `<span>${esc(z)}</span>`).join("")}</div>` : ""}
-        ${a.wissen ? `<p class="vs-wissen">${B.marke(a.wissen.wer, 24)}<span><b>${esc(a.wissen.name)} erkennt:</b> ${esc(a.wissen.text)}</span></p>`
+        ${a.wissen ? `<p class="vs-wissen">${a.wissen.wer ? B.marke(a.wissen.wer, 24) : `<i class="vs-segen" aria-hidden="true">🧭</i>`}<span><b>${a.wissen.wer ? esc(a.wissen.name) + " erkennt" : "Ortskunde"}:</b> ${esc(a.wissen.text)}</span></p>`
           : a.verdeckt ? `<p class="vs-verdeckt">Schwäche unbekannt. ${esc(a.kenner.join(" oder "))} wüsste mehr.</p>` : ""}
       </article>`).join("")}</div>
       ${hinweise.map((h) => `<p class="vs-hinweis">${esc(h)}</p>`).join("")}</section>`;

@@ -46,6 +46,25 @@ check(Boolean(akt(o3.f, "laehmbolzen")) && !akt(o2.f, "laehmbolzen"), "Orin: Lä
   const g1 = R.gegnerFiguren(stB)[0], g0 = R.gegnerFiguren(st0).find((x) => x.art === g1.art);
   check(ko.bedrohung === 5 && stB.bed === 5 && g1.tpMax > g0.tpMax * 1.5 && g1.rk === g0.rk + 1, "Krone, erster Kampf: Bedrohung +5 – Gegner mit mehr Leben und RK +1");
   Wd.szene = "kampf_speicher"; check(S.kampfOptionen(Wd).bedrohung === 0, "Weidenhain, erster Kampf: Bedrohung 0 (Gegner wie bisher)"); }
+// Kampagnen-Segen: am Lagerfeuer statt des Aufstiegs eine Wahl aus drei, gilt bis zum Ende der Kampagne
+{ const g = ["schildwaechter", "lichtbringer", "wildnislaeufer"], Wd = S.neu(11, { abenteuer: "weidenhain", gruppe: g });
+  S.gehe(Wd, "lager"); const an = S.ansicht(Wd), wahl = (an.optionen || []).map((o) => o.id);
+  check(Wd.szene === S.SEGEN_SZENE && an.art === "wahl" && wahl.length === 3 && new Set(wahl).size === 3 && wahl.every((id) => F.SEGEN[id]), "Lagerfeuer: erst die Wahl aus drei Segen (" + wahl.join(", ") + ")");
+  S.stimme(Wd, g[0], wahl[1]); S.stimme(Wd, g[1], wahl[1]); S.stimme(Wd, g[2], wahl[0]); S.weiter(Wd);
+  check(Wd.szene === "lager" && Wd.segen.length === 1 && Wd.segen[0] === wahl[1] && Wd.stufe === 1, "Abstimmung: Die Mehrheit entscheidet, danach geht es am Lagerfeuer weiter – ohne Aufstieg");
+  S.gehe(Wd, "lager"); check(Wd.szene === "lager", "Dasselbe Lagerfeuer bietet keinen zweiten Segen an");
+  // Wirkungen im Kampf
+  const kampf = (segen, szene) => { const X = S.neu(3, { abenteuer: "weidenhain", gruppe: g }); X.segen = segen; X.szene = szene; return R.neuesSpiel(5, S.kampfOptionen(X)); };
+  const ohne = kampf([], "kampf_muehle"), mit = kampf(["wachtfeuer", "haende", "fuesse", "ortskunde", "fell", "wind"], "kampf_muehle"), f0 = R.spielerFiguren(ohne)[0], f1 = R.spielerFiguren(mit)[0];
+  check(f1.tpMax === f0.tpMax + 3 && ohne.mech.ziele[0].runden === 2 && mit.mech.ziele[0].runden === 1, "Wachtfeuer: 3 Lebenspunkte mehr; Flinke Hände: die Schleuse braucht eine Aktion statt zwei");
+  const bew = (st) => { let n = 0; while (R.aktiv(st).seite !== "spieler" && n++ < 30) R.gegnerZug(st); return st.zug.bewegung; };
+  const b0 = bew(kampf([], "kampf_speicher")), b1 = bew(kampf(["fuesse", "ortskunde"], "kampf_speicher"));
+  check(b1 === b0 + 3, "Leichte Füße und Ortskunde: in der ersten Runde 3 Felder mehr Bewegung (" + b0 + " → " + b1 + ")");
+  const tpVor = f1.tp; R.schadenTest(mit, f1, 9); const nachFell = f1.tp; R.schadenTest(mit, f1, 999);
+  check(tpVor - nachFell === 5 && f1.tp === 1, "Dickes Fell: erster Schaden halbiert (9 → 5); Zweiter Wind: bleibt einmal mit 1 Lebenspunkt stehen");
+  R.schadenTest(mit, f1, 5); check(f1.tp === 0, "Zweiter Wind wirkt nur einmal je Kampf");
+  const V = S.neu(3, { abenteuer: "weidenhain", gruppe: g }), t0 = V.zust[g[0]].rucksack[0].n; S.gehe(V, "lager"); V.segenWahl.auswahl = ["vorraete", "atem", "klingen"]; S.waehle(V, "vorraete");
+  check(V.zust[g[0]].rucksack[0].n === t0 + 1 && V.segen[0] === "vorraete", "Vorräte: jede Figur bekommt sofort einen Heiltrank"); }
 // Erfahrung: Grundwert aus der Schwierigkeit, mehr unter und weniger über der empfohlenen Stufe
 check(F.xpFuer(2, 3) === 200 && F.xpFuer(2, 1) === 320 && F.xpFuer(2, 5) === 90 && F.xpFuer(1, 10) === 0, "XP: Schwierigkeit 2 gibt 200 auf Stufe 3, 320 auf Stufe 1, 90 auf Stufe 5; Stufe 10 sammelt nichts mehr");
 { const a = F.stufeAusXp(99), b = F.stufeAusXp(100), c = F.stufeAusXp(5650), d = F.stufeAusXp(260); check(a.stufe === 1 && b.stufe === 2 && c.stufe === 10 && c.bis === 0 && d.stufe === 3 && d.xp === 10, "XP: 100 → Stufe 2, 260 → Stufe 3 (10 von 250), 5650 → Stufe 10"); }

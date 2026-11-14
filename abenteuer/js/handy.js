@@ -308,7 +308,7 @@
           <div class="tpbalken hz-leben ${anteil <= .25 ? "kritisch" : ""}"><i style="width:${anteil * 100}%"></i><span>${tp} / ${tpMax}</span></div>
           <div class="hz-werte"><span>RK<b>${rk}</b></span><span>TEMPO<b>${dran ? s.zug.bewegung : (k.bewegung || 6)}</b></span>${platzChip || `<span>TRÄNKE<b>${traenke}</b></span>`}</div>
         </div>
-      </div>
+      </div>${ab && ab.segen && ab.segen.length ? `<div class="segen-leiste handy"><small>Segen</small>${ab.segen.map((x) => `<span><i>${x.zeichen}</i><b>${esc(x.name)}</b><em>${esc(x.text)}</em></span>`).join("")}</div>` : ""}
       <p class="spruch hz-spruch">„${esc(d.spruch)}“</p>
       ${fd && fd.tot ? `<div class="info schlecht">${esc(d.name)} ist tot.</div>` : fd && fd.tp <= 0 && s.schwierigkeit === "hardcore" ? `<div class="info schlecht">Todeswürfe: ${"✓".repeat(fd.todes.e)}${"·".repeat(3 - fd.todes.e)} | ${"✗".repeat(fd.todes.f)}${"·".repeat(Math.max(0, 3 - fd.todes.f))}${fd.stabil ? " · stabil" : ""}</div>` : ""}
       ${zust.length ? `<p class="zustaende">${zust.map((z) => `<span>${esc(z)}</span>`).join("")}</p>` : ""}

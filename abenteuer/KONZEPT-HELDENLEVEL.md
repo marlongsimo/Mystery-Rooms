@@ -32,7 +32,9 @@
   - **Einschalten:** Sobald die Migration in Supabase läuft, spielt jede **neu begonnene** Kampagne im Zehn-Stufen-Modell (`A.modell10`), jeder Held auf seiner eigenen Stufe (`A.heldStufe`). Laufende Kampagnen bleiben in ihrem Modell. Ohne die Migration bleibt alles wie bisher.
   - **Wer spielt auf welcher Stufe:** eigene Helden auf ihrer Stufe; Tisch-Helden auf der Stufe des Gastgebers; Helden von Gästen auf der empfohlenen Stufe. **Keine Anhebung** (entgegen 9.3): Die Kampagne ist für alle gleich schwer und wächst nur mit der Gruppengröße. Wer zu weit unter der Empfehlung liegt, schafft sie nicht.
   - **Anzeige:** Stufe und XP-Balken auf den Heldenkacheln, der Heldenkarte (mit Markierung in der Stufentabelle), der Charaktere-Seite („Deine Helden“) und im Profil („Meine Helden“); nach der Kampagne zeigt die Belohnung XP und Aufstieg je Held.
-  - Noch offen: Kampagnen-Segen am Lagerfeuer, Ampel vor dem Start, Meistertitel im Spiel.
+  - **Ampel in der Heldenwahl:** Gruppenstufe im Schnitt gegen die empfohlene Stufe (grün, gelb ab 1 darunter, rot ab 3 darunter). Starten darf die Gruppe immer.
+  - **Kampagnen-Segen:** An jedem Lagerfeuer, das früher einen Aufstieg brachte, wählt die Gruppe per Abstimmung einen von drei Segen (aus neun, `figuren.js`: `SEGEN`). Er gilt bis zum Ende der Kampagne, derselbe kommt nicht zweimal. Die Kämpfe sind ohne Segen abgestimmt und werden dadurch etwas leichter.
+  - Noch offen: Meistertitel im Spiel.
 
 **Umgesetzt:**
 - `js/figuren.js`: Zehn-Stufen-Modell hinter dem Schalter `STUFEN10.aktiv` (aus): Lebenspunkte, Zauberplätze, Übungsbonus, Rüstungsklasse +1 ab Stufe 6, Hauptattribut +2 ab Stufe 4, Fähigkeiten auf Stufe 3 und 7. Dazu `AUFSTIEG` (Verbesserungen und Meistertitel im Wortlaut), `stufenpfad(fid)` und `SCHWIERIGKEIT`.

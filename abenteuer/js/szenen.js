@@ -101,7 +101,24 @@
     const k = F.KLASSEN[F.FIGUREN[fid].klasse];
     return { stufe, tp: F.tpVon(fid, stufe), tot: false, plaetze: k.plaetze ? F.plaetzeVon(stufe).slice() : [0, 0], genutzt: {}, rucksack: [{ id: "heiltrank", n: 1 }] };
   }
-  const szene = (A) => DATEN(A).SZENEN[A.szene];
+  /* ---------- Kampagnen-Segen (Zehn-Stufen-Modell): statt des Aufstiegs am Lagerfeuer eine Wahl aus drei ----------
+   * Die Wahl ist eine gewöhnliche Abstimmung („wahl“) in einer Szene, die es nur für diesen Moment gibt. */
+  const SEGEN_SZENE = "__segen";
+  function segenSzene(A) {
+    const w = A.segenWahl || { auswahl: [], ziel: null }, lager = DATEN(A).SZENEN[w.ziel] || {};
+    return { art: "wahl", segen: true, abschnitt: lager.abschnitt || A.abschnitt, titel: "Der Segen des Feuers", ort: lager.ort || "Am Lagerfeuer",
+      text: ["Das Feuer brennt herunter. Ihr seid nicht mehr dieselben, die aufgebrochen sind: Der Weg hat euch etwas gelehrt.",
+        "*Wählt gemeinsam einen Segen. Er gilt für die ganze Gruppe, bis diese Kampagne endet.*",
+        (A.segen || []).length ? "↳ Ihr tragt schon: " + A.segen.map((id) => F.SEGEN[id].name).join(", ") + "." : ""].filter(Boolean),
+      optionen: w.auswahl.map((id) => ({ id, text: F.SEGEN[id].zeichen + " " + F.SEGEN[id].name + ": " + F.SEGEN[id].text, segen: id, weiter: () => w.ziel })) };
+  }
+  function segenGeben(A, id) {
+    if (!F.SEGEN[id] || (A.segen || []).includes(id)) return;
+    A.segen = (A.segen || []).concat(id);
+    if (id === "vorraete") for (const fid of lebende(A)) { const t = (A.zust[fid].rucksack || []).find((d) => d.id === "heiltrank"); if (t) t.n++; }
+    notiz(A, "Segen: " + F.SEGEN[id].name + ". " + F.SEGEN[id].text, "gut");
+  }
+  const szene = (A) => (A.szene === SEGEN_SZENE ? segenSzene(A) : DATEN(A).SZENEN[A.szene]);
   const text = (A, s = szene(A)) => (typeof s.text === "function" ? s.text(A, hilfen) : s.text || []).filter(Boolean);
   /** Zieht ein noch nicht erlebtes Ereignis für diesen Haltepunkt; danach geht es zu „danach“ weiter */
   function ereignis(A, punkt, danach) {
@@ -157,6 +174,7 @@
       if (typeof v === "number" && typeof A.merker[k] === "number" && w.addiere) A.merker[k] += v; else A.merker[k] = v;
     }
     if (w.plus) for (const [k, v] of Object.entries(w.plus)) A.merker[k] = (A.merker[k] || 0) + v;
+    if (w.segen) segenGeben(A, w.segen);
     if (w.glocke) glocke(A, w.glocke);
     if (w.tranke) for (let i = 0; i < w.tranke; i++) { const fid = A.gruppe.filter((f) => !A.zust[f].tot)[i % Math.max(1, A.gruppe.length)]; if (fid) A.zust[fid].rucksack[0].n++; }
     if (w.heilen) for (const fid of lebende(A)) { const max = F.tpVon(fid, hst(A, fid)), z = A.zust[fid]; z.tp = Math.min(max, z.tp + Math.ceil(max * w.heilen)); }
@@ -188,6 +206,14 @@
   }
   function geheZu(A, id) {
     if (!DATEN(A).SZENEN[id]) throw new Error("Unbekannte Szene: " + id);
+    // Lagerfeuer, an dem die Gruppe früher aufgestiegen wäre: erst den Segen wählen (einmal je Lagerfeuer)
+    { const zs = DATEN(A).SZENEN[id]; A.segenLager = A.segenLager || {};
+      if (A.modell10 && zs.art === "lager" && zs.aufstieg && !A.segenLager[id]) {
+        const frei = Object.keys(F.SEGEN).filter((x) => !(A.segen || []).includes(x)), auswahl = [];
+        while (auswahl.length < 3 && frei.length) auswahl.push(frei.splice(Math.floor(A.r() * frei.length), 1)[0]);
+        A.segenLager[id] = true;
+        if (auswahl.length) { A.segenWahl = { ziel: id, auswahl }; A.szene = SEGEN_SZENE; A.gewaehlt = A.gewaehlt || {}; A.stimmen = {}; A.geheim = {}; A.probe = null; A.ergebnis = null; A.nachhall = A.nachhallNeu && A.nachhallNeu.length ? A.nachhallNeu : null; A.nachhallNeu = []; return; }
+      } }
     A.szene = id; A.gewaehlt = A.gewaehlt || {}; A.stimmen = {}; A.geheim = {}; A.probe = null; A.ergebnis = null;
     A.nachhall = A.nachhallNeu && A.nachhallNeu.length ? A.nachhallNeu : null; A.nachhallNeu = [];
     const s = szene(A);
@@ -510,7 +536,7 @@
         a = { art: g.art, name: g.name.replace(/\s+\d+$/, ""), anzahl: 0, tp: 0, rk: g.rk, bewegung: d.bewegung != null ? d.bewegung : 6, boss: Boolean(d.boss),
           angriff: d.angriff ? { name: d.angriff.name, schaden: d.angriff.schaden, reichweite: d.angriff.reichweite || 1 } : null,
           zeichen: [d.untot && "Untot", d.boss && "Ruft Tote herbei", d.sporen && "Sporen", d.netz && "Netz", d.atem && !d.boss && "Glutatem", d.bewegung === 0 && "Bewegt sich nicht"].filter(Boolean),
-          wissen: wer ? { wer, name: name(A, wer), text: w.text } : null, verdeckt: Boolean(w && !wer), kenner: w ? w.klassen.map((kl) => F.KLASSEN[kl].name) : [] };
+          wissen: wer ? { wer, name: name(A, wer), text: w.text } : w && (A.segen || []).includes("ortskunde") ? { wer: null, name: "Ortskunde", text: w.text } : null, verdeckt: Boolean(w && !wer && !(A.segen || []).includes("ortskunde")), kenner: w ? w.klassen.map((kl) => F.KLASSEN[kl].name) : [] };
         arten.push(a);
       }
       a.anzahl++; a.tp = Math.max(a.tp, g.tpMax);
@@ -520,7 +546,7 @@
   function kampfOptionen(A) {
     const s = szene(A), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf;
     const vorher = {}; for (const fid of A.gruppe) vorher[fid] = Object.assign({}, A.zust[fid], { stufe: hst(A, fid) });
-    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, stufen: A.heldStufe || null, schwierigkeit: A.schwierigkeit, vorher, bedrohung: bedrohung(A, s, k) }, k);
+    const o = Object.assign({ figuren: A.gruppe.filter((f) => !A.zust[f].tot), stufe: A.stufe, stufen: A.heldStufe || null, segen: A.segen || [], schwierigkeit: A.schwierigkeit, vorher, bedrohung: bedrohung(A, s, k) }, k);
     // Abwechslung: gemischte Startplätze, in etwa jedem dritten Kampf ein Anführer (nicht im Duell und nicht beim Endgegner)
     if (!o.gegner && !o.boss) { o.mischen = k.mischen !== false; o.anfuehrer = anfuehrerFestlegen(A, k); } // feste Plätze (z. B. Nester): mischen: false
     if (A.kampfMod) { o.skalaMal = (o.skalaMal || 1) * A.kampfMod; }
@@ -595,7 +621,7 @@
     return {
       dialog: (A.dialog && A.dialog[A.szene]) || [],
       szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || A.abschnitt || 1, text: text(A), antwort: A.antwort || null,
-      glocke: A.glocke, stufe: A.stufe, modell10: Boolean(A.modell10), heldStufe: A.heldStufe || null, empfohlen: A.modell10 ? empfStufe(A.abenteuer) : null, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
+      glocke: A.glocke, stufe: A.stufe, modell10: Boolean(A.modell10), heldStufe: A.heldStufe || null, segen: (A.segen || []).map((id) => ({ id, name: F.SEGEN[id].name, zeichen: F.SEGEN[id].zeichen, text: F.SEGEN[id].text })), empfohlen: A.modell10 ? empfStufe(A.abenteuer) : null, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
       nachhall: A.nachhall || null,
       offen: s.art === "gespraech" ? optionen(A).filter((o) => !o.weiter).map((o) => ({ text: o.text, wichtig: Boolean(o.wichtig) })) : null,
       fragen: gespraechStand(A),
@@ -620,7 +646,7 @@
   /** Spielstand laden. Er bestimmt auch, nach welchem Stufenmodell gespielt wird (laufende Kampagnen bleiben in ihrem Modell). */
   function laden(o) { const A = R.zufall(JSON.parse(JSON.stringify(o))); F.STUFEN10.aktiv = Boolean(A.modell10); return A; }
 
-  const API = { metaVon, empfStufe, bedrohung, hst, datenVon, wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
+  const API = { metaVon, empfStufe, bedrohung, hst, gehe: geheZu, SEGEN_SZENE, datenVon, wiederbeleben, reliquieTraeger, beuteGeben, beuteLassen, darfTragen, getragen, geheimFuer, raetselTipp, raetselNeu, raetselAufgeben, raetselHinweise, ersatz, freieFiguren, neu, szene, text, optionen, waehle, stimme, auswerten, weiter, probeWer, probeWurf, bonus, aktuelleProbe, probeZustand, geheim, alleGeheim, kurzeRast,
     kampfOptionen, gegnerVorschau, kampfEnde, ansicht, speichern, laden, glocke, hilfen, lebende };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABS = API;

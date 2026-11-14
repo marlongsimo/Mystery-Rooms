@@ -122,6 +122,7 @@
         <tr><td><b>Heilzauber</b></td><td>Kleriker heilen Verbündete im Kampf.</td><td>Einen Zauberplatz.</td></tr>
         <tr><td><b>Rückzug</b></td><td><b>Normal: Die Gruppe kommt mit vollen TP zurück</b> und versucht den Kampf noch einmal.</td><td>Die Uhr rückt um 1 vor.</td></tr>
       </table>
+      <p><b>Segen am Lagerfeuer:</b> Eure Helden bringen ihre Stufe mit und steigen unterwegs nicht mehr auf. Dafür wählt die Gruppe an manchen Lagerfeuern gemeinsam einen von drei Segen, zum Beispiel mehr Lebenspunkte, einen zusätzlichen Heiltrank oder schnellere Hände an Zielen. Er gilt für alle, bis die Kampagne endet.</p>
       <p>In <b>Hardcore</b> gibt es keine kurze Rast und keinen Rückzug, und bei fortgeschrittener Uhr heilt das Lagerfeuer nur bis drei Viertel.</p>` },
     { id: "uhr", titel: "Die Uhr der Kampagne", html: `
       <p>Jede Kampagne hat eine Uhr mit sieben Schritten. Sie heißt überall anders: die Nacht, die Lichter, der Pegel, die Glocke, die Kälte, der Frost.</p>

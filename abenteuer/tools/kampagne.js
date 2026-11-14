@@ -384,6 +384,7 @@ if (require.main === module) {
     }
   } else if (befehl === "durchlauf") {
     for (const id of welche) {
+      if (flag("modell10")) F.STUFEN10.aktiv = true; // Durchläufe im Zehn-Stufen-Modell (Helden auf empfohlener Stufe, Segen am Lagerfeuer)
       const d = durchlauf(id, N || 200, { hardcore: flag("hardcore") });
       console.log(`\n${daten(id).META.titel} · ${d.N} Durchläufe${flag("hardcore") ? " · Hardcore" : ""}`);
       console.log("  Enden: " + Object.entries(d.enden).map(([e, n]) => `${e} ${n}`).join(" · "));

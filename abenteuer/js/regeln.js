@@ -325,7 +325,7 @@
   function neuesSpiel(seed, opts = {}) {
     const st = { sparen: opts.sparen != null ? opts.sparen : 1, seed, rs: seed >>> 0 || 1, karte: null, figuren: [], log: [], runde: 1, reihe: [], am: 0, zug: null, ende: null, xp: 0, zonen: [], brand: [],
       stufe: opts.stufe || 1, schwierigkeit: opts.schwierigkeit === "hardcore" ? "hardcore" : "normal", ereignisse: [], boss: opts.boss ? JSON.parse(JSON.stringify(opts.boss)) : null, siegel: [],
-      bed: modell10() ? Math.max(-3, Math.min(9, Math.round(opts.bedrohung || 0))) : 0 };
+      bed: modell10() ? Math.max(-3, Math.min(9, Math.round(opts.bedrohung || 0))) : 0, segen: (opts.segen || []).slice() };
     zufall(st);
     const r = st.r; let k = opts.karte || KARTE_GARTEN;
     st.siegel = k.hindernisse.filter(([t]) => t === "Z").map(([, x, y]) => ({ x, y, beruehrt: false }));
@@ -341,6 +341,7 @@
       if (v) { f.tp = v.tot ? 0 : Math.max(v.tp, 1); f.tot = Boolean(v.tot); f.plaetze = v.plaetze.slice(); f.genutzt = Object.assign({}, v.genutzt); f.rucksack = JSON.parse(JSON.stringify(v.rucksack)); }
       st.figuren.push(f);
       if (hatDing(f, "rune") && !f.tot && f.tp > 0) { f.tp += 3; f.tpMax += 3; }
+      if (st.segen.includes("wachtfeuer") && !f.tot && f.tp > 0) { f.tp += 3; f.tpMax += 3; }
       if (hatDing(f, "manastein") && f.plaetzeMax) f.plaetzeMax[0]++;
       if (f.tot) { f.x = -1; f.y = -1; }
       const wd = FD.FIGUREN[fid].wolf;
@@ -554,7 +555,7 @@
     let { w } = w20(st, v);
     const bon = () => mod(z.werte[attr]) + (z.seite === "spieler" && z.klasse && FD.KLASSEN[z.klasse].rettung.includes(attr) ? ueb(z) : 0);
     // Klassenmerkmal Kleriker: Beistand – Verbündete direkt neben einem Kleriker +1
-    const glueck = (hatDing(z, "gluecksbringer") ? 1 : 0) + (z.seite === "spieler" && st.figuren.some((k) => k !== z && k.seite === "spieler" && lebt(k) && FD.KLASSEN[k.klasse] && FD.KLASSEN[k.klasse].beistand && abstand(k, z) <= 1) ? 1 : 0);
+    const glueck = (hatDing(z, "gluecksbringer") ? 1 : 0) + (z.seite === "spieler" && st.segen && st.segen.includes("atem") ? 1 : 0) + (z.seite === "spieler" && st.figuren.some((k) => k !== z && k.seite === "spieler" && lebt(k) && FD.KLASSEN[k.klasse] && FD.KLASSEN[k.klasse].beistand && abstand(k, z) <= 1) ? 1 : 0);
     let total = w + bon() + glueck + (z.z.segen ? W(st.r, 4) : 0);
     if (total < sg) { const g = gedankenstuetze(st, z, sg - total); if (g) { w = W(st.r, 20); total = w + bon() + (z.z.segen ? W(st.r, 4) : 0); st.log.push({ t: `${g.name}: Gedankenstütze – ${z.name} würfelt noch einmal.`, art: "gut" }); } }
     return { erfolg: total >= sg, w, total };
@@ -571,6 +572,11 @@
         if (z.todes.f >= 3) stirbt(st, z);
       }
       return;
+    }
+    // Segen der Kampagne: Dickes Fell (erster Schaden halb), Zweiter Wind (einmal je Kampf bei 1 Lebenspunkt stehen bleiben)
+    if (z.seite === "spieler" && z.fid && n > 0 && st.segen && st.segen.length) {
+      if (st.segen.includes("fell") && !z.segenFell) { z.segenFell = true; n = Math.ceil(n / 2); st.log.push({ t: `Dickes Fell: ${z.name} steckt den ersten Schlag weg.`, art: "gut" }); }
+      if (st.segen.includes("wind") && !z.segenWind && z.tp > 0 && n >= z.tp) { z.segenWind = true; n = z.tp - 1; st.log.push({ t: `Zweiter Wind: ${z.name} bleibt mit letzter Kraft stehen.`, art: "gut" }); }
     }
     const ueber = n - z.tp;
     z.tp = Math.max(0, z.tp - n);
@@ -685,6 +691,7 @@
     if (treffer) {
       let s = Math.max(1, roll(st.r, spec.schaden, krit).total + (spec.fest || 0) + bedA);
       const extra = (spec.extra || []).slice();
+      if (a.seite === "spieler" && a.fid && st.segen && st.segen.includes("klingen") && !a.segenKlinge) { a.segenKlinge = true; extra.push("1W6"); } // Segen „Scharfe Klingen“
       if (spec.hinterhalt && (!st.zug.hinterhalt || spec.hinterhaltImmer) && (v > 0 || (v === 0 && st.figuren.some((o) => o.seite === a.seite && o !== a && lebt(o) && abstand(o, z) <= 1)))) { extra.push(spec.hinterhalt); st.zug.hinterhalt = true; }
       for (const e of extra) s += roll(st.r, e, krit).total;
       if (a.z.entwaffnet) s = Math.floor(s / 2);
@@ -1119,6 +1126,8 @@
     if (istFig(f, "lichtbringer") && hs(f) >= 10 && f.z.schutzkreis > st.runde && lebt(f)) for (const o of st.figuren) if (o.seite === "spieler" && !o.tot && o.tp > 0 && o.tp < o.tpMax && abstand(f, o) <= 2) heilen(st, o, W(st.r, 6), `${f.name}: Schutzkreis`);
     delete f.z.ruecksichtslos;
     let bew = f.seite === "gegner" ? Math.round((GEGNER[f.art].bewegung != null ? GEGNER[f.art].bewegung : 6) * (st.gegnerTempo || 1)) : bewegungVon(f);
+    // Segen der Kampagne: Leichte Füße (+1), Ortskunde (+2 in der ersten Runde)
+    if (f.seite === "spieler" && f.fid && st.segen && st.segen.length) bew += (st.segen.includes("fuesse") ? 1 : 0) + (st.segen.includes("ortskunde") && st.runde === 1 ? 2 : 0);
     const basis = bew;
     if (f.z.verlangsamt || f.z.zeitriss) bew = Math.floor(bew / 2);
     st.zug = { figur: f.id, bewegung: bew, basis, aktion: true, bonus: !f.z.zeitriss, hinterhalt: false, tatendrang: false, leicht: 0, schritt: 0, dolch: false, getroffen: [], wolfBiss: false };
@@ -1492,7 +1501,8 @@
     const mech = st.mech = { ziele: [], wellen: [], marken: [], wandel: [], wieder: [], gerettet: 0, stat: { getroffen: 0, ausgewichen: 0 }, tpk: tpk || 1, sieg: m.sieg || null, schild: m.schild || null, eis: null,
       ausgang: m.ausgang ? { felder: m.ausgang.felder.map((p) => p.slice()), text: m.ausgang.text || null } : null, zieleZuerst: Boolean(m.zieleZuerst) };
     for (const z of m.ziele || []) {
-      mech.ziele.push({ id: z.id, name: z.name, art: z.art || "ziel", x: z.x, y: z.y, runden: z.runden || 1, fortschritt: Math.min(z.start || 0, (z.runden || 1) - 1), fertig: false, verloren: false, ruhe: Boolean(z.ruhe), frist: z.frist || null,
+      const rd = Math.max(1, (z.runden || 1) - ((st.segen || []).includes("haende") ? 1 : 0)); // Segen „Flinke Hände“
+      mech.ziele.push({ id: z.id, name: z.name, art: z.art || "ziel", x: z.x, y: z.y, runden: rd, fortschritt: Math.min(z.start || 0, rd - 1), fertig: false, verloren: false, ruhe: Boolean(z.ruhe), frist: z.frist || null,
         umkehrbar: Boolean(z.umkehrbar), aktion: z.aktion || null, fertigText: z.fertigText || null, wirkung: z.wirkung || {} });
       st.karte.hindernisse.push(["O", z.x, z.y]); st.karte.block.add(key(z.x, z.y));
     }
@@ -2143,7 +2153,7 @@
   }
 
   const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
-    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, gegnerZug, autoZug,
+    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;

@@ -52,6 +52,21 @@ async function seite(b, mit007) {
     await p.waitForFunction(() => window.AB.st);
     const k = await p.evaluate(() => { const st = window.AB.st, R = window.AB.R; const f = R.spielerFiguren(st).map((x) => x.fid + ":" + x.stufe).join(","); let n = 0; while (!st.ende && n++ < 4000) R.aktiv(st).seite === "gegner" ? R.gegnerZug(st) : R.autoZug(st); return { f, bed: st.bed, ende: st.ende }; });
     check(/schildwaechter:6/.test(k.f) && /wildnislaeufer:1/.test(k.f) && k.bed === 5 && Boolean(k.ende), `Kampf: Figuren mit eigener Stufe (${k.f}), Bedrohung ${k.bed}, endet mit „${k.ende}“`);
+    // Segen am Lagerfeuer: Wahl aus drei am Tisch, danach als Zeile unter der Gruppe sichtbar
+    const segen = await p.evaluate(async () => {
+      const A = window.ABT.A(), D = window.ABS.datenVon(A.abenteuer), lager = Object.keys(D.SZENEN).find((k) => D.SZENEN[k].art === "lager" && D.SZENEN[k].aufstieg);
+      window.AB.st = null; window.ABS.gehe(A, lager); window.ABT.render(); await new Promise((r) => setTimeout(r, 300));
+      const knoepfe = [...document.querySelectorAll("#szene button")].filter((b) => /:/.test(b.textContent) && Object.values(window.ABF.SEGEN).some((s) => b.textContent.includes(s.name)));
+      const titel = document.querySelector("#szene").textContent.includes("Der Segen des Feuers"), n = knoepfe.length, name = n ? knoepfe[0].textContent : "";
+      if (n) knoepfe[0].click(); await new Promise((r) => setTimeout(r, 300));
+      const leiste = document.querySelector(".segen-leiste");
+      return { titel, n, name: name.slice(0, 40), danach: A.szene === lager, segen: A.segen, leiste: leiste ? leiste.textContent : "" };
+    });
+    check(segen.titel && segen.n === 3 && segen.danach && segen.segen.length === 1 && segen.leiste.includes(await p.evaluate((id) => window.ABF.SEGEN[id].name, segen.segen[0])), `Lagerfeuer am Tisch: „Der Segen des Feuers“ mit drei Möglichkeiten, gewählt: ${segen.segen[0]}, Zeile unter der Gruppe`);
+    // Ortskunde: Die Gegnervorschau zeigt Schwächen auch ohne die passende Klasse (früher ein Absturz der Anzeige)
+    const orts = await p.evaluate(async () => { const A = window.ABT.A(); A.segen = ["ortskunde"]; A.szene = "kampf_markt"; window.ABT.render(); await new Promise((r) => setTimeout(r, 300));
+      const v = window.ABS.gegnerVorschau(A); return { offen: v.arten.filter((a) => a.wissen && !a.wissen.wer).length, verdeckt: v.arten.filter((a) => a.verdeckt).length, knopf: Boolean(document.querySelector("#sz-kampf")), text: /Ortskunde:/.test(document.querySelector("#szene").textContent) }; });
+    check(orts.knopf && orts.verdeckt === 0 && (orts.offen === 0 || orts.text), `Ortskunde: Vorschau ohne verdeckte Schwächen (${orts.offen} durch den Segen aufgedeckt), Szene wird angezeigt`);
     // Belohnung mit XP
     await p.evaluate(() => { window.ABSAMMLUNG.endeMelden("00000000-0000-0000-0000-000000000001", { versuche: 1 }); }); await p.waitForSelector(".sm-xp");
     const xp = await p.evaluate(() => [...document.querySelectorAll(".sm-xp .sm-xp-zeile")].map((z) => (z.classList.contains("auf") ? "AUF " : "") + z.textContent.replace(/\s+/g, " ").trim()));

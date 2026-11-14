@@ -28,6 +28,8 @@
   const mittel = (expr) => { const p = parse(expr); return p.n * (p.s + 1) / 2 + p.b; };
   const mod = (v) => Math.floor((v - 10) / 2);
   const UEBUNG = 2; // bisheriges Modell; mit Heldenstufen 1–10 wächst der Übungsbonus (ueb)
+  /** Heldenstufe im Zehn-Stufen-Modell (sonst 0): schaltet Verbesserungen frei, die sich nicht als Feld der Fähigkeit ausdrücken lassen */
+  const hs = (f) => (FD.STUFEN10 && FD.STUFEN10.aktiv && f && f.seite === "spieler" ? f.stufe || 1 : 0);
   const ueb = (f) => (FD.uebung ? FD.uebung((f && f.stufe) || 1) : UEBUNG);
   /* ---------- Gegenstände (Beute): getragen im Rucksack, wirken im Kampf ---------- */
   const GEGENSTAENDE = {
@@ -327,7 +329,7 @@
       const wd = FD.FIGUREN[fid].wolf;
       if (wd) {
         const frei = k.start.wolf.find(([wx, wy]) => !belegt(st, wx, wy));
-        st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[FD.altStufe(st.stufe) - 1], tpMax: wd.tp[FD.altStufe(st.stufe) - 1], rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
+        st.figuren.push({ id: "w" + i, seite: "spieler", art: "wolf", besitzer: f.id, name: wd.name, x: frei[0], y: frei[1], tp: wd.tp[FD.altStufe(st.stufe) - 1] + (hs(f) >= 5 ? 10 : 0), tpMax: wd.tp[FD.altStufe(st.stufe) - 1] + (hs(f) >= 5 ? 10 : 0), rk: wd.rk, rkBasis: wd.rk, werte: WOLF_WERTE, z: {}, reaktion: 1, genutzt: {} });
       }
     });
     // Eskorte: eine Begleiterin (z. B. Sera Venn) als eigene Figur auf Heldenseite – ohne Spielerzug, sie läuft in der Begleiterphase
@@ -371,6 +373,7 @@
     const tpk = skalaK(opts.begegnung || "garten", fids.length, st.stufe, opts.skala, st.schwierigkeit === "hardcore") * (opts.skalaMal || 1) * tpGlobal;
     if (!st.mech && gegnerFiguren(st).some((g) => { const d = GEGNER[g.art]; return d.flaeche || d.nest || d.brut || d.feldzauber || d.rufer || d.phasen; })) mechanikStart(st, {}, tpk);
     if (st.mech) { st.mech.tpk = tpk; mechanikGegner(st); }
+    { const leger = st.figuren.find((f) => istFig(f, "schattenlaeufer") && hs(f) >= 7 && !f.tot); if (leger) st.falle = { von: leger.id, meister: hs(leger) >= 10 }; }
     // Anführer: der zäheste Gegner bekommt mehr Leben, bessere Rüstung und trifft besser
     if (opts.anfuehrer) { const a = gegnerFiguren(st).filter((g) => !GEGNER[g.art].boss).sort((x, y) => y.tpMax - x.tpMax)[0]; if (a) { a.tp = a.tpMax = Math.round(a.tpMax * (st.schwierigkeit === "hardcore" ? 1.4 : 1.6)); a.rk += 1; a.rkBasis += 1; a.anfuehrer = true; a.name = a.name.replace(/ \d+$/, "") + " (Anführer)"; st.log.push({ t: `Ein Anführer führt die Gegner: ${a.name}.`, art: "schlecht" }); } }
     // Zauberer haben die Zeichen gelesen: ein Siegelstein leuchtet schon zu Kampfbeginn
@@ -435,14 +438,12 @@
   /** Wie oft eine Fähigkeit in diesem Kampf noch geht (Infinity = beliebig) */
   /** Begrenzte Fähigkeit: wie oft insgesamt und wofür ({ n, je }) oder null */
   function grenze(f, a) {
-    if (a.id === "raserei") return { n: 1, je: "Rast" };
     if (!a.pro || a.id === "brandmal") return null;
     const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange;
-    return { n: Array.isArray(v) ? v[(f.stufe || 1) - 1] : v, je: a.pro.kampf != null ? "Kampf" : a.pro.rast != null ? "Rast" : "lange Rast" };
+    return { n: Array.isArray(v) ? v[FD.altStufe(f.stufe || 1) - 1] : v, je: a.pro.kampf != null ? "Kampf" : a.pro.rast != null ? "Rast" : "lange Rast" };
   }
   function rest(f, a) {
     const gen = (f.genutzt || {})[a.id] || 0;
-    if (a.id === "raserei") return 1 - gen;
     if (a.id === "brandmal") return Infinity; // erster frei, danach Platz
     if (!a.pro) return Infinity;
     const v = a.pro.kampf != null ? a.pro.kampf : a.pro.rast != null ? a.pro.rast : a.pro.lange;
@@ -455,7 +456,8 @@
     return -1;
   }
   function brauchtPlatz(f, a) {
-    if (a.id === "brandmal") return ((f.genutzt || {}).brandmal_frei || 0) >= 1 ? 1 : 0;
+    if (a.id === "brandmal") return ((f.genutzt || {}).brandmal_frei || 0) >= (a.freiJeKampf || 1) ? 1 : 0;
+    if (a.freiJeRast && ((f.genutzt || {})[a.id + "_frei"] || 0) < a.freiJeRast) return 0; // Meisterschaft: einmal je Rast ohne Zauberplatz
     if (a.art === "mal" && a.mal === "jaeger") return 0;
     return a.platz || 0;
   }
@@ -476,7 +478,7 @@
   function rkEff(st, z, a, spec = {}) {
     let rk = z.rk + (hatDing(z, "amulett") ? 1 : 0);
     if (z.z.schild) rk += 2;
-    if (z.seite === "spieler" && st.figuren.some((l) => istFig(l, "lichtbringer") && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2)) rk += 2;
+    if (z.seite === "spieler" && st.figuren.some((l) => istFig(l, "lichtbringer") && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2)) rk += st.figuren.some((l) => istFig(l, "lichtbringer") && hs(l) >= 10 && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2) ? 3 : 2;
     if (z.z.analyse === st.runde) rk -= 2;
     if (z.z.zeitriss) rk -= 2;
     if (z.z.bruch && z.z.bruch.bis > st.runde) rk -= z.z.bruch.n; // Waldläufer: Durchbrechen
@@ -496,7 +498,7 @@
     if (a.z.finte) plus.push("Finte");
     if (spec.ruecksichtslos) plus.push("rücksichtslos");
     if (z.z.ruecksichtslos) plus.push("Ziel rücksichtslos");
-    if (istFig(a, "assassine") && !z.gehandelt) plus.push("Todesstoß");
+    if (istFig(a, "assassine") && (!z.gehandelt || (hs(a) >= 8 && z.gehandeltRunde !== st.runde))) plus.push("Todesstoß");
     if (istFig(a, "tiergefaehrte")) { const w = wolfVon(st, a); if (w && lebt(w) && abstand(w, z) <= 1) plus.push("Rudeltaktik"); }
     if (a.art === "wolf") { const b = fig(st, a.besitzer); if (b && lebt(b) && abstand(b, z) <= 1) plus.push("Rudeltaktik"); }
     if (a.z.geblendet) minus.push("geblendet");
@@ -620,7 +622,7 @@
     let v = vt.v;
     // Schutzhaltung: Angriff gegen Verbündeten neben dem Schildwächter
     if (a.seite === "gegner" && z.seite === "spieler") {
-      const s = st.figuren.find((o) => istFig(o, "schildwaechter") && o !== z && lebt(o) && o.reaktion > 0 && abstand(o, z) <= 1);
+      const s = st.figuren.find((o) => istFig(o, "schildwaechter") && o !== z && lebt(o) && o.reaktion > 0 && abstand(o, z) <= (hs(o) >= 10 ? 2 : 1));
       if (s) { s.reaktion--; vt.minus.push("Schutzhaltung"); v = vt.plus.length ? 0 : -1; st.log.push({ t: `${s.name} stellt sich mit dem Schild dazwischen (Schutzhaltung).` }); }
     }
     let rk = rkEff(st, z, a, spec);
@@ -630,22 +632,25 @@
     let total = w + spec.bonus + segen();
     let treffer = w !== 1 && (w >= kritAb || total >= rk);
     // Glückspilz (Trickserin): eigener knapper Fehlwurf
-    if (!treffer && istFig(a, "trickser") && rk - total <= 5 && (a.genutzt.glueckspilz || 0) < 1) {
-      a.genutzt.glueckspilz = 1; w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
+    if (!treffer && istFig(a, "trickser") && rk - total <= 5 && (a.genutzt.glueckspilz || 0) < (hs(a) >= 7 ? 2 : 1)) {
+      a.genutzt.glueckspilz = (a.genutzt.glueckspilz || 0) + 1; w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
       st.log.push({ t: `${a.name} hat Glück und versucht es noch einmal.` });
     }
     // Gedankenstütze
     if (!treffer && a.seite === "spieler" && w !== 1) { const g = gedankenstuetze(st, a, rk - total); if (g) { w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk); st.log.push({ t: `${g.name}: Gedankenstütze – ${a.name} würfelt noch einmal.`, art: "gut" }); } }
     // Glückspilz: Gegner trifft die Trickserin
-    if (treffer && w < kritAb && istFig(z, "trickser") && a.seite === "gegner" && (z.genutzt.glueckspilz || 0) < 1) {
-      z.genutzt.glueckspilz = 1; w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
+    if (treffer && w < kritAb && istFig(z, "trickser") && a.seite === "gegner" && (z.genutzt.glueckspilz || 0) < (hs(z) >= 7 ? 2 : 1)) {
+      z.genutzt.glueckspilz = (z.genutzt.glueckspilz || 0) + 1; w = w20(st, v).w; total = w + spec.bonus + segen(); treffer = w !== 1 && (w >= kritAb || total >= rk);
       st.log.push({ t: `${z.name} weicht im letzten Moment aus: ${a.name} muss neu würfeln.` });
     }
     // Schutzglyphe (Gelehrte): knapper Treffer, der viel kosten würde
-    if (treffer && w < kritAb && a.seite === "gegner" && z.seite === "spieler" && total < rk + 5) {
-      const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.reaktion > 0 && platzIndex(o, 1) >= 0 && abstand(o, z) <= 6);
-      if (g && z.tp - mittel(spec.schaden) <= z.tpMax / 2) {
-        g.reaktion--; g.plaetze[platzIndex(g, 1)]--; rk += 5; treffer = false;
+    if (treffer && w < kritAb && a.seite === "gegner" && z.seite === "spieler") {
+      // ab Stufe 8: +7 statt +5 und einmal je Kampf ohne Zauberplatz
+      const glFrei = (o) => hs(o) >= 8 && !(o.genutzt.glyphe_frei);
+      const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.reaktion > 0 && (platzIndex(o, 1) >= 0 || glFrei(o)) && abstand(o, z) <= 6);
+      const glPlus = g && hs(g) >= 8 ? 7 : 5;
+      if (g && total < rk + glPlus && z.tp - mittel(spec.schaden) <= z.tpMax / 2) {
+        g.reaktion--; if (glFrei(g)) g.genutzt.glyphe_frei = 1; else g.plaetze[platzIndex(g, 1)]--; rk += glPlus; treffer = false;
         st.log.push({ t: `${g.name} wirft eine Schutzglyphe vor ${z.name}: RK ${rk}.`, art: "gut" });
       }
     }
@@ -661,7 +666,7 @@
     if (treffer) {
       let s = roll(st.r, spec.schaden, krit).total + (spec.fest || 0);
       const extra = (spec.extra || []).slice();
-      if (spec.hinterhalt && !st.zug.hinterhalt && (v > 0 || (v === 0 && st.figuren.some((o) => o.seite === a.seite && o !== a && lebt(o) && abstand(o, z) <= 1)))) { extra.push(spec.hinterhalt); st.zug.hinterhalt = true; }
+      if (spec.hinterhalt && (!st.zug.hinterhalt || spec.hinterhaltImmer) && (v > 0 || (v === 0 && st.figuren.some((o) => o.seite === a.seite && o !== a && lebt(o) && abstand(o, z) <= 1)))) { extra.push(spec.hinterhalt); st.zug.hinterhalt = true; }
       for (const e of extra) s += roll(st.r, e, krit).total;
       if (a.z.entwaffnet) s = Math.floor(s / 2);
       if (z.z.raserei && !spec.magisch) s = Math.floor(s / 2);
@@ -702,18 +707,19 @@
     // Darian, Schattenstoß (ab Stufe 2): Angriff aus dem Versteck +1W6 und kritisch ab 19
     const schattenstoss = istFig(f, "schattenlaeufer") && FD.altStufe(f.stufe) >= 2 && f.z.versteckt;
     if (schattenstoss) extra.push("1W6");
-    if (istFig(f, "berserker") && f.tp < f.tpMax / 2) extra.push(FD.altStufe(f.stufe) >= 3 ? "0W1+2" : "0W1+1");
+    if (istFig(f, "berserker") && f.tp < f.tpMax * (hs(f) >= 8 ? 0.75 : 0.5)) extra.push(FD.altStufe(f.stufe) >= 3 ? "0W1+2" : "0W1+1");
     if (f.z.finte) extra.push("1W6");
     if (hatDing(f, "silberdolch") && GEGNER[z.art] && GEGNER[z.art].untot) extra.push("1W4");
     if (hatDing(f, "wolfszahn") && TIERE.has(z.art)) extra.push("1W4");
     if (abstand(f, z) <= 1 ? hatDing(f, "schleifstein") : hatDing(f, "eisenspitzen")) extra.push("0W1+1");
     if (f.z.gift) extra.push(FD.altStufe(f.stufe) >= 2 ? "2W6" : "1W6");
-    if (z.z.mal_jaeger === f.id) extra.push(FD.FIGUREN[f.fid].malWuerfel || "1W6");
-    if (z.z.brandmal === f.id) extra.push(FD.altStufe(f.stufe) >= 3 ? "2W6" : "1W4");
+    if (z.z.mal_jaeger === f.id) extra.push(FD.FIGUREN[f.fid].malWuerfel || (istFig(f, "wildnislaeufer") && hs(f) >= 5 ? "1W8" : "1W6"));
+    if (z.z.brandmal === f.id) extra.push(hs(f) >= 10 ? "3W6" : FD.altStufe(f.stufe) >= 3 ? "2W6" : "1W4");
     if (istFig(f, "elementarist") && a.id === "glutpfeil" && FD.altStufe(f.stufe) >= 2) extra.push("1W6");
-    if (istFig(f, "assassine") && FD.altStufe(f.stufe) >= 3 && z.tp < z.tpMax / 2) extra.push("1W6");
-    if (istFig(f, "kopfgeldjaeger") && FD.altStufe(f.stufe) >= 3 && z.z.mal_jaeger === f.id && z.tp < z.tpMax / 2 && !(f.genutzt.erlegen)) { extra.push("2W6"); f.genutzt.erlegen = 1; zusatz = " Erlegen!"; }
+    if (istFig(f, "assassine") && FD.altStufe(f.stufe) >= 3 && z.tp < z.tpMax / 2) extra.push(hs(f) >= 10 ? "2W6" : "1W6");
+    if (istFig(f, "kopfgeldjaeger") && FD.altStufe(f.stufe) >= 3 && z.z.mal_jaeger === f.id && z.tp < z.tpMax / 2 && (f.genutzt.erlegen || 0) < (hs(f) >= 10 ? 2 : 1)) { extra.push(hs(f) >= 10 ? "4W6" : "2W6"); f.genutzt.erlegen = (f.genutzt.erlegen || 0) + 1; zusatz = " Erlegen!"; }
     if (istFig(f, "duellant") && FD.altStufe(f.stufe) >= 3) krit = 19;
+    if (istFig(f, "duellant") && hs(f) >= 10 && opt.reaktion) krit = 17; // Meisterin: Parade-Treffer kritisch bei 17–20
     if (schattenstoss) krit = Math.min(krit, 19);
     if (hatDing(f, "wetzstein")) krit = Math.min(krit, 19);
     if (istFig(f, "kopfgeldjaeger") && z.z.mal_jaeger === f.id) krit = 19;
@@ -722,10 +728,14 @@
       name: a.name, bonus, schaden: a.schaden, fest, extra, krit, nah: abstand(f, z) <= 1, fern: Boolean(a.fern) || (a.wurfwaffe && abstand(f, z) > 1),
       magisch: Boolean(a.magisch), wucht: Boolean(a.wucht), ruecksichtslos: Boolean(a.ruecksichtslos), zusatzText: zusatz,
       hinterhalt: f.klasse === "schurke" ? (FD.altStufe(f.stufe) >= 2 ? "2W6" : "1W6") : null,
+      hinterhaltImmer: istFig(f, "trickser") && hs(f) >= 10 && /dolch/.test(a.id),
       nachTreffer: () => {
         if (giftAktiv && lebt(z)) { z.z.vergiftet = 1; delete f.z.gift; }
         if (a.fesseln && lebt(z)) { const r = rettung(st, z, "STR", SG(f, "GES")); if (!r.erfolg) { z.z.festgehalten = { rest: 2, flucht: SG(f, "GES") }; st.log.push({ t: `${z.name} ist festgenagelt (Rettungswurf ${r.total}).` }); } }
-        if (a.brennt && !blockiert(st, z.x, z.y)) st.brand.push({ x: z.x, y: z.y, bis: st.runde + 1 });
+        if (a.brennt && !blockiert(st, z.x, z.y)) st.brand.push({ x: z.x, y: z.y, bis: st.runde + ((a.brennt && a.brennt.runden) || 1), w: (a.brennt && a.brennt.schaden) || null });
+        if (a.lahm && lebt(z)) { z.z.verlangsamt = Math.max(z.z.verlangsamt || 0, 1); st.log.push({ t: `${z.name} ist gelähmt: verlangsamt.` }); }
+        // Vex, Meisterschaft: Wer nach dem Treffer unter 8 Lebenspunkten steht, fällt (keine Anführer und Bosse)
+        if (istFig(f, "assassine") && hs(f) >= 10 && lebt(z) && z.seite === "gegner" && z.tp < 8 && !z.anfuehrer && !(GEGNER[z.art] && (GEGNER[z.art].boss || GEGNER[z.art].phasen || GEGNER[z.art].xp >= 150))) { st.log.push({ t: `${f.name} bringt es zu Ende: ${z.name} fällt.`, art: "gut" }); schaden(st, z, z.tp); }
         // Klassenmerkmale bei Waffentreffern: Schurken lassen bluten, Waldläufer brechen die Rüstung auf (frischt auf, stapelt nicht)
         if (waffe && kl.nachbluten && lebt(z) && z.seite === "gegner") { if (!z.z.blutung) st.log.push({ t: `${z.name} blutet.` }); z.z.blutung = { rest: 3, w: kl.nachbluten, von: f.name }; }
         if (waffe && kl.festnageln && lebt(z) && z.seite === "gegner") { if (!z.z.verlangsamt) st.log.push({ t: `${f.name} nagelt ${z.name} fest: verlangsamt.` }); z.z.verlangsamt = Math.max(z.z.verlangsamt || 0, kl.festnageln); }
@@ -734,10 +744,16 @@
     };
     if (a.ruecksichtslos) f.z.ruecksichtslos = true;
     const erg = angriffswurf(st, f, z, spec);
+    // Ragnar, Meisterschaft: Der rücksichtslose Angriff trifft einmal je Runde alle Gegner neben ihm
+    if (a.ruecksichtslos && hs(f) >= 10 && !opt.zweites && f.rundum !== st.runde && !st.ende) {
+      f.rundum = st.runde;
+      for (const o of gegnerFiguren(st).filter((o) => o !== z && lebt(o) && abstand(f, o) <= 1)) { if (st.ende || !lebt(f)) break; spielerAngriff(st, f, a, o, { zweites: true }); }
+    }
     if (a.bogen && st.zug && st.zug.figur === f.id) st.zug.leicht = 2;
     if (a.doppel && !opt.zweites) {
       const zweit = gegnerFiguren(st).find((o) => o !== z && lebt(o) && abstand(o, z) <= 1 && abstand(f, o) <= a.reichweite && sicht(st, f, o));
       if (zweit) spielerAngriff(st, f, Object.assign({}, a, { doppel: false }), zweit, { zweites: true });
+      if (zweit && (a.ziele || 2) >= 3 && !st.ende) { const dritt = gegnerFiguren(st).find((o) => o !== z && o !== zweit && lebt(o) && (abstand(o, z) <= 1 || abstand(o, zweit) <= 1) && abstand(f, o) <= a.reichweite && sicht(st, f, o)); if (dritt) spielerAngriff(st, f, Object.assign({}, a, { doppel: false }), dritt, { zweites: true }); }
     }
     if (a.id === "dolch" && st.zug && st.zug.figur === f.id) st.zug.dolch = true;
     return erg;
@@ -825,8 +841,9 @@
   function verbrauche(st, f, a, typ) {
     if (typ === "aktion") st.zug.aktion = false; else if (typ === "bonus") st.zug.bonus = false;
     if (a.id === "brandmal") {
-      if ((f.genutzt.brandmal_frei || 0) < 1) f.genutzt.brandmal_frei = 1; else f.plaetze[platzIndex(f, 1)]--;
-    } else if (a.platz) f.plaetze[platzIndex(f, a.platz)]--;
+      if ((f.genutzt.brandmal_frei || 0) < (a.freiJeKampf || 1)) f.genutzt.brandmal_frei = (f.genutzt.brandmal_frei || 0) + 1; else f.plaetze[platzIndex(f, 1)]--;
+    } else if (a.freiJeRast && (f.genutzt[a.id + "_frei"] || 0) < a.freiJeRast) f.genutzt[a.id + "_frei"] = (f.genutzt[a.id + "_frei"] || 0) + 1;
+    else if (a.platz) f.plaetze[platzIndex(f, a.platz)]--;
     if ((a.pro || a.id === "raserei") && !(a.art === "mal" && a.mal === "jaeger" && f.malFrei)) f.genutzt[a.id] = (f.genutzt[a.id] || 0) + 1;
   }
   function schieben(st, z, von, n) {
@@ -835,7 +852,7 @@
   }
   function setzeZustand(st, z, a, f) {
     const zu = a.zustand;
-    if (zu === "netz") z.z.festgehalten = { netz: true, flucht: SG(f, a.attr) };
+    if (zu === "netz") z.z.festgehalten = { netz: true, flucht: SG(f, a.attr) + (a.sgPlus || 0) };
     else if (zu === "festgehalten") z.z.festgehalten = { rest: a.dauer };
     else if (zu === "veraengstigt") z.z.veraengstigt = { rest: a.dauer, von: f.id };
     else if (zu === "verbannt") { z.z.verbannt = a.dauer; }
@@ -909,17 +926,18 @@
       case "stoss": {
         const sg = SG(f, a.attr), rw = rettung(st, ziel, a.rettung, sg);
         if (rw.erfolg) st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} hält stand (${rw.total} gegen SG ${sg}).`, art: "wurf" });
-        else { schieben(st, ziel, f, 1); ziel.z.liegend = true; st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} fliegt zurück und liegt am Boden.`, art: "gut" }); }
+        else { schieben(st, ziel, f, a.felder || 1); ziel.z.liegend = true; st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} fliegt zurück und liegt am Boden.`, art: "gut" }); }
         break;
       }
       case "entwaffnen": {
         const sg = SG(f, a.attr), rw = rettung(st, ziel, a.rettung, sg);
         if (rw.erfolg) st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} hält fest (${rw.total} gegen SG ${sg}).`, art: "wurf" });
-        else { ziel.z.entwaffnet = 2; st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} verliert den Halt und macht 2 Runden nur halben Schaden.`, art: "gut" }); }
+        else { ziel.z.entwaffnet = a.dauer || 2; st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} verliert den Halt und macht ${a.dauer || 2} Runden nur halben Schaden.`, art: "gut" }); }
         break;
       }
       case "spott": ziel.z.spott = f.id; st.log.push({ t: `${f.name} verspottet ${ziel.name}.` }); break;
-      case "analyse": ziel.z.analyse = st.runde; st.log.push({ t: `${f.name} analysiert ${ziel.name}: RK ${ziel.rk - 2} bis Rundenende, ${ziel.tp}/${ziel.tpMax} TP.` }); break;
+      case "analyse": if ((a.ziele || 1) > 1) { const zw = gegnerFiguren(st).filter((o) => o !== ziel && lebt(o) && abstand(f, o) <= a.reichweite && sicht(st, f, o)).sort((x, y) => abstand(x, ziel) - abstand(y, ziel))[0]; if (zw) { zw.z.analyse = st.runde; st.log.push({ t: `${f.name} analysiert auch ${zw.name}.` }); } }
+        ziel.z.analyse = st.runde; st.log.push({ t: `${f.name} analysiert ${ziel.name}: RK ${ziel.rk - 2} bis Rundenende, ${ziel.tp}/${ziel.tpMax} TP.` }); break;
       case "mal": {
         if (a.mal === "jaeger") { ziel.z.mal_jaeger = f.id; f.malZiel = ziel.id; f.malFrei = false; st.log.push({ t: `${f.name} markiert ${ziel.name} (Jägermal).` }); }
         else { ziel.z.brandmal = f.id; st.log.push({ t: `${f.name} brennt ${ziel.name} ein Mal ein (Brandmal).` }); }
@@ -940,7 +958,7 @@
       }
       case "schild": ziel.z.schild = true; st.log.push({ t: `${f.name}: Schild des Glaubens auf ${ziel.name} (+2 RK).`, art: "gut" }); break;
       case "tausch": { const x = f.x, y = f.y; f.x = ziel.x; f.y = ziel.y; ziel.x = x; ziel.y = y; st.log.push({ t: `${f.name} tauscht den Platz mit ${ziel.name}.` }); break; }
-      case "wolf": wolfBeisst(st, f, ziel, Boolean(a.umreissen)); break;
+      case "wolf": wolfBeisst(st, f, ziel, Boolean(a.umreissen)); if (hs(f) >= 10 && lebt(ziel) && !st.ende) wolfBeisst(st, f, ziel, false); break; // Meisterschaft: Grau beißt zweimal
       case "verstecken": f.z.versteckt = true; st.log.push({ t: `${f.name} verschwindet im Schatten.` }); break;
       case "raserei": f.z.raserei = true; st.log.push({ t: `${f.name} gerät in Raserei!`, art: "gut" }); break;
       case "finte": f.z.finte = true; st.log.push({ t: `${f.name} täuscht einen Angriff an.` }); break;
@@ -948,9 +966,9 @@
       case "rueckzug": f.z.rueckzug = true; st.log.push({ t: `${f.name} zieht sich geschickt zurück.` }); break;
       case "spurt": st.zug.bewegung += st.zug.basis || 6; st.log.push({ t: `${f.name} spurtet.` }); break;
       case "schattenschritt": st.zug.schritt = 6; st.log.push({ t: `${f.name} tritt in die Schatten.` }); break;
-      case "spiegelbilder": f.z.spiegel = 3; st.log.push({ t: `${f.name} teilt sich in drei Spiegelbilder.`, art: "gut" }); break;
+      case "spiegelbilder": f.z.spiegel = a.bilder || 3; st.log.push({ t: `${f.name} teilt sich in ${a.bilder === 4 ? "vier" : "drei"} Spiegelbilder.`, art: "gut" }); break;
       case "segen": {
-        const zs2 = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).sort((x, y) => abstand(f, x) - abstand(f, y)).slice(0, 3);
+        const zs2 = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).sort((x, y) => abstand(f, x) - abstand(f, y)).slice(0, a.ziele || 3);
         zs2.forEach((o) => { o.z.segen = f.id; o.z.segenBis = st.runde + (a.dauer || 99); });
         st.log.push({ t: `${f.name} segnet ${zs2.map((o) => o.name).join(", ")}.`, art: "gut" }); break;
       }
@@ -965,7 +983,7 @@
         break;
       }
       case "bewahren": {
-        let topf = 5 * f.stufe;
+        let topf = (hs(f) >= 8 ? 6 : 5) * f.stufe;
         while (topf > 0) {
           const o = spielerFiguren(st).concat(st.figuren.filter((x) => x.art === "wolf")).filter((x) => !x.tot && x.tp < x.tpMax && abstand(f, x) <= a.reichweite).sort((x, y) => x.tp / x.tpMax - y.tp / y.tpMax)[0];
           if (!o) break;
@@ -974,7 +992,7 @@
         break;
       }
       case "massenheil": {
-        const zs3 = st.figuren.filter((o) => o.seite === "spieler" && !o.tot && o.tp < o.tpMax && abstand(f, o) <= a.reichweite).sort((x, y) => x.tp / x.tpMax - y.tp / y.tpMax).slice(0, 3);
+        const zs3 = st.figuren.filter((o) => o.seite === "spieler" && !o.tot && o.tp < o.tpMax && abstand(f, o) <= a.reichweite).sort((x, y) => x.tp / x.tpMax - y.tp / y.tpMax).slice(0, hs(f) >= 10 ? 99 : 3);
         for (const o of zs3) heilen(st, o, roll(r, a.heilung).total + mod(f.werte.WEI) + 2 + 1, `${f.name}: Massenheilwort`);
         break;
       }
@@ -1044,7 +1062,7 @@
     return { ok: true };
   }
   function brandFeld(st, f) {
-    if (st.brand.some((b) => b.x === f.x && b.y === f.y) && lebt(f)) { const s = W(st.r, 4); st.log.push({ t: `${f.name} tritt in die Glut: ${s} Schaden.` }); schaden(st, f, s); }
+    if (st.brand.some((b) => b.x === f.x && b.y === f.y) && lebt(f)) { const b = st.brand.find((x) => x.x === f.x && x.y === f.y), s = b && b.w ? roll(st.r, b.w).total : W(st.r, 4); st.log.push({ t: `${f.name} tritt in die Glut: ${s} Schaden.` }); schaden(st, f, s); }
   }
 
   /* ---------- Zugwechsel ---------- */
@@ -1075,7 +1093,11 @@
     }
     const f = aktiv(st);
     f.gehandelt = true;
-    f.reaktion = istFig(f, "schildwaechter") && FD.altStufe(f.stufe) >= 3 ? 2 : 1;
+    // Reaktionen je Runde: Bollwerk 2 (Meister 3); Meisterin der Parade 2; Fangschuss ab Stufe 8 zweimal
+    f.reaktion = istFig(f, "schildwaechter") ? (hs(f) >= 10 ? 3 : FD.altStufe(f.stufe) >= 3 ? 2 : 1) : (istFig(f, "duellant") && hs(f) >= 10) || (istFig(f, "kopfgeldjaeger") && hs(f) >= 8) ? 2 : 1;
+    f.gehandeltRunde = st.runde;
+    // Elara, Meisterschaft: Der Schutzkreis heilt jede Runde
+    if (istFig(f, "lichtbringer") && hs(f) >= 10 && f.z.schutzkreis > st.runde && lebt(f)) for (const o of st.figuren) if (o.seite === "spieler" && !o.tot && o.tp > 0 && o.tp < o.tpMax && abstand(f, o) <= 2) heilen(st, o, W(st.r, 6), `${f.name}: Schutzkreis`);
     delete f.z.ruecksichtslos;
     let bew = f.seite === "gegner" ? Math.round((GEGNER[f.art].bewegung != null ? GEGNER[f.art].bewegung : 6) * (st.gegnerTempo || 1)) : bewegungVon(f);
     const basis = bew;
@@ -1088,7 +1110,7 @@
     }
     if (f.z.liegend && f.tp > 0 && st.zug.bewegung >= 3) { st.zug.bewegung -= 3; delete f.z.liegend; }
     // Strahlende Aura gegen Untote
-    if (f.seite === "gegner") for (const l of st.figuren) if (istFig(l, "lichtbringer") && lebt(l) && abstand(l, f) <= 1 && lebt(f)) { const n = GEGNER[f.art].untot ? 2 : 1; st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
+    if (f.seite === "gegner") for (const l of st.figuren) if (istFig(l, "lichtbringer") && lebt(l) && abstand(l, f) <= (hs(l) >= 8 ? 2 : 1) && lebt(f)) { const n = GEGNER[f.art].untot ? 2 : 1; st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
     if (f.z.blutung && lebt(f)) { const b = f.z.blutung, s2 = roll(st.r, b.w).total; b.rest--; if (b.rest <= 0) delete f.z.blutung; st.log.push({ t: `${f.name} blutet: ${s2} Schaden.` }); schaden(st, f, s2); }
     if (f.z.bruch && f.z.bruch.bis <= st.runde) delete f.z.bruch;
     if (lebt(f)) brandFeld(st, f);
@@ -1202,6 +1224,19 @@
       for (const [k] of m) { const [x, y] = k.split(",").map(Number); const dd = Math.min(...lebende.map((f) => abstand({ x, y }, f))); if (!best || dd > best.d) best = { x, y, d: dd }; }
       if (best) { g.x = best.x; g.y = best.y; }
     };
+    // Darian, Fallensteller (Zehn-Stufen-Modell): Der erste Gegner, der sich rührt, tritt in seine Falle. Meisterschaft: doppelter Schaden, hält fest.
+    if (st.falle && !st.falle.weg && !d.boss && d.bewegung !== 0 && !st.ueberfall) {
+      const leger = fig(st, st.falle.von);
+      if (leger && lebt(leger)) {
+        st.falle.weg = true;
+        const sch = roll(st.r, st.falle.meister ? "4W6" : "2W6").total;
+        st.log.push({ t: `${g.name} tritt in ${leger.name}s Falle: ${sch} Schaden${st.falle.meister ? " und sitzt fest" : ""}.`, art: "gut" });
+        schaden(st, g, sch);
+        if (st.falle.meister && lebt(g)) g.z.festgehalten = { rest: 1, flucht: 13 };
+        if (st.ende) return;
+        if (!lebt(g)) { weiter(st); return; }
+      }
+    }
     if (d.boss) { bossZug(st, g); return; }
     if (st.mech && sonderZug(st, g, d)) return;
     // Verängstigt: weg, kein Angriff
@@ -1214,7 +1249,7 @@
       weiter(st); return;
     }
     // Kobold flieht bei wenig TP
-    if (d.flieht && g.tp < d.flieht && !g.geflohen) { g.geflohen = true; flieheVon(); st.log.push({ t: `${g.name} flieht.`, art: "gegner" }); fangschuss(st, g, startX, startY); if (!st.ende) weiter(st); return; }
+    if (d.flieht && g.tp < d.flieht && !g.geflohen && !(g.z.brandmal && hs(fig(st, g.z.brandmal)) >= 10)) { g.geflohen = true; flieheVon(); st.log.push({ t: `${g.name} flieht.`, art: "gegner" }); fangschuss(st, g, startX, startY); if (!st.ende) weiter(st); return; }
     // Pilzbrut: Sporen auf alle Nachbarn
     if (d.sporen) {
       const nach = lebende.filter((f) => abstand(g, f) <= 1);
@@ -1975,15 +2010,15 @@
       const z = zust[fid]; if (z.tot) continue;
       const max = FD.tpVon(fid, z.stufe || 1);
       z.tp = Math.min(max, z.tp + Math.floor((max - z.tp) / 2));
-      for (const a of FD.faehigVon(fid, 3)) if (a.pro && (a.pro.rast != null || a.pro.kampf != null)) delete z.genutzt[a.id];
-      delete z.genutzt.glueckspilz; delete z.genutzt.gedankenstuetze; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei;
+      for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && (a.pro.rast != null || a.pro.kampf != null)) delete z.genutzt[a.id];
+      delete z.genutzt.glueckspilz; delete z.genutzt.gedankenstuetze; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glutsphaere_frei; delete z.genutzt.glyphe_frei;
       if (z.genutzt.raserei) z.genutzt.raserei--;
     }
     return zust;
   }
   /** Zwischen zwei Kämpfen ohne Rast: nur „je Kampf“ kommt zurück */
   function neuerKampf(zust) {
-    for (const fid of Object.keys(zust)) { const z = zust[fid]; for (const a of FD.faehigVon(fid, 3)) if (a.pro && a.pro.kampf != null) delete z.genutzt[a.id]; delete z.genutzt.glueckspilz; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; }
+    for (const fid of Object.keys(zust)) { const z = zust[fid]; for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && a.pro.kampf != null) delete z.genutzt[a.id]; delete z.genutzt.glueckspilz; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glyphe_frei; }
     return zust;
   }
 

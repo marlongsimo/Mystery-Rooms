@@ -29,8 +29,11 @@
 - Heldenkarte: Der Reiter „Attribute“ ist durch „Stufen“ ersetzt, eine Tabelle von Stufe 1 bis 10 mit Leben, neuen Fähigkeiten, Verbesserungen und Meistertitel.
 - Werkzeug: `node abenteuer/tools/kampagne.js kaempfe <id> --stufe=N` misst Kämpfe mit Helden der Stufe N.
 
+- **Verbesserungen im Kampf:** Alle 45 Verbesserungen und die drei neuen Fähigkeiten (Lähmender Bolzen, Pfeilregen, Glückssträhne) wirken im Zehn-Stufen-Modell. Einfache Änderungen (Einsätze, Reichweite, Ziele) stehen als Daten in `figuren.js` (`BESSER`), der Rest als Regel in `regeln.js` (`hs(f) >= Stufe`). Darians Fallensteller hat dabei zum ersten Mal eine Wirkung im Kampf bekommen. Test: `node abenteuer/tests/stufen.test.js`.
+- **Auslegung, wo das Konzept offen war:** „Furcht trifft zwei Ziele“ und „Befehl trifft zwei Ziele“ wirken auf das Ziel und die Gegner daneben (Radius 2 bzw. 1). Pfeilregen ist ein Flächenangriff mit GES-Rettung. „Todesstoß in jeder Runde“ heißt: Vorteil gegen Gegner, die in dieser Runde noch nicht gehandelt haben. Vex' Meisterschaft fällt keine Anführer und Bosse.
+
 **Offen:**
-- Die Wirkung der 45 Verbesserungen und der drei neuen Fähigkeiten im Kampf (bisher nur als Text in der Anzeige).
+- Die Verbesserungen sind noch nicht gegeneinander abgestimmt (Heldenvergleich je Stufe nach Abschnitt 6.3).
 - Gegner mit Bedrohungsstufe und die Anpassung der Kampagnen an die Tabelle oben.
 - XP, Speicherung am Konto (Migration 007), Kampagnen-Segen statt Aufstieg am Lagerfeuer, Oberfläche zum Launch.
 

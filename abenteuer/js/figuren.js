@@ -161,6 +161,7 @@
         { id: "zweiter_dolch", name: "Zweiter Dolch", typ: "bonus", ab: 1, art: "angriff", reichweite: 8, attr: "GES", schaden: "1W4", ohneMod: true, nachDolch: true, wurfwaffe: true, text: "Nach einem Dolchangriff: ein zweiter Dolch, 1W4." },
         { id: "glueckspilz", name: "Glückspilz", typ: "passiv", ab: 1, pro: { kampf: 1 }, text: "Automatisch, 1× je Kampf: einen knapp verfehlten eigenen Angriff wiederholen oder einen Gegner seinen Treffer gegen dich wiederholen lassen." },
         { id: "trick", name: "Schmutziger Trick", typ: "bonus", ab: 1, art: "kontrolle", zustand: "geblendet", dauer: 1, reichweite: 1, rettung: "GES", attr: "GES", pro: { rast: [2, 2, 3] }, text: "Ein Gegner neben dir: GES-Rettungswurf, sonst 1 Runde geblendet." },
+        { id: "gluecksstraehne", name: "Glückssträhne", typ: "passiv", ab: 3, nur10: true, text: "Glückspilz 2× je Kampf, Platztausch 2× je Rast." },
         { id: "platztausch", name: "Platztausch", typ: "bonus", ab: 1, art: "tausch", reichweite: 6, pro: { rast: 1 }, text: "Tausche den Platz mit einem Verbündeten in 6 Feldern." },
       ],
       aussen: { name: "Täuschen", text: "Vorteil auf Lügen, Verkleiden, Taschendiebstahl." },
@@ -240,6 +241,7 @@
         { id: "scharfes_auge", name: "Scharfes Auge", typ: "passiv", ab: 1, text: "Ignoriert Deckung." },
         { id: "leichtfuessig", name: "Leichtfüßig", typ: "passiv", ab: 1, text: "Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff." },
         { id: "bogenschuetze", name: "Bogenschütze", typ: "passiv", ab: 1, text: "+1 auf Fernkampf." },
+        { id: "pfeilregen", name: "Pfeilregen", typ: "aktion", ab: 3, nur10: true, art: "flaeche", form: "kreis", groesse: 1, reichweite: 20, schaden: "1W8+3", rettung: "GES", attr: "GES", halb: true, pro: { rast: 1 }, text: "Pfeile regnen auf ein Ziel und alle Gegner direkt daneben: 1W8 + 3, GES-Rettung halbiert." },
         { id: "doppelschuss", name: "Doppelschuss", typ: "aktion", ab: 2, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, doppel: true, pro: { rast: 2 }, text: "Zwei Ziele nebeneinander, je ein Angriff." },
       ],
       aussen: { name: "Fährtenleser", text: "Liest Spuren genau, findet sichere Wege." },
@@ -272,6 +274,7 @@
         { id: "netz", name: "Netz", typ: "aktion", ab: 1, art: "kontrolle", zustand: "netz", reichweite: 6, rettung: "STR", attr: "GES", pro: { rast: 2 }, text: "STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13)." },
         { id: "fangschuss", name: "Fangschuss", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Bewegt sich dein markiertes Ziel, schießt du einmal." },
         { id: "jagdvorbereitung", name: "Jagdvorbereitung", typ: "passiv", ab: 1, text: "Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz)." },
+        { id: "laehmbolzen", name: "Lähmender Bolzen", typ: "aktion", ab: 2, nur10: true, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W10", fern: true, lahm: true, pro: { rast: 2 }, text: "Treffer, und das Ziel ist 1 Runde verlangsamt." },
         { id: "erlegen", name: "Erlegen", typ: "passiv", ab: 3, pro: { kampf: 1 }, text: "1× je Kampf gegen dein markiertes Ziel unter halben TP: +2W6." },
       ],
       aussen: { name: "Steckbriefe", text: "Kennt Kreaturen: vor einem Kampf eine Schwäche des Gegners." },
@@ -293,7 +296,13 @@
     const d = FIGUREN[fid], stufe = altStufe(stufeRoh);
     let k = KLASSE_FAEHIG[d.klasse].slice();
     if (d.gerissenAb) k = k.map((x) => (x.gerissen ? Object.assign({}, x, { ab: d.gerissenAb }) : x));
-    const eigen = d.faehig.filter((x) => x.ab <= stufe), klasse = k.filter((x) => x.ab <= stufe);
+    const besser = (x) => {
+      if (!STUFEN10.aktiv) return x;
+      let y = x;
+      for (const [ab, id, patch] of BESSER[fid] || []) if (id === x.id && stufeRoh >= ab) y = Object.assign({}, y, patch, { besser: true, text: y.text + " ★ " + (AUFSTIEG[fid][ab] || "verbessert") + "." });
+      return y;
+    };
+    const eigen = d.faehig.filter((x) => x.ab <= stufe && (STUFEN10.aktiv || !x.nur10)).map(besser), klasse = k.filter((x) => x.ab <= stufe).map(besser);
     return eigen.filter((x) => x.typ !== "passiv").concat(klasse.filter((x) => x.typ !== "passiv")).concat(eigen.filter((x) => x.typ === "passiv")).concat(klasse.filter((x) => x.typ === "passiv"));
   }
   const bild = (fid) => "img/figuren/" + fid + ".jpg";
@@ -334,14 +343,33 @@
     elementarist: { 5: "Glutpfeil: Das Feld brennt 2 Runden lang (1W6)", 8: "Magisches Geschoss mit 4 statt 3 Lichtpfeilen", 10: "Glutsphäre einmal je Rast ohne Zauberplatz, Radius +1", titel: "Herr der Elemente" },
     schattenmagier: { 5: "Furcht trifft zwei Ziele", 8: "Spiegelbilder: 4 statt 3", 10: "Albtraum verängstigt zusätzlich alle Gegner in 2 Feldern um das Ziel", titel: "Die aus dem Schatten" },
     schattenlaeufer: { 5: "Rauchbombe 2× je Rast", 8: "Schattenwirbel 3× je Rast", 10: "Fallen machen doppelten Schaden und halten fest", titel: "Der Unsichtbare" },
-    trickser: { 5: "Schmutziger Trick: ein Einsatz mehr, Reichweite 2 Felder", 7: { name: "Glückssträhne", text: "Glückspilz 2× je Kampf, Platztausch 2× je Rast." }, 8: "Zweiter Dolch mit vollem Schaden", 10: "Hinterhalt mit jedem Dolch, nicht nur einmal je Zug", titel: "Königin der Gassen" },
+    trickser: { 5: "Schmutziger Trick: ein Einsatz mehr, Reichweite 2 Felder", 8: "Zweiter Dolch mit vollem Schaden", 10: "Hinterhalt mit jedem Dolch, nicht nur einmal je Zug", titel: "Königin der Gassen" },
     assassine: { 5: "Gift 3× je Rast", 8: "Todesstoß: Vorteil aus dem Versteck in jeder Runde", 10: "Hinrichtung +2W6 statt 1W6; Gegner (keine Bosse) unter 8 Lebenspunkten fallen bei einem Treffer", titel: "Die letzte Klinge" },
     lichtbringer: { 5: "Segen auf 4 Verbündete", 8: "Strahlende Aura wirkt in 2 Feldern", 10: "Schutzkreis +3 RK und heilt jede Runde 1W6", titel: "Licht von Grauwacht" },
     wanderheiler: { 5: "Lebenshauch 2× je Kampf", 8: "Bewahren verteilt 6 × Stufe statt 5 × Stufe", 10: "Massenheilwort heilt alle Verbündeten in 6 Feldern", titel: "Der Barmherzige" },
     inquisitor: { 5: "Brandmal 2× je Kampf ohne Zauberplatz", 8: "Befehl „Flieh!“ trifft zwei Ziele", 10: "Gerechter Zorn +3W6, und das Brandmal-Ziel kann nicht fliehen", titel: "Hammer der Wahrheit" },
-    wildnislaeufer: { 5: "Jägermal +1W8 statt +1W6", 7: { name: "Pfeilregen", text: "Aktion, 1× je Rast: ein Angriff gegen jeden Gegner in einem Kreis mit 1 Feld." }, 8: "Fesselnder Pfeil 3× je Rast", 10: "Doppelschuss trifft drei Ziele", titel: "Falke des Nordens" },
+    wildnislaeufer: { 5: "Jägermal +1W8 statt +1W6", 8: "Fesselnder Pfeil 3× je Rast", 10: "Doppelschuss trifft drei Ziele", titel: "Falke des Nordens" },
     tiergefaehrte: { 5: "Grau hat 10 Lebenspunkte mehr", 8: "Grau: Umreißen 3× je Rast", 10: "Grau greift zweimal je Zug an", titel: "Herrin der Wölfe" },
-    kopfgeldjaeger: { 3: { name: "Lähmender Bolzen", text: "Aktion, 2× je Rast: Treffer, und das Ziel ist 1 Runde verlangsamt." }, 5: "Netz mit 8 Feldern Reichweite, Befreien gegen SG +2", 8: "Fangschuss zweimal je Runde", 10: "Erlegen 2× je Kampf, +4W6 statt +2W6", titel: "Der Unentrinnbare" },
+    kopfgeldjaeger: { 5: "Netz mit 8 Feldern Reichweite, Befreien gegen SG +2", 8: "Fangschuss zweimal je Runde", 10: "Erlegen 2× je Kampf, +4W6 statt +2W6", titel: "Der Unentrinnbare" },
+  };
+  /** Verbesserungen als Änderungen an den Fähigkeiten: [ab Heldenstufe, Fähigkeit, geänderte Felder].
+   *  Was sich nicht als Feld ausdrücken lässt (z. B. „Parade zweimal je Runde“), steht in regeln.js bei der jeweiligen Regel (hs(f) >= Stufe). */
+  const BESSER = {
+    schildwaechter: [[5, "spott", { pro: { rast: 2 } }], [8, "schildstoss", { pro: { kampf: 2 }, felder: 2 }]],
+    berserker: [[5, "raserei", { pro: { rast: 2 } }]],
+    duellant: [[5, "finte", { pro: { rast: 3 } }], [8, "entwaffnen", { pro: { kampf: 2 }, dauer: 3 }]],
+    gelehrter: [[5, "analyse", { ziele: 2 }], [10, "zeitriss", { radius: 2 }]],
+    elementarist: [[5, "glutpfeil", { brennt: { runden: 2, schaden: "1W6" } }], [8, "geschoss", { anzahl: 4 }], [10, "glutsphaere", { groesse: 3, freiJeRast: 1 }]],
+    schattenmagier: [[5, "furcht", { radius: 2 }], [8, "spiegelbilder", { bilder: 4 }], [10, "albtraum", { radius: 2 }]],
+    schattenlaeufer: [[5, "rauchbombe", { pro: { rast: 2 } }], [8, "schattenwirbel", { pro: { rast: 3 } }]],
+    trickser: [[5, "trick", { pro: { rast: [3, 3, 4] }, reichweite: 2 }], [7, "platztausch", { pro: { rast: 2 } }], [8, "zweiter_dolch", { ohneMod: false }]],
+    assassine: [[5, "gift", { pro: { rast: 3 } }]],
+    lichtbringer: [[5, "segen", { ziele: 4 }]],
+    wanderheiler: [[5, "lebenshauch", { pro: { kampf: 2 } }]],
+    inquisitor: [[5, "brandmal", { freiJeKampf: 2 }], [8, "befehl", { radius: 1 }]],
+    wildnislaeufer: [[8, "fesselpfeil", { pro: { rast: 3 } }], [10, "doppelschuss", { ziele: 3 }]],
+    tiergefaehrte: [[8, "wolf_umreissen", { pro: { rast: 3 } }]],
+    kopfgeldjaeger: [[5, "netz", { reichweite: 8, sgPlus: 2 }], [10, "erlegen", { pro: { kampf: 2 } }]],
   };
   /** Der Stufenpfad eines Helden für die Anzeige: zehn Zeilen { stufe, tp, werte: [..], neu: [{name, text}], verbesserung, meister, titel } */
   function stufenpfad(fid) {
@@ -374,7 +402,9 @@
   };
 
   const API = { KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
-    STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, stufenpfad, SCHWIERIGKEIT };
+    STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, BESSER, stufenpfad, SCHWIERIGKEIT,
+    /** höchste Stufe des geltenden Modells (für „alle Fähigkeiten dieser Figur“) */
+    maxStufe: () => (STUFEN10.aktiv ? 10 : 3) };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABF = API;
 })(typeof window !== "undefined" ? window : globalThis);

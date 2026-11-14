@@ -215,8 +215,15 @@
     },
     kampf_bohlen: {
       art: "kampf", abschnitt: 1, titel: "Kampf auf dem Bohlenweg", ort: "Schwarzmoor",
-      text: ["Schlammkröten und Irrlichter versperren den Steg. Die Kröten schnappen mit langen Zungen auch über zwei Felder, die Irrlichter werfen kalte Funken aus der Ferne. Das Wasser selbst ist zu tief: Niemand geht hindurch, aber man sieht darüber hinweg."],
-      kampf: { begegnung: "moor_rand", karte: BOHLENWEG, sieg: { weiter: "nach_bohlen", tranke: 1 } },
+      text: ["Schlammkröten und Irrlichter versperren den Steg. Die Kröten schnappen mit langen Zungen auch über zwei Felder, die Irrlichter werfen kalte Funken aus der Ferne. Das Wasser selbst ist zu tief: Niemand geht hindurch, aber man sieht darüber hinweg.",
+        "Am anderen Ende des Stegs hängt eine alte Sturmlaterne der Torfstecher an einem Pfahl. Sie ist aus.",
+        "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Gegner besiegt sind – oder sobald jemand die Sturmlaterne anzündet. Dafür muss eine Figur neben dem Pfahl stehen und zweimal ihre Aktion einsetzen. Der Weg führt über den schmalen Steg.*"],
+      kampf: { begegnung: "moor_rand", karte: BOHLENWEG,
+        mechanik: {
+          ziele: [{ id: "laterne", name: "Die Sturmlaterne", art: "grablicht", x: 11, y: 6, runden: 2, aktion: "Sturmlaterne anzünden", fertigText: "Warmes, gelbes Licht fällt über den Steg" }],
+          sieg: { ziele: 1, art: "grablicht", text: "Im warmen Licht der Laterne verblassen die Irrlichter, eines nach dem anderen. Die Kröten blinzeln und tauchen ab." },
+        },
+        sieg: { weiter: "nach_bohlen", tranke: 1 } },
     },
     nach_bohlen: {
       art: "erzaehlung", abschnitt: 1, titel: "Stille", ort: "Schwarzmoor", weiter: (A, h) => h.ereignis(A, 1, "hedda"), rastErlaubt: true,
@@ -240,7 +247,11 @@
     },
     kampf_ried: {
       art: "kampf", abschnitt: 1, titel: "Kröten im Ried", ort: "Das Ried",
-      text: ["Schlammkröten schieben sich aus dem Wasser, drei, vier, mehr. Zwischen den Schilfinseln liegen tiefe Furten: Wer darüber will, muss außen herum."],
+      text: [
+        "Schlammkröten schieben sich aus dem Wasser, drei, vier, mehr. Zwischen den Schilfinseln liegen tiefe Furten: Wer darüber will, muss außen herum.",
+        "Hinter ihnen, im flachen Wasser, glänzt ein Haufen Laich, so groß wie ein Wagenrad. Es bewegt sich darin.",
+        "*Achtet auf den Krötenlaich: Solange er liegt, schlüpfen alle paar Runden neue Kröten. Er wehrt sich nicht. Wer ihn zuerst zerschlägt, hat danach nur noch die Kröten vor sich, die schon da sind.*",
+      ],
       kampf: { begegnung: "moor_kroeten", karte: RIED, sieg: { weiter: "ried_still" } },
     },
     kahnfahrt: {
@@ -417,8 +428,19 @@
     },
     kampf_toten: {
       art: "kampf", abschnitt: 2, titel: "Die Ertrunkenen", ort: "Der Totenpfad",
-      text: ["Moorleichen waten aus den Tümpeln, langsam, aber zäh. Über ihnen tanzen Irrlichter. Der Damm ist schmal: Haltet die Linie."],
-      kampf: { begegnung: "moor_tote", karte: TOTENPFAD, sieg: { weiter: "kinder" } },
+      text: [
+        "Moorleichen waten aus den Tümpeln, langsam, aber zäh. Über ihnen tanzen Irrlichter. Der Damm ist schmal: Haltet die Linie.",
+        "Am Pfad stehen zwei Grablaternen, in denen ein grünes Licht brennt, das niemand angezündet hat. Wo ihr Schein hinfällt, bewegt sich das Wasser.",
+        "*Ein Kampf mit einem Ziel: Solange die Grablaternen brennen, steigen neue Ertrunkene auf. Ihr gewinnt, wenn alle Gegner besiegt sind – oder sobald beide Laternen gelöscht sind. Dafür muss je eine Figur daneben stehen und ihre Aktion einsetzen.*",
+      ],
+      kampf: { begegnung: "moor_tote", karte: TOTENPFAD,
+        mechanik: {
+          ziele: [{ id: "g1", name: "Grablaterne am Damm", art: "grablaterne", x: 7, y: 2, runden: 1, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } },
+            { id: "g2", name: "Grablaterne am Tümpel", art: "grablaterne", x: 5, y: 6, runden: 1, aktion: "Grablaterne löschen", fertigText: "Das grüne Licht erlischt mit einem Zischen", wirkung: { welleAusAlle: "tuempel" } }],
+          sieg: { ziele: 2, art: "grablaterne", text: "Als das zweite Licht erlischt, bleiben die Ertrunkenen stehen. Einer nach dem anderen lassen sie sich zurück ins Wasser sinken, langsam, fast dankbar." },
+          wellen: [{ id: "tuempel", name: "Die Tümpel", kurz: "aus den Tümpeln", quellen: [[6, 4], [8, 5]], gegner: [["moorleiche", 0.2, 1, 0.3]], alle: 3, ab: 2, max: 3, text: "Im Schein der Grablaternen brodelt das Wasser" }],
+        },
+        sieg: { weiter: "kinder" } },
     },
     kinder: {
       art: "probe", abschnitt: 2, titel: "Im Schilf", ort: "Das tiefe Moor",
@@ -489,8 +511,14 @@
     },
     kampf_schrein: {
       art: "kampf", abschnitt: 2, titel: "Die Stumme", ort: "Der Schrein der Stummen",
-      text: ["Alwine schwebt über dem Altar. Ihre kalte Hand reicht weit, und wenn sie die Wehklage ausstößt, trifft die Kälte alle in einem Kegel vor ihr (WEI-Rettung halbiert). Ertrunkene steigen aus dem Wasser, Irrlichter umkreisen sie. Mira liegt auf dem Altar: Bringt es zu Ende."],
-      kampf: { begegnung: "moor_schrein", karte: SCHREIN, keinAnfuehrer: true, beute: false, sieg: { weiter: "ende_besiegt" } },
+      text: ["Alwine schwebt über dem Altar. Ihre kalte Hand reicht weit, und wenn sie die Wehklage ausstößt, trifft die Kälte alle in einem Kegel vor ihr (WEI-Rettung halbiert). Ertrunkene steigen aus dem Wasser, Irrlichter umkreisen sie. Mira liegt neben dem Altar und schläft: Bringt es zu Ende."],
+      // Miras Traum schützt Alwine: Solange das Kind schläft, fängt ein Schild die Hälfte jedes Treffers ab. Wer Mira weckt, nimmt ihn ihr.
+      kampf: (A) => ({ begegnung: "moor_schrein", karte: SCHREIN, keinAnfuehrer: true, beute: false,
+        mechanik: {
+          ziele: [{ id: "mira", name: "Mira", art: "kind", x: 7, y: 4, runden: A.merker.pfeife ? 1 : 2, aktion: A.merker.pfeife ? "Mira mit der Pfeife wecken" : "Mira wecken", fertigText: "Mira schlägt die Augen auf und beginnt zu weinen", wirkung: { schild: true } }],
+          schild: { art: "alwine", ziele: ["mira"], halt: 12, pause: 2, text: "Miras Traum" },
+        },
+        sieg: { weiter: "ende_besiegt" } }),
     },
     ende_erloest: {
       art: "ende", abschnitt: 2, titel: "Der Name im Wasser", ort: "Rabenmoor", rueckschau,
@@ -552,7 +580,8 @@
     irrlicht: { klassen: ["zauberer", "waldlaeufer"], text: "Flink und schwer zu treffen (RK 14): Es wirft kalte Funken über 4 Felder und bleibt auf Abstand. Fernkämpfer und Zauber holen es herunter." },
     schlammkroete: { klassen: ["waldlaeufer"], text: "Ein Tier: Wolfszahn trifft sie härter. Ihre Zunge reicht 2 Felder weit, über Wasser hinweg." },
     moorleiche: { klassen: ["kleriker", "zauberer"], text: "Untot und langsam (4 Felder): Untote vertreiben und strahlende Aura wirken. Wer Abstand hält, wird selten erwischt." },
-    alwine: { klassen: ["kleriker", "zauberer", "waldlaeufer"], text: "Ihre kalte Hand reicht 4 Felder. Alle drei Runden stößt sie die Wehklage aus: Kälte im Kegel von 3 Feldern (3W6, WEI-Rettung halbiert). Nicht hintereinander stehen." },
+    kroetenlaich: { klassen: ["waldlaeufer"], text: "Wehrt sich nicht und bewegt sich nicht. Solange er liegt, schlüpfen alle drei Runden neue Kröten, höchstens zwei." },
+    alwine: { klassen: ["kleriker", "zauberer", "waldlaeufer"], text: "Solange Mira schläft, schützt ihr Traum Alwine: Jeder Treffer wirkt nur halb. Wer Mira weckt, nimmt ihr den Schutz. Ihre kalte Hand reicht 4 Felder. Alle drei Runden stößt sie die Wehklage aus: Kälte im Kegel von 3 Feldern (3W6, WEI-Rettung halbiert). Nicht hintereinander stehen." },
   };
   const META = {
     // Hinweise ohne Spoiler auf das Ende, das die Gruppe nicht gesehen hat

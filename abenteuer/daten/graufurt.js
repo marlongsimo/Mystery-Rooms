@@ -184,8 +184,18 @@
     },
     kampf_kette: {
       art: "kampf", abschnitt: 1, titel: "Rost am Anleger", ort: "Die Fährstelle",
-      text: ["Die Käfer kommen über die Wiese. Metall schützt euch hier nicht: Wer gebissen wird, dessen Rüstung rostet."],
-      kampf: { begegnung: "f_kette", karte: UFER, sieg: { weiter: "kette_nach" } },
+      text: [
+        "Die Käfer kommen über die Wiese. Metall schützt euch hier nicht: Wer gebissen wird, dessen Rüstung rostet.",
+        "Am Pfosten beim Wasser hängt die lose Kette. Solange sie durchhängt, klettern immer neue Käfer daran aus dem Fluss.",
+        "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Gegner besiegt sind – oder sobald jemand die Kette spannt. Dafür muss eine Figur neben dem Pfosten stehen, ohne dass ein Gegner daneben ist, und zweimal ihre Aktion einsetzen.*",
+      ],
+      kampf: { begegnung: "f_kette", karte: UFER,
+        mechanik: {
+          ziele: [{ id: "kette", name: "Der Kettenpfosten", art: "kette", x: 9, y: 5, runden: 2, ruhe: true, aktion: "Kette spannen", fertigText: "Die Kette hebt sich triefend aus dem Wasser", wirkung: { welleAus: "fluss" } }],
+          sieg: { ziele: 1, art: "kette", text: "Die Kette spannt sich mit einem Ruck und beginnt zu summen. Die Käfer, die noch daran hängen, fallen ins Wasser. Die übrigen suchen das Weite." },
+          wellen: [{ id: "fluss", name: "Die Kette im Wasser", kurz: "aus dem Fluss", quellen: [[9, 0], [9, 8]], gegner: [["rostkaefer", 0.2, 1, 0.3]], alle: 3, ab: 3, max: 2, text: "An der Kette klickt und knirscht es" }],
+        },
+        sieg: { weiter: "kette_nach" } },
     },
     kette_nach: {
       art: "erzaehlung", abschnitt: 1, titel: "Geflickt", ort: "Der Anleger", weiter: "ueberfahrt", rastErlaubt: true,
@@ -201,8 +211,18 @@
     },
     kampf_faehre: {
       art: "kampf", abschnitt: 1, titel: "Kobolde an Bord", ort: "Die Fähre",
-      text: ["Rund um euch ist nur Wasser. Wer am Rand steht, steht den Kobolden am nächsten."],
-      kampf: { begegnung: "f_faehre", karte: FAEHRE, sieg: { weiter: "anderes_ufer" } },
+      text: [
+        "Rund um euch ist nur Wasser. Wer am Rand steht, steht den Kobolden am nächsten.",
+        "Marit ist von der Winde zurückgewichen, das Beil in beiden Händen. „Kurbelt!“, ruft sie. „Solange wir mitten im Fluss stehen, kommen immer mehr!“",
+        "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Kobolde besiegt sind – oder sobald die Fähre das Ufer erreicht. Dafür muss jemand an der Winde in der Mitte des Decks stehen und dreimal seine Aktion einsetzen. Bis dahin klettern Kobolde nach.*",
+      ],
+      kampf: { begegnung: "f_faehre", karte: FAEHRE,
+        mechanik: {
+          ziele: [{ id: "winde", name: "Die Winde", art: "winde", x: 6, y: 2, runden: 3, aktion: "An der Winde kurbeln", fertigText: "Die Fähre ruckt ein Stück weiter", wirkung: { welleAus: "rand" } }],
+          sieg: { ziele: 1, art: "winde", text: "Die Fähre knirscht auf den Kies des Nordufers. Die Kobolde springen kreischend ab und verschwinden im Schilf." },
+          wellen: [{ id: "rand", name: "Die Bordwand", kurz: "über die Bordwand", quellen: [[3, 2], [3, 6], [8, 2], [8, 6]], gegner: [["schattenkobold", 0.25, 2, 0.3]], alle: 2, ab: 2, max: 3, text: "Nasse Hände krallen sich an den Rand" }],
+        },
+        sieg: { weiter: "anderes_ufer" } },
     },
 
     /* ----- Weg 2: die Furt ----- */
@@ -216,8 +236,17 @@
     },
     kampf_furt: {
       art: "kampf", abschnitt: 1, titel: "Auf der Kiesbank", ort: "Die alte Furt",
-      text: ["Zwischen den Kiesbänken ist das Wasser zu tief zum Durchwaten. Ihr müsst über die Steine."],
-      kampf: (A) => ({ begegnung: "f_furt", karte: FURT, ueberraschung: Boolean(A.merker.furt_ueberraschung), sieg: { weiter: "anderes_ufer" } }),
+      text: [
+        "Zwischen den Kiesbänken ist das Wasser zu tief zum Durchwaten. Ihr müsst über die Steine.",
+        "Ganz hinten, am Rand der letzten Kiesbank, liegt der glänzende Haufen, um den sich die Kobolde gestritten haben: Löffel, Schnallen, Nägel. Sie lassen ihn nicht aus den Augen.",
+        "*Ein Kampf mit einem Ziel: Ihr gewinnt, wenn alle Gegner besiegt sind – oder sobald jemand den Haufen in den Fluss tritt. Dafür muss eine Figur daneben stehen und ihre Aktion einsetzen. Der Weg dorthin führt mitten durch die Kobolde.*",
+      ],
+      kampf: (A) => ({ begegnung: "f_furt", karte: FURT, ueberraschung: Boolean(A.merker.furt_ueberraschung),
+        mechanik: {
+          ziele: [{ id: "haufen", name: "Der glänzende Haufen", art: "haufen", x: 11, y: 5, runden: 1, aktion: "Den Haufen in den Fluss treten", fertigText: "Es klirrt, glitzert und versinkt" }],
+          sieg: { ziele: 1, art: "haufen", text: "Die Kobolde kreischen auf und stürzen sich dem Glitzern hinterher ins Wasser. Die Strömung nimmt sie mit." },
+        },
+        sieg: { weiter: "anderes_ufer" } }),
     },
 
     /* ----- Das andere Ufer ----- */
@@ -270,7 +299,10 @@
     },
     kampf_turm: {
       art: "kampf", abschnitt: 1, titel: "Der Zöllner zählt", ort: "Der Zollturm",
-      text: ["Pim liegt gefesselt an der hinteren Wand. Zwischen euch und ihm: Kobolde, und am Tisch mit den Münzen eine Gestalt aus Knochen, im verrotteten Mantel eines Zöllners. Brannick. Er zählt noch immer. Besiegt sie, dann ist Pim frei."],
+      text: [
+        "Pim liegt gefesselt an der hinteren Wand. Zwischen euch und ihm: Kobolde, und am Tisch mit den Münzen eine Gestalt aus Knochen, im verrotteten Mantel eines Zöllners. Brannick. Er zählt noch immer. Besiegt sie, dann ist Pim frei.",
+        "*Achtet auf Brannick: Wenn er eine Handvoll Münzen hebt, leuchten Felder rot auf. Dorthin schleudert er sie bei seinem nächsten Zug. Wer bis dahin heruntergeht, bleibt heil. Steht nicht dicht beieinander.*",
+      ],
       kampf: (A) => ({ begegnung: "f_turm", karte: TURM, keinAnfuehrer: true, ueberraschung: Boolean(A.merker.ueberraschung),
         begleiter: { name: "Pim", titel: "gefesselt", tp: 8, start: TURM.start.begleiter, route: [], ausgang: false, gefesselt: true },
         sieg: { setzt: { pim_frei: true }, weiter: "turm_nach", folge: "Pim ist frei." } }),
@@ -399,6 +431,7 @@
     rostkaefer: { klassen: ["waldlaeufer", "zauberer"], text: "Frisst Metall: Jeder Biss lässt eine Metallrüstung rosten (−1 RK, höchstens −2). Leder und Stoff sind sicher." },
     schattenkobold: { klassen: ["waldlaeufer", "schurke"], text: "Feige: Unter 3 Trefferpunkten flieht er. Wer ihn dabei im Blick hat, bekommt einen letzten Schuss." },
     knochenwaechter: { klassen: ["kleriker", "zauberer"], text: "Knochen brechen unter Wucht: Streitkolben, Hämmer und Schildstöße machen anderthalbfachen Schaden." },
+    zoellner: { klassen: ["kleriker", "zauberer"], text: "Untot, und Knochen brechen unter Wucht. Bevor er Münzen schleudert, hebt er sie eine Runde lang: Die Felder leuchten rot. Wer auseinander steht, verliert weniger." },
   };
   const META = {
     id: "graufurt", schwierigkeit: 1, reihe: 2, titel: "Die Fähre von Graufurt", kurz: "Graufurt", untertitel: "Ein Kurzabenteuer an der Wehre, auf dem Weg nach Grauwacht",

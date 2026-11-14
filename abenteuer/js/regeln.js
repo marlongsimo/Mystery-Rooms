@@ -54,7 +54,7 @@
     reliquie: { name: "Reliquie der Brüder", sym: "✝", verbrauch: true, nurHardcore: true, text: "Nach einem Kampf, nicht währenddessen: holt eine gefallene Figur mit halben Trefferpunkten zurück. Einmal." },
     heiltraenke: { name: "Zwei Heiltränke", sym: "🧪", verbrauch: true, text: "Zwei gewöhnliche Heiltränke für den Rucksack (je 2W4+2 TP)." },
   };
-  const TIERE = new Set(["rostkaefer", "netzweber", "aschehund", "schlammkroete", "alte_unke"]);
+  const TIERE = new Set(["rostkaefer", "netzweber", "aschehund", "schlammkroete", "alte_unke", "kroetenlaich"]);
   const GEGNER_TP = { wert: 1.05, zusatz: 1 }; // alle Gegner +5 % Leben; in Normal ein Gegner mehr je Kampf
   const hatDing = (f, id) => Boolean(f && (f.rucksack || []).some((d) => d.id === id && d.n > 0));
   const GROSS_TRANK = { id: "grosser_trank", name: "Großer Heiltrank", typ: "bonus", art: "trank", gross: true, heilung: "4W4+4", text: GEGENSTAENDE.grosser_trank.text };
@@ -87,6 +87,11 @@
     irrlicht: { name: "Irrlicht", tp: 6, rk: 14, werte: { STR: 1, GES: 18, KON: 10, INT: 6, WEI: 12, CHA: 10 }, angriff: { name: "Kalter Funke", bonus: 4, schaden: "1W6+1", reichweite: 4 }, bewegung: 6, xp: 25 },
     moorleiche: { name: "Moorleiche", tp: 16, rk: 10, werte: { STR: 14, GES: 7, KON: 15, INT: 3, WEI: 6, CHA: 3 }, angriff: { name: "Nasser Griff", bonus: 4, schaden: "1W8+2" }, untot: true, bewegung: 4, xp: 50 },
     schlammkroete: { name: "Schlammkröte", tp: 18, rk: 11, werte: { STR: 15, GES: 12, KON: 14, INT: 2, WEI: 10, CHA: 3 }, angriff: { name: "Zunge", bonus: 4, schaden: "1W8+2", reichweite: 2 }, xp: 50 },
+    // Graufurt: Brannick, der tote Zöllner, schleudert Münzen (angekündigter Kreis)
+    zoellner: { name: "Brannick, der Zöllner", tp: 28, rk: 13, werte: { STR: 12, GES: 12, KON: 15, INT: 10, WEI: 10, CHA: 6 }, angriff: { name: "Zählstock", bonus: 4, schaden: "1W8+2" },
+      flaeche: { name: "Münzhagel", form: "kreis", radius: 1, reichweite: 6, schaden: "2W6", sg: 12, rettung: "GES", alle: 2 }, untot: true, anfaellig: "wucht", xp: 150 },
+    // Moor: Krötenlaich im Ried – solange er liegt, schlüpfen Kröten nach
+    kroetenlaich: { name: "Krötenlaich", tp: 14, rk: 9, werte: { STR: 1, GES: 1, KON: 12, INT: 1, WEI: 1, CHA: 1 }, nest: { art: "schlammkroete", alle: 3, max: 2 }, bewegung: 0, xp: 50 },
     // Weidenhain: Die alte Unke kündigt ihren Zungenschlag an (eine Reihe Felder leuchtet, getroffen wird beim nächsten Zug)
     alte_unke: { name: "Die alte Unke", tp: 34, rk: 12, werte: { STR: 17, GES: 10, KON: 16, INT: 3, WEI: 12, CHA: 5 }, angriff: { name: "Zunge", bonus: 5, schaden: "1W8+3", reichweite: 2 },
       flaeche: { name: "Zungenschlag", form: "linie", reichweite: 5, schaden: "2W6+2", sg: 12, rettung: "GES", alle: 2 }, xp: 150 },
@@ -140,7 +145,7 @@
     halle_asche: { name: "Die Aschehunde", stufe: 3, gegner: [["aschehund", 0.75]], faktor: { 3: 2.2, 4: 2.6, 5: 3.0, 6: 2.8 } },
     // Das Moor der stummen Lichter (ab 2 Helden): eigene Tabelle je Gruppengröße, mit tools/kalibrieren-moor.js bestimmt
     moor_rand: { name: "Kröten und Irrlichter", zusatzAb: 3, stufe: 1, gegner: [["schlammkroete", 0.5], ["irrlicht", 0.75]], skala: { 2: 1.49, 3: 1.57, 4: 2.78, 5: 3.47, 6: 4.8 }, skalaHC: { 2: 1.35, 3: 1.69, 4: 2.01, 5: 2.71, 6: 3.23 } },
-    moor_kroeten: { name: "Schlammkröten", zusatzAb: 3, stufe: 1, gegner: [["schlammkroete", 0.85]], skala: { 2: 1.65, 3: 1.42, 4: 2.45, 5: 2.99, 6: 3.31 }, skalaHC: { 2: 1.61, 3: 1.91, 4: 2.71, 5: 2.92, 6: 2.92 } },
+    moor_kroeten: { name: "Schlammkröten", zusatzAb: 3, stufe: 1, gegner: [["kroetenlaich", 0, 1, 1], ["schlammkroete", 0.7]], skala: { 2: 1.65, 3: 1.42, 4: 2.45, 5: 2.99, 6: 3.31 }, skalaHC: { 2: 1.61, 3: 1.91, 4: 2.71, 5: 2.92, 6: 2.92 } },
     moor_kroeten2: { name: "Schlammkröten im Ried", zusatzAb: 3, stufe: 2, gegner: [["schlammkroete", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.49, 3: 1.42, 4: 2.06, 5: 2.11, 6: 2.22 }, skalaHC: { 2: 1.17, 3: 1.29, 4: 1.53, 5: 1.53, 6: 2.01 } },
     moor_tote: { name: "Die Ertrunkenen", zusatzAb: 3, stufe: 2, gegner: [["moorleiche", 1.0], ["irrlicht", 0.5]], skala: { 2: 1.82, 3: 1.57, 4: 2.58, 5: 2.85, 6: 3.23 }, skalaHC: { 2: 1.65, 3: 1.82, 4: 2.34, 5: 2.71, 6: 2.99 } },
     moor_schrein: { name: "Alwine, die Stumme", zusatzAb: 3, stufe: 2, gegner: [["alwine", 0.1, 1, 0.6], ["moorleiche", 0.5], ["irrlicht", 0.5]], skala: { 2: 0.75, 3: 0.84, 4: 1.78, 5: 2.45, 6: 3.23 }, skalaHC: { 2: 0.5, 3: 1, 4: 1.61, 5: 1.96, 6: 2.34 } },
@@ -165,10 +170,10 @@
     k_frost: { name: "Die Frostkammer", stufe: 3, zusatzAb: 99, gegner: [["frostmatrone", 0.25, 1, 0], ["glasnest", 0, 2, 2], ["glasschwaermer", 0.8, 6], ["frostknecht", 0.4, 3, -0.5]], skala: { 2: 0.51, 3: 0.51, 4: 1.15, 5: 1.59, 6: 2.3 }, skalaHC: { 2: 0.39, 3: 0.39, 4: 0.99, 5: 1.23, 6: 1.98 } },
     k_krone: { name: "Der Kronensaal", stufe: 3, zusatzAb: 99, gegner: [["koenig", 0.25, 1, 0], ["frostknecht", 0.5, 4, -1], ["jaegerschuetze", 0.3, 2, -0.5], ["kettenbestie", 0.5, 1, -2]], skala: { 2: 0.68, 3: 0.68, 4: 0.93, 5: 0.8, 6: 1.1 }, skalaHC: { 2: 0.43, 3: 0.43, 4: 0.51, 5: 0.42, 6: 0.6 } },
     // Die Fähre von Graufurt (Kurzabenteuer, Heldenstufe 1, 2–6 Helden). Faktoren: tools/kampagne.js kaempfe graufurt --kalibrieren
-    f_kette: { name: "Rost am Anleger", stufe: 1, zusatzAb: 99, gegner: [["rostkaefer", 1.0, 6, 0.3], ["schattenkobold", 0.6, 4, -1]], skala: { 2: 3.6, 3: 3.6, 4: 4.3, 5: 4.1, 6: 3.4 }, skalaHC: { 2: 3.14, 3: 3.41, 4: 3.2, 5: 3.14, 6: 3.23 } },
+    f_kette: { name: "Rost am Anleger", stufe: 1, zusatzAb: 99, gegner: [["rostkaefer", 1.0, 6, 0.3], ["schattenkobold", 0.6, 4, -1]], skala: { 2: 1.6, 3: 2.27, 4: 3.41, 5: 2.53, 6: 3.14 }, skalaHC: { 2: 3.14, 3: 3.41, 4: 3.2, 5: 3.14, 6: 3.23 } },
     f_faehre: { name: "Kobolde an Bord", stufe: 1, zusatzAb: 99, gegner: [["schattenkobold", 1.5, 9, 0.5]], skala: { 2: 1.64, 3: 2.4, 4: 2.98, 5: 4.23, 6: 4.59 }, skalaHC: { 2: 1.78, 3: 1.98, 4: 2.75, 5: 2.67, 6: 3.9 } },
     f_furt: { name: "Auf der Kiesbank", stufe: 1, zusatzAb: 99, gegner: [["schattenkobold", 1.1, 7, 0.3], ["rostkaefer", 0.5, 3, -0.5]], skala: { 2: 1.88, 3: 2.98, 4: 2.98, 5: 3.9, 6: 4.35 }, skalaHC: { 2: 1.55, 3: 2.82, 4: 2.75, 5: 3.7, 6: 3.6 } },
-    f_turm: { name: "Der Zöllner zählt", stufe: 1, zusatzAb: 99, gegner: [["knochenwaechter", 0.2, 2, 0.7], ["schattenkobold", 1.1, 7, 0.3]], skala: { 2: 0.9, 3: 2.46, 4: 2.4, 5: 3.8, 6: 4.59 }, skalaHC: { 2: 0.9, 3: 2.04, 4: 2.4, 5: 2.9, 6: 3.41 } },
+    f_turm: { name: "Der Zöllner zählt", stufe: 1, zusatzAb: 99, gegner: [["zoellner", 0, 1, 1], ["knochenwaechter", 0.25, 1, -0.75], ["schattenkobold", 1.1, 7, 0.3]], skala: { 2: 0.9, 3: 2.46, 4: 2.4, 5: 3.8, 6: 4.59 }, skalaHC: { 2: 0.9, 3: 2.04, 4: 2.4, 5: 2.9, 6: 3.41 } },
     // Das Erntefest von Weidenhain (Einsteiger-Kurzabenteuer, Heldenstufe 1, die Unke mit Stufe 2, 2–6 Helden). Faktoren: tools/kampagne.js kaempfe weidenhain --kalibrieren
     w_speicher: { name: "Kröten im Korn", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 1.1, 7, 0.2]], skala: { 2: 1.12, 3: 1.19, 4: 1.4, 5: 1.93, 6: 1.98 }, skalaHC: { 2: 1.04, 3: 0.75, 4: 0.88, 5: 1.15, 6: 1.29 } },
     w_muehle: { name: "Am Mühlgraben", stufe: 1, zusatzAb: 99, gegner: [["schlammkroete", 0.6, 4, 0.3], ["irrlicht", 0.5, 3, -0.5]], skala: { 2: 0.67, 3: 1.69, 4: 1.6, 5: 2.67, 6: 2.6 }, skalaHC: { 2: 0.53, 3: 1.12, 4: 1.32, 5: 1.64, 6: 1.6 } },

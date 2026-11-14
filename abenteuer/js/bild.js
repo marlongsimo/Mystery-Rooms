@@ -41,10 +41,11 @@
     koenig: () => '<g><circle r="26" fill="#e8f6ff" opacity=".12"/><path d="M-18 24 L-16 -6 Q0 -20 16 -6 L18 24 Z" fill="#8aa4b8" stroke="#2a3a46" stroke-width="2.5"/><path d="M-12 -14 L-12 -28 L-6 -20 L0 -30 L6 -20 L12 -28 L12 -14 Z" fill="#e8c46a" stroke="#6a5020" stroke-width="1.5"/><circle cx="-5" cy="-6" r="2.5" fill="#cfefff"/><circle cx="5" cy="-6" r="2.5" fill="#cfefff"/><path d="M0 2 L-5 10 L0 18 L5 10 Z" fill="#8fd0ff" stroke="#fff" stroke-width="1"/><path d="M20 22 L22 -18" stroke="#c8ccd8" stroke-width="3.5"/></g>',
     eisenhirte: () => '<g><rect x="-20" y="-20" width="40" height="42" rx="6" fill="#5a5e66" stroke="#1c1e22" stroke-width="2.5"/><rect x="-12" y="-30" width="24" height="14" rx="3" fill="#6a6e76" stroke="#1c1e22" stroke-width="2"/><path d="M0 -10 L-6 0 L0 10 L6 0 Z" fill="#8fd0ff" stroke="#e8f6ff" stroke-width="1.5"/><circle cx="-5" cy="-23" r="2" fill="#8fd0ff"/><circle cx="5" cy="-23" r="2" fill="#8fd0ff"/></g>',
   };
+  GEGNER.kroetenlaich = () => '<g><ellipse cy="10" rx="22" ry="10" fill="#2f3a22" stroke="#141a0c" stroke-width="2"/>' + [[-10, 4], [0, -2], [10, 5], [-3, 10], [7, -6], [-12, -5]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#9fb86a" fill-opacity=".75" stroke="#3a4a1c" stroke-width="1.5"/><circle cx="${x + 1}" cy="${y + 1}" r="2.5" fill="#1c2410"/>`).join("") + "</g>";
   GEGNER.funkenhund = () => GEGNER.aschehund().replace('fill="#3a2a24"', 'fill="#4a2a1a"');
   /** Gemalte Gegner-Porträts (img/gegner/<art>.jpg); ohne Bild bleibt das gezeichnete Symbol */
   const BILDER = new Set("rostkaefer schattenkobold knochenwaechter pilzbrut netzweber aschehund grabritter abt irrlicht moorleiche schlammkroete alwine siegeljaeger jaegerschuetze wachkonstrukt jaegerhauptmann funkenhund fackelzehrer frostknecht eisgezeichneter glasschwaermer glasnest kaelterufer runenleser kettenbestie splitterbrutmutter eidwaechter frostmatrone eisenhirte koenig".split(" "));
-  const BILD_WIE = { alte_unke: "schlammkroete" }; // Gegner ohne eigenes Porträt nutzen das eines Verwandten
+  const BILD_WIE = { alte_unke: "schlammkroete", zoellner: "knochenwaechter" }; // Gegner ohne eigenes Porträt nutzen das eines Verwandten
   const gegnerBild = (art) => (BILDER.has(BILD_WIE[art] || art) ? `img/gegner/${BILD_WIE[art] || art}.jpg` : null);
   /** Gegner im SVG (Koordinaten -26…26): rundes Porträt mit rotem Rand, sonst Symbol */
   const gegner = (art, grau) => {

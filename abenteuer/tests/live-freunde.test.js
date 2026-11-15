@@ -45,7 +45,7 @@ const { chromium } = require('playwright');
 
   // A startet eine neue Kampagne: Abenteuer wählen → Regeln → Schwierigkeit → Spielweise: Tisch + Handys → Einladen
   await A.click('#fenster-zu');
-  await A.click('#hub-start [data-hub="neu"]');
+  await A.click('.dorf-ort[data-hub="kampagnen"]'); await A.click('.gilde-knoepfe [data-hub="neu"]');
   check(await until(A, () => Boolean(document.querySelector('[data-neu-abenteuer="grauwacht"]')) && !document.querySelector('#f-titel')), 'Neue Kampagne: zuerst das Abenteuer wählen (ohne Freunde-Auswahl)');
   await A.click('[data-neu-abenteuer="grauwacht"]');
   check(await until(A, () => !document.querySelector('#kodex').hidden), 'Der Start beginnt mit den Regeln');

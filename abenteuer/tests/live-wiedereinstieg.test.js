@@ -18,7 +18,7 @@ const { chromium } = require('playwright');
   let kid = null;
   const L = await page('Tisch');
   try {
-    await L.goto(BASE + '/abenteuer/index.html?schnell'); await L.click('#my-gast-start'); await L.click('#hub-start [data-hub="neu"]'); await L.click('[data-neu-abenteuer="grauwacht"]');
+    await L.goto(BASE + '/abenteuer/index.html?schnell'); await L.click('#my-gast-start'); await L.click('.dorf-ort[data-hub="kampagnen"]'); await L.click('.gilde-knoepfe [data-hub="neu"]'); await L.click('[data-neu-abenteuer="grauwacht"]');
     await L.waitForSelector('#kodex:not([hidden])'); for (let i = 0; i < 6; i++) await L.click('#kodex-weiter');
     await L.click('#live'); await L.waitForSelector('#ei-weiter'); await L.click('#ei-weiter');
     await L.waitForSelector('.beitritt .code'); const code = (await L.textContent('.beitritt .code')).trim();

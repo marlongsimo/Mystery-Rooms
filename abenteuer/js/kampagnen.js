@@ -162,16 +162,17 @@
   let archivOffen = false;
   function box(inhalt) {
     const o = $("#qr-overlay");
-    o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-labelledby="k-titel"><div class="k-kopf"><h2 id="k-titel">Meine Kampagnen</h2><button class="link" id="k-zu">Schließen</button></div>${inhalt}</div>`;
+    o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-labelledby="k-titel"><div class="k-kopf"><h2 id="k-titel">Meine Kampagnen</h2><button class="link" id="k-zu">Schließen</button></div><div class="knoepfe gilde-knoepfe"><button class="btn" data-hub="neu">Neue Kampagne starten</button><button class="btn ghost" data-hub="beitreten">Kampagne beitreten</button></div>${inhalt}</div>`;
     o.hidden = false; $("#k-zu").onclick = () => { o.hidden = true; };
+    o.querySelectorAll(".gilde-knoepfe [data-hub]").forEach((b) => b.addEventListener("click", () => { o.hidden = true; })); // weiter geht es über die Startseite (js/mythara.js)
     return o;
   }
   function eintrag(c) {
-    const i = c.checkpoint || {}, host = c.role === "host", fertig = c.status === "abgeschlossen" || c.status === "archiviert";
+    const i = c.checkpoint || {}, host = c.role === "host", fertig = c.status === "abgeschlossen" || c.status === "archiviert", pause = c.status === "pausiert";
     const spieler = (c.members || []).filter((m) => m.role !== "host");
     const knoepfe = host ? [
-      !fertig && c.version > 0 && i.live ? `<button class="btn klein" data-k="handys" data-id="${c.id}">Mit Handys fortsetzen</button>` : "",
-      !fertig && c.version > 0 ? `<button class="btn ${i.live ? "ghost " : ""}klein" data-k="allein" data-id="${c.id}">${i.live ? "Allein fortsetzen" : "Fortsetzen"}</button>` : "",
+      !fertig && c.version > 0 && i.live ? `<button class="btn klein" data-k="handys" data-id="${c.id}">${pause ? "Mit Handys wieder aufnehmen" : "Mit Handys fortsetzen"}</button>` : "",
+      !fertig && c.version > 0 ? `<button class="btn ${i.live ? "ghost " : ""}klein" data-k="allein" data-id="${c.id}">${i.live ? (pause ? "Allein wieder aufnehmen" : "Allein fortsetzen") : pause ? "Wieder aufnehmen" : "Fortsetzen"}</button>` : "",
       !fertig && c.version === 0 ? `<button class="btn klein" data-k="beginnen" data-id="${c.id}">Beginnen</button>` : "",
       c.version > 0 && c.status !== "archiviert" ? `<button class="btn ghost klein" data-k="neu" data-id="${c.id}">Neu beginnen</button>` : "",
       !fertig && window.MYTHARA && window.MYTHARA.istKonto() ? `<button class="btn ghost klein" data-k="einladen" data-id="${c.id}">Freunde einladen</button>` : "",
@@ -192,15 +193,16 @@
     box(`<p class="note">Kampagnen werden geladen …</p>`);
     let liste;
     try { liste = await rpc("rpg_my_campaigns", {}); }
-    catch (e) { box(`<p class="fb">${esc(e.message)}</p>`); return; }
+    catch (e) { if (!$("#qr-overlay").hidden) box(`<p class="fb">${esc(e.message)}</p>`); return; }
+    if ($("#qr-overlay").hidden) return; // inzwischen weitergeklickt (z. B. „Neue Kampagne starten“): nicht wieder aufklappen
     const offen = liste.filter((c) => c.status !== "archiviert"), archiv = liste.filter((c) => c.status === "archiviert");
     const lokal = window.ABT && window.ABT.gespeichert() && !(K && K.id) ? `<div class="k-lokal"><p>In diesem Browser liegt ein Abenteuer ohne Kampagne.</p><button class="btn klein" data-k="uebernehmen">Als Kampagne speichern</button></div>` : "";
-    const o = box(`<div class="knoepfe gilde-knoepfe"><button class="btn" data-hub="neu">Neue Kampagne starten</button><button class="btn ghost" data-hub="beitreten">Kampagne beitreten</button></div>${lokal}
+    const o = box(`${lokal}
       ${offen.length ? `<ul class="k-liste">${offen.map(eintrag).join("")}</ul>` : `<p class="note">Noch keine Kampagne. Startet ein Abenteuer – es wird automatisch als Kampagne gespeichert.</p>`}
       ${archiv.length ? `<button class="link" id="k-archiv">${archivOffen ? "Archiv ausblenden" : `Archiv anzeigen (${archiv.length})`}</button>${archivOffen ? `<ul class="k-liste archiv">${archiv.map(eintrag).join("")}</ul>` : ""}` : ""}
       <p class="note klein">${window.MYTHARA && window.MYTHARA.istKonto() ? "Deine Kampagnen sind mit deinem Konto verbunden." : "Als Gast gehören deine Kampagnen zu diesem Browser. Mit einem Konto hast du sie auf jedem Gerät."}</p>`);
     const a = $("#k-archiv"); if (a) a.onclick = () => { archivOffen = !archivOffen; bibliothek(); };
-    o.querySelectorAll(".gilde-knoepfe [data-hub]").forEach((b) => b.addEventListener("click", () => { o.hidden = true; })); // weiter geht es über die Startseite (js/mythara.js)
+
     o.querySelectorAll("[data-k]").forEach((b) => { b.onclick = () => aktion(b.dataset.k, b.dataset.id, liste.find((c) => c.id === b.dataset.id), b); });
   }
   async function aktion(was, id, c, b) {

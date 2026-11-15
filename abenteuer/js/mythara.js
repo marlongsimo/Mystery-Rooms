@@ -650,7 +650,8 @@
     const h = e.target.closest("[data-hub]"); if (!h || $("#hub").hidden) { const m = $("#hub-menue"); if (m && !m.hidden && !e.target.closest(".hub-profil")) m.hidden = true; return; }
     const was = h.dataset.hub;
     if (was === "uebersicht") return zeigeHub();
-    if (was === "kampagnen") return window.KAMPAGNE ? window.KAMPAGNE.bibliothek() : toast("Kampagnen sind gerade nicht verfügbar.");
+    if (was === "kampagnen") return window.KAMPAGNE ? window.KAMPAGNE.bibliothek()
+      : seiteZeigen("kampagnen", `<h1 class="hub-gruss">Abenteurergilde</h1><p class="hub-untertitel">Gespeicherte Kampagnen sind gerade nicht verfügbar. Ein neues Abenteuer könnt ihr trotzdem beginnen.</p><div class="knoepfe gilde-knoepfe"><button class="btn" data-hub="neu">Neue Kampagne starten</button><button class="btn ghost" data-hub="beitreten">Kampagne beitreten</button></div>`);
     if (was === "helden") return heldenSeite();
     if (was === "neu") return neueKampagne();
     if (was === "freunde") return freundeZeigen();

@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
   const T = await page({ width: 1100, height: 900 }, 'Tisch'), H = {};
   try {
     await T.goto(BASE + '/abenteuer/index.html?schnell&testlauf'); await T.evaluate(() => localStorage.clear()); await T.reload();
-    await T.click('#my-gast-start'); await T.click('#hub-start [data-hub="neu"]'); await T.click('[data-neu-abenteuer="rabenmoor"]');
+    await T.click('#my-gast-start'); await T.click('.dorf-ort[data-hub="kampagnen"]'); await T.click('.gilde-knoepfe [data-hub="neu"]'); await T.click('[data-neu-abenteuer="rabenmoor"]');
     await T.waitForSelector('#kodex:not([hidden])'); for (let i = 0; i < 6; i++) await T.click('#kodex-weiter');
     await T.click('#live'); await until(T, () => Boolean(document.querySelector('.beitritt .code')));
     const code = (await T.textContent('.beitritt .code')).trim();

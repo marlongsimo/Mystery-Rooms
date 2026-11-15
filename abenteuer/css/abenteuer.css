@@ -1839,3 +1839,31 @@ small.meister, .fkarte small.meister, .gk-info small.meister { color: #ffd75e; }
 /* Aushänge der Gilde mit echter Pergamentstruktur (Ausschnitt aus dem Auftragsblatt) */
 .gilde .k-eintrag { background: linear-gradient(175deg, rgba(255,244,214,.34), rgba(120,78,28,.10) 60%, rgba(90,56,18,.26)), url("../img/dorf/pergament.webp") center / cover; box-shadow: 0 10px 22px rgba(0,0,0,.6), inset 0 0 34px rgba(96,58,18,.5), inset 0 0 4px rgba(60,36,10,.6); }
 .gilde .k-text b { color: #24160a; } .gilde .k-text small { color: #4a3619; }
+/* Aushänge als ganzes Pergamentblatt (Querformat, mit gerissenem Rand, Zierrahmen und Siegel) – ab Tablet-Breite.
+   Am Handy sind die Blätter zu schmal für den Rahmen: dort bleibt die schlichte Pergamentstruktur. */
+@media (min-width: 720px) {
+  .gilde .k-liste { grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 10px 14px; padding: 4px 0 0; }
+  .gilde .k-eintrag, .gilde .k-eintrag:nth-child(even) { aspect-ratio: 1260 / 778; padding: 13.5% 11% 8% 10.5%; gap: 6px; align-content: start; background: url("../img/dorf/aushang.webp") center / 100% 100% no-repeat; box-shadow: none; border-radius: 0;
+    -webkit-mask-image: radial-gradient(ellipse 60% 62% at 50% 50%, #000 86%, transparent 100%); mask-image: radial-gradient(ellipse 60% 62% at 50% 50%, #000 86%, transparent 100%); filter: drop-shadow(0 10px 14px rgba(0,0,0,.55)); }
+  .gilde .k-eintrag:hover { box-shadow: none; }
+  .gilde .k-eintrag::before, .gilde .k-eintrag::after { display: none; }
+  .gilde .k-text { padding-right: 0; gap: 1px; } .gilde .k-text b { font-size: clamp(17px, 1.700vw, 22px); }
+  .gilde .k-text small { font-size: 14.500px; line-height: 1.25; }
+  .gilde .k-knoepfe { padding-top: 6px; padding-right: 15%; gap: 5px; border-top-color: rgba(90,62,24,.35); }
+  .gilde .k-knoepfe .btn { padding: 4px 9px; font-size: 12.500px; }
+  .gilde .k-eintrag[data-status="pausiert"] { filter: drop-shadow(0 10px 14px rgba(0,0,0,.55)) saturate(.82); }
+  .gilde .k-eintrag[data-status="abgeschlossen"], .gilde .k-eintrag[data-status="archiviert"] { filter: drop-shadow(0 10px 14px rgba(0,0,0,.55)) saturate(.45) brightness(.92); }
+}
+@media (min-width: 720px) {
+  .gilde .k-eintrag, .gilde .k-eintrag:nth-child(even) { padding: 12.500% 11% 8.500% 10.500%; gap: 4px; }
+  .gilde .k-text b { font-size: clamp(16px, 1.450vw, 20px); line-height: 1.1; }
+  .gilde .k-status { font-size: 10px; }
+  .gilde .k-text small { font-size: 13.500px; line-height: 1.2; }
+  .gilde .k-knoepfe { padding-top: 5px; gap: 4px; }
+  .gilde .k-knoepfe .btn { padding: 3px 8px; font-size: 12px; }
+}
+@media (min-width: 720px) {
+  .karte-box.gilde { box-sizing: border-box; overflow-x: hidden; }
+  .gilde .k-liste { justify-items: center; }
+  .gilde .k-eintrag, .gilde .k-eintrag:nth-child(even) { width: 100%; max-width: 640px; min-width: 0; }
+}

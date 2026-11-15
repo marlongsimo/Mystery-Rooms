@@ -1867,3 +1867,45 @@ small.meister, .fkarte small.meister, .gk-info small.meister { color: #ffd75e; }
   .gilde .k-liste { justify-items: center; }
   .gilde .k-eintrag, .gilde .k-eintrag:nth-child(even) { width: 100%; max-width: 640px; min-width: 0; }
 }
+
+/* ---------- Intro-Film: Standbilder mit Kamerafahrt, Überblendung und eingeblendetem Text ---------- */
+body.intro-an { overflow: hidden; }
+.intro-film { position: fixed; inset: 0; z-index: 200; background: #000; overflow: hidden; cursor: pointer; transition: opacity .6s; }
+.intro-film.zu { opacity: 0; pointer-events: none; }
+.intro-buehne { position: absolute; inset: 0; }
+.intro-bild { position: absolute; inset: -6%; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.200s ease; animation-timing-function: linear; animation-fill-mode: both; will-change: transform, opacity; }
+.intro-bild.an { opacity: 1; }
+.intro-bild.fahrt-zoom-rein { animation-name: intro-zoom-rein; } .intro-bild.fahrt-zoom-raus { animation-name: intro-zoom-raus; }
+.intro-bild.fahrt-rechts { animation-name: intro-rechts; } .intro-bild.fahrt-links { animation-name: intro-links; } .intro-bild.fahrt-runter { animation-name: intro-runter; }
+@keyframes intro-zoom-rein { from { transform: scale(1); } to { transform: scale(1.140); } }
+@keyframes intro-zoom-raus { from { transform: scale(1.160); } to { transform: scale(1); } }
+@keyframes intro-rechts { from { transform: scale(1.080) translateX(2.500%); } to { transform: scale(1.080) translateX(-2.500%); } }
+@keyframes intro-links { from { transform: scale(1.080) translateX(-2.500%); } to { transform: scale(1.080) translateX(2.500%); } }
+@keyframes intro-runter { from { transform: scale(1.100) translateY(-3%); } to { transform: scale(1.100) translateY(3%); } }
+/* Handy hochkant: Breitbilder füllen die Höhe, die Kamera fährt quer darüber – so sieht man das ganze Bild */
+@media (orientation: portrait) and (max-width: 760px) {
+  .intro-bild:not(.passt) { inset: 0 auto 0 0; width: calc(100vh * 1672 / 941); width: calc(100dvh * 1672 / 941); background-size: 100% 100%; }
+  .intro-bild.fahrt-zoom-rein:not(.passt), .intro-bild.fahrt-rechts:not(.passt), .intro-bild.fahrt-runter:not(.passt) { animation-name: intro-quer-hin; }
+  .intro-bild.fahrt-zoom-raus:not(.passt), .intro-bild.fahrt-links:not(.passt) { animation-name: intro-quer-her; }
+}
+@keyframes intro-quer-hin { from { transform: translateX(calc(-18% )); } to { transform: translateX(calc(-100% + 100vw + 18%)); } }
+@keyframes intro-quer-her { from { transform: translateX(calc(-100% + 100vw + 18%)); } to { transform: translateX(-18%); } }
+.intro-schleier { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 85% at 50% 42%, transparent 45%, rgba(0,0,0,.6) 100%), linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 22%, transparent 55%, rgba(0,0,0,.86) 100%); }
+.intro-text { position: absolute; left: 50%; bottom: clamp(74px, 13vh, 150px); transform: translate(-50%, 12px); width: min(92vw, 900px); margin: 0; text-align: center; font: 500 clamp(21px, 3.200vw, 38px)/1.3 "Cormorant Garamond", Georgia, serif; color: #f6ecd4; text-shadow: 0 2px 14px #000, 0 0 3px #000; opacity: 0; transition: opacity .9s ease, transform .9s ease; }
+.intro-text.an { opacity: 1; transform: translate(-50%, 0); }
+.intro-ende { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; gap: 6px; background: rgba(0,0,0,.55); animation: intro-titel 1.400s ease both; }
+.intro-ende[hidden] { display: none; }
+.intro-ende span { font: 700 clamp(44px, 10vw, 110px) var(--schrift-titel); letter-spacing: .08em; color: #f6dc9c; text-shadow: 0 0 40px rgba(246,200,110,.55), 0 4px 0 #2a1a08; }
+.intro-ende small { font: 600 clamp(13px, 2vw, 20px) var(--schrift-titel); letter-spacing: .5em; text-transform: uppercase; color: #e9c77e; }
+@keyframes intro-titel { from { opacity: 0; transform: scale(1.060); } to { opacity: 1; transform: none; } }
+.intro-leiste { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px calc(14px + env(safe-area-inset-bottom)); }
+.intro-punkte { display: flex; gap: 6px; } .intro-punkte i { width: 22px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.25); transition: background .4s; } .intro-punkte i.an { background: #e9c77e; }
+.intro-leiste .btn { background: rgba(0,0,0,.55); border-color: rgba(233,199,126,.6); color: #f3e7cc; }
+@media (max-width: 560px) { .intro-punkte i { width: 12px; } }
+@media (prefers-reduced-motion: reduce) { .intro-bild { animation: none !important; inset: 0; } }
+.lore-intro-knopf { display: flex; justify-content: center; margin: 0 0 22px; }
+.intro-knoepfe { display: flex; gap: 8px; }
+/* Vorschau-Seite des Intros (intro.html) */
+.intro-vorschau { min-height: 100vh; display: grid; place-content: center; gap: 14px; text-align: center; padding: 24px; background: radial-gradient(90% 70% at 50% 40%, #1b1410, #07070a); color: #f3e7cc; }
+.intro-vorschau h1 { margin: 0; font: 700 clamp(34px, 7vw, 64px) var(--schrift-titel); letter-spacing: .08em; color: #f6dc9c; }
+.intro-vorschau p { margin: 0; color: #cdbf9f; max-width: 520px; }

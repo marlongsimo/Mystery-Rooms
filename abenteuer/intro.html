@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Mythara – Intro (Vorschau)</title>
+  <meta name="theme-color" content="#07070a">
+  <link rel="icon" href="../portal/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/abenteuer.css?v=75">
+</head>
+<body>
+  <!-- Vorschau des Intros: läuft hier für sich, ohne Registrierung. Im Spiel ist es noch nicht eingehängt (js/intro.js, AKTIV). -->
+  <main class="intro-vorschau">
+    <h1>MYTHARA</h1>
+    <p>Vorschau des Intros. Etwa eine Minute, mit Musik. Ein Tipp ins Bild springt zur nächsten Szene.</p>
+    <div class="knoepfe mitte"><button class="btn gross" id="vorschau-start">▶ Intro abspielen</button></div>
+  </main>
+  <script src="js/intro.js?v=2"></script>
+  <script>document.getElementById("vorschau-start").onclick = function () { this.textContent = "▶ Noch einmal abspielen"; window.ABINTRO.zeigen(function () {}); };</script>
+</body>
+</html>

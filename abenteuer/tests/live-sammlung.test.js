@@ -46,6 +46,9 @@ const STARTER = ['schildwaechter', 'elementarist', 'trickser', 'lichtbringer', '
   await A.click('#my-reg'); await A.fill('#my-reg-name', NAME);
   await until(A, () => /ist frei/.test(document.querySelector('#my-name-info').textContent));
   await A.fill('#my-reg-pw', PW); await A.fill('#my-reg-pw2', PW); await A.click('#my-reg-form .my-knopf');
+  // vor der Heldenwahl läuft das Intro (überspringbar)
+  check(await until(A, () => { const f = document.querySelector('.intro-film'); return Boolean(f && /Am Anfang war Mythara/.test(f.textContent)); }), 'Nach der Registrierung: das Intro startet mit der ersten Szene');
+  await A.click('#intro-skip');
   check(await until(A, () => { const b = document.querySelector('#sm-buehne'); return b && !b.hidden && /Runde 1 von 3/.test(b.textContent); }), 'Nach der Registrierung: Startrunde 1 von 3');
   const gewaehlt = [], gesehen = [];
   for (let r = 1; r <= 3; r++) {

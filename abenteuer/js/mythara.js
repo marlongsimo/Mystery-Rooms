@@ -413,10 +413,12 @@
   function loreSeite() {
     const L = window.ABLORE || { welt: [] };
     seiteZeigen("lore", `<div class="lore"><p class="shop-eyebrow">Der Splitterbrunnen</p><h1 class="hub-gruss">Die Geschichte von Mythara</h1><p class="hub-untertitel">${esc(L.auftakt || "")}</p>
-      ${window.ABINTRO && window.ABINTRO.aktiv ? `<div class="lore-intro-knopf"><button class="btn" id="lore-intro">▶ Intro ansehen</button></div>` : ""}
+      ${window.ABINTRO && window.ABINTRO.aktiv ? `<div class="lore-intro-knopf"><button class="btn ghost" id="lore-intro">▶ Intro noch einmal ansehen</button></div>` : ""}
       ${L.welt.map((k, i) => `<section class="lore-kapitel"><span class="lore-nr">${["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][i] || i + 1}</span><h2>${esc(k.titel)}</h2>${k.text.map((a) => `<p>${esc(a)}</p>`).join("")}</section>`).join("")}
       <p class="lore-schluss">${esc(L.schluss || "")}</p></div>`);
     const ib = $("#lore-intro"); if (ib) ib.onclick = () => window.ABINTRO.zeigen(() => {});
+    // Am Splitterbrunnen läuft zuerst das Intro (überspringbar), darunter steht schon der Text
+    if (window.ABINTRO && window.ABINTRO.aktiv && !window.ABINTRO.still) window.ABINTRO.zeigen(() => {});
   }
   function weltSeite(abenteuer) {
     if (!abenteuer) {

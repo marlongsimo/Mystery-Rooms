@@ -18,8 +18,8 @@
     { bild: "img/intro/szene-8.webp", dauer: 6500, fahrt: "links", text: "Jetzt werden die Siegel schwach. Etwas erwacht." },
     { bild: "img/dorf/dorf-breit.webp", hoch: "img/dorf/dorf-hoch.webp", dauer: 7500, fahrt: "zoom-raus", text: "Manche tragen einen größeren Splitter in sich. Es zieht sie dorthin, wo es bricht. Du bist einer von ihnen." },
   ];
-  // AKTIV: Solange false, läuft das Intro nur auf der Vorschau-Seite (intro.html) – nicht nach der Registrierung und nicht am Splitterbrunnen.
-  const AKTIV = false, MUSIK = "ton/intro.mp3";
+  // AKTIV: Bei false liefe das Intro nur auf der Vorschau-Seite (intro.html) – nicht nach der Registrierung und nicht am Splitterbrunnen.
+  const AKTIV = true, MUSIK = "ton/intro.mp3";
   const MERKER = "ab_intro_gesehen";
   // ?schnell und ?testlauf (automatische Tests) überspringen das Intro; ?intro erzwingt es
   const PARAM = new URLSearchParams(location.search);
@@ -78,5 +78,6 @@
     weiter();
   }
 
-  window.ABINTRO = { zeigen, gesehen, SZENEN, aktiv: AKTIV || PARAM.has("intro") };
+  // still: in automatischen Tests (?schnell, ?testlauf) startet das Intro nirgends von selbst
+  window.ABINTRO = { zeigen, gesehen, SZENEN, aktiv: AKTIV || PARAM.has("intro"), still: !PARAM.has("intro") && (PARAM.has("schnell") || PARAM.has("testlauf")) };
 })();

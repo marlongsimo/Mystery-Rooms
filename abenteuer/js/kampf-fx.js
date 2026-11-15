@@ -269,7 +269,7 @@
       const d = f.tp - v, p = figurPos(f.id); if (!p) continue;
       if (d < 0) {
         const kr = krit && f.seite === "gegner", fern = gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite, amZiel = fern && AM_ZIEL[gArt];
-        const wann = fern ? (amZiel ? wuerfel + 120 : flug(schuetze.id, f.id, gArt, wuerfel + nr++ * 90) || 180) : 180;
+        const wann = fern ? (amZiel ? wuerfel + 120 : flug(schuetze.id, f.id, gArt, wuerfel + nr++ * 90) || wuerfel + 180) : wuerfel + 180; // auch im Nahkampf erst nach dem Würfel
         setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel ? 10 : 26);
           if (amZiel) saeule(f.id, gArt);
           const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, wann);
@@ -277,7 +277,7 @@
     }
     // Schutz: Steigt die Rüstungsklasse einer Figur (Schild des Glaubens, Schutzhaltung, Schutzkreis …), leuchtet ein Schild auf
     for (const f of st.figuren) { const v = vorher.rk && vorher.rk[f.id]; if (v != null && f.rk > v && f.tp > 0) schild(f.id); }
-    if (krit) { setTimeout(() => { blitz("gold"); beben(); }, 160); }
+    if (krit) { setTimeout(() => { blitz("gold"); beben(); }, wuerfel + 160); }
     const gefallen = st.figuren.find((f) => f.seite === "gegner" && vorher.tp[f.id] > 0 && f.tp <= 0 && istBoss(R, f) && !f.geflohen);
     if (gefallen) setTimeout(() => { beben(); blitz("gold"); bossFall(gefallen); }, 500);
     if (gArt !== "feuer" && logNeu.some((l) => /Feuerball|Flammen|Glut|Feuer/.test(l.t) && l.art === "wurf")) { const z = st.figuren.filter((f) => vorher.tp[f.id] > f.tp && f.seite === "gegner"); for (const f of z) { const p = figurPos(f.id); if (p) wolke(p.x, p.y, "feuer", 60); } }

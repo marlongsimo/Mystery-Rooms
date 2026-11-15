@@ -305,7 +305,7 @@
     const HL = window.ABH_HELDEN, F = window.ABF;
     if (SM && !SM.zustand().geladen) SM.laden().then(() => { const s = $("#hub-seite"); if (s && !s.hidden && s.querySelector("[data-heldenseite]")) heldenSeite(klasse, fid); });
     const frei = (f) => !smAktiv() || SM.frei(f);
-    if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Charaktere</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p>${sammlungKopf()}<div class="hub-helden" data-heldenseite>${HL.klassenWahl({ frei: smAktiv() ? frei : null })}</div>${smAktiv() && SM.zustand().konto && SM.zustand().stufenDa ? `<h2 class="hub-zwischen">Deine Helden</h2>${SM.heldenUebersichtHtml()}` : ""}`); return; }
+    if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Heldenhalle</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p>${sammlungKopf()}<div class="hub-helden" data-heldenseite>${HL.klassenWahl({ frei: smAktiv() ? frei : null })}</div>${smAktiv() && SM.zustand().konto && SM.zustand().stufenDa ? `<h2 class="hub-zwischen">Deine Helden</h2>${SM.heldenUebersichtHtml()}` : ""}`); return; }
     const helden = HL.vonKlasse(klasse); fid = fid || helden.find(frei) || helden[0];
     const gesperrt = !frei(fid) ? `<div class="sm-gesperrt">${SM.SCHLOSS}<span><b>Noch gesperrt.</b> ${esc(SM.gesperrtText())}</span></div>` : "";
     seiteZeigen("helden", `<div class="hub-helden" data-heldenseite>${HL.klassenLeiste(klasse).replace('id="klassen-zurueck"', 'data-held-klassen')}${HL.klassenKopf(klasse)}
@@ -405,19 +405,19 @@
   function regelnSeite() {
     // Grundlagen in einfachen Worten (js/hilfe.js); ohne das Modul bleibt der Kodex als Ersatz
     const H = window.ABHILFE;
-    seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">Die Grundlagen, einfach erklärt. Ihr müsst nichts davon auswendig können: Das Spiel rechnet für euch.</p>${H ? `<div class="hub-text hilfe">${H.html()}</div>` : `<div class="hub-text kodex">${kopie('#kodex .seite:not([data-seite="6"])')}</div>`}`);
+    seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe</h1><p class="hub-untertitel">Die Grundlagen, einfach erklärt. Ihr müsst nichts davon auswendig können: Das Spiel rechnet für euch.</p>${H ? `<div class="hub-text hilfe">${H.html()}</div>` : `<div class="hub-text kodex">${kopie('#kodex .seite:not([data-seite="6"])')}</div>`}`);
     if (H) H.binden(document);
   }
   /** Lore: die Hintergründe der Welt bis zum Heute (Texte in js/lore.js) */
   function loreSeite() {
     const L = window.ABLORE || { welt: [] };
-    seiteZeigen("lore", `<div class="lore"><p class="shop-eyebrow">Die Splitterlande</p><h1 class="hub-gruss">Die Geschichte von Mythara</h1><p class="hub-untertitel">${esc(L.auftakt || "")}</p>
+    seiteZeigen("lore", `<div class="lore"><p class="shop-eyebrow">Der Splitterbrunnen</p><h1 class="hub-gruss">Die Geschichte von Mythara</h1><p class="hub-untertitel">${esc(L.auftakt || "")}</p>
       ${L.welt.map((k, i) => `<section class="lore-kapitel"><span class="lore-nr">${["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][i] || i + 1}</span><h2>${esc(k.titel)}</h2>${k.text.map((a) => `<p>${esc(a)}</p>`).join("")}</section>`).join("")}
       <p class="lore-schluss">${esc(L.schluss || "")}</p></div>`);
   }
   function weltSeite(abenteuer) {
     if (!abenteuer) {
-      seiteZeigen("welt", `<h1 class="hub-gruss">Kampagnenwelt</h1><p class="hub-untertitel">Die Splitterlande – und die Abenteuer, die dort auf euch warten.</p>
+      seiteZeigen("welt", `<h1 class="hub-gruss">Stadttor</h1><p class="hub-untertitel">Hinter dem Tor liegen die Splitterlande – und die Abenteuer, die dort auf euch warten.</p>
         <div class="hub-welt-liste">
           ${ABENTEUER().map((m) => abenteuerKachel(m, "data-welt")).join("")}
           <div class="hub-kachel welt bald" aria-disabled="true"><b>Weitere Abenteuer</b><small>sind in Vorbereitung.</small></div>
@@ -512,12 +512,12 @@
     }; });
   }
   async function freundeZeigen(suchErgebnis) {
-    if (!istKonto()) { fenster("Freunde", `<p class="note">Freunde gibt es mit einem Spielerkonto: Dann kannst du andere über ihren Benutzernamen finden und zu deinen Kampagnen einladen.</p><button class="my-knopf rot" data-profil="registrieren">Konto erstellen</button>`); return; }
-    let d; try { d = await netz().rpc("rpg_my_friends", {}); } catch (e) { fenster("Freunde", `<p class="fb">${esc(e.message)}</p>`); return; }
+    if (!istKonto()) { fenster("Taverne", `<p class="note">Freunde gibt es mit einem Spielerkonto: Dann kannst du andere über ihren Benutzernamen finden und zu deinen Kampagnen einladen.</p><button class="my-knopf rot" data-profil="registrieren">Konto erstellen</button>`); return; }
+    let d; try { d = await netz().rpc("rpg_my_friends", {}); } catch (e) { fenster("Taverne", `<p class="fb">${esc(e.message)}</p>`); return; }
     const zeile = (x, knoepfe) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.handle)}</span><b>${esc(x.handle)}</b><span class="f-knoepfe">${knoepfe}</span></li>`;
     const s = suchErgebnis;
     const sKnopf = !s ? "" : s.beziehung === "freund" ? `<span class="f-info">Ihr seid befreundet.</span>` : s.beziehung === "angefragt" ? `<span class="f-info">Anfrage gesendet.</span>` : s.beziehung === "anfrage_an_mich" ? `<button class="btn klein" data-f="annehmen" data-name="${esc(s.handle)}">Anfrage annehmen</button>` : s.beziehung === "blockiert" ? `<button class="btn ghost klein" data-f="entsperren" data-name="${esc(s.handle)}">Entsperren</button>` : `<button class="btn klein" data-f="anfragen" data-name="${esc(s.handle)}">Freundschaftsanfrage senden</button>`;
-    const o = fenster("Freunde", `<form class="f-suche" id="f-suche"><label for="f-name">Spieler finden</label><div><input id="f-name" placeholder="Genauer Benutzername" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn klein" type="submit">Suchen</button></div><p class="my-fb" id="f-fb" role="status"></p></form>
+    const o = fenster("Taverne", `<form class="f-suche" id="f-suche"><label for="f-name">Spieler finden</label><div><input id="f-name" placeholder="Genauer Benutzername" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn klein" type="submit">Suchen</button></div><p class="my-fb" id="f-fb" role="status"></p></form>
       ${s ? `<ul class="f-liste treffer">${zeile(s, sKnopf)}</ul>` : ""}
       ${d.an_mich.length ? `<h3 class="f-unter">Anfragen an dich</h3><ul class="f-liste">${d.an_mich.map((x) => zeile(x, `<button class="btn klein" data-f="annehmen" data-name="${esc(x.handle)}">Annehmen</button><button class="btn ghost klein" data-f="ablehnen" data-name="${esc(x.handle)}">Ablehnen</button>`)).join("")}</ul>` : ""}
       <h3 class="f-unter">Deine Freunde (${d.freunde.length})</h3>

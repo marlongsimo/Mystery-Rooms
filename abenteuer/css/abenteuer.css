@@ -1794,3 +1794,45 @@ small.meister, .fkarte small.meister, .gk-info small.meister { color: #ffd75e; }
 .hub-seite-inhalt:has([data-arena]) .arena-mein, .hub-seite-inhalt:has([data-arena]) .arena-liste li, .hub-seite-inhalt:has([data-arena]) .arena-team, .hub-seite-inhalt:has([data-arena]) .arena-info, .hub-seite-inhalt:has([data-arena]) .arena-held { background-color: rgba(8,8,11,.78); }
 .hub-seite-inhalt:has([data-arena]) .hub-gruss, .hub-seite-inhalt:has([data-arena]) .hub-untertitel, .hub-seite-inhalt:has([data-arena]) .note, .hub-seite-inhalt:has([data-arena]) .hub-zwischen { text-shadow: 0 2px 10px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.9); }
 .hub-seite-inhalt:has([data-arena]) .note { color: #e6dcc6; }
+
+/* Händler: der Stand als Hintergrund */
+.hub-seite-inhalt:has(.shop), .hub-seite-inhalt:has(.shop-bald) { background: linear-gradient(180deg, rgba(8,8,11,.45) 0%, rgba(8,8,11,.66) 40%, rgba(8,8,11,.88) 100%), url("../img/dorf/haendler.webp") center / cover no-repeat; min-height: min(78vh, 760px); }
+.hub-seite-inhalt:has(.shop) .hub-gruss, .hub-seite-inhalt:has(.shop) .hub-untertitel, .hub-seite-inhalt:has(.shop) .note, .hub-seite-inhalt:has(.shop-bald) .hub-gruss, .hub-seite-inhalt:has(.shop-bald) .hub-untertitel { text-shadow: 0 2px 10px rgba(0,0,0,.95), 0 0 2px #000; }
+.hub-seite-inhalt:has(.shop) .shop-held { background: rgba(10,9,8,.82); backdrop-filter: blur(2px); }
+
+/* ---------- Abenteurergilde als Auftragsbrett (Prototyp): Holzbrett, Aushänge aus Pergament, Wachssiegel für den Stand ---------- */
+.karte-box.gilde { max-width: 1040px; padding: 22px 24px 26px; border: 1px solid #b08a45; border-radius: 8px;
+  background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.55)), repeating-linear-gradient(92deg, #2b1c10 0 46px, #33210f 46px 49px, #281a0e 49px 118px, #3a2613 118px 121px), #2b1c10;
+  box-shadow: inset 0 0 0 3px #150d06, inset 0 0 0 4px rgba(217,178,106,.45), inset 0 0 60px rgba(0,0,0,.7), 0 24px 70px rgba(0,0,0,.75); }
+.gilde .k-kopf { align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(217,178,106,.35); }
+.gilde-eyebrow { margin: 0 0 2px; font: 600 11px var(--schrift-titel); letter-spacing: .2em; text-transform: uppercase; color: #d9b26a; }
+.gilde .k-kopf h2 { font-size: clamp(26px, 4vw, 36px); color: #f6dc9c; text-shadow: 0 2px 0 #1a0f06, 0 0 22px rgba(246,200,110,.25); }
+.gilde .gilde-knoepfe { margin: 4px 0 6px; gap: 10px; }
+.gilde .gilde-knoepfe .btn { padding: 12px 20px; font: 600 15px var(--schrift-titel); letter-spacing: .04em; border-radius: 4px; }
+.gilde .gilde-knoepfe .btn:not(.ghost) { background: linear-gradient(180deg, #9a2a2a, #6d1717); border: 1px solid #d9b26a; color: #ffe9c4; box-shadow: 0 4px 0 #3d0c0c, 0 8px 18px rgba(0,0,0,.5); }
+.gilde .gilde-knoepfe .btn.ghost { background: rgba(0,0,0,.35); border: 1px solid #b08a45; color: #f3e7cc; }
+.gilde-zwischen { margin: 16px 0 2px; font: 600 13px var(--schrift-titel); letter-spacing: .16em; text-transform: uppercase; color: #e9c77e; display: flex; align-items: center; gap: 12px; }
+.gilde-zwischen::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(217,178,106,.6), transparent); }
+.gilde .k-liste { grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 22px 20px; padding: 12px 4px 4px; }
+.gilde .k-eintrag { position: relative; align-content: start; padding: 22px 20px 16px; border: 0; border-radius: 3px; color: #2c2013;
+  background: radial-gradient(120% 90% at 20% 10%, rgba(255,255,255,.35), transparent 55%), linear-gradient(175deg, #ecdcb4 0%, #e1cd9c 55%, #cfb67f 100%);
+  box-shadow: 0 10px 22px rgba(0,0,0,.6), inset 0 0 26px rgba(120,84,34,.35), inset 0 -8px 14px rgba(110,76,30,.22); transform: rotate(-.5deg); transition: transform .18s, box-shadow .18s; }
+.gilde .k-eintrag:nth-child(even) { transform: rotate(.6deg); }
+.gilde .k-eintrag:hover { transform: rotate(0) translateY(-2px); box-shadow: 0 16px 30px rgba(0,0,0,.7), inset 0 0 26px rgba(120,84,34,.35); }
+.gilde .k-eintrag::before { content: ""; position: absolute; top: -7px; left: 50%; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe9a8, #b8862f 55%, #5d3f10); box-shadow: 0 3px 5px rgba(0,0,0,.6); }
+.gilde .k-eintrag::after { content: ""; position: absolute; top: 14px; right: 16px; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #d04a4a, #8e1f1f 60%, #5a0f0f); box-shadow: 0 2px 5px rgba(0,0,0,.5), inset 0 0 0 3px rgba(0,0,0,.18); }
+.gilde .k-eintrag[data-status="pausiert"]::after { background: radial-gradient(circle at 35% 30%, #f0c668, #b9842a 60%, #6e4a10); }
+.gilde .k-eintrag[data-status="abgeschlossen"]::after, .gilde .k-eintrag[data-status="archiviert"]::after { background: radial-gradient(circle at 35% 30%, #9aa3ad, #5c646e 60%, #353b43); }
+.gilde .k-eintrag[data-status="geplant"]::after { background: radial-gradient(circle at 35% 30%, #7fb08a, #3f7650 60%, #214430); }
+.gilde .k-eintrag[data-status="abgeschlossen"], .gilde .k-eintrag[data-status="archiviert"] { opacity: 1; filter: saturate(.7); }
+.gilde .k-text { padding-right: 46px; } .gilde .k-text b { color: #2a1a0b; font-size: 21px; line-height: 1.15; }
+.gilde .k-status { color: #7a1c1c; } .gilde .k-eintrag[data-status="pausiert"] .k-status { color: #8a5a0a; }
+.gilde .k-text small { color: #5b4526; font: 15px/1.35 "Cormorant Garamond", Georgia, serif; }
+.gilde .k-knoepfe { padding-top: 10px; border-top: 1px dashed rgba(90,62,24,.5); }
+.gilde .k-knoepfe .btn { background: transparent; border: 1px solid rgba(70,46,16,.65); color: #3a2710; box-shadow: none; border-radius: 3px; }
+.gilde .k-knoepfe .btn:not(.ghost) { background: linear-gradient(180deg, #8f2626, #671515); border-color: #4a0f0f; color: #ffe9c4; box-shadow: 0 2px 0 #3d0c0c; }
+.gilde .k-knoepfe .btn.gefahr { color: #8e1f1f; border-color: rgba(142,31,31,.55); }
+.gilde .k-knoepfe .btn:hover { filter: brightness(1.08); }
+.gilde .note { color: #d9ccb0; } .gilde .link { color: #e9c77e; }
+.gilde .k-lokal { background: rgba(0,0,0,.35); border-color: #d9b26a; color: #f3e7cc; }
+@media (max-width: 560px) { .karte-box.gilde { padding: 16px 14px 20px; } .gilde .k-eintrag, .gilde .k-eintrag:nth-child(even) { transform: none; } }

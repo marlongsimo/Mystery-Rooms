@@ -902,7 +902,13 @@
     for (let i = 0; i < n; i++) { const nx = z.x + dx, ny = z.y + dy; if (blockiert(st, nx, ny) || belegt(st, nx, ny, z)) break; z.x = nx; z.y = ny; }
   }
   function setzeZustand(st, z, a, f) {
-    const zu = a.zustand;
+    let zu = a.zustand;
+    // Arena: Kontrolle wirkt auch gegen Helden, aber höchstens eine Runde – danach ist die Figur zwei Runden dagegen gefeit
+    if (st.arena && teamVon(st, z)) {
+      if ((z.arenaGefeit || 0) >= st.runde) { st.log.push({ t: `${z.name} schüttelt es ab (noch gefeit gegen Kontrolle).` }); return; }
+      z.arenaGefeit = st.runde + 2; a = Object.assign({}, a, { dauer: 1 });
+      if (zu === "netz") zu = "festgehalten"; // ein Netz hält einen Helden eine Runde fest (kein eigener Befreiungswurf nötig)
+    }
     if (zu === "netz") z.z.festgehalten = { netz: true, flucht: SG(f, a.attr) + (a.sgPlus || 0) };
     else if (zu === "festgehalten") z.z.festgehalten = { rest: a.dauer };
     else if (zu === "veraengstigt") z.z.veraengstigt = { rest: a.dauer, von: f.id };
@@ -1165,6 +1171,8 @@
       if (f.z.festgehalten) st.zug.bewegung = 0;
     }
     if (f.z.liegend && f.tp > 0 && st.zug.bewegung >= 3) { st.zug.bewegung -= 3; delete f.z.liegend; }
+    // Arena: Ein verängstigter Held kann in diesem Zug nur laufen (keine Aktion, keine Bonusaktion)
+    if (st.arena && f.team && f.z.veraengstigt) { st.zug.aktion = false; st.zug.bonus = false; st.log.push({ t: `${f.name} ist verängstigt und kann in diesem Zug nur laufen.`, art: "schlecht" }); }
     // Strahlende Aura gegen Untote
     if (f.seite === "gegner") for (const l of st.figuren) if (istFig(l, "lichtbringer") && lebt(l) && abstand(l, f) <= (hs(l) >= 8 ? 2 : 1) && lebt(f)) { const n = GEGNER[f.art].untot ? 2 : 1; st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
     if (f.z.blutung && lebt(f)) { const b = f.z.blutung, s2 = roll(st.r, b.w).total; b.rest--; if (b.rest <= 0) delete f.z.blutung; st.log.push({ t: `${f.name} blutet: ${s2} Schaden.` }); schaden(st, f, s2); }
@@ -1188,6 +1196,7 @@
     if (st.am >= st.reihe.length) {
       st.am = 0; st.runde++;
       if (st.arena && st.runde > st.arena.runden) { arenaEnde(st, "Die Zeit ist um."); return; }
+      if (st.arena && st.arena.modus === "horde") hordeWelle(st);
       st.zonen = st.zonen.filter((z) => z.bis > st.runde);
       st.brand = st.brand.filter((b) => b.bis > st.runde);
       const verblasst = st.figuren.filter((g) => g.z && g.z.segen && g.z.segenBis <= st.runde);
@@ -1315,6 +1324,8 @@
     arenaSicht(st, 0);
     if (arenaPruefen(st)) return false;
     const f = aktiv(st), tm = teamVon(st, f);
+    // Verbannte Helden setzen aus (wie verbannte Gegner)
+    if (tm && f.z && f.z.verbannt) { f.z.verbannt--; if (!f.z.verbannt) { delete f.z.verbannt; st.log.push({ t: `${f.name} kehrt aus der Verbannung zurück.` }); } else st.log.push({ t: `${f.name} ist noch verbannt.` }); weiter(st, true); return true; }
     // Chronik: wer jetzt zieht (nur stehende Figuren), damit sich die Züge beider Spieler und der Monster nachlesen lassen
     if (f.tp > 0 && !f.tot && st.arena.zugLog !== f.id + ":" + st.runde) { st.arena.zugLog = f.id + ":" + st.runde; st.log.push({ t: tm ? `▸ ${f.name} ist am Zug (${st.arena.namen[tm - 1]}).` : `▸ ${f.name} ist am Zug.`, art: "zug" }); }
     arenaSicht(st, tm);
@@ -1329,10 +1340,27 @@
     if (zt && z.team && (z.fid || z.fidA)) { const an = 3 - zt; st.arena.punkte[an] += 5; st.log.push({ t: `Team ${st.arena.namen[an - 1]}: +5 Punkte (${z.name} am Boden).`, art: "gut" }); }
     else if (!zt && z.seite === "gegner" && GEGNER[z.art]) { const p = GEGNER[z.art].boss ? 2 : 1; st.arena.punkte[t] += p; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +${p} ${p === 1 ? "Punkt" : "Punkte"} (${z.name}).`, art: "gut" }); }
   }
+  /** Horde: Jede Runde kommen neue Monster vom Rand, und sie werden stärker (mehr Leben, härtere Treffer) */
+  function hordeWelle(st) {
+    const a = st.arena, n = Math.min(4, 1 + Math.floor(st.runde / 3)), helden = st.figuren.filter((f) => f.team && f.tp > 0), neu = [];
+    st.bed = Math.min(6, Math.floor(st.runde / 3)); // Angriff und Schaden der Monster wachsen mit
+    for (let i = 0; i < n; i++) {
+      const frei = (a.felder || []).filter(([x, y]) => !belegt(st, x, y) && !blockiert(st, x, y));
+      if (!frei.length) break;
+      // möglichst weit weg von allen Helden, mit etwas Zufall – und nie bevorzugt bei einem Team
+      const weit = (p) => Math.min(...helden.map((h) => Math.max(Math.abs(h.x - p[0]), Math.abs(h.y - p[1]))), 9);
+      const best = Math.max(...frei.map(weit)), kand = frei.filter((p) => weit(p) >= best - 1), p = kand[Math.floor(st.r() * kand.length)];
+      const g = neuerGegner(st, a.hordeArt, { x: p[0], y: p[1] }, "Welle " + st.runde), tp = Math.max(1, Math.round(GEGNER[a.hordeArt].tp * (0.6 + 0.12 * st.runde)));
+      g.tp = tp; g.tpMax = tp; neu.push(g);
+    }
+    if (neu.length) st.log.push({ t: `Die Horde wächst: ${neu.length} ${neu.length === 1 ? "neues Monster" : "neue Monster"} (${GEGNER[a.hordeArt].name}).`, art: "schlecht" });
+  }
   const arenaMonster = (st) => st.figuren.filter((f) => !teamVon(st, f) && f.seite === "gegner");
   function arenaPruefen(st) {
     if (st.ende) return st.ende;
     const steht = (tm) => st.figuren.some((f) => f.team === tm && f.tp > 0 && !f.tot);
+    // Königsmord: Fällt der Anführer, ist der Kampf verloren
+    if (st.arena.koenig) for (const tm of [1, 2]) { const k = fig(st, st.arena.koenig[tm]); if (k && k.tp <= 0) { arenaEnde(st, `${k.name}, Anführer von ${st.arena.namen[tm - 1]}, ist gefallen.`, 3 - tm); return st.ende; } }
     if (!steht(1) || !steht(2)) arenaEnde(st, `Das Team von ${st.arena.namen[steht(1) ? 1 : 0]} liegt am Boden.`, steht(1) ? 1 : 2);
     return st.ende;
   }
@@ -1374,7 +1402,10 @@
     { const sn = [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"]; for (const f of helden) if (helden.some((g) => g !== f && g.fid === f.fid)) f.name = `${f.name} (${sn[f.team - 1]})`; }
     // Jede Zeile der Chronik merkt sich, wessen Zug es war (1, 2 oder 0 für Monster): Die Anzeige färbt danach
     { const log = st.log; log.push = function (e) { if (e && e.tm == null) { const a = st.arena ? aktiv(st) : null; e.tm = a ? teamVon(st, a) : 0; } return Array.prototype.push.call(this, e); }; }
-    st.arena = { punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || 15, sicht: 0, sieger: null };
+    const modus = ["koenig", "horde"].includes(o.modus) ? o.modus : "arena";
+    st.arena = { modus, felder: modus === "horde" ? frei : null, hordeArt: modus === "horde" ? ((BEGEGNUNGEN[o.begegnung] || BEGEGNUNGEN.garten).gegner[0] || ["rostkaefer"])[0] : null,
+      koenig: modus === "koenig" ? { 1: helden[Math.max(0, Math.min(2, (o.anfuehrer || [])[0] || 0))].id, 2: helden[3 + Math.max(0, Math.min(2, (o.anfuehrer || [])[1] || 0))].id } : null,
+      punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || (modus === "horde" ? 30 : 15), sicht: 0, sieger: null };
     st.schwierigkeit = "normal"; st.ende = null;
     beginneZug(st);
     return st;

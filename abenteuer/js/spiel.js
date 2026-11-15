@@ -32,7 +32,9 @@
    * dadurch bleiben Antippen, Bewegungsanimation und Schadenszahlen unverändert.
    * Einschalten: TISCH_STANDARD = true (für alle) – oder zum Ausprobieren ?tisch=1 in der Adresse (merkt sich das Gerät), ?tisch=0 schaltet ab.
    * Gegner ohne Ganzkörperbild bleiben runde Spielsteine; Bilder dafür kommen in GANZ_GEGNER dazu. */
-  const TISCH_STANDARD = true, TISCH_WINKEL = 40;
+  // Neigung der Karte in Grad (am Handy flacher); die Figuren werden passend dazu aufgerichtet, das CSS liest den Wert aus --tisch-winkel
+  const TISCH_STANDARD = true, TISCH_WINKEL = window.matchMedia("(max-width: 700px)").matches ? 22 : 27;
+  document.documentElement.style.setProperty("--tisch-winkel", TISCH_WINKEL + "deg");
   const GANZ_MASS = 0.8; // alle Miniaturen gemeinsam größer oder kleiner (1 = Helden 1,25 Felder hoch)
   const GANZ = { schildwaechter: 0.589, berserker: 0.654, duellant: 0.435, gelehrter: 0.561, elementarist: 0.593, schattenmagier: 0.633, schattenlaeufer: 0.563, trickser: 0.535, assassine: 0.567, lichtbringer: 0.535, wanderheiler: 0.628, inquisitor: 0.561, wildnislaeufer: 0.524, tiergefaehrte: 0.611, kopfgeldjaeger: 0.648, wolf: 0.472, sera: 0.659 }; // Breite : Höhe
   const GANZ_HOCH = { wolf: 0.8, sera: 1.15 }, GANZ_HOCH_STANDARD = 1.25; // Höhe in Feldern

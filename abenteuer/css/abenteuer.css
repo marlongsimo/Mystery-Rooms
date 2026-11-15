@@ -1773,3 +1773,15 @@ small.meister, .fkarte small.meister, .gk-info small.meister { color: #ffd75e; }
 @media (prefers-reduced-motion: reduce) { .dorf-glanz { animation: none; } }
 /* Kopfzeile auf schmalen Tablets: Name neben dem Profilbild weglassen, damit Glocke, Händler und Einstellungen sichtbar bleiben */
 @media (min-width: 561px) and (max-width: 900px) { .hub-profil-knopf .hub-name { display: none; } }
+
+/* Dorf-Startseite: Menü als Leiste über dem Bild, darunter Begrüßung und laufende Kampagnen */
+.hub-rahmen, .hub.seite-offen .hub-rahmen { grid-template-columns: minmax(0, 1fr) 340px; }
+.hub-rahmen { grid-template-areas: "kopf kopf" "nav nav" "dorf dorf" "mitte seite"; }
+.hub.seite-offen .hub-rahmen { grid-template-areas: "kopf kopf" "nav nav" "mitte mitte"; }
+.hub-nav { display: flex; flex-wrap: nowrap; justify-content: center; gap: 4px; overflow-x: auto; padding: 6px; scrollbar-width: none; }
+.hub-nav::-webkit-scrollbar { display: none; }
+.hub-nav-punkt { flex: none; border-bottom-color: transparent; padding: 9px 16px; white-space: nowrap; }
+.hub-start-knoepfe { margin-top: 14px; }
+.gilde-knoepfe { margin: 0 0 14px; }
+@media (max-width: 1150px) { .hub-rahmen { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kopf" "nav" "dorf" "mitte" "seite"; } .hub.seite-offen .hub-rahmen { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kopf" "nav" "mitte"; } }
+@media (max-width: 900px) { .hub-nav { justify-content: flex-start; } .hub-nav-punkt { font-size: 16px; padding: 8px 10px; } }

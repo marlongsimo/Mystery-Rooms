@@ -668,12 +668,10 @@
     el.innerHTML = `<i>${window.ARENA.ZEICHEN}</i>${Number(n) || 0}`;
   }
   let kachelAlt = null;
+  /** Währung neben dem Profilbild zeigen, sobald es die Arena für dieses Konto gibt (die Arena selbst erreicht man über das Dorf) */
   async function arenaKachel() {
-    const k = document.querySelector('.hub-kachel[data-hub="beitreten"], .hub-kachel[data-hub="arena"]'); if (!k || !window.ARENA) return;
-    if (kachelAlt == null) kachelAlt = k.innerHTML;
-    const da = Boolean(profil && profil.konto) && await window.ARENA.pruefen();
-    if (da) { k.dataset.hub = "arena"; const b = k.querySelector("b"), s = k.querySelector("small"); if (b) b.textContent = "Arena"; if (s) s.textContent = "Tritt mit drei deiner Helden gegen einen anderen Spieler an."; waehrungZeigen(window.ARENA.waehrung()); }
-    else { k.dataset.hub = "beitreten"; k.innerHTML = kachelAlt; }
+    if (!window.ARENA) return;
+    if (Boolean(profil && profil.konto) && await window.ARENA.pruefen()) waehrungZeigen(window.ARENA.waehrung());
   }
 
   /* ---------- Zur Startseite (MYTHARA oben rechts und das Logo) ---------- */

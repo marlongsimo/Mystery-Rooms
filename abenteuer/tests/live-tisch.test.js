@@ -18,7 +18,7 @@ const { chromium } = require('playwright');
   const T = await page('T');
   try {
     await T.goto(BASE + '/abenteuer/index.html'); await T.click('#my-gast-start');
-    await T.click('.hub-kachel[data-hub="neu"]'); await T.click('[data-neu-abenteuer="hochwacht"]');
+    await T.click('#hub-start [data-hub="neu"]'); await T.click('[data-neu-abenteuer="hochwacht"]');
     await T.waitForSelector('#kodex:not([hidden])');
     for (let i = 0; i < 6; i++) await T.click('#kodex-weiter');
     await T.click('#live');

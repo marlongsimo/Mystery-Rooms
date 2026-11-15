@@ -18,11 +18,11 @@ const { chromium } = require('playwright');
     check(await sichtbar('hub'), 'Spielerseite (Startseite) offen');
     await p.click('#brand-heim');
     check(await sichtbar('hub'), 'MYTHARA auf der Startseite: bleibt auf der Startseite');
-    await p.click('.hub-kachel[data-hub="neu"]'); await p.click('[data-neu-abenteuer="rabenmoor"]');
+    await p.click('#hub-start [data-hub="neu"]'); await p.click('[data-neu-abenteuer="rabenmoor"]');
     await p.waitForSelector('#kodex:not([hidden])'); for (let i = 0; i < 6; i++) await p.click('#kodex-weiter');
     await p.click('#start');
     const zu = async (fid) => { if (!(await p.$(`[data-fid="${fid}"]`))) { const k = await p.evaluate((f) => window.ABF.FIGUREN[f].klasse, fid); await p.click(`[data-klasse="${k}"]`); } };
-    for (const f of ['schildwaechter', 'lichtbringer']) { await zu(f); await p.click(`[data-fid="${f}"]`); await p.click('#f-waehlen'); }
+    for (const f of ['schildwaechter', 'lichtbringer', 'trickser']) { await zu(f); await p.click(`[data-fid="${f}"]`); await p.click('#f-waehlen'); }
     await p.click('#abenteuer-los'); await p.click('#einl-skip');
     check(await until(p, () => !document.querySelector('#szene').hidden), 'Abenteuer läuft');
     await p.click('#sz-weiter');

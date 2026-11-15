@@ -49,16 +49,16 @@ async function spieler(b, ich) {
   await p.route(/\/rest\/v1\/rpc\/rpg_(my_inbox|my_campaigns)(\?|$)/, (r) => json(r, r.request().url().includes("inbox") ? { freunde: [], kampagnen: [] } : []));
   await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z_]+|my_wallet)(\?|$)/, (r) => { const name = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1]; let args = {}; try { args = JSON.parse(r.request().postData() || "{}"); } catch (e) { /* leer */ }
     const e = server(ich, name, args); return e && e.fehler ? r.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ code: "P0001", message: e.fehler }) }) : json(r, e); });
-  await p.goto(URL); await p.waitForSelector('.hub-kachel[data-hub="arena"]', { timeout: 20000 });
+  await p.goto(URL); await p.waitForSelector('.dorf-ort[data-hub="arena"]', { timeout: 20000 });
   return { p, fehler, ich };
 }
 const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t }).then(() => true, () => false);
 (async () => {
   const b = await chromium.launch();
   const A = await spieler(b, "A"), B = await spieler(b, "B");
-  check(await A.p.evaluate(() => /Arena/.test(document.querySelector('.hub-kachel[data-hub="arena"] b').textContent) && !document.querySelector('.hub-kachel[data-hub="beitreten"]')), "Startseite: „Arena“ statt „Kampagne beitreten“");
+  check(await A.p.evaluate(() => /Arena/.test(document.querySelector('.dorf-ort[data-hub="arena"] b').textContent) && !document.querySelector('#hub-start [data-hub="beitreten"]')), "Startseite: „Arena“ statt „Kampagne beitreten“");
   // A erstellt einen Kampf
-  await A.p.click('.hub-kachel[data-hub="arena"]'); await A.p.waitForSelector("#arena-erstellen"); await A.p.click("#arena-erstellen");
+  await A.p.click('.dorf-ort[data-hub="arena"]'); await A.p.waitForSelector("#arena-erstellen"); await A.p.click("#arena-erstellen");
   for (const f of ["schildwaechter", "lichtbringer", "wildnislaeufer"]) await A.p.click(`[data-arena-held="${f}"]`);
   const schnittA = await A.p.textContent(".arena-schnitt");
   check(/3 von 3/.test(schnittA) && /3,3/.test(schnittA), "Heldenwahl: Stufen 6, 3, 1 → Durchschnitt 3,3 wird oben angezeigt");
@@ -69,7 +69,7 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
   check(/Arena/.test(info) && /Königsmord/.test(info) && /Die Horde/.test(info) && /So gewinnst du/.test(info) && /eine Minute Zugzeit/.test(info) && /ausgelost/.test(info), "„i“ in der Arena: Ablauf, Zugzeit, Belohnung und alle drei Modi mit Siegbedingungen");
   check(/wartet auf einen Gegner/.test(await A.p.textContent(".arena-mein")), "Ersteller: Kampf wartet auf einen Gegner");
   // B sieht ihn nach dem Aktualisieren – ohne Helden
-  await B.p.click('.hub-kachel[data-hub="arena"]'); await B.p.waitForSelector("#arena-neu-laden"); await B.p.click("#arena-neu-laden"); await B.p.waitForSelector("[data-arena-bei]");
+  await B.p.click('.dorf-ort[data-hub="arena"]'); await B.p.waitForSelector("#arena-neu-laden"); await B.p.click("#arena-neu-laden"); await B.p.waitForSelector("[data-arena-bei]");
   const zeile = await B.p.textContent(".arena-liste li");
   check(/Spieler A/.test(zeile) && /3,3/.test(zeile) && !/Torvald|Elara|Kael/.test(zeile), "Übersicht des anderen: Name und Durchschnittsstufe, keine Helden (" + zeile.replace(/\s+/g, " ").trim() + ")");
   await B.p.click("[data-arena-bei]");

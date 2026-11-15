@@ -45,7 +45,7 @@ const { chromium } = require('playwright');
   check(await p.evaluate(() => document.querySelectorAll('#hub-seite .einleitung .seite').length === 3 && /5/.test(document.querySelector('.hub-fakten').textContent)), 'Kampagnenwelt: Grauwacht mit Vorgeschichte und Eckdaten');
   await p.click('#hub-seite > .hub-zurueck');
   check(await p.isVisible('#hub-start') && !(await p.isVisible('#einleitung')), '„Zur Übersicht“ führt zurück, kein Spiel gestartet');
-  await p.click('.hub-kachel[data-hub="beitreten"]');
+  await p.click('.dorf-ort[data-hub="kampagnen"]'); await p.click('.gilde-knoepfe [data-hub="beitreten"]');
   check(await p.isVisible('#bt-code'), 'Kampagne beitreten: Codefeld');
   await p.click('#bt-zu');
   await p.click('.hub-nav-punkt[data-hub="regeln"]');

@@ -27,17 +27,17 @@ async function konto(b) {
   const b = await chromium.launch();
   const A = await konto(b), B = await konto(b);
   console.log("  Testkonten:", A.name, "und", B.name);
-  check((await warte(A.p, () => document.querySelector('.hub-kachel[data-hub="arena"]'), null, 20000)) && (await warte(B.p, () => document.querySelector('.hub-kachel[data-hub="arena"]'), null, 20000)), "Startseite beider Konten: „Arena“ ist da (Migration 008 läuft)");
+  check((await warte(A.p, () => document.querySelector('.dorf-ort[data-hub="arena"]'), null, 20000)) && (await warte(B.p, () => document.querySelector('.dorf-ort[data-hub="arena"]'), null, 20000)), "Startseite beider Konten: „Arena“ ist da (Migration 008 läuft)");
   check(await A.p.evaluate(() => { const w = document.querySelector("#hub-waehrung"); return w && !w.hidden && /0/.test(w.textContent); }), "Neben dem Profilbild: 0 Seelensplitter");
   // A erstellt
-  await A.p.click('.hub-kachel[data-hub="arena"]'); await A.p.waitForSelector("#arena-erstellen", { timeout: 30000 }); await A.p.click("#arena-erstellen");
+  await A.p.click('.dorf-ort[data-hub="arena"]'); await A.p.waitForSelector("#arena-erstellen", { timeout: 30000 }); await A.p.click("#arena-erstellen");
   await A.p.waitForSelector("[data-arena-held]"); const hA = await A.p.evaluate(() => [...document.querySelectorAll("[data-arena-held]")].map((x) => x.dataset.arenaHeld));
   check(hA.length === 3, "Heldenwahl zeigt die drei Helden des neuen Kontos (" + hA.join(", ") + ")");
   for (const f of hA) await A.p.click(`[data-arena-held="${f}"]`);
   check(/1,0/.test(await A.p.textContent(".arena-schnitt")), "Durchschnittsstufe 1,0");
   await A.p.click("#arena-wahl-ok"); check(await warte(A.p, () => document.querySelector(".arena-mein"), null, 30000), "Echte Datenbank: Kampf erstellt, wartet auf einen Gegner");
   // B sieht und tritt bei
-  await B.p.click('.hub-kachel[data-hub="arena"]'); await B.p.waitForSelector("#arena-neu-laden", { timeout: 30000 }); await B.p.click("#arena-neu-laden");
+  await B.p.click('.dorf-ort[data-hub="arena"]'); await B.p.waitForSelector("#arena-neu-laden", { timeout: 30000 }); await B.p.click("#arena-neu-laden");
   const da = await warte(B.p, (n) => [...document.querySelectorAll(".arena-liste li")].some((li) => li.textContent.includes(n)), A.name, 30000);
   check(da, "Der andere sieht den Kampf in der Übersicht (Name des Erstellers)");
   const zeile = await B.p.evaluate((n) => { const li = [...document.querySelectorAll(".arena-liste li")].find((x) => x.textContent.includes(n)); return li ? li.textContent.replace(/\s+/g, " ") : ""; }, A.name);

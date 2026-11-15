@@ -40,7 +40,9 @@
   const GANZ_GEGNER = { schlammkroete: [1.106, 0.8], irrlicht: [0.489, 0.7, true], alte_unke: [1.144, 1.6], moorleiche: [0.55, 1.25], alwine: [0.52, 1.4, true],
     schattenkobold: [0.835, 0.85], rostkaefer: [1.512, 0.6], knochenwaechter: [0.457, 1.25], zoellner: [0.607, 1.35],
     netzweber: [1.489, 0.9], pilzbrut: [1.494, 0.8], aschehund: [1.192, 0.85], grabritter: [0.639, 1.45], abt: [0.73, 1.5],
-    siegeljaeger: [0.948, 1.2], jaegerschuetze: [0.833, 1.2], funkenhund: [1.909, 0.75], jaegerhauptmann: [0.835, 1.35], wachkonstrukt: [0.757, 1.5], fackelzehrer: [0.85, 1.8] };
+    siegeljaeger: [0.948, 1.2], jaegerschuetze: [0.833, 1.2], funkenhund: [1.909, 0.75], jaegerhauptmann: [0.835, 1.35], wachkonstrukt: [0.757, 1.5], fackelzehrer: [0.85, 1.8],
+    eisgezeichneter: [0.663, 1.25], frostknecht: [0.635, 1.25], kaelterufer: [0.643, 1.25], runenleser: [0.637, 1.25], glasschwaermer: [1.494, 0.5], glasnest: [1.508, 0.9],
+    splitterbrutmutter: [1.533, 1.5], eidwaechter: [0.639, 1.9], kettenbestie: [1.498, 1.2], eisenhirte: [0.611, 1.6], frostmatrone: [0.617, 1.6, true], koenig: [0.661, 1.9] };
   function ganzGegner(art) {
     const [form, felder, schwebt] = GANZ_GEGNER[art], hoch = felder * GANZ_MASS * Z, breit = hoch * form, streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
     return `<g transform="translate(0 ${schwebt ? 2 : 14}) scale(1 ${streck.toFixed(3)})"><image class="fig-ganz feind${schwebt ? " schwebt" : ""}" href="img/gegner/ganz/${art}.webp" x="${(-breit / 2).toFixed(1)}" y="${(-hoch).toFixed(1)}" width="${breit.toFixed(1)}" height="${hoch.toFixed(1)}" preserveAspectRatio="xMidYMax meet"/></g>`;

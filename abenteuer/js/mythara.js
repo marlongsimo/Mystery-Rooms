@@ -364,6 +364,13 @@
     seiteZeigen("regeln", `<h1 class="hub-gruss">Hilfe &amp; Regeln</h1><p class="hub-untertitel">Die Grundlagen, einfach erklärt. Ihr müsst nichts davon auswendig können: Das Spiel rechnet für euch.</p>${H ? `<div class="hub-text hilfe">${H.html()}</div>` : `<div class="hub-text kodex">${kopie('#kodex .seite:not([data-seite="6"])')}</div>`}`);
     if (H) H.binden(document);
   }
+  /** Lore: die Hintergründe der Welt bis zum Heute (Texte in js/lore.js) */
+  function loreSeite() {
+    const L = window.ABLORE || { welt: [] };
+    seiteZeigen("lore", `<div class="lore"><p class="shop-eyebrow">Die Splitterlande</p><h1 class="hub-gruss">Die Geschichte von Mythara</h1><p class="hub-untertitel">${esc(L.auftakt || "")}</p>
+      ${L.welt.map((k, i) => `<section class="lore-kapitel"><span class="lore-nr">${["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][i] || i + 1}</span><h2>${esc(k.titel)}</h2>${k.text.map((a) => `<p>${esc(a)}</p>`).join("")}</section>`).join("")}
+      <p class="lore-schluss">${esc(L.schluss || "")}</p></div>`);
+  }
   function weltSeite(abenteuer) {
     if (!abenteuer) {
       seiteZeigen("welt", `<h1 class="hub-gruss">Kampagnenwelt</h1><p class="hub-untertitel">Die Splitterlande – und die Abenteuer, die dort auf euch warten.</p>
@@ -602,6 +609,7 @@
     if (was === "helden") return heldenSeite();
     if (was === "neu") return neueKampagne();
     if (was === "freunde") return freundeZeigen();
+    if (was === "lore") return loreSeite();
     if (was === "welt") return weltSeite();
     if (was === "regeln") return regelnSeite();
     if (was === "beitreten") return beitretenDialog();

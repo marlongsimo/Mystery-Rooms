@@ -117,6 +117,7 @@
     ].filter(Boolean)) : [];
     const zu = (g) => `<li class="zu">${SCHLOSS}<b>${esc(g.name)}</b><span class="typ">${esc(g.art)} · ab Stufe ${g.ab}</span>${g.text ? `<p>${esc(g.text)}</p>` : ""}</li>`;
     const fae = (a) => `<li${a.besser ? ' class="besser"' : ""}><b>${esc(a.name)}</b><span class="typ">${a.typ === "passiv" ? "immer" : a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion"}${(() => { const gz = R.grenze(m10 ? { stufe: heldenstufe, seite: "spieler", fid } : { stufe }, a); return gz ? ` · ${gz.n}× je ${gz.je}` : ""; })()}</span><p>${esc(a.text)}</p></li>`;
+    const lore = ((window.ABLORE || {}).helden || {})[fid] || null;
     return `<article class="held" style="--k:${k.farbe}">
       <div class="held-bild"><img src="${F.bild(fid)}" alt="${esc(d.name)}"><span class="held-klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span></div>
       <div class="held-text">
@@ -128,7 +129,7 @@
         <div class="held-kern"><span><b>${F.tpVon(fid, heldenstufe)}</b><small>Trefferpunkte</small></span><span><b>${F.rkVon(fid, heldenstufe)}</b><small>Rüstungsklasse</small></span><span><b>${d.bewegung || k.bewegung || 6}</b><small>Felder Bewegung</small></span>${k.plaetze ? `<span><b>${F.plaetzeVon(heldenstufe)[0] + F.plaetzeVon(heldenstufe)[1]}</b><small>Zauberplätze</small></span>` : ""}${d.wolf ? `<span><b>🐺</b><small>Wolf ${esc(d.wolf.name)}</small></span>` : ""}</div>
         <div class="held-werte">${werte}</div>
         ${knopf}
-        <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="stufen">Stufen</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button></div>
+        <div class="held-reiter" role="tablist"><button role="tab" data-reiter="faehig" class="an">Fähigkeiten</button><button role="tab" data-reiter="stufen">Stufen</button><button role="tab" data-reiter="aussen">Abseits des Kampfes</button>${lore ? `<button role="tab" data-reiter="lore">Geschichte</button>` : ""}</div>
         <div class="held-tafel" data-tafel="faehig">
           <ul class="held-faehig">${k.merkmal ? (([n, ...t]) => `<li class="klassen-merkmal"><b>${esc(n)}</b><span class="typ">Klassenmerkmal · immer</span><p>${esc(t.join(": "))}</p></li>`)(k.merkmal.split(": ")) : ""}${jetzt ? jetzt.map(fae).join("") : eigene.map(fae).join("") + kl.map(fae).join("")}</ul>
           ${m10 ? (gesperrt.length ? `<p class="held-spaeter">Noch gesperrt – das kommt mit höheren Stufen:</p><ul class="held-faehig gesperrt">${gesperrt.map(zu).join("")}</ul>` : `<p class="held-spaeter">Alles freigeschaltet: ${esc(d.name)} hat die höchste Stufe erreicht.</p>`)
@@ -148,6 +149,7 @@
           <p class="held-spaeter">Erfahrung gibt es für jeden erfolgreichen Abschluss einer Kampagne. Stufen und Erfahrung gehören zu einem Spielerkonto.</p>`;
         })()}</div>
         <div class="held-tafel" data-tafel="aussen" hidden><p class="held-aussen"><b>${esc(d.aussen.name)}:</b> ${esc(d.aussen.text)}</p><p class="held-spaeter">Rolle in der Gruppe: ${esc(d.rolle)}</p><p class="held-spaeter">Rettungswürfe der Klasse: ${k.rettung.map((a) => ATTR_NAME[a]).join(", ")} · Lebenswürfel W${k.wuerfel}</p></div>
+        ${lore ? `<div class="held-tafel held-lore" data-tafel="lore" hidden><p class="held-lore-herkunft">${esc(lore.herkunft)}</p>${lore.text.map((x) => `<p>${esc(x)}</p>`).join("")}<p class="held-lore-geheim"><b>Was kaum jemand weiß:</b> ${esc(lore.geheimnis)}</p>${lore.verbunden ? `<p class="held-spaeter"><b>Verbunden mit:</b> ${esc(lore.verbunden)}</p>` : ""}</div>` : ""}
       </div></article>`;
   }
   /** Gruppenplätze (3 Pflicht, 3 frei) */

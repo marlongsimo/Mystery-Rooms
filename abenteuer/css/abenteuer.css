@@ -1699,3 +1699,18 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .shop-bald .hub-gruss { font-size: clamp(34px, 6vw, 54px); }
 .shop-stand { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; padding: 8px 18px; border-radius: 20px; font: 600 16px var(--schrift-titel); color: #cfd8ff; background: rgba(40,44,90,.5); box-shadow: inset 0 0 0 1px rgba(140,150,255,.45); }
 .shop-stand i { font-style: normal; color: #a9b4ff; }
+
+/* Lore: Geschichte der Welt (Seite) und der Helden (Reiter im Heldenprofil) */
+.lore { max-width: 760px; margin: 0 auto; padding: 8px 4px 32px; }
+.lore > .shop-eyebrow, .lore > .hub-gruss, .lore > .hub-untertitel { text-align: center; }
+.lore > .hub-untertitel { font-style: italic; margin-bottom: 26px; }
+.lore-kapitel { position: relative; margin: 0 0 26px; padding: 18px 20px 8px 62px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.28); }
+.lore-nr { position: absolute; left: 16px; top: 16px; width: 34px; text-align: center; font: 600 20px var(--schrift-titel); color: #d9b26a; }
+.lore-kapitel h2 { margin: 0 0 8px; font: 600 21px var(--schrift-titel); color: #f6dc9c; }
+.lore-kapitel p { margin: 0 0 12px; font: 17px/1.6 "Cormorant Garamond", Georgia, serif; color: #e9dfc8; }
+.lore-schluss { text-align: center; font: italic 18px/1.5 "Cormorant Garamond", Georgia, serif; color: #f6dc9c; margin-top: 8px; }
+@media (max-width: 560px) { .lore-kapitel { padding: 46px 16px 6px; } .lore-nr { left: 16px; top: 12px; width: auto; } }
+.held-lore p { font: 16.500px/1.55 "Cormorant Garamond", Georgia, serif; color: #e9dfc8; margin: 0 0 10px; }
+.held-lore .held-lore-herkunft { font: 600 12px var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase; color: var(--k, #d9b26a); }
+.held-lore .held-lore-geheim { padding: 10px 12px; border-left: 3px solid var(--k, #d9b26a); background: rgba(255,255,255,.04); border-radius: 0 8px 8px 0; }
+.held-lore .held-lore-geheim b { color: #f6dc9c; }

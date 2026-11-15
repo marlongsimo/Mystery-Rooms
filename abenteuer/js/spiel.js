@@ -33,12 +33,13 @@
    * Einschalten: TISCH_STANDARD = true (für alle) – oder zum Ausprobieren ?tisch=1 in der Adresse (merkt sich das Gerät), ?tisch=0 schaltet ab.
    * Gegner ohne Ganzkörperbild bleiben runde Spielsteine; Bilder dafür kommen in GANZ_GEGNER dazu. */
   const TISCH_STANDARD = false, TISCH_WINKEL = 40;
-  const GANZ = { schildwaechter: 0.589, berserker: 0.654, duellant: 0.435, gelehrter: 0.561, elementarist: 0.593, schattenmagier: 0.633, schattenlaeufer: 0.563, trickser: 0.535, assassine: 0.567, lichtbringer: 0.535, wanderheiler: 0.628, inquisitor: 0.561, wildnislaeufer: 0.524, tiergefaehrte: 0.611, kopfgeldjaeger: 0.648, wolf: 0.472 }; // Breite : Höhe
-  const GANZ_HOCH = { wolf: 0.8 }, GANZ_HOCH_STANDARD = 1.25; // Höhe in Feldern
+  const GANZ = { schildwaechter: 0.589, berserker: 0.654, duellant: 0.435, gelehrter: 0.561, elementarist: 0.593, schattenmagier: 0.633, schattenlaeufer: 0.563, trickser: 0.535, assassine: 0.567, lichtbringer: 0.535, wanderheiler: 0.628, inquisitor: 0.561, wildnislaeufer: 0.524, tiergefaehrte: 0.611, kopfgeldjaeger: 0.648, wolf: 0.472, sera: 0.659 }; // Breite : Höhe
+  const GANZ_HOCH = { wolf: 0.8, sera: 1.15 }, GANZ_HOCH_STANDARD = 1.25; // Höhe in Feldern
   // Gegner mit Ganzkörperbild (img/gegner/ganz/<art>.webp): [Breite : Höhe, Höhe in Feldern, schwebt?] – Kampagne für Kampagne ergänzen
   const GANZ_GEGNER = { schlammkroete: [1.106, 0.8], irrlicht: [0.489, 0.7, true], alte_unke: [1.144, 1.6], moorleiche: [0.55, 1.25], alwine: [0.52, 1.4, true],
     schattenkobold: [0.835, 0.85], rostkaefer: [1.512, 0.6], knochenwaechter: [0.457, 1.25], zoellner: [0.607, 1.35],
-    netzweber: [1.489, 0.9], pilzbrut: [1.494, 0.8], aschehund: [1.192, 0.85], grabritter: [0.639, 1.45], abt: [0.73, 1.5] };
+    netzweber: [1.489, 0.9], pilzbrut: [1.494, 0.8], aschehund: [1.192, 0.85], grabritter: [0.639, 1.45], abt: [0.73, 1.5],
+    siegeljaeger: [0.948, 1.2], jaegerschuetze: [0.833, 1.2], funkenhund: [1.909, 0.75], jaegerhauptmann: [0.835, 1.35], wachkonstrukt: [0.757, 1.5], fackelzehrer: [0.85, 1.8] };
   function ganzGegner(art) {
     const [form, felder, schwebt] = GANZ_GEGNER[art], hoch = felder * Z, breit = hoch * form, streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
     return `<g transform="translate(0 ${schwebt ? 2 : 14}) scale(1 ${streck.toFixed(3)})"><image class="fig-ganz feind${schwebt ? " schwebt" : ""}" href="img/gegner/ganz/${art}.webp" x="${(-breit / 2).toFixed(1)}" y="${(-hoch).toFixed(1)}" width="${breit.toFixed(1)}" height="${hoch.toFixed(1)}" preserveAspectRatio="xMidYMax meet"/></g>`;
@@ -669,11 +670,14 @@
       } else {
         if (f.art === "begleiter") {
           const visier = st.figuren.some((g) => g.seite === "gegner" && g.tp > 0 && g.visier === st.runde);
-          o += `<g transform="translate(${cx} ${cy})">${titel}${B.begleiter(unten)}</g>`;
+          const seraMini = TISCH && !unten && /Sera/.test(f.name);
+          o += `<g transform="translate(${cx} ${cy})">${titel}${seraMini ? `<circle r="23" fill="none" stroke="#e8c46a" stroke-width="2.5" stroke-dasharray="6 4"/>` + ganzFigur("sera", "#e8c46a", false) : B.begleiter(unten)}</g>`;
           if (visier && !unten) o += `<g class="visier" transform="translate(${cx} ${cy})"><circle r="30" fill="none" stroke="#ff5a4a" stroke-width="2.5" stroke-dasharray="5 4"/><path d="M0 -36V-26M0 26V36M-36 0H-26M26 0H36" stroke="#ff5a4a" stroke-width="3"/></g>`;
           if (unten) o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${f.stabil ? "stabil" : "retten!"}</text>`;
           const w = 44, anteil = Math.max(0, f.tp / f.tpMax);
-          o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="#e8c46a"/>`;
+          if (seraMini) { const streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180), bh = 3.4 * streck, bw = 30, by = cy + 12 - GANZ_HOCH.sera * Z * streck - bh - 2.5 * streck; // ihr Balken ist immer zu sehen: Sie zu schützen ist das Ziel
+            o += `<rect x="${cx - bw / 2 - 1}" y="${(by - streck).toFixed(1)}" width="${bw + 2}" height="${(bh + 2 * streck).toFixed(1)}" rx="2.7" fill="#07080b" fill-opacity=".82"/><rect x="${cx - bw / 2}" y="${by.toFixed(1)}" width="${Math.max(2, bw * anteil).toFixed(1)}" height="${bh.toFixed(1)}" rx="1.7" fill="#e8c46a"/>`; }
+          else o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="#e8c46a"/>`;
           continue;
         }
         const href = wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fid || f.fidA);

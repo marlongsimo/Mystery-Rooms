@@ -206,6 +206,7 @@
   }
   function geheZu(A, id) {
     if (!DATEN(A).SZENEN[id]) throw new Error("Unbekannte Szene: " + id);
+    if (A.rueckzug && A.rueckzug.szene !== id) delete A.rueckzug;
     // Lagerfeuer, an dem die Gruppe früher aufgestiegen wäre: erst den Segen wählen (einmal je Lagerfeuer)
     { const zs = DATEN(A).SZENEN[id]; A.segenLager = A.segenLager || {};
       if (A.modell10 && zs.art === "lager" && zs.aufstieg && !A.segenLager[id]) {
@@ -561,6 +562,7 @@
     // Ergebnis aus dem Kampf übernehmen (z. B. wie viele Gefangene gerettet wurden), egal wie er endet
     if (typeof k.nachher === "function") wirke(A, k.nachher(st, A));
     if (st.ende === "sieg") {
+      delete A.rueckzug;
       const nz = R.nachKampf(st);
       for (const fid of A.gruppe) if (nz[fid]) A.zust[fid] = Object.assign(A.zust[fid], nz[fid], { stufe: hst(A, fid) }); else if (A.gefallen.includes(fid)) A.zust[fid].tot = true;
       for (const fid of A.gefallen) if (A.zust[fid]) A.zust[fid].tot = true;
@@ -588,6 +590,7 @@
     }
     if (st.ende === "rueckzug") {
       notiz(A, "Rückzug zum Lagerfeuer.", "schlecht"); glocke(A, 1);
+      A.rueckzug = { szene: A.szene, n: A.rueckzug && A.rueckzug.szene === A.szene ? A.rueckzug.n + 1 : 1 }; // die Kampfszene zeigt danach die Rückzugsseite
       A.zust = JSON.parse(JSON.stringify(A.lagerZust || startZustand(A)));
       // Bekam das letzte Lagerfeuer nachträglich einen Stufenaufstieg (laufende Spielstände), wird er hier nachgeholt
       const ls = A.lagerSzene && DATEN(A).SZENEN[A.lagerSzene];
@@ -616,11 +619,28 @@
     const andere = enden.filter((id) => id !== A.szene).map((id) => (M.endeHinweise || {})[id]).filter(Boolean);
     return { zeilen, andere, enden: enden.length };
   }
+  /** Rückzugsseite: Nach einem verlorenen Kampf beginnt dieselbe Szene neu – mit einer kurzen Erzählung statt des Szenentexts.
+   *  Wer verloren hat, der Rückzug, die Nacht am Feuer, alle wieder bei Kräften, ein neuer Versuch. Der Hinweis zum Ziel des Kampfes (kursiv) bleibt stehen. */
+  function rueckzugText(A, s) {
+    const n = A.rueckzug.n, M = metaVon(A.abenteuer), k = typeof s.kampf === "function" ? s.kampf(A, hilfen) : s.kampf || {}, gegner = (R.BEGEGNUNGEN[k.begegnung] || {}).name || "Eure Gegner";
+    const namen = lebende(A).map((f) => F.FIGUREN[f].name), liste = namen.length > 1 ? namen.slice(0, -1).join(", ") + " und " + namen[namen.length - 1] : namen[0] || "Ihr";
+    const lager = A.lagerSzene && DATEN(A).SZENEN[A.lagerSzene], wo = lager && lager.ort ? `zurück zum Lagerfeuer (${lager.ort})` : "zurück zu eurem letzten Rastplatz";
+    const verloren = n === 1 ? `Der Kampf „${gegner}“ ist verloren. Diesmal wart ihr nicht stark genug: Einer nach dem anderen ging zu Boden.`
+      : n === 2 ? `Auch der zweite Anlauf im Kampf „${gegner}“ ist gescheitert. Wieder lag am Ende die ganze Gruppe am Boden.`
+      : `Zum ${n}. Mal seid ihr im Kampf „${gegner}“ gescheitert. Leichter wird es nicht – aber ihr kennt ihn jetzt.`;
+    const zurueck = `Ihr habt euch ${wo} geschleppt, mehr getragen als gegangen.${M.uhr && M.uhr.rueckzug ? " " + M.uhr.rueckzug : ""}`;
+    const nacht = `Eine Nacht Schlaf, die Wunden verbunden, etwas Warmes im Bauch. Am Morgen ${namen.length === 1 ? "fühlt sich " + liste : "fühlen sich " + liste} wieder fit: Alle sind bei vollen Kräften.`;
+    const neu = n === 1 ? "Ihr wisst jetzt, was euch erwartet. Ihr wagt einen neuen Versuch." : n === 2 ? "Stellt euch diesmal anders auf. Ihr versucht es noch einmal." : "Noch einmal von vorn. Diesmal muss es gelingen.";
+    const ziel = text(A, s).filter((x) => /^\*.*\*$/.test(x.trim())); // Hinweis zum Ziel des Kampfes
+    return [verloren, zurueck, nacht, neu].concat(ziel);
+  }
+  const rueckzugAn = (A, s) => Boolean(s.art === "kampf" && A.rueckzug && A.rueckzug.szene === A.szene);
+
   function ansicht(A) {
     const s = szene(A), pz = probeZustand(A), p = pz ? aktuelleProbe(A) : null;
     return {
       dialog: (A.dialog && A.dialog[A.szene]) || [],
-      szene: A.szene, art: s.art, titel: s.titel, ort: s.ort || "", abschnitt: s.abschnitt || A.abschnitt || 1, text: text(A), antwort: A.antwort || null,
+      szene: A.szene, art: s.art, titel: rueckzugAn(A, s) ? "Rückzug – und ein neuer Versuch" : s.titel, ort: s.ort || "", abschnitt: s.abschnitt || A.abschnitt || 1, text: rueckzugAn(A, s) ? rueckzugText(A, s) : text(A), rueckzug: rueckzugAn(A, s) ? { n: A.rueckzug.n, kampf: s.titel } : null, antwort: A.antwort || null,
       glocke: A.glocke, stufe: A.stufe, modell10: Boolean(A.modell10), heldStufe: A.heldStufe || null, segen: (A.segen || []).map((id) => ({ id, name: F.SEGEN[id].name, zeichen: F.SEGEN[id].zeichen, text: F.SEGEN[id].text })), empfohlen: A.modell10 ? empfStufe(A.abenteuer) : null, schwierigkeit: A.schwierigkeit, abenteuer: A.abenteuer || "grauwacht", uhr: metaVon(A.abenteuer).uhr,
       nachhall: A.nachhall || null,
       offen: s.art === "gespraech" ? optionen(A).filter((o) => !o.weiter).map((o) => ({ text: o.text, wichtig: Boolean(o.wichtig) })) : null,

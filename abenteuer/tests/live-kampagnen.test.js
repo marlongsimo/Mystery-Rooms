@@ -87,7 +87,7 @@ const { chromium } = require('playwright');
   const ctxF = await b.newContext(); const Fp = await page(ctxF, 'Fremd');
   await Fp.goto(BASE + '/abenteuer/index.html?kampagnen');
   await Fp.click('#my-gast-start'); await Fp.click('.hub-nav-punkt[data-hub="kampagnen"]');
-  check(await until(Fp, () => /Noch keine Kampagne/.test(document.querySelector('.kampagnen').textContent)), 'Fremder Browser: keine fremden Kampagnen');
+  check(await until(Fp, () => /Am Brett hängt noch nichts/.test(document.querySelector('.kampagnen').textContent)), 'Fremder Browser: keine fremden Kampagnen');
   check(await Fp.evaluate((id) => window.AB.liveClient().rpc('rpg_load_campaign', { p_campaign_id: id }).then(() => false, (e) => /gehörst nicht/.test(e.message)), k1.id), 'Fremder kann die Kampagne nicht laden');
   await ctxF.close();
 

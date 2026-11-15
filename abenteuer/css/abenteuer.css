@@ -1928,3 +1928,7 @@ body.intro-an { overflow: hidden; }
 .tut-knoepfe { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
 .tut-hinweis { margin-right: auto; font-size: 13.500px; color: #e9c77e; }
 @media (prefers-reduced-motion: reduce) { .tut-ring { animation: none; } }
+/* Einstellungen: Lautstärke der Musik */
+.musik-regler { display: flex; align-items: center; gap: 12px; }
+.musik-regler input[type="range"] { flex: 1; min-width: 90px; accent-color: #d9b26a; }
+.musik-regler output { min-width: 44px; text-align: right; color: #e9c77e; font-variant-numeric: tabular-nums; }

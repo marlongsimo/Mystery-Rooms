@@ -1836,3 +1836,6 @@ small.meister, .fkarte small.meister, .gk-info small.meister { color: #ffd75e; }
 .gilde .note { color: #d9ccb0; } .gilde .link { color: #e9c77e; }
 .gilde .k-lokal { background: rgba(0,0,0,.35); border-color: #d9b26a; color: #f3e7cc; }
 @media (max-width: 560px) { .karte-box.gilde { padding: 16px 14px 20px; } .gilde .k-eintrag, .gilde .k-eintrag:nth-child(even) { transform: none; } }
+/* Aushänge der Gilde mit echter Pergamentstruktur (Ausschnitt aus dem Auftragsblatt) */
+.gilde .k-eintrag { background: linear-gradient(175deg, rgba(255,244,214,.34), rgba(120,78,28,.10) 60%, rgba(90,56,18,.26)), url("../img/dorf/pergament.webp") center / cover; box-shadow: 0 10px 22px rgba(0,0,0,.6), inset 0 0 34px rgba(96,58,18,.5), inset 0 0 4px rgba(60,36,10,.6); }
+.gilde .k-text b { color: #24160a; } .gilde .k-text small { color: #4a3619; }

@@ -79,6 +79,11 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
   if (imKampf) {
     const start = await B.p.evaluate(() => { const st = window.AB.st; return { teams: st.figuren.filter((f) => f.team).length, monster: st.figuren.filter((f) => !f.team && f.seite === "gegner" && f.tp > 0).length, reihe: document.querySelector("#reihe").textContent + " | " + document.querySelector("#kampf-kopf").textContent, bild: Boolean(st.karte.bild) }; });
     check(start.teams === 6 && start.monster > 0 && start.monster <= 5 && /von 15/.test(start.reihe) && /Arena/.test(start.reihe) && /Spieler A gegen Spieler B/.test(start.reihe) && /Punkte\s*0 : 0/.test(start.reihe) && start.bild, `Kampf: sechs Helden, ${start.monster} Monster (wenige, schwache), Kopfzeile „Arena · Spieler A gegen Spieler B · Runde 1 von 15 · Punkte 0 : 0“, Kartenbild auch beim Beigetretenen`);
+    await B.p.waitForTimeout(1200);
+    const sichtB = await B.p.evaluate(() => { const st = window.AB.st; const el = (id) => document.querySelector(`#karte g.fig[data-id="${id}"]`);
+      return st.figuren.filter((f) => f.team).map((f) => ({ id: f.id, team: f.team, seite: f.seite, x: f.x, y: f.y, da: Boolean(el(f.id)), klasse: el(f.id) ? el(f.id).getAttribute("class") : "", blau: el(f.id) ? /4f8cff/.test(el(f.id).innerHTML) : false })); });
+    if (process.env.DEBUG) console.log(JSON.stringify(sichtB));
+    check(sichtB.filter((f) => f.team === 2).every((f) => f.da && !f.blau && f.y <= 4) && sichtB.filter((f) => f.team === 1).every((f) => f.da && f.blau && f.y >= 6), "Beigetretener: eigene Helden oben auf der Karte, die drei Gegenspieler unten und blau markiert");
     if (process.env.SHOT_DIR) { await B.p.waitForTimeout(600); await B.p.screenshot({ path: process.env.SHOT_DIR + "/arena-kampf-gast.png" }); await A.p.screenshot({ path: process.env.SHOT_DIR + "/arena-kampf-ersteller.png" }); }
     // Züge: Wer dran ist, bewegt sich einmal (wenn möglich) und beendet den Zug. Der Beigetretene schickt seine Züge an den Ersteller.
     const dran = (S) => S.p.evaluate((seite) => { const st = window.AB.st; if (!st || st.ende) return null; const a = window.AB.R.aktiv(st); return window.AB.R.teamVon(st, a) === seite && a.tp > 0 ? a.id : null; }, S.ich === "A" ? 1 : 2);

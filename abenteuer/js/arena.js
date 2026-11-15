@@ -161,7 +161,7 @@
       // Stand schreiben: immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig
       let schreibt = false, wartend = null;
       const publish = (json) => { wartend = json; if (schreibt) return; schreibt = true;
-        const lauf = () => { const j = wartend; wartend = null; j.log = (j.log || []).slice(-60); t.writeOwn("spiel", { arena: true, at: Date.now(), st: j }).catch(() => {}).then(() => { if (wartend) lauf(); else schreibt = false; }); }; lauf(); };
+        const lauf = () => { const j = wartend; wartend = null; j.log = (j.log || []).slice(-140); t.writeOwn("spiel", { arena: true, at: Date.now(), st: j }).catch(() => {}).then(() => { if (wartend) lauf(); else schreibt = false; }); }; lauf(); };
       const erledigt = {};
       t.on("state", (row) => { const k = row.state_key || ""; if (!k.startsWith("zug:")) return; const von = k.slice(4); if (row.updated_by && row.updated_by !== von) return; if (von === uid) return;
         const v = row.state || {}; if (!v.n || v.n <= (erledigt[von] || 0)) return; erledigt[von] = v.n; window.AB.arenaWunsch(v); });

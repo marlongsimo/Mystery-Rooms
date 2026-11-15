@@ -1618,7 +1618,7 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .arena-team-helden { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .arena-team-helden .arena-held img { width: 64px; height: 64px; }
 .arena-vs { font: 600 14px "Cinzel", serif; color: #d9b46a; letter-spacing: .1em; text-transform: uppercase; }
 @media (max-width: 720px) { .arena-gegenueber { grid-template-columns: 1fr; } .arena-vs { text-align: center; } }
-.arena-aufgeben { position: fixed; right: 12px; bottom: 12px; z-index: 60; opacity: .8; }
+.arena-aufgeben { position: fixed; left: 12px; bottom: 12px; z-index: 60; opacity: .8; }
 .arena-ende { position: fixed; inset: 0; z-index: 950; display: grid; place-items: center; overflow-y: auto; padding: 24px 16px; color: #ece4d4; text-align: center; background: radial-gradient(ellipse at 50% 20%, rgba(217,180,106,.35), rgba(10,8,6,.96) 60%), #0b0906; }
 .arena-ende.niederlage { background: radial-gradient(ellipse at 50% 20%, rgba(160,40,50,.4), rgba(10,8,6,.97) 60%), #0b0906; }
 .arena-ende-inhalt { max-width: 560px; width: 100%; }
@@ -1643,3 +1643,11 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
   .hub-profil { grid-column: 1; justify-self: center; flex-wrap: wrap; justify-content: center; }
   .arena-waehrung.kopf { margin-right: 0; }
 }
+
+/* Arena: Helden des Gegenspielers blau (Monster bleiben rot) */
+.reihe span.gh { color: #a9c6ff; cursor: pointer; }
+.reihe span.gh .mini { border-color: #4f8cff; box-shadow: 0 0 0 2px rgba(79,140,255,.25); }
+.reihe span.gh small { display: block; color: #7fa8f0; font-size: 10px; letter-spacing: .04em; }
+/* Arena-Chronik: eigene Züge golden, Gegenspieler blau, Monster rot; „ist am Zug“ als Zwischenzeile */
+#log li.tm-eigen { border-left-color: #d9b46a; } #log li.tm-gegner { border-left-color: #4f8cff; } #log li.tm-monster { border-left-color: #c0444e; }
+#log li.zug { font-weight: 600; opacity: .85; margin-top: 6px; }

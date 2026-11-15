@@ -19,7 +19,9 @@ Stand: 14. November 2026 · Status: **Konzept, noch nichts gebaut**
   - **Technik:** Das Gerät des Erstellers rechnet den Kampf, das andere zeigt den Stand und schickt seine Züge (wie Tisch und Handys). Mitrechnen auf beiden Geräten und Würfel vom Server fehlen noch – der Ersteller könnte theoretisch schummeln. Beide Seiten melden das Ergebnis; gewertet wird nur bei Übereinstimmung und frühestens nach zwei Minuten.
   - **Regeln gegen Helden (Abschnitt 4) sind nicht umgesetzt.** Während ein Spieler zieht, gelten die Helden des anderen für die Regeln als Gegner: Schadenszauber und Angriffe wirken normal, viele Kontrolleffekte halten gegen Helden nicht an, und Reaktionen der gegnerischen Helden (Schutzhaltung, Parade) greifen in fremden Zügen nicht.
   - **Kein Zeitlimit je Zug, keine Aufzeichnung für die Auswertung** (Abschnitt 7) – beides folgt.
-  - **Karten:** die sieben Karten aus Grauwacht (unverändert, 12 × 9). Die Startseiten sind nicht spiegelgleich; in der Simulation gewinnt der Ersteller etwas öfter (57 % von 150 Partien).
+  - **Karten:** die sieben Karten aus Grauwacht (unverändert, 12 × 9). Der Ersteller startet gemeinsam ganz unten, der Beigetretene ganz oben, die Monster stehen dazwischen – von beiden Teams gleich weit entfernt. In der Simulation gewinnt der Ersteller 53 % von 300 Partien.
+  - **Monster greifen beide Spieler gleich oft an:** Jedes Monster nimmt sich das Team vor, das bisher seltener dran war; bei Gleichstand entscheidet der Zufall.
+  - **Anzeige:** Helden des Gegenspielers sind blau markiert (Monster rot). Die Chronik nennt jeden Zug mit Spieler, Bewegungen und bei Angriffen das Ziel samt Treffer oder Fehlwurf.
 - **Geprüft:** Datenbankfunktionen lokal (`supabase/tests/008_rpg_arena_test.sql`), Regelkern in 150 simulierten Partien ohne Fehler oder Hänger, der ganze Ablauf mit zwei Browsern (`tests/arena.test.js`, Datenbank nachgebildet, Live-Verbindung echt). Nicht geprüft: gegen die echte Datenbank und von Hand gespielt.
 
 ---

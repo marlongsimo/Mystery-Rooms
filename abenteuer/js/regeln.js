@@ -707,12 +707,12 @@
       if (z.z.raserei && !spec.magisch) s = Math.floor(s / 2);
       if (z.seite === "gegner" && GEGNER[z.art].anfaellig === "wucht" && spec.wucht) s = Math.floor(s * 1.5);
       erg.schaden = s;
-      st.log.push({ t: `${a.name}: ${spec.name} – W20 ${w}${vtext} + ${spec.bonus} = ${total} gegen RK ${rk}: ${krit ? "kritischer Treffer" : "Treffer"}, ${s} Schaden.${spec.zusatzText || ""}`, art: a.seite === "gegner" ? "gegner" : "wurf", wurf: w });
+      st.log.push({ t: `${a.name}: ${spec.name}${st.arena ? " auf " + z.name : ""} – W20 ${w}${vtext} + ${spec.bonus} = ${total} gegen RK ${rk}: ${krit ? "kritischer Treffer" : "Treffer"}, ${s} Schaden.${spec.zusatzText || ""}`, art: a.seite === "gegner" ? "gegner" : "wurf", wurf: w });
       schaden(st, z, s, { krit });
       if (spec.nachTreffer) spec.nachTreffer(erg);
       if (a.seite === "spieler" && st.zug) st.zug.getroffen.push(z.id);
     } else {
-      st.log.push({ t: `${a.name}: ${spec.name} – W20 ${w}${vtext} + ${spec.bonus} = ${total} gegen RK ${rk}: verfehlt.`, art: a.seite === "gegner" ? "gegner" : "wurf", wurf: w });
+      st.log.push({ t: `${a.name}: ${spec.name}${st.arena ? " auf " + z.name : ""} – W20 ${w}${vtext} + ${spec.bonus} = ${total} gegen RK ${rk}: verfehlt.`, art: a.seite === "gegner" ? "gegner" : "wurf", wurf: w });
       // Parade der Duellantin
       if (spec.nah && istFig(z, "duellant") && a.seite === "gegner" && lebt(z) && z.reaktion > 0) {
         z.reaktion--; st.log.push({ t: `${z.name} pariert und sticht zurück.` });
@@ -1092,6 +1092,8 @@
     }
     if (schritt) { st.zug.schritt = 0; } else { st.zug.bewegung -= c; st.zug.leicht = Math.max(0, (st.zug.leicht || 0) - c); }
     f.x = x; f.y = y;
+    // Arena: Bewegungen stehen in der Chronik, damit auch der Gegenspieler sieht, was geschehen ist (einmal je Zug)
+    if (st.arena && !st.zug.bewegtLog) { st.zug.bewegtLog = true; st.log.push({ t: `${f.name} bewegt sich.` }); }
     brandFeld(st, f);
     if (st.mech && st.mech.ausgang) ausgangPruefen(st);
     return { ok: true };
@@ -1256,7 +1258,19 @@
     // Jäger: die Begleiterin hat Vorrang, wenn sie steht und sichtbar ist
     const j = GEGNER[g.art].jaeger, s = j && (j !== "wechsel" || st.runde % 2 === 0) && begleiterVon(st);
     if (s && lebt(s) && !s.gefesselt && sicht(st, g, s)) { if (g.visier !== st.runde) { g.visier = st.runde; st.log.push({ t: `${g.name} nimmt ${s.name} ins Visier.`, art: "gegner" }); } return [s]; }
-    const alle = st.figuren.filter((f) => f.seite === "spieler" && lebt(f));
+    let alle = st.figuren.filter((f) => f.seite === "spieler" && lebt(f));
+    // Arena: Die Monster greifen beide Spieler gleich oft an. Jedes Monster nimmt sich in seinem Zug das Team vor,
+    // das bisher seltener dran war; bei Gleichstand entscheidet der Zufall.
+    if (st.arena) {
+      const a = st.arena, z = a.monsterZiel = a.monsterZiel || { 1: 0, 2: 0 };
+      if (a.monsterWer !== g.id + ":" + st.runde) {
+        const da = (tm) => alle.some((f) => teamVon(st, f) === tm);
+        let tm = z[1] !== z[2] ? (z[1] < z[2] ? 1 : 2) : (st.r() < 0.5 ? 1 : 2);
+        if (!da(tm)) tm = 3 - tm;
+        a.monsterWer = g.id + ":" + st.runde; a.monsterTeam = tm; z[tm]++;
+      }
+      const nur = alle.filter((f) => teamVon(st, f) === a.monsterTeam); if (nur.length) alle = nur;
+    }
     const sichtbar = alle.filter((f) => !f.z.versteckt);
     return sichtbar.length ? sichtbar : alle;
   }
@@ -1282,7 +1296,10 @@
   function arenaZugbeginn(st) {
     arenaSicht(st, 0);
     if (arenaPruefen(st)) return false;
-    arenaSicht(st, teamVon(st, aktiv(st)));
+    const f = aktiv(st), tm = teamVon(st, f);
+    // Chronik: wer jetzt zieht (nur stehende Figuren), damit sich die Züge beider Spieler und der Monster nachlesen lassen
+    if (f.tp > 0 && !f.tot && st.arena.zugLog !== f.id + ":" + st.runde) { st.arena.zugLog = f.id + ":" + st.runde; st.log.push({ t: tm ? `▸ ${f.name} ist am Zug (${st.arena.namen[tm - 1]}).` : `▸ ${f.name} ist am Zug.`, art: "zug" }); }
+    arenaSicht(st, tm);
     return false;
   }
   function arenaPunkte(st, z, vor) {
@@ -1309,16 +1326,34 @@
   /** Neue Arena-Partie. o: { teams: [[{fid, stufe} × 3], [{fid, stufe} × 3]], namen: [a, b], karte, begegnung, bedrohung, runden } */
   function neueArena(seed, o) {
     const k = o.karte, alle = o.teams[0].concat(o.teams[1]), mitte = { x: (k.b - 1) / 2, y: (k.h - 1) / 2 };
-    const s1 = k.start.spieler.slice(0, 3), schwer = { x: s1.reduce((a, p) => a + p[0], 0) / 3, y: s1.reduce((a, p) => a + p[1], 0) / 3 };
-    // Team 2 startet so weit wie möglich von Team 1 entfernt, die Monster stehen dazwischen
-    const fern = k.start.gegner.slice().sort((a, b) => (Math.abs(b[0] - schwer.x) + Math.abs(b[1] - schwer.y)) - (Math.abs(a[0] - schwer.x) + Math.abs(a[1] - schwer.y)));
-    const s2 = fern.slice(0, 3), rest = fern.slice(3).sort((a, b) => (Math.abs(a[0] - mitte.x) + Math.abs(a[1] - mitte.y)) - (Math.abs(b[0] - mitte.x) + Math.abs(b[1] - mitte.y)));
-    const karte = Object.assign({}, k, { start: Object.assign({}, k.start, { spieler: s1.concat(s2), gegner: rest.length ? rest : k.start.gegner, wolf: (k.start.wolf || []).concat(fern.slice(3)) }) });
+    // Aufstellung: Team 1 gemeinsam ganz unten, Team 2 gemeinsam ganz oben, die Monster in der Mitte.
+    // Gewählt wird aus den Feldern, die vom bisherigen Startplatz aus begehbar sind (keine abgeschnittenen Ecken).
+    const zu = new Set(k.hindernisse.map(([, x, y]) => key(x, y))), frei = [], gesehen = new Set(), offen = [k.start.spieler[0].slice()];
+    gesehen.add(key(offen[0][0], offen[0][1]));
+    while (offen.length) { const [x, y] = offen.shift(); frei.push([x, y]);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy, kk = key(nx, ny); if (nx < 0 || ny < 0 || nx >= k.b || ny >= k.h || zu.has(kk) || gesehen.has(kk)) continue; gesehen.add(kk); offen.push([nx, ny]); } }
+    const nahMitteX = (p) => Math.abs(p[0] - mitte.x);
+    const unten = frei.slice().sort((a, b) => b[1] - a[1] || nahMitteX(a) - nahMitteX(b)), oben = frei.slice().sort((a, b) => a[1] - b[1] || nahMitteX(a) - nahMitteX(b));
+    const s1 = unten.slice(0, 3), s2 = oben.filter((p) => !s1.some((q) => q[0] === p[0] && q[1] === p[1])).slice(0, 3);
+    const belegtS = (p) => s1.concat(s2).some((q) => q[0] === p[0] && q[1] === p[1]);
+    // Monster: möglichst weit weg von beiden Teams und von beiden gleich weit – so hat keine Seite sie zuerst am Hals
+    const nah = (p, s) => Math.min(...s.map((q) => Math.max(Math.abs(p[0] - q[0]), Math.abs(p[1] - q[1]))));
+    // … und dabei in der Mitte der Karte: zuerst zählt, dass beide Teams gleich weit entfernt sind, dann die Nähe zur Mitte
+    const wert = (p) => { const d1 = nah(p, s1), d2 = nah(p, s2); return -Math.abs(d1 - d2) * 20 - (Math.abs(p[0] - mitte.x) + Math.abs(p[1] - mitte.y)) * 2 + Math.min(d1, d2); };
+    const rest = frei.filter((p) => !belegtS(p)).sort((a, b) => wert(b) - wert(a));
+    const wolfP = unten.slice(3, 6).concat(oben.filter((p) => !belegtS(p)).slice(0, 3));
+    const karte = Object.assign({}, k, { start: Object.assign({}, k.start, { spieler: s1.concat(s2), gegner: rest.slice(0, 12), wolf: wolfP }) });
     const st = neuesSpiel(seed, { figuren: alle.map((h) => h.fid), stufenListe: alle.map((h) => h.stufe), karte, begegnung: o.begegnung, bedrohung: 0, mischen: false, anfuehrer: false, zusatzGegner: 0,
       // Monster bewusst wenige und schwach (so viele wie für zwei Helden, 60 % Leben, ohne Bedrohung): Der Kampf der Spieler steht im Mittelpunkt
       gegner: gegnerFuer(o.begegnung, 2, null, o.skala != null ? o.skala : 0.6, false, 0) });
     const helden = st.figuren.filter((f) => /^f\d+$/.test(f.id));
     helden.forEach((f, i) => { f.team = i < 3 ? 1 : 2; f.arenaStart = [f.x, f.y]; });
+    // Wölfe stehen bei ihrem Team (nicht auf der anderen Seite der Karte)
+    for (const w of st.figuren) if (w.art === "wolf" && w.besitzer) { const h = fig(st, w.besitzer); if (h && abstand(w, h) > 2) { const p = freiesFeldNahe(st, [h.x, h.y], 3); if (p) { w.x = p.x; w.y = p.y; } } }
+    // Steht derselbe Held auf beiden Seiten, bekommt er den Namen seines Spielers dazu (sonst liest sich die Chronik nicht)
+    { const sn = [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"]; for (const f of helden) if (helden.some((g) => g !== f && g.fid === f.fid)) f.name = `${f.name} (${sn[f.team - 1]})`; }
+    // Jede Zeile der Chronik merkt sich, wessen Zug es war (1, 2 oder 0 für Monster): Die Anzeige färbt danach
+    { const log = st.log; log.push = function (e) { if (e && e.tm == null) { const a = st.arena ? aktiv(st) : null; e.tm = a ? teamVon(st, a) : 0; } return Array.prototype.push.call(this, e); }; }
     st.arena = { punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || 15, sicht: 0, sieger: null };
     st.schwierigkeit = "normal"; st.ende = null;
     beginneZug(st);

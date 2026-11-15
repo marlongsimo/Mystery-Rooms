@@ -17,7 +17,8 @@
   const logZeile = (l) => {
     const m = /(kritischer Treffer|Treffer|verfehlt|widersteht|misslingt)/.exec(l.t || "");
     if (!m || !/W20|Rettungswurf/.test(l.t)) return esc(l.t);
-    const gegner = l.art === "gegner", wort = m[1];
+    // Arena: „gut“ ist, was dem eigenen Team nützt – also Treffer eigener Helden und Fehlwürfe der anderen
+    const gegner = l.tm != null && ARENA ? l.tm !== ARENA.seite : l.art === "gegner", wort = m[1];
     const erfolg = wort === "Treffer" || wort === "kritischer Treffer" || wort === "misslingt"; // der Angriff/Zauber wirkt
     const gut = gegner ? !erfolg : erfolg; // gut für die Helden?
     const marke = wort === "kritischer Treffer" ? "Kritisch" : wort === "Treffer" ? "Treffer" : wort === "verfehlt" ? "Verfehlt" : wort === "widersteht" ? "Widerstanden" : "Wirkt";
@@ -524,7 +525,7 @@
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
       if (f.seite === "gegner" && unten && !heldA(f)) { o += B.gegnerBild(f.art) ? `<g transform="translate(${cx} ${cy}) scale(.8)" opacity=".45">${B.gegner(f.art, true)}</g>` : `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
-      if (!unten) o += `<ellipse class="fig-schatten" cx="${cx}" cy="${cy + 22}" rx="24" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="27" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" stroke="${f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
+      if (!unten) o += `<ellipse class="fig-schatten" cx="${cx}" cy="${cy + 22}" rx="24" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="27" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" stroke="${heldA(f) ? "#4f8cff" : f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="${heldA(f) ? 3.5 : 2.5}"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
       if (!unten && f.schild && f.schild.aktiv) o += `<circle class="schild-ring" cx="${cx}" cy="${cy}" r="33" fill="#8fd0ff" fill-opacity=".12" stroke="#8fd0ff" stroke-width="3" stroke-dasharray="5 3"><title>${esc(f.schild.text)}: fängt die Hälfte des Schadens ab</title></circle>`;
       if (f === akt && !st.ende) o += `<circle class="aktiv-ring" cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#C5A267" stroke-width="3.5"/><circle cx="${cx}" cy="${cy}" r="33" fill="none" stroke="#C5A267" stroke-opacity=".35" stroke-width="5"/>`;
       if (gegnerInfo === f.id) o += `<circle cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#e8dcc0" stroke-width="2" stroke-dasharray="4 3"/>`;
@@ -549,7 +550,7 @@
           continue;
         }
         const href = wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fid || f.fidA);
-        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, wolfA(f) ? 17 : 21, heldA(f) ? "#c0444e" : farbeVon(f), "c" + f.id, unten)}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
+        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, wolfA(f) ? 17 : 21, heldA(f) ? "#4f8cff" : farbeVon(f), "c" + f.id, unten)}${heldA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9" fill="#12233f" stroke="#4f8cff" stroke-width="1.5"/><path d="M-4 -4 L4 4 M4 -4 L-4 4" stroke="#cfe0ff" stroke-width="2" stroke-linecap="round"/></g>` : ""}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
         if (f.tot) o += `<text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="22" fill="#fff">✝</text>`;
         else if (unten) o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${st.schwierigkeit === "hardcore" && f.art !== "wolf" ? (f.stabil ? "stabil" : `${f.todes.e}✓ ${f.todes.f}✗`) : "am Boden"}</text>`;
       }
@@ -566,7 +567,7 @@
     svg.innerHTML = o;
 
     const mini = (f) => heldA(f) ? `<img class="mini" src="${wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fidA)}" alt="">` : f.seite === "gegner" ? `<svg class="mini" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(f.art)}</svg>` : `<img class="mini" src="${F.bild(f.fid)}" alt="">`;
-    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${f.seite === "gegner" ? "g" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${esc(f.name)}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
+    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${heldA(f) ? "gh" : f.seite === "gegner" ? "g" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${esc(f.name)}${heldA(f) ? ` <small>Gegenspieler</small>` : ""}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
 
     if (st.ende) { $("#aktiv").innerHTML = ""; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
     else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">${heldA(akt) ? "(Gegner) " : ""}ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
@@ -589,7 +590,7 @@
       const gewaehlt = wahl && R.findeAktion(akt, wahl);
       $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt. Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
     }
-    $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}">${logZeile(l)}</li>`).join("");
+    $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}${l.tm != null && ARENA ? (l.tm === ARENA.seite ? " tm-eigen" : l.tm ? " tm-gegner" : " tm-monster") : ""}">${logZeile(l)}</li>`).join("");
     zeichneGegnerInfo(); zeichneLeiste(akt, spielerDran);
     zeigeWurf();
     schwebeZahlen();

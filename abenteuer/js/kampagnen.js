@@ -146,14 +146,14 @@
   /** Speichern, Status „pausiert“, Live-Runde beenden. allein: „Pause“ am Tisch – der Browser-Stand bleibt zum direkten Fortsetzen. */
   async function pausieren(o = {}) {
     if (!aktiv()) return;
-    if (!o.allein && !confirm("Kampagne pausieren? Sie wird gespeichert und kann unter „Meine Kampagnen“ fortgesetzt werden." + (window.AB.liveAn() ? " Die Handys werden getrennt." : ""))) return;
+    if (!o.allein && !confirm("Kampagne pausieren? Sie wird gespeichert und kann in der Abenteurergilde wieder aufgenommen werden." + (window.AB.liveAn() ? " Die Handys werden getrennt." : ""))) return;
     clearTimeout(timer); await speichern();
     try { await rpc("rpg_set_campaign_status", { p_campaign_id: K.id, p_status: "pausiert" }); K.status = "pausiert"; merkeK(); }
     catch (e) { toast("Pausieren: " + e.message); }
     if (o.allein) { zeigeStatus(""); return; }
     if (window.AB.liveAn()) await window.AB.liveFuerPauseBeenden();
     window.AB.allesBeenden(); window.ABT.verwerfen(); zeigeStatus("");
-    window.AB.zeigeIntro(); toast("Kampagne pausiert. Fortsetzen unter „Meine Kampagnen“.");
+    window.AB.zeigeIntro(); toast("Kampagne pausiert. Wieder aufnehmen in der Abenteurergilde.");
   }
 
   /* ---------- Bibliothek ---------- */
@@ -162,7 +162,7 @@
   let archivOffen = false;
   function box(inhalt) {
     const o = $("#qr-overlay");
-    o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-labelledby="k-titel"><div class="k-kopf"><h2 id="k-titel">Meine Kampagnen</h2><button class="link" id="k-zu">Schließen</button></div><div class="knoepfe gilde-knoepfe"><button class="btn" data-hub="neu">Neue Kampagne starten</button><button class="btn ghost" data-hub="beitreten">Kampagne beitreten</button></div>${inhalt}</div>`;
+    o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-labelledby="k-titel"><div class="k-kopf"><h2 id="k-titel">Abenteurergilde</h2><button class="link" id="k-zu">Schließen</button></div><div class="knoepfe gilde-knoepfe"><button class="btn" data-hub="neu">Neue Kampagne starten</button><button class="btn ghost" data-hub="beitreten">Kampagne beitreten</button></div>${inhalt}</div>`;
     o.hidden = false; $("#k-zu").onclick = () => { o.hidden = true; };
     o.querySelectorAll(".gilde-knoepfe [data-hub]").forEach((b) => b.addEventListener("click", () => { o.hidden = true; })); // weiter geht es über die Startseite (js/mythara.js)
     return o;

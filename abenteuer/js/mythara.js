@@ -268,7 +268,7 @@
   }
   function seiteZeigen(name, html) {
     const s = $("#hub-seite");
-    s.innerHTML = `<button class="hub-zurueck" data-hub="uebersicht">← Zur Übersicht</button>${html}`;
+    s.innerHTML = `<button class="hub-zurueck" data-hub="uebersicht">← Zum Dorf</button>${html}`;
     s.hidden = false; $("#hub-start").hidden = true; $("#hub").classList.add("seite-offen");
     document.querySelectorAll(".hub-nav-punkt").forEach((b) => b.classList.toggle("an", b.dataset.hub === name));
     s.scrollIntoView({ block: "start" }); window.scrollTo(0, 0);

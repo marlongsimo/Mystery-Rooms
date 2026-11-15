@@ -1785,3 +1785,12 @@ small.meister, .fkarte small.meister, .gk-info small.meister { color: #ffd75e; }
 .gilde-knoepfe { margin: 0 0 14px; }
 @media (max-width: 1150px) { .hub-rahmen { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kopf" "nav" "dorf" "mitte" "seite"; } .hub.seite-offen .hub-rahmen { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kopf" "nav" "mitte"; } }
 @media (max-width: 900px) { .hub-nav { justify-content: flex-start; } .hub-nav-punkt { font-size: 16px; padding: 8px 10px; } }
+
+/* Leiste mit neun Orten: etwas enger, damit sie am Laptop in eine Zeile passt */
+.hub-nav-punkt { padding: 9px 12px; font-size: 17px; gap: 8px; }
+@media (max-width: 1320px) { .hub-nav { justify-content: flex-start; } }
+/* Arena: das Rund als Hintergrund der Arena-Seiten (Übersicht, Heldenwahl, Aufstellung) */
+.hub-seite-inhalt:has([data-arena]) { background: linear-gradient(180deg, rgba(8,8,11,.38) 0%, rgba(8,8,11,.55) 38%, rgba(8,8,11,.84) 100%), url("../img/dorf/arena.webp") center top / cover no-repeat; min-height: min(78vh, 760px); }
+.hub-seite-inhalt:has([data-arena]) .arena-mein, .hub-seite-inhalt:has([data-arena]) .arena-liste li, .hub-seite-inhalt:has([data-arena]) .arena-team, .hub-seite-inhalt:has([data-arena]) .arena-info, .hub-seite-inhalt:has([data-arena]) .arena-held { background-color: rgba(8,8,11,.78); }
+.hub-seite-inhalt:has([data-arena]) .hub-gruss, .hub-seite-inhalt:has([data-arena]) .hub-untertitel, .hub-seite-inhalt:has([data-arena]) .note, .hub-seite-inhalt:has([data-arena]) .hub-zwischen { text-shadow: 0 2px 10px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.9); }
+.hub-seite-inhalt:has([data-arena]) .note { color: #e6dcc6; }

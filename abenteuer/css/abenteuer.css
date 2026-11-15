@@ -1651,3 +1651,7 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 /* Arena-Chronik: eigene Züge golden, Gegenspieler blau, Monster rot; „ist am Zug“ als Zwischenzeile */
 #log li.tm-eigen { border-left-color: #d9b46a; } #log li.tm-gegner { border-left-color: #4f8cff; } #log li.tm-monster { border-left-color: #c0444e; }
 #log li.zug { font-weight: 600; opacity: .85; margin-top: 6px; }
+/* Arena-Zugreihe: eigene Helden golden, darunter bei allen Helden der Name ihres Spielers */
+.reihe span.eh { color: #f1e3bf; }
+.reihe span.eh .mini { border-color: #d9b46a; box-shadow: 0 0 0 2px rgba(217,180,106,.3); }
+.reihe span.eh small { display: block; color: #d9b46a; font-size: 10px; letter-spacing: .04em; }

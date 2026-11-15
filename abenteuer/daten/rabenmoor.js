@@ -105,7 +105,7 @@
     t.push(m.wahrheit ? "Hedda hat euch die Wahrheit über ihre Schwester anvertraut." : "");
     t.push(m.schrein_weg ? "Ihr wusstet von Hedda, wo der versunkene Schrein liegt." : "");
     t.push(m.bertold_bringt ? "Bertold hat Jannik und Fenna selbst nach Hause getragen. Es war das Erste, was er in dieser Nacht richtig gemacht hat." : "");
-    t.push(m.toten_ruhig ? "Die Toten auf dem Pfad habt ihr in den Schlaf gesungen, statt sie zu erschlagen." : "");
+    t.push(m.toten_ruhig ? "Die meisten Toten auf dem Pfad habt ihr in den Schlaf gesungen, statt sie zu erschlagen." : "");
     for (const f of h.lebende(A)) if (h.feuerEcho(A, f, "nacht")) t.push(h.feuerEcho(A, f, "nacht"));
     return t.filter(Boolean);
   }
@@ -237,7 +237,7 @@
       art: "probe", abschnitt: 1, titel: "Durchs Ried", ort: "Schwarzmoor",
       text: (A) => ["Ihr springt von Buckel zu Buckel. Alle müssen sicher auftreten; gelingt es der Hälfte, helfen die anderen.", A.merker.spur ? "Ihr wisst, wohin die Kinder gegangen sind: Vorteil." : ""],
       probe: { name: "Trittsicher", wer: "gruppe", attr: "GES", sg: 12, geuebt: ["schurke", "waldlaeufer"], vorteil: (A) => (A.merker.spur ? 1 : 0), knapp: true,
-        erfolg: { text: "Ihr kommt trocken und schnell durch das Ried. Keine Kröte bemerkt euch.", weiter: "ried_still" },
+        erfolg: { text: "Ihr kommt trocken und schnell durch das Ried. Erst kurz vor der Hütte versperren euch Kröten den Weg – wenige, und sie haben euch nicht kommen hören.", naechsterKampf: 0.6, weiter: "kampf_ried" },
         knapp: { text: "Jemand rutscht ab, bis zur Hüfte ins Wasser. Ihr zieht ihn heraus, aber es platscht laut. Im Schilf regt sich etwas.", weiter: "kampf_ried" },
         fehl: { text: "Der Schlamm hält euch fest. Bis ihr wieder frei seid, ist es spät, und ein weiteres Licht steht über dem Moor. Dann rascheln die Kröten.", glocke: 1, weiter: "kampf_ried" } },
     },
@@ -260,13 +260,28 @@
         sieg: { weiter: "ried_still" } },
     },
     kahnfahrt: {
-      art: "erzaehlung", abschnitt: 1, titel: "Joosts Kahn", ort: "Schwarzmoor", weiter: "hedda",
-      beimEintritt: (A) => (A.merker.kahn_gefahren ? null : Object.assign({ setzt: { kahn_gefahren: true } }, A.glocke > 0 ? { glocke: -1 } : {})),
+      art: "erzaehlung", abschnitt: 1, titel: "Joosts Kahn", ort: "Schwarzmoor", weiter: "kampf_kanal",
+      beimEintritt: (A) => (A.merker.kahn_gefahren ? null : Object.assign({ setzt: { kahn_gefahren: true }, naechsterKampf: 0.7 }, A.glocke > 0 ? { glocke: -1 } : {})),
       text: [
         "Joost stakt den Kahn lautlos durch Kanäle, die ihr allein nie gefunden hättet. Einmal hält er an und legt den Finger an die Lippen. Neben dem Boot gleitet ein brauner Rücken vorbei, groß wie ein Kalb.",
         "„Der Stein“, sagt er leise, als ihr weiterfahrt, „lag tief im Torf. Eine Frauenfigur, mit einem Finger auf den Lippen. Der Schulze hat gesagt, wir sollen ihn ins Wasser werfen. Hab ich nicht. Er liegt am Schrein, wo er war.“",
         "Ihr seid schneller als jedes Licht. Eines, weit hinten, erlischt sogar. Am Ende des Kanals: eine Hütte auf Pfählen, im Fenster eine Kerze.",
+        "Dann knirscht der Kiel. Der Kahn sitzt fest, im flachen Wasser zwischen den Schilfinseln. „Raus“, flüstert Joost. „Sie haben uns gehört.“ Rings um das Boot heben sich braune Rücken aus dem Schlamm.",
       ],
+    },
+    kampf_kanal: {
+      art: "kampf", abschnitt: 1, titel: "Am Ende des Kanals", ort: "Das Ried",
+      text: [
+        "Schlammkröten kriechen auf die Schilfinseln, langsam noch, vom Kahn aufgeschreckt. Zwischen den Inseln liegen tiefe Furten: Wer hinüber will, muss außen herum.",
+        "Joost hat euch dicht an die Hütte herangebracht. Es sind weniger Kröten, als auf dem Bohlenweg gewartet hätten.",
+        "*Ein Kampf ohne besonderes Ziel: Besiegt die Kröten, dann ist der Weg zur Hütte frei.*",
+      ],
+      kampf: { begegnung: "moor_kroeten", karte: RIED, sieg: { weiter: "kanal_frei" } },
+    },
+    kanal_frei: {
+      art: "erzaehlung", abschnitt: 1, titel: "Am Steg", ort: "Schwarzmoor", weiter: (A, h) => h.ereignis(A, 1, "hedda"), rastErlaubt: true,
+      text: ["Die letzte Kröte taucht ab. Joost zieht den Kahn mit einem Ruck frei und bindet ihn an einen Pfahl. „Ich warte hier“, sagt er. „Wenn ihr mich braucht, pfeift.“",
+        "Auf dem Steg vor der Hütte sitzt eine alte Frau und sieht euch kommen, als hätte sie euch erwartet."],
     },
     hedda: {
       art: "gespraech", abschnitt: 1, titel: "Mutter Hedda", ort: "Heddas Hütte",
@@ -427,8 +442,8 @@
       art: "probe", abschnitt: 2, titel: "Ein Lied für die Ertrunkenen", ort: "Der Totenpfad",
       text: (A) => ["Eine Person tritt vor und singt. Ein Gebet, ein Wiegenlied, irgendetwas Warmes.", A.merker.lied ? "Heddas Lied hilft: Vorteil." : ""],
       probe: { name: "Singen", attr: (A, fid) => (["lichtbringer", "wanderheiler", "inquisitor"].includes(fid) ? "WEI" : "CHA"), sg: 13, geuebt: ["kleriker"], vorteil: (A) => (A.merker.lied ? 1 : 0), knapp: true,
-        erfolg: { text: "Einer nach dem anderen sinken die Ertrunkenen zurück ins Wasser, still, als hätten sie nur darauf gewartet. Am Damm liegt, was sie bei sich trugen: zwei Heiltränke in einer Ledertasche.", tranke: 2, setzt: { toten_ruhig: true }, weiter: "kinder" },
-        knapp: { text: "Die meisten sinken zurück. Ein paar bleiben stehen, die leeren Augen auf euch gerichtet.", naechsterKampf: 0.55, weiter: "kampf_toten" },
+        erfolg: { text: "Einer nach dem anderen sinken die Ertrunkenen zurück ins Wasser, still, als hätten sie nur darauf gewartet. Am Damm liegt, was sie bei sich trugen: zwei Heiltränke in einer Ledertasche. Nur die, die im grünen Schein der Grablaternen stehen, hören das Lied nicht. Sie kommen.", tranke: 2, setzt: { toten_ruhig: true }, naechsterKampf: 0.45, weiter: "kampf_toten" },
+        knapp: { text: "Viele sinken zurück. Die anderen bleiben stehen, die leeren Augen auf euch gerichtet.", naechsterKampf: 0.7, weiter: "kampf_toten" },
         fehl: { text: "Die Stimme versagt. Die Ertrunkenen kommen näher.", weiter: "kampf_toten" } },
     },
     kampf_toten: {
@@ -594,7 +609,7 @@
     id: "rabenmoor", schwierigkeit: 1, titel: "Das Moor der stummen Lichter", kurz: "Rabenmoor", untertitel: "Ein Abenteuer im Schwarzmoor",
     kurztext: "Drei Kinder sind stummen Lichtern ins Moor gefolgt. Das Dorf will die Kräuterfrau verbrennen.",
     abschnitte_namen: { 1: "Rabenmoor", 2: "Das tiefe Moor" },
-    min: 3, max: 6, stufen: "1–2", dauer: "1,5–2 Stunden", abschnitte: 2, enden: 4,
+    min: 3, max: 6, stufen: "1–2", dauer: "30–60 Minuten", abschnitte: 2, enden: 4,
     // Bilder (siehe BILDER-RABENMOOR.md): fehlt ein Abschnittsbild, zeigt die Liste die Vorschau des Titelbilds
     bild: "img/rabenmoor/titel.webp", vorschau: "img/rabenmoor/vorschau.webp", abschnittBilder: { 1: "img/rabenmoor/abschnitt-1.webp", 2: "img/rabenmoor/abschnitt-2.webp" },
     uhr: { name: "Lichter", symbol: "✦", klasse: "lichter", max: 7, mehr: "Ein weiteres Licht steigt über dem Moor auf.", weniger: "Ein Licht über dem Moor erlischt.", unruhe: "die Lichter lassen niemanden ganz schlafen", rueckzug: "Ein weiteres Licht steigt auf." },

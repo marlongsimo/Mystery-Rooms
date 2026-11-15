@@ -215,6 +215,13 @@
     const d = Math.round(s / 86400); return d === 1 ? "gestern" : d < 14 ? `vor ${d} Tagen` : `vor ${Math.round(d / 7)} Wochen`;
   };
   /* ---------- Eigene Seiten der Spielerseite: Helden, Regeln, Kampagnenwelt (ohne Spielablauf) ---------- */
+  /** Händler: Platzhalter, bis es etwas für Seelensplitter zu kaufen gibt */
+  function shopZeigen() {
+    const A = window.ARENA, n = A ? A.waehrung() : 0;
+    seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Folgt bald</h1>
+      <p class="hub-untertitel">Der Händler packt seine Waren noch aus. Bald kannst du hier deine ${A ? A.WAEHRUNG : "Seelensplitter"} eintauschen.</p>
+      ${A ? `<p class="shop-stand"><i>${A.ZEICHEN}</i> ${n} ${A.WAEHRUNG}</p>` : ""}</div>`);
+  }
   function seiteZeigen(name, html) {
     const s = $("#hub-seite");
     s.innerHTML = `<button class="hub-zurueck" data-hub="uebersicht">← Zur Übersicht</button>${html}`;
@@ -401,10 +408,12 @@
     if (!konto) gh.innerHTML = `<span>Du spielst als <b>Gast</b>. Deine Kampagnen sind an diesen Browser gebunden. Mit einem Konto hast du sie auf jedem Gerät.</span><span class="hub-gast-knoepfe"><button class="my-link" data-profil="registrieren">Konto erstellen</button><button class="my-link" data-profil="anmelden">Anmelden</button></span>`;
     $("#hub-profil").innerHTML = `<span class="arena-waehrung kopf" id="hub-waehrung" hidden></span><button class="hub-profil-knopf" id="hub-profil-knopf" aria-haspopup="true" aria-expanded="false"><span class="hub-avatar">${avatarHtml()}</span><span class="hub-name"><b>${esc(name)}</b><small id="hub-titel">${konto ? esc((smAktiv() && SM.titelText()) || "Spieler") : "Gast"}</small></span><span aria-hidden="true">▾</span></button>
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
+      <button class="hub-rund" id="hub-shop" aria-label="Händler" title="Händler"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16l1.5 5a3 3 0 0 1-2.5 3.9V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.100A3 3 0 0 1 2.500 9zm3 9v6h4v-4h3v4h3v-6a3 3 0 0 1-2.500-1.300A3 3 0 0 1 12 12.900a3 3 0 0 1-2.500-1.200A3 3 0 0 1 7 13z"/></svg></span></button>
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
       <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     arenaKachel();
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
+    $("#hub-shop").onclick = shopZeigen;
     $("#hub-einst").onclick = () => { const t = $("#titel-einst"); if (t) t.click(); };
     const gl = $("#hub-glocke"); if (gl) gl.onclick = anfragenZeigen;
     posteingang();

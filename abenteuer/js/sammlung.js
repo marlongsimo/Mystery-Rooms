@@ -436,7 +436,7 @@
     if (!S.konto) return "";
     return `<div class="sm-enden">${Object.entries(KAMPAGNEN).map(([ab, v]) => {
       const n = (S.alle_enden || {})[ab] || Object.keys(v.enden).length, g = (S.enden || []).filter((e) => e.abenteuer === ab).length, titel = (S.titel || []).includes(ab);
-      return `<div class="sm-ende-chip ${titel ? "titel" : ""}" style="--bild:url('${bildVon(ab)}')"><b>${esc(v.titel)}</b><span>${g} von ${n} Enden${titel ? ` · ♛ ${esc(TITEL[ab])}` : ""}</span><i style="width:${n ? (g / n) * 100 : 0}%"></i></div>`;
+      return `<div class="sm-ende-chip ${titel ? "mit-titel" : ""}" style="--bild:url('${bildVon(ab)}')"><b>${esc(v.titel)}</b><span>${g} von ${n} Enden${titel ? ` · ♛ ${esc(TITEL[ab])}` : ""}</span><i style="width:${n ? (g / n) * 100 : 0}%"></i></div>`;
     }).join("")}</div>`;
   }
   /** Chronik des Kontos: je Kampagne alle Enden, gefundene mit Namen und Datum, die übrigen verdeckt */

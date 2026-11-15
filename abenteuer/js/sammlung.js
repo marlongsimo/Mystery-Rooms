@@ -318,7 +318,7 @@
       return belohnung(r, { schluss: sch });
     }
     const text = !S.konto ? "Als Gast sammelst du keine Erfahrung und keine neuen Helden. Mit einem Spielerkonto steigen deine Helden mit jedem Abschluss auf."
-      : "Dieser Abschluss bringt keine Belohnung. Gewertet werden Kampagnen, die ein reguläres Ende erreichen und mindestens 15 Minuten gedauert haben.";
+      : "Dieser Abschluss bringt keine Belohnung. Gewertet werden Kampagnen, die ein reguläres Ende erreichen.";
     schlussSchirm(sch, { kopf: K.titel, titel: K.titel, bild, text });
   }
   /** Ergebnis von rpg_claim_ending (oder ein offenes Angebot) zeigen */

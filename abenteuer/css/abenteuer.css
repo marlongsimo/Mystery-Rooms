@@ -1714,3 +1714,13 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .held-lore .held-lore-herkunft { font: 600 12px var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase; color: var(--k, #d9b26a); }
 .held-lore .held-lore-geheim { padding: 10px 12px; border-left: 3px solid var(--k, #d9b26a); background: rgba(255,255,255,.04); border-radius: 0 8px 8px 0; }
 .held-lore .held-lore-geheim b { color: #f6dc9c; }
+
+/* Arena: Leiste oben mit Zugzeit, Punkten und Runde – am Rechner stehen Punkte und Runde schon in der Kopfzeile */
+.arena-uhr { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.arena-uhr[hidden] { display: none; }
+.arena-uhr .au-punkte i { font-style: normal; opacity: .75; }
+.arena-uhr .au-punkte b { margin-left: 0; }
+.arena-uhr .au-runde { opacity: .8; font-size: 12px; }
+@media (min-width: 1200px) { .arena-uhr .au-punkte, .arena-uhr .au-runde { display: none; } .arena-uhr:not(:has(.au-zeit)) { display: none; } }
+.arena-modus-reihe.vier { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 760px) { .arena-modus-reihe.vier { grid-template-columns: 1fr; } }

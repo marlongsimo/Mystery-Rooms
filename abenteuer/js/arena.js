@@ -28,11 +28,13 @@
   const MODI = {
     arena: { name: "Arena", kurz: "Das klassische Duell um Punkte.", lang: "Zwei Teams, ein paar Monster dazwischen. Wer mehr Punkte sammelt, gewinnt.",
       ziel: ["Bringe alle drei gegnerischen Helden zu Boden – dann hast du sofort gewonnen.", "Sonst entscheiden nach 15 Runden die Punkte: 5 je gefälltem Helden, 1 je Monster, 2 je Anführer-Monster."] },
+    duell: { name: "Duell", kurz: "Drei gegen drei. Keine Monster.", lang: "Nur ihr beide und eure Helden. Kein Monster mischt sich ein.",
+      ziel: ["Bringe alle drei gegnerischen Helden zu Boden – dann hast du sofort gewonnen.", "Sonst entscheiden nach 15 Runden die Punkte: 5 je gefälltem Helden."] },
     koenig: { name: "Königsmord", kurz: "Jeder hat einen geheimen Anführer. Fällt er, ist alles verloren.", lang: "Vor dem Start bestimmst du verdeckt einen deiner Helden zum Anführer. Dein Gegner weiß nicht, wer es ist.",
       ziel: ["Bringe den gegnerischen Anführer zu Boden – dann hast du sofort gewonnen.", "Fällt dein eigener Anführer, hast du sofort verloren.", "Sonst entscheiden nach 15 Runden die Punkte."] },
     horde: { name: "Die Horde", kurz: "Jede Runde kommen neue, stärkere Monster.", lang: "Jede Runde erscheinen neue Monster, gleich weit von beiden Teams entfernt, und sie werden mit jeder Runde stärker.",
       ziel: ["Liegt ein Team ganz am Boden – durch Monster oder Gegner –, gewinnt das andere.", "Sonst entscheiden nach 30 Runden die Punkte."] } };
-  const LOS = ["arena", "koenig", "horde"];
+  const LOS = ["arena", "koenig", "horde", "duell"]; // Reihenfolge wie in rpg_arena_modus (Migration 010)
   const modusVon = (m) => { const fest = new URLSearchParams(location.search).get("arenamodus"); if (MODI[fest]) return fest;
     return m && m.seed != null && isFinite(Number(m.seed)) ? LOS[Math.abs(Math.trunc(Number(m.seed))) % LOS.length] : "arena"; };
   const modusHtml = (k, gross) => `<div class="arena-modus-karte${gross ? " gross" : ""}"><h3>${MODI[k].name}</h3><p>${MODI[k].lang}</p><b>So gewinnst du</b><ul>${MODI[k].ziel.map((z) => `<li>${z}</li>`).join("")}</ul></div>`;
@@ -98,7 +100,7 @@
           <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
           <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
           <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. Erfahrung und Heldenchance gibt es für die ersten fünf Kämpfe des Tages.</li></ul>
-        <h2>Die Modi</h2><div class="arena-modus-reihe">${LOS.map((k) => modusHtml(k)).join("")}</div></div>
+        <h2>Die Modi</h2><div class="arena-modus-reihe vier">${LOS.map((k) => modusHtml(k)).join("")}</div></div>
       ${Z.fehler ? `<p class="fb">${esc(Z.fehler)}</p>` : ""}
       ${m ? `<div class="arena-mein"><div><b>Dein Kampf wartet auf einen Gegner</b><small>Durchschnittsstufe ${komma(m.host.schnitt)} · ${m.host.team.map((h) => esc(F.FIGUREN[h.held].name) + " (" + h.stufe + ")").join(", ")}</small></div><button class="btn ghost klein" id="arena-verwerfen">Verwerfen</button></div>`
         : `<div class="knoepfe"><button class="btn gross" id="arena-erstellen" ${eigene < 3 ? "disabled" : ""}>Kampf erstellen</button></div>${eigene < 3 ? `<p class="note">Du brauchst mindestens drei Helden in deiner Sammlung.</p>` : ""}`}

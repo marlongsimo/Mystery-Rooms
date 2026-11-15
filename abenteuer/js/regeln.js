@@ -1404,7 +1404,14 @@
     { const sn = [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"]; for (const f of helden) if (helden.some((g) => g !== f && g.fid === f.fid)) f.name = `${f.name} (${sn[f.team - 1]})`; }
     // Jede Zeile der Chronik merkt sich, wessen Zug es war (1, 2 oder 0 für Monster): Die Anzeige färbt danach
     { const log = st.log; log.push = function (e) { if (e && e.tm == null) { const a = st.arena ? aktiv(st) : null; e.tm = a ? teamVon(st, a) : 0; } return Array.prototype.push.call(this, e); }; }
-    const modus = ["koenig", "horde"].includes(o.modus) ? o.modus : "arena";
+    const modus = ["koenig", "horde", "duell"].includes(o.modus) ? o.modus : "arena";
+    // Duell: drei gegen drei, ganz ohne Monster
+    if (modus === "duell") {
+      const bleibt = (f) => Boolean(teamVon(st, f));
+      st.figuren = st.figuren.filter(bleibt); st.reihe = st.reihe.filter((id) => fig(st, id)); st.am = 0;
+      for (const f of st.figuren) { if (f.malZiel && !fig(st, f.malZiel)) delete f.malZiel; }
+      st.log.length = 0; st.log.push({ t: "Initiative: " + st.reihe.map((id) => { const f = fig(st, id); return `${f.name} (${f.ini})`; }).join(" · "), tm: 0 });
+    }
     st.arena = { modus, felder: modus === "horde" ? frei : null, hordeArt: modus === "horde" ? ((BEGEGNUNGEN[o.begegnung] || BEGEGNUNGEN.garten).gegner[0] || ["rostkaefer"])[0] : null,
       koenig: modus === "koenig" ? { 1: helden[Math.max(0, Math.min(2, (o.anfuehrer || [])[0] || 0))].id, 2: helden[3 + Math.max(0, Math.min(2, (o.anfuehrer || [])[1] || 0))].id } : null,
       punkte: { 1: 0, 2: 0 }, namen: [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"], runden: o.runden || (modus === "horde" ? 30 : 15), sicht: 0, sieger: null };

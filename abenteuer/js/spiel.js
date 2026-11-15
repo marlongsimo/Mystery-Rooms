@@ -67,11 +67,14 @@
     let el = document.getElementById("arena-uhr");
     if (!ARENA) { if (el) el.hidden = true; return; }
     if (!el) { el = document.createElement("div"); el.id = "arena-uhr"; el.className = "arena-uhr"; el.hidden = true; document.body.appendChild(el); }
-    const bis = st && st.arena && !st.ende ? st.arena.zugBis : null;
-    if (!bis) { el.hidden = true; return; }
+    if (!st || !st.arena || st.ende) { el.hidden = true; return; }
+    // Punktestand immer (am Handy gibt es keine Kopfzeile): die eigenen Punkte zuerst
+    const p = st.arena.punkte, ich = ARENA.seite, stand = `<span class="au-punkte"><i>Du</i> <b>${p[ich]}</b> : <b>${p[3 - ich]}</b></span><span class="au-runde">Runde ${st.runde}/${st.arena.runden}</span>`;
+    const bis = st.arena.zugBis, a = R.aktiv(st), mein = a && R.teamVon(st, a) === ARENA.seite;
+    el.hidden = false; el.classList.toggle("fremd", Boolean(bis) && !mein);
+    if (!bis) { el.classList.remove("knapp"); el.innerHTML = stand; return; }
     const s = Math.max(0, Math.ceil((bis + uhrVersatz - Date.now()) / 1000));
-    const a = R.aktiv(st), mein = a && R.teamVon(st, a) === ARENA.seite;
-    el.hidden = false; el.classList.toggle("knapp", s <= 10); el.classList.toggle("fremd", !mein); el.innerHTML = `Zugzeit <b>${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}</b>`;
+    el.classList.toggle("knapp", s <= 10); el.innerHTML = `<span class="au-zeit">Zugzeit <b>${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}</b></span>${stand}`;
   }
   function zugUhrTakt() {
     zugUhrZeigen();

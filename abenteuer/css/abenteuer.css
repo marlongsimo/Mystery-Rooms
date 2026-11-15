@@ -1652,6 +1652,26 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 #log li.tm-eigen { border-left-color: #d9b46a; } #log li.tm-gegner { border-left-color: #4f8cff; } #log li.tm-monster { border-left-color: #c0444e; }
 #log li.zug { font-weight: 600; opacity: .85; margin-top: 6px; }
 /* Arena-Zugreihe: eigene Helden golden, darunter bei allen Helden der Name ihres Spielers */
-.reihe span.eh { color: #f1e3bf; }
-.reihe span.eh .mini { border-color: #d9b46a; box-shadow: 0 0 0 2px rgba(217,180,106,.3); }
-.reihe span.eh small { display: block; color: #d9b46a; font-size: 10px; letter-spacing: .04em; }
+.reihe span.eh { color: #ffe9a8; }
+.reihe span.eh .mini, .reihe span.eh.dran .mini { border-color: #f5c842; box-shadow: 0 0 0 2px rgba(245,200,66,.45); }
+.reihe span.gh.dran .mini { border-color: #4f8cff; }
+.reihe span.eh small { display: block; color: #f5c842; font-size: 10px; letter-spacing: .04em; }
+.reihe .krone { font-style: normal; color: #ffd75e; margin-right: 2px; }
+/* Arena: Zugzeit (oben in der Mitte), Moduswahl, Anführer */
+.arena-uhr { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 60; padding: 5px 14px; border-radius: 16px; font: 600 13px var(--schrift-titel); letter-spacing: .04em; color: #ffe9a8; background: rgba(10,11,15,.88); box-shadow: inset 0 0 0 1px rgba(245,200,66,.55); pointer-events: none; }
+.arena-uhr b { font-size: 16px; color: #fff; margin-left: 4px; }
+.arena-uhr.fremd { color: #a9c6ff; box-shadow: inset 0 0 0 1px rgba(79,140,255,.6); }
+.arena-uhr.knapp b { color: #ff8a7a; }
+.arena-modi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.arena-modi button { text-align: left; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--stein, #171a22); color: var(--muted); cursor: pointer; font: inherit; }
+.arena-modi button b { display: block; color: var(--text); font: 600 15px var(--schrift-titel); margin-bottom: 3px; }
+.arena-modi button small { font-size: 12px; line-height: 1.35; display: block; }
+.arena-modi button.an { border-color: #f5c842; box-shadow: 0 0 0 1px #f5c842; color: var(--text); }
+@media (max-width: 640px) { .arena-modi { grid-template-columns: 1fr; } }
+.arena-modus-marke { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 10px; font-size: 11px; letter-spacing: .04em; color: #ffe9a8; box-shadow: inset 0 0 0 1px rgba(245,200,66,.5); vertical-align: middle; }
+.arena-anfuehrer { margin: 10px 0; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(245,200,66,.4); }
+.arena-anfuehrer div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.arena-anfuehrer button { padding: 6px 12px; border-radius: 16px; border: 1px solid var(--line); background: none; color: var(--text); cursor: pointer; font: inherit; }
+.arena-anfuehrer button.an { border-color: #f5c842; background: rgba(245,200,66,.14); color: #ffe9a8; }
+.arena-held { position: relative; }
+.arena-held .krone { position: absolute; top: 6px; right: 8px; font-style: normal; color: #ffd75e; font-size: 20px; text-shadow: 0 1px 4px #000; }

@@ -6,6 +6,7 @@
  */
 const { chromium } = require("playwright"); const { ALLE } = require("./alle-helden");
 const URL = "http://localhost:8765/abenteuer/index.html?schnell";
+const MODUS = process.env.MODUS || "arena", MODUSNAME = { arena: "Arena", koenig: "Königsmord", horde: "Die Horde" }[MODUS]; // MODUS=koenig|horde spielt den jeweiligen Modus
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 // Nachgebildeter Server
 const DB = { match: null, wallet: { A: 0, B: 0 }, xp: { A: { schildwaechter: 1350, lichtbringer: 260 }, B: { berserker: 850 } } };
@@ -22,6 +23,8 @@ function server(ich, name, args) {
   if (name === "rpg_my_wallet") return { konto: true, waehrung: DB.wallet[ich] };
   if (name === "rpg_arena_list") return { konto: true, waehrung: DB.wallet[ich], heute: 0, offen: m && m.status === "offen" && m.hostWer !== ich ? [{ id: m.id, name: m.host.name, schnitt: m.host.schnitt, erstellt: new Date().toISOString() }] : [],
     mein: m && (m.hostWer === ich || m.gastWer === ich) && ["offen", "bereit", "laeuft"].includes(m.status) ? sicht(ich) : null };
+  if (name === "rpg_arena_modes") return m && (args.p_ids || []).includes(m.id) ? { [m.id]: m.modus || "arena" } : {};
+  if (name === "rpg_arena_set_mode") { if (!m || m.hostWer !== ich || m.status !== "offen") return fehler("Der Modus lässt sich nicht mehr ändern."); m.modus = args.p_modus; return args.p_modus; }
   if (name === "rpg_arena_create") { const t = team(ich, args.p_team); DB.match = { id: "00000000-0000-0000-0000-00000000aaaa", status: "offen", hostWer: ich, host: { name: "Spieler " + ich, schnitt: schnitt(t), team: t } }; return sicht(ich); }
   if (!m) return fehler("Diesen Kampf gibt es nicht.");
   if (name === "rpg_arena_join") { const t = team(ich, args.p_team), s = schnitt(t); if (Math.abs(s - m.host.schnitt) > 1) return fehler("Dein Team liegt zu weit entfernt.");
@@ -44,7 +47,7 @@ async function spieler(b, ich) {
   await p.route(/\/rest\/v1\/rpc\/rpg_(my_heroes|campaign_heroes)(\?|$)/, (r) => json(r, { konto: true, helden: ALLE, start_offen: false, angebote: [], enden: [], alle_enden: {}, titel: [] }));
   await p.route(/\/rest\/v1\/rpc\/rpg_hero_levels(\?|$)/, (r) => json(r, { konto: true, xp: DB.xp[ich] }));
   await p.route(/\/rest\/v1\/rpc\/rpg_(my_inbox|my_campaigns)(\?|$)/, (r) => json(r, r.request().url().includes("inbox") ? { freunde: [], kampagnen: [] } : []));
-  await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z]+|my_wallet)(\?|$)/, (r) => { const name = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1]; let args = {}; try { args = JSON.parse(r.request().postData() || "{}"); } catch (e) { /* leer */ }
+  await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z_]+|my_wallet)(\?|$)/, (r) => { const name = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1]; let args = {}; try { args = JSON.parse(r.request().postData() || "{}"); } catch (e) { /* leer */ }
     const e = server(ich, name, args); return e && e.fehler ? r.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ code: "P0001", message: e.fehler }) }) : json(r, e); });
   await p.goto(URL); await p.waitForSelector('.hub-kachel[data-hub="arena"]', { timeout: 20000 });
   return { p, fehler, ich };
@@ -59,18 +62,26 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
   for (const f of ["schildwaechter", "lichtbringer", "wildnislaeufer"]) await A.p.click(`[data-arena-held="${f}"]`);
   const schnittA = await A.p.textContent(".arena-schnitt");
   check(/3 von 3/.test(schnittA) && /3,3/.test(schnittA), "Heldenwahl: Stufen 6, 3, 1 → Durchschnitt 3,3 wird oben angezeigt");
+  check(await A.p.evaluate(() => document.querySelectorAll("[data-arena-modus]").length === 3 && document.querySelector('[data-arena-modus="arena"]').classList.contains("an")), "Kampf erstellen: drei Modi zur Wahl, „Arena“ ist vorgewählt");
+  if (MODUS !== "arena") await A.p.click(`[data-arena-modus="${MODUS}"]`);
+  if (MODUS === "koenig") { await A.p.click('[data-arena-anf="lichtbringer"]'); check(await A.p.evaluate(() => Boolean(document.querySelector('[data-arena-held="lichtbringer"] .krone')) && !document.querySelector('[data-arena-held="schildwaechter"] .krone')), "Königsmord: Anführer lässt sich bestimmen (Krone an Elara)"); }
   await A.p.click("#arena-wahl-ok"); await A.p.waitForSelector(".arena-mein");
+  if (MODUS !== "arena") check(new RegExp(MODUSNAME).test(await A.p.textContent(".arena-mein")), "Der eigene Kampf zeigt den Modus: " + MODUSNAME);
   check(/wartet auf einen Gegner/.test(await A.p.textContent(".arena-mein")), "Ersteller: Kampf wartet auf einen Gegner");
   // B sieht ihn nach dem Aktualisieren – ohne Helden
   await B.p.click('.hub-kachel[data-hub="arena"]'); await B.p.waitForSelector("#arena-neu-laden"); await B.p.click("#arena-neu-laden"); await B.p.waitForSelector("[data-arena-bei]");
   const zeile = await B.p.textContent(".arena-liste li");
   check(/Spieler A/.test(zeile) && /3,3/.test(zeile) && !/Torvald|Elara|Kael/.test(zeile), "Übersicht des anderen: Name und Durchschnittsstufe, keine Helden (" + zeile.replace(/\s+/g, " ").trim() + ")");
+  if (MODUS !== "arena") check(new RegExp(MODUSNAME).test(zeile), "Der andere sieht den Modus in der Übersicht");
   await B.p.click("[data-arena-bei]");
   for (const f of ["trickser", "elementarist", "duellant"]) await B.p.click(`[data-arena-held="${f}"]`);
   check(await B.p.evaluate(() => document.querySelector("#arena-wahl-ok").disabled && document.querySelector(".arena-schnitt").classList.contains("schlecht")), "Beitreten mit Schnitt 1,0 gegen 3,3: gesperrt, Hinweis auf die Spanne");
   await B.p.click('[data-arena-held="duellant"]'); await B.p.click('[data-arena-held="berserker"]');
   check(await B.p.evaluate(() => !document.querySelector("#arena-wahl-ok").disabled && /2,3/.test(document.querySelector(".arena-schnitt").textContent)), "Mit Ragnar (Stufe 5): Schnitt 2,3 passt");
+  if (MODUS === "koenig") await B.p.click('[data-arena-anf="berserker"]');
   await B.p.click("#arena-wahl-ok"); await B.p.waitForSelector(".arena-gegenueber");
+  await B.p.waitForFunction(() => /Zugzeit/.test(document.querySelector("#arena-modus-text").textContent), null, { timeout: 10000 }).catch(() => {});
+  check(new RegExp(MODUSNAME + ":").test(await B.p.textContent("#arena-modus-text")) && (MODUS !== "koenig" || /Dein Anführer: ♛ Ragnar/.test(await B.p.textContent("#arena-modus-text"))), "Aufstellung nennt den Modus und seine Regel" + (MODUS === "koenig" ? " und den eigenen Anführer" : ""));
   const auf = await B.p.textContent(".arena-gegenueber");
   check(/Torvald/.test(auf) && /Stufe 6/.test(auf) && /Ragnar/.test(auf) && /Stufe 5/.test(auf) && /Gruft/.test(await B.p.textContent("[data-arena]")), "Aufstellung: beide Teams mit den Stufen der einzelnen Helden, Karte gelost");
   // Beide landen im Kampf
@@ -78,8 +89,22 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
   check(imKampf, "Beide Geräte sind im Kampf (Ersteller rechnet, der andere bekommt den Stand)");
   if (imKampf) {
     const start = await B.p.evaluate(() => { const st = window.AB.st; return { teams: st.figuren.filter((f) => f.team).length, monster: st.figuren.filter((f) => !f.team && f.seite === "gegner" && f.tp > 0).length, reihe: document.querySelector("#reihe").textContent + " | " + document.querySelector("#kampf-kopf").textContent, bild: Boolean(st.karte.bild) }; });
-    check(start.teams === 6 && start.monster > 0 && start.monster <= 5 && /von 15/.test(start.reihe) && /Arena/.test(start.reihe) && /Spieler A gegen Spieler B/.test(start.reihe) && /Punkte\s*0 : 0/.test(start.reihe) && start.bild, `Kampf: sechs Helden, ${start.monster} Monster (wenige, schwache), Kopfzeile „Arena · Spieler A gegen Spieler B · Runde 1 von 15 · Punkte 0 : 0“, Kartenbild auch beim Beigetretenen`);
+    check(start.teams === 6 && start.monster > 0 && start.monster <= 5 && new RegExp("von " + (MODUS === "horde" ? 30 : 15)).test(start.reihe) && new RegExp(MODUSNAME).test(start.reihe) && /Spieler A gegen Spieler B/.test(start.reihe) && /Punkte\s*0 : 0/.test(start.reihe) && start.bild, `Kampf: sechs Helden, ${start.monster} Monster (wenige, schwache), Kopfzeile „Arena · Spieler A gegen Spieler B · Runde 1 von 15 · Punkte 0 : 0“, Kartenbild auch beim Beigetretenen`);
     await B.p.waitForTimeout(1200);
+    // Zugreihe: eigene Helden gelb, die des Gegners blau, überall der Spielername; Zugzeit sichtbar
+    for (const S of [A, B]) {
+      const r = await S.p.evaluate(() => { const farbe = (s) => [...document.querySelectorAll("#reihe span." + s + " .mini")].map((e) => getComputedStyle(e).borderTopColor);
+        return { eh: farbe("eh"), gh: farbe("gh"), namen: [...document.querySelectorAll("#reihe span.eh small, #reihe span.gh small")].map((e) => e.textContent), uhr: (document.querySelector("#arena-uhr") || {}).textContent || "", uhrDa: Boolean(document.querySelector("#arena-uhr") && !document.querySelector("#arena-uhr").hidden),
+          krone: [...document.querySelectorAll("#reihe .krone")].map((e) => e.parentElement.textContent), koenig: window.AB.st.arena.koenig }; });
+      check(r.eh.length === 3 && r.eh.every((c) => c === "rgb(245, 200, 66)") && r.gh.length === 3 && r.gh.every((c) => c === "rgb(79, 140, 255)") && r.namen.length === 6, `Spieler ${S.ich}: Zugreihe – drei eigene Helden gelb, drei gegnerische blau, bei allen der Spielername`);
+      check(r.uhrDa && /Zugzeit\s*(1:00|0:5\d)/.test(r.uhr), `Spieler ${S.ich}: Zugzeit läuft sichtbar von einer Minute herunter (${r.uhr.trim()})`);
+      if (MODUS === "koenig") check(r.krone.length === 1 && new RegExp(S === A ? "Elara" : "Ragnar").test(r.krone[0]) && (S === A ? r.koenig[1] && r.koenig[2] : r.koenig[1] === null && r.koenig[2]), `Spieler ${S.ich}: Krone nur am eigenen Anführer (${r.krone.join()})${S === B ? "; der Anführer des Gegners wird nicht übertragen" : ""}`);
+    }
+    { // Zugzeit abgelaufen: der Ersteller beendet den Zug – auch den des Gegners
+      const vor = await A.p.evaluate(() => { const st = window.AB.st, a = window.AB.R.aktiv(st); st.arena.zugBis = Date.now() - 1; return a.id; });
+      const weiter = await warte(A.p, (alt) => window.AB.R.aktiv(window.AB.st).id !== alt && window.AB.st.log.some((l) => /Zugzeit von .* ist abgelaufen/.test(l.t)), vor, 8000);
+      check(weiter, "Läuft die Zugzeit ab, endet der Zug von selbst (Eintrag in der Chronik)");
+    }
     const sichtB = await B.p.evaluate(() => { const st = window.AB.st; const el = (id) => document.querySelector(`#karte g.fig[data-id="${id}"]`);
       return st.figuren.filter((f) => f.team).map((f) => ({ id: f.id, team: f.team, seite: f.seite, x: f.x, y: f.y, da: Boolean(el(f.id)), klasse: el(f.id) ? el(f.id).getAttribute("class") : "", blau: el(f.id) ? /4f8cff/.test(el(f.id).innerHTML) : false })); });
     if (process.env.DEBUG) console.log(JSON.stringify(sichtB));

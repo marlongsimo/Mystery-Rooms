@@ -25,4 +25,21 @@ select pg_temp.ok(public.rpg_arena_modes(array[:'id']::uuid[]) = '{}'::jsonb, 'U
 select pg_temp.als('A');
 select pg_temp.fehler(format('select public.rpg_arena_set_mode(%L, ''arena'')', :'id'), 'nicht mehr ändern', 'Nach dem Beitritt bleibt der Modus fest');
 select public.rpg_arena_cancel(:'id');
+-- Währung: A hat heute schon fünf gewertete Kämpfe; ein weiterer Sieg bringt trotzdem 5 bis 25
+select (public.rpg_my_wallet()->>'waehrung')::int as vor \gset
+select public.rpg_arena_create(array['schildwaechter', 'trickser', 'lichtbringer'])->>'id' as id2 \gset
+select pg_temp.als('B'); select public.rpg_arena_join(:'id2', array['trickser', 'berserker', 'duellant']);
+select pg_temp.als('A'); select public.rpg_arena_room(:'id2', 'QRST');
+select pg_temp.als('B'); select public.rpg_arena_cancel(:'id2');
+select pg_temp.als('A');
+select (public.rpg_my_wallet()->>'waehrung')::int as nach \gset
+select (public.rpg_arena_get(:'id2')->'belohnung'->>'waehrung')::int as lohn \gset
+select pg_temp.ok(:lohn between 5 and 25 and :nach - :vor = :lohn, 'Sieg über der Tagesgrenze: gewürfelte Währung (' || :lohn || ') landet auf dem Konto');
+select pg_temp.ok(not (public.rpg_arena_get(:'id2')->'belohnung'->>'gewertet')::boolean, 'XP und Heldenchance bleiben bei fünf Kämpfen am Tag');
+select pg_temp.als('B');
+select pg_temp.ok((public.rpg_arena_get(:'id2')->'belohnung'->>'waehrung')::int = 0, 'Wer verliert oder aufgibt, bekommt keine Währung');
 reset role;
+-- viele Würfe: immer 5 bis 25, Konto und Belohnung stimmen überein
+insert into public.rpg_arena_matches (id, status, host_id, host_name, host_team, host_schnitt) select gen_random_uuid(), 'beendet', '00000000-0000-0000-0000-0000000008a3', 'w', '[]'::jsonb, 1 from generate_series(1, 200);
+insert into public.rpg_arena_rewards (match_id, user_id, sieg, gewertet, waehrung) select id, '00000000-0000-0000-0000-0000000008a3', true, true, 25 from public.rpg_arena_matches where host_name = 'w';
+select pg_temp.ok(min(waehrung) >= 5 and max(waehrung) <= 25 and count(distinct waehrung) > 10, 'Würfe liegen zwischen 5 und 25 (' || min(waehrung) || '–' || max(waehrung) || ')') from public.rpg_arena_rewards where user_id = '00000000-0000-0000-0000-0000000008a3';

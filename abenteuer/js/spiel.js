@@ -52,6 +52,34 @@
   let ARENA = null;
   const heldA = (f) => Boolean(f && (f.fidA || f.art === "arenaheld" || f.art === "arenawolf")); // Held oder Wolf des anderen Spielers
   const wolfA = (f) => f.art === "wolf" || f.art === "arenawolf";
+  const kroneA = (f) => Boolean(ARENA && st && st.arena && st.arena.koenig && f && st.arena.koenig[ARENA.seite] === f.id); // der eigene Anführer (Königsmord)
+
+  /* Arena: Zugzeit. Der Ersteller stellt die Uhr, sobald ein anderer Held an die Reihe kommt, und beendet den Zug, wenn sie abläuft. */
+  const ZUGZEIT = 60000;
+  let uhrTakt = null, uhrVersatz = 0;
+  function zugUhrStellen() {
+    if (!st || !st.arena) return;
+    const a = R.aktiv(st), held = !st.ende && a && R.teamVon(st, a) && a.tp > 0, k = held ? a.id + ":" + st.runde : null;
+    if (st.arena.zugWer === k) return;
+    st.arena.zugWer = k; st.arena.zugBis = k ? Date.now() + ZUGZEIT : null;
+  }
+  function zugUhrZeigen() {
+    let el = document.getElementById("arena-uhr");
+    if (!ARENA) { if (el) el.hidden = true; return; }
+    if (!el) { el = document.createElement("div"); el.id = "arena-uhr"; el.className = "arena-uhr"; el.hidden = true; document.body.appendChild(el); }
+    const bis = st && st.arena && !st.ende ? st.arena.zugBis : null;
+    if (!bis) { el.hidden = true; return; }
+    const s = Math.max(0, Math.ceil((bis + uhrVersatz - Date.now()) / 1000));
+    const a = R.aktiv(st), mein = a && R.teamVon(st, a) === ARENA.seite;
+    el.hidden = false; el.classList.toggle("knapp", s <= 10); el.classList.toggle("fremd", !mein); el.innerHTML = `Zugzeit <b>${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}</b>`;
+  }
+  function zugUhrTakt() {
+    zugUhrZeigen();
+    if (!ARENA || ARENA.gast || !st || st.ende || !st.arena.zugBis || Date.now() < st.arena.zugBis) return;
+    const a = R.aktiv(st); if (!a || !R.teamVon(st, a)) return;
+    st.log.push({ t: `Die Zugzeit von ${a.name} ist abgelaufen.`, art: "schlecht" });
+    wahl = null; R.zugEnde(st); render(); veroeffentlichen(); gegnerSchleife();
+  }
   const spielerName = (uid) => (LIVE.client && LIVE.client.playerName(uid)) || "Handy";
   const besitzerVon = (f) => (!ARENA && liveAn() && f && f.fid ? LIVE.besitz[f.fid] : null);
 
@@ -66,7 +94,13 @@
 
   /** Öffentlichen Stand an alle Handys (immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig) */
   function veroeffentlichen() {
-    if (ARENA) { if (!ARENA.gast && st) ARENA.publish(R.speichern(st)); return; }
+    if (ARENA) {
+      if (ARENA.gast || !st) return;
+      zugUhrStellen();
+      const j = R.speichern(st); j.arena = Object.assign({}, j.arena, { jetzt: Date.now() });
+      if (j.arena.koenig) j.arena.koenig = { 1: null, 2: j.arena.koenig[2] }; // der eigene Anführer bleibt dem Gegner verborgen
+      ARENA.publish(j); return;
+    }
     if (window.KAMPAGNE) window.KAMPAGNE.geaendert();
     if (!liveAn()) { soloMerken(); return; }
     if (!LIVE.client.session.is_host) return;
@@ -550,7 +584,7 @@
           continue;
         }
         const href = wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fid || f.fidA);
-        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, wolfA(f) ? 17 : 21, heldA(f) ? "#4f8cff" : farbeVon(f), "c" + f.id, unten)}${heldA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9" fill="#12233f" stroke="#4f8cff" stroke-width="1.5"/><path d="M-4 -4 L4 4 M4 -4 L-4 4" stroke="#cfe0ff" stroke-width="2" stroke-linecap="round"/></g>` : ""}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
+        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, wolfA(f) ? 17 : 21, heldA(f) ? "#4f8cff" : farbeVon(f), "c" + f.id, unten)}${kroneA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9.5" fill="#3a2a08" stroke="#f5c842" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" fill="#ffe08a">♛</text></g>` : ""}${heldA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9" fill="#12233f" stroke="#4f8cff" stroke-width="1.5"/><path d="M-4 -4 L4 4 M4 -4 L-4 4" stroke="#cfe0ff" stroke-width="2" stroke-linecap="round"/></g>` : ""}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
         if (f.tot) o += `<text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="22" fill="#fff">✝</text>`;
         else if (unten) o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${st.schwierigkeit === "hardcore" && f.art !== "wolf" ? (f.stabil ? "stabil" : `${f.todes.e}✓ ${f.todes.f}✗`) : "am Boden"}</text>`;
       }
@@ -567,7 +601,7 @@
     svg.innerHTML = o;
 
     const mini = (f) => heldA(f) ? `<img class="mini" src="${wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fidA)}" alt="">` : f.seite === "gegner" ? `<svg class="mini" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(f.art)}</svg>` : `<img class="mini" src="${F.bild(f.fid)}" alt="">`;
-    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${heldA(f) ? "gh" : f.seite === "gegner" ? "g" : st.arena && R.teamVon(st, f) ? "eh" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${esc(st.arena && R.teamVon(st, f) ? f.name.replace(/ \([^)]*\)$/, "") : f.name)}${st.arena && R.teamVon(st, f) ? ` <small>${esc(st.arena.namen[R.teamVon(st, f) - 1])}</small>` : ""}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
+    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${heldA(f) ? "gh" : f.seite === "gegner" ? "g" : st.arena && R.teamVon(st, f) ? "eh" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${kroneA(f) ? `<i class="krone" title="Dein Anführer">♛</i>` : ""}${esc(st.arena && R.teamVon(st, f) ? f.name.replace(/ \([^)]*\)$/, "") : f.name)}${st.arena && R.teamVon(st, f) ? ` <small>${esc(st.arena.namen[R.teamVon(st, f) - 1])}</small>` : ""}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
 
     if (st.ende) { $("#aktiv").innerHTML = ""; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
     else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">${heldA(akt) ? "(Gegner) " : ""}ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
@@ -774,12 +808,14 @@
     clearTimeout(gegnerTimer); F.STUFEN10.aktiv = true;
     ARENA = { seite: o.seite, gast: Boolean(o.gast), sende: o.sende || (() => {}), publish: o.publish || (() => {}), ende: o.ende || (() => {}), fertig: false };
     st = o.st || null; window.AB.st = st; kampfEnde = null; wahl = null; tipp = null; letzteTP = {}; letzterLog = st ? st.log.length : 0;
-    zeigeSpiel(); if (st) { render(); veroeffentlichen(); gegnerSchleife(); }
+    clearInterval(uhrTakt); uhrVersatz = 0; uhrTakt = setInterval(zugUhrTakt, 500);
+    zeigeSpiel(); if (st) { zugUhrStellen(); render(); veroeffentlichen(); gegnerSchleife(); }
   }
   /** Arena (Beigetretener): neuen Stand vom Ersteller übernehmen */
   function arenaStand(json) {
     if (!ARENA || !ARENA.gast || !json) return;
-    st = R.laden(json); window.AB.st = st; wahl = null; render();
+    if (json.arena && json.arena.jetzt) uhrVersatz = Date.now() - json.arena.jetzt; // Uhren beider Geräte angleichen
+    st = R.laden(json); window.AB.st = st; wahl = null; render(); zugUhrZeigen();
   }
   /** Arena (Ersteller): Wunsch des Beigetretenen ausführen. Zurück: Fehlertext oder null */
   function arenaWunsch(v) {
@@ -794,7 +830,7 @@
     render(); veroeffentlichen(); gegnerSchleife();
     return (r && r.fehler) || null;
   }
-  function arenaEnde() { clearTimeout(gegnerTimer); ARENA = null; st = null; window.AB.st = null; }
+  function arenaEnde() { clearTimeout(gegnerTimer); clearInterval(uhrTakt); uhrTakt = null; { const u = document.getElementById("arena-uhr"); if (u) u.hidden = true; } ARENA = null; st = null; window.AB.st = null; }
   function kampfStarten(opts, cb) {
     clearTimeout(gegnerTimer);
     st = R.neuesSpiel(Math.floor(Math.random() * 1e9), opts);

@@ -258,3 +258,13 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 - Siegquote des Teams mit der höheren Teamstufe: wird beobachtet, kein festes Ziel vorab.
 - Abgebrochene Partien (Verbindung, abweichender Prüfwert): Ziel unter 5 %.
 - Anteil der Tester, die sofort eine zweite Partie spielen wollen: Ziel über 50 %.
+
+## Nachtrag: Spielmodi, Zugzeit, Kontrolle (Migration 009)
+
+- **Modi** (Wahl beim Erstellen, sichtbar in Übersicht und Aufstellung): *Arena* (wie bisher), *Königsmord* (jeder bestimmt verdeckt einen Anführer; fällt er, ist der Kampf verloren; sonst Punkte nach 15 Runden), *Die Horde* (jede Runde neue, stärker werdende Monster; bis 30 Runden). Der Modus liegt in `rpg_arena_modes` (Migration 009, rein ergänzend); ohne 009 gibt es nur „Arena“.
+- **Anführer:** bleibt auf dem eigenen Gerät; der Beigetretene nennt ihn dem Ersteller über die Live-Sitzung, der Ersteller überträgt seinen eigenen nicht. Krone nur am eigenen Anführer.
+- **Zugzeit:** eine Minute je Held. Der Ersteller stellt die Uhr und beendet den Zug, wenn sie abläuft; beide Geräte zeigen sie an.
+- **Kontrolle gegen Helden:** wirkt höchstens eine Runde, danach ist der Held zwei Runden gefeit. Verängstigt: nur bewegen. Verbannt: setzt aus. Netz: eine Runde festgehalten.
+- **Währung:** jeder Sieg bringt zufällig 5–25 Seelensplitter, ohne Tagesgrenze (Auslöser auf `rpg_arena_rewards`); XP und Heldenchance bleiben bei fünf Kämpfen am Tag.
+- **Simulation (je 150 Kämpfe, KI gegen KI):** Arena Ø 6,9 Runden; Königsmord Ø 3,7 Runden (immer durch den Anführer entschieden – mit Menschen beobachten, ggf. Anführer zäher machen); Horde Ø 8,9 Runden, rund 24 Monster je Kampf.
+- **Offen:** Reaktionen gegnerischer Helden im fremden Zug, Aufzeichnung der Kämpfe für die Auswertung, Schutz gegen Schummeln, Zweck der Währung.

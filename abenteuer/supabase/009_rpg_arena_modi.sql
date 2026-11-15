@@ -14,6 +14,8 @@
 --   • Der Ersteller legt ihn fest, solange der Kampf offen ist. Alle sehen den Modus offener Kämpfe;
 --     bei laufenden oder beendeten Kämpfen sehen ihn nur die beiden Teilnehmer.
 --   • Ohne Eintrag gilt 'arena'.
+--   • Währung: jeder Sieg bringt zufällig 5 bis 25 Einheiten statt fest 25, ohne Obergrenze am Tag
+--     (XP und Heldenchance bleiben bei fünf gewerteten Kämpfen am Tag).
 --
 -- Rückbau: 009_rpg_arena_modi_rueckbau.sql
 -- =====================================================================
@@ -54,5 +56,28 @@ $$;
 
 revoke all on function public.rpg_arena_set_mode(uuid, text), public.rpg_arena_modes(uuid[]) from public, anon;
 grant execute on function public.rpg_arena_set_mode(uuid, text), public.rpg_arena_modes(uuid[]) to authenticated;
+
+-- ---------------------------------------------------------------------
+-- Währung: jeder Sieg bringt zufällig 5 bis 25 Einheiten – auch über die fünf gewerteten Kämpfe des Tages hinaus.
+-- Greift beim Eintragen der Belohnung (rpg_arena_rewards) und gleicht das Konto um die Differenz aus;
+-- die Belohnungsfunktion aus Migration 008 bleibt, wie sie ist.
+-- ---------------------------------------------------------------------
+create or replace function public.rpg_arena_waehrung_wuerfeln()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare v_neu integer; v_diff integer;
+begin
+  if not new.sieg or exists (select 1 from public.rpg_arena_rewards where match_id = new.match_id and user_id = new.user_id) then return new; end if;
+  v_neu := 5 + floor(random() * 21)::integer;
+  v_diff := v_neu - coalesce(new.waehrung, 0);
+  insert into public.rpg_wallet (user_id, betrag) values (new.user_id, greatest(v_diff, 0))
+    on conflict (user_id) do update set betrag = greatest(0, public.rpg_wallet.betrag + v_diff), updated_at = now();
+  new.waehrung := v_neu;
+  return new;
+end;
+$$;
+revoke all on function public.rpg_arena_waehrung_wuerfeln() from public, anon, authenticated;
+drop trigger if exists rpg_arena_waehrung_wuerfeln on public.rpg_arena_rewards;
+create trigger rpg_arena_waehrung_wuerfeln before insert on public.rpg_arena_rewards
+  for each row execute function public.rpg_arena_waehrung_wuerfeln();
 
 commit;

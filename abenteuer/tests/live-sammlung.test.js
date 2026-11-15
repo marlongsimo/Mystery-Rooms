@@ -80,6 +80,10 @@ const STARTER = ['schildwaechter', 'elementarist', 'trickser', 'lichtbringer', '
 
   // Code einlösen: falscher Code
   await A.evaluate(() => window.MYTHARA.zeigeHub()); await A.waitForTimeout(500);
+  // Neu registriert: Nach der Heldenwahl beginnt im Dorf das Tutorial (Wert je Profil); hier nur Start und Überspringen
+  check(await until(A, () => { const b = document.querySelector('#tut .tut-blase'); return Boolean(b && !b.classList.contains('wartet') && /Willkommen in Mythara/.test(b.textContent)); }), 'Nach der Heldenwahl: das Tutorial startet im Dorf');
+  await A.click('#tut-skip');
+  check(await until(A, () => !document.querySelector('#tut')), '„Tutorial überspringen“ beendet es');
   await A.click('#hub-profil-knopf');
   check(await A.evaluate(() => !document.querySelector('[data-profil="codes"]') && Boolean(document.querySelector('[data-profil="code"]'))), 'Profilmenü: „Freischalt-Code“ ja, „Code-Übersicht“ nein (kein Admin)');
   await A.click('#hub-menue [data-profil="code"]');

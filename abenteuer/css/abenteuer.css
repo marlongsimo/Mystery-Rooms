@@ -1909,3 +1909,22 @@ body.intro-an { overflow: hidden; }
 .intro-vorschau { min-height: 100vh; display: grid; place-content: center; gap: 14px; text-align: center; padding: 24px; background: radial-gradient(90% 70% at 50% 40%, #1b1410, #07070a); color: #f3e7cc; }
 .intro-vorschau h1 { margin: 0; font: 700 clamp(34px, 7vw, 64px) var(--schrift-titel); letter-spacing: .08em; color: #f6dc9c; }
 .intro-vorschau p { margin: 0; color: #cdbf9f; max-width: 520px; }
+
+/* ---------- Tutorial: eine Stelle hervorgehoben, alles andere gesperrt ---------- */
+.tut { position: fixed; inset: 0; z-index: 890; pointer-events: none; }
+.tut-b { position: fixed; background: rgba(4,5,8,.72); pointer-events: auto; }
+.tut-b.mitte { background: transparent; }
+.tut-ring { position: fixed; border-radius: 10px; pointer-events: none; box-shadow: 0 0 0 2px #f6dc9c, 0 0 0 6px rgba(246,220,156,.25), 0 0 26px rgba(246,200,110,.55); animation: tut-puls 1.600s ease-in-out infinite; }
+@keyframes tut-puls { 0%, 100% { box-shadow: 0 0 0 2px #f6dc9c, 0 0 0 6px rgba(246,220,156,.22), 0 0 22px rgba(246,200,110,.45); } 50% { box-shadow: 0 0 0 2px #fff0c4, 0 0 0 10px rgba(246,220,156,.12), 0 0 34px rgba(246,200,110,.75); } }
+.tut-skip { position: fixed; top: 10px; right: 12px; pointer-events: auto; background: rgba(10,10,12,.92); border-color: rgba(233,199,126,.7); color: #f3e7cc; z-index: 2; }
+.tut-blase { position: fixed; pointer-events: auto; width: min(420px, calc(100vw - 24px)); padding: 16px 18px 16px; border-radius: 12px; color: #f3e7cc; background: linear-gradient(180deg, #1d1810, #100d09); border: 1px solid #d9b26a; box-shadow: 0 18px 50px rgba(0,0,0,.75), inset 0 0 0 1px rgba(246,220,156,.12); transition: opacity .18s; z-index: 1; }
+.tut-blase.wartet { opacity: 0; pointer-events: none; }
+.tut-blase.mitte { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.tut-blase.unten { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); width: auto; }
+.tut-blase.oben { left: 12px; right: 12px; top: 54px; width: auto; }
+.tut-zahl { margin: 0 0 4px; font: 600 11px var(--schrift-titel); letter-spacing: .14em; text-transform: uppercase; color: #d9b26a; }
+.tut-blase h3 { margin: 0 0 6px; font: 600 21px var(--schrift-titel); color: #f6dc9c; }
+.tut-text { margin: 0 0 12px; font: 18px/1.4 "Cormorant Garamond", Georgia, serif; color: #efe4cc; }
+.tut-knoepfe { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+.tut-hinweis { margin-right: auto; font-size: 13.500px; color: #e9c77e; }
+@media (prefers-reduced-motion: reduce) { .tut-ring { animation: none; } }

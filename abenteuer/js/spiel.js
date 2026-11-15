@@ -33,6 +33,7 @@
    * Einschalten: TISCH_STANDARD = true (für alle) – oder zum Ausprobieren ?tisch=1 in der Adresse (merkt sich das Gerät), ?tisch=0 schaltet ab.
    * Gegner ohne Ganzkörperbild bleiben runde Spielsteine; Bilder dafür kommen in GANZ_GEGNER dazu. */
   const TISCH_STANDARD = false, TISCH_WINKEL = 40;
+  const GANZ_MASS = 0.8; // alle Miniaturen gemeinsam größer oder kleiner (1 = Helden 1,25 Felder hoch)
   const GANZ = { schildwaechter: 0.589, berserker: 0.654, duellant: 0.435, gelehrter: 0.561, elementarist: 0.593, schattenmagier: 0.633, schattenlaeufer: 0.563, trickser: 0.535, assassine: 0.567, lichtbringer: 0.535, wanderheiler: 0.628, inquisitor: 0.561, wildnislaeufer: 0.524, tiergefaehrte: 0.611, kopfgeldjaeger: 0.648, wolf: 0.472, sera: 0.659 }; // Breite : Höhe
   const GANZ_HOCH = { wolf: 0.8, sera: 1.15 }, GANZ_HOCH_STANDARD = 1.25; // Höhe in Feldern
   // Gegner mit Ganzkörperbild (img/gegner/ganz/<art>.webp): [Breite : Höhe, Höhe in Feldern, schwebt?] – Kampagne für Kampagne ergänzen
@@ -41,13 +42,13 @@
     netzweber: [1.489, 0.9], pilzbrut: [1.494, 0.8], aschehund: [1.192, 0.85], grabritter: [0.639, 1.45], abt: [0.73, 1.5],
     siegeljaeger: [0.948, 1.2], jaegerschuetze: [0.833, 1.2], funkenhund: [1.909, 0.75], jaegerhauptmann: [0.835, 1.35], wachkonstrukt: [0.757, 1.5], fackelzehrer: [0.85, 1.8] };
   function ganzGegner(art) {
-    const [form, felder, schwebt] = GANZ_GEGNER[art], hoch = felder * Z, breit = hoch * form, streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
+    const [form, felder, schwebt] = GANZ_GEGNER[art], hoch = felder * GANZ_MASS * Z, breit = hoch * form, streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
     return `<g transform="translate(0 ${schwebt ? 2 : 14}) scale(1 ${streck.toFixed(3)})"><image class="fig-ganz feind${schwebt ? " schwebt" : ""}" href="img/gegner/ganz/${art}.webp" x="${(-breit / 2).toFixed(1)}" y="${(-hoch).toFixed(1)}" width="${breit.toFixed(1)}" height="${hoch.toFixed(1)}" preserveAspectRatio="xMidYMax meet"/></g>`;
   }
   const TISCH = (() => { const q = new URLSearchParams(location.search).get("tisch"); try { if (q === "1") localStorage.setItem("ab_tisch", "an"); if (q === "0") localStorage.setItem("ab_tisch", "aus"); const v = localStorage.getItem("ab_tisch"); if (v) return v === "an"; } catch (e) { if (q) return q === "1"; } return TISCH_STANDARD; })();
   /** Ganze Figur als SVG-Bild, Füße auf dem Feld (0,0 = Feldmitte) */
   function ganzFigur(name, farbe, aktiv) {
-    const hoch = (GANZ_HOCH[name] || GANZ_HOCH_STANDARD) * Z, breit = hoch * GANZ[name], streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180), fuss = 12;
+    const hoch = (GANZ_HOCH[name] || GANZ_HOCH_STANDARD) * GANZ_MASS * Z, breit = hoch * GANZ[name], streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180), fuss = 12;
     return `<g transform="translate(0 ${fuss}) scale(1 ${streck.toFixed(3)})"><image class="fig-ganz${aktiv ? " dran" : ""}" href="img/figuren/ganz/${name}.webp" x="${(-breit / 2).toFixed(1)}" y="${(-hoch).toFixed(1)}" width="${breit.toFixed(1)}" height="${hoch.toFixed(1)}" preserveAspectRatio="xMidYMax meet" style="--k:${farbe}"/></g>`;
   }
   const params = new URLSearchParams(location.search);
@@ -675,7 +676,7 @@
           if (visier && !unten) o += `<g class="visier" transform="translate(${cx} ${cy})"><circle r="30" fill="none" stroke="#ff5a4a" stroke-width="2.5" stroke-dasharray="5 4"/><path d="M0 -36V-26M0 26V36M-36 0H-26M26 0H36" stroke="#ff5a4a" stroke-width="3"/></g>`;
           if (unten) o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${f.stabil ? "stabil" : "retten!"}</text>`;
           const w = 44, anteil = Math.max(0, f.tp / f.tpMax);
-          if (seraMini) { const streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180), bh = 3.4 * streck, bw = 30, by = cy + 12 - GANZ_HOCH.sera * Z * streck - bh - 2.5 * streck; // ihr Balken ist immer zu sehen: Sie zu schützen ist das Ziel
+          if (seraMini) { const streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180), bh = 3.4 * streck, bw = 30, by = cy + 12 - GANZ_HOCH.sera * GANZ_MASS * Z * streck - bh - 2.5 * streck; // ihr Balken ist immer zu sehen: Sie zu schützen ist das Ziel
             o += `<rect x="${cx - bw / 2 - 1}" y="${(by - streck).toFixed(1)}" width="${bw + 2}" height="${(bh + 2 * streck).toFixed(1)}" rx="2.7" fill="#07080b" fill-opacity=".82"/><rect x="${cx - bw / 2}" y="${by.toFixed(1)}" width="${Math.max(2, bw * anteil).toFixed(1)}" height="${bh.toFixed(1)}" rx="1.7" fill="#e8c46a"/>`; }
           else o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="#e8c46a"/>`;
           continue;
@@ -694,7 +695,7 @@
           const gegner = f.seite === "gegner" && !heldA(f), streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
           const felder = gegner ? GANZ_GEGNER[f.art][1] : GANZ_HOCH[wolfA(f) ? "wolf" : f.fid || f.fidA] || GANZ_HOCH_STANDARD, fuss = gegner ? (GANZ_GEGNER[f.art][2] ? 2 : 14) : 12;
           // schmal, dicht über dem Kopf – und nur, wenn die Figur verletzt ist
-          const bh = 3.4 * streck, bw = 30, by = cy + fuss - felder * Z * streck - bh - 2.5 * streck;
+          const bh = 3.4 * streck, bw = 30, by = cy + fuss - felder * GANZ_MASS * Z * streck - bh - 2.5 * streck;
           if (f.tp < f.tpMax) o += `<g class="tp-balken"><rect x="${cx - bw / 2 - 1}" y="${(by - streck).toFixed(1)}" width="${bw + 2}" height="${(bh + 2 * streck).toFixed(1)}" rx="${(bh / 2 + streck).toFixed(1)}" ry="2.7" fill="#07080b" fill-opacity=".82"/><rect x="${cx - bw / 2}" y="${by.toFixed(1)}" width="${bw}" height="${bh.toFixed(1)}" rx="1.7" fill="#ffffff" fill-opacity=".14"/><rect x="${cx - bw / 2}" y="${by.toFixed(1)}" width="${Math.max(2, bw * anteil).toFixed(1)}" height="${bh.toFixed(1)}" rx="1.7" fill="${anteil > .5 ? "#7fe08a" : anteil > .25 ? "#f2c14e" : "#ff6b5a"}"/></g>`;
         } else o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="${farbe}"/>`;
       }

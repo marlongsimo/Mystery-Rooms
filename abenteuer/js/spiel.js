@@ -599,6 +599,17 @@
     }
     renderSicht(); for (const f of st.figuren) gezeigt.tp[f.id] = f.tp;
   }
+  /* Karte neu zeichnen, ohne dass Bilder aufblitzen: Würde man alles ersetzen, legte der Browser jedes Bild (Karte, Figuren) neu an und zeigte es
+     auf manchen Geräten einen Moment lang leer. Darum wandern die schon geladenen Bildelemente in das neue Bild hinüber und bekommen nur neue Werte. */
+  function svgSetzen(svg, o) {
+    const alt = {}; svg.querySelectorAll("image").forEach((i) => { const h = i.getAttribute("href"); (alt[h] = alt[h] || []).push(i); });
+    const neu = document.createElementNS("http://www.w3.org/2000/svg", "svg"); neu.innerHTML = o;
+    neu.querySelectorAll("image").forEach((i) => { const a = (alt[i.getAttribute("href")] || []).shift(); if (!a) return;
+      for (const at of [...a.attributes]) if (!i.hasAttribute(at.name)) a.removeAttribute(at.name);
+      for (const at of [...i.attributes]) if (a.getAttribute(at.name) !== at.value) a.setAttribute(at.name, at.value);
+      i.replaceWith(a); });
+    svg.replaceChildren(...neu.childNodes);
+  }
   function renderSicht() {
     // Arena: Jedes Gerät sieht die Karte aus seiner Sicht (eigene Helden als Helden, die des Gegners rot) – danach zurückstellen
     if (st && st.arena && ARENA) { const alt = st.arena.sicht; if (alt !== ARENA.seite) { R.arenaSicht(st, ARENA.seite); try { return renderKern(); } finally { R.arenaSicht(st, alt); } } }
@@ -723,7 +734,7 @@
     }
     if (RASTER) o += rasterEbene(k);
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect class="feld" data-x="${x}" data-y="${y}" x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="transparent"/>`;
-    svg.innerHTML = o;
+    svgSetzen(svg, o);
 
     const mini = (f) => heldA(f) ? `<img class="mini" src="${wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fidA)}" alt="">` : f.seite === "gegner" ? `<svg class="mini" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(f.art)}</svg>` : `<img class="mini" src="${F.bild(f.fid)}" alt="">`;
     $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${heldA(f) ? "gh" : f.seite === "gegner" ? "g" : st.arena && R.teamVon(st, f) ? "eh" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${kroneA(f) ? `<i class="krone" title="Dein Anführer">♛</i>` : ""}${esc(st.arena && R.teamVon(st, f) ? f.name.replace(/ \([^)]*\)$/, "") : f.name)}${st.arena && R.teamVon(st, f) ? ` <small>${esc(st.arena.namen[R.teamVon(st, f) - 1])}</small>` : ""}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");

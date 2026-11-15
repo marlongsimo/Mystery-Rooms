@@ -80,9 +80,9 @@
     return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height, b: r.width };
   }
   /** Lichtsäule um eine Figur: grün bei Heilung, Feuer bei Feuerzaubern. Sie steigt auf, dreht sich und verglüht */
-  const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp" };
+  const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp", dolch: "img/fx/dolch.webp", netz: "img/fx/netz.webp", muenzen: "img/fx/muenzen.webp", ranke: "img/fx/ranke.webp" };
   // Breite in Feldern, Höhe : Breite, Dauer in ms, zwei gespiegelte Lagen (Drehung)?
-  const SAEULE = { heil: [1.45, 2.27, 1500, true], feuer: [1.45, 2.27, 1500, true], eis: [1.7, 1.34, 1300, false], blitz: [1.5, 1.95, 800, false] }; let fxGeladen = false;
+  const SAEULE = { heil: [1.45, 2.27, 1500, true], feuer: [1.45, 2.27, 1500, true], eis: [1.7, 1.34, 1300, false], blitz: [1.5, 1.95, 800, false], ranke: [1.6, 1.6, 1600, false], muenzen: [1.6, 1.62, 1300, false] }; let fxGeladen = false;
   function saeule(id, art) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const [breit, hoch, dauer, doppelt] = SAEULE[art], lage = `<i style="background-image:url(${FXBILD[art]})"></i>`;
@@ -97,26 +97,36 @@
     const b = Math.max(34, p.b * 1.25); d.style.width = b + "px"; d.style.height = b * 1.11 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .15 + "px";
     wrap.appendChild(d); setTimeout(() => d.remove(), 1400);
   }
+  /** Netz: fällt von oben über die Figur und bleibt kurz liegen */
+  function netz(id) {
+    const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
+    const d = document.createElement("div"); d.className = "fx-schild netz"; d.style.backgroundImage = `url(${FXBILD.netz})`;
+    const b = Math.max(44, p.b * 1.8); d.style.width = b + "px"; d.style.height = b * .69 + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .05 + "px";
+    wrap.appendChild(d); setTimeout(() => d.remove(), 1900);
+  }
   /** Womit wurde angegriffen? Aus den neuen Zeilen der Chronik gelesen: Pfeil (Bogen, Armbrust), Kugel (arkane und Schattenzauber), Feuer */
   const GESCHOSS = [["feuer", /Glutpfeil|Glutsphäre|Brandmal|Feuerball|Flammen/], ["eis", /Frostlanze|Frosthauch|Frostwelle|Frostgriff|Eiskorridor|Kalte Hand|Kalter Funke/], ["blitz", /Runenblitz|Donnerwelle|Blitz/],
+    ["ranke", /Dornenranke/], ["muenzen", /Münzhagel/], ["dolch", /Dolch/],
     ["pfeil", /bogen|Armbrust|Doppelschuss|Fesselnder Pfeil|Pfeilregen|Bolzen/i],
     ["kugel", /Arkaner Funke|Magisches Geschoss|Albtraum|Schattenstich|Schattenfesseln|Fluchhand|Zeitriss|Furcht/]];
-  const AM_ZIEL = { feuer: 1, eis: 1, blitz: 1 }; // diese Effekte entstehen am Ziel, Pfeil und Kugel fliegen dorthin
+  const AM_ZIEL = { feuer: 1, eis: 1, blitz: 1, ranke: 1, muenzen: 1 }; // diese Effekte entstehen am Ziel, Pfeil und Kugel fliegen dorthin
   const geschossArt = (zeilen) => { const t = zeilen.map((l) => l.t).join(" "); const g = GESCHOSS.find(([, re]) => re.test(t)); return g ? g[0] : null; };
   /** Ein Geschoss fliegt von einer Figur zur anderen; liefert die Flugzeit in Millisekunden (0 = kein Flug) */
   function flug(von, zu, art, verzug) {
     const a = figurPos(von), z = figurPos(zu), wrap = $(".karte-wrap"); if (!a || !z || !wrap || !wrap.animate) return 0;
-    const ay = a.y - a.h * .25, zy = z.y - z.h * .15, dx = z.x - a.x, dy = zy - ay, weg = Math.hypot(dx, dy); if (weg < a.b * 1.3) return 0;
-    const dauer = Math.round(Math.max(230, Math.min(520, weg * (art === "pfeil" ? .75 : 1.1))));
+    const ay = a.y - a.h * .25, zy = z.y - z.h * .15, dx = z.x - a.x, dy = zy - ay, weg = Math.hypot(dx, dy); if (weg < a.b * 1.6) return 0;
+    const spitz = art === "pfeil" || art === "dolch", dauer = Math.round(Math.max(230, Math.min(520, weg * (art === "pfeil" ? .75 : 1.1))));
     const d = document.createElement("div"); d.className = "fx-flug " + art; d.style.left = a.x + "px"; d.style.top = ay + "px";
-    const k = Math.max(26, a.b * (art === "pfeil" ? 1.5 : .8)); d.style.setProperty("--k", k + "px");
+    const k = Math.max(26, a.b * (art === "pfeil" ? 1.5 : art === "dolch" ? .95 : .8)); d.style.setProperty("--k", k + "px");
     d.innerHTML = `<i style="background-image:url(${FXBILD[art]})"></i>`; d.style.opacity = "0";
-    const w = Math.atan2(dy, dx) * 180 / Math.PI + 90, bogen = art === "pfeil" ? -Math.min(46, weg * .12) : 0, dreh = art === "pfeil" ? `rotate(${w}deg)` : "";
+    const w = Math.atan2(dy, dx) * 180 / Math.PI + 90, bogen = spitz ? -Math.min(46, weg * .12) : 0;
     wrap.appendChild(d);
-    const bilder = art === "pfeil"
-      ? [{ transform: `translate(0px, 0px) ${dreh}`, opacity: 1 }, { transform: `translate(${dx / 2}px, ${dy / 2 + bogen}px) ${dreh}`, opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) ${dreh}`, opacity: 1 }]
+    // Pfeil und Dolch fliegen mit der Spitze voran und folgen der Flugkurve: erst leicht aufwärts, am Ende abwärts geneigt
+    const w1 = Math.atan2(dy / 2 + bogen, dx / 2) * 180 / Math.PI + 90, w2 = Math.atan2(dy / 2 - bogen, dx / 2) * 180 / Math.PI + 90, nah = (x) => x + Math.round((w - x) / 360) * 360;
+    const bilder = spitz
+      ? [{ transform: `translate(0px, 0px) rotate(${nah(w1)}deg)`, opacity: 1 }, { transform: `translate(${dx / 2}px, ${dy / 2 + bogen}px) rotate(${w}deg)`, opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) rotate(${nah(w2)}deg)`, opacity: 1 }]
       : [{ transform: "translate(0px, 0px) scale(.35) rotate(0deg)", opacity: .2 }, { transform: `translate(${dx * .25}px, ${dy * .25}px) scale(1) rotate(120deg)`, opacity: 1, offset: .25 }, { transform: `translate(${dx}px, ${dy}px) scale(1) rotate(420deg)`, opacity: 1 }];
-    d.animate(bilder, { duration: dauer, delay: verzug || 0, easing: art === "pfeil" ? "linear" : "ease-in", fill: "forwards" });
+    d.animate(bilder, { duration: dauer, delay: verzug || 0, easing: spitz ? "linear" : "ease-in", fill: "forwards" });
     setTimeout(() => { if (art === "kugel") { d.style.left = z.x + "px"; d.style.top = zy + "px"; d.getAnimations().forEach((x) => x.cancel()); d.style.opacity = "1"; d.classList.add("platzt"); setTimeout(() => d.remove(), 420); } else d.remove(); }, (verzug || 0) + dauer);
     return (verzug || 0) + dauer;
   }
@@ -235,8 +245,8 @@
     document.body.classList.toggle("fx-an", !ruhig());
     gruppe(st, R); bossKarte(st, R); kopf(st);
     document.body.dataset.stimmung = stil(STIMMUNG[kampagne()] || "glut");
-    const neu = { pos: {}, tp: {}, rk: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
-    for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; neu.rk[f.id] = f.rk; }
+    const neu = { pos: {}, tp: {}, rk: {}, netz: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
+    for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; neu.rk[f.id] = f.rk; neu.netz[f.id] = Boolean(f.z && f.z.festgehalten && f.z.festgehalten.netz); }
     const wrap = $(".karte-wrap"); if (wrap) wrap.classList.toggle("mit-bild", Boolean(st.karte.bild));
     const vorher = alt && alt.st === st ? alt : null;
     alt = neu;
@@ -274,13 +284,15 @@
       if (d < 0) {
         const kr = krit && f.seite === "gegner", fern = gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite, amZiel = fern && AM_ZIEL[gArt];
         const wann = fern ? (amZiel ? wuerfel + 120 : flug(schuetze.id, f.id, gArt, wuerfel + nr++ * 90) || wuerfel + 180) : wuerfel + 180; // auch im Nahkampf erst nach dem Würfel
-        setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel ? 10 : 26);
+        setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && gArt === "muenzen" ? "gold" : amZiel && gArt === "ranke" ? "heil" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel ? 10 : 26);
           if (amZiel) saeule(f.id, gArt);
           const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, wann);
       } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 6); saeule(f.id, "heil"); }
     }
     // Schutz: Steigt die Rüstungsklasse einer Figur (Schild des Glaubens, Schutzhaltung, Schutzkreis …), leuchtet ein Schild auf
     for (const f of st.figuren) { const v = vorher.rk && vorher.rk[f.id]; if (v != null && f.rk > v && f.tp > 0) schild(f.id); }
+    // Netz: Wer neu im Netz hängt, bekommt es übergeworfen (nach dem Würfel)
+    for (const f of st.figuren) if (neu.netz[f.id] && vorher.netz && !vorher.netz[f.id]) setTimeout(() => netz(f.id), logNeu.some((l) => l.wurf) ? 620 : 0);
     if (krit) { setTimeout(() => { blitz("gold"); beben(); }, wuerfel + 160); }
     const gefallen = st.figuren.find((f) => f.seite === "gegner" && vorher.tp[f.id] > 0 && f.tp <= 0 && istBoss(R, f) && !f.geflohen);
     if (gefallen) setTimeout(() => { beben(); blitz("gold"); bossFall(gefallen); }, 500);

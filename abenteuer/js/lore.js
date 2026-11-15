@@ -18,22 +18,26 @@
     ] },
     { titel: "Der Krieg der Magier", text: [
       "Vor dreihundert Jahren stritten die Magier der alten Fürstentümer um die Macht des Ersten Lichts. Jeder zog mehr davon aus der Erde als der andere, bis das Land selbst dünn wurde.",
-      "Niemand gewann diesen Krieg. Aber er riss auf, was nie hätte aufgehen dürfen. Das Hohle kam herein, und was es hervorbrachte, ließ sich nicht töten.",
+      "Niemand gewann diesen Krieg. Aber er setzte Kräfte frei, die sich nicht mehr einfangen ließen. Tiere wuchsen zu Ungeheuern heran. Tote standen auf und gingen weiter. Und es entstanden Wesen, die es vorher nie gegeben hatte. Durch den Riss, den die Magier geschlagen hatten, kam schließlich das Hohle selbst herein.",
     ] },
     { titel: "Die sieben Siegel", text: [
-      "Das Reich von Veyrholm tat, was noch zu tun war: Es band das Hohle in sieben Siegel, verteilt über das ganze Land. Über jedes Siegel setzte es eine Wacht, und einen Orden, der die Wachten verband.",
-      "In der Hauptstadt Veyrholm schufen die Gründer das Kronenherz. Es hält die sieben Siegel im Gleichgewicht. Solange es schlägt, hält jedes Siegel das andere.",
+      "Das Reich von Veyrholm tat, was noch zu tun war. Töten ließ sich das Hohle nicht, also band man es: in sieben Siegel, verteilt über das ganze Land. Über jedes Siegel setzte das Reich eine Wacht, und einen Orden, der die Wachten verband.",
+      "In der Hauptstadt Veyrholm schufen die Gründer das Kronenherz. Es hält die sieben Siegel im Gleichgewicht. Solange es schlägt, hält jedes Siegel das andere. Das Böse war besiegt. Vorerst.",
     ] },
     { titel: "Der König unter dem Eis", text: [
       "Die letzten Könige von Veyrholm wollten die Siegel nicht nur hüten. Sie wollten sie lenken. Was genau in jener Nacht geschah, weiß niemand mehr.",
       "Man weiß nur: Über Nacht kam das Eis. Ein Gletscher begrub die Stadt mit allen, die in ihr lebten. Das Reich zerfiel in Herrschaften, die einander kaum noch kennen. Seither heißt dieses Land die Splitterlande.",
     ] },
+    { titel: "Was blieb", text: [
+      "Das Hohle war gebunden, doch was der Krieg hervorgebracht hatte, verschwand nicht mit ihm. Die veränderten Tiere, die ruhelosen Toten und die neuen Kreaturen blieben in der Welt. Sie gehorchen niemandem mehr.",
+      "Seither streifen sie frei durch die Splitterlande: Kröten, groß wie Kälber, im Moor. Kobolde an den Furten. Ertrunkene, die nachts aus dem Wasser steigen. Wo sie auftauchen, herrscht Chaos, und kein Fürst ist mehr da, der sie vertreibt.",
+    ] },
     { titel: "Dreihundert Jahre später", text: [
       "Die Fürsten sind vergessen, ihre Münzen liegen noch in alten Truhen. Der Wachtorden ist zu einer Handvoll alter Leute geschrumpft. Die meisten Wachten sind Ruinen. Kaum jemand weiß noch, was unter ihnen liegt.",
-      "Und doch regt sich etwas. Im Schwarzmoor ziehen stumme Lichter über das Wasser. In der Abtei Grauwacht läutet eine Glocke, Nacht für Nacht. Die Signalwarte von Hochwacht ist seit vierzig Jahren dunkel. Auf den Straßen tauchen Maskierte auf, die eine leere Krone im Zeichen führen und nach den Siegeln fragen.",
+      "Und nun mehren sich die Zeichen, dass das Böse wieder erwacht. Im Schwarzmoor ziehen stumme Lichter über das Wasser. In der Abtei Grauwacht läutet eine Glocke, Nacht für Nacht. Die Signalwarte von Hochwacht ist seit vierzig Jahren dunkel. Die Kreaturen werden dreister. Und auf den Straßen tauchen Maskierte auf, die eine leere Krone im Zeichen führen und nach den Siegeln fragen.",
     ] },
     { titel: "Die Gerufenen", text: [
-      "Manche Menschen tragen einen größeren Seelensplitter als andere. Sie merken es selten selbst. Aber wenn ein Siegel schwach wird, zieht es sie dorthin, ob sie wollen oder nicht.",
+      "Die Kräfte des Krieges haben nicht nur Tiere verändert. Auch manche Menschen tragen seither einen größeren Seelensplitter als andere, und mit ihm Fähigkeiten, die sich nicht erlernen lassen. Sie merken es selten selbst. Aber wenn ein Siegel schwach wird, zieht es sie dorthin, ob sie wollen oder nicht.",
       "Die Leute nennen sie Helden. Sie selbst nennen sich meistens gar nichts. Sie sind Wächter, Diebe, Heiler, Jäger – und sie sind gerade unterwegs.",
     ] },
     { titel: "Der Spiegelgrund", text: [

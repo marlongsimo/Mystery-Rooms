@@ -6,7 +6,15 @@ Kennzeichnung: **[Kanon]** steht so in den Kampagnentexten. **[Neu]** ist mit di
 
 ## 1. Die Welt in einem Absatz
 
-Mythara war ein einziges Licht, das zerbrach. Aus den kleinsten Stücken wurden die Seelensplitter in allem Lebendigen; wo kein Licht hinfiel, blieb das Hohle. Vor dreihundert Jahren riss ein Magierkrieg dem Hohlen einen Weg in die Welt. Das Reich von Veyrholm band es in sieben Siegel und ging an seinem eigenen Ehrgeiz unter. Heute werden die Siegel schwach, ein Bund will sie öffnen, und Menschen mit großem Seelensplitter – die Gerufenen – zieht es dorthin, wo es bricht.
+Mythara war ein einziges Licht, das zerbrach. Aus den kleinsten Stücken wurden die Seelensplitter in allem Lebendigen; wo kein Licht hinfiel, blieb das Hohle. Vor dreihundert Jahren setzte ein Magierkrieg Kräfte frei, die Wesen veränderten, Tote erweckten und neue Kreaturen schufen – und riss dem Hohlen einen Weg in die Welt. Das Reich von Veyrholm band es in sieben Siegel und ging an seinem eigenen Ehrgeiz unter. Das Böse war besiegt, vorerst; geblieben sind die Kreaturen, die frei umherstreifen. Heute werden die Siegel schwach, ein Bund will sie öffnen, und Menschen mit großem Seelensplitter – die Gerufenen – zieht es dorthin, wo es bricht.
+
+## 1a. Der Krieg und was er hinterließ [Neu, vom Spielleiter festgelegt]
+
+- Der magische Krieg hat **Kräfte freigesetzt**, die dreierlei bewirkten: Sie haben normale Wesen **verändert und mächtiger gemacht** (Riesenkröten, Funkenhunde – aber auch Menschen: daher die Gerufenen), sie haben **Tote erweckt**, und sie haben **neue Kreaturen erschaffen**.
+- Das Böse (das Hohle) wurde **besiegt – vorerst**: Es ist in den sieben Siegeln gebunden.
+- **Geblieben sind die Kreaturen.** Sie streifen frei durch die Splitterlande und sorgen für Chaos. Das ist der Grund, warum es überall Monster gibt, auch dort, wo kein Siegel in der Nähe ist (Weidenhain, Rabenmoor, Graufurt) – und warum im Spiegelgrund Echos von ihnen auftauchen.
+- **Es gibt Anzeichen, dass das Böse wieder erwacht:** schwächer werdende Siegel, dreistere Kreaturen, die Glocke von Grauwacht, der Bund der Hohlkrone.
+- Folge für neue Kampagnen: Nicht jeder Gegner muss mit einem Siegel zu tun haben. „Kreaturen aus dem Krieg“ sind eine eigene, alltägliche Bedrohung; das wiedererwachende Böse ist der rote Faden darüber.
 
 ## 2. Kosmologie [Neu]
 
@@ -27,13 +35,14 @@ Mythara war ein einziges Licht, das zerbrach. Aus den kleinsten Stücken wurden 
 |---|---|
 | Vorzeit | Das Erste Licht zerbricht. Seelensplitter, das Hohle. [Neu] |
 | vor 300 Jahren | Krieg der Magier der alten Fürstentümer, „den niemand gewann“. Was er hervorbrachte, ließ sich nicht töten. [Kanon] |
+| im Krieg | Freigesetzte Kräfte verändern Wesen, erwecken Tote, erschaffen neue Kreaturen; das Hohle kommt herein. [Neu] |
 | kurz danach | Veyrholm bindet es in sieben Siegel, gründet die Wachten und den Wachtorden, baut das Kronenherz. [Kanon] |
 | vor 300 Jahren, „über Nacht“ | Die letzten Könige wollen die Siegel lenken. Das Eis begräbt Veyrholm. [Kanon] |
-| seither | Die Splitterlande: kleine Herrschaften, der Orden schrumpft, die Wachten verfallen. [Kanon] |
+| seither | Die Splitterlande: kleine Herrschaften, der Orden schrumpft, die Wachten verfallen [Kanon]. Die Kreaturen des Krieges streifen frei umher. [Neu] |
 | vor 50 Jahren | Rabenmoor treibt die stumme Alwine ins Moor. [Kanon] |
 | vor 40 Jahren | Die Hochwarte wird dunkel. Bruder Anselm beginnt in Grauwacht zu wachen. [Kanon] |
 | vor 20 Jahren | Jorek Hald verschwindet. [Kanon] |
-| heute | Lichter im Moor, die Glocke von Grauwacht, Maskierte auf den Straßen. Die Kampagnen beginnen. |
+| heute | Anzeichen, dass das Böse wieder erwacht: Lichter im Moor, die Glocke von Grauwacht, dreistere Kreaturen, Maskierte auf den Straßen. Die Kampagnen beginnen. |
 
 ## 4. Die sieben Siegel
 

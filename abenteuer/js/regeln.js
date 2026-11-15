@@ -1324,7 +1324,9 @@
     if (!(vor > 0) || z.tp > 0) return;
     const wer = aktiv(st), t = teamVon(st, wer), zt = teamVon(st, z);
     if (!t) return;                                  // Monster bringen niemandem Punkte
-    if (zt && zt !== t && z.fidA) { st.arena.punkte[t] += 5; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +5 Punkte (${z.name} am Boden).`, art: "gut" }); }
+    // Held am Boden: 5 Punkte für den Gegenspieler – auch wenn es im eigenen Zug geschieht (brennendes Feld, Gift, Bluten, Brandmal).
+    // Nur wenn ein Monster am Zug ist, bekommt niemand etwas (oben abgefangen).
+    if (zt && z.team && (z.fid || z.fidA)) { const an = 3 - zt; st.arena.punkte[an] += 5; st.log.push({ t: `Team ${st.arena.namen[an - 1]}: +5 Punkte (${z.name} am Boden).`, art: "gut" }); }
     else if (!zt && z.seite === "gegner" && GEGNER[z.art]) { const p = GEGNER[z.art].boss ? 2 : 1; st.arena.punkte[t] += p; st.log.push({ t: `Team ${st.arena.namen[t - 1]}: +${p} ${p === 1 ? "Punkt" : "Punkte"} (${z.name}).`, art: "gut" }); }
   }
   const arenaMonster = (st) => st.figuren.filter((f) => !teamVon(st, f) && f.seite === "gegner");

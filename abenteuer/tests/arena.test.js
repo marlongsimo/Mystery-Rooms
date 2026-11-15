@@ -21,7 +21,7 @@ function sicht(ich) {
 function server(ich, name, args) {
   const m = DB.match, fehler = (t) => ({ fehler: t });
   if (name === "rpg_my_wallet") return { konto: true, waehrung: DB.wallet[ich] };
-  if (name === "rpg_arena_list") return { konto: true, waehrung: DB.wallet[ich], heute: 0, offen: m && m.status === "offen" && m.hostWer !== ich ? [{ id: m.id, name: m.host.name, schnitt: m.host.schnitt, erstellt: new Date().toISOString() }] : [],
+  if (name === "rpg_arena_list") return { konto: true, waehrung: DB.wallet[ich], heute: Number(process.env.HEUTE || 0), nur_siege: true, offen: m && m.status === "offen" && m.hostWer !== ich ? [{ id: m.id, name: m.host.name, schnitt: m.host.schnitt, erstellt: new Date().toISOString() }] : [],
     mein: m && (m.hostWer === ich || m.gastWer === ich) && ["offen", "bereit", "laeuft"].includes(m.status) ? sicht(ich) : null };
   if (name === "rpg_arena_modes") return m && (args.p_ids || []).includes(m.id) ? { [m.id]: m.modus || "arena" } : {};
   if (name === "rpg_arena_set_mode") { if (!m || m.hostWer !== ich || m.status !== "offen") return fehler("Der Modus lässt sich nicht mehr ändern."); m.modus = args.p_modus; return args.p_modus; }
@@ -70,6 +70,9 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
   check(/wartet auf einen Gegner/.test(await A.p.textContent(".arena-mein")), "Ersteller: Kampf wartet auf einen Gegner");
   // B sieht ihn nach dem Aktualisieren – ohne Helden
   await B.p.click('.dorf-ort[data-hub="arena"]'); await B.p.waitForSelector("#arena-neu-laden"); await B.p.click("#arena-neu-laden"); await B.p.waitForSelector("[data-arena-bei]");
+  { const voll = Number(process.env.HEUTE || 0) >= 5, da = await B.p.isVisible(".arena-grenze");
+    check(da === voll, voll ? "Tagesgrenze erreicht: Die Warnung steht schon in der Arena-Übersicht" : "Tagesgrenze nicht erreicht: keine Warnung in der Übersicht");
+    if (process.env.SHOT_DIR) await B.p.screenshot({ path: process.env.SHOT_DIR + "/arena-liste.png" }); }
   const zeile = await B.p.textContent(".arena-liste li");
   check(/Spieler A/.test(zeile) && /3,3/.test(zeile) && !/Torvald|Elara|Kael/.test(zeile), "Übersicht des anderen: Name und Durchschnittsstufe, keine Helden (" + zeile.replace(/\s+/g, " ").trim() + ")");
   await B.p.click("[data-arena-bei]");

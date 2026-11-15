@@ -86,20 +86,24 @@
     zeichneListe();
     if (Z.match) pollen(8000, async () => { await laden(); if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match); if (seiteOffen() && !Z.modus) zeichneListe(); });
   }
+  /** Tagesgrenze erreicht? Dann steht die Warnung schon in der Arena, nicht erst nach dem Kampf */
+  const grenzeVoll = () => Boolean(Z.liste && Z.liste.heute != null && Z.liste.heute >= 5);
+  const grenzeHtml = () => (grenzeVoll() ? `<p class="arena-grenze" role="status"><b>Tagesgrenze erreicht (5 von 5${Z.liste.nur_siege ? " Siegen" : ""}).</b> Du kannst weiterkämpfen und bekommst für Siege weiter ${WAEHRUNG}. Erfahrung und Heldenchance gibt es erst morgen wieder.</p>` : "");
   function zeichneListe() {
     const L = Z.liste || {}, offen = L.offen || [], m = Z.match;
     if (!L.konto) return seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">${esc(Z.fehler || "Die Arena gibt es nur mit einem Spielerkonto: Hier treten deine eigenen Helden mit ihren Stufen an.")}</p>`);
     const eigene = sm().zustand().helden.length;
     seite(`<div class="arena-kopf"><div><h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">Du gegen einen anderen Spieler, jeder mit drei Helden. Dazwischen ein paar Monster.</p></div>
         <div class="arena-kopf-rechts">${waehrungHtml()}<button class="btn ghost klein arena-info-knopf" id="arena-info" aria-label="Regeln und Modi" title="Regeln und Modi">i</button><button class="btn ghost klein" id="arena-neu-laden">↻ Aktualisieren</button></div></div>
-      <p class="note">${L.heute != null ? `Belohnungen heute: ${L.heute} von 5 Kämpfen. ` : "Belohnungen gibt es für die ersten fünf Kämpfe des Tages. "}Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
+      ${grenzeHtml()}
+      <p class="note">${L.heute != null ? `Belohnungen heute: ${Math.min(5, L.heute)} von 5 ${L.nur_siege ? "Siegen" : "Kämpfen"}. ` : `Belohnungen gibt es für die ersten fünf ${Z.liste && Z.liste.nur_siege ? "Siege" : "Kämpfe"} des Tages. `}Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
       <div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
         <h2>So läuft ein Kampf</h2>
         <ul><li>Du wählst drei deiner Helden. Die Durchschnittsstufen beider Teams dürfen höchstens eine Stufe auseinanderliegen.</li>
           <li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>
           <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
           <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
-          <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. Erfahrung und Heldenchance gibt es für die ersten fünf Kämpfe des Tages.</li></ul>
+          <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. ${L.nur_siege ? "Erfahrung und Heldenchance gibt es bis zum fünften Sieg des Tages; Niederlagen zählen nicht mit." : "Erfahrung und Heldenchance gibt es für die ersten fünf Kämpfe des Tages."}</li></ul>
         <h2>Die Modi</h2><div class="arena-modus-reihe vier">${LOS.map((k) => modusHtml(k)).join("")}</div></div>
       ${Z.fehler ? `<p class="fb">${esc(Z.fehler)}</p>` : ""}
       ${m ? `<div class="arena-mein"><div><b>Dein Kampf wartet auf einen Gegner</b><small>Durchschnittsstufe ${komma(m.host.schnitt)} · ${m.host.team.map((h) => esc(F.FIGUREN[h.held].name) + " (" + h.stufe + ")").join(", ")}</small></div><button class="btn ghost klein" id="arena-verwerfen">Verwerfen</button></div>`
@@ -145,6 +149,7 @@
     stoppUhr(); Z.modus = "aufstellung"; Z.match = m;
     const ich = m.seite, karte = KARTE(m.karte), beg = (R.BEGEGNUNGEN[m.begegnung] || {}).name || "Monster";
     seite(`<h1 class="hub-gruss">Die Aufstellung</h1><p class="hub-untertitel">${esc(karte.name || "Arena")} · ${esc(beg)} · Kampfstufe ${m.kampfstufe}</p>
+      ${grenzeHtml()}
       <div id="arena-modus-text"></div>
       <div class="arena-gegenueber">${teamHtml(m.host, m.host.name, ich === 1)}<span class="arena-vs">gegen</span>${teamHtml(m.gast, m.gast.name, ich === 2)}</div>
       <p class="note" id="arena-status">${ich === 1 ? "Die Verbindung wird aufgebaut …" : "Warte auf den Ersteller des Kampfes …"}</p>
@@ -275,7 +280,7 @@
       return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>+${h.xp} XP</span></div><i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</small></div></div>`; }).join("")}</div>` : "";
     const text = g.status === "abgebrochen" ? (Z.kampf && Z.kampf.faul ? "Der Kampf wurde ohne Wertung beendet: " + esc(Z.kampf.faul) : Z.kampf && Z.kampf.m && g.sieger == null && g.runden == null && Z.kampf.gemeldetSelbst ? "Der Kampf wurde ohne Wertung beendet: Die beiden Geräte kamen nicht zum selben Ergebnis." : "Der Kampf wurde ohne Wertung beendet.") : g.status === "fehler" ? "Das Ergebnis konnte nicht gemeldet werden: " + esc(g.fehler || "") : g.status === "laeuft" ? "Dein Gegner hat das Ergebnis noch nicht bestätigt. Sobald er es tut, wird gewertet."
       : g.grund === "aufgabe" ? (sieg ? "Dein Gegner hat aufgegeben." : "Du hast aufgegeben.") : g.grund === "team" ? (Z.kampf && Z.kampf.modus === "koenig" ? (sieg ? "Der gegnerische Anführer ist gefallen." : "Dein Anführer ist gefallen.") : sieg ? "Das gegnerische Team liegt am Boden." : "Dein Team liegt am Boden.") : "Nach Punkten entschieden.";
-    const lohn = !b ? "" : !b.gewertet ? (g.grund === "aufgabe" && !sieg ? "" : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}<p class="arena-ende-note">Für heute hast du schon fünf gewertete Kämpfe: Erfahrung und Heldenchance gibt es morgen wieder.</p>`)
+    const lohn = !b ? "" : !b.gewertet ? (g.grund === "aufgabe" && !sieg ? "" : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}<p class="arena-ende-note">Tagesgrenze erreicht (5 von 5): Dieser Kampf brachte keine Erfahrung mehr. Morgen gibt es wieder welche.</p>`)
       : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}${xp}${b.angebot ? `<p class="arena-ende-lohn held">★ Ein neuer Held will sich dir anschließen!</p>` : ""}`;
     const e = schirm(`<p class="arena-ende-eyebrow">${esc(g.host ? g.host.name : "")} gegen ${esc(g.gast ? g.gast.name : "")}</p><h1>${g.status === "abgebrochen" ? "Abgebrochen" : sieg ? "Sieg" : "Niederlage"}</h1>
       ${p ? `<p class="arena-ende-punkte">${p[1] != null ? p[1] : p["1"]} : ${p[2] != null ? p[2] : p["2"]}</p>` : ""}<p>${text}</p>${lohn}

@@ -83,7 +83,7 @@
     { art: "info", ziel: "#arena-info-text", opt: true, titel: "Vier Modi, das Los entscheidet", text: "Arena, Königsmord, Die Horde oder Duell: Welcher Modus gespielt wird, wird ausgelost. Jeder Held hat eine Minute Zugzeit." },
     { art: "info", ziel: "#arena-erstellen", opt: true, titel: "Kampf erstellen", text: "Du wählst drei Helden und wartest auf einen Gegner. Die Durchschnittsstufen beider Teams dürfen höchstens eine Stufe auseinanderliegen." },
     { art: "info", ziel: "[data-arena] .arena-liste, [data-arena] .hub-zwischen", opt: true, titel: "Offene Kämpfe", text: "Hier siehst du, wer gerade einen Gegner sucht, und trittst bei." },
-    { art: "info", ziel: "[data-arena] .arena-waehrung", opt: true, titel: "Belohnungen", text: "Ein Sieg bringt Seelensplitter und Erfahrung für deine Helden, mit etwas Glück sogar einen neuen Helden. Erfahrung gibt es für die ersten fünf Kämpfe am Tag." },
+    { art: "info", ziel: "[data-arena] .arena-waehrung", opt: true, titel: "Belohnungen", text: "Ein Sieg bringt Seelensplitter und Erfahrung für deine Helden, mit etwas Glück sogar einen neuen Helden. Erfahrung gibt es bis zum fünften Sieg am Tag." },
     // --- Händler ---
     { art: "klick", ziel: nav("shop"), titel: "Der Händler", text: "Weiter zum Händler. Tippe darauf." },
     { art: "info", ziel: ".shop-held, .shop-bald .hub-gruss, .shop .hub-gruss", titel: "Helden des Tages", text: "Jeden Tag bietet der Händler drei Helden an, die dir noch fehlen. Um Mitternacht wechselt die Auswahl." },

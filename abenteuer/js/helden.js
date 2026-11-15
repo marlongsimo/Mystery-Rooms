@@ -81,9 +81,10 @@
   /** Kachel in der Galerie */
   function kachel(fid, o = {}) {
     const d = F.FIGUREN[fid], k = F.KLASSEN[d.klasse];
+    const fs = !o.gesperrt && window.ABSAMMLUNG && window.ABSAMMLUNG.fortschritt ? window.ABSAMMLUNG.fortschritt(fid) : null, mt = fs ? F.meistertitel(fid, fs.stufe) : null; // Meistertitel ab Stufe 10
     return `<button class="fkarte ${o.an ? "an" : ""} ${o.fokus ? "fokus" : ""} ${o.gesperrt ? "gesperrt" : ""}" data-fid="${fid}" ${o.gesperrt ? "aria-disabled=\"true\"" : ""} style="--k:${k.farbe}" title="${esc(d.name)} – ${esc(d.titel)}${o.gesperrt ? " (gesperrt)" : ""}">
       <img src="${F.bild(fid)}" alt="" loading="lazy">${o.gesperrt && window.ABSAMMLUNG ? `<span class="sm-schloss">${window.ABSAMMLUNG.SCHLOSS}</span>` : ""}<span class="klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span>
-      <b>${esc(d.name)}</b><small>${esc(d.titel)}</small>${!o.gesperrt && window.ABSAMMLUNG && window.ABSAMMLUNG.stufeHtml ? window.ABSAMMLUNG.stufeHtml(fid, true) : ""}${o.status ? `<em class="${o.statusArt || ""}">${esc(o.status)}</em>` : ""}</button>`;
+      <b>${esc(d.name)}</b><small${mt ? ' class="meister"' : ""}>${mt ? "♛ " + esc(mt) : esc(d.titel)}</small>${!o.gesperrt && window.ABSAMMLUNG && window.ABSAMMLUNG.stufeHtml ? window.ABSAMMLUNG.stufeHtml(fid, true) : ""}${o.status ? `<em class="${o.statusArt || ""}">${esc(o.status)}</em>` : ""}</button>`;
   }
   /** Große Vorstellung einer Figur. knopf: HTML für die Aktion (wählen) */
   function detail(fid, stufe = 1, knopf = "", o = {}) {
@@ -122,7 +123,7 @@
       <div class="held-bild"><img src="${F.bild(fid)}" alt="${esc(d.name)}"><span class="held-klasse">${KLASSE_ZEICHEN[d.klasse]} ${esc(k.name)}</span></div>
       <div class="held-text">
         <p class="eyebrow">${esc(d.rolle)} · ${"●".repeat(pr.anspruch)}${"○".repeat(3 - pr.anspruch)} ${ANSPRUCH[pr.anspruch]}</p>
-        <h2>${esc(d.name)}</h2><p class="held-titel">${esc(d.titel)}</p>${fo && SM ? SM.stufeHtml(fid) : m10 ? `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${heldenstufe}</b><span>${window.ABT && window.ABT.A && window.ABT.A() ? "in dieser Kampagne" : "so beginnt jeder Held"}</span></div></div>` : ""}
+        <h2>${esc(d.name)}</h2><p class="held-titel">${esc(d.titel)}</p>${F.meistertitel(fid, heldenstufe) ? `<p class="held-meister">♛ ${esc(F.meistertitel(fid, heldenstufe))}</p>` : ""}${fo && SM ? SM.stufeHtml(fid) : m10 ? `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${heldenstufe}</b><span>${window.ABT && window.ABT.A && window.ABT.A() ? "in dieser Kampagne" : "so beginnt jeder Held"}</span></div></div>` : ""}
         <blockquote>„${esc(d.spruch)}“</blockquote>
         <p class="held-spielweise">${esc(pr.spielweise)}</p>
         <div class="held-achsen">${balken}</div>

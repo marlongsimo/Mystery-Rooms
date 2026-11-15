@@ -140,7 +140,7 @@
   /* ---------- Aufstellung beider Seiten, dann der Kampf ---------- */
   const KARTE = (k) => (k === "garten" ? R.KARTE_GARTEN : ((window.ABD_ALLE || {}).grauwacht || { KARTEN: {} }).KARTEN[String(k || "").toUpperCase()]) || R.KARTE_GARTEN;
   const teamHtml = (t, name, mein) => `<div class="arena-team ${mein ? "mein" : "gegner"}"><h3>${esc(name)}${mein ? " (du)" : ""}<span>Ø ${komma(t.schnitt)}</span></h3><div class="arena-team-helden">${t.team.map((h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
-    return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b><em>Stufe ${h.stufe}</em></div>`; }).join("")}</div></div>`;
+    return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b>${F.meistertitel(h.held, h.stufe) ? `<small class="meister">♛ ${esc(F.meistertitel(h.held, h.stufe))}</small>` : ""}<em>Stufe ${h.stufe}</em></div>`; }).join("")}</div></div>`;
   function aufstellung(m) {
     stoppUhr(); Z.modus = "aufstellung"; Z.match = m;
     const ich = m.seite, karte = KARTE(m.karte), beg = (R.BEGEGNUNGEN[m.begegnung] || {}).name || "Monster";
@@ -198,11 +198,12 @@
     const ich = m.seite, uid = t.user && t.user.id;
     F.STUFEN10.aktiv = true;
     const ende = (st) => ergebnisMelden(m, st, t);
+    // Derselbe Aufbau auf beiden Geräten: Der Ersteller rechnet, der Beigetretene rechnet mit (js/spiel.js, Mitrechnen)
+    const beg = R.BEGEGNUNGEN[m.begegnung] ? m.begegnung : "garten", alt = Math.max(1, Math.min(3, R.BEGEGNUNGEN[beg].stufe || 1));
+    let anfGast = 0;
+    const neu = () => R.neueArena(m.seed || 1, { modus, anfuehrer: ich === 1 ? [anfuehrerIdx(m), anfGast] : [0, anfuehrerIdx(m)], teams: [m.host.team, m.gast.team].map((tm) => tm.map((h) => ({ fid: h.held, stufe: h.stufe }))), namen: [m.host.name, m.gast.name],
+      karte: KARTE(m.karte), begegnung: beg, bedrohung: Math.max(0, m.kampfstufe - [1, 3, 6][alt - 1]) });
     if (ich === 1) {
-      const beg = R.BEGEGNUNGEN[m.begegnung] ? m.begegnung : "garten", alt = Math.max(1, Math.min(3, R.BEGEGNUNGEN[beg].stufe || 1));
-      let anfGast = 0;
-      const neu = () => R.neueArena(m.seed || 1, { modus, anfuehrer: [anfuehrerIdx(m), anfGast], teams: [m.host.team, m.gast.team].map((tm) => tm.map((h) => ({ fid: h.held, stufe: h.stufe }))), namen: [m.host.name, m.gast.name],
-        karte: KARTE(m.karte), begegnung: beg, bedrohung: Math.max(0, m.kampfstufe - [1, 3, 6][alt - 1]) });
       let los = false;
       const starte = () => { if (los || !Z.kampf) return; los = true; clearInterval(vorUhr); window.AB.arenaStart({ st: neu(), seite: 1, publish, ende }); };
       // Stand schreiben: immer nur der neueste, nie zwei Schreibvorgänge gleichzeitig
@@ -221,7 +222,7 @@
       const sagAnf = () => { if (standDa || !Z.kampf) return clearInterval(anfUhr); t.writeOwn("zug:" + uid, { typ: "anfuehrer", idx: anfuehrerIdx(m), n: ++n, at: Date.now() }).catch(() => {}); };
       // Der Kampfbildschirm erscheint erst mit dem ersten Stand des Erstellers – bis dahin bleibt die Aufstellung stehen
       const stand = (json) => { if (!Z.kampf) return; if (!standDa) { standDa = true; clearInterval(anfUhr); clearInterval(vorUhr);
-          window.AB.arenaStart({ st: null, seite: 2, gast: true, sende: (w) => { t.writeOwn("zug:" + uid, Object.assign({}, w, { n: ++n, at: Date.now() })).catch(() => {}); }, ende }); }
+          window.AB.arenaStart({ st: null, seite: 2, gast: true, schatten: neu, sende: (w) => { t.writeOwn("zug:" + uid, Object.assign({}, w, { n: ++n, at: Date.now() })).catch(() => {}); }, ende }); }
         window.AB.arenaStand(json); };
       t.on("state", (row) => { if (row.state_key === "spiel" && row.state && row.state.arena && row.state.st) stand(row.state.st); });
       const da = t.states && t.states.spiel; if (da && da.st) stand(da.st);
@@ -239,12 +240,16 @@
       try { const g = await rpc("rpg_arena_cancel", { p_match_id: m.id }); Z.kampf.gemeldet = true; ergebnisZeigen(g, t); } catch (e) { b.disabled = false; } };
   }
   async function ergebnisMelden(m, st, t) {
-    if (!Z.kampf || Z.kampf.gemeldet) return; Z.kampf.gemeldet = true; stoppUhr();
-    const a = st.arena; if (a.modus) Z.kampf.modus = a.modus; const grund = /am Boden|ist gefallen/.test(a.grund || "") ? "team" : "punkte";
-    schirm(`<p class="arena-ende-eyebrow">Der Kampf ist vorbei</p><h1>${a.sieger === m.seite ? "Sieg" : "Niederlage"}</h1><p>Das Ergebnis wird gewertet …</p>`, a.sieger === m.seite);
+    if (!Z.kampf || Z.kampf.gemeldet) return; Z.kampf.gemeldet = true; Z.kampf.gemeldetSelbst = true; stoppUhr();
+    const a = st.arena; if (a.modus) Z.kampf.modus = a.modus;
+    // Mitrechnen fehlgeschlagen: abweichend melden – die Datenbank beendet den Kampf dann ohne Wertung
+    const pr = window.AB.arenaPruef ? window.AB.arenaPruef() : null, faul = Boolean(pr && !pr.ok);
+    if (faul) Z.kampf.faul = pr.grund;
+    const grund = /am Boden|ist gefallen/.test(a.grund || "") ? "team" : "punkte";
+    schirm(`<p class="arena-ende-eyebrow">Der Kampf ist vorbei</p><h1>${faul ? "Nicht gewertet" : a.sieger === m.seite ? "Sieg" : "Niederlage"}</h1><p>${faul ? esc(pr.grund) : "Das Ergebnis wird gewertet …"}</p>`, !faul && a.sieger === m.seite);
     let g = null;
     try {
-      g = await rpc("rpg_arena_report", { p_match_id: m.id, p_sieger: a.sieger, p_grund: grund, p_punkte: a.punkte, p_runden: st.runde });
+      g = await rpc("rpg_arena_report", { p_match_id: m.id, p_sieger: faul ? 3 - a.sieger : a.sieger, p_grund: grund, p_punkte: a.punkte, p_runden: st.runde });
       // auf die Meldung der anderen Seite warten (höchstens 20 Sekunden)
       for (let i = 0; i < 10 && g.status === "laeuft"; i++) { await new Promise((r) => setTimeout(r, 2000)); g = await rpc("rpg_arena_get", { p_match_id: m.id }); }
     } catch (e) { g = { status: "fehler", fehler: e.message, seite: m.seite, sieger: a.sieger, punkte: a.punkte, host: m.host, gast: m.gast }; }
@@ -268,7 +273,7 @@
     const gewertet = g.status === "beendet", sieg = gewertet ? g.sieger === g.seite : g.sieger === g.seite, b = g.belohnung || null, p = g.punkte || g.punkteLokal || null;
     const xp = b && b.xp && b.xp.length ? `<div class="arena-xp">${b.xp.map((h) => { const d = F.FIGUREN[h.held]; if (!d) return ""; const f = F.stufeAusXp(h.gesamt || 0), auf = h.stufe > h.vorher, voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
       return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>+${h.xp} XP</span></div><i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</small></div></div>`; }).join("")}</div>` : "";
-    const text = g.status === "abgebrochen" ? "Der Kampf wurde ohne Wertung beendet." : g.status === "fehler" ? "Das Ergebnis konnte nicht gemeldet werden: " + esc(g.fehler || "") : g.status === "laeuft" ? "Dein Gegner hat das Ergebnis noch nicht bestätigt. Sobald er es tut, wird gewertet."
+    const text = g.status === "abgebrochen" ? (Z.kampf && Z.kampf.faul ? "Der Kampf wurde ohne Wertung beendet: " + esc(Z.kampf.faul) : Z.kampf && Z.kampf.m && g.sieger == null && g.runden == null && Z.kampf.gemeldetSelbst ? "Der Kampf wurde ohne Wertung beendet: Die beiden Geräte kamen nicht zum selben Ergebnis." : "Der Kampf wurde ohne Wertung beendet.") : g.status === "fehler" ? "Das Ergebnis konnte nicht gemeldet werden: " + esc(g.fehler || "") : g.status === "laeuft" ? "Dein Gegner hat das Ergebnis noch nicht bestätigt. Sobald er es tut, wird gewertet."
       : g.grund === "aufgabe" ? (sieg ? "Dein Gegner hat aufgegeben." : "Du hast aufgegeben.") : g.grund === "team" ? (Z.kampf && Z.kampf.modus === "koenig" ? (sieg ? "Der gegnerische Anführer ist gefallen." : "Dein Anführer ist gefallen.") : sieg ? "Das gegnerische Team liegt am Boden." : "Dein Team liegt am Boden.") : "Nach Punkten entschieden.";
     const lohn = !b ? "" : !b.gewertet ? (g.grund === "aufgabe" && !sieg ? "" : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}<p class="arena-ende-note">Für heute hast du schon fünf gewertete Kämpfe: Erfahrung und Heldenchance gibt es morgen wieder.</p>`)
       : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}${xp}${b.angebot ? `<p class="arena-ende-lohn held">★ Ein neuer Held will sich dir anschließen!</p>` : ""}`;

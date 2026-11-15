@@ -54,6 +54,69 @@
   const wolfA = (f) => f.art === "wolf" || f.art === "arenawolf";
   const kroneA = (f) => Boolean(ARENA && st && st.arena && st.arena.koenig && f && st.arena.koenig[ARENA.seite] === f.id); // der eigene Anführer (Königsmord)
 
+  /* ---------- Arena: Mitrechnen ----------
+   * Der Ersteller rechnet den Kampf und schreibt jeden Schritt mit, der den Stand verändert (Bewegung, Aktion, Zugende, Monsterzug).
+   * Das Gerät des Beigetretenen rechnet dieselben Schritte aus derselben Zufallszahl nach und vergleicht den Prüfwert.
+   * Erlaubt sind nur echte Spielzüge – und in den Zügen des Beigetretenen nur das, was er selbst geschickt hat (oder das Zugende nach Ablauf der Zeit).
+   * Stimmt etwas nicht, meldet der Beigetretene das Ergebnis abweichend: Die Datenbank beendet den Kampf dann ohne Wertung. */
+  let PRUEF = null;
+  const PRUEF_V = () => { const s = document.querySelector('script[src*="regeln.js"]'); return s ? (/[?&]v=([^&]+)/.exec(s.getAttribute("src")) || [])[1] || "0" : "0"; };
+  const ZUEGE = { bewegen: 1, handeln: 1, zugEnde: 1, autoZug: 1 }, NICHT_MITSCHREIBEN = { arenaAbdruck: 1, pruefwert: 1, arenaSicht: 1, speichern: 1, laden: 1, neueArena: 1, neuesSpiel: 1, neuerKampf: 1, rng: 1, zufall: 1 };
+  const kodiere = (x) => (Array.isArray(x) ? x.map(kodiere) : x && typeof x === "object" && st && st.figuren.includes(x) ? { $f: x.id } : x);
+  /** Ersteller: Aufrufe der Regeln mitschreiben, soweit sie den Stand verändern */
+  function pruefErsteller() {
+    const P = PRUEF = { ersteller: true, ein: [], tiefe: 0, orig: {}, zusage: "", salz: "" };
+    if (st.arena.koenig) { const z = new Uint32Array(4); (window.crypto || { getRandomValues: (a) => a.forEach((_, i) => { a[i] = Math.floor(Math.random() * 4294967296); }) }).getRandomValues(z); P.salz = Array.from(z, (n) => n.toString(36)).join(""); P.zusage = R.pruefwert(P.salz + ":" + st.arena.koenig[1]); }
+    for (const k of Object.keys(R)) {
+      if (typeof R[k] !== "function" || NICHT_MITSCHREIBEN[k]) continue; const o = R[k]; P.orig[k] = o;
+      R[k] = function (...a) {
+        if (PRUEF !== P || !st || a[0] !== st || !st.arena || P.tiefe) return o.apply(this, a);
+        P.tiefe++; const vor = P.orig ? R.arenaAbdruck(st) : ""; const arg = a.slice(1).map(kodiere);
+        try { return o.apply(this, a); } finally { P.tiefe--; if (st && R.arenaAbdruck(st) !== vor) P.ein.push([k, arg]); }
+      };
+    }
+  }
+  function pruefAus() { const P = PRUEF; PRUEF = null; if (P && P.orig) for (const k of Object.keys(P.orig)) R[k] = P.orig[k]; const h = document.getElementById("arena-pruef"); if (h) h.hidden = true; }
+  /** Beigetretener: die neuen Schritte nachrechnen und vergleichen */
+  function pruefGast(p, json) {
+    const P = PRUEF; if (!P || P.ersteller || !P.ok) return;
+    const raus = (g) => { P.ok = false; P.grund = g; let el = document.getElementById("arena-pruef"); if (!el) { el = document.createElement("div"); el.id = "arena-pruef"; el.className = "arena-pruef"; document.body.appendChild(el); }
+      el.hidden = false; el.textContent = "Dieser Kampf wird nicht gewertet: " + g; };
+    if (!P.st) return raus("Dein Gerät konnte den Kampf nicht mitrechnen.");
+    if (!p || !Array.isArray(p.ein)) return raus("Das Gerät deines Gegners schickt keine Prüfdaten. Ladet beide die Seite neu.");
+    if (p.v !== P.v) return raus("Ihr spielt mit unterschiedlichen Spielversionen. Ladet beide die Seite neu.");
+    if (P.zusage == null) P.zusage = p.zusage || ""; else if ((p.zusage || "") !== P.zusage) return raus("Die Angaben deines Gegners haben sich nachträglich geändert.");
+    if (p.ein.length < P.n) return raus("In der Rechnung deines Gegners fehlen Schritte.");
+    const S = P.st, dek = (x) => (Array.isArray(x) ? x.map(dek) : x && typeof x === "object" && x.$f ? R.fig(S, x.$f) : x);
+    try {
+      for (; P.n < p.ein.length && !S.ende; P.n++) {
+        const [name, args] = p.ein[P.n], akt = R.aktiv(S), tm = R.teamVon(S, akt);
+        if (!tm) { if (name !== "gegnerZug") return raus("Unerlaubter Schritt im Zug eines Monsters."); }
+        else if (!ZUEGE[name]) return raus("Unerlaubter Schritt im Zug eines Helden.");
+        else if (tm === ARENA.seite) { // mein Held: nur, was ich geschickt habe – oder das Zugende nach Ablauf der Zeit
+          const ich = JSON.stringify([name, args]), i = P.gesendet.indexOf(ich);
+          if (i >= 0) P.gesendet.splice(0, i + 1);
+          else if (!(name === "zugEnde" && Date.now() - P.seit > 30000)) return raus("Dein Gegner hat einen deiner Helden ohne deinen Befehl ziehen lassen.");
+        }
+        R[name](S, ...(args || []).map(dek));
+        for (const f of S.figuren) if (f.team === 3 - ARENA.seite && f.tp <= 0 && P.gefallen[f.id] == null) P.gefallen[f.id] = P.n;
+        const neu = R.aktiv(S); if (neu.id + ":" + S.runde !== P.dran) { P.dran = neu.id + ":" + S.runde; P.seit = Date.now(); }
+      }
+    } catch (e) { return raus("Ein Schritt deines Gegners lässt sich nicht nachrechnen."); }
+    if (P.n < p.ein.length) return raus("Dein Gegner hat nach dem Ende weitergespielt.");
+    if (R.arenaAbdruck(S) !== p.h) return raus("Die Rechnung deines Gegners weicht von deiner ab.");
+    if (!json.ende) { if (S.ende) return raus("Der Kampf müsste schon beendet sein."); return; }
+    // Ende: gleicher Sieger – im Königsmord mit aufgedecktem Anführer des Erstellers
+    const sieger = json.arena.sieger, kg = S.arena.modus === "koenig", o = p.offen || {};
+    if (kg) {
+      if (!o.id || R.pruefwert(o.salz + ":" + o.id) !== P.zusage || !(R.fig(S, o.id) && R.fig(S, o.id).team === 3 - ARENA.seite)) return raus("Dein Gegner hat seinen Anführer nicht ehrlich aufgedeckt.");
+      const fiel = P.gefallen[o.id];
+      if (fiel != null && fiel < p.ein.length - 1) return raus("Der Anführer deines Gegners war längst gefallen.");
+      if (!S.ende) { if (fiel == null || sieger !== ARENA.seite) return raus("Das Ende deines Gegners stimmt nicht mit deiner Rechnung überein."); return; }
+    }
+    if (!S.ende || S.arena.sieger !== sieger) return raus("Das Ende deines Gegners stimmt nicht mit deiner Rechnung überein.");
+  }
+
   /* Arena: Zugzeit. Der Ersteller stellt die Uhr, sobald ein anderer Held an die Reihe kommt, und beendet den Zug, wenn sie abläuft. */
   const ZUGZEIT = 60000;
   let uhrTakt = null, uhrVersatz = 0;
@@ -101,7 +164,8 @@
       if (ARENA.gast || !st) return;
       zugUhrStellen();
       const j = R.speichern(st); j.arena = Object.assign({}, j.arena, { jetzt: Date.now() });
-      if (j.arena.koenig) j.arena.koenig = { 1: null, 2: j.arena.koenig[2] }; // der eigene Anführer bleibt dem Gegner verborgen
+      if (j.arena.koenig && !st.ende) j.arena.koenig = { 1: null, 2: j.arena.koenig[2] }; // der eigene Anführer bleibt dem Gegner verborgen (bis zum Ende)
+      if (PRUEF && PRUEF.ersteller) j.pruef = { v: PRUEF_V(), ein: PRUEF.ein.slice() /* Kopie: Der Stand wird verzögert geschrieben, die Liste wächst inzwischen weiter */, h: R.arenaAbdruck(st), zusage: PRUEF.zusage, offen: st.ende && st.arena.koenig ? { salz: PRUEF.salz, id: st.arena.koenig[1] } : null };
       ARENA.publish(j); return;
     }
     if (window.KAMPAGNE) window.KAMPAGNE.geaendert();
@@ -812,12 +876,22 @@
     ARENA = { seite: o.seite, gast: Boolean(o.gast), sende: o.sende || (() => {}), publish: o.publish || (() => {}), ende: o.ende || (() => {}), fertig: false };
     st = o.st || null; window.AB.st = st; kampfEnde = null; wahl = null; tipp = null; letzteTP = {}; letzterLog = st ? st.log.length : 0;
     clearInterval(uhrTakt); uhrVersatz = 0; uhrTakt = setInterval(zugUhrTakt, 500);
+    pruefAus();
+    if (st) pruefErsteller();
+    else { // Beigetretener: eigenen Kampf aus derselben Zufallszahl aufbauen (der Anführer des Erstellers bleibt unbekannt)
+      let s = null; try { s = o.schatten ? o.schatten() : null; if (s && s.arena.koenig) s.arena.koenig[3 - o.seite] = null; } catch (e) { s = null; }
+      PRUEF = { st: s, n: 0, ok: true, grund: "", v: PRUEF_V(), zusage: null, gesendet: [], gefallen: {}, seit: Date.now(), dran: "" };
+      const sende = ARENA.sende;
+      ARENA.sende = (w) => { const a = st ? R.aktiv(st) : null; PRUEF && PRUEF.gesendet.push(JSON.stringify(w.typ === "bewegen" ? ["bewegen", [Number(w.x), Number(w.y)]] : w.typ === "aktion" ? ["handeln", [String(w.aktion), String(w.ziel || (a && a.id))]] : ["zugEnde", []])); sende(w); };
+    }
     zeigeSpiel(); if (st) { zugUhrStellen(); render(); veroeffentlichen(); gegnerSchleife(); }
   }
   /** Arena (Beigetretener): neuen Stand vom Ersteller übernehmen */
   function arenaStand(json) {
     if (!ARENA || !ARENA.gast || !json) return;
     if (json.arena && json.arena.jetzt) uhrVersatz = Date.now() - json.arena.jetzt; // Uhren beider Geräte angleichen
+    const pruef = json.pruef; delete json.pruef;
+    pruefGast(pruef, json);
     st = R.laden(json); window.AB.st = st; wahl = null; render(); zugUhrZeigen();
   }
   /** Arena (Ersteller): Wunsch des Beigetretenen ausführen. Zurück: Fehlertext oder null */
@@ -833,7 +907,7 @@
     render(); veroeffentlichen(); gegnerSchleife();
     return (r && r.fehler) || null;
   }
-  function arenaEnde() { clearTimeout(gegnerTimer); clearInterval(uhrTakt); uhrTakt = null; { const u = document.getElementById("arena-uhr"); if (u) u.hidden = true; } ARENA = null; st = null; window.AB.st = null; }
+  function arenaEnde() { pruefAus(); clearTimeout(gegnerTimer); clearInterval(uhrTakt); uhrTakt = null; { const u = document.getElementById("arena-uhr"); if (u) u.hidden = true; } ARENA = null; st = null; window.AB.st = null; }
   function kampfStarten(opts, cb) {
     clearTimeout(gegnerTimer);
     st = R.neuesSpiel(Math.floor(Math.random() * 1e9), opts);
@@ -922,7 +996,7 @@
   }
 
   // Für automatische Tests
-  window.AB = { arenaStart, arenaStand, arenaWunsch, arenaEnde, arenaAn: () => Boolean(ARENA), st: null, R, LIVE, SETUP: () => SETUP, META, liveClient, frueherSetzen,
+  window.AB = { arenaSende: (w) => { if (ARENA && ARENA.gast) ARENA.sende(w); }, arenaPruef: () => (PRUEF && !PRUEF.ersteller ? { ok: PRUEF.ok, grund: PRUEF.grund, schritte: PRUEF.n } : null), arenaStart, arenaStand, arenaWunsch, arenaEnde, arenaAn: () => Boolean(ARENA), st: null, R, LIVE, SETUP: () => SETUP, META, liveClient, frueherSetzen,
     /** Neues Abenteuer wählen (Spielerseite → Neue Kampagne): Daten, Mindestgröße und Texte für Einleitung und Kodex */
     abenteuerWaehlen(id) { SETUP.abenteuer = id || "grauwacht"; setupMerken(); if (window.ABE && window.ABE.abenteuerTexte) window.ABE.abenteuerTexte(META()); }, qrSvg, lobbyFuerKampagne, spielstand, spielstandUebernehmen, liveFuerKampagne, liveFuerPauseBeenden, allesBeenden, qrZeigen, zeigeIntro, render, klickFeld, start, zeigeSetup, zeigeSektion, kampfStarten, veroeffentlichen, toast,
     liveBeenden: async () => { try { await LIVE.client.leave(); } catch (e) { /* schon zu */ } LIVE.phase = null; vergessen(); zeichneLiveBar(); },

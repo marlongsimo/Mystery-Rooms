@@ -49,7 +49,7 @@ async function konto(b) {
   await B.p.click("#arena-wahl-ok"); check(await warte(B.p, () => document.querySelector(".arena-gegenueber"), null, 30000), "Beitritt: Aufstellung beider Seiten");
   const auf = (await B.p.textContent(".arena-gegenueber")).replace(/\s+/g, " ");
   const los = await B.p.evaluate(() => ({ seed: window.ARENA.zustand().match.seed, modus: (document.querySelector("#arena-modus-text h3") || {}).textContent || "" }));
-  check(los.seed != null && /Arena|Königsmord|Die Horde/.test(los.modus), `Das Los kommt aus der Zufallszahl der Datenbank (${los.seed}) → ${los.modus}`);
+  check(los.seed != null && /Arena|Königsmord|Die Horde|Duell/.test(los.modus), `Das Los kommt aus der Zufallszahl der Datenbank (${los.seed}) → ${los.modus}`);
   check(namenA.every((n) => auf.includes(n)) && /Stufe 1/.test(auf), "Aufstellung zeigt jetzt auch die Helden des Erstellers mit Stufe");
   const imKampf = (await warte(A.p, () => window.AB.arenaAn() && window.AB.st && !document.querySelector("#spiel").hidden, null, 60000)) && (await warte(B.p, () => window.AB.arenaAn() && window.AB.st && !document.querySelector("#spiel").hidden, null, 60000));
   check(imKampf, "Beide Geräte sind im Kampf");
@@ -74,6 +74,7 @@ async function konto(b) {
     console.log("    A:", tA.slice(0, 230)); console.log("    B:", tB.slice(0, 230));
     const siegA = /Sieg/.test(tA) && !/Niederlage/.test(tA), siegB = /Sieg/.test(tB) && !/Niederlage/.test(tB);
     check(siegA !== siegB && !/Abgebrochen/.test(tA + tB), "Gewertet: ein Sieg, eine Niederlage");
+    { const pr = await B.p.evaluate(() => window.AB.arenaPruef()); check(pr && pr.ok && pr.schritte > 5, `Mitrechnen gegen die echte Datenbank: ${pr && pr.schritte} Schritte nachgerechnet, ohne Abweichung${pr && !pr.ok ? " – " + pr.grund : ""}`); }
     const splitter = Number((/\+(\d+) Seelensplitter/.exec(siegA ? tA : tB) || [])[1] || 0); // 25 fest (nur Migration 008) oder gewürfelt 5–25 (mit 009)
     check(splitter >= 5 && splitter <= 25 && /XP/.test(tA) && /XP/.test(tB), `Echte Belohnung: Sieger +${splitter} Seelensplitter (5 bis 25), beide XP für ihre Helden`);
     const S = siegA ? A : B, V = siegA ? B : A;

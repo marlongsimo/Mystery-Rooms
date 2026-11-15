@@ -105,6 +105,9 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
       if (MODUS === "koenig") check(r.krone.length === 1 && new RegExp(S === A ? "Elara" : "Ragnar").test(r.krone[0]) && (S === A ? r.koenig[1] && r.koenig[2] : r.koenig[1] === null && r.koenig[2]), `Spieler ${S.ich}: Krone nur am eigenen Anführer (${r.krone.join()})${S === B ? "; der Anführer des Gegners wird nicht übertragen" : ""}`);
     }
     { // Zugzeit abgelaufen: der Ersteller beendet den Zug – auch den des Gegners
+      // (im Test nur bei einem Helden des Erstellers: Die Uhr des Gegners vorzudrehen wäre Schummeln und fiele beim Mitrechnen auf)
+      for (let i = 0; i < 60; i++) { const tm = await A.p.evaluate(() => { const st = window.AB.st, a = window.AB.R.aktiv(st); return a.tp > 0 ? window.AB.R.teamVon(st, a) : 0; }); if (tm === 1) break;
+        if (tm === 2) await B.p.evaluate(() => { const b = document.querySelector("#ende-zug") || document.querySelector('[data-l="ende"]'); if (b && !b.disabled) b.click(); }); await A.p.waitForTimeout(400); }
       const vor = await A.p.evaluate(() => { const st = window.AB.st, a = window.AB.R.aktiv(st); st.arena.zugBis = Date.now() - 1; return a.id; });
       const weiter = await warte(A.p, (alt) => window.AB.R.aktiv(window.AB.st).id !== alt && window.AB.st.log.some((l) => /Zugzeit von .* ist abgelaufen/.test(l.t)), vor, 8000);
       check(weiter, "Läuft die Zugzeit ab, endet der Zug von selbst (Eintrag in der Chronik)");
@@ -116,10 +119,12 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
     if (process.env.SHOT_DIR) { await B.p.waitForTimeout(600); await B.p.screenshot({ path: process.env.SHOT_DIR + "/arena-kampf-gast.png" }); await A.p.screenshot({ path: process.env.SHOT_DIR + "/arena-kampf-ersteller.png" }); }
     // Züge: Wer dran ist, bewegt sich einmal (wenn möglich) und beendet den Zug. Der Beigetretene schickt seine Züge an den Ersteller.
     const dran = (S) => S.p.evaluate((seite) => { const st = window.AB.st; if (!st || st.ende) return null; const a = window.AB.R.aktiv(st); return window.AB.R.teamVon(st, a) === seite && a.tp > 0 ? a.id : null; }, S.ich === "A" ? 1 : 2);
-    let gastBewegt = null, zuege = 0;
+    let gastBewegt = null, zuege = 0, geschummelt = false;
     for (let i = 0; i < 400; i++) {
       if (await A.p.evaluate(() => Boolean(document.querySelector("#arena-ende") && !document.querySelector("#arena-ende").hidden)) ) break;
       let gezogen = false;
+      // SCHUMMELN=1: Der Ersteller ändert nach ein paar Zügen heimlich die Lebenspunkte eines gegnerischen Helden
+      if (process.env.SCHUMMELN && !geschummelt && zuege >= 4) { geschummelt = true; await A.p.evaluate(() => { const f = window.AB.st.figuren.find((x) => x.team === 2 && x.tp > 1); f.tp = 1; }); }
       for (const S of [A, B]) {
         const id = await dran(S); if (!id) continue;
         if (S === B && !gastBewegt) { // einmal prüfen: Bewegung des Beigetretenen kommt beim Ersteller an
@@ -127,6 +132,9 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
           if (ziel) { await B.p.evaluate((z) => document.querySelector(`.feld[data-x="${z.x}"][data-y="${z.y}"]`).dispatchEvent(new MouseEvent("click", { bubbles: true })), ziel);
             gastBewegt = (await warte(A.p, (z) => { const f = window.AB.R.fig(window.AB.st, z.id); return f && f.x === z.x && f.y === z.y; }, ziel, 15000)) ? "ja" : "nein"; }
         }
+        // KI=1: Beide Seiten setzen ihre Fähigkeiten ein (Ersteller über den Vorschlag der Regeln, der Beigetretene schickt ihn als Wunsch)
+        if (process.env.KI && S === A && !process.env.FALL) await A.p.evaluate(() => window.AB.auto());
+        else if (process.env.KI) { for (let n = 0; n < 3; n++) { const mehr = await B.p.evaluate((alt) => { const st = window.AB.st, R = window.AB.R; if (!st || st.ende || R.aktiv(st).id !== alt) return false; const v = R.vorschlag(st); if (!v || !v.aktion) return false; window.AB.arenaSende({ typ: "aktion", aktion: v.aktion, ziel: v.ziel }); return true; }, id); if (!mehr) break; await B.p.waitForTimeout(900); } }
         await S.p.evaluate(() => { const b = document.querySelector("#ende-zug") || document.querySelector('[data-l="ende"]'); if (b && !b.disabled) b.click(); });
         await warte(S.p, (alt) => { const st = window.AB.st; return !st || st.ende || window.AB.R.aktiv(st).id !== alt; }, id, 15000); gezogen = true; zuege++;
       }
@@ -137,6 +145,14 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
     check(endeDa, `Der Kampf endet auf beiden Geräten (${zuege} Züge gespielt)`);
     if (endeDa) {
       const tA = (await A.p.textContent("#arena-ende")).replace(/\s+/g, " "), tB = (await B.p.textContent("#arena-ende")).replace(/\s+/g, " ");
+      const pr = await B.p.evaluate(() => window.AB.arenaPruef());
+      if (process.env.DEBUG) console.log("    Ende:", await A.p.evaluate(() => window.AB.st.arena.grund + " | Sieger " + window.AB.st.arena.sieger));
+      if (process.env.SCHUMMELN) {
+        check(pr && !pr.ok && /weicht/.test(pr.grund), "Mitrechnen: Der Beigetretene bemerkt die Manipulation (" + (pr && pr.grund) + ")");
+        check(/Nicht gewertet|Abgebrochen/.test(tB) && /Abgebrochen/.test(tA) && !/Seelensplitter/.test(tA + tB) && !/XP/.test(tA + tB) && DB.match.status === "abgebrochen" && DB.wallet.A === 0 && DB.wallet.B === 0, "Der manipulierte Kampf endet ohne Wertung: keine Seelensplitter, keine Erfahrung");
+        if (process.env.SHOT_DIR) await B.p.screenshot({ path: process.env.SHOT_DIR + "/arena-nicht-gewertet.png" });
+      } else {
+      check(pr && pr.ok && pr.schritte > 10, `Mitrechnen: Der Beigetretene hat alle ${pr && pr.schritte} Schritte nachgerechnet, ohne Abweichung${pr && !pr.ok ? " – ABWEICHUNG: " + pr.grund : ""}`);
       const siegA = /Sieg/.test(tA) && !/Niederlage/.test(tA), siegB = /Sieg/.test(tB) && !/Niederlage/.test(tB);
       check(siegA !== siegB && /Niederlage/.test(siegA ? tB : tA), "Ein Gerät zeigt „Sieg“, das andere „Niederlage“");
       check(/\+25 Seelensplitter/.test(siegA ? tA : tB) && !/Seelensplitter/.test(siegA ? tB : tA) && /XP/.test(tA) && /XP/.test(tB), "Sieger: +25 Seelensplitter; beide sehen die Erfahrung ihrer Helden");
@@ -145,6 +161,7 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
       await S.p.click("#arena-ende-zu");
       const zurueck = await warte(S.p, () => !document.querySelector("#hub").hidden && document.querySelector("#hub-waehrung") && /25/.test(document.querySelector("#hub-waehrung").textContent), null, 20000);
       check(zurueck, "„Zur Startseite“: zurück im Hub, neben dem Profilbild stehen 25 Seelensplitter");
+      }
     }
   }
   check(!A.fehler.length && !B.fehler.length, "keine Skriptfehler" + (A.fehler.concat(B.fehler).length ? ": " + A.fehler.concat(B.fehler).slice(0, 3).join(" | ") : ""));

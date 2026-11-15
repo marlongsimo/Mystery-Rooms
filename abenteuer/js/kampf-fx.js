@@ -133,7 +133,7 @@
       const vorher = alt && alt.tp[f.id] != null ? Math.max(0, alt.tp[f.id]) / f.tpMax * 100 : p;
       return `<div class="gk-held ${f === akt && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "unten" : ""} ${f.tot ? "tot" : ""}">
         <span class="gk-bild" style="${bild ? `background-image:url('${bild}')` : ""}">${f.art === "begleiter" ? "✦" : ""}</span>
-        <div class="gk-info"><b>${esc(f.name)}</b><small>${esc(f.titel || (f.art === "begleiter" ? "Begleiterin" : ""))}${f.stufe ? ` · Stufe ${f.stufe}` : ""}</small>
+        <div class="gk-info"><b>${esc(f.name)}</b><small${f.fid && f.stufe >= 10 ? ' class="meister"' : ""}>${f.fid && f.stufe >= 10 ? "♛ " : ""}${esc(f.titel || (f.art === "begleiter" ? "Begleiterin" : ""))}${f.stufe ? ` · Stufe ${f.stufe}` : ""}</small>
           <div class="gk-leben ${p > vorher ? "heil" : ""}"><i class="rest" style="width:${Math.max(p, vorher)}%" data-ziel="${p}"></i><i class="wert" style="width:${p}%"></i><span>${f.tot ? "gefallen" : f.tp <= 0 ? "am Boden" : `${f.tp} / ${f.tpMax}`}</span></div>
           <div class="gk-werte"><span>RK <em>${f.rk}</em></span>${f.rucksack && f.art !== "begleiter" ? `<span>Tränke <em>${R.trankZahl(f)}</em></span>` : ""}${z.length ? `<span class="gk-zust">${esc(z.slice(0, 2).join(" · "))}</span>` : ""}</div></div></div>`;
     }).join("");

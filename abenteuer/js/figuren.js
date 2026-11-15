@@ -378,6 +378,9 @@
     tiergefaehrte: [[8, "wolf_umreissen", { pro: { rast: 3 } }]],
     kopfgeldjaeger: [[5, "netz", { reichweite: 8, sgPlus: 2 }], [10, "erlegen", { pro: { kampf: 2 } }]],
   };
+  /** Meistertitel eines Helden (ab Stufe 10), sonst null – und der Titel, der gerade gilt */
+  const meistertitel = (fid, stufe) => (stufe >= 10 && AUFSTIEG[fid] && AUFSTIEG[fid].titel) || null;
+  const titelVon = (fid, stufe) => meistertitel(fid, stufe) || (FIGUREN[fid] || {}).titel || "";
   /** Der Stufenpfad eines Helden für die Anzeige: zehn Zeilen { stufe, tp, werte: [..], neu: [{name, text}], verbesserung, meister, titel } */
   function stufenpfad(fid) {
     const d = FIGUREN[fid], k = KLASSEN[d.klasse], auf = AUFSTIEG[fid] || {}, haupt = hauptAttr(fid);
@@ -444,7 +447,7 @@
    *  starten in Normal; bereits laufende Hardcore-Kampagnen spielen unverändert weiter. */
   const HARDCORE = false;
   const API = { HARDCORE, SEGEN, XP_BIS, XP_FAKTOR, xpFuer, stufeAusXp, KLASSEN, PLAETZE, KLASSE_FAEHIG, FIGUREN, REIHE, tpVon, faehigVon, bild, mod,
-    STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, BESSER, stufenpfad, SCHWIERIGKEIT,
+    STUFEN10, altStufe, neuAb, uebung, plaetzeVon, rkVon, werteVon, hauptAttr, tp10, tpAlt, AUFSTIEG, BESSER, stufenpfad, meistertitel, titelVon, SCHWIERIGKEIT,
     /** höchste Stufe des geltenden Modells (für „alle Fähigkeiten dieser Figur“) */
     maxStufe: () => (STUFEN10.aktiv ? 10 : 3) };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

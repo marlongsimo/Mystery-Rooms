@@ -281,3 +281,11 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 - **Handy:** Die Leiste oben zeigt neben der Zugzeit auch Punktestand (eigene Punkte zuerst) und Runde; am Rechner stehen beide in der Kopfzeile.
 - **Auswertung** (`rpg_arena_stats`, nur Admins, Profilmenü „Arena-Auswertung“): Kämpfe je Modus, Siegquote je Held (gesamt und je Modus), häufigste Dreier-Teams. Liest aus `rpg_arena_matches`, speichert nichts zusätzlich.
 - **Händler** (`rpg_shop_today`, `rpg_shop_buy`): jeden Tag drei zufällige Helden, die dem Konto fehlen, je 830 Seelensplitter; Wechsel um Mitternacht (Europe/Berlin), je Konto eigene Auswahl. Ohne Migration 010 zeigt der Händler „Folgt bald“.
+
+### Mitrechnen (Schutz gegen Schummeln)
+- Der Ersteller rechnet weiter den Kampf, schreibt aber jeden Schritt mit, der den Stand verändert (`bewegen`, `handeln`, `zugEnde`, `gegnerZug`, `autoZug`), und schickt Liste und Prüfwert (`R.arenaAbdruck`) mit dem Stand.
+- Das Gerät des Beigetretenen baut denselben Kampf aus derselben Zufallszahl und rechnet jeden Schritt nach (`pruefGast` in `js/spiel.js`). Geprüft wird: nur erlaubte Schritte; in den eigenen Zügen nur, was man selbst geschickt hat (oder das Zugende nach Ablauf der Zeit); gleicher Prüfwert; gleiches Ende.
+- Königsmord: Der Ersteller legt seinen Anführer mit einer Zusage (Prüfwert aus Zufallstext und Figur) fest und deckt ihn am Ende auf.
+- Bei einer Abweichung (auch: unterschiedliche Spielversionen, fehlende Prüfdaten) meldet der Beigetretene das Ergebnis abweichend; die Datenbank beendet den Kampf dann ohne Wertung. Keine Änderung an der Datenbank nötig.
+- Grenzen: Der Beigetretene kann einen Kampf weiterhin ungewertet machen (konnte er schon vorher). Der Ersteller kennt den Anführer des Beigetretenen.
+- Tests: `tests/arena-mitrechnen.test.js` (Regeln rechnen auf zwei Ständen gleich), `tests/arena.test.js` mit `KI=1`, `SCHUMMELN=1`, `FALL=1`, `tests/live-arena.test.js`.

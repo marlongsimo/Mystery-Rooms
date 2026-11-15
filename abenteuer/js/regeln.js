@@ -314,7 +314,7 @@
     const d = FD.FIGUREN[fid], k = FD.KLASSEN[d.klasse], tp = FD.tpVon(fid, stufe);
     const pl = k.plaetze ? FD.plaetzeVon(stufe).slice() : [0, 0];
     return {
-      id: "f" + i, seite: "spieler", fid, klasse: d.klasse, name: d.name, titel: d.titel, stufe, x, y,
+      id: "f" + i, seite: "spieler", fid, klasse: d.klasse, name: d.name, titel: FD.titelVon ? FD.titelVon(fid, stufe) : d.titel, stufe, x, y,
       tp, tpMax: tp, rk: FD.rkVon(fid, stufe), rkBasis: FD.rkVon(fid, stufe), metall: Boolean(d.metall), werte: FD.werteVon(fid, stufe),
       plaetze: pl, plaetzeMax: pl.slice(), genutzt: {}, rucksack: [{ id: "heiltrank", n: 1 }], z: {}, todes: { e: 0, f: 0 }, reaktion: 1,
     };
@@ -2324,7 +2324,25 @@
     };
   }
 
-  const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  /* ---------- Arena: Mitrechnen auf dem zweiten Gerät ----------
+   * arenaAbdruck: Prüfwert über alles, was den weiteren Kampf bestimmt (Figuren, Zug, Runde, Würfelstand, Punkte) – ohne Chronik,
+   * ohne Anzeige-Dinge (Sicht, Zugzeit) und ohne den verdeckten Anführer. Zwei Geräte, die dieselben Schritte rechnen, kommen auf denselben Wert. */
+  const SICHT_FELDER = { seite: 1, art: 1, artA: 1, fid: 1, fidA: 1 };
+  function arenaAbdruck(st) {
+    const fig1 = (f) => { const o = {}; for (const k of Object.keys(f).sort()) if (!SICHT_FELDER[k]) o[k] = f[k]; o.wer = f.fid || f.fidA || f.artA || f.art || ""; o.team = teamVon(st, f); return o; };
+    const a = st.arena || {}, kern = { f: st.figuren.map(fig1), reihe: st.reihe, am: st.am, runde: st.runde, rs: st.rs, zug: st.zug, zonen: st.zonen, brand: st.brand, bed: st.bed, segen: st.segen || null,
+      p: a.punkte, mz: a.monsterZiel || null, modus: a.modus, zl: a.zugLog || null };
+    const s = JSON.stringify(kern); let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36) + ":" + s.length;
+  }
+  /** Kurzer Prüfwert über einen Text (für die Zusage des verdeckten Anführers) */
+  function pruefwert(text) { let h1 = 0x9e3779b9, h2 = 0x85ebca6b; const s = String(text);
+    for (let r = 0; r < 3; r++) for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i) + r * 131; h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c ^ (h1 >>> 15), 1597334677); }
+    return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36); }
+
+  const API = { arenaAbdruck, pruefwert, begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, heilenTest: heilen, neueArena, teamVon, arenaSicht, KARTE_GARTEN, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

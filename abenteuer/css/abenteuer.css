@@ -1049,6 +1049,22 @@ body > .einst-panel { position: fixed; z-index: 40; }
 @keyframes fx-heil { 0% { opacity: 0; filter: brightness(1.7); } 12% { opacity: 1; } 45% { filter: brightness(1.15); } 70% { opacity: 1; } 100% { opacity: 0; filter: brightness(1); } }
 @keyframes fx-heil-dreh { 0% { transform: scale(.8, .12); opacity: 1; } 14% { transform: scale(.9, .45); } 32% { transform: scale(1, 1); opacity: 1; } 50% { transform: scale(.25, 1.04); opacity: 0; } 80% { transform: scale(1, 1.1); opacity: 1; } 100% { transform: scale(.5, 1.22); opacity: 1; } }
 @keyframes fx-heil-dreh2 { 0%, 30% { transform: scale(-.25, 1); opacity: 0; } 50% { transform: scale(-1, 1.04); opacity: 1; } 80% { transform: scale(-.25, 1.1); opacity: 0; } 100% { opacity: 0; } }
+/* Eis bricht aus dem Boden, Blitz schlägt ein, Schild leuchtet auf */
+.fx-heil.eis, .fx-heil.blitz { animation: none; }
+.fx-heil.eis i { animation: fx-eis 1.3s cubic-bezier(.2, 1.4, .4, 1) forwards; }
+.fx-heil.blitz, .fx-heil.eis { mix-blend-mode: normal; }
+.fx-heil.blitz i { filter: drop-shadow(0 0 6px #6aa8ff) drop-shadow(0 0 16px rgba(80,140,255,.9)); animation: fx-blitzschlag .8s linear forwards; }
+@keyframes fx-eis { 0% { transform: scale(.5, .05); opacity: 0; filter: brightness(2); } 10% { opacity: 1; } 22% { transform: scale(1.06, 1.08); filter: brightness(1.5); } 32% { transform: scale(1, 1); filter: brightness(1.1); } 72% { transform: scale(1, 1); opacity: 1; } 100% { transform: scale(1.04, .9); opacity: 0; } }
+@keyframes fx-blitzschlag { 0% { opacity: 0; transform: scale(.9, 1); } 6% { opacity: 1; transform: scale(1, 1); } 16% { opacity: .25; } 24% { opacity: 1; transform: scale(-1, 1); } 38% { opacity: .35; transform: scale(-1, 1); } 46% { opacity: 1; transform: scale(1, 1); } 70% { opacity: .8; } 100% { opacity: 0; transform: scale(1, 1.05); } }
+.fx-schild { position: absolute; z-index: 5; pointer-events: none; background: center / contain no-repeat; transform: translate(-50%, -50%); filter: drop-shadow(0 0 10px rgba(90,170,255,.9)); animation: fx-schild 1.4s ease-out forwards; }
+@keyframes fx-schild { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); } 18% { opacity: .6; transform: translate(-50%, -50%) scale(1.18); } 32% { opacity: .5; transform: translate(-50%, -50%) scale(1); } 55% { opacity: .55; transform: translate(-50%, -50%) scale(1.06); } 75% { opacity: .45; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.25); } }
+/* Geschosse: Pfeil (zeigt im Bild nach oben, wird in Flugrichtung gedreht) und Zauberkugel, die beim Einschlag zerplatzt */
+.fx-flug { position: absolute; z-index: 5; width: 0; height: 0; pointer-events: none; }
+.fx-flug i { position: absolute; background: center / contain no-repeat; }
+.fx-flug.pfeil i { width: calc(var(--k) * .12); height: var(--k); left: calc(var(--k) * -.06); top: calc(var(--k) * -.5); filter: drop-shadow(0 2px 2px rgba(0,0,0,.6)); }
+.fx-flug.kugel i { width: var(--k); height: var(--k); left: calc(var(--k) * -.5); top: calc(var(--k) * -.5); filter: drop-shadow(0 0 10px rgba(190,110,255,.9)); }
+.fx-flug.platzt i { animation: fx-platzt .4s ease-out forwards; }
+@keyframes fx-platzt { 0% { transform: scale(1); opacity: 1; filter: brightness(1.8) drop-shadow(0 0 14px rgba(210,140,255,1)); } 100% { transform: scale(2.6); opacity: 0; filter: brightness(1.2); } }
 .fx-zahl.heil { color: #d9ffe2; text-shadow: 0 0 2px #000, 0 2px 0 #1d5a2a, 0 0 18px rgba(80,230,120,.9); }
 @keyframes fx-steigen { 0% { opacity: 0; transform: translate(-50%, -20%) scale(.4); } 15% { opacity: 1; transform: translate(-50%, -60%) scale(1.25); } 30% { transform: translate(-50%, -70%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -190%) scale(.95); } }
 .fx-blitz { position: absolute; inset: 0; z-index: 7; pointer-events: none; animation: fx-blitz .9s ease-out forwards; }

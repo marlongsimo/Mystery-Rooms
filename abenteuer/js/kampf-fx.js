@@ -66,9 +66,11 @@
   }
   function starten() { if (!laeuft) { laeuft = true; requestAnimationFrame(schleife); } }
   function wolke(px, py, art, n) {
-    const e = ebene(); if (!e) return;
+    let e = ebene(); if (!e) return;
+    // Auf kleinen Karten (Handy) sind die Felder klein: Die Funken schrumpfen mit, sonst verdecken sie Figur und Effekt
+    const fg = document.querySelector("#karte .fig"), m = fg ? Math.max(.4, Math.min(1, fg.getBoundingClientRect().width / 70)) : 1; e = { dpr: e.dpr * m, roh: e.dpr };
     for (let i = 0; i < n; i++) { const w = Math.random() * Math.PI * 2, s = (art === "heil" ? 1 : 2.4) + Math.random() * (art === "feuer" ? 5 : 3);
-      partikel.push({ x: px * e.dpr, y: py * e.dpr, vx: Math.cos(w) * s * e.dpr, vy: Math.sin(w) * s * e.dpr - (art === "heil" ? 1.6 : 0), g: art === "heil" ? -.04 : art === "feuer" ? -.06 : .03, s: (2 + Math.random() * 3) * e.dpr, art, leben: 1 }); }
+      partikel.push({ x: px * e.roh, y: py * e.roh, vx: Math.cos(w) * s * e.dpr, vy: Math.sin(w) * s * e.dpr - (art === "heil" ? 1.6 : 0), g: art === "heil" ? -.04 : art === "feuer" ? -.06 : .03, s: (2 + Math.random() * 3) * e.dpr, art, leben: 1 }); }
   }
 
   /* ---------- Hilfen ---------- */
@@ -77,13 +79,46 @@
     const r = g.getBoundingClientRect(), w = wrap.getBoundingClientRect(); if (!r.width) return null;
     return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height, b: r.width };
   }
-  /** Heilung: Eine grüne Lichtsäule steigt um die Figur auf, dreht sich und verglüht */
-  const HEILBILD = "img/fx/heil.webp"; let heilGeladen = false;
-  function heilSaeule(id) {
+  /** Lichtsäule um eine Figur: grün bei Heilung, Feuer bei Feuerzaubern. Sie steigt auf, dreht sich und verglüht */
+  const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp" };
+  // Breite in Feldern, Höhe : Breite, Dauer in ms, zwei gespiegelte Lagen (Drehung)?
+  const SAEULE = { heil: [1.45, 2.27, 1500, true], feuer: [1.45, 2.27, 1500, true], eis: [1.7, 1.34, 1300, false], blitz: [1.5, 1.95, 800, false] }; let fxGeladen = false;
+  function saeule(id, art) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
-    const d = document.createElement("div"); d.className = "fx-heil"; d.innerHTML = `<i style="background-image:url(${HEILBILD})"></i><i style="background-image:url(${HEILBILD})"></i>`;
-    const b = Math.max(40, p.b * 1.45); d.style.width = b + "px"; d.style.height = b * 2.24 + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .42 + "px";
-    wrap.appendChild(d); setTimeout(() => d.remove(), 1500);
+    const [breit, hoch, dauer, doppelt] = SAEULE[art], lage = `<i style="background-image:url(${FXBILD[art]})"></i>`;
+    const d = document.createElement("div"); d.className = "fx-heil " + art; d.innerHTML = lage + (doppelt ? lage : "");
+    const b = Math.max(40, p.b * breit); d.style.width = b + "px"; d.style.height = b * hoch + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .42 + "px";
+    wrap.appendChild(d); setTimeout(() => d.remove(), dauer);
+  }
+  /** Schutz: Ein leuchtender Schild erscheint vor der Figur, pulsiert und verblasst */
+  function schild(id) {
+    const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
+    const d = document.createElement("div"); d.className = "fx-schild"; d.style.backgroundImage = `url(${FXBILD.schild})`;
+    const b = Math.max(34, p.b * 1.25); d.style.width = b + "px"; d.style.height = b * 1.11 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .15 + "px";
+    wrap.appendChild(d); setTimeout(() => d.remove(), 1400);
+  }
+  /** Womit wurde angegriffen? Aus den neuen Zeilen der Chronik gelesen: Pfeil (Bogen, Armbrust), Kugel (arkane und Schattenzauber), Feuer */
+  const GESCHOSS = [["feuer", /Glutpfeil|Glutsphäre|Brandmal|Feuerball|Flammen/], ["eis", /Frostlanze|Frosthauch|Frostwelle|Frostgriff|Eiskorridor|Kalte Hand|Kalter Funke/], ["blitz", /Runenblitz|Donnerwelle|Blitz/],
+    ["pfeil", /bogen|Armbrust|Doppelschuss|Fesselnder Pfeil|Pfeilregen|Bolzen/i],
+    ["kugel", /Arkaner Funke|Magisches Geschoss|Albtraum|Schattenstich|Schattenfesseln|Fluchhand|Zeitriss|Furcht/]];
+  const AM_ZIEL = { feuer: 1, eis: 1, blitz: 1 }; // diese Effekte entstehen am Ziel, Pfeil und Kugel fliegen dorthin
+  const geschossArt = (zeilen) => { const t = zeilen.map((l) => l.t).join(" "); const g = GESCHOSS.find(([, re]) => re.test(t)); return g ? g[0] : null; };
+  /** Ein Geschoss fliegt von einer Figur zur anderen; liefert die Flugzeit in Millisekunden (0 = kein Flug) */
+  function flug(von, zu, art, verzug) {
+    const a = figurPos(von), z = figurPos(zu), wrap = $(".karte-wrap"); if (!a || !z || !wrap || !wrap.animate) return 0;
+    const ay = a.y - a.h * .25, zy = z.y - z.h * .15, dx = z.x - a.x, dy = zy - ay, weg = Math.hypot(dx, dy); if (weg < a.b * 1.3) return 0;
+    const dauer = Math.round(Math.max(230, Math.min(520, weg * (art === "pfeil" ? .75 : 1.1))));
+    const d = document.createElement("div"); d.className = "fx-flug " + art; d.style.left = a.x + "px"; d.style.top = ay + "px";
+    const k = Math.max(26, a.b * (art === "pfeil" ? 1.5 : .8)); d.style.setProperty("--k", k + "px");
+    d.innerHTML = `<i style="background-image:url(${FXBILD[art]})"></i>`; d.style.opacity = "0";
+    const w = Math.atan2(dy, dx) * 180 / Math.PI + 90, bogen = art === "pfeil" ? -Math.min(46, weg * .12) : 0, dreh = art === "pfeil" ? `rotate(${w}deg)` : "";
+    wrap.appendChild(d);
+    const bilder = art === "pfeil"
+      ? [{ transform: `translate(0px, 0px) ${dreh}`, opacity: 1 }, { transform: `translate(${dx / 2}px, ${dy / 2 + bogen}px) ${dreh}`, opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) ${dreh}`, opacity: 1 }]
+      : [{ transform: "translate(0px, 0px) scale(.35) rotate(0deg)", opacity: .2 }, { transform: `translate(${dx * .25}px, ${dy * .25}px) scale(1) rotate(120deg)`, opacity: 1, offset: .25 }, { transform: `translate(${dx}px, ${dy}px) scale(1) rotate(420deg)`, opacity: 1 }];
+    d.animate(bilder, { duration: dauer, delay: verzug || 0, easing: art === "pfeil" ? "linear" : "ease-in", fill: "forwards" });
+    setTimeout(() => { if (art === "kugel") { d.style.left = z.x + "px"; d.style.top = zy + "px"; d.getAnimations().forEach((x) => x.cancel()); d.style.opacity = "1"; d.classList.add("platzt"); setTimeout(() => d.remove(), 420); } else d.remove(); }, (verzug || 0) + dauer);
+    return (verzug || 0) + dauer;
   }
   function zahl(id, text, art) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
@@ -199,8 +234,8 @@
     document.body.classList.toggle("fx-an", !ruhig());
     gruppe(st, R); bossKarte(st, R); kopf(st);
     document.body.dataset.stimmung = stil(STIMMUNG[kampagne()] || "glut");
-    const neu = { pos: {}, tp: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
-    for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; }
+    const neu = { pos: {}, tp: {}, rk: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
+    for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; neu.rk[f.id] = f.rk; }
     const wrap = $(".karte-wrap"); if (wrap) wrap.classList.toggle("mit-bild", Boolean(st.karte.bild));
     const vorher = alt && alt.st === st ? alt : null;
     alt = neu;
@@ -208,7 +243,7 @@
     const art = STIMMUNG[kampagne()] || "schnee";
     if (stimmung !== art || !partikel.some((p) => p.amb)) { stimmung = art; ambient(art); }
     starten();
-    if (!heilGeladen) { heilGeladen = true; new Image().src = HEILBILD; }
+    if (!fxGeladen) { fxGeladen = true; for (const k in FXBILD) new Image().src = FXBILD[k]; }
     if (!vorher) {
       // Kampfbeginn: Bosse bekommen einen Auftritt
       const boss = st.figuren.find((f) => f.seite === "gegner" && f.tp > 0 && (R.GEGNER[f.art] || {}).boss) || st.figuren.find((f) => f.seite === "gegner" && f.tp > 0 && istBoss(R, f));
@@ -226,19 +261,26 @@
     }
     // Leben: Zahlen, Treffer, Heilung
     const logNeu = st.log.slice(vorher.log), krit = logNeu.some((l) => /kritischer Treffer|kritisch/i.test(l.t) && l.art !== "gegner");
+    // Fernangriffe und Zauber: Erst fällt der Würfel (etwa 0,6 s), dann fliegt das Geschoss vom Angreifer (wer vor diesem Bild am Zug war) zu jedem Getroffenen.
+    // Wer verfehlt, richtet keinen Schaden an – dann fliegt auch nichts. Zahl und Treffer folgen beim Einschlag.
+    const schuetze = st.figuren.find((f) => f.id === vorher.akt), gArt = geschossArt(logNeu), wuerfel = logNeu.some((l) => l.wurf) ? 620 : 0; let nr = 0;
     for (const f of st.figuren) {
       const v = vorher.tp[f.id]; if (v == null || v === f.tp) continue;
       const d = f.tp - v, p = figurPos(f.id); if (!p) continue;
       if (d < 0) {
-        const kr = krit && f.seite === "gegner";
-        setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : 26);
-          const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, 180);
-      } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 6); heilSaeule(f.id); }
+        const kr = krit && f.seite === "gegner", fern = gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite, amZiel = fern && AM_ZIEL[gArt];
+        const wann = fern ? (amZiel ? wuerfel + 120 : flug(schuetze.id, f.id, gArt, wuerfel + nr++ * 90) || 180) : 180;
+        setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel ? 10 : 26);
+          if (amZiel) saeule(f.id, gArt);
+          const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, wann);
+      } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 6); saeule(f.id, "heil"); }
     }
+    // Schutz: Steigt die Rüstungsklasse einer Figur (Schild des Glaubens, Schutzhaltung, Schutzkreis …), leuchtet ein Schild auf
+    for (const f of st.figuren) { const v = vorher.rk && vorher.rk[f.id]; if (v != null && f.rk > v && f.tp > 0) schild(f.id); }
     if (krit) { setTimeout(() => { blitz("gold"); beben(); }, 160); }
     const gefallen = st.figuren.find((f) => f.seite === "gegner" && vorher.tp[f.id] > 0 && f.tp <= 0 && istBoss(R, f) && !f.geflohen);
     if (gefallen) setTimeout(() => { beben(); blitz("gold"); bossFall(gefallen); }, 500);
-    if (logNeu.some((l) => /Feuerball|Flammen|Glut|Feuer/.test(l.t) && l.art === "wurf")) { const z = st.figuren.filter((f) => vorher.tp[f.id] > f.tp && f.seite === "gegner"); for (const f of z) { const p = figurPos(f.id); if (p) wolke(p.x, p.y, "feuer", 60); } }
+    if (gArt !== "feuer" && logNeu.some((l) => /Feuerball|Flammen|Glut|Feuer/.test(l.t) && l.art === "wurf")) { const z = st.figuren.filter((f) => vorher.tp[f.id] > f.tp && f.seite === "gegner"); for (const f of z) { const p = figurPos(f.id); if (p) wolke(p.x, p.y, "feuer", 60); } }
     // Banner: neue Runde, Phasenwechsel, wer am Zug ist
     const phase = logNeu.find((l) => /Phase (II|III)|Das Siegel bricht|Die Krone des Königs bricht|zerfällt zu Eis und Licht/.test(l.t));
     if (phase) { beben(); blitz("eis"); banner((phase.t.match(/Phase (II|III)/) || [])[0] || "Die Wende", phase.t.replace(/^.*?: /, "").split(".")[0], "phase"); }

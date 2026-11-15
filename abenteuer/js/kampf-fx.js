@@ -229,7 +229,8 @@
     return p;
   }
   /* ---------- Nach jedem Zeichnen ---------- */
-  function nach(st, R) {
+  let offen = null; // Treffer, deren Würfel noch rollt: Das Spiel zeichnet erst die alten Lebenspunkte (lage.wartet), dann die neuen (lage.nachWurf)
+  function nach(st, R, lage) {
     if (!st) return;
     document.body.classList.toggle("fx-an", !ruhig());
     gruppe(st, R); bossKarte(st, R); kopf(st);
@@ -260,10 +261,13 @@
       g.animate(bilder, { duration: Math.max(220, n * schritt) });
     }
     // Leben: Zahlen, Treffer, Heilung
-    const logNeu = st.log.slice(vorher.log), krit = logNeu.some((l) => /kritischer Treffer|kritisch/i.test(l.t) && l.art !== "gegner");
+    const logNeu = st.log.slice(vorher.log); let logTreffer = logNeu, akteur = vorher.akt, gewuerfelt = false;
+    if (lage && lage.wartet) { if (!offen) offen = { log: [], akt: vorher.akt }; offen.log = offen.log.concat(logNeu); }
+    else if (offen) { logTreffer = offen.log.concat(logNeu); akteur = offen.akt; offen = null; gewuerfelt = true; }
+    const krit = logTreffer.some((l) => /kritischer Treffer|kritisch/i.test(l.t) && l.art !== "gegner");
     // Fernangriffe und Zauber: Erst fällt der Würfel (etwa 0,6 s), dann fliegt das Geschoss vom Angreifer (wer vor diesem Bild am Zug war) zu jedem Getroffenen.
     // Wer verfehlt, richtet keinen Schaden an – dann fliegt auch nichts. Zahl und Treffer folgen beim Einschlag.
-    const schuetze = st.figuren.find((f) => f.id === vorher.akt), gArt = geschossArt(logNeu), wuerfel = logNeu.some((l) => l.wurf) ? 620 : 0; let nr = 0;
+    const schuetze = st.figuren.find((f) => f.id === akteur), gArt = geschossArt(logTreffer), wuerfel = !gewuerfelt && logTreffer.some((l) => l.wurf) ? 620 : 0; let nr = 0;
     for (const f of st.figuren) {
       const v = vorher.tp[f.id]; if (v == null || v === f.tp) continue;
       const d = f.tp - v, p = figurPos(f.id); if (!p) continue;
@@ -280,7 +284,7 @@
     if (krit) { setTimeout(() => { blitz("gold"); beben(); }, wuerfel + 160); }
     const gefallen = st.figuren.find((f) => f.seite === "gegner" && vorher.tp[f.id] > 0 && f.tp <= 0 && istBoss(R, f) && !f.geflohen);
     if (gefallen) setTimeout(() => { beben(); blitz("gold"); bossFall(gefallen); }, 500);
-    if (gArt !== "feuer" && logNeu.some((l) => /Feuerball|Flammen|Glut|Feuer/.test(l.t) && l.art === "wurf")) { const z = st.figuren.filter((f) => vorher.tp[f.id] > f.tp && f.seite === "gegner"); for (const f of z) { const p = figurPos(f.id); if (p) wolke(p.x, p.y, "feuer", 60); } }
+    if (gArt !== "feuer" && logTreffer.some((l) => /Feuerball|Flammen|Glut|Feuer/.test(l.t) && l.art === "wurf")) { const z = st.figuren.filter((f) => vorher.tp[f.id] > f.tp && f.seite === "gegner"); for (const f of z) { const p = figurPos(f.id); if (p) wolke(p.x, p.y, "feuer", 60); } }
     // Banner: neue Runde, Phasenwechsel, wer am Zug ist
     const phase = logNeu.find((l) => /Phase (II|III)|Das Siegel bricht|Die Krone des Königs bricht|zerfällt zu Eis und Licht/.test(l.t));
     if (phase) { beben(); blitz("eis"); banner((phase.t.match(/Phase (II|III)/) || [])[0] || "Die Wende", phase.t.replace(/^.*?: /, "").split(".")[0], "phase"); }

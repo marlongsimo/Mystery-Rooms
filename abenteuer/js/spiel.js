@@ -583,7 +583,23 @@
   }
   const farbeVon = (f) => (wolfA(f) ? "#3f7a3a" : F.KLASSEN[f.klasse].farbe);
 
+  /* Erst der Würfel, dann die Wirkung: Bringt ein neuer Wurf Schaden, zeigt das Bild noch gut eine halbe Sekunde die alten Lebenspunkte
+     (Balken, Leisten, am Boden liegen, Kampfende) – so lange rollt der Würfel. Danach wird mit den echten Werten neu gezeichnet. */
+  const WURFZEIT = 620; let gezeigt = { st: null, tp: {} }, wurfWarten = null, fxLage = null;
   function render() {
+    if (!st) return renderSicht();
+    if (gezeigt.st !== st) { gezeigt = { st, tp: {} }; clearTimeout(wurfWarten); wurfWarten = null; }
+    const anders = st.figuren.filter((f) => gezeigt.tp[f.id] != null && gezeigt.tp[f.id] > f.tp);
+    const neuerWurf = st.log.slice(letzterLog).some((l) => l.wurf && (l.art === "wurf" || l.art === "gegner"));
+    if (TEMPO !== 0 && anders.length && (wurfWarten || neuerWurf)) {
+      const echt = anders.map((f) => [f, f.tp]), ende = st.ende; anders.forEach((f) => { f.tp = gezeigt.tp[f.id]; }); st.ende = null; fxLage = { wartet: true };
+      try { renderSicht(); } finally { echt.forEach(([f, tp]) => { f.tp = tp; }); st.ende = ende; fxLage = null; }
+      if (!wurfWarten) { const fuer = st; wurfWarten = setTimeout(() => { wurfWarten = null; if (st !== fuer) return; fxLage = { nachWurf: true }; try { gezeigt.tp = {}; render(); } finally { fxLage = null; } }, WURFZEIT); }
+      return;
+    }
+    renderSicht(); for (const f of st.figuren) gezeigt.tp[f.id] = f.tp;
+  }
+  function renderSicht() {
     // Arena: Jedes Gerät sieht die Karte aus seiner Sicht (eigene Helden als Helden, die des Gegners rot) – danach zurückstellen
     if (st && st.arena && ARENA) { const alt = st.arena.sicht; if (alt !== ARENA.seite) { R.arenaSicht(st, ARENA.seite); try { return renderKern(); } finally { R.arenaSicht(st, alt); } } }
     return renderKern();
@@ -740,7 +756,7 @@
     zeichneLiveBar();
     if (st.ende && ARENA) { $("#ende").hidden = true; const a = ARENA; if (!a.fertig) { a.fertig = true; a.ende(st); } }
     else if (st.ende) zeigeEnde(); else $("#ende").hidden = true;
-    if (window.ABFX) window.ABFX.nach(st, R);
+    if (window.ABFX) window.ABFX.nach(st, R, fxLage);
   }
 
   /** Schaden und Heilung als aufsteigende Zahlen über den Figuren */

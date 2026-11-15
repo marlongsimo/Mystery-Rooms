@@ -1724,3 +1724,21 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 @media (min-width: 1200px) { .arena-uhr .au-punkte, .arena-uhr .au-runde { display: none; } .arena-uhr:not(:has(.au-zeit)) { display: none; } }
 .arena-modus-reihe.vier { grid-template-columns: repeat(2, 1fr); }
 @media (max-width: 760px) { .arena-modus-reihe.vier { grid-template-columns: 1fr; } }
+
+/* Händler: Helden des Tages */
+.shop-kopf { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.shop-kopf .shop-stand { margin-top: 6px; }
+.shop-helden { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 18px 0 12px; }
+@media (max-width: 640px) { .shop-helden { grid-template-columns: 1fr; } }
+.shop-held { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.32); text-align: center; }
+.shop-held img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; object-position: top; border: 3px solid var(--k, #d9b46a); box-shadow: 0 0 24px rgba(0,0,0,.6); }
+.shop-held b { font: 600 20px var(--schrift-titel); color: #f6dc9c; margin-top: 6px; }
+.shop-held small { color: var(--muted); font-size: 13px; }
+.shop-held .btn { margin-top: 8px; min-width: 130px; } .shop-held .btn i { font-style: normal; color: #a9b4ff; margin-right: 4px; }
+.shop-held .shop-fehlt { color: #e39a8a; }
+.shop-held.gekauft { border-color: rgba(120,200,140,.5); } .shop-gekauft { margin-top: 10px; color: #8fd6a4; font-weight: 600; }
+/* Arena-Auswertung (Admins) */
+.auswertung { overflow-x: auto; } .auswertung h3 { font: 600 15px var(--schrift-titel); color: #f6dc9c; margin: 16px 0 6px; }
+.auswertung table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.auswertung th, .auswertung td { padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,.08); text-align: right; white-space: nowrap; }
+.auswertung th:first-child { text-align: left; } .auswertung thead th { color: var(--muted); font-weight: 600; } .auswertung td small { opacity: .6; }

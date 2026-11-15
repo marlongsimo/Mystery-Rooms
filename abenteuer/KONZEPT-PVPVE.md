@@ -275,3 +275,9 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 - „i“ in der Arena-Übersicht: Ablauf, Zugzeit, Belohnungen und alle drei Modi.
 - Horde: Neue Monster erscheinen von den nächsten Helden beider Teams gleich weit entfernt (höchstens ein Feld Unterschied).
 - Live geprüft (`tests/live-arena.test.js`): Los aus der echten Datenbank, gewürfelte Seelensplitter (009 ist eingespielt).
+
+### Duell, Auswertung, Händler (Migration 010)
+- **Duell:** vierter Modus, drei gegen drei ohne Monster. Das Los zieht jetzt aus vier Modi (`abs(seed) % 4`: Arena, Königsmord, Horde, Duell – dieselbe Rechnung in `rpg_arena_modus`).
+- **Handy:** Die Leiste oben zeigt neben der Zugzeit auch Punktestand (eigene Punkte zuerst) und Runde; am Rechner stehen beide in der Kopfzeile.
+- **Auswertung** (`rpg_arena_stats`, nur Admins, Profilmenü „Arena-Auswertung“): Kämpfe je Modus, Siegquote je Held (gesamt und je Modus), häufigste Dreier-Teams. Liest aus `rpg_arena_matches`, speichert nichts zusätzlich.
+- **Händler** (`rpg_shop_today`, `rpg_shop_buy`): jeden Tag drei zufällige Helden, die dem Konto fehlen, je 830 Seelensplitter; Wechsel um Mitternacht (Europe/Berlin), je Konto eigene Auswahl. Ohne Migration 010 zeigt der Händler „Folgt bald“.

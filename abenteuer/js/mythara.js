@@ -215,12 +215,56 @@
     const d = Math.round(s / 86400); return d === 1 ? "gestern" : d < 14 ? `vor ${d} Tagen` : `vor ${Math.round(d / 7)} Wochen`;
   };
   /* ---------- Eigene Seiten der Spielerseite: Helden, Regeln, Kampagnenwelt (ohne Spielablauf) ---------- */
-  /** Händler: Platzhalter, bis es etwas für Seelensplitter zu kaufen gibt */
-  function shopZeigen() {
-    const A = window.ARENA, n = A ? A.waehrung() : 0;
-    seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Folgt bald</h1>
-      <p class="hub-untertitel">Der Händler packt seine Waren noch aus. Bald kannst du hier deine ${A ? A.WAEHRUNG : "Seelensplitter"} eintauschen.</p>
-      ${A ? `<p class="shop-stand"><i>${A.ZEICHEN}</i> ${n} ${A.WAEHRUNG}</p>` : ""}</div>`);
+  /* ---------- Händler: jeden Tag drei Helden, die man noch nicht hat (Migration 010) ---------- */
+  const rpcFehlt = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
+  let shopUhr = null;
+  async function shopZeigen() {
+    const A = window.ARENA, F = window.ABF, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈";
+    const bald = (text) => seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Folgt bald</h1><p class="hub-untertitel">${text}</p></div>`);
+    clearInterval(shopUhr);
+    seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
+    let s = null;
+    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_today", {}); }
+    catch (e) { if (!document.querySelector("[data-shop]")) return; return bald(rpcFehlt(e) ? `Der Händler packt seine Waren noch aus. Bald kannst du hier deine ${name} eintauschen.` : esc(e.message)); }
+    if (!document.querySelector("[data-shop]")) return;
+    if (!s || !s.konto) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Nur für Spielerkonten</h1><p class="hub-untertitel">Der Händler tauscht ${name} gegen Helden. Beides gibt es nur mit einem Konto.</p></div>`);
+    const zeichne = (meldung) => {
+      const rest = () => { const ms = Math.max(0, new Date(s.bis).getTime() - Date.now()), h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000); return h ? `${h} Std. ${m} Min` : `${m} Min`; };
+      seiteZeigen("shop", `<div class="shop" data-shop><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Helden des Tages</h1>
+          <p class="hub-untertitel">Jeden Tag drei Helden, die dir noch fehlen. Jeder kostet ${s.preis} ${name}.</p></div><p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p></div>
+        ${meldung ? `<p class="fb">${esc(meldung)}</p>` : ""}
+        ${s.helden.length ? `<div class="shop-helden">${s.helden.map((h) => { const d = F.FIGUREN[h.held]; if (!d) return ""; const fehlt = s.preis - s.waehrung;
+          return `<div class="shop-held ${h.gekauft ? "gekauft" : ""}" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt="" loading="lazy"><b>${esc(d.name)}</b><small>${esc(d.titel)} · ${esc(F.KLASSEN[d.klasse].name)}</small>
+            <button class="my-link" data-shop-ansehen="${h.held}">Ansehen</button>
+            ${h.gekauft ? `<span class="shop-gekauft">✓ In deiner Sammlung</span>` : `<button class="btn" data-shop-kauf="${h.held}" ${fehlt > 0 ? "disabled" : ""}><i>${zeichen}</i> ${s.preis}</button>${fehlt > 0 ? `<small class="shop-fehlt">Es fehlen ${fehlt}</small>` : ""}`}</div>`; }).join("")}</div>
+          <p class="note">Neue Auswahl in <span id="shop-rest">${rest()}</span> – ${name} bekommst du für Siege in der Arena.</p>`
+          : `<p class="note">${s.alle ? "Du hast alle Helden. Der Händler hat dir nichts mehr anzubieten – vorerst." : "Heute hat der Händler nichts für dich. Schau morgen wieder vorbei."}</p>`}</div>`);
+      clearInterval(shopUhr); shopUhr = setInterval(() => { const el = $("#shop-rest"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = rest(); }, 30000);
+      document.querySelectorAll("[data-shop-ansehen]").forEach((b) => { b.onclick = () => { const f = b.dataset.shopAnsehen; fenster(F.FIGUREN[f].name, window.ABH_HELDEN.detail(f, 1, "")); }; });
+      document.querySelectorAll("[data-shop-kauf]").forEach((b) => { b.onclick = async () => { const f = b.dataset.shopKauf;
+        if (!confirm(`${F.FIGUREN[f].name} für ${s.preis} ${name} in deine Sammlung holen?`)) return; b.disabled = true;
+        try { s = await netz().rpc("rpg_shop_buy", { p_held: f }); if (A) { await A.pruefen(true); waehrungZeigen(A.waehrung()); } if (SM) await SM.laden(true); zeichne(); toast(`${F.FIGUREN[f].name} gehört jetzt zu deiner Sammlung.`); }
+        catch (e) { try { s = await netz().rpc("rpg_shop_today", {}); } catch (e2) { /* alter Stand bleibt */ } zeichne(e.message); } }; });
+    };
+    zeichne();
+  }
+
+  /* ---------- Auswertung der Arena (nur Admins, Migration 010) ---------- */
+  async function arenaAuswertung() {
+    if (!smAktiv() || !SM.istAdmin()) return toast("Die Auswertung gibt es nur für Admins.");
+    const F = window.ABF, MODUS = { arena: "Arena", koenig: "Königsmord", horde: "Die Horde", duell: "Duell" }, pct = (s, n) => (n ? Math.round(100 * s / n) + " %" : "–");
+    let a = null;
+    try { a = await netz().rpc("rpg_arena_stats", {}); } catch (e) { return fenster("Arena-Auswertung", `<p class="note">${rpcFehlt(e) ? "Die Auswertung ist in der Datenbank noch nicht eingerichtet (Migration 010)." : esc(e.message)}</p>`); }
+    const hn = (f) => esc((F.FIGUREN[f] || { name: f }).name), modi = Object.keys(MODUS);
+    fenster("Arena-Auswertung", `<div class="auswertung">
+      <p class="note"><b>${a.kaempfe}</b> gewertete Kämpfe · ${a.offen} offen oder laufend · ${a.abgebrochen} abgebrochen. Kämpfe vor Einführung des Duells stehen unter dem Modus, den ihre Zufallszahl heute ergäbe.</p>
+      <h3>Modi</h3><table><thead><tr><th>Modus</th><th>Kämpfe</th><th>Ersteller gewinnt</th><th>Ø Runden</th><th>Ø Minuten</th><th>Team am Boden</th><th>Punkte</th><th>Aufgabe</th></tr></thead><tbody>
+        ${(a.modi || []).map((m) => `<tr><th>${MODUS[m.modus] || esc(m.modus)}</th><td>${m.kaempfe}</td><td>${pct(m.sieg_ersteller, m.kaempfe)}</td><td>${m.runden != null ? m.runden : "–"}</td><td>${m.minuten != null ? m.minuten : "–"}</td><td>${m.team}</td><td>${m.punkte}</td><td>${m.aufgabe}</td></tr>`).join("") || `<tr><td colspan="8">Noch keine Kämpfe.</td></tr>`}</tbody></table>
+      <h3>Helden</h3><table><thead><tr><th>Held</th><th>Kämpfe</th><th>Siege</th><th>Quote</th><th>Ø Stufe</th>${modi.map((k) => `<th>${MODUS[k]}</th>`).join("")}</tr></thead><tbody>
+        ${(a.helden || []).slice().sort((x, y) => y.siege / y.kaempfe - x.siege / x.kaempfe || y.kaempfe - x.kaempfe).map((h) => `<tr><th>${hn(h.held)}</th><td>${h.kaempfe}</td><td>${h.siege}</td><td><b>${pct(h.siege, h.kaempfe)}</b></td><td>${h.stufe}</td>${modi.map((k) => { const m = (h.modi || {})[k]; return `<td>${m ? pct(m[1], m[0]) + " <small>(" + m[0] + ")</small>" : "–"}</td>`; }).join("")}</tr>`).join("") || `<tr><td colspan="9">Noch keine Kämpfe.</td></tr>`}</tbody></table>
+      <h3>Häufigste Teams</h3><table><thead><tr><th>Team</th><th>Kämpfe</th><th>Siege</th><th>Quote</th></tr></thead><tbody>
+        ${(a.teams || []).map((t) => `<tr><th>${t.team.map(hn).join(" · ")}</th><td>${t.kaempfe}</td><td>${t.siege}</td><td>${pct(t.siege, t.kaempfe)}</td></tr>`).join("") || `<tr><td colspan="4">Noch keine Kämpfe.</td></tr>`}</tbody></table>
+      <p class="note">Karten: ${Object.keys(a.karten || {}).map((k) => `${esc(k)} ${a.karten[k]}`).join(" · ") || "–"}</p></div>`);
   }
   function seiteZeigen(name, html) {
     const s = $("#hub-seite");
@@ -417,7 +461,7 @@
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-shop" aria-label="Händler" title="Händler"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16l1.5 5a3 3 0 0 1-2.5 3.9V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.100A3 3 0 0 1 2.500 9zm3 9v6h4v-4h3v4h3v-6a3 3 0 0 1-2.500-1.300A3 3 0 0 1 12 12.900a3 3 0 0 1-2.500-1.200A3 3 0 0 1 7 13z"/></svg></span></button>
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
-      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
+      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button><button data-profil="arenastats">Arena-Auswertung</button>` : ""}<button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     arenaKachel();
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-shop").onclick = shopZeigen;
@@ -542,6 +586,7 @@
     if (was === "stufen") return SM.laden(true).then(() => fenster("Meine Helden", SM.heldenUebersichtHtml()));
     if (was === "chronik") return SM.laden(true).then(() => fenster("Chronik", SM.chronikHtml()));
     if (was === "codes") return codeUebersicht();
+    if (was === "arenastats") return arenaAuswertung();
     ansicht = was === "registrieren" ? "registrieren" : "anmelden";
     zeige("mythara"); kontoZeichnen();
     const f = $(ansicht === "registrieren" ? "#my-reg-name" : "#my-name"); if (f) f.focus();

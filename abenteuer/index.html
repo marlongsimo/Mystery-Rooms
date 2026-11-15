@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mythara">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/abenteuer.css?v=65">
+  <link rel="stylesheet" href="css/abenteuer.css?v=66">
   <link rel="stylesheet" href="css/sammlung.css?v=5">
 </head>
 <body>
@@ -71,6 +71,11 @@
           <img class="hub-logo" src="img/mythara/logo-700.webp" alt="Mythara">
           <div class="hub-profil" id="hub-profil"></div>
         </header>
+        <section class="dorf" id="dorf" aria-label="Das Dorf">
+          <picture><source media="(max-width: 760px) and (orientation: portrait)" srcset="img/dorf/dorf-hoch.webp"><img src="img/dorf/dorf-breit.webp" alt="Der Dorfplatz von Mythara bei Nacht" decoding="async"></picture>
+          <span class="dorf-glanz effekt" aria-hidden="true"></span>
+          <button class="dorf-ort" data-hub="helden" style="--x:39%;--y:31%;--hx:27%;--hy:19%"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l7 3v6c0 5-3 8.500-7 11-4-2.500-7-6-7-11V5z"/></svg></span><span class="dorf-text"><b>Heldenhalle</b><small>Deine Helden & Klassen</small></span></button><button class="dorf-ort" data-hub="kampagnen" style="--x:19%;--y:41%;--hx:26%;--hy:36%"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3l7 7-2 2-7-7V3zM20 3h2v2l-11 11-2-2zM5 17l3 3-2 2-3-3zM19 17l-3 3 2 2 3-3z"/></svg></span><span class="dorf-text"><b>Abenteurergilde</b><small>Kampagnen & Abenteuer</small></span></button><button class="dorf-ort" data-hub="arena" style="--x:65%;--y:38%;--hx:70%;--hy:27%"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2l6 7 6-7 2 2-6 7 6 7-2 2-6-7-6 7-2-2 6-7-6-7z"/></svg></span><span class="dorf-text"><b>Arena</b><small>Der Spiegelgrund</small></span></button><button class="dorf-ort" data-hub="freunde" style="--x:40%;--y:54%;--hx:33%;--hy:47%"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h11v4h2a3 3 0 0 1 0 6h-2v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zm11 6v2h2a1 1 0 0 0 0-2z"/></svg></span><span class="dorf-text"><b>Taverne</b><small>Freunde & Gruppen</small></span></button><button class="dorf-ort" data-hub="shop" style="--x:72%;--y:56%;--hx:70%;--hy:53%"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16l1.500 5a3 3 0 0 1-2.500 3.900V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.100A3 3 0 0 1 2.500 9z"/></svg></span><span class="dorf-text"><b>Händler</b><small>Helden des Tages</small></span></button><button class="dorf-ort" data-hub="welt" style="--x:90%;--y:47%;--hx:82%;--hy:41%"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V10a8 8 0 0 1 16 0v11h-5v-8a3 3 0 0 0-6 0v8z"/></svg></span><span class="dorf-text"><b>Stadttor</b><small>Die Splitterlande erkunden</small></span></button><button class="dorf-ort" data-hub="lore" style="--x:55%;--y:82%;--hx:54%;--hy:65%"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l5 9-5 11-5-11z"/></svg></span><span class="dorf-text"><b>Splitterbrunnen</b><small>Die Geschichte von Mythara</small></span></button>
+        </section>
         <nav class="hub-nav" aria-label="Spielerseite">
           <button class="hub-nav-punkt an" data-hub="uebersicht"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/></svg></span>Übersicht</button>
           <button class="hub-nav-punkt" data-hub="lore"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.500C5.500 3.300 8.500 3.300 11 5v15c-2.500-1.600-5.500-1.600-8-.500zM21 4.500C18.500 3.300 15.500 3.300 13 5v15c2.500-1.600 5.500-1.600 8-.500z"/></svg></span>Lore</button>
@@ -268,7 +273,7 @@
   <script src="js/abenteuer-tisch.js?v=32"></script>
   <script src="js/einstieg.js?v=8"></script>
   <script src="js/hilfe.js?v=6"></script>
-  <script src="js/mythara.js?v=38"></script>
+  <script src="js/mythara.js?v=39"></script>
   <script src="js/kampagnen.js?v=20"></script>
   <script src="js/arena.js?v=7"></script>
   <script src="js/app.js?v=1"></script>

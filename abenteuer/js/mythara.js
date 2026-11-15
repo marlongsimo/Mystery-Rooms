@@ -655,6 +655,7 @@
     if (was === "neu") return neueKampagne();
     if (was === "freunde") return freundeZeigen();
     if (was === "lore") return loreSeite();
+    if (was === "shop") return shopZeigen();
     if (was === "welt") return weltSeite();
     if (was === "regeln") return regelnSeite();
     if (was === "beitreten") return beitretenDialog();

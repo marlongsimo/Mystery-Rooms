@@ -37,7 +37,8 @@
   const GANZ_HOCH = { wolf: 0.8 }, GANZ_HOCH_STANDARD = 1.25; // Höhe in Feldern
   // Gegner mit Ganzkörperbild (img/gegner/ganz/<art>.webp): [Breite : Höhe, Höhe in Feldern, schwebt?] – Kampagne für Kampagne ergänzen
   const GANZ_GEGNER = { schlammkroete: [1.106, 0.8], irrlicht: [0.489, 0.7, true], alte_unke: [1.144, 1.6], moorleiche: [0.55, 1.25], alwine: [0.52, 1.4, true],
-    schattenkobold: [0.835, 0.85], rostkaefer: [1.512, 0.6], knochenwaechter: [0.457, 1.25], zoellner: [0.607, 1.35] };
+    schattenkobold: [0.835, 0.85], rostkaefer: [1.512, 0.6], knochenwaechter: [0.457, 1.25], zoellner: [0.607, 1.35],
+    netzweber: [1.489, 0.9], pilzbrut: [1.494, 0.8], aschehund: [1.192, 0.85], grabritter: [0.639, 1.45], abt: [0.73, 1.5] };
   function ganzGegner(art) {
     const [form, felder, schwebt] = GANZ_GEGNER[art], hoch = felder * Z, breit = hoch * form, streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
     return `<g transform="translate(0 ${schwebt ? 2 : 14}) scale(1 ${streck.toFixed(3)})"><image class="fig-ganz feind${schwebt ? " schwebt" : ""}" href="img/gegner/ganz/${art}.webp" x="${(-breit / 2).toFixed(1)}" y="${(-hoch).toFixed(1)}" width="${breit.toFixed(1)}" height="${hoch.toFixed(1)}" preserveAspectRatio="xMidYMax meet"/></g>`;

@@ -80,9 +80,9 @@
     return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height, b: r.width };
   }
   /** Lichtsäule um eine Figur: grün bei Heilung, Feuer bei Feuerzaubern. Sie steigt auf, dreht sich und verglüht */
-  const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp", dolch: "img/fx/dolch.webp", netz: "img/fx/netz.webp", muenzen: "img/fx/muenzen.webp", ranke: "img/fx/ranke.webp", schatten: "img/fx/schatten.webp", licht: "img/fx/licht.webp" };
+  const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp", dolch: "img/fx/dolch.webp", netz: "img/fx/netz.webp", muenzen: "img/fx/muenzen.webp", ranke: "img/fx/ranke.webp", schatten: "img/fx/schatten.webp", licht: "img/fx/licht.webp", sterne: "img/fx/sterne.webp", mal: "img/fx/mal.webp", gift: "img/fx/gift.webp", aura: "img/fx/aura.webp", hieb: "img/fx/hieb.webp", welle: "img/fx/welle.webp" };
   // Breite in Feldern, Höhe : Breite, Dauer in ms, zwei gespiegelte Lagen (Drehung)?
-  const SAEULE = { heil: [1.45, 2.27, 1500, true], feuer: [1.45, 2.27, 1500, true], eis: [1.7, 1.34, 1300, false], blitz: [1.5, 1.95, 800, false], ranke: [1.6, 1.6, 1600, false], muenzen: [1.6, 1.62, 1300, false], schatten: [2.5, 1.09, 1500, false], licht: [1.5, 2.5, 1400, false] }; let fxGeladen = false;
+  const SAEULE = { heil: [1.45, 2.27, 1500, true], feuer: [1.45, 2.27, 1500, true], eis: [1.7, 1.34, 1300, false], blitz: [1.5, 1.95, 800, false], ranke: [1.6, 1.6, 1600, false], muenzen: [1.6, 1.62, 1300, false], schatten: [2.5, 1.09, 1500, false], licht: [1.5, 2.5, 1400, false], welle: [2.8, .6, 800, false] }; let fxGeladen = false;
   function saeule(id, art) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const [breit, hoch, dauer, doppelt] = SAEULE[art], lage = `<i style="background-image:url(${FXBILD[art]})"></i>`;
@@ -104,14 +104,31 @@
     const b = Math.max(44, p.b * 1.8); d.style.width = b + "px"; d.style.height = b * .69 + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .05 + "px";
     wrap.appendChild(d); setTimeout(() => d.remove(), 1900);
   }
+  /** Zustände: Sterne über dem Kopf (betäubt, verlangsamt …), Zielmarke (Jägermal), Giftwolke, goldene Aura (Segen und Stärkung) */
+  const MARKE = { sterne: [1.5, .85, -.62, 1700], mal: [1.5, 1.09, -.1, 1500], gift: [1.9, 1.09, -.1, 1700], aura: [1.9, 1.09, -.12, 1600] }; // Breite in Feldern, Höhe : Breite, Lage (in Figurhöhen über der Mitte), Dauer
+  const ZUSTAND_FX = { betaeubt: "sterne", verlangsamt: "sterne", geblendet: "sterne", entwaffnet: "sterne", zeitriss: "sterne", mal_jaeger: "mal", analyse: "mal", vergiftet: "gift", gift: "gift", segen: "aura", raserei: "aura", spiegel: "aura", schild: "schild", schutzkreis: "schild" };
+  function marke(id, art) {
+    if (art === "schild") return schild(id);
+    const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
+    const [breit, hoch, lage, dauer] = MARKE[art], d = document.createElement("div"); d.className = "fx-schild " + art; d.style.backgroundImage = `url(${FXBILD[art]})`;
+    const b = Math.max(40, p.b * breit); d.style.width = b + "px"; d.style.height = b * hoch + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * lage + "px";
+    wrap.appendChild(d); setTimeout(() => d.remove(), dauer);
+  }
+  /** Nahkampf: Ein roter Hieb fährt über das Ziel, von der Seite des Angreifers her */
+  function hieb(von, zu) {
+    const a = figurPos(von), p = figurPos(zu), wrap = $(".karte-wrap"); if (!p) return;
+    const d = document.createElement("div"); d.className = "fx-hieb" + (a && a.x > p.x ? " links" : ""); d.innerHTML = `<i style="background-image:url(${FXBILD.hieb})"></i>`;
+    const b = Math.max(44, p.b * 1.7); d.style.width = b + "px"; d.style.height = b * .68 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .12 + "px";
+    wrap.appendChild(d); setTimeout(() => d.remove(), 520);
+  }
   /** Womit wurde angegriffen? Aus den neuen Zeilen der Chronik gelesen: Pfeil (Bogen, Armbrust), Kugel (arkane und Schattenzauber), Feuer */
-  const GESCHOSS = [["feuer", /Glutpfeil|Glutsphäre|Brandmal|Feuerball|Flammen/], ["eis", /Frostlanze|Frosthauch|Frostwelle|Frostgriff|Eiskorridor|Kalte Hand|Kalter Funke/], ["blitz", /Runenblitz|Donnerwelle|Blitz/],
+  const GESCHOSS = [["feuer", /Glutpfeil|Glutsphäre|Brandmal|Feuerball|Flammen/], ["eis", /Frostlanze|Frosthauch|Frostwelle|Frostgriff|Eiskorridor|Kalte Hand|Kalter Funke/], ["welle", /Schildstoß|Donnerwelle|stößt .*(zurück|an die Kante)/], ["blitz", /Runenblitz|Blitz/],
     ["ranke", /Dornenranke/], ["muenzen", /Münzhagel/], ["dolch", /Dolch/],
     ["schatten", /Schattenfesseln|Schattenstich|Fluchhand|Fluchwelle|Furcht|Albtraum/], ["licht", /Heiliges Licht|Untote vertreiben/],
     ["pfeil", /bogen|Armbrust|Doppelschuss|Fesselnder Pfeil|Pfeilregen|Bolzen/i],
     ["kugel", /Arkaner Funke|Magisches Geschoss|Zeitriss/]];
   const geschossRe = (art) => (GESCHOSS.find(([a]) => a === art) || [])[1];
-  const AM_ZIEL = { feuer: 1, eis: 1, blitz: 1, ranke: 1, muenzen: 1, schatten: 1, licht: 1 }; // diese Effekte entstehen am Ziel, Pfeil und Kugel fliegen dorthin
+  const AM_ZIEL = { feuer: 1, eis: 1, blitz: 1, ranke: 1, muenzen: 1, schatten: 1, licht: 1, welle: 1 }; // diese Effekte entstehen am Ziel, Pfeil und Kugel fliegen dorthin
   const geschossArt = (zeilen) => { const t = zeilen.map((l) => l.t).join(" "); const g = GESCHOSS.find(([, re]) => re.test(t)); return g ? g[0] : null; };
   /** Ein Geschoss fliegt von einer Figur zur anderen; liefert die Flugzeit in Millisekunden (0 = kein Flug) */
   function flug(von, zu, art, verzug) {
@@ -247,8 +264,8 @@
     document.body.classList.toggle("fx-an", !ruhig());
     gruppe(st, R); bossKarte(st, R); kopf(st);
     document.body.dataset.stimmung = stil(STIMMUNG[kampagne()] || "glut");
-    const neu = { pos: {}, tp: {}, rk: {}, netz: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
-    for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; neu.rk[f.id] = f.rk; neu.netz[f.id] = Boolean(f.z && f.z.festgehalten && f.z.festgehalten.netz); }
+    const neu = { pos: {}, tp: {}, rk: {}, netz: {}, z: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
+    for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; neu.rk[f.id] = f.rk; neu.netz[f.id] = Boolean(f.z && f.z.festgehalten && f.z.festgehalten.netz); neu.z[f.id] = Object.keys(f.z || {}).filter((k) => f.z[k] && ZUSTAND_FX[k]); }
     const wrap = $(".karte-wrap"); if (wrap) wrap.classList.toggle("mit-bild", Boolean(st.karte.bild));
     const vorher = alt && alt.st === st ? alt : null;
     alt = neu;
@@ -288,6 +305,7 @@
         const wann = fern ? (amZiel ? wuerfel + 120 : flug(schuetze.id, f.id, gArt, wuerfel + nr++ * 90) || wuerfel + 180) : wuerfel + 180; // auch im Nahkampf erst nach dem Würfel
         setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && (gArt === "muenzen" || gArt === "licht") ? "gold" : amZiel && gArt === "schatten" ? "blut" : amZiel && gArt === "ranke" ? "heil" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel ? 10 : 26);
           if (amZiel) saeule(f.id, gArt);
+          else if (!gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite && Math.max(Math.abs(schuetze.x - f.x), Math.abs(schuetze.y - f.y)) <= 2) hieb(schuetze.id, f.id); // gewöhnlicher Nahkampftreffer
           const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, wann);
       } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 6); saeule(f.id, "heil"); }
     }
@@ -296,7 +314,12 @@
       for (const f of st.figuren) { if (f.id === schuetze.id || f.seite === schuetze.seite || f.tp <= 0 || vorher.tp[f.id] !== f.tp) continue;
         if (zeilen.some((l) => l.t.replace(/^[^:]+: /, "").includes(f.name))) setTimeout(() => saeule(f.id, gArt), wuerfel + 120); } }
     // Schutz: Steigt die Rüstungsklasse einer Figur (Schild des Glaubens, Schutzhaltung, Schutzkreis …), leuchtet ein Schild auf
-    for (const f of st.figuren) { const v = vorher.rk && vorher.rk[f.id]; if (v != null && f.rk > v && f.tp > 0) schild(f.id); }
+    const beschirmt = {};
+    for (const f of st.figuren) { const v = vorher.rk && vorher.rk[f.id]; if (v != null && f.rk > v && f.tp > 0) { beschirmt[f.id] = true; schild(f.id); } }
+    // Neue Zustände: je Figur höchstens ein Zeichen je Art (nach dem Würfel)
+    for (const f of st.figuren) { if (f.tp <= 0 || !vorher.z || !vorher.z[f.id]) continue;
+      const arten = [...new Set(neu.z[f.id].filter((k) => !vorher.z[f.id].includes(k)).map((k) => ZUSTAND_FX[k]))].filter((a) => !(a === "schild" && beschirmt[f.id]));
+      arten.forEach((a, i) => setTimeout(() => marke(f.id, a), (logNeu.some((l) => l.wurf) ? 620 : 0) + 150 + i * 350)); }
     // Netz: Wer neu im Netz hängt, bekommt es übergeworfen (nach dem Würfel)
     for (const f of st.figuren) if (neu.netz[f.id] && vorher.netz && !vorher.netz[f.id]) setTimeout(() => netz(f.id), logNeu.some((l) => l.wurf) ? 620 : 0);
     if (krit) { setTimeout(() => { blitz("gold"); beben(); }, wuerfel + 160); }

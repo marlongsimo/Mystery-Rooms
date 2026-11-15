@@ -683,8 +683,13 @@
       const n = R.zustaende(st, f).length;
       if (n && f.tp > 0) o += `<g transform="translate(${cx - 18} ${cy - 18})"><circle r="8" fill="#b58cff" stroke="#1b1612" stroke-width="1.5"/><text y="4" text-anchor="middle" font-size="10" font-weight="700" fill="#1b1612">${n}</text></g>`;
       if (!f.tot) {
-        const w = 44, anteil = Math.max(0, f.tp / f.tpMax);
-        o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="${anteil > .5 ? "#6fa86a" : anteil > .25 ? "#d6a23a" : "#c0503a"}"/>`;
+        const w = 44, anteil = Math.max(0, f.tp / f.tpMax), farbe = anteil > .5 ? "#6fa86a" : anteil > .25 ? "#d6a23a" : "#c0503a";
+        if (mini && !unten) { // Tischansicht: Lebensanzeige aufrecht über dem Kopf der Miniatur (gut sichtbar, auch wenn Figuren hintereinander stehen)
+          const gegner = f.seite === "gegner" && !heldA(f), streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
+          const felder = gegner ? GANZ_GEGNER[f.art][1] : GANZ_HOCH[wolfA(f) ? "wolf" : f.fid || f.fidA] || GANZ_HOCH_STANDARD, fuss = gegner ? (GANZ_GEGNER[f.art][2] ? 2 : 14) : 12;
+          const by = cy + fuss - felder * Z * streck - 5, bh = 7 * streck, bw = 40;
+          o += `<g class="tp-balken"><rect x="${cx - bw / 2 - 1.5}" y="${(by - 1.5).toFixed(1)}" width="${bw + 3}" height="${(bh + 3).toFixed(1)}" rx="3" fill="#0b0b0c" fill-opacity=".9"/><rect x="${cx - bw / 2}" y="${by.toFixed(1)}" width="${(bw * anteil).toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${farbe}"/></g>`;
+        } else o += `<rect x="${cx - w / 2}" y="${cy + 23}" width="${w}" height="6" fill="#1b1612" rx="2"/><rect x="${cx - w / 2}" y="${cy + 23}" width="${w * anteil}" height="6" rx="2" fill="${farbe}"/>`;
       }
       } finally { o = o.slice(0, vorFig) + `<g class="fig ${f.seite === "gegner" ? "feind" : "held"} ${f.tp > 0 && !f.tot ? "steht" : "liegt"}" data-id="${f.id}" style="--v:${-(((Date.now() / 1000) + (st.figuren.indexOf(f) % 5) * 0.6) % 3).toFixed(2)}s"><g class="fig-k">` + figSchweben(o.slice(vorFig)) + "</g></g>"; }
     }

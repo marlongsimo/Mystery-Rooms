@@ -75,7 +75,15 @@
   function figurPos(id) {
     const g = document.querySelector(`#karte .fig[data-id="${id}"]`), wrap = $(".karte-wrap"); if (!g || !wrap) return null;
     const r = g.getBoundingClientRect(), w = wrap.getBoundingClientRect(); if (!r.width) return null;
-    return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height };
+    return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height, b: r.width };
+  }
+  /** Heilung: Eine grüne Lichtsäule steigt um die Figur auf, dreht sich und verglüht */
+  const HEILBILD = "img/fx/heil.webp"; let heilGeladen = false;
+  function heilSaeule(id) {
+    const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
+    const d = document.createElement("div"); d.className = "fx-heil"; d.innerHTML = `<i style="background-image:url(${HEILBILD})"></i><i style="background-image:url(${HEILBILD})"></i>`;
+    const b = Math.max(40, p.b * 1.45); d.style.width = b + "px"; d.style.height = b * 2.24 + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .42 + "px";
+    wrap.appendChild(d); setTimeout(() => d.remove(), 1500);
   }
   function zahl(id, text, art) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
@@ -200,6 +208,7 @@
     const art = STIMMUNG[kampagne()] || "schnee";
     if (stimmung !== art || !partikel.some((p) => p.amb)) { stimmung = art; ambient(art); }
     starten();
+    if (!heilGeladen) { heilGeladen = true; new Image().src = HEILBILD; }
     if (!vorher) {
       // Kampfbeginn: Bosse bekommen einen Auftritt
       const boss = st.figuren.find((f) => f.seite === "gegner" && f.tp > 0 && (R.GEGNER[f.art] || {}).boss) || st.figuren.find((f) => f.seite === "gegner" && f.tp > 0 && istBoss(R, f));
@@ -224,7 +233,7 @@
         const kr = krit && f.seite === "gegner";
         setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : 26);
           const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, 180);
-      } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 30); }
+      } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 6); heilSaeule(f.id); }
     }
     if (krit) { setTimeout(() => { blitz("gold"); beben(); }, 160); }
     const gefallen = st.figuren.find((f) => f.seite === "gegner" && vorher.tp[f.id] > 0 && f.tp <= 0 && istBoss(R, f) && !f.geflohen);

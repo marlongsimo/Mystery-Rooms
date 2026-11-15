@@ -1042,6 +1042,13 @@ body > .einst-panel { position: fixed; z-index: 40; }
 .fx-zahl.wunde { color: #ffd6d0; }
 .fx-zahl.krit { font-size: 54px; color: #ffe9a8; text-shadow: 0 0 2px #000, 0 3px 0 #7a4a10, 0 0 34px rgba(255,200,80,1); }
 .fx-zahl.krit::before { content: "KRITISCH"; position: absolute; left: 50%; top: -18px; transform: translateX(-50%); font-size: 13px; letter-spacing: .3em; color: #f6dc9c; }
+/* Heilung: Lichtsäule. Der Fußring sitzt am Feld der Figur; zwei gespiegelte Lagen wechseln sich ab, das wirkt wie eine Drehung der Spirale */
+.fx-heil { position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, -96%); mix-blend-mode: screen; animation: fx-heil 1.45s ease-out forwards; }
+.fx-heil i { position: absolute; inset: 0; background: center bottom / contain no-repeat; transform-origin: 50% 100%; animation: fx-heil-dreh 1.45s linear forwards; }
+.fx-heil i + i { animation-name: fx-heil-dreh2; }
+@keyframes fx-heil { 0% { opacity: 0; filter: brightness(1.7); } 12% { opacity: 1; } 45% { filter: brightness(1.15); } 70% { opacity: 1; } 100% { opacity: 0; filter: brightness(1); } }
+@keyframes fx-heil-dreh { 0% { transform: scale(.8, .12); opacity: 1; } 14% { transform: scale(.9, .45); } 32% { transform: scale(1, 1); opacity: 1; } 50% { transform: scale(.25, 1.04); opacity: 0; } 80% { transform: scale(1, 1.1); opacity: 1; } 100% { transform: scale(.5, 1.22); opacity: 1; } }
+@keyframes fx-heil-dreh2 { 0%, 30% { transform: scale(-.25, 1); opacity: 0; } 50% { transform: scale(-1, 1.04); opacity: 1; } 80% { transform: scale(-.25, 1.1); opacity: 0; } 100% { opacity: 0; } }
 .fx-zahl.heil { color: #d9ffe2; text-shadow: 0 0 2px #000, 0 2px 0 #1d5a2a, 0 0 18px rgba(80,230,120,.9); }
 @keyframes fx-steigen { 0% { opacity: 0; transform: translate(-50%, -20%) scale(.4); } 15% { opacity: 1; transform: translate(-50%, -60%) scale(1.25); } 30% { transform: translate(-50%, -70%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -190%) scale(.95); } }
 .fx-blitz { position: absolute; inset: 0; z-index: 7; pointer-events: none; animation: fx-blitz .9s ease-out forwards; }

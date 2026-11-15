@@ -1932,3 +1932,15 @@ body.intro-an { overflow: hidden; }
 .musik-regler { display: flex; align-items: center; gap: 12px; }
 .musik-regler input[type="range"] { flex: 1; min-width: 90px; accent-color: #d9b26a; }
 .musik-regler output { min-width: 44px; text-align: right; color: #e9c77e; font-variant-numeric: tabular-nums; }
+
+/* ---------- Tischansicht (Schalter in js/spiel.js, standardmäßig aus): Karte gekippt, Helden als stehende Miniaturen ---------- */
+body.tischansicht .karte-wrap { perspective: 1400px; perspective-origin: 50% 0%; overflow: visible; background: none; border-color: transparent; box-shadow: none; }
+body.tischansicht #karte { transform: rotateX(40deg) scale(.9); transform-origin: 50% 30%; border-radius: 6px; box-shadow: 0 0 0 7px #2a1c10, 0 0 0 9px #b08a45, 0 40px 60px rgba(0,0,0,.8); overflow: visible; }
+body.tischansicht #karte .fig-ganz { filter: drop-shadow(0 0 .6px #000) drop-shadow(0 3px 3px rgba(0,0,0,.55)); pointer-events: none; }
+body.tischansicht #karte .fig-ganz.dran { filter: drop-shadow(0 0 .6px #000) drop-shadow(0 0 5px rgba(255,215,94,.95)) drop-shadow(0 3px 3px rgba(0,0,0,.55)); }
+body.tischansicht #karte .fig.held .fig-schatten { opacity: .7; }
+body.tischansicht.fx-an #karte .fig.steht .fig-schweb { animation: none; } /* Miniaturen stehen fest auf dem Plan */
+body.tischansicht #karte .fig-ganz.schwebt { filter: drop-shadow(0 0 4px rgba(150,210,255,.9)); }
+body.tischansicht .spiel { overflow-x: clip; }
+@media (max-width: 700px) { body.tischansicht .karte-wrap { perspective: 900px; } body.tischansicht #karte { transform: rotateX(32deg) scale(.93); transform-origin: 50% 40%; box-shadow: 0 0 0 4px #2a1c10, 0 0 0 5px #b08a45, 0 24px 40px rgba(0,0,0,.8); } }
+body.tischansicht .karte-wrap { min-width: 0; } body.tischansicht .karte-wrap .leiste { max-width: 100%; overflow: hidden; }

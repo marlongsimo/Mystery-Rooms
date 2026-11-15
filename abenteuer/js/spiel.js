@@ -25,6 +25,28 @@
     return `<b class="lg-marke ${gut ? "gut" : "schlecht"}">${erfolg ? "✓" : "✗"} ${marke}</b> ` + esc(l.t).replace(wort, `<b>${wort}</b>`);
   };
   const Z = 60; // Feldgröße im SVG
+
+  /* ---------- Tischansicht (Schalter, standardmäßig AUS) ----------
+   * Die Karte liegt gekippt wie ein Spielplan, Helden und Wolf stehen als ganze Figuren darauf (img/figuren/ganz/<held>.webp).
+   * Die Figuren liegen technisch in der Kartenebene und sind in der Höhe so gestreckt, dass die Kippung sie wieder aufrichtet –
+   * dadurch bleiben Antippen, Bewegungsanimation und Schadenszahlen unverändert.
+   * Einschalten: TISCH_STANDARD = true (für alle) – oder zum Ausprobieren ?tisch=1 in der Adresse (merkt sich das Gerät), ?tisch=0 schaltet ab.
+   * Gegner ohne Ganzkörperbild bleiben runde Spielsteine; Bilder dafür kommen in GANZ_GEGNER dazu. */
+  const TISCH_STANDARD = false, TISCH_WINKEL = 40;
+  const GANZ = { schildwaechter: 0.589, berserker: 0.654, duellant: 0.435, gelehrter: 0.561, elementarist: 0.593, schattenmagier: 0.633, schattenlaeufer: 0.563, trickser: 0.535, assassine: 0.567, lichtbringer: 0.535, wanderheiler: 0.628, inquisitor: 0.561, wildnislaeufer: 0.524, tiergefaehrte: 0.611, kopfgeldjaeger: 0.648, wolf: 0.472 }; // Breite : Höhe
+  const GANZ_HOCH = { wolf: 0.8 }, GANZ_HOCH_STANDARD = 1.25; // Höhe in Feldern
+  // Gegner mit Ganzkörperbild (img/gegner/ganz/<art>.webp): [Breite : Höhe, Höhe in Feldern, schwebt?] – Kampagne für Kampagne ergänzen
+  const GANZ_GEGNER = { schlammkroete: [1.106, 0.8], irrlicht: [0.489, 0.7, true], alte_unke: [1.144, 1.6] };
+  function ganzGegner(art) {
+    const [form, felder, schwebt] = GANZ_GEGNER[art], hoch = felder * Z, breit = hoch * form, streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180);
+    return `<g transform="translate(0 ${schwebt ? 2 : 14}) scale(1 ${streck.toFixed(3)})"><image class="fig-ganz feind${schwebt ? " schwebt" : ""}" href="img/gegner/ganz/${art}.webp" x="${(-breit / 2).toFixed(1)}" y="${(-hoch).toFixed(1)}" width="${breit.toFixed(1)}" height="${hoch.toFixed(1)}" preserveAspectRatio="xMidYMax meet"/></g>`;
+  }
+  const TISCH = (() => { const q = new URLSearchParams(location.search).get("tisch"); try { if (q === "1") localStorage.setItem("ab_tisch", "an"); if (q === "0") localStorage.setItem("ab_tisch", "aus"); const v = localStorage.getItem("ab_tisch"); if (v) return v === "an"; } catch (e) { if (q) return q === "1"; } return TISCH_STANDARD; })();
+  /** Ganze Figur als SVG-Bild, Füße auf dem Feld (0,0 = Feldmitte) */
+  function ganzFigur(name, farbe, aktiv) {
+    const hoch = (GANZ_HOCH[name] || GANZ_HOCH_STANDARD) * Z, breit = hoch * GANZ[name], streck = 1 / Math.cos(TISCH_WINKEL * Math.PI / 180), fuss = 12;
+    return `<g transform="translate(0 ${fuss}) scale(1 ${streck.toFixed(3)})"><image class="fig-ganz${aktiv ? " dran" : ""}" href="img/figuren/ganz/${name}.webp" x="${(-breit / 2).toFixed(1)}" y="${(-hoch).toFixed(1)}" width="${breit.toFixed(1)}" height="${hoch.toFixed(1)}" preserveAspectRatio="xMidYMax meet" style="--k:${farbe}"/></g>`;
+  }
   const params = new URLSearchParams(location.search);
   // Erst wenn alle Skripte geladen sind (sonst fehlt bei langsamem Laden noch die Abenteuer-Oberfläche und das Fortsetzen fällt aus)
   const bereit = new Promise((r) => (document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", r, { once: true }) : r()));
@@ -619,14 +641,16 @@
     // Sockel und Licht der Spielfiguren (Verläufe einmal je Karte)
     o += `<defs><radialGradient id="sockel-held" cx="50%" cy="35%" r="65%"><stop offset="0" stop-color="#2c4a5c"/><stop offset="1" stop-color="#0c1820"/></radialGradient><radialGradient id="sockel-feind" cx="50%" cy="35%" r="65%"><stop offset="0" stop-color="#5a1c22"/><stop offset="1" stop-color="#1a080a"/></radialGradient><radialGradient id="aktiv-licht"><stop offset="0" stop-color="#ffd890" stop-opacity=".55"/><stop offset="1" stop-color="#ffd890" stop-opacity="0"/></radialGradient></defs>`;
     if (!st.ende && akt && akt.x >= 0) o += `<circle class="aktiv-licht" cx="${akt.x * Z + Z / 2}" cy="${akt.y * Z + Z / 2}" r="${Z * 1.6}" fill="url(#aktiv-licht)"/>`;
-    for (const f of st.figuren.slice().sort((a, b) => (a.tp > 0) - (b.tp > 0))) {
+    for (const f of st.figuren.slice().sort((a, b) => (a.tp > 0) - (b.tp > 0) || (TISCH ? a.y - b.y : 0))) {
       if (f.x < 0 || (f.z && f.z.verbannt)) continue;
       const vorFig = o.length; // jede Figur in eine eigene Gruppe, damit die Effekt-Ebene sie bewegen kann
       try {
       const cx = f.x * Z + Z / 2, cy = f.y * Z + Z / 2, unten = f.tp <= 0;
       const titel = `<title>${esc(f.name)}${f.titel ? " – " + esc(f.titel) : ""} · ${f.tp}/${f.tpMax} TP · RK ${f.rk}${R.zustaende(st, f).length ? " · " + esc(R.zustaende(st, f).join(", ")) : ""}</title>`;
       if (f.seite === "gegner" && unten && !heldA(f)) { o += B.gegnerBild(f.art) ? `<g transform="translate(${cx} ${cy}) scale(.8)" opacity=".45">${B.gegner(f.art, true)}</g>` : `<g transform="translate(${cx} ${cy}) rotate(180)" opacity=".35">${B.gegner(f.art)}</g>`; continue; }
-      if (!unten) o += `<ellipse class="fig-schatten" cx="${cx}" cy="${cy + 22}" rx="24" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="27" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" stroke="${heldA(f) ? "#4f8cff" : f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="${heldA(f) ? 3.5 : 2.5}"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
+      // Tischansicht: Miniaturen stehen auf einem schlanken Ring statt auf der vollen Scheibe
+      const mini = TISCH && (f.seite === "gegner" && !heldA(f) ? Boolean(GANZ_GEGNER[f.art]) : f.art !== "begleiter" && Boolean(wolfA(f) || GANZ[f.fid || f.fidA]));
+      if (!unten) o += `<ellipse class="fig-schatten" cx="${cx}" cy="${cy + (mini ? 14 : 22)}" rx="${mini ? 20 : 24}" ry="7" fill="#000" opacity=".55"/><circle cx="${cx}" cy="${cy}" r="${mini ? 23 : 27}" fill="url(#sockel-${f.seite === "gegner" ? "feind" : "held"})" fill-opacity="${mini ? 0.35 : 1}" stroke="${heldA(f) ? "#4f8cff" : f.seite === "gegner" ? "#c0444e" : f.art === "wolf" ? "#6fbf8a" : "#d9b26a"}" stroke-width="${heldA(f) ? 3.5 : 2.5}"/><circle cx="${cx}" cy="${cy}" r="29.5" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1.5"/>`;
       if (!unten && f.schild && f.schild.aktiv) o += `<circle class="schild-ring" cx="${cx}" cy="${cy}" r="33" fill="#8fd0ff" fill-opacity=".12" stroke="#8fd0ff" stroke-width="3" stroke-dasharray="5 3"><title>${esc(f.schild.text)}: fängt die Hälfte des Schadens ab</title></circle>`;
       if (f === akt && !st.ende) o += `<circle class="aktiv-ring" cx="${cx}" cy="${cy}" r="29" fill="none" stroke="#C5A267" stroke-width="3.5"/><circle cx="${cx}" cy="${cy}" r="33" fill="none" stroke="#C5A267" stroke-opacity=".35" stroke-width="5"/>`;
       if (gegnerInfo === f.id) o += `<circle cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#e8dcc0" stroke-width="2" stroke-dasharray="4 3"/>`;
@@ -637,7 +661,7 @@
       }
       if (tipp && tipp.ziel === f.id && !wahl) o += `<circle class="tipp-ring" cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#f2d35a" stroke-width="3"/>`;
       if (f.seite === "gegner" && !heldA(f)) {
-        o += `<g transform="translate(${cx} ${cy})">${titel}${B.gegner(f.art)}</g>`;
+        o += `<g transform="translate(${cx} ${cy})">${titel}${TISCH && GANZ_GEGNER[f.art] ? ganzGegner(f.art) : B.gegner(f.art)}</g>`;
         const nr = (f.name.match(/\d+$/) || [""])[0];
         if (nr) o += `<g transform="translate(${cx + 17} ${cy - 17})"><circle r="10" fill="#1b1612" stroke="#d79a7d" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" font-weight="700" fill="#f0d0c0">${esc(nr)}</text></g>`;
       } else {
@@ -651,7 +675,8 @@
           continue;
         }
         const href = wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fid || f.fidA);
-        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${B.portraet(href, wolfA(f) ? 17 : 21, heldA(f) ? "#4f8cff" : farbeVon(f), "c" + f.id, unten)}${kroneA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9.5" fill="#3a2a08" stroke="#f5c842" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" fill="#ffe08a">♛</text></g>` : ""}${heldA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9" fill="#12233f" stroke="#4f8cff" stroke-width="1.5"/><path d="M-4 -4 L4 4 M4 -4 L-4 4" stroke="#cfe0ff" stroke-width="2" stroke-linecap="round"/></g>` : ""}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
+        const ganz = TISCH && !unten ? (wolfA(f) ? "wolf" : GANZ[f.fid || f.fidA] ? f.fid || f.fidA : null) : null; // stehende Figur als Miniatur
+        o += `<g transform="translate(${cx} ${cy})" opacity="${f.tot ? 0.5 : 1}">${titel}${ganz ? ganzFigur(ganz, heldA(f) ? "#4f8cff" : farbeVon(f), f === akt && !st.ende) : B.portraet(href, wolfA(f) ? 17 : 21, heldA(f) ? "#4f8cff" : farbeVon(f), "c" + f.id, unten)}${kroneA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9.5" fill="#3a2a08" stroke="#f5c842" stroke-width="1.5"/><text y="4.5" text-anchor="middle" font-size="13" fill="#ffe08a">♛</text></g>` : ""}${heldA(f) && !unten ? `<g transform="translate(17 -17)"><circle r="9" fill="#12233f" stroke="#4f8cff" stroke-width="1.5"/><path d="M-4 -4 L4 4 M4 -4 L-4 4" stroke="#cfe0ff" stroke-width="2" stroke-linecap="round"/></g>` : ""}${f.z && f.z.versteckt ? '<circle r="25" fill="none" stroke="#b58cff" stroke-width="2" stroke-dasharray="3 3"/>' : ""}</g>`;
         if (f.tot) o += `<text x="${cx}" y="${cy + 7}" text-anchor="middle" font-size="22" fill="#fff">✝</text>`;
         else if (unten) o += `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">${st.schwierigkeit === "hardcore" && f.art !== "wolf" ? (f.stabil ? "stabil" : `${f.todes.e}✓ ${f.todes.f}✗`) : "am Boden"}</text>`;
       }
@@ -798,6 +823,7 @@
   function zeigeSektion(id) {
     for (const x of ["mythara", "hub", "einladen", "intro", "einleitung", "kodex", "lobby", "spiel", "ende", "szene"]) { const el = $("#" + x); if (el) el.hidden = x !== id; }
     document.body.classList.toggle("im-kampf", id === "spiel");
+    document.body.classList.toggle("tischansicht", TISCH && id === "spiel");
     document.body.classList.toggle("im-szene", id === "szene");
     // Für das Neuladen merken, ob man gerade im Spiel war (nur dann wird automatisch fortgesetzt)
     try { sessionStorage.setItem("ab_ansicht", id); } catch (e) { /* privat */ }

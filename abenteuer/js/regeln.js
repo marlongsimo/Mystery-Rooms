@@ -614,7 +614,23 @@
     const vorher = z.tp; z.tp = Math.min(z.tpMax, z.tp + n);
     if (vorher === 0 && z.tp > 0) { z.todes = { e: 0, f: 0 }; z.stabil = false; }
     st.log.push({ t: `${quelle}: ${z.name} heilt ${z.tp - vorher} TP${vorher === 0 && z.tp > 0 ? " und steht wieder auf" : ""}.`, art: "gut" });
+    if (vorher === 0 && z.tp > 0) platzKlaeren(st, z);
     return z.tp - vorher;
+  }
+  /** Zwei stehende Figuren auf demselben Feld (jemand stand über einer Liegenden, die wieder aufsteht):
+   *  Die Aufstehende – oder sonst die, die nicht am Zug ist – weicht auf das nächste freie Feld aus. */
+  function platzKlaeren(st, zuerst) {
+    const steht = (f) => f.tp > 0 && !f.tot && f.x >= 0 && !(f.z && f.z.verbannt);
+    for (let schutz = 0; schutz < 12; schutz++) {
+      let paar = null;
+      for (const a of st.figuren) { if (!steht(a)) continue; const b = st.figuren.find((o) => o !== a && steht(o) && o.x === a.x && o.y === a.y); if (b) { paar = [a, b]; break; } }
+      if (!paar) return;
+      const [a, b] = paar, akt = st.reihe && st.reihe.length ? aktiv(st) : null;
+      const wer = zuerst === a || zuerst === b ? zuerst : a.z.liegend ? a : b.z.liegend ? b : akt === a ? b : a;
+      const p = freiesFeldNahe(st, [wer.x, wer.y], 4); if (!p) return;
+      wer.x = p.x; wer.y = p.y; zuerst = null;
+      st.log.push({ t: `${wer.name} steht auf und weicht auf ein freies Feld aus.` });
+    }
   }
   function pruefeEnde(st) {
     if (st.ende) return st.ende;
@@ -1166,6 +1182,7 @@
   }
   function weiter(st, still) {
     const f = aktiv(st); if (f && !still) tick(f);
+    platzKlaeren(st); // nie zwei stehende Figuren auf einem Feld
     if (st.arena) arenaSicht(st, 0); // zwischen den Zügen sind alle Helden wieder „Spieler“ (für Monster, Flächen und Rundenwechsel)
     st.am++;
     if (st.am >= st.reihe.length) {
@@ -1186,6 +1203,7 @@
    *  Sie könnte ihn sonst nicht mehr beenden, und der Kampf bliebe stehen. */
   const mitZugende = (fn) => function (st) {
     const wer = aktiv(st), erg = fn.apply(this, arguments);
+    if (!st.ende) platzKlaeren(st);
     if (!st.ende && wer && wer.seite === "spieler" && wer.art !== "begleiter" && aktiv(st) === wer && wer.tp <= 0) {
       st.log.push({ t: `${wer.name} geht zu Boden. Der Zug endet.`, art: "schlecht" }); zugEnde(st);
     }
@@ -2265,7 +2283,7 @@
   }
 
   const API = { begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
-    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, neueArena, teamVon, arenaSicht, KARTE_GARTEN, gegnerZug, autoZug,
+    neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, heilenTest: heilen, neueArena, teamVon, arenaSicht, KARTE_GARTEN, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   else root.ABR = API;

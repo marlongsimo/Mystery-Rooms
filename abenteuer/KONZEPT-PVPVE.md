@@ -268,3 +268,10 @@ Filter nach Zeitraum, Regelversion und Stufenbereich. Zahlen mit wenigen Partien
 - **Währung:** jeder Sieg bringt zufällig 5–25 Seelensplitter, ohne Tagesgrenze (Auslöser auf `rpg_arena_rewards`); XP und Heldenchance bleiben bei fünf Kämpfen am Tag.
 - **Simulation (je 150 Kämpfe, KI gegen KI):** Arena Ø 6,9 Runden; Königsmord Ø 3,7 Runden (immer durch den Anführer entschieden – mit Menschen beobachten, ggf. Anführer zäher machen); Horde Ø 8,9 Runden, rund 24 Monster je Kampf.
 - **Offen:** Reaktionen gegnerischer Helden im fremden Zug, Aufzeichnung der Kämpfe für die Auswertung, Schutz gegen Schummeln, Zweck der Währung.
+
+### Änderung: Modus per Los
+- Der Modus wird nicht mehr gewählt, sondern **ausgelost**: aus der Zufallszahl des Kampfes (`seed` der Datenbank, Rest bei Teilung durch 3 → Arena, Königsmord, Horde). Die Tabelle `rpg_arena_modes` aus 009 wird dafür nicht mehr gebraucht (bleibt ungenutzt bestehen).
+- Die Aufstellung zeigt vor dem Start Modus, Erklärung und Siegbedingungen; danach läuft ein Countdown (8 Sekunden, im Königsmord 15 – dort bestimmt jeder in der Aufstellung seinen Anführer).
+- „i“ in der Arena-Übersicht: Ablauf, Zugzeit, Belohnungen und alle drei Modi.
+- Horde: Neue Monster erscheinen von den nächsten Helden beider Teams gleich weit entfernt (höchstens ein Feld Unterschied).
+- Live geprüft (`tests/live-arena.test.js`): Los aus der echten Datenbank, gewürfelte Seelensplitter (009 ist eingespielt).

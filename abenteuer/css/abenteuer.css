@@ -1675,3 +1675,20 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .arena-anfuehrer button.an { border-color: #f5c842; background: rgba(245,200,66,.14); color: #ffe9a8; }
 .arena-held { position: relative; }
 .arena-held .krone { position: absolute; top: 6px; right: 8px; font-style: normal; color: #ffd75e; font-size: 20px; text-shadow: 0 1px 4px #000; }
+
+/* Arena: ausgeloster Modus (Aufstellung), Regeln hinter dem „i“ */
+.arena-info-knopf { width: 34px; height: 34px; padding: 0; border-radius: 50%; font: italic 700 17px Georgia, serif; }
+.arena-info { margin: 10px 0 16px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
+.arena-info h2 { font: 600 16px var(--schrift-titel); color: #f6dc9c; margin: 4px 0 8px; }
+.arena-info ul { margin: 0 0 12px; padding-left: 20px; line-height: 1.5; font-size: 14px; }
+.arena-modus-reihe { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 760px) { .arena-modus-reihe { grid-template-columns: 1fr; } }
+.arena-modus-karte { padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(245,200,66,.35); background: rgba(245,200,66,.05); font-size: 13.5px; line-height: 1.45; }
+.arena-modus-karte h3 { margin: 0 0 4px; font: 600 16px var(--schrift-titel); color: #ffe9a8; }
+.arena-modus-karte p { margin: 0 0 8px; color: var(--muted); }
+.arena-modus-karte b { color: #f6dc9c; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.arena-modus-karte ul { margin: 4px 0 0; padding-left: 18px; }
+.arena-modus-karte.gross { margin: 4px 0 12px; padding: 16px 18px; font-size: 15px; box-shadow: 0 0 0 1px rgba(245,200,66,.5), 0 0 24px rgba(245,200,66,.12); }
+.arena-modus-karte.gross h3 { font-size: 26px; }
+.arena-los { margin: 14px 0 4px; font: 600 12px var(--schrift-titel); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+#arena-status b { color: #ffe9a8; font-size: 1.2em; }

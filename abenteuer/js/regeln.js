@@ -1347,9 +1347,11 @@
     for (let i = 0; i < n; i++) {
       const frei = (a.felder || []).filter(([x, y]) => !belegt(st, x, y) && !blockiert(st, x, y));
       if (!frei.length) break;
-      // möglichst weit weg von allen Helden, mit etwas Zufall – und nie bevorzugt bei einem Team
-      const weit = (p) => Math.min(...helden.map((h) => Math.max(Math.abs(h.x - p[0]), Math.abs(h.y - p[1]))), 9);
-      const best = Math.max(...frei.map(weit)), kand = frei.filter((p) => weit(p) >= best - 1), p = kand[Math.floor(st.r() * kand.length)];
+      // fair: von den nächsten Helden beider Teams gleich weit entfernt (höchstens ein Feld Unterschied), dabei möglichst weit weg; unter den besten entscheidet der Zufall
+      const nah = (p, tm) => Math.min(...helden.filter((h) => h.team === tm).map((h) => Math.max(Math.abs(h.x - p[0]), Math.abs(h.y - p[1]))), 99);
+      const schief = (p) => { const d1 = nah(p, 1), d2 = nah(p, 2); return d1 > 90 || d2 > 90 ? 0 : Math.abs(d1 - d2); }, weit = (p) => Math.min(nah(p, 1), nah(p, 2), 9);
+      const s0 = Math.min(...frei.map(schief)), gerecht = frei.filter((p) => schief(p) <= Math.max(1, s0));
+      const best = Math.max(...gerecht.map(weit)), kand = gerecht.filter((p) => weit(p) >= Math.max(2, best - 1) || weit(p) >= best), p = kand[Math.floor(st.r() * kand.length)];
       const g = neuerGegner(st, a.hordeArt, { x: p[0], y: p[1] }, "Welle " + st.runde), tp = Math.max(1, Math.round(GEGNER[a.hordeArt].tp * (0.6 + 0.12 * st.runde)));
       g.tp = tp; g.tpMax = tp; neu.push(g);
     }

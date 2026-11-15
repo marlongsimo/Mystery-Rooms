@@ -6,7 +6,7 @@
  */
 const { chromium } = require("playwright"); const { ALLE } = require("./alle-helden");
 const URL = "http://localhost:8765/abenteuer/index.html?schnell";
-const MODUS = process.env.MODUS || "arena", MODUSNAME = { arena: "Arena", koenig: "Königsmord", horde: "Die Horde" }[MODUS]; // MODUS=koenig|horde spielt den jeweiligen Modus
+const MODUS = process.env.MODUS || "arena", MODUSNAME = { arena: "Arena", koenig: "Königsmord", horde: "Die Horde" }[MODUS]; // MODUS=koenig|horde: Das Los (die Zufallszahl des Kampfes) fällt auf diesen Modus
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 // Nachgebildeter Server
 const DB = { match: null, wallet: { A: 0, B: 0 }, xp: { A: { schildwaechter: 1350, lichtbringer: 260 }, B: { berserker: 850 } } };
@@ -28,7 +28,7 @@ function server(ich, name, args) {
   if (name === "rpg_arena_create") { const t = team(ich, args.p_team); DB.match = { id: "00000000-0000-0000-0000-00000000aaaa", status: "offen", hostWer: ich, host: { name: "Spieler " + ich, schnitt: schnitt(t), team: t } }; return sicht(ich); }
   if (!m) return fehler("Diesen Kampf gibt es nicht.");
   if (name === "rpg_arena_join") { const t = team(ich, args.p_team), s = schnitt(t); if (Math.abs(s - m.host.schnitt) > 1) return fehler("Dein Team liegt zu weit entfernt.");
-    Object.assign(m, { status: "bereit", gastWer: ich, gast: { name: "Spieler " + ich, schnitt: s, team: t }, karte: "gruft", begegnung: "kobolde", seed: 4711 }); return sicht(ich); }
+    Object.assign(m, { status: "bereit", gastWer: ich, gast: { name: "Spieler " + ich, schnitt: s, team: t }, karte: "gruft", begegnung: "kobolde", seed: { arena: 4710, koenig: 4711, horde: 4712 }[MODUS] }); return sicht(ich); }
   if (name === "rpg_arena_get") return sicht(ich);
   if (name === "rpg_arena_room") { m.room = args.p_code; m.status = "laeuft"; return sicht(ich); }
   if (name === "rpg_arena_cancel") { if (m.status === "laeuft") { const seite = m.hostWer === ich ? 1 : 2; Object.assign(m, { status: "beendet", sieger: 3 - seite, grund: "aufgabe" }); } else m.status = "abgebrochen"; return sicht(ich); }
@@ -62,26 +62,29 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
   for (const f of ["schildwaechter", "lichtbringer", "wildnislaeufer"]) await A.p.click(`[data-arena-held="${f}"]`);
   const schnittA = await A.p.textContent(".arena-schnitt");
   check(/3 von 3/.test(schnittA) && /3,3/.test(schnittA), "Heldenwahl: Stufen 6, 3, 1 → Durchschnitt 3,3 wird oben angezeigt");
-  check(await A.p.evaluate(() => document.querySelectorAll("[data-arena-modus]").length === 3 && document.querySelector('[data-arena-modus="arena"]').classList.contains("an")), "Kampf erstellen: drei Modi zur Wahl, „Arena“ ist vorgewählt");
-  if (MODUS !== "arena") await A.p.click(`[data-arena-modus="${MODUS}"]`);
-  if (MODUS === "koenig") { await A.p.click('[data-arena-anf="lichtbringer"]'); check(await A.p.evaluate(() => Boolean(document.querySelector('[data-arena-held="lichtbringer"] .krone')) && !document.querySelector('[data-arena-held="schildwaechter"] .krone')), "Königsmord: Anführer lässt sich bestimmen (Krone an Elara)"); }
+  check(await A.p.evaluate(() => !document.querySelector("[data-arena-modus]") && !document.querySelector("[data-arena-anf]")), "Kampf erstellen: kein Modus zur Wahl – das Los entscheidet");
   await A.p.click("#arena-wahl-ok"); await A.p.waitForSelector(".arena-mein");
-  if (MODUS !== "arena") check(new RegExp(MODUSNAME).test(await A.p.textContent(".arena-mein")), "Der eigene Kampf zeigt den Modus: " + MODUSNAME);
+  await A.p.click("#arena-info");
+  const info = await A.p.textContent("#arena-info-text");
+  check(/Arena/.test(info) && /Königsmord/.test(info) && /Die Horde/.test(info) && /So gewinnst du/.test(info) && /eine Minute Zugzeit/.test(info) && /ausgelost/.test(info), "„i“ in der Arena: Ablauf, Zugzeit, Belohnung und alle drei Modi mit Siegbedingungen");
   check(/wartet auf einen Gegner/.test(await A.p.textContent(".arena-mein")), "Ersteller: Kampf wartet auf einen Gegner");
   // B sieht ihn nach dem Aktualisieren – ohne Helden
   await B.p.click('.hub-kachel[data-hub="arena"]'); await B.p.waitForSelector("#arena-neu-laden"); await B.p.click("#arena-neu-laden"); await B.p.waitForSelector("[data-arena-bei]");
   const zeile = await B.p.textContent(".arena-liste li");
   check(/Spieler A/.test(zeile) && /3,3/.test(zeile) && !/Torvald|Elara|Kael/.test(zeile), "Übersicht des anderen: Name und Durchschnittsstufe, keine Helden (" + zeile.replace(/\s+/g, " ").trim() + ")");
-  if (MODUS !== "arena") check(new RegExp(MODUSNAME).test(zeile), "Der andere sieht den Modus in der Übersicht");
   await B.p.click("[data-arena-bei]");
   for (const f of ["trickser", "elementarist", "duellant"]) await B.p.click(`[data-arena-held="${f}"]`);
   check(await B.p.evaluate(() => document.querySelector("#arena-wahl-ok").disabled && document.querySelector(".arena-schnitt").classList.contains("schlecht")), "Beitreten mit Schnitt 1,0 gegen 3,3: gesperrt, Hinweis auf die Spanne");
   await B.p.click('[data-arena-held="duellant"]'); await B.p.click('[data-arena-held="berserker"]');
   check(await B.p.evaluate(() => !document.querySelector("#arena-wahl-ok").disabled && /2,3/.test(document.querySelector(".arena-schnitt").textContent)), "Mit Ragnar (Stufe 5): Schnitt 2,3 passt");
-  if (MODUS === "koenig") await B.p.click('[data-arena-anf="berserker"]');
   await B.p.click("#arena-wahl-ok"); await B.p.waitForSelector(".arena-gegenueber");
-  await B.p.waitForFunction(() => /Zugzeit/.test(document.querySelector("#arena-modus-text").textContent), null, { timeout: 10000 }).catch(() => {});
-  check(new RegExp(MODUSNAME + ":").test(await B.p.textContent("#arena-modus-text")) && (MODUS !== "koenig" || /Dein Anführer: ♛ Ragnar/.test(await B.p.textContent("#arena-modus-text"))), "Aufstellung nennt den Modus und seine Regel" + (MODUS === "koenig" ? " und den eigenen Anführer" : ""));
+  const mt = (await B.p.textContent("#arena-modus-text")).replace(/\s+/g, " ");
+  check(/Das Los hat entschieden/.test(mt) && new RegExp(MODUSNAME).test(mt) && /So gewinnst du/.test(mt) && (MODUS === "horde" ? /nach 30 Runden/ : MODUS === "koenig" ? /gegnerischen Anführer zu Boden/ : /5 je gefälltem Helden/).test(mt), "Vor dem Start: ausgeloster Modus (" + MODUSNAME + ") mit Erklärung und Siegbedingungen");
+  if (MODUS === "koenig") { await B.p.click('[data-arena-anf="berserker"]'); await A.p.waitForSelector('[data-arena-anf="lichtbringer"]', { timeout: 20000 }); await A.p.click('[data-arena-anf="lichtbringer"]');
+    check(await B.p.evaluate(() => /♛ Ragnar/.test(document.querySelector("[data-arena-anf].an").textContent)) && await A.p.evaluate(() => /♛ Elara/.test(document.querySelector("[data-arena-anf].an").textContent)), "Königsmord: Beide bestimmen vor dem Start ihren Anführer"); }
+  if (process.env.SHOT_DIR) await B.p.screenshot({ path: process.env.SHOT_DIR + "/arena-aufstellung.png", fullPage: true });
+  const zaehlt = await warte(B.p, () => /beginnt in \d+/.test((document.querySelector("#arena-status") || {}).textContent || ""), null, 30000);
+  check(zaehlt, "Sind beide verbunden, läuft ein kurzer Countdown bis zum Start");
   const auf = await B.p.textContent(".arena-gegenueber");
   check(/Torvald/.test(auf) && /Stufe 6/.test(auf) && /Ragnar/.test(auf) && /Stufe 5/.test(auf) && /Gruft/.test(await B.p.textContent("[data-arena]")), "Aufstellung: beide Teams mit den Stufen der einzelnen Helden, Karte gelost");
   // Beide landen im Kampf

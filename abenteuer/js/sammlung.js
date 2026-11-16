@@ -427,7 +427,8 @@
   /* ---------- Code-Übersicht für Admins (Admin wird nur per SQL festgelegt, der Server prüft jeden Aufruf) ---------- */
   const istAdmin = () => Boolean(S.geladen && S.installiert && S.konto && S.admin);
   const adminCodes = () => rpc("rpg_admin_codes", {});
-  const adminErstellen = (o) => rpc("rpg_admin_create_code", { p_label: o.bezeichnung, p_fuer: o.fuer || null, p_max_uses: o.anzahl || 1, p_valid_days: o.tage || 90 });
+  // p_waehrung nur mitschicken, wenn der Code Seelensplitter bringen soll (Migration 021) – so gehen Helden-Codes auch ohne sie
+  const adminErstellen = (o) => rpc("rpg_admin_create_code", Object.assign({ p_label: o.bezeichnung, p_fuer: o.fuer || null, p_max_uses: o.anzahl || 1, p_valid_days: o.tage || 90 }, o.waehrung ? { p_waehrung: o.waehrung } : {}));
   const adminSperren = (id) => rpc("rpg_admin_disable_code", { p_id: id });
 
   /* ---------- Sammlung als Seite (Charaktere im Hub) ---------- */

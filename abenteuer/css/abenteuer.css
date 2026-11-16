@@ -2233,3 +2233,18 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .gi-eff li { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.35; }
 .gi-eff li b { color: #d9c2ff; white-space: nowrap; } .gi-eff li span { color: var(--muted); }
 .gi-keine { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+
+/* ---------- Mein Profil ---------- */
+.profil-kopf { display: flex; align-items: center; gap: 16px; padding: 14px 16px; margin: 2px 0 12px; border: 1px solid rgba(197,162,103,.35); border-radius: 12px; background: linear-gradient(135deg, rgba(60,44,22,.55), rgba(18,16,13,.75)); }
+.profil-bild { flex: none; width: 92px; height: 92px; display: grid; place-items: center; }
+.profil-bild .rahmen-halter { width: 76px; height: 76px; } .profil-bild .hub-avatar { width: 76px; height: 76px; }
+.profil-bild .hub-avatar img, .profil-bild .hub-avatar span { width: 100%; height: 100%; }
+.profil-wer { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; }
+.profil-wer b { font: 600 22px var(--schrift-titel); letter-spacing: .04em; color: #f6dc9c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profil-wer small { color: var(--muted); font-size: 13px; }
+.profil-wuerfel { flex: none; width: 64px; height: 64px; display: grid; place-items: center; }
+.profil-wuerfel .w20-box { width: 56px; height: 56px; } .profil-wuerfel .w20-box svg { width: 100%; height: 100%; }
+.profil .hub-bild.an { border-color: #f6dc9c; box-shadow: 0 0 0 2px rgba(246,220,156,.45); }
+.profil .hub-bild:disabled { opacity: .6; }
+.profil-inhalt .sm-code-form { max-width: 420px; }
+@media (max-width: 520px) { .profil-kopf { gap: 12px; padding: 12px; } .profil-wer b { font-size: 19px; } .profil-wuerfel { width: 52px; height: 52px; } .profil-wuerfel .w20-box { width: 46px; height: 46px; } }

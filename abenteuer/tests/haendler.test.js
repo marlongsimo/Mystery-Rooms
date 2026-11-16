@@ -68,13 +68,13 @@ const shot = async (p, name) => { if (process.env.SHOT_DIR) await p.screenshot({
     "Kauf „Silber“-Rahmen (75): Das eigene Profilbild oben trägt ihn sofort");
   check(await p.evaluate(() => [...document.querySelectorAll("[data-kos-kauf]")].every((x) => x.disabled) && document.querySelectorAll(".shop-fehlt").length === 21), "Mit 35 Seelensplittern: alle übrigen Stücke gesperrt, mit Hinweis, wie viel fehlt");
   // Personalisieren
-  await p.click("#hub-profil-knopf"); await p.click('[data-profil="kosmetik"]'); await p.waitForSelector(".kos-profil");
+  await p.click("#hub-profil-knopf"); await p.click('[data-profil="profil"]'); await p.waitForSelector(".profil-kopf"); await p.click('[data-profil-tab="aussehen"]'); await p.waitForSelector(".kos-profil");
   const pers = await p.evaluate(() => ({ wuerfel: [...document.querySelectorAll('[data-kos-wahl][data-art="wuerfel"]')].map((x) => x.dataset.kosWahl), rahmen: [...document.querySelectorAll('[data-kos-wahl][data-art="rahmen"]')].map((x) => x.dataset.kosWahl), an: [...document.querySelectorAll(".kos-wahl.an")].map((x) => x.dataset.kosWahl), text: document.querySelector(".kos-profil").textContent }));
-  check(pers.wuerfel.join() === ",w_glut" && pers.rahmen.join() === ",r_silber" && pers.an.join() === "w_glut,r_silber" && /14 weitere beim Händler/.test(pers.text), "Profil → Personalisieren: je Art „Standard“ und das Gekaufte; das Ausgewählte ist markiert");
+  check(pers.wuerfel.join() === ",w_glut" && pers.rahmen.join() === ",r_silber" && pers.an.slice().sort().join() === "r_silber,w_glut" && /14 weitere beim Händler/.test(pers.text), "Profil → Personalisieren: je Art „Standard“ und das Gekaufte; das Ausgewählte ist markiert");
   await shot(p, "haendler-3-personalisieren");
-  await p.click('[data-kos-wahl=""][data-art="wuerfel"]'); await p.waitForFunction(() => !document.body.dataset.wuerfel);
+  await p.click('[data-kos-wahl=""][data-art="wuerfel"]'); await p.waitForFunction(() => !document.body.dataset.wuerfel); await p.waitForFunction(() => { const e = document.querySelector('[data-kos-wahl=""][data-art="wuerfel"]'); return e && !e.disabled && e.classList.contains("an"); });
   check(DB.aktiv.wuerfel === null && DB.besitz.includes("w_glut") && await p.evaluate(() => document.querySelector('[data-kos-wahl=""][data-art="wuerfel"]').classList.contains("an")), "Zurück auf Standard: gespeichert, das Stück bleibt im Besitz");
-  await p.click('[data-kos-wahl="w_glut"]'); await p.waitForFunction(() => document.body.dataset.wuerfel === "w_glut");
+  await p.click('[data-kos-wahl="w_glut"]'); await p.waitForFunction(() => document.body.dataset.wuerfel === "w_glut"); await p.waitForFunction(() => { const e = document.querySelector('[data-kos-wahl="w_glut"]'); return e && !e.disabled; });
   await p.click("#fenster-zu");
   // Im Kampf: Der Würfel trägt das Design
   await p.evaluate(() => { const D = window.ABD_ALLE.weidenhain, K = Object.values(D.KARTEN); window.ABF.STUFEN10.aktiv = true; const w = document.querySelector("#wurf"); window.ABW.rollen(w, 17, "Probe", { sofort: true }); w.classList.add("an"); });

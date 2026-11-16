@@ -110,6 +110,15 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche_rueckbau.sql
+# Migration 021 (Codes für Seelensplitter): braucht 006 und 008
+CODE_VOR=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('rpg_redeem_unlock_code', 'rpg_admin_create_code', 'rpg_admin_codes')")
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../021_rpg_splitter_codes.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../021_rpg_splitter_codes.sql 2>/dev/null     # zweimal: idempotent
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 021_rpg_splitter_codes_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../021_rpg_splitter_codes_rueckbau.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../006_rpg_heldensammlung.sql 2>/dev/null
+CODE_NACH=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('rpg_redeem_unlock_code', 'rpg_admin_create_code', 'rpg_admin_codes')")
+if [ "$CODE_VOR" = "$CODE_NACH" ]; then echo "✓ Nach dem Rückbau von 021 (und erneutem 006) sind die Code-Funktionen wie vorher"; else echo "✗ Der Rückbau von 021 hinterlässt Reste"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../018_rpg_ausstattung_sichtbar_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../017_rpg_ausstattung_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../008_rpg_arena_rueckbau.sql

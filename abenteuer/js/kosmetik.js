@@ -109,23 +109,24 @@
   }
 
   /* ---------- Profil: Personalisieren ---------- */
-  async function personalisieren() {
-    const M = window.MYTHARA; M.fenster("Personalisieren", `<p class="note">Einen Moment …</p>`);
-    const d = await laden();
-    const zeichne = () => {
-      if (!d || d.fehlt || !d.konto) return M.fenster("Personalisieren", `<p class="note">${d && d.fehlt ? "Das Personalisieren ist in der Datenbank noch nicht eingerichtet (Migration 017)." : d ? "Das gibt es nur mit einem Spielerkonto." : "Gerade keine Verbindung. Versuch es gleich noch einmal."}</p>`);
-      const wahl = (art, id, name, text) => `<button class="kos-wahl ${aktiv[art] === id ? "an" : ""}" data-kos-wahl="${id || ""}" data-art="${art}" aria-pressed="${aktiv[art] === id}">${vorschau(art, id)}<b>${esc(name)}</b><small>${esc(text)}</small></button>`;
-      const block = (art) => { const meine = stuecke(art).filter((k) => hat(k.id)), offen = stuecke(art).length - meine.length;
-        return `<h3 class="f-unter">${ART[art].titel}</h3><div class="kos-raster wahl">${wahl(art, null, "Standard", ART[art].standard)}${meine.map((k) => wahl(art, k.id, STUECKE[k.id].name, STUECKE[k.id].text)).join("")}</div>
-          ${offen > 0 ? `<p class="note">${offen} weitere beim Händler.</p>` : ""}`; };
-      M.fenster("Personalisieren", `<div class="kos-profil"><p class="note">Wähle, was du trägst. Die Auswahl ist an deinem Konto gespeichert und gilt auf jedem Gerät.</p>
-        ${block("wuerfel")}${block("rahmen")}
-        <div class="knoepfe"><button class="btn ghost" id="kos-zum-haendler">Zum Händler</button></div></div>`);
-      document.querySelectorAll("[data-kos-wahl]").forEach((b) => { b.onclick = () => { document.querySelectorAll(`[data-kos-wahl][data-art="${b.dataset.art}"]`).forEach((x) => { x.disabled = true; }); waehlen(b.dataset.art, b.dataset.kosWahl || null, zeichne); }; });
-      const h = $("#kos-zum-haendler"); if (h) h.onclick = () => { $("#qr-overlay").hidden = true; ausstattung(); };
-    };
-    zeichne();
+  /** Auswahl (Würfel und Rahmen) als Baustein – die Profilseite (js/mythara.js) zeigt ihn im Reiter „Aussehen“ */
+  function wahlHtml() {
+    const d = D;
+    if (!d || d.fehlt || !d.konto) return `<p class="note">${d && d.fehlt ? "Das Personalisieren ist in der Datenbank noch nicht eingerichtet (Migration 017)." : d ? "Das gibt es nur mit einem Spielerkonto." : "Gerade keine Verbindung. Versuch es gleich noch einmal."}</p>`;
+    const wahl = (art, id, name, text) => `<button class="kos-wahl ${aktiv[art] === id ? "an" : ""}" data-kos-wahl="${id || ""}" data-art="${art}" aria-pressed="${aktiv[art] === id}">${vorschau(art, id)}<b>${esc(name)}</b><small>${esc(text)}</small></button>`;
+    const block = (art) => { const meine = stuecke(art).filter((k) => hat(k.id)), offen = stuecke(art).length - meine.length;
+      return `<h3 class="f-unter">${ART[art].titel}</h3><div class="kos-raster wahl">${wahl(art, null, "Standard", ART[art].standard)}${meine.map((k) => wahl(art, k.id, STUECKE[k.id].name, STUECKE[k.id].text)).join("")}</div>
+        ${offen > 0 ? `<p class="note">${offen} weitere beim Händler.</p>` : ""}`; };
+    return `<div class="kos-profil"><p class="note">Wähle, was du trägst. Die Auswahl ist an deinem Konto gespeichert und gilt auf jedem Gerät.</p>
+      ${block("rahmen")}${block("wuerfel")}
+      <div class="knoepfe"><button class="btn ghost" id="kos-zum-haendler">Zum Händler</button></div></div>`;
   }
+  function wahlBinden(danach) {
+    document.querySelectorAll("[data-kos-wahl]").forEach((b) => { b.onclick = () => { document.querySelectorAll(`[data-kos-wahl][data-art="${b.dataset.art}"]`).forEach((x) => { x.disabled = true; }); waehlen(b.dataset.art, b.dataset.kosWahl || null, danach); }; });
+    const h = $("#kos-zum-haendler"); if (h) h.onclick = () => { $("#qr-overlay").hidden = true; ausstattung(); };
+  }
+  /** „Personalisieren“: öffnet die Profilseite im Reiter „Aussehen“ */
+  function personalisieren() { return window.MYTHARA && window.MYTHARA.profil ? window.MYTHARA.profil("aussehen") : null; }
 
   /* ---------- Rahmen anderer Spieler (Migration 018) ----------
      Ein „Träger“ ist ein Profilbild mit Platz für einen Rahmen. Er steht zunächst auf Standard (mit dem Anfangsbuchstaben)
@@ -158,5 +159,5 @@
 
   anwenden();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", anwenden);
-  window.ABKOS = { laden, anwenden, zuruecksetzen, ausstattung, personalisieren, traeger, schmuecken, arena, fuellen, STUECKE, aktiv: () => Object.assign({}, aktiv), da: () => Boolean(D && D.konto) };
+  window.ABKOS = { laden, anwenden, zuruecksetzen, ausstattung, personalisieren, wahlHtml, wahlBinden, traeger, schmuecken, arena, fuellen, STUECKE, aktiv: () => Object.assign({}, aktiv), da: () => Boolean(D && D.konto) };
 })();

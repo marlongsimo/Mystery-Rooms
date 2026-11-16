@@ -38,7 +38,7 @@ async function seite(b, admin, vp) {
   const b = await chromium.launch();
   console.log("Admin-Bereich");
   const S = await seite(b, false); await S.p.click("#hub-profil-knopf");
-  check(await S.p.evaluate(() => !document.querySelector('[data-profil="admin"]') && !document.querySelector('[data-profil="codes"]') && Boolean(document.querySelector('[data-profil="code"]'))), "Spieler ohne Admin-Recht: kein Admin-Bereich im Profilmenü");
+  check(await S.p.evaluate(() => !document.querySelector('[data-profil="admin"]') && !document.querySelector('[data-profil="codes"]') && Boolean(document.querySelector('[data-profil="profil"]'))), "Spieler ohne Admin-Recht: kein Admin-Bereich im Profilmenü");
   const A = await seite(b, true), p = A.p; await p.click("#hub-profil-knopf");
   const menue = await p.evaluate(() => [...document.querySelectorAll("#hub-menue button")].map((x) => x.textContent));
   check(menue.includes("Admin-Bereich") && !menue.includes("Code-Übersicht") && !menue.includes("Arena-Auswertung"), "Admin: ein Menüpunkt „Admin-Bereich“ (statt zwei einzelner)");
@@ -67,8 +67,8 @@ async function seite(b, admin, vp) {
   await p.click("#ab-aktiv"); await p.click("#admin-bot button[type=submit]"); await p.waitForFunction(() => /Gespeichert/.test((document.querySelector("#ab-fb") || {}).textContent || "") && !document.querySelector("#ab-aktiv").checked);
   check(DB.gesetzt[1] && DB.gesetzt[1].p_aktiv === false, "Ausschalten lässt sich speichern");
   // Schließen, danach ein anderes Fenster: keine Reiter
-  await p.click("#fenster-zu"); await p.click("#hub-profil-knopf"); await p.click('[data-profil="stufen"]'); await p.waitForFunction(() => { const o = document.querySelector("#qr-overlay"); return !o.hidden && /Meine Helden/.test(o.querySelector("h2").textContent); });
-  check(await p.evaluate(() => !document.querySelector(".admin-tabs")), "Andere Fenster (z. B. „Meine Helden“) zeigen keine Admin-Reiter");
+  await p.click("#fenster-zu"); await p.click("#hub-profil-knopf"); await p.click('[data-profil="profil"]'); await p.waitForFunction(() => { const o = document.querySelector("#qr-overlay"); return !o.hidden && /Mein Profil/.test(o.querySelector("h2").textContent); });
+  check(await p.evaluate(() => !document.querySelector("[data-admin-tab]")), "Andere Fenster (z. B. „Mein Profil“) zeigen keine Admin-Reiter");
   await p.click("#fenster-zu");
   // Handy
   const H = await seite(b, true, { width: 390, height: 800 }); await H.p.click("#hub-profil-knopf"); await H.p.click('[data-profil="admin"]'); await H.p.waitForSelector(".admin-tabs"); await H.p.click('[data-admin-tab="bots"]'); await H.p.waitForSelector("#admin-bot");

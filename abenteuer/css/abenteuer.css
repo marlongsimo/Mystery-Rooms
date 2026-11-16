@@ -1687,6 +1687,22 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .arena-ende-note { color: #b9ad94; font-size: 14px; }
 .arena-grenze { margin: 10px 0 4px; padding: 10px 14px; border: 1px solid rgba(232, 176, 76, .55); border-left-width: 4px; border-radius: 8px; background: rgba(232, 176, 76, .12); color: #f1e3c4; font-size: 15px; line-height: 1.45; }
 .arena-grenze b { color: #f5c96a; }
+/* Neue Arena: Mein Team oben, darunter die Gegnersuche */
+.arena-meinteam { margin: 14px 0 6px; border-color: rgba(197,162,103,.6); }
+.arena-meinteam-fuss { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.arena-meinteam-fuss small { flex: 1 1 220px; color: #b9ad94; font-size: 14px; line-height: 1.4; }
+.arena-held.leer { opacity: .55; border-style: dashed; } .arena-held.leer span { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto; border-radius: 50%; border: 2px dashed rgba(197,162,103,.5); font: 600 26px var(--schrift-titel); color: #c5a267; }
+.arena-suchknopf { margin: 16px 0 4px; } .arena-suchknopf .btn { min-width: min(320px, 100%); }
+.arena-suche { display: grid; justify-items: center; gap: 6px; padding: 26px 0 12px; text-align: center; }
+.arena-suche-ring { position: relative; width: 132px; height: 132px; margin-bottom: 10px; display: grid; place-items: center; }
+.arena-suche-ring span { font-size: 44px; color: #f1dca7; text-shadow: 0 0 18px rgba(232,176,76,.7); animation: arena-suche-puls 1.6s ease-in-out infinite; }
+.arena-suche-ring i { position: absolute; inset: 0; border-radius: 50%; border: 3px solid transparent; border-top-color: #e8b04c; border-right-color: rgba(232,176,76,.35); animation: arena-suche-dreh 1.4s linear infinite; }
+.arena-suche-ring i + i { inset: 14px; border-top-color: rgba(197,162,103,.7); border-right-color: transparent; border-left-color: rgba(197,162,103,.25); animation-duration: 2.3s; animation-direction: reverse; }
+.arena-suche-team { display: flex; gap: 10px; margin: 8px 0 4px; } .arena-suche-team img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(197,162,103,.7); }
+.arena-suche .note { max-width: 420px; }
+@keyframes arena-suche-dreh { to { transform: rotate(360deg); } }
+@keyframes arena-suche-puls { 0%, 100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.12); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .arena-suche-ring i, .arena-suche-ring span { animation: none; } }
 .arena-xp { text-align: left; margin: 10px auto; }
 
 /* Heldenkarte: noch gesperrte Fähigkeiten mit Schloss und Stufe; verbesserte Fähigkeiten markiert */

@@ -20,6 +20,11 @@
   const rpc = async (name, args = {}) => { const c = window.AB.liveClient(); await c.ensureUser(); return c.rpc(name, args); };
   const fehlt = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
   const sm = () => window.ABSAMMLUNG;
+  /* Neue Arena (Vorschau): gespeichertes Team und Gegnersuche statt „Kampf erstellen“. Eingeschaltet über den Link …/abenteuer/?arena=suche,
+     ausgeschaltet über ?arena=liste; die Wahl gilt, bis der Tab geschlossen wird. Braucht Migration 014. */
+  const NEU = (() => { let an = false; try { const p = new URLSearchParams(location.search).get("arena");
+    if (p === "suche") sessionStorage.setItem("ab_arena_neu", "1"); else if (p === "liste") sessionStorage.removeItem("ab_arena_neu");
+    an = sessionStorage.getItem("ab_arena_neu") === "1"; } catch (e) { an = new URLSearchParams(location.search).get("arena") === "suche"; } return an; })();
   const stufe = (fid) => { const p = sm() && sm().fortschritt ? sm().fortschritt(fid) : null; return p ? p.stufe : 1; };
 
   // Z: Zustand der Arena-Seite
@@ -83,6 +88,7 @@
     await laden();
     if (!seiteOffen()) return;
     if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match);
+    if (NEU) return zeigenNeu();
     zeichneListe();
     if (Z.match) pollen(8000, async () => { await laden(); if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match); if (seiteOffen() && !Z.modus) zeichneListe(); });
   }
@@ -118,9 +124,80 @@
     document.querySelectorAll("[data-arena-bei]").forEach((b) => { b.onclick = () => heldenWahl({ titel: "Kampf beitreten", knopf: "Beitreten", gegner: Number(b.dataset.schnitt), fertig: (team) => beitreten(b.dataset.arenaBei, team) }); });
   }
 
+  /* ---------- Neue Arena: Mein Team und Gegnersuche ---------- */
+  async function zeigenNeu() {
+    // In der neuen Arena wartet kein Kampf im Hintergrund: Ein übrig gebliebener Sucheintrag (Tab geschlossen, neu geladen) wird ausgetragen
+    if (Z.match && Z.match.status === "offen") { try { await rpc("rpg_arena_cancel", { p_match_id: Z.match.id }); } catch (e) { /* schon weg */ } Z.match = null; meinMerken(null); }
+    Z.teamFehlt = false;
+    try { Z.team = await rpc("rpg_arena_squad", {}); } catch (e) { Z.team = null; if (fehlt(e)) Z.teamFehlt = true; else Z.fehler = e.message; }
+    if (seiteOffen()) zeichneNeu();
+  }
+  function zeichneNeu() {
+    const L = Z.liste || {};
+    if (!L.konto) return seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">${esc(Z.fehler || "Die Arena gibt es nur mit einem Spielerkonto: Hier treten deine eigenen Helden mit ihren Stufen an.")}</p>`);
+    const eigene = sm().zustand().helden.length, t = Z.team && Z.team.team ? Z.team : null;
+    const held = (h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
+      return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b>${F.meistertitel(h.held, h.stufe) ? `<small class="meister">♛ ${esc(F.meistertitel(h.held, h.stufe))}</small>` : ""}<em>Stufe ${h.stufe}</em></div>`; };
+    const leer = `<div class="arena-held fest leer"><span>?</span><b>frei</b><em>&nbsp;</em></div>`;
+    seite(`<div class="arena-kopf"><div><h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">Du gegen einen anderen Spieler, jeder mit drei Helden.</p></div>
+        <div class="arena-kopf-rechts">${waehrungHtml()}<button class="btn ghost klein arena-info-knopf" id="arena-info" aria-label="Regeln und Modi" title="Regeln und Modi">i</button></div></div>
+      ${grenzeHtml()}
+      ${Z.teamFehlt ? `<p class="fb">Die neue Arena ist in der Datenbank noch nicht eingerichtet (Migration 014 fehlt).</p>` : ""}
+      ${Z.fehler ? `<p class="fb">${esc(Z.fehler)}</p>` : ""}
+      <div class="arena-team mein arena-meinteam"><h3>Mein Team${t ? `<span>Ø ${komma(t.schnitt)}</span>` : ""}</h3>
+        <div class="arena-team-helden">${t ? t.team.map(held).join("") : leer + leer + leer}</div>
+        <div class="arena-meinteam-fuss"><small>${t ? "Mit diesen drei Helden trittst du in jedem Kampf an, bis du das Team änderst." : eigene < 3 ? "Du brauchst mindestens drei Helden in deiner Sammlung." : "Lege fest, mit welchen drei Helden du in der Arena antrittst."}</small>
+          <button class="btn ${t ? "ghost" : ""} klein" id="arena-team-aendern" ${eigene < 3 || Z.teamFehlt ? "disabled" : ""}>${t ? "Team bearbeiten" : "Team festlegen"}</button></div></div>
+      <div class="knoepfe arena-suchknopf"><button class="btn gross" id="arena-suchen" ${t ? "" : "disabled"}>⚔ Gegner suchen</button></div>
+      <p class="note">${t ? `Gesucht wird ein Gegner mit Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))}. ` : ""}${L.heute != null ? `Belohnungen heute: ${Math.min(5, L.heute)} von 5 ${L.nur_siege ? "Siegen" : "Kämpfen"}. ` : ""}Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
+      <div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
+        <h2>So läuft ein Kampf</h2>
+        <ul><li>Du legst einmal dein Team aus drei Helden fest. Es gilt für jeden Kampf, bis du es änderst.</li>
+          <li>„Gegner suchen“ verbindet dich mit einem anderen Suchenden, dessen Durchschnittsstufe höchstens eine Stufe von deiner entfernt ist.</li>
+          <li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>
+          <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
+          <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
+          <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. ${L.nur_siege ? "Erfahrung und Heldenchance gibt es bis zum fünften Sieg des Tages; Niederlagen zählen nicht mit." : "Erfahrung und Heldenchance gibt es für die ersten fünf Kämpfe des Tages."}</li></ul>
+        <h2>Die Modi</h2><div class="arena-modus-reihe vier">${LOS.map((k) => modusHtml(k)).join("")}</div></div>`);
+    Z.fehler = "";
+    const inf = $("#arena-info"); if (inf) inf.onclick = () => { Z.infoAuf = !Z.infoAuf; $("#arena-info-text").hidden = !Z.infoAuf; };
+    const ta = $("#arena-team-aendern"); if (ta) ta.onclick = () => heldenWahl({ titel: "Mein Team", knopf: "Team speichern", vorwahl: t ? t.team.map((h) => h.held) : [],
+      fertig: async (team) => { Z.team = await rpc("rpg_arena_squad_set", { p_team: team }); Z.modus = null; zeigen(); } });
+    const su = $("#arena-suchen"); if (su) su.onclick = () => suchen();
+  }
+  /** Suchbildschirm: fragt alle paar Sekunden nach (das ist zugleich das Lebenszeichen), bis ein Gegner gefunden ist oder abgebrochen wird */
+  function suchen() {
+    stoppUhr(); Z.modus = "suche"; Z.fehler = ""; const t = Z.team, seit = Date.now(); let laeuft = false, vorbei = false;
+    const zeit = () => { const s = Math.floor((Date.now() - seit) / 1000); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+    seite(`<div class="arena-suche" role="status" aria-live="polite">
+        <div class="arena-suche-ring"><i></i><i></i><span>⚔</span></div>
+        <h1 class="hub-gruss">Suche nach einem Gegner …</h1>
+        <p class="hub-untertitel">Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))} · <span id="arena-suche-zeit">0:00</span></p>
+        <div class="arena-suche-team">${t.team.map((h) => `<img src="${F.bild(h.held)}" alt="${esc((F.FIGUREN[h.held] || {}).name || h.held)}">`).join("")}</div>
+        <p class="note" id="arena-suche-text">Sobald ein anderer Spieler mit passender Stufe sucht, werdet ihr verbunden. Lass diese Seite offen.</p>
+        <div class="knoepfe"><button class="btn ghost" id="arena-suche-ab">Abbrechen</button></div></div>`);
+    const ende = async (zurueck) => { if (vorbei) return; vorbei = true; stoppUhr(); clearInterval(takt);
+      const m = Z.match; if (m && m.status === "offen") { try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon weg */ } }
+      Z.match = null; meinMerken(null); Z.modus = null; if (zurueck) zeigen(); };
+    const takt = setInterval(() => { const e = $("#arena-suche-zeit"); if (!e || Z.modus !== "suche") { clearInterval(takt); if (!vorbei) ende(false); return; } e.textContent = zeit(); }, 1000);
+    const fragen = async () => {
+      if (laeuft || vorbei) return; if (!seiteOffen() || Z.modus !== "suche") return ende(false);
+      laeuft = true;
+      try {
+        const m = await rpc("rpg_arena_search", {}); if (vorbei) { if (m && m.status === "offen") rpc("rpg_arena_cancel", { p_match_id: m.id }).catch(() => {}); return; }
+        Z.match = m; meinMerken(m && m.id);
+        if (m && m.status !== "offen") { vorbei = true; stoppUhr(); clearInterval(takt); return aufstellung(m); }
+        if (Date.now() - seit > 60000) { const e = $("#arena-suche-text"); if (e) e.textContent = "Gerade sucht niemand mit passender Stufe. Du kannst weiter warten oder es später noch einmal versuchen."; }
+      } catch (e) { vorbei = true; stoppUhr(); clearInterval(takt); Z.modus = null; Z.fehler = fehlt(e) ? "Die Gegnersuche ist in der Datenbank noch nicht eingerichtet (Migration 014 fehlt)." : e.message; zeichneNeu(); }
+      finally { laeuft = false; }
+    };
+    $("#arena-suche-ab").onclick = () => { $("#arena-suche-ab").disabled = true; ende(true); };
+    fragen(); pollen(3000, fragen);
+  }
+
   /* ---------- Heldenwahl: drei eigene Helden, oben der Schnitt ---------- */
   function heldenWahl(o) {
-    stoppUhr(); Z.modus = "wahl"; Z.wahl = []; Z.fehler = "";
+    stoppUhr(); Z.modus = "wahl"; Z.wahl = (o.vorwahl || []).filter((f) => sm().zustand().helden.includes(f)).slice(0, 3); Z.fehler = "";
     const helden = F.REIHE.filter((f) => sm().zustand().helden.includes(f));
     const zeichne = () => {
       const st = Z.wahl.map(stufe), schnitt = st.length ? st.reduce((a, b) => a + b, 0) / st.length : 0, voll = Z.wahl.length === 3;

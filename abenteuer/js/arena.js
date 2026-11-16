@@ -85,6 +85,7 @@
           offen: r.filter((m) => m && m.status === "offen" && m.host).map((m) => ({ id: m.id, name: m.host.name, schnitt: m.host.schnitt, erstellt: m.erstellt })) };
       }
       Z.liste = r; if (r && r.konto) { Z.waehrung = r.waehrung || 0; Z.match = r.mein || null; }
+      if (r && r.konto && window.ABRANG) { await window.ABRANG.laden(true).catch(() => null); window.ABRANG.kopf(); } // Ranked (Migration 022); ohne sie bleibt die Arena wie bisher
       if (r && r.konto) { if (Z.modiDa == null) { try { await rpc("rpg_arena_modes", { p_ids: [] }); Z.modiDa = true; } catch (e) { Z.modiDa = !fehlt(e); } } }
       if (window.MYTHARA && window.MYTHARA.waehrungZeigen) window.MYTHARA.waehrungZeigen(Z.waehrung);
     } catch (e) { Z.fehler = fehlt(e) ? "Die Arena ist noch nicht freigeschaltet." : e.message; Z.liste = Z.liste || { konto: !/Spielerkonto/.test(e.message || "") && Boolean(Z.da), offen: [] }; }
@@ -146,6 +147,8 @@
     try { Z.team = await rpc("rpg_arena_squad", {}); } catch (e) { Z.team = null; if (fehlt(e)) Z.teamFehlt = true; else Z.fehler = e.message; }
     if (seiteOffen()) zeichneNeu();
   }
+  /** Ranked (js/rang.js) – nur, wenn die Datenbank es kennt und eine Saison da ist */
+  const RG = () => (window.ABRANG && window.ABRANG.da() ? window.ABRANG : null);
   function zeichneNeu() {
     const L = Z.liste || {};
     if (!L.konto) return seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">${esc(Z.fehler || "Die Arena gibt es nur mit einem Spielerkonto: Hier treten deine eigenen Helden mit ihren Stufen an.")}</p>`);
@@ -158,16 +161,18 @@
       ${grenzeHtml()}
       ${Z.teamFehlt ? `<p class="fb">Die neue Arena ist in der Datenbank noch nicht eingerichtet (Migration 014 fehlt).</p>` : ""}
       ${Z.fehler ? `<p class="fb">${esc(Z.fehler)}</p>` : ""}
+      ${SERVER && RG() ? RG().karteHtml(Boolean(t)) : ""}
       <div class="arena-team mein arena-meinteam"><h3>Mein Team${t ? `<span>Ø ${komma(t.schnitt)}</span>` : ""}</h3>
         <div class="arena-team-helden">${t ? t.team.map(held).join("") : leer + leer + leer}</div>
         <div class="arena-meinteam-fuss"><small>${t ? "Mit diesen drei Helden trittst du in jedem Kampf an, bis du das Team änderst." : eigene < 3 ? "Du brauchst mindestens drei Helden in deiner Sammlung." : "Lege fest, mit welchen drei Helden du in der Arena antrittst."}</small>
           <button class="btn ${t ? "ghost" : ""} klein" id="arena-team-aendern" ${eigene < 3 || Z.teamFehlt ? "disabled" : ""}>${t ? "Team bearbeiten" : "Team festlegen"}</button></div></div>
       ${SERVER ? `<div id="arena-einladungen"></div>
+      ${RG() ? `<h3 class="arena-zwischen">Weitere Spielarten</h3>` : ""}
       <div class="arena-arten">
         <button class="arena-art" data-arena-art="normal" ${t ? "" : "disabled"}><b>⚔ Normal</b><span>Duell: drei gegen drei, keine Monster.</span><em>Gegner suchen</em></button>
         <button class="arena-art" data-arena-art="arcade" ${t ? "" : "disabled"}><b>🎲 Arcade</b><span>Arena, Königsmord oder Horde – das Los entscheidet.</span><em>Gegner suchen</em></button>
         <button class="arena-art privat" id="arena-privat" ${t ? "" : "disabled"}><b>♟ Privater Kampf</b><span>Fordere einen Freund heraus und wähle den Modus. Ohne Wertung.</span><em>Freund einladen</em></button>
-      </div>` : `<div class="knoepfe arena-suchknopf"><button class="btn gross" id="arena-suchen" ${t ? "" : "disabled"}>⚔ Gegner suchen</button></div>`}
+      </div>${RG() ? RG().reiterHtml() : ""}` : `<div class="knoepfe arena-suchknopf"><button class="btn gross" id="arena-suchen" ${t ? "" : "disabled"}>⚔ Gegner suchen</button></div>`}
       <p class="note">${t ? `Gesucht wird ein Gegner mit Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))}. ` : ""}${L.heute != null ? `Belohnungen heute: ${Math.min(5, L.heute)} von 5 ${L.nur_siege ? "Siegen" : "Kämpfen"}. ` : ""}Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
       <div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
         <h2>So läuft ein Kampf</h2>
@@ -184,6 +189,7 @@
     const ta = $("#arena-team-aendern"); if (ta) ta.onclick = () => heldenWahl({ titel: "Mein Team", knopf: "Team speichern", vorwahl: t ? t.team.map((h) => h.held) : [],
       fertig: async (team) => { Z.team = await rpc("rpg_arena_squad_set", { p_team: team }); Z.modus = null; zeigen(); } });
     const su = $("#arena-suchen"); if (su) su.onclick = () => suchen();
+    if (RG()) RG().binden();
     document.querySelectorAll("[data-arena-art]").forEach((b) => { b.onclick = () => suchen(b.dataset.arenaArt); });
     const pv = $("#arena-privat"); if (pv) pv.onclick = () => privatWahl();
     if (SERVER) { einladungenZeigen(); pollen(5000, async () => { if (!seiteOffen() || Z.modus) return stoppUhr(); try { Z.einl = await rpc("rpg_arena_invites", {}); } catch (e) { if (fehlt(e)) { Z.einl = null; stoppUhr(); } } einladungenZeigen(); });
@@ -252,10 +258,10 @@
     const zeit = () => { const s = Math.floor((Date.now() - seit) / 1000); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
     seite(`<div class="arena-suche" role="status" aria-live="polite">
         <div class="arena-suche-ring"><i></i><i></i><span>⚔</span></div>
-        <h1 class="hub-gruss">${art === "normal" ? "Normal: Suche nach einem Duell …" : art === "arcade" ? "Arcade: Suche nach einem Gegner …" : "Suche nach einem Gegner …"}</h1>
-        <p class="hub-untertitel">Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))} · <span id="arena-suche-zeit">0:00</span></p>
+        <h1 class="hub-gruss">${art === "ranked" ? "Ranked: Suche nach einem Gegner in deinem Rang …" : art === "normal" ? "Normal: Suche nach einem Duell …" : art === "arcade" ? "Arcade: Suche nach einem Gegner …" : "Suche nach einem Gegner …"}</h1>
+        <p class="hub-untertitel">${art === "ranked" && RG() ? `${RG().emblem((RG().stand().ich || {}).rang, "mini")} ${RG().info((RG().stand().ich || {}).rang).name}` : `Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))}`} · <span id="arena-suche-zeit">0:00</span></p>
         <div class="arena-suche-team">${t.team.map((h) => `<img src="${F.bild(h.held)}" alt="${esc((F.FIGUREN[h.held] || {}).name || h.held)}">`).join("")}</div>
-        <p class="note" id="arena-suche-text">Sobald ein anderer Spieler mit passender Stufe sucht, werdet ihr verbunden. Lass diese Seite offen.</p>
+        <p class="note" id="arena-suche-text">${art === "ranked" ? "Gesucht wird in deinem Rang; nach 25 Sekunden auch einen Rang darüber oder darunter. Lass diese Seite offen." : "Sobald ein anderer Spieler mit passender Stufe sucht, werdet ihr verbunden. Lass diese Seite offen."}</p>
         <div class="knoepfe"><button class="btn ghost" id="arena-suche-ab">Abbrechen</button></div></div>`);
     const ende = async (zurueck) => { if (vorbei) return; vorbei = true; stoppUhr(); clearInterval(takt);
       const m = Z.match; if (m && m.status === "offen") { try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon weg */ } }
@@ -266,12 +272,13 @@
       laeuft = true;
       try {
         let m = null;
-        if (SERVER && art && !alt) { try { m = await rpc("rpg_arena_queue", { p_art: art }); } catch (e) { if (!fehlt(e)) throw e; alt = true; } }
+        if (SERVER && art === "ranked") m = await rpc("rpg_ranked_queue", {});
+        else if (SERVER && art && !alt) { try { m = await rpc("rpg_arena_queue", { p_art: art }); } catch (e) { if (!fehlt(e)) throw e; alt = true; } }
         if (!m) m = await rpc(SERVER ? "rpg_arena_search_server" : "rpg_arena_search", {});
         if (vorbei) { if (m && m.status === "offen") rpc("rpg_arena_cancel", { p_match_id: m.id }).catch(() => {}); return; }
         Z.match = m; meinMerken(m && m.id);
         if (m && m.status !== "offen") { vorbei = true; stoppUhr(); clearInterval(takt); return aufstellung(m); }
-        if (Date.now() - seit > 60000) { const e = $("#arena-suche-text"); if (e) e.textContent = "Gerade sucht niemand mit passender Stufe. Du kannst weiter warten oder es später noch einmal versuchen."; }
+        if (art !== "ranked" && Date.now() - seit > 60000) { const e = $("#arena-suche-text"); if (e) e.textContent = "Gerade sucht niemand mit passender Stufe. Du kannst weiter warten oder es später noch einmal versuchen."; }
       } catch (e) { vorbei = true; stoppUhr(); clearInterval(takt); Z.modus = null; Z.fehler = fehlt(e) ? `Die Gegnersuche ist in der Datenbank noch nicht eingerichtet (Migration ${SERVER ? "015" : "014"} fehlt).` : e.message; zeichneNeu(); }
       finally { laeuft = false; }
     };
@@ -524,6 +531,7 @@
       ${p ? `<p class="arena-ende-punkte">${p[1] != null ? p[1] : p["1"]} : ${p[2] != null ? p[2] : p["2"]}</p>` : ""}<p>${text}</p>${lohn}
       <div class="knoepfe mitte"><button class="btn gross" id="arena-ende-zu">${b && b.angebot ? "Helden wählen" : "Zur Startseite"}</button></div>`, sieg && g.status !== "abgebrochen");
     if (kos()) kos().arena(g.id || (Z.kampf && Z.kampf.m && Z.kampf.m.id), e);
+    if (window.ABRANG && g.status === "beendet") window.ABRANG.ergebnis(g.id || (Z.kampf && Z.kampf.m && Z.kampf.m.id), e); // Ranked: Punkte, Aufstieg, Abstieg
     $("#arena-ende-zu").onclick = async () => {
       e.hidden = true; e.innerHTML = ""; window.AB.arenaEnde(); Z.kampf = null; Z.match = null; Z.modus = null; await trennen();
       await pruefen(true); if (window.MYTHARA.waehrungZeigen) window.MYTHARA.waehrungZeigen(Z.waehrung);

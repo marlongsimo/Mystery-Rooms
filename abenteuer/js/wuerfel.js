@@ -8,6 +8,11 @@
       <defs><linearGradient id="w20-glut" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a1408"/><stop offset=".55" stop-color="#b8380c"/><stop offset="1" stop-color="#f2a030"/></linearGradient>
         <linearGradient id="w20-frost" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8f2ff"/><stop offset=".5" stop-color="#5aa4d8"/><stop offset="1" stop-color="#16406e"/></linearGradient>
         <linearGradient id="w20-arkan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a0b3a"/><stop offset=".5" stop-color="#5a2aa8"/><stop offset="1" stop-color="#c48aff"/></linearGradient>
+        <linearGradient id="w20-s0-bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0b98a"/><stop offset=".5" stop-color="#c98552"/><stop offset="1" stop-color="#7a4520"/></linearGradient>
+        <linearGradient id="w20-s0-silber" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset=".5" stop-color="#c3ccd6"/><stop offset="1" stop-color="#5c6672"/></linearGradient>
+        <linearGradient id="w20-s0-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".5" stop-color="#e6b53c"/><stop offset="1" stop-color="#7a5410"/></linearGradient>
+        <linearGradient id="w20-s0-platin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d4fff9"/><stop offset=".5" stop-color="#58cfc4"/><stop offset="1" stop-color="#0f4a45"/></linearGradient>
+        <linearGradient id="w20-s0-meister" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0d9ff"/><stop offset=".5" stop-color="#b06cf0"/><stop offset="1" stop-color="#3d1163"/></linearGradient>
         <linearGradient id="w20-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c0"/><stop offset=".45" stop-color="#d9a233"/><stop offset="1" stop-color="#7a5010"/></linearGradient></defs>
       <polygon class="w20-koerper" points="50,3 94,27 94,73 50,97 6,73 6,27" fill="#2a2216" stroke="currentColor" stroke-width="3"/>
       <polygon points="50,15 82,66 18,66" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="2"/>

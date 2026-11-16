@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v73, figuren.js v23
+// Stand der Regeln: regeln.js v74, figuren.js v23
 
 /* ===== js/figuren.js ===== */
 /*
@@ -916,7 +916,7 @@
     if (hatDing(f, "grosser_trank")) liste.push(GROSS_TRANK);
     if (hatDing(f, "rauchbeutel")) liste.push(RAUCH_DING);
     if (!st || st.figuren.some((o) => o.seite === "spieler" && o.art !== "wolf" && o.tp <= 0 && !o.tot)) liste.push(STABIL);
-    if (st && st.siegel && st.siegel.some((z) => !z.beruehrt) && !imPakt(st, f)) liste.push(SIEGEL_A);
+    if (st && !st.arena && st.siegel && st.siegel.some((z) => !z.beruehrt) && !imPakt(st, f)) liste.push(SIEGEL_A); // in der Arena gibt es keinen Endgegner: dort wäre die Aktion nie nutzbar
     if (st && st.mech && st.mech.ziele.some(zielOffen)) { const zn = zielNeben(st, f); liste.push(zn && zn.aktion ? Object.assign({}, ZIEL_A, { name: zn.aktion }) : ZIEL_A); }
     if (st && st.boss && st.boss.name && !st.boss.nameGenutzt) liste.push(NAME_A);
     if (st && st.boss && st.boss.silber && !st.boss.silberGenutzt) liste.push(SILBER_A);

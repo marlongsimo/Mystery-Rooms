@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v70, figuren.js v21
+// Stand der Regeln: regeln.js v71, figuren.js v22
 
 /* ===== js/figuren.js ===== */
 /*
@@ -211,6 +211,7 @@
       werte: { WEI: 16, KON: 14, GES: 13, INT: 12, CHA: 10, STR: 8 }, rk: [15, 15, 15], ruestung: "Schuppenpanzer", metall: true,
       faehig: [
         { id: "dornenranke", name: "Dornenranke", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 5, rettung: "GES", attr: "WEI", schaden: "1W8", plusAttr: true, zustand: "verlangsamt", dauer: 1, text: "Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt." },
+        { id: "kraeutermesser", name: "Kräutermesser", typ: "aktion", ab: 1, art: "angriff", reichweite: 3, attr: "WEI", schaden: "1W4", wurfwaffe: true, text: "Nah oder geworfen (3 Felder). Angriffswurf mit Weisheit – er weiß, wo es wehtut." },
         { id: "gesegnete_heilung", name: "Gesegnete Heilung", typ: "passiv", ab: 1, text: "Deine Heilzauber heilen zusätzlich 1 + Grad des Platzes." },
         { id: "schild_glaube", name: "Schild des Glaubens", typ: "bonus", ab: 1, art: "schild", reichweite: 5, platz: 1, text: "Ein Verbündeter +2 RK bis Kampfende." },
         { id: "lebenshauch", name: "Lebenshauch", typ: "aktion", ab: 1, art: "aufrichten", reichweite: 5, pro: { kampf: 1 }, text: "Ein Verbündeter am Boden in 5 Feldern steht mit 1 TP auf." },
@@ -359,7 +360,7 @@
     trickser: { 5: "Schmutziger Trick: ein Einsatz mehr, Reichweite 2 Felder", 8: "Zweiter Dolch mit vollem Schaden", 10: "Hinterhalt mit jedem Dolch, nicht nur einmal je Zug", titel: "Königin der Gassen" },
     assassine: { 5: "Gift 3× je Rast", 8: "Todesstoß: Vorteil aus dem Versteck in jeder Runde", 10: "Hinrichtung +2W6 statt 1W6; Gegner (keine Bosse) unter 8 Lebenspunkten fallen bei einem Treffer", titel: "Die letzte Klinge" },
     lichtbringer: { 5: "Segen auf 4 Verbündete", 8: "Strahlende Aura wirkt in 2 Feldern", 10: "Schutzkreis +3 RK und heilt jede Runde 1W6", titel: "Licht von Grauwacht" },
-    wanderheiler: { 5: "Lebenshauch 2× je Kampf", 8: "Bewahren verteilt 6 × Stufe statt 5 × Stufe", 10: "Massenheilwort heilt alle Verbündeten in 5 Feldern", titel: "Der Barmherzige" },
+    wanderheiler: { 5: "Lebenshauch 2× je Kampf; Kräutermesser mit Betäubungskraut: der erste Treffer je Kampf vergiftet das Ziel", 8: "Bewahren verteilt 6 × Stufe statt 5 × Stufe; Kräutermesser 1W6 statt 1W4", 10: "Massenheilwort heilt alle Verbündeten in 5 Feldern; jeder Treffer mit dem Kräutermesser heilt den am schwersten Verletzten in 5 Feldern um 1W4", titel: "Der Barmherzige" },
     inquisitor: { 5: "Brandmal 2× je Kampf ohne Zauberplatz", 8: "Befehl „Flieh!“ trifft zwei Ziele", 10: "Gerechter Zorn +3W6, und das Brandmal-Ziel kann nicht fliehen", titel: "Hammer der Wahrheit" },
     wildnislaeufer: { 5: "Jägermal +1W8 statt +1W6", 8: "Fesselnder Pfeil 3× je Rast", 10: "Doppelschuss trifft drei Ziele", titel: "Falke des Nordens" },
     tiergefaehrte: { 5: "Grau hat 10 Lebenspunkte mehr", 8: "Grau: Umreißen 3× je Rast", 10: "Grau greift zweimal je Zug an", titel: "Herrin der Wölfe" },
@@ -378,7 +379,7 @@
     trickser: [[5, "trick", { pro: { rast: [3, 3, 4] }, reichweite: 2 }], [7, "platztausch", { pro: { rast: 2 } }], [8, "zweiter_dolch", { ohneMod: false }]],
     assassine: [[5, "gift", { pro: { rast: 3 } }]],
     lichtbringer: [[5, "segen", { ziele: 4 }]],
-    wanderheiler: [[5, "lebenshauch", { pro: { kampf: 2 } }]],
+    wanderheiler: [[5, "lebenshauch", { pro: { kampf: 2 } }], [8, "kraeutermesser", { schaden: "1W6" }]],
     inquisitor: [[5, "brandmal", { freiJeKampf: 2 }], [8, "befehl", { radius: 1 }]],
     wildnislaeufer: [[8, "fesselpfeil", { pro: { rast: 3 } }], [10, "doppelschuss", { ziele: 3 }]],
     tiergefaehrte: [[8, "wolf_umreissen", { pro: { rast: 3 } }]],
@@ -1246,6 +1247,12 @@
       hinterhaltImmer: istFig(f, "trickser") && hs(f) >= 10 && /dolch/.test(a.id),
       nachTreffer: () => {
         if (giftAktiv && lebt(z)) { z.z.vergiftet = 1; delete f.z.gift; }
+        // Brogars Kräutermesser: ab Stufe 5 vergiftet der erste Treffer je Kampf (Betäubungskraut); ab Stufe 10 heilt jeder Treffer den am schwersten Verletzten in 5 Feldern
+        if (a.id === "kraeutermesser") {
+          if (hs(f) >= 5 && lebt(z) && !f.genutzt.kraut) { f.genutzt.kraut = 1; z.z.vergiftet = Math.max(z.z.vergiftet || 0, 1); st.log.push({ t: `${f.name}: Betäubungskraut – ${z.name} ist vergiftet.`, art: "gut" }); }
+          if (hs(f) >= 10) { const o = st.figuren.filter((x) => x.seite === f.seite && lebt(x) && x.tp < x.tpMax && abstand(f, x) <= 5).sort((p, q) => p.tp / p.tpMax - q.tp / q.tpMax)[0];
+            if (o) { const n = roll(st.r, "1W4").total, vor = o.tp; heilen(st, o, n); if (o.tp > vor) st.log.push({ t: `${f.name}: Blut für Blut – ${o.name} heilt ${o.tp - vor} TP.`, art: "gut" }); } }
+        }
         if (a.fesseln && lebt(z)) { const r = rettung(st, z, "STR", SG(f, "GES")); if (!r.erfolg) { z.z.festgehalten = { rest: 2, flucht: SG(f, "GES") }; st.log.push({ t: `${z.name} ist festgenagelt (Rettungswurf ${r.total}).` }); } }
         if (a.brennt && !blockiert(st, z.x, z.y)) st.brand.push({ x: z.x, y: z.y, bis: st.runde + ((a.brennt && a.brennt.runden) || 1), w: (a.brennt && a.brennt.schaden) || null });
         if (a.lahm && lebt(z)) { z.z.verlangsamt = Math.max(z.z.verlangsamt || 0, 1); st.log.push({ t: `${z.name} ist gelähmt: verlangsamt.` }); }
@@ -2747,14 +2754,14 @@
       const max = FD.tpVon(fid, z.stufe || 1);
       z.tp = Math.min(max, z.tp + Math.floor((max - z.tp) / 2));
       for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && (a.pro.rast != null || a.pro.kampf != null)) delete z.genutzt[a.id];
-      delete z.genutzt.glueckspilz; delete z.genutzt.gedankenstuetze; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glutsphaere_frei; delete z.genutzt.glyphe_frei;
+      delete z.genutzt.glueckspilz; delete z.genutzt.kraut; delete z.genutzt.gedankenstuetze; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glutsphaere_frei; delete z.genutzt.glyphe_frei;
       if (z.genutzt.raserei) z.genutzt.raserei--;
     }
     return zust;
   }
   /** Zwischen zwei Kämpfen ohne Rast: nur „je Kampf“ kommt zurück */
   function neuerKampf(zust) {
-    for (const fid of Object.keys(zust)) { const z = zust[fid]; for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && a.pro.kampf != null) delete z.genutzt[a.id]; delete z.genutzt.glueckspilz; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glyphe_frei; }
+    for (const fid of Object.keys(zust)) { const z = zust[fid]; for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && a.pro.kampf != null) delete z.genutzt[a.id]; delete z.genutzt.glueckspilz; delete z.genutzt.kraut; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glyphe_frei; }
     return zust;
   }
 

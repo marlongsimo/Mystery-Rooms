@@ -289,6 +289,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Dornenranke** | 1 | Aktion · 5 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt. |
+| **Kräutermesser** | 1 | Aktion · 3 Felder · Angriff +5 · 1W4 + 3 | Nah oder geworfen (3 Felder). Angriffswurf mit Weisheit – er weiß, wo es wehtut. |
 | **Schild des Glaubens** | 1 | Bonusaktion · 5 Felder · 1 Zauberplatz | Ein Verbündeter +2 RK bis Kampfende. |
 | **Lebenshauch** | 1 | Aktion · 5 Felder · 1× je Kampf | Ein Verbündeter am Boden in 5 Feldern steht mit 1 TP auf. |
 | **Bewahren** | 2 | Aktion · 5 Felder · 1× je Rast | Göttliche Macht: 5 × Stufe TP auf Verbündete in 5 Feldern verteilen. |

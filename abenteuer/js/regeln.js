@@ -782,6 +782,12 @@
       hinterhaltImmer: istFig(f, "trickser") && hs(f) >= 10 && /dolch/.test(a.id),
       nachTreffer: () => {
         if (giftAktiv && lebt(z)) { z.z.vergiftet = 1; delete f.z.gift; }
+        // Brogars Kräutermesser: ab Stufe 5 vergiftet der erste Treffer je Kampf (Betäubungskraut); ab Stufe 10 heilt jeder Treffer den am schwersten Verletzten in 5 Feldern
+        if (a.id === "kraeutermesser") {
+          if (hs(f) >= 5 && lebt(z) && !f.genutzt.kraut) { f.genutzt.kraut = 1; z.z.vergiftet = Math.max(z.z.vergiftet || 0, 1); st.log.push({ t: `${f.name}: Betäubungskraut – ${z.name} ist vergiftet.`, art: "gut" }); }
+          if (hs(f) >= 10) { const o = st.figuren.filter((x) => x.seite === f.seite && lebt(x) && x.tp < x.tpMax && abstand(f, x) <= 5).sort((p, q) => p.tp / p.tpMax - q.tp / q.tpMax)[0];
+            if (o) { const n = roll(st.r, "1W4").total, vor = o.tp; heilen(st, o, n); if (o.tp > vor) st.log.push({ t: `${f.name}: Blut für Blut – ${o.name} heilt ${o.tp - vor} TP.`, art: "gut" }); } }
+        }
         if (a.fesseln && lebt(z)) { const r = rettung(st, z, "STR", SG(f, "GES")); if (!r.erfolg) { z.z.festgehalten = { rest: 2, flucht: SG(f, "GES") }; st.log.push({ t: `${z.name} ist festgenagelt (Rettungswurf ${r.total}).` }); } }
         if (a.brennt && !blockiert(st, z.x, z.y)) st.brand.push({ x: z.x, y: z.y, bis: st.runde + ((a.brennt && a.brennt.runden) || 1), w: (a.brennt && a.brennt.schaden) || null });
         if (a.lahm && lebt(z)) { z.z.verlangsamt = Math.max(z.z.verlangsamt || 0, 1); st.log.push({ t: `${z.name} ist gelähmt: verlangsamt.` }); }
@@ -2283,14 +2289,14 @@
       const max = FD.tpVon(fid, z.stufe || 1);
       z.tp = Math.min(max, z.tp + Math.floor((max - z.tp) / 2));
       for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && (a.pro.rast != null || a.pro.kampf != null)) delete z.genutzt[a.id];
-      delete z.genutzt.glueckspilz; delete z.genutzt.gedankenstuetze; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glutsphaere_frei; delete z.genutzt.glyphe_frei;
+      delete z.genutzt.glueckspilz; delete z.genutzt.kraut; delete z.genutzt.gedankenstuetze; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glutsphaere_frei; delete z.genutzt.glyphe_frei;
       if (z.genutzt.raserei) z.genutzt.raserei--;
     }
     return zust;
   }
   /** Zwischen zwei Kämpfen ohne Rast: nur „je Kampf“ kommt zurück */
   function neuerKampf(zust) {
-    for (const fid of Object.keys(zust)) { const z = zust[fid]; for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && a.pro.kampf != null) delete z.genutzt[a.id]; delete z.genutzt.glueckspilz; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glyphe_frei; }
+    for (const fid of Object.keys(zust)) { const z = zust[fid]; for (const a of FD.faehigVon(fid, FD.maxStufe())) if (a.pro && a.pro.kampf != null) delete z.genutzt[a.id]; delete z.genutzt.glueckspilz; delete z.genutzt.kraut; delete z.genutzt.erlegen; delete z.genutzt.brandmal_frei; delete z.genutzt.glyphe_frei; }
     return zust;
   }
 

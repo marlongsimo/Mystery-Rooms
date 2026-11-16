@@ -242,8 +242,8 @@
           ${s && s.bis ? `<em class="shop-uhr">Neue Auswahl in <strong id="shop-uhr">${uhr()}</strong></em>` : ""}</button>
         <button class="shop-feld ausstattung" data-shop-feld="ausstattung"><span class="shop-feld-bilder kos"><span class="kos-bild kos-wuerfel" data-wuerfel="w_glut"><span class="w20-box">${window.ABW ? window.ABW.svg(20) : ""}</span></span><span class="kos-bild kos-rahmen" data-rahmen="r_lorbeer"><span class="rahmen-halter"><span class="hub-avatar">${avatarHtml()}</span></span></span></span>
           <b>Ausstattung</b><span>Würfel-Designs und Profilrahmen. Ab 75 ${name}.</span><em class="shop-uhr">Rein fürs Auge</em></button>
-        <button class="shop-feld erfahrung" data-shop-feld="erfahrung"><span class="shop-feld-bilder xp"><i>✦</i><i>✦</i><i>✦</i></span>
-          <b>Erfahrung</b><span>Pakete mit 50, 150 oder 350 XP für einen deiner Helden.</span><em class="shop-uhr">Täglich begrenzt</em></button>
+        <button class="shop-feld erfahrung" data-shop-feld="erfahrung"><span class="shop-feld-bilder xp"><img src="img/shop/ep50.webp" alt=""><img src="img/shop/ep150.webp" alt=""><img src="img/shop/ep350.webp" alt=""></span>
+          <b>Erfahrung</b><span>Pakete mit 50, 150 oder 350 XP – auf Vorrat, einsetzbar bei jedem Helden.</span><em class="shop-uhr">Täglich begrenzt</em></button>
       </div></div>`);
     shopUhr = setInterval(() => { const el = $("#shop-uhr"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = uhr(); }, 1000);
     document.querySelectorAll("[data-shop-feld]").forEach((b) => { b.onclick = () => { clearInterval(shopUhr); if (b.dataset.shopFeld === "helden") shopHelden(); else if (b.dataset.shopFeld === "erfahrung") xpShop(); else if (window.ABKOS) window.ABKOS.ausstattung(); }; });
@@ -438,7 +438,7 @@
     const helden = HL.vonKlasse(klasse); fid = fid || helden.find(frei) || helden[0];
     const gesperrt = !frei(fid) ? `<div class="sm-gesperrt">${SM.SCHLOSS}<span><b>Noch gesperrt.</b> ${esc(SM.gesperrtText())}</span></div>` : "";
     seiteZeigen("helden", `<div class="hub-helden" data-heldenseite>${HL.klassenLeiste(klasse).replace('id="klassen-zurueck"', 'data-held-klassen')}${HL.klassenKopf(klasse)}
-      <div class="hub-held-reihe">${helden.map((f) => HL.kachel(f, { an: f === fid, gesperrt: !frei(f), status: !frei(f) ? "gesperrt" : "" })).join("")}</div>${HL.detail(fid, 1, gesperrt).replace('<article class="held"', `<article class="held${gesperrt ? " gesperrt" : ""}"`)}${smAktiv() && SM.fortschritt(fid) ? `<div class="xp-kauf">${SM.stufeHtml(fid)}<button class="btn" data-xp-kauf="${fid}" ${SM.fortschritt(fid).bis ? "" : "disabled"}>✦ Erfahrung kaufen</button></div>` : ""}</div>`);
+      <div class="hub-held-reihe">${helden.map((f) => HL.kachel(f, { an: f === fid, gesperrt: !frei(f), status: !frei(f) ? "gesperrt" : "" })).join("")}</div>${HL.detail(fid, 1, gesperrt).replace('<article class="held"', `<article class="held${gesperrt ? " gesperrt" : ""}"`)}${smAktiv() && SM.fortschritt(fid) ? `<div class="xp-kauf">${SM.stufeHtml(fid)}<button class="btn" data-xp-kauf="${fid}" ${SM.fortschritt(fid).bis ? "" : "disabled"}>✦ Erfahrungspaket einsetzen</button></div>` : ""}</div>`);
   }
   /** Einmal je Seitenaufruf (und nach der Registrierung): offene Startrunden oder eine wartende Belohnung zeigen */
   let sammlungGeprueft = false;
@@ -483,68 +483,88 @@
       } catch (err) { fbc(err.message, "fehler"); k.disabled = false; }
     };
   }
-  /* ---------- Erfahrungspakete (Migration 023): beim Händler ansehen, an der Heldenkarte kaufen ---------- */
+  /* ---------- Erfahrungspakete (Migration 023): beim Händler auf Vorrat kaufen, an der Heldenkarte einsetzen ---------- */
   const xpLaden = async () => { await netz().ensureUser(); return netz().rpc("rpg_xp_shop", {}); };
-  const XP_NAME = { klein: "Kleines Paket", mittel: "Mittleres Paket", gross: "Großes Paket" };
-  /** Händler: die drei Pakete und darunter die eigenen Helden zur Wahl */
-  async function xpShop() {
-    const A = window.ARENA, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈", F = window.ABF;
-    seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
+  const XP_NAME = { klein: "Kleines Paket", mittel: "Mittleres Paket", gross: "Großes Paket" }, XP_BILD = { klein: "ep50", mittel: "ep150", gross: "ep350" };
+  const xpBild = (p) => XP_BILD[p.id] ? `<img class="xp-truhe" src="img/shop/${XP_BILD[p.id]}.webp" alt="" loading="lazy">` : `<span class="xp-zeichen">✦</span>`;
+  const xpAlt = (e) => rpcFehlt(e) || /rpg_xp_(use|buy)|PGRST20[23]/.test((e && (e.message || "")) + (e && e.code || "")) ? "Die Erfahrungspakete sind in der Datenbank noch nicht auf dem neuesten Stand (Migration 023)." : (e && e.message) || "Das hat nicht geklappt.";
+  /** Händler: die drei Pakete – auf Vorrat, noch ohne Helden */
+  async function xpShop(meldung) {
+    const A = window.ARENA, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈";
+    if (!meldung) seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
     let d = null, fehler = null;
-    try { d = await xpLaden(); if (SM) await SM.laden(); } catch (e) { fehler = e; }
+    try { d = await xpLaden(); } catch (e) { fehler = e; }
     if (!document.querySelector("[data-shop]")) return;
     const zurueck = `<button class="hub-zurueck shop-zurueck" data-shop-zurueck>← Zum Händler</button>`;
-    if (fehler || !d || !d.konto) return seiteZeigen("shop", `<div class="shop-bald" data-shop>${zurueck}<p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Erfahrung</h1><p class="hub-untertitel">${fehler && rpcFehlt(fehler) ? "Die Erfahrungspakete sind in der Datenbank noch nicht eingerichtet (Migration 023)." : fehler ? esc(fehler.message) : "Das gibt es nur mit einem Spielerkonto."}</p></div>`), xpBinden();
-    const helden = SM && SM.zustand().helden ? F.REIHE.filter((f) => SM.zustand().helden.includes(f)) : [];
+    if (fehler || !d || !d.konto) return seiteZeigen("shop", `<div class="shop-bald" data-shop>${zurueck}<p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Erfahrung</h1><p class="hub-untertitel">${fehler ? esc(xpAlt(fehler)) : "Das gibt es nur mit einem Spielerkonto."}</p></div>`), xpBinden();
+    const frei = (p) => Math.max(0, p.pro_tag - p.heute), menge = {};
     seiteZeigen("shop", `<div class="shop" data-shop>${zurueck}<div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Erfahrung</h1>
-        <p class="hub-untertitel">Ein Paket bringt einen deiner Helden sofort voran. Jedes gibt es nur begrenzt oft am Tag.</p></div><p class="shop-stand"><i>${zeichen}</i> ${d.waehrung} ${name}</p></div>
-      <div class="xp-pakete">${d.pakete.map((p) => `<div class="xp-paket ${p.heute >= p.pro_tag ? "leer" : ""}" data-xp-paket="${esc(p.id)}"><span class="xp-zeichen">✦</span><b>+${p.xp} XP</b><small>${esc(XP_NAME[p.id] || p.id)}</small><span class="xp-preis"><i>${zeichen}</i> ${p.preis}</span><em>${p.heute >= p.pro_tag ? "heute aufgebraucht" : `heute noch ${p.pro_tag - p.heute} von ${p.pro_tag}`}</em></div>`).join("")}</div>
-      <h2 class="hub-zwischen">Für welchen Helden?</h2>
-      ${helden.length ? `<div class="xp-helden">${helden.map((f) => { const s = SM.fortschritt(f), voll = s && !s.bis; return `<button class="xp-held" data-xp-kauf="${f}" ${voll ? "disabled" : ""}><img src="${F.bild(f)}" alt=""><b>${esc(F.FIGUREN[f].name)}</b>${SM.stufeHtml(f, true)}${voll ? "<small>höchste Stufe</small>" : ""}</button>`; }).join("")}</div>` : `<p class="note">Du hast noch keine Helden in deiner Sammlung.</p>`}</div>`);
+        <p class="hub-untertitel">Kauf Pakete auf Vorrat. Einsetzen kannst du sie später in der Heldenhalle – an der Karte des Helden, der sie bekommen soll.</p></div><p class="shop-stand"><i>${zeichen}</i> <span id="xp-stand">${d.waehrung}</span> ${name}</p></div>
+      ${meldung ? `<p class="my-fb xp-meldung" data-art="ok" role="status">${esc(meldung)}</p>` : ""}
+      <div class="xp-pakete">${d.pakete.map((p) => `<div class="xp-paket ${frei(p) ? "" : "leer"}" data-xp-paket="${esc(p.id)}">${xpBild(p)}<b>+${p.xp} XP</b><small>${esc(XP_NAME[p.id] || p.id)}</small><span class="xp-preis"><i>${zeichen}</i> ${p.preis}</span>
+        <em>${frei(p) ? `heute noch ${frei(p)} von ${p.pro_tag}` : "heute aufgebraucht"}</em><span class="xp-besitz ${p.besitz ? "hat" : ""}">Im Vorrat: <b>${p.besitz || 0}</b></span>
+        <div class="xp-menge"><button class="btn ghost klein" data-xp-minus aria-label="weniger">−</button><b data-xp-n>1</b><button class="btn ghost klein" data-xp-plus aria-label="mehr">+</button></div>
+        <button class="my-knopf rot xp-kaufen" data-xp-kaufen></button></div>`).join("")}</div>
+      <p class="my-fb" id="xp-fb" role="status"></p>
+      <p class="note klein">Die Pakete sind je Konto und Tag begrenzt. Um Mitternacht gibt es neue.</p></div>`);
     xpBinden();
+    document.querySelectorAll("[data-xp-paket]").forEach((el) => {
+      const p = d.pakete.find((x) => x.id === el.dataset.xpPaket), k = el.querySelector("[data-xp-kaufen]"); menge[p.id] = 1;
+      const zeig = () => { const n = menge[p.id] = Math.max(1, Math.min(menge[p.id], Math.max(1, frei(p)))), preis = p.preis * n, reicht = preis <= d.waehrung;
+        el.querySelector("[data-xp-n]").textContent = n; el.querySelector("[data-xp-minus]").disabled = n <= 1 || !frei(p); el.querySelector("[data-xp-plus]").disabled = n >= frei(p);
+        k.disabled = !frei(p) || !reicht; k.textContent = !frei(p) ? "Morgen wieder" : reicht ? `Kaufen · ${zeichen} ${preis}` : `Es fehlen ${zeichen} ${preis - d.waehrung}`; };
+      el.querySelector("[data-xp-minus]").onclick = () => { menge[p.id]--; zeig(); }; el.querySelector("[data-xp-plus]").onclick = () => { menge[p.id]++; zeig(); };
+      k.onclick = async () => { const n = menge[p.id]; document.querySelectorAll("[data-xp-kaufen]").forEach((x) => { x.disabled = true; }); $("#xp-fb").textContent = "Wird gekauft …";
+        try { const r = await netz().rpc("rpg_xp_buy", { p_pack: p.id, p_anzahl: n });
+          waehrungZeigen(r.waehrung); if (window.ARENA && window.ARENA.pruefen) window.ARENA.pruefen(true).catch(() => {});
+          await xpShop(`${n} × ${XP_NAME[p.id] || p.id} gekauft – ${n > 1 ? "sie liegen" : "es liegt"} in deinem Vorrat.`);
+        } catch (e) { $("#xp-fb").textContent = xpAlt(e); zeigAlle(); } };
+      zeig(); el._zeig = zeig;
+    });
+    function zeigAlle() { document.querySelectorAll("[data-xp-paket]").forEach((x) => x._zeig && x._zeig()); }
   }
   function xpBinden() { const z = document.querySelector("[data-shop-zurueck]"); if (z) z.onclick = () => shopZeigen(); }
-  /** Kaufen für einen Helden: Paket und Anzahl wählen */
+  /** Heldenkarte: Pakete aus dem Vorrat für diesen Helden einsetzen */
   async function xpDialog(fid, meldung) {
-    const F = window.ABF, A = window.ARENA, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈", h = F.FIGUREN[fid];
+    const F = window.ABF, h = F.FIGUREN[fid], TITEL = "Erfahrungspaket einsetzen";
     if (!h || !istKonto() || !smAktiv()) return;
     let d = null;
-    try { d = await xpLaden(); await SM.laden(true); } catch (e) { return fenster("Erfahrung kaufen", `<p class="note">${rpcFehlt(e) ? "Die Erfahrungspakete sind in der Datenbank noch nicht eingerichtet (Migration 023)." : esc(e.message)}</p>`); }
+    try { d = await xpLaden(); await SM.laden(true); } catch (e) { return fenster(TITEL, `<p class="note">${esc(xpAlt(e))}</p>`); }
     if (!d.konto || !SM.zustand().helden.includes(fid)) return toast("Erfahrung gibt es nur für eigene Helden.");
     const gesamt = (SM.zustand().xp || {})[fid] || 0, jetzt = F.stufeAusXp(gesamt), voll = !jetzt.bis;
-    const frei = (p) => Math.max(0, p.pro_tag - p.heute), erste = d.pakete.find((p) => frei(p) > 0 && p.preis <= d.waehrung) || d.pakete.find((p) => frei(p) > 0);
+    // höchstens so viele, wie im Vorrat sind – und nicht mehr, als der Held bis Stufe 10 braucht
+    const hoechstens = (p) => { let n = 0; while (n < (p.besitz || 0) && F.stufeAusXp(gesamt + p.xp * n).bis) n++; return n; };
+    const vorrat = d.pakete.reduce((s, p) => s + (p.besitz || 0), 0), erste = d.pakete.find((p) => p.besitz > 0);
     const st = { pack: erste ? erste.id : null, n: 1 };
-    const o = fenster("Erfahrung kaufen", `<div class="xp-dialog" data-xp-held="${fid}">
-      <div class="xp-kopf"><img src="${F.bild(fid)}" alt=""><div><b>${esc(h.name)}</b>${SM.stufeHtml(fid)}</div><p class="shop-stand"><i>${zeichen}</i> <span id="xp-stand">${d.waehrung}</span></p></div>
+    const o = fenster(TITEL, `<div class="xp-dialog" data-xp-held="${fid}">
+      <div class="xp-kopf"><img src="${F.bild(fid)}" alt=""><div><b>${esc(h.name)}</b>${SM.stufeHtml(fid)}</div></div>
       ${meldung ? `<p class="my-fb" data-art="ok" role="status">${esc(meldung)}</p>` : ""}
-      ${voll ? `<p class="note">${esc(h.name)} hat die höchste Stufe erreicht.</p>` : `
-      <div class="xp-wahl" role="radiogroup" aria-label="Paket">${d.pakete.map((p) => `<button class="xp-paket" role="radio" data-xp-pack="${esc(p.id)}" ${frei(p) ? "" : "disabled"}><span class="xp-zeichen">✦</span><b>+${p.xp} XP</b><span class="xp-preis"><i>${zeichen}</i> ${p.preis}</span><em>${frei(p) ? `heute noch ${frei(p)}` : "heute aufgebraucht"}</em></button>`).join("")}</div>
+      ${voll ? `<p class="note">${esc(h.name)} hat die höchste Stufe erreicht.</p>` : !vorrat ? `<p class="note" id="xp-leer">Du hast gerade keine Erfahrungspakete im Vorrat. Der Händler führt welche.</p><button class="my-knopf" id="xp-zum-haendler">Zum Händler</button>` : `
+      <div class="xp-wahl" role="radiogroup" aria-label="Paket">${d.pakete.map((p) => `<button class="xp-paket" role="radio" data-xp-pack="${esc(p.id)}" ${p.besitz ? "" : "disabled"}>${xpBild(p)}<b>+${p.xp} XP</b><em>${p.besitz ? `im Vorrat: ${p.besitz}` : "keines im Vorrat"}</em></button>`).join("")}</div>
       <div class="xp-menge"><span>Anzahl</span><button class="btn ghost klein" id="xp-minus" aria-label="weniger">−</button><b id="xp-n">1</b><button class="btn ghost klein" id="xp-plus" aria-label="mehr">+</button></div>
       <p class="xp-summe" id="xp-summe"></p>
-      <button class="my-knopf rot" id="xp-kaufen">Kaufen</button><p class="my-fb" id="xp-fb" role="status"></p>
-      <p class="note klein">Die Pakete sind je Konto und Tag begrenzt, nicht je Held. Um Mitternacht gibt es neue.</p>`}</div>`);
-    if (voll) return;
+      <button class="my-knopf rot" id="xp-einsetzen">Einsetzen</button><p class="my-fb" id="xp-fb" role="status"></p>
+      <p class="note klein">Weitere Pakete gibt es beim Händler.</p>`}</div>`);
+    const zh = $("#xp-zum-haendler"); if (zh) zh.onclick = () => { const zu = $("#fenster-zu"); if (zu) zu.click(); xpShop(); };
+    if (voll || !vorrat) return;
     const paket = () => d.pakete.find((p) => p.id === st.pack);
     const zeig = () => {
-      const p = paket(); o.querySelectorAll("[data-xp-pack]").forEach((b) => { b.classList.toggle("an", b.dataset.xpPack === st.pack); b.setAttribute("aria-checked", String(b.dataset.xpPack === st.pack)); });
-      if (!p) { $("#xp-summe").textContent = "Heute sind alle Pakete aufgebraucht."; $("#xp-kaufen").disabled = true; $("#xp-minus").disabled = $("#xp-plus").disabled = true; return; }
-      st.n = Math.max(1, Math.min(st.n, frei(p))); $("#xp-n").textContent = st.n; $("#xp-minus").disabled = st.n <= 1; $("#xp-plus").disabled = st.n >= frei(p);
-      const xp = p.xp * st.n, preis = p.preis * st.n, nach = F.stufeAusXp(gesamt + xp), reicht = preis <= d.waehrung;
-      $("#xp-summe").innerHTML = `<b>+${xp} XP</b> für <b>${zeichen} ${preis}</b> ${esc(name)} · ${nach.stufe > jetzt.stufe ? `Stufe ${jetzt.stufe} → <b>Stufe ${nach.stufe}</b>` : `bleibt Stufe ${jetzt.stufe}${nach.bis ? ` (${nach.xp} / ${nach.bis} XP)` : ""}`}${reicht ? "" : ` · <span class="xp-fehlt">es fehlen ${preis - d.waehrung}</span>`}`;
-      $("#xp-kaufen").disabled = !reicht; $("#xp-kaufen").textContent = `Kaufen für ${zeichen} ${preis}`;
+      const p = paket(), max = hoechstens(p); o.querySelectorAll("[data-xp-pack]").forEach((b) => { b.classList.toggle("an", b.dataset.xpPack === st.pack); b.setAttribute("aria-checked", String(b.dataset.xpPack === st.pack)); });
+      st.n = Math.max(1, Math.min(st.n, max)); $("#xp-n").textContent = st.n; $("#xp-minus").disabled = st.n <= 1; $("#xp-plus").disabled = st.n >= max;
+      const xp = p.xp * st.n, nach = F.stufeAusXp(gesamt + xp);
+      $("#xp-summe").innerHTML = `<b>+${xp} XP</b> für ${esc(h.name)} · ${nach.stufe > jetzt.stufe ? `Stufe ${jetzt.stufe} → <b>Stufe ${nach.stufe}</b>` : `bleibt Stufe ${jetzt.stufe}${nach.bis ? ` (${nach.xp} / ${nach.bis} XP)` : ""}`}`;
+      $("#xp-einsetzen").textContent = `${st.n} × einsetzen`;
     };
     o.querySelectorAll("[data-xp-pack]").forEach((b) => { b.onclick = () => { st.pack = b.dataset.xpPack; st.n = 1; zeig(); }; });
     $("#xp-minus").onclick = () => { st.n--; zeig(); }; $("#xp-plus").onclick = () => { st.n++; zeig(); };
-    $("#xp-kaufen").onclick = async () => {
-      const p = paket(); if (!p) return; const k = $("#xp-kaufen"); k.disabled = true; $("#xp-fb").textContent = "Wird gekauft …";
-      try { const r = await netz().rpc("rpg_xp_buy", { p_held: fid, p_pack: p.id, p_anzahl: st.n });
-        waehrungZeigen(r.waehrung); if (window.ARENA && window.ARENA.pruefen) window.ARENA.pruefen(true).catch(() => {});
+    $("#xp-einsetzen").onclick = async () => {
+      const p = paket(); if (!p) return; const k = $("#xp-einsetzen"); k.disabled = true; $("#xp-fb").textContent = "Wird eingesetzt …";
+      try { const r = await netz().rpc("rpg_xp_use", { p_held: fid, p_pack: p.id, p_anzahl: st.n });
         if (r.stufe > r.stufe_vorher) toast(`${h.name} erreicht Stufe ${r.stufe}!`);
         await xpDialog(fid, `+${r.xp} XP für ${h.name}${r.stufe > r.stufe_vorher ? ` – jetzt Stufe ${r.stufe}` : ""}.`);
-        // die Seite dahinter (Heldenhalle oder Händler) zeigt die neue Stufe
-        const hs = $("#hub-seite"); if (hs && !hs.hidden && hs.querySelector("[data-heldenseite]")) { const kl = F.FIGUREN[fid].klasse, det = hs.querySelector("[data-xp-kauf]"); heldenSeite(det && hs.querySelector("article.held") ? kl : null, det && hs.querySelector("article.held") ? fid : undefined); }
-        else if (hs && !hs.hidden && hs.querySelector(".xp-helden")) xpShop();
-      } catch (e) { k.disabled = false; $("#xp-fb").textContent = e.message; }
+        // die Heldenhalle dahinter zeigt die neue Stufe
+        const hs = $("#hub-seite"); if (hs && !hs.hidden && hs.querySelector("[data-heldenseite]")) { const kl = F.FIGUREN[fid].klasse, offen = hs.querySelector("article.held"); heldenSeite(offen ? kl : null, offen ? fid : undefined); }
+      } catch (e) { k.disabled = false; $("#xp-fb").textContent = xpAlt(e); }
     };
     zeig();
   }

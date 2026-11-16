@@ -2365,7 +2365,7 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .xp-pakete, .xp-wahl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
 .xp-paket { display: grid; justify-items: center; gap: 3px; padding: 12px 8px; border-radius: 12px; border: 1px solid rgba(143,196,255,.35); background: linear-gradient(170deg, rgba(40,70,110,.45), rgba(14,16,22,.85)); color: #efe6d4; font: inherit; text-align: center; }
 button.xp-paket { cursor: pointer; } .xp-paket.an { border-color: #9fd9ff; box-shadow: 0 0 0 2px rgba(159,217,255,.45), 0 0 18px rgba(120,200,255,.25); }
-.xp-paket:disabled, .xp-paket.leer { opacity: .45; cursor: default; }
+.xp-paket:disabled { opacity: .45; cursor: default; }
 .xp-zeichen { font-size: 22px; color: #9fd9ff; text-shadow: 0 0 10px rgba(120,200,255,.8); line-height: 1; }
 .xp-paket b { font: 600 20px var(--schrift-titel); color: #dff1ff; } .xp-paket small { color: var(--muted); font-size: 12px; }
 .xp-preis { font: 600 16px var(--schrift-titel); color: #d9c2ff; white-space: nowrap; } .xp-preis i { font-style: normal; }
@@ -2383,3 +2383,13 @@ button.xp-paket { cursor: pointer; } .xp-paket.an { border-color: #9fd9ff; box-s
 .xp-summe { margin: 8px 0 12px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.05); font-size: 14px; line-height: 1.5; } .xp-fehlt { color: #e08a8a; }
 .sm-xp-zeile[data-held-stufe] { cursor: pointer; }
 @media (max-width: 520px) { .xp-pakete, .xp-wahl { gap: 6px; } .xp-paket { padding: 10px 4px; } .xp-paket b { font-size: 17px; } .xp-kopf img { width: 56px; height: 56px; } }
+.shop-feld-bilder.xp img { width: 62px; height: 62px; border: 0; border-radius: 0; box-shadow: none; object-fit: contain; margin: 0 -4px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.6)); } .shop-feld-bilder.xp img:nth-child(2) { width: 74px; height: 74px; } .shop-feld-bilder.xp img:nth-child(3) { width: 88px; height: 88px; }
+.xp-truhe { width: 100%; max-width: 132px; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 6px 10px rgba(0,0,0,.55)); }
+.xp-wahl .xp-truhe { max-width: 84px; }
+.xp-besitz { font-size: 12px; color: var(--muted); } .xp-besitz b { font-size: 16px; color: inherit; } .xp-besitz.hat { color: #bfe9c4; }
+.xp-paket .xp-menge { margin: 4px 0 2px; gap: 8px; } .xp-paket .xp-menge b { font-size: 18px; min-width: 22px; color: #efe6d4; } .xp-paket .xp-menge .btn { min-width: 34px; padding: 4px 8px; }
+.xp-paket .xp-kaufen { width: 100%; padding: 9px 6px; font-size: 14px; white-space: nowrap; } .xp-paket.leer { opacity: 1; } .xp-paket.leer .xp-truhe, .xp-paket.leer > b, .xp-paket.leer .xp-preis { opacity: .45; }
+.xp-meldung { margin: 10px 0 0; }
+@media (max-width: 620px) { .xp-pakete { grid-template-columns: 1fr; } .xp-pakete .xp-paket { grid-template-columns: 92px 1fr auto; grid-template-areas: "bild name preis" "bild klein besitz" "bild tag tag" "menge menge kauf"; justify-items: start; align-items: center; column-gap: 12px; padding: 10px 12px; }
+  .xp-pakete .xp-truhe { grid-area: bild; max-width: 92px; } .xp-pakete .xp-paket > b { grid-area: name; white-space: nowrap; } .xp-pakete .xp-paket > small { grid-area: klein; } .xp-pakete .xp-preis { grid-area: preis; justify-self: end; } .xp-pakete .xp-besitz { grid-area: besitz; justify-self: end; }
+  .xp-pakete .xp-paket > em { grid-area: tag; } .xp-pakete .xp-menge { grid-area: menge; } .xp-pakete .xp-kaufen { grid-area: kauf; width: auto; padding: 9px 14px; } }

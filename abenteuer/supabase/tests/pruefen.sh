@@ -104,6 +104,12 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../022_rpg_ranked.sql 2>/dev/null     # z
 RANK_MIT=$(psql -q -At -d "$DB" -c "select md5(string_agg(regexp_replace(lower(pg_get_functiondef(p.oid)), '[[:space:]\\\"]+', '', 'g'), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and (p.proname like 'rpg_arena%' or p.proname like 'rpg_cosmetic%' or (p.proname like 'rpg_admin%' and p.proname not like 'rpg_admin_ranked%'))")
 if [ "$RANK_VOR" = "$RANK_MIT" ]; then echo "✓ Migration 022 verändert keine vorhandene Funktion (Arena, Ausstattung, Admin)"; else echo "✗ Migration 022 hat eine vorhandene Funktion verändert"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 022_rpg_ranked_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+# Migration 024 (Rang des Gegners in der Aufstellung): braucht 022
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../024_rpg_ranked_gegenueber.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../024_rpg_ranked_gegenueber.sql 2>/dev/null     # zweimal: idempotent
+RANK_24=$(psql -q -At -d "$DB" -c "select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_%'")
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 024_rpg_ranked_gegenueber_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../024_rpg_ranked_gegenueber_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../022_rpg_ranked_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../020_rpg_admin_bereich_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>/dev/null

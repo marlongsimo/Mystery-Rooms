@@ -543,6 +543,7 @@
       <div class="xp-wahl" role="radiogroup" aria-label="Paket">${d.pakete.map((p) => `<button class="xp-paket" role="radio" data-xp-pack="${esc(p.id)}" ${p.besitz ? "" : "disabled"}>${xpBild(p)}<b>+${p.xp} XP</b><em>${p.besitz ? `im Vorrat: ${p.besitz}` : "keines im Vorrat"}</em></button>`).join("")}</div>
       <div class="xp-menge"><span>Anzahl</span><button class="btn ghost klein" id="xp-minus" aria-label="weniger">−</button><b id="xp-n">1</b><button class="btn ghost klein" id="xp-plus" aria-label="mehr">+</button></div>
       <p class="xp-summe" id="xp-summe"></p>
+      <p class="xp-warnung" id="xp-warnung" role="alert" hidden></p>
       <button class="my-knopf rot" id="xp-einsetzen">Einsetzen</button><p class="my-fb" id="xp-fb" role="status"></p>
       <p class="note klein">Weitere Pakete gibt es beim Händler.</p>`}</div>`);
     const zh = $("#xp-zum-haendler"); if (zh) zh.onclick = () => { const zu = $("#fenster-zu"); if (zu) zu.click(); xpShop(); };
@@ -553,12 +554,18 @@
       st.n = Math.max(1, Math.min(st.n, max)); $("#xp-n").textContent = st.n; $("#xp-minus").disabled = st.n <= 1; $("#xp-plus").disabled = st.n >= max;
       const xp = p.xp * st.n, nach = F.stufeAusXp(gesamt + xp);
       $("#xp-summe").innerHTML = `<b>+${xp} XP</b> für ${esc(h.name)} · ${nach.stufe > jetzt.stufe ? `Stufe ${jetzt.stufe} → <b>Stufe ${nach.stufe}</b>` : `bleibt Stufe ${jetzt.stufe}${nach.bis ? ` (${nach.xp} / ${nach.bis} XP)` : ""}`}`;
-      $("#xp-einsetzen").textContent = `${st.n} × einsetzen`;
+      // geht das (letzte) Paket über Stufe 10 hinaus, verfällt der Rest: warnen und eigens bestätigen lassen
+      st.verfall = 0; if (!nach.bis) while (st.verfall < xp && !F.stufeAusXp(gesamt + xp - st.verfall - 1).bis) st.verfall++;
+      st.sicher = false; const w = $("#xp-warnung"); w.hidden = !st.verfall;
+      if (st.verfall) w.innerHTML = `<b>Achtung:</b> ${esc(h.name)} braucht bis Stufe 10 nur noch <b>${xp - st.verfall} XP</b>. Von ${st.n > 1 ? "diesen Paketen" : "diesem Paket"} verfallen <b>${st.verfall} XP</b> – sie lassen sich nicht auf einen anderen Helden übertragen.`;
+      $("#xp-einsetzen").textContent = st.verfall ? "Einsetzen …" : `${st.n} × einsetzen`; $("#xp-fb").textContent = "";
     };
     o.querySelectorAll("[data-xp-pack]").forEach((b) => { b.onclick = () => { st.pack = b.dataset.xpPack; st.n = 1; zeig(); }; });
     $("#xp-minus").onclick = () => { st.n--; zeig(); }; $("#xp-plus").onclick = () => { st.n++; zeig(); };
     $("#xp-einsetzen").onclick = async () => {
-      const p = paket(); if (!p) return; const k = $("#xp-einsetzen"); k.disabled = true; $("#xp-fb").textContent = "Wird eingesetzt …";
+      const p = paket(); if (!p) return; const k = $("#xp-einsetzen");
+      if (st.verfall && !st.sicher) { st.sicher = true; k.textContent = `Trotzdem einsetzen (${st.verfall} XP verfallen)`; $("#xp-fb").textContent = "Bitte bestätige noch einmal."; return; }
+      k.disabled = true; $("#xp-fb").textContent = "Wird eingesetzt …";
       try { const r = await netz().rpc("rpg_xp_use", { p_held: fid, p_pack: p.id, p_anzahl: st.n });
         if (r.stufe > r.stufe_vorher) toast(`${h.name} erreicht Stufe ${r.stufe}!`);
         await xpDialog(fid, `+${r.xp} XP für ${h.name}${r.stufe > r.stufe_vorher ? ` – jetzt Stufe ${r.stufe}` : ""}.`);

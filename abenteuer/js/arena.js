@@ -336,17 +336,28 @@
   /* ---------- Aufstellung beider Seiten, dann der Kampf ---------- */
   const KARTE = (k) => (k === "garten" ? R.KARTE_GARTEN : ((window.ABD_ALLE || {}).grauwacht || { KARTEN: {} }).KARTEN[String(k || "").toUpperCase()]) || R.KARTE_GARTEN;
   const kos = () => window.ABKOS, bildVon = (name, klasse) => (kos() ? kos().traeger(name, klasse) : "");
-  const teamHtml = (t, name, mein) => `<div class="arena-team ${mein ? "mein" : "gegner"}"><h3>${bildVon(name)}<b class="arena-team-name">${esc(name)}${mein ? " (du)" : ""}</b><span>Ø ${komma(t.schnitt)}</span></h3><div class="arena-team-helden">${t.team.map((h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
+  const teamHtml = (t, name, mein, seiteNr) => `<div class="arena-team ${mein ? "mein" : "gegner"}" data-team-seite="${seiteNr || ""}"><h3>${bildVon(name)}<b class="arena-team-name">${esc(name)}${mein ? " (du)" : ""}</b><span>Ø ${komma(t.schnitt)}</span></h3><div class="arena-team-helden">${t.team.map((h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
     return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b>${F.meistertitel(h.held, h.stufe) ? `<small class="meister">♛ ${esc(F.meistertitel(h.held, h.stufe))}</small>` : ""}<em>Stufe ${h.stufe}</em></div>`; }).join("")}</div></div>`;
+  /** Rang beider Seiten in der Aufstellung (Migration 024); fehlt die Funktion oder läuft keine Saison, bleibt die Zeile weg */
+  const rangMerk = {};
+  async function raengeZeigen(m) {
+    const RGm = RG(); if (!SERVER || !RGm || !m || !m.id || rangMerk[m.id] === false) return;
+    const setzen = (d) => { if (!d || !d.da || !Z.match || Z.match.id !== m.id) return; [[1, d.host], [2, d.gast]].forEach(([nr, rang]) => { const h = document.querySelector(`.arena-team[data-team-seite="${nr}"] h3`);
+      if (!h || rang == null || h.querySelector(".arena-team-rang")) return; const n = h.querySelector(".arena-team-name"); if (!n) return;
+      n.insertAdjacentHTML("beforeend", `<small class="arena-team-rang" data-rang="${rang}">${RGm.emblem(rang, "mini")}<span>${esc(RGm.info(rang).name)}</span></small>`); }); };
+    if (rangMerk[m.id]) return setzen(rangMerk[m.id]);
+    try { const d = await rpc("rpg_ranked_gegenueber", { p_match_id: m.id }); rangMerk[m.id] = d && d.da ? d : false; setzen(d); } catch (e) { rangMerk[m.id] = false; }
+  }
   function aufstellung(m) {
     stoppUhr(); Z.modus = "aufstellung"; Z.match = m;
     const ich = m.seite, karte = KARTE(m.karte), beg = (R.BEGEGNUNGEN[m.begegnung] || {}).name || "Monster";
     seite(`<h1 class="hub-gruss">Die Aufstellung</h1><p class="hub-untertitel">${esc(karte.name || "Arena")} · ${esc(beg)} · Kampfstufe ${m.kampfstufe}</p>
       ${grenzeHtml()}
       <div id="arena-modus-text"></div>
-      <div class="arena-gegenueber">${teamHtml(m.host, m.host.name, ich === 1)}<span class="arena-vs">gegen</span>${teamHtml(m.gast, m.gast.name, ich === 2)}</div>
+      <div class="arena-gegenueber">${teamHtml(m.host, m.host.name, ich === 1, 1)}<span class="arena-vs">gegen</span>${teamHtml(m.gast, m.gast.name, ich === 2, 2)}</div>
       <p class="note" id="arena-status">${ich === 1 ? "Die Verbindung wird aufgebaut …" : "Warte auf den Ersteller des Kampfes …"}</p>
       <div class="knoepfe"><button class="btn ghost klein" id="arena-abbrechen">Abbrechen</button></div>`);
+    raengeZeigen(m);
     if (kos()) kos().arena(m.id, $("[data-arena]")); // Profilbild und Rahmen beider Teilnehmer
     $("#arena-abbrechen").onclick = async () => { stoppUhr(); Z.kampf = null; Z.anfGeaendert = null; try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon beendet */ } await trennen(); Z.match = null; zeigen(); };
     let k = modusVon(m), bekannt = !SERVER, privat = false; const team = (ich === 1 ? m.host : m.gast).team || [];

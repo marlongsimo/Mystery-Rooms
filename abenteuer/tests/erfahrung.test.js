@@ -84,6 +84,20 @@ async function seite(b, vp) {
   await p.click("[data-xp-kauf]"); await p.waitForSelector(".xp-dialog #xp-einsetzen"); await p.click("#xp-einsetzen"); await p.waitForSelector("#xp-leer");
   check(DB.einsatz.length === 2 && DB.besitz.mittel === 0, "Einsetzen von der Heldenkarte aus: das letzte Paket ist verbraucht");
   check(await p.evaluate(() => /keine Erfahrungspakete im Vorrat/.test(document.querySelector("#xp-leer").textContent) && !!document.querySelector("#xp-zum-haendler")), "Leerer Vorrat: Hinweis und der Knopf „Zum Händler“");
+  await p.click("#fenster-zu");
+  // kurz vor Stufe 10: Warnung und eigene Bestätigung
+  DB.xp.berserker = 5600; DB.besitz.gross = 1; const vorher = DB.einsatz.length;
+  await p.click("[data-xp-kauf]"); await p.waitForSelector(".xp-dialog #xp-einsetzen");
+  const w0 = await p.evaluate(() => ({ warn: !document.querySelector("#xp-warnung").hidden, text: document.querySelector("#xp-warnung").textContent.replace(/\s+/g, " "), knopf: document.querySelector("#xp-einsetzen").textContent }));
+  check(w0.warn && /nur noch 50 XP/.test(w0.text) && /verfallen 300 XP/.test(w0.text), `Großes Paket bei 50 fehlenden XP: Warnhinweis „nur noch 50 XP … verfallen 300 XP“`);
+  await p.click("#xp-einsetzen");
+  check(DB.einsatz.length === vorher && await p.evaluate(() => /Trotzdem einsetzen \(300 XP verfallen\)/.test(document.querySelector("#xp-einsetzen").textContent)), "Der erste Klick setzt noch nichts ein – der Knopf verlangt die Bestätigung „Trotzdem einsetzen“");
+  if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + "/xp-warnung.png" });
+  await p.click("#xp-einsetzen"); await p.waitForFunction(() => /höchste Stufe/.test((document.querySelector(".xp-dialog") || {}).textContent || ""));
+  check(DB.einsatz.length === vorher + 1 && DB.besitz.gross === 0, "Nach der Bestätigung wird das Paket eingesetzt: Stufe 10");
+  await p.click("#fenster-zu"); DB.xp.berserker = 230;
+  await p.click('.hub-zurueck[data-hub="uebersicht"]').catch(() => {}); await p.waitForSelector('.dorf-ort[data-hub="helden"]'); await p.click('.dorf-ort[data-hub="helden"]'); await p.waitForSelector("[data-heldenseite]");
+  await p.click('.sm-xp-zeile[data-held-stufe="gelehrter"]'); await p.waitForSelector("#xp-leer");
   await p.click("#xp-zum-haendler"); await p.waitForSelector(".xp-pakete");
   check(await p.evaluate(() => !document.querySelector(".xp-dialog") || document.querySelector(".xp-dialog").offsetParent === null), "… der führt direkt zu den Paketen");
   check(!fehler.length, "keine Skriptfehler" + (fehler.length ? ": " + fehler.join(" | ") : ""));

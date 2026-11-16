@@ -41,6 +41,7 @@ function server(name, args) {
     return sicht(); }
   if (name === "rpg_ranked_result") { DB.ergebnis++; const m = (S.db.kaempfe[ID] || {}).match; if (!m || m.status !== "beendet") return { ranked: true, gewertet: false, vor: 105 };
     if (DB.punkte === 105) { DB.punkte = 90; DB.niederlagen++; } return { ranked: true, gewertet: true, vor: 105, delta: -15, nach: 90, rang_vor: 1, rang_nach: 0, weit: false }; }
+  if (name === "rpg_ranked_gegenueber") return { da: true, ranked: true, host: 1, gast: 1 };
   if (name === "rpg_arena_looks") return { host: { name: "Spieler A", avatar: "schildwaechter", rahmen: null }, gast: { name: "Runenwolf_3", avatar: "trickser", rahmen: null } };
   if (name === "rpg_looks") return {};
   if (name === "rpg_arena_get") return sicht() || { fehler: "Diesen Kampf gibt es nicht." };
@@ -96,6 +97,9 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   check(/Ranked: Suche nach einem Gegner in deinem Rang/.test(await p.textContent(".arena-suche")) && /Bronze II/.test(await p.textContent(".arena-suche")) && /nach 25 Sekunden/.test(await p.textContent(".arena-suche")), "Suche: „in deinem Rang“, mit Abzeichen und dem Hinweis auf die 25 Sekunden");
   const auf = await p.waitForSelector(".arena-gegenueber", { timeout: 20000 }).then(() => true, () => false);
   check(auf && DB.queue.every((x) => x === "ranked") && DB.queue.length >= 3, "Gesucht wird nur in der Ranked-Warteschlange; danach steht ein Gegner bereit");
+  const rg = await p.waitForSelector('.arena-team[data-team-seite="2"] .arena-team-rang', { timeout: 5000 }).then(() => p.evaluate(() => [...document.querySelectorAll(".arena-team")].map((t) => (t.classList.contains("gegner") ? "Gegner" : "ich") + ":" + (t.querySelector(".arena-team-rang") ? t.querySelector(".arena-team-rang").textContent.trim() + (t.querySelector(".arena-team-rang .rang-emblem") ? "+Emblem" : "") : "–")).join(" | ")), () => "fehlt");
+  if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + "/aufstellung-rang.png" });
+  check(/ich:(II)?Bronze II\+Emblem/.test(rg) && /Gegner:(II)?Bronze II\+Emblem/.test(rg), `Aufstellung: Unter beiden Namen steht der Rang mit Emblem (${rg})`);
   check(await p.waitForSelector("#karte .fig", { timeout: 25000 }).then(() => true, () => false) && S.db.kaempfe[ID].st.arena.modus === "duell" && Math.abs(S.db.kaempfe[ID].st.arena.bot.staerke - 0.63) < 1e-9, "Gespielt wird ein Duell; der Rechner-Gegner bekommt seine Stärke aus dem Rang");
   await p.click("#arena-aufgeben");
   const ende = await p.waitForSelector(".rang-ergebnis", { timeout: 20000 }).then(() => true, () => false);

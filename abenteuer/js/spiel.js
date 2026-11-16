@@ -882,6 +882,8 @@
     const akt = R.aktiv(st);
     const g = st.figuren.find((f) => f.seite === "gegner" && f.x === x && f.y === y && f.tp > 0);
     if (!wahl && g) { gegnerInfo = gegnerInfo === g.id ? null : g.id; render(); return; }
+    // Eigene Helden und Verbündete antippen: Infokarte mit dem, was auf sie wirkt (nur stehende Figuren – auf ein Feld mit einer Figur am Boden kann man laufen)
+    { const h = !wahl && st.figuren.find((f) => f.seite === "spieler" && f.x === x && f.y === y && f.tp > 0 && !f.tot); if (h) { gegnerInfo = gegnerInfo === h.id ? null : h.id; render(); return; } }
     if (st.ende || akt.seite !== "spieler") return;
     if (wahl) {
       const z = R.ziele(st, wahl).find((f) => f.x === x && f.y === y);
@@ -939,13 +941,23 @@
     atem: "Atem: Greift alle paar Runden mehrere Ziele auf einmal an.",
     boss: "Anführer: ruft Tote zu Hilfe. Siegelsteine und sein wahrer Name schwächen ihn.",
   };
+  // Kurz erklärt, was ein Zustand bedeutet: [Name wie in der Anzeige, Erklärung]
+  const ZUSTAND_KURZ = { verlangsamt: ["verlangsamt", "bewegt sich langsamer"], veraengstigt: ["verängstigt", "Nachteil auf Angriffe; in der Arena im eigenen Zug nur laufen"], festgehalten: ["festgehalten", "kann sich nicht bewegen"], geblendet: ["geblendet", "Nachteil auf eigene Angriffe, leichter zu treffen"],
+    liegend: ["liegt", "liegt am Boden"], vergiftet: ["vergiftet", "Nachteil auf Angriffe"], entwaffnet: ["entwaffnet", "hat die Waffe verloren"], zeitriss: ["Zeitriss", "verlangsamt, ohne Bonusaktion, −2 RK"], verbannt: ["verbannt", "setzt aus"],
+    raserei: ["Raserei", "kämpft in Raserei"], versteckt: ["versteckt", "der nächste Angriff hat Vorteil"], segen: ["gesegnet", "+1W4 auf Angriffe und Rettungswürfe"], schild: ["Schild des Glaubens", "höhere Rüstungsklasse"],
+    spiegel: ["Spiegelbilder", "Angriffe treffen oft nur ein Trugbild"], finte: ["Finte", "täuscht an – der nächste Angriff ist vorbereitet"], gift: ["Gift bereit", "der nächste Treffer vergiftet"], spott: ["verspottet", "muss den Spötter angreifen"],
+    stich: ["Schattenstich", "Nachteil auf den nächsten Angriff"], ruecksichtslos: ["rücksichtslos", "schlägt härter zu, ist leichter zu treffen"], rueckzug: ["Rückzug", "diesen Zug keine Gelegenheitsangriffe gegen die Figur"],
+    blutung: ["blutet", "verliert zu Beginn des eigenen Zugs Leben"], bruch: ["Rüstung durchbrochen", "niedrigere Rüstungsklasse"], mal_jaeger: ["Jägermal", "der Jäger trifft dieses Ziel härter"], brandmal: ["Brandmal", "gezeichnet: Treffer des Inquisitors brennen"] };
   function zeichneGegnerInfo() {
     const el = $("#gegner-info"), g = gegnerInfo && R.fig(st, gegnerInfo);
-    if (!g || g.tp <= 0) { gegnerInfo = null; el.hidden = true; el.innerHTML = ""; return; }
-    if (heldA(g)) { // Arena: Held des anderen Spielers – nur das, was man am Tisch auch sähe
-      const an = Math.max(0, g.tp / g.tpMax), zz = R.zustaende(st, g); el.hidden = false;
-      el.innerHTML = `<div class="gi-kopf"><img class="gi-bild" src="${wolfA(g) ? "img/figuren/wolf.jpg" : F.bild(g.fidA)}" alt=""><div><b>${esc(g.name)}</b><small>Gegnerischer Held${g.stufe ? " · Stufe " + g.stufe : ""}</small></div><button class="link" id="gi-zu" aria-label="Schließen">✕</button></div>
-        <div class="gi-tp"><i style="width:${an * 100}%"></i><span>❤ ${g.tp} / ${g.tpMax}</span></div><ul class="gi-werte"><li><span>Rüstungsklasse</span><b>${R.rkEff ? R.rkEff(st, g) : g.rk}</b></li></ul>${zz.length ? `<p class="gi-zust">${zz.map(esc).join(" · ")}</p>` : ""}`;
+    if (!g || g.tp <= 0 || g.tot) { gegnerInfo = null; el.hidden = true; el.innerHTML = ""; return; }
+    if (heldA(g) || g.seite === "spieler") { // Held (eigener oder – Arena – der des anderen Spielers): Leben, Rüstung und was gerade auf ihn wirkt
+      const an = Math.max(0, g.tp / g.tpMax), zz = R.zustaende(st, g), eigen = g.seite === "spieler", wolf = eigen ? g.art === "wolf" : wolfA(g); el.hidden = false;
+      const rest = (name) => { const k = Object.keys(g.z || {}).find((x) => g.z[x] && ZUSTAND_KURZ[x] && ZUSTAND_KURZ[x][0] === name.replace(/ \(.*$/, "")), v = k && g.z[k], n = v && typeof v === "object" ? v.rest : typeof v === "number" && v > 0 && v < 20 && k !== "segen" ? v : null;
+        return { text: k ? ZUSTAND_KURZ[k][1] : "", n: k === "spiegel" ? null : n }; };
+      const eff = zz.length ? `<ul class="gi-eff">${zz.map((z) => { const r = rest(z); return `<li><b>${esc(z)}</b><span>${esc(r.text)}${r.n ? ` (noch ${r.n})` : ""}</span></li>`; }).join("")}</ul>` : `<p class="gi-keine">Keine Effekte aktiv.</p>`;
+      el.innerHTML = `<div class="gi-kopf"><img class="gi-bild" src="${wolf ? "img/figuren/wolf.jpg" : F.bild(eigen ? g.fid : g.fidA)}" alt=""><div><b>${esc(g.name)}</b><small>${eigen ? (wolf ? "Begleiter" : "Held") : "Gegnerischer Held"}${g.stufe ? " · Stufe " + g.stufe : ""}</small></div><button class="link" id="gi-zu" aria-label="Schließen">✕</button></div>
+        <div class="gi-tp"><i style="width:${an * 100}%"></i><span>❤ ${Math.max(0, g.tp)} / ${g.tpMax}</span></div><ul class="gi-werte"><li><span>Rüstungsklasse</span><b>${R.rkEff ? R.rkEff(st, g) : g.rk}</b></li></ul>${eff}`;
       return;
     }
     const d = R.GEGNER[g.art], anteil = Math.max(0, g.tp / g.tpMax), z = R.zustaende(st, g);
@@ -995,6 +1007,13 @@
     pruefGast(pruef, json);
     const davor = st;
     st = R.laden(json); window.AB.st = st; wahl = null;
+    // Der Server schickt nur die letzten Zeilen der Chronik. Fallen vorn Zeilen weg, rückt der Merker „bis hierher schon gezeigt“ mit –
+    // sonst gälte ab der Grenze jede neue Zeile als alt, und Würfel und Meldungen erschienen nicht mehr.
+    if (davor && davor.seed === st.seed && davor.log.length) {
+      const ende = davor.log.slice(-8).map((l) => l.t), n = st.log.map((l) => l.t); let ab = -1;
+      for (let i = n.length - ende.length; i >= 0 && ab < 0; i--) if (ende.every((t, j) => n[i + j] === t)) ab = i + ende.length;
+      letzterLog = ab < 0 ? Math.min(letzterLog, st.log.length) : Math.max(0, Math.min(st.log.length, letzterLog - (davor.log.length - ab)));
+    }
     if (davor && gezeigt.st === davor && davor.seed === st.seed && davor.log.length <= st.log.length) {
       // derselbe Kampf, nächster Schritt: Gezeigt sind die Lebenspunkte des vorigen Schritts (ein noch laufender Würfel wird abgelöst)
       clearTimeout(wurfWarten); wurfWarten = null; gezeigt = { st, tp: {} }; for (const f of davor.figuren) gezeigt.tp[f.id] = f.tp;

@@ -3,6 +3,8 @@
  * Browser lassen Ton erst nach dem ersten Tipp zu: Die Musik beginnt deshalb mit der ersten Berührung der Seite.
  * Lautstärke in den Einstellungen (Regler „Musik“, 0 = aus), gemerkt auf diesem Gerät. Während des Intros schweigt sie (das Intro hat eigene Musik).
  * Die Dateien werden erst geladen, wenn ihr Ort zum ersten Mal betreten wird.
+ * Manche Geräte (iPhone, iPad) lassen die Lautstärke nicht per Programm stellen: Dort gibt es keine Überblendung – das alte Stück
+ * hält sofort an, das neue beginnt. Die Lautstärke wird ohnehin selbst mitgeführt (a._v) und nie vom Gerät zurückgelesen.
  * Globaler Name: window.ABMUSIK = { ort(), laut(), setze(v) }
  */
 (function () {
@@ -14,6 +16,8 @@
   const KEY = "ab_musik", BLENDE = 1800, UEBERLAPP = 3.5;
   let laut = 0.45; try { const v = parseFloat(localStorage.getItem(KEY)); if (v >= 0 && v <= 1) laut = v; } catch (e) { /* privat */ }
   let frei = false;          // erst nach dem ersten Tipp darf Ton spielen
+  // Lässt das Gerät die Lautstärke stellen? (Zum Ausprobieren am Computer: ?lautfest)
+  const FEST = (() => { if (/[?&]lautfest/.test(location.search)) return true; try { const t = new Audio(); t.volume = 0.37; return Math.abs(t.volume - 0.37) > 0.01; } catch (e) { return true; } })();
   let jetzt = null;          // { name, a: Audio, ziel: 0..1 }
   const alle = new Set();    // alle Audios, die gerade ein- oder ausblenden
 
@@ -30,9 +34,10 @@
   const datei = (name) => STUECKE[name] || STUECKE[SONST[name]] || null;
 
   function neu(src) {
-    const a = new Audio(src); a.preload = "auto"; a.volume = 0; a._soll = 0; a._weg = false; alle.add(a);
+    const a = new Audio(src); a.preload = "auto"; a._v = 0; a._soll = 0; a._weg = false; alle.add(a);
+    if (FEST) a.loop = true; else a.volume = 0;
     // Wiederholen mit Überblendung: kurz vor dem Ende beginnt eine zweite Wiedergabe von vorn
-    a.addEventListener("timeupdate", () => { if (a._weg || a._folgt || !a.duration || a.duration - a.currentTime > UEBERLAPP) return;
+    a.addEventListener("timeupdate", () => { if (FEST || a._weg || a._folgt || !a.duration || a.duration - a.currentTime > UEBERLAPP) return;
       if (!jetzt || jetzt.a !== a) return; a._folgt = true; const b = neu(src); jetzt.a = b; b._soll = 1; a._soll = 0; a._weg = true; b.play().catch(() => {}); });
     a.addEventListener("ended", () => { alle.delete(a); });
     return a;
@@ -53,8 +58,9 @@
     wechsle(ort());
     for (const a of alle) {
       const soll = a._soll * laut, schritt = dt / BLENDE * Math.max(0.2, laut);
-      a.volume = Math.max(0, Math.min(1, a.volume < soll ? Math.min(soll, a.volume + schritt) : Math.max(soll, a.volume - schritt)));
-      if (a._weg && a.volume <= 0.001) { a.pause(); alle.delete(a); }
+      a._v = Math.max(0, Math.min(1, a._v < soll ? Math.min(soll, a._v + schritt) : Math.max(soll, a._v - schritt)));
+      if (!FEST) { try { a.volume = a._v; } catch (e) { /* nicht stellbar */ } }
+      if (a._weg && (FEST || a._v <= 0.001)) { a.pause(); alle.delete(a); }
     }
   }, 120);
   const los = () => { if (frei) return; frei = true; wechsle(ort()); };
@@ -71,5 +77,5 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", regler); else regler();
 
-  window.ABMUSIK = { ort, laut: () => laut, setze, spielt: () => (jetzt ? { src: jetzt.src, laut: jetzt.a.volume, pausiert: jetzt.a.paused } : null) };
+  window.ABMUSIK = { ort, laut: () => laut, setze, spielt: () => (jetzt ? { src: jetzt.src, laut: jetzt.a._v, pausiert: jetzt.a.paused } : null), laufend: () => [...alle].filter((a) => !a.paused).length, fest: FEST };
 })();

@@ -2225,3 +2225,11 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .hinweis-knoepfe { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 .kh-info #kh-ok { margin-left: auto; padding: 6px 14px; border-radius: 9px; border: 1px solid rgba(232,196,106,.9); background: linear-gradient(180deg, #a8323d, #7d2029); color: #fff; font: 600 13px var(--schrift-ui, inherit); }
 .kh-info #kh-ok + #kh-ab { margin-left: 0; }
+/* Blutung: ein Tropfen rinnt an der Figur herab */
+.fx-schild.blut { filter: drop-shadow(0 0 7px rgba(200,20,20,.75)); animation: fx-blut 1.5s ease-in forwards; }
+@keyframes fx-blut { 0% { opacity: 0; transform: translate(-50%, -85%) scale(.55); } 18% { opacity: 1; transform: translate(-50%, -70%) scale(1); } 70% { opacity: .95; transform: translate(-50%, -32%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -8%) scale(.9, 1.12); } }
+/* Figur antippen: Effekte in der Infokarte */
+.gi-eff { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 5px; }
+.gi-eff li { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 1.35; }
+.gi-eff li b { color: #d9c2ff; white-space: nowrap; } .gi-eff li span { color: var(--muted); }
+.gi-keine { margin: 8px 0 0; font-size: 13px; color: var(--muted); }

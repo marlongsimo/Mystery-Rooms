@@ -84,7 +84,7 @@
     return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height, b: feld * Math.max(1, Math.min(1.25, r.width / (feld || 1))) };
   }
   /** Lichtsäule um eine Figur: grün bei Heilung, Feuer bei Feuerzaubern. Sie steigt auf, dreht sich und verglüht */
-  const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp", dolch: "img/fx/dolch.webp", netz: "img/fx/netz.webp", muenzen: "img/fx/muenzen.webp", ranke: "img/fx/ranke.webp", schatten: "img/fx/schatten.webp", licht: "img/fx/licht.webp", sterne: "img/fx/sterne.webp", mal: "img/fx/mal.webp", gift: "img/fx/gift.webp", aura: "img/fx/aura.webp", hieb: "img/fx/hieb.webp", welle: "img/fx/welle.webp" };
+  const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp", dolch: "img/fx/dolch.webp", netz: "img/fx/netz.webp", muenzen: "img/fx/muenzen.webp", ranke: "img/fx/ranke.webp", schatten: "img/fx/schatten.webp", licht: "img/fx/licht.webp", sterne: "img/fx/sterne.webp", mal: "img/fx/mal.webp", gift: "img/fx/gift.webp", blut: "img/fx/blut.webp", aura: "img/fx/aura.webp", hieb: "img/fx/hieb.webp", welle: "img/fx/welle.webp" };
   // Breite in Feldern, Höhe : Breite, Dauer in ms, zwei gespiegelte Lagen (Drehung)?
   const SAEULE = { heil: [1.1, 2.27, 1500, true], feuer: [1.1, 2.27, 1500, true], eis: [1.3, 1.34, 1300, false], blitz: [1.1, 1.95, 800, false], ranke: [1.25, 1.6, 1600, false], muenzen: [1.2, 1.62, 1300, false], schatten: [1.6, 1.09, 1500, false], licht: [1.1, 2.5, 1400, false], welle: [2, .6, 800, false] }; let fxGeladen = false;
   function saeule(id, art) {
@@ -109,7 +109,7 @@
     wrap.appendChild(d); setTimeout(() => d.remove(), 1900);
   }
   /** Zustände: Sterne über dem Kopf (betäubt, verlangsamt …), Zielmarke (Jägermal), Giftwolke, goldene Aura (Segen und Stärkung) */
-  const MARKE = { sterne: [1.1, .85, -.62, 1700], mal: [1.15, 1.09, -.1, 1500], gift: [1.4, 1.09, -.1, 1700], aura: [1.4, 1.09, -.12, 1600] }; // Breite in Feldern, Höhe : Breite, Lage (in Figurhöhen über der Mitte), Dauer
+  const MARKE = { blut: [.8, 1.50, -.2, 1500], sterne: [1.1, .85, -.62, 1700], mal: [1.15, 1.09, -.1, 1500], gift: [1.4, 1.09, -.1, 1700], aura: [1.4, 1.09, -.12, 1600] }; // Breite in Feldern, Höhe : Breite, Lage (in Figurhöhen über der Mitte), Dauer
   const ZUSTAND_FX = { betaeubt: "sterne", verlangsamt: "sterne", geblendet: "sterne", entwaffnet: "sterne", zeitriss: "sterne", mal_jaeger: "mal", analyse: "mal", vergiftet: "gift", gift: "gift", segen: "aura", raserei: "aura", spiegel: "aura", schild: "schild", schutzkreis: "schild" };
   function marke(id, art) {
     if (art === "schild") return schild(id);
@@ -336,6 +336,9 @@
     for (const f of st.figuren) { if (f.tp <= 0 || !vorher.z || !vorher.z[f.id]) continue;
       const arten = [...new Set(neu.z[f.id].filter((k) => !vorher.z[f.id].includes(k)).map((k) => ZUSTAND_FX[k]))].filter((a) => !(a === "schild" && beschirmt[f.id]));
       arten.forEach((a, i) => setTimeout(() => marke(f.id, a), (logNeu.some((l) => l.wurf) ? 620 : 0) + 150 + i * 350)); }
+    // Blutung: Bei jedem Schaden durch die Wunde (und wenn sie geschlagen wird) fällt ein Blutstropfen an der Figur herab
+    for (const l of logNeu) { const m = /^(.+?) blutet(?:: \d+ Schaden)?\.$/.exec(l.t || ""); if (!m) continue;
+      const f = st.figuren.find((x) => x.name === m[1]); if (f) setTimeout(() => marke(f.id, "blut"), /Schaden/.test(l.t) ? 80 : (logNeu.some((x) => x.wurf) ? 620 : 0) + 300); }
     // Netz: Wer neu im Netz hängt, bekommt es übergeworfen (nach dem Würfel)
     for (const f of st.figuren) if (neu.netz[f.id] && vorher.netz && !vorher.netz[f.id]) setTimeout(() => netz(f.id), logNeu.some((l) => l.wurf) ? 620 : 0);
     if (krit) { setTimeout(() => { blitz("gold"); beben(); }, wuerfel + 160); }

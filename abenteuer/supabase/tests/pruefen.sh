@@ -68,6 +68,12 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/n
 ARENA_NACH=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%' and p.proname not in ('rpg_arena_search_server', 'rpg_arena_fight', 'rpg_arena_fight_leader', 'rpg_arena_srv_load', 'rpg_arena_srv_save', 'rpg_arena_srv_end')")
 if [ "$ARENA_VOR" = "$ARENA_NACH" ]; then echo "✓ Migration 015 verändert keine vorhandene Arena-Funktion (008, 014)"; else echo "✗ Migration 015 hat eine vorhandene Arena-Funktion verändert"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 015_rpg_arena_serverkampf_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql 2>/dev/null     # zweimal: idempotent
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 016_rpg_arena_spielarten_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null     # 015 nach 016 erneut: darf an den erweiterten Tabellen nicht scheitern
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten_rueckbau.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null     # nach dem Rückbau von 016: stellt die Fassungen aus 015 wieder her
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf_rueckbau.sql
 ARENA_ENDE=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
 if [ "$ARENA_VOR" = "$ARENA_ENDE" ]; then echo "✓ Nach dem Rückbau von 015 ist alles wie vorher"; else echo "✗ Der Rückbau von 015 hinterlässt Reste"; exit 1; fi

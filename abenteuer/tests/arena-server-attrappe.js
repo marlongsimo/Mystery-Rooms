@@ -48,7 +48,7 @@ function attrappe() {
   function sicht(id, nutzer, version) {
     const k = db.kaempfe[id]; if (!k) return { server: false };
     const seite = k.match.host_id === nutzer ? 1 : 2;
-    return { server: true, v: k.v, laeuft: Boolean(k.st), status: k.match.status, seite, beginn: k.beginn, jetzt: Date.now(), anfuehrer: seite === 1 ? k.anf1 : k.anf2,
+    return { server: true, v: k.v, laeuft: Boolean(k.st), status: k.match.status, seite, modus: k.match.modus || null, privat: Boolean(k.privat), beginn: k.beginn, jetzt: Date.now(), anfuehrer: seite === 1 ? k.anf1 : k.anf2,
       schritte: k.schritte.filter((s) => s.v > (version || 0)).slice(0, 12).map((s) => ({ v: s.v, st: seite === 1 ? s.sicht1 : s.sicht2 })) };
   }
   return { db, kampf, ruf, sicht, DIENST };

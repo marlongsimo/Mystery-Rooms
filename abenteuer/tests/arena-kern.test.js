@@ -66,6 +66,11 @@ for (const [seed, name] of [[4712, "Arena"], [4713, "Königsmord"], [4714, "Die 
   }
   check(JSON.stringify(e.sichten[0].sicht1).length < 200000, `${name}: Eine Sicht bleibt handlich (${Math.round(JSON.stringify(e.sichten[0].sicht1).length / 1024)} KB)`);
 }
+// Festgelegter Modus (Normal, Arcade, privat) geht vor der Zufallszahl
+{ const m = (modus) => Object.assign(match(4712, "gruft"), { modus }); // 4712 ergäbe „arena“
+  const d = K.start(m("duell"), 0, 0, 0).st, h = K.start(m("horde"), 0, 0, 0).st, k = K.start(m("koenig"), 1, 1, 0).st, x = K.start(m("unsinn"), 0, 0, 0).st;
+  check(d.arena.modus === "duell" && !d.figuren.some((f) => !R.teamVon(d, f)) && h.arena.modus === "horde" && k.arena.modus === "koenig" && Boolean(k.arena.koenig) && x.arena.modus === "arena",
+    "Ein am Kampf festgelegter Modus gilt (Duell ohne Monster, Horde, Königsmord); eine unbekannte Angabe fällt auf das Los zurück"); }
 // Unerlaubtes
 { const s = K.start(match(4712, "gruft"), 0, 0, 5000), st = s.st, a = R.aktiv(st), tm = R.teamVon(st, a);
   check(K.zug(st, tm, { typ: "bewegen", x: 99, y: 99 }, 6000).fehler && K.zug(st, tm, { typ: "aktion", aktion: "gibt_es_nicht" }, 6000).fehler && K.zug(st, tm, { typ: "zaubern" }, 6000).fehler && K.zug(st, 3, { typ: "ende" }, 6000).fehler,

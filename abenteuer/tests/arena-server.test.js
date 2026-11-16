@@ -10,7 +10,7 @@ const URL = "http://localhost:8765/abenteuer/index.html?schnell&arena=server";
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 const S = attrappe(); Object.assign(S.db.nutzer, { "tok-A": "nutzer-A", "tok-B": "nutzer-B" });
 const ID = "00000000-0000-0000-0000-00000000d001";
-const DB = { teams: {}, suchend: null, xp: { A: { schildwaechter: 1350, lichtbringer: 260 }, B: { berserker: 850 } }, live: 0, anf: 0 };
+const DB = { teams: {}, suchend: null, arten: [], einl: null, suchAb: 0, xp: { A: { schildwaechter: 1350, lichtbringer: 260 }, B: { berserker: 850 } }, live: 0, anf: 0 };
 const stufe = (xp) => { const bis = [100, 150, 250, 350, 500, 700, 900, 1200, 1500]; let s = 1, r = xp || 0; while (s < 10 && r >= bis[s - 1]) { r -= bis[s - 1]; s++; } return s; };
 const team = (ich, helden) => helden.map((h) => ({ held: h, stufe: stufe(DB.xp[ich][h]) }));
 const schnitt = (t) => Math.round(t.reduce((a, h) => a + h.stufe, 0) / t.length * 10) / 10;
@@ -21,7 +21,7 @@ function sicht(ich) {
   const m = k.match, seite = m.host_id === "nutzer-" + ich ? 1 : 2, sieg = m.sieger === seite, t = seite === 1 ? m.host_team : m.guest_team;
   return { id: ID, status: m.status, seite, host: { name: m.host_name, schnitt: schnitt(m.host_team), team: m.host_team }, gast: { name: m.guest_name, schnitt: schnitt(m.guest_team), team: m.guest_team }, karte: m.karte, begegnung: m.begegnung, seed: m.seed, room_code: null,
     kampfstufe: m.kampfstufe, sieger: m.sieger || null, grund: m.grund || null, punkte: m.punkte || null, runden: m.runden || null,
-    belohnung: m.status === "beendet" ? { sieg, gewertet: true, waehrung: sieg ? 17 : 0, angebot: null, xp: t.map((h) => ({ held: h.held, xp: sieg ? 25 : 8, vorher: h.stufe, stufe: h.stufe, gesamt: (DB.xp[ich][h.held] || 0) + (sieg ? 25 : 8), neu: true })) } : null };
+    belohnung: m.status === "beendet" && k.privat ? { sieg: false, gewertet: false, waehrung: 0, angebot: null, xp: [] } : m.status === "beendet" ? { sieg, gewertet: true, waehrung: sieg ? 17 : 0, angebot: null, xp: t.map((h) => ({ held: h.held, xp: sieg ? 25 : 8, vorher: h.stufe, stufe: h.stufe, gesamt: (DB.xp[ich][h.held] || 0) + (sieg ? 25 : 8), neu: true })) } : null };
 }
 function server(ich, name, args) {
   const fehler = (t) => ({ fehler: t }), squad = () => (DB.teams[ich] ? { konto: true, team: team(ich, DB.teams[ich]), schnitt: schnitt(team(ich, DB.teams[ich])) } : { konto: true, team: null });
@@ -39,10 +39,22 @@ function server(ich, name, args) {
       DB.suchend = null; return sicht(ich); }
     DB.suchend = { wer: ich, host: { name: "Spieler " + ich, schnitt: schnitt(t), team: t } }; return sicht(ich);
   }
+  // Migration 016: Spielarten und privater Kampf
+  if (name === "rpg_arena_queue") { DB.arten.push(ich + ":" + args.p_art); const k = S.db.kaempfe[ID]; if (k) return sicht(ich); const t = team(ich, DB.teams[ich]);
+    DB.suchend = { wer: ich, art: args.p_art, host: { name: "Spieler " + ich, schnitt: schnitt(t), team: t } }; return sicht(ich); }
+  if (name === "rpg_my_friends") return { freunde: [{ handle: "Spieler " + (ich === "A" ? "B" : "A") }], anfragen_an_mich: [], anfragen_von_mir: [], blockiert: [] };
+  if (name === "rpg_arena_invite") { DB.einl = { id: "00000000-0000-0000-0000-0000000000e1", von: ich, an: args.p_handle.slice(-1), modus: args.p_modus, status: "offen" }; return DB.einl.id; }
+  if (name === "rpg_arena_invites") { const e = DB.einl; return { an_mich: e && e.an === ich && e.status === "offen" ? [{ id: e.id, von: "Spieler " + e.von, modus: e.modus, seit: new Date().toISOString() }] : [],
+    von_mir: e && e.von === ich ? { id: e.id, an: "Spieler " + e.an, modus: e.modus, status: e.status, kampf: e.status === "angenommen" ? sicht(ich) : null } : null }; }
+  if (name === "rpg_arena_invite_cancel") { if (DB.einl && DB.einl.status === "offen") DB.einl.status = "zurueck"; return true; }
+  if (name === "rpg_arena_invite_answer") { const e = DB.einl; if (!e || e.an !== ich || e.status !== "offen") return fehler("Diese Einladung gilt nicht mehr."); if (!args.p_accept) { e.status = "abgelehnt"; return null; }
+    const t1 = team(e.von, DB.teams[e.von]), t2 = team(ich, DB.teams[ich]);
+    S.kampf(ID, { beginn: Date.now() + 5000, match: { host_id: "nutzer-" + e.von, guest_id: "nutzer-" + ich, host_name: "Spieler " + e.von, guest_name: "Spieler " + ich, host_team: t1, guest_team: t2, seed: 4712, modus: e.modus, karte: "gruft", begegnung: "kobolde", kampfstufe: Math.round(Math.max(schnitt(t1), schnitt(t2))) } });
+    S.db.kaempfe[ID].privat = true; e.status = "angenommen"; return sicht(ich); }
   if (name === "rpg_arena_get") return sicht(ich) || fehler("Diesen Kampf gibt es nicht.");
   if (name === "rpg_arena_fight") return S.sicht(ID, "nutzer-" + ich, args.p_version);
   if (name === "rpg_arena_fight_leader") { const k = S.db.kaempfe[ID]; if (!k || k.st) return false; DB.anf++; if (k.match.host_id === "nutzer-" + ich) k.anf1 = args.p_idx; else k.anf2 = args.p_idx; return true; }
-  if (name === "rpg_arena_cancel") { const k = S.db.kaempfe[ID]; if (!k) { DB.suchend = null; return { id: ID, status: "abgebrochen", seite: 1 }; }
+  if (name === "rpg_arena_cancel") { const k = S.db.kaempfe[ID]; if (!k) { DB.suchend = null; DB.suchAb++; return { id: ID, status: "abgebrochen", seite: 1 }; }
     const m = k.match, seite = m.host_id === "nutzer-" + ich ? 1 : 2; if (m.status === "laeuft") Object.assign(m, { status: "beendet", sieger: 3 - seite, grund: "aufgabe" }); else if (m.status === "bereit") m.status = "abgebrochen"; return sicht(ich); }
   return fehler("unbekannt: " + name);
 }
@@ -54,7 +66,7 @@ async function spieler(b, ich, mobil) {
   await p.route(/\/rest\/v1\/rpc\/rpg_hero_levels(\?|$)/, (r) => json(r, { konto: true, xp: DB.xp[ich] }));
   await p.route(/\/rest\/v1\/rpc\/rpg_(my_inbox|my_campaigns)(\?|$)/, (r) => json(r, r.request().url().includes("inbox") ? { freunde: [], kampagnen: [] } : []));
   await p.route(/\/rest\/v1\/rpc\/(create_game_session|join_game_session|set_session_state)(\?|$)/, (r) => { DB.live++; return json(r, { message: "nicht erwartet" }, 400); });
-  await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z_]+|my_wallet)(\?|$)/, (r) => { const name = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1]; let args = {}; try { args = JSON.parse(r.request().postData() || "{}"); } catch (e) { /* leer */ }
+  await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z_]+|my_wallet|my_friends)(\?|$)/, (r) => { const name = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1]; let args = {}; try { args = JSON.parse(r.request().postData() || "{}"); } catch (e) { /* leer */ }
     const e = server(ich, name, args); return e && e.fehler ? r.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ code: "P0001", message: e.fehler }) }) : json(r, e); });
   // Die Edge Function: die gebaute Datei, in Node ausgeführt. Wer anfragt, bestimmt hier das Gerät (im Echtbetrieb das Anmelde-Token).
   await p.route(/\/functions\/v1\/arena(\?|$)/, async (r) => { if (r.request().method() === "OPTIONS") return json(r, {});
@@ -68,16 +80,42 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
 (async () => {
   const b = await chromium.launch();
   const A = await spieler(b, "A"), B = await spieler(b, "B", true), seite = { A: 1, B: 2 };
-  // Teams festlegen, beide suchen
+  // Teams festlegen
   for (const [s, helden] of [[A, ["schildwaechter", "lichtbringer", "wildnislaeufer"]], [B, ["trickser", "elementarist", "berserker"]]]) {
     await s.p.click('.dorf-ort[data-hub="arena"]'); await s.p.waitForSelector("#arena-team-aendern"); await s.p.click("#arena-team-aendern");
     for (const f of helden) await s.p.click(`[data-arena-held="${f}"]`);
-    await s.p.click("#arena-wahl-ok"); await s.p.waitForSelector("#arena-suchen:not([disabled])"); await s.p.click("#arena-suchen");
+    await s.p.click("#arena-wahl-ok"); await s.p.waitForSelector('[data-arena-art="normal"]:not([disabled])');
   }
+  const arten = (await A.p.textContent(".arena-arten")).replace(/\s+/g, " ");
+  check(/Normal/.test(arten) && /Duell/.test(arten) && /Arcade/.test(arten) && /Königsmord oder Horde/.test(arten) && /Privater Kampf/.test(arten) && /Ohne Wertung/.test(arten) && !(await A.p.$("#arena-suchen")),
+    "Übersicht: drei Spielarten – Normal (Duell), Arcade (Los aus drei Modi), Privater Kampf");
+  await shot(A.p, "arten-1-uebersicht"); await shot(B.p, "arten-2-uebersicht-handy");
+  // Normal und Arcade: suchen mit der gewählten Spielart, abbrechen
+  await A.p.click('[data-arena-art="normal"]'); await A.p.waitForSelector(".arena-suche");
+  check(/Normal: Suche nach einem Duell/.test(await A.p.textContent(".arena-suche")) && DB.arten.includes("A:normal"), "Normal: Suchbildschirm, die Suche läuft in der Warteschlange „normal“");
+  await A.p.click("#arena-suche-ab"); await A.p.waitForSelector(".arena-arten");
+  await A.p.click('[data-arena-art="arcade"]'); await A.p.waitForSelector(".arena-suche");
+  check(/Arcade/.test(await A.p.textContent(".arena-suche")) && DB.arten.includes("A:arcade") && DB.suchAb >= 1, "Arcade: eigene Warteschlange; Abbrechen trägt die Suche aus");
+  await A.p.click("#arena-suche-ab"); await A.p.waitForSelector(".arena-arten");
+  // Privater Kampf: Modus wählen, Freund einladen
+  await A.p.click("#arena-privat"); await A.p.waitForSelector("[data-privat-freund]");
+  const pw = (await A.p.textContent("[data-arena]")).replace(/\s+/g, " ");
+  check(/Privater Kampf/.test(pw) && /Spieler B/.test(pw) && await A.p.evaluate(() => document.querySelectorAll("[data-privat-modus]").length === 4 && document.querySelector('[data-privat-modus="duell"]').classList.contains("an")), "Privater Kampf: vier Modi zur Wahl (Duell vorgewählt), darunter die Freundesliste");
+  await A.p.click('[data-privat-modus="koenig"]'); await shot(A.p, "arten-3-privat");
+  await A.p.click('[data-privat-freund="Spieler B"]'); await A.p.waitForSelector(".arena-suche");
+  check(/Warte auf Spieler B/.test(await A.p.textContent(".arena-suche")) && DB.einl && DB.einl.modus === "koenig" && DB.einl.an === "B", "Einladung an den Freund mit dem gewählten Modus (Königsmord); A wartet");
+  const einl = await B.p.waitForSelector(".arena-einladung", { timeout: 12000 }).then(() => true, () => false);
+  const et = einl ? (await B.p.textContent(".arena-einladung")).replace(/\s+/g, " ") : "";
+  check(einl && /Spieler A fordert dich heraus/.test(et) && /Königsmord/.test(et) && /ohne Wertung/.test(et), "Der Freund sieht die Einladung in seiner Arena: wer, welcher Modus, ohne Wertung");
+  await shot(B.p, "arten-4-einladung-handy");
+  await B.p.click("[data-einl-ja]");
   const auf = await A.p.waitForSelector(".arena-gegenueber", { timeout: 15000 }).then(() => true, () => false) && await B.p.waitForSelector(".arena-gegenueber", { timeout: 15000 }).then(() => true, () => false);
-  check(auf && S.db.kaempfe[ID], "Beide suchen im Server-Modus und landen in der Aufstellung");
+  check(auf && S.db.kaempfe[ID], "Annehmen: Beide landen in der Aufstellung");
   // Königsmord: Anführer wählen – er geht an den Server, nicht an den Gegner
-  await B.p.waitForSelector('[data-arena-anf="berserker"]'); await B.p.click('[data-arena-anf="berserker"]'); await A.p.click('[data-arena-anf="lichtbringer"]');
+  await B.p.waitForSelector('[data-arena-anf="berserker"]', { timeout: 10000 });
+  const mt = (await B.p.textContent("#arena-modus-text")).replace(/\s+/g, " ");
+  check(/Privater Kampf · ohne Wertung/.test(mt) && /Königsmord/.test(mt) && !/Das Los hat entschieden/.test(mt), "Aufstellung: gewählter Modus Königsmord (die Zufallszahl hätte „Arena“ ergeben), gekennzeichnet als privat");
+  await B.p.click('[data-arena-anf="berserker"]'); await A.p.click('[data-arena-anf="lichtbringer"]');
   const zaehlt = await warte(A.p, () => /beginnt in \d+/.test((document.querySelector("#arena-status") || {}).textContent || ""), null, 8000);
   check(zaehlt, "Aufstellung: Der Countdown kommt vom Server");
   const los = await warte(A.p, () => { const s = document.querySelector("#spiel"); return s && !s.hidden && document.querySelectorAll("#karte .fig").length >= 6; }, null, 30000)
@@ -97,15 +135,13 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   // erst zeigen beide Geräte alle Schritte des Starts (Monster ziehen einzeln), dann ist der Held des Servers auch dort an der Reihe
   const aufgeholt = await warte(d.ich.p, (id) => window.AB.R.aktiv(window.AB.st).id === id, d.a.id, 20000) && await warte(d.andere.p, (id) => window.AB.R.aktiv(window.AB.st).id === id, d.a.id, 20000);
   check(aufgeholt, "Beide Geräte haben den Stand des Servers eingeholt: derselbe Held ist an der Reihe");
-  const ziel = await d.ich.p.evaluate(() => { const st = window.AB.st, Rr = window.AB.R, a = Rr.aktiv(st); const kk = [...Rr.bewegungsfelder(st, a).keys()].filter((x) => x !== a.x + "," + a.y); // ein Feld, das nicht unter der Aktionsleiste liegt
-    for (const key of kk.reverse()) { const [x, y] = key.split(",").map(Number), q = document.querySelector(`#karte .feld[data-x="${x}"][data-y="${y}"]`).getBoundingClientRect(), px = q.left + q.width / 2, py = q.top + q.height / 2, el = document.elementFromPoint(px, py);
-      if (el && el.classList && el.classList.contains("feld")) return { id: a.id, x, y, px, py }; } return null; });
+  const ziel = await d.ich.p.evaluate(() => { const st = window.AB.st, Rr = window.AB.R, a = Rr.aktiv(st); const kk = [...Rr.bewegungsfelder(st, a).keys()].filter((x) => x !== a.x + "," + a.y);
+    const [x, y] = kk[kk.length - 1].split(",").map(Number); return { id: a.id, x, y }; });
   const vVor = k.v;
   // Die andere Seite tippt auch – das darf nichts auslösen
   await d.andere.p.mouse.click(300, 300).catch(() => {});
-  if (process.env.DEBUG) console.log("   debug", d.ich.ich, JSON.stringify(ziel), JSON.stringify(await d.ich.p.evaluate((z) => { const st = window.AB.st, a = window.AB.R.aktiv(st); const el = document.elementFromPoint(z.px, z.py);
-    return { akt: a.id, seite: a.seite, sicht: st.arena.sicht, hat: window.AB.R.bewegungsfelder(st, a).has(z.x + "," + z.y), el: el && (el.id || el.className.baseVal || el.className || el.tagName), dx: el && el.dataset && el.dataset.x, dy: el && el.dataset && el.dataset.y, zug: st.zug }; }, ziel)));
-  await d.ich.p.mouse.click(ziel.px, ziel.py);
+  // Tipp auf das Feld (als Ereignis am Feld selbst: An manchen Stellen liegt die Aktionsleiste über dem Kartenrand)
+  await d.ich.p.evaluate((z) => document.querySelector(`#karte .feld[data-x="${z.x}"][data-y="${z.y}"]`).dispatchEvent(new MouseEvent("click", { bubbles: true })), ziel);
   const bewegtIch = await warte(d.ich.p, (z) => { const f = window.AB.R.fig(window.AB.st, z.id); return f && f.x === z.x && f.y === z.y; }, ziel, 8000);
   const bewegtAndere = await warte(d.andere.p, (z) => { const f = window.AB.st.figuren.find((x) => x.id === z.id); return f && f.x === z.x && f.y === z.y; }, ziel, 8000);
   const fs = R.fig(stand(), ziel.id);
@@ -133,7 +169,7 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   const endeB = await warte(B.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Startseite|Helden wählen/.test(e.textContent); }, null, 30000);
   const tA = endeA ? (await A.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "", tB = endeB ? (await B.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "";
   check(endeA && endeB && new RegExp(sieger === 1 ? "Sieg" : "Niederlage").test(tA) && new RegExp(sieger === 2 ? "Sieg" : "Niederlage").test(tB), "Ergebnis: Ein Gerät zeigt „Sieg“, das andere „Niederlage“ – ohne dass ein Gerät etwas gemeldet hat");
-  check(/XP/.test(tA) && /XP/.test(tB) && /\+17 Seelensplitter/.test(sieger === 1 ? tA : tB), "Belohnungen aus der Datenbank werden angezeigt");
+  check(/Privater Kampf: ohne Wertung/.test(tA) && /Privater Kampf: ohne Wertung/.test(tB) && !/XP/.test(tA + tB) && !/Seelensplitter/.test(tA + tB) && !/Tagesgrenze/.test(tA + tB), "Privater Kampf: Das Ergebnis nennt „ohne Wertung“, keine Belohnung");
   await shot(A.p, "server-3-ende-a");
   await A.p.click("#arena-ende-zu"); const zurueck = await warte(A.p, () => { const h = document.querySelector("#hub"); return h && !h.hidden; }, null, 15000);
   check(zurueck, "„Zur Startseite“ führt zurück ins Dorf");

@@ -44,6 +44,7 @@
       ziel: ["Liegt ein Team ganz am Boden – durch Monster oder Gegner –, gewinnt das andere.", "Sonst entscheiden nach 30 Runden die Punkte."] } };
   const LOS = ["arena", "koenig", "horde", "duell"]; // Reihenfolge wie in rpg_arena_modus (Migration 010)
   const modusVon = (m) => { const fest = new URLSearchParams(location.search).get("arenamodus"); if (MODI[fest]) return fest;
+    if (m && Z.festModus && Z.festModus.id === m.id && MODI[Z.festModus.modus]) return Z.festModus.modus; // Serverkampf: Der Modus steht am Kampf
     return m && m.seed != null && isFinite(Number(m.seed)) ? LOS[Math.abs(Math.trunc(Number(m.seed))) % LOS.length] : "arena"; };
   const modusHtml = (k, gross) => `<div class="arena-modus-karte${gross ? " gross" : ""}"><h3>${MODI[k].name}</h3><p>${MODI[k].lang}</p><b>So gewinnst du</b><ul>${MODI[k].ziel.map((z) => `<li>${z}</li>`).join("")}</ul></div>`;
   // Der eigene Anführer (Königsmord) wird nur auf diesem Gerät gemerkt
@@ -151,13 +152,19 @@
         <div class="arena-team-helden">${t ? t.team.map(held).join("") : leer + leer + leer}</div>
         <div class="arena-meinteam-fuss"><small>${t ? "Mit diesen drei Helden trittst du in jedem Kampf an, bis du das Team änderst." : eigene < 3 ? "Du brauchst mindestens drei Helden in deiner Sammlung." : "Lege fest, mit welchen drei Helden du in der Arena antrittst."}</small>
           <button class="btn ${t ? "ghost" : ""} klein" id="arena-team-aendern" ${eigene < 3 || Z.teamFehlt ? "disabled" : ""}>${t ? "Team bearbeiten" : "Team festlegen"}</button></div></div>
-      <div class="knoepfe arena-suchknopf"><button class="btn gross" id="arena-suchen" ${t ? "" : "disabled"}>⚔ Gegner suchen</button></div>
+      ${SERVER ? `<div id="arena-einladungen"></div>
+      <div class="arena-arten">
+        <button class="arena-art" data-arena-art="normal" ${t ? "" : "disabled"}><b>⚔ Normal</b><span>Duell: drei gegen drei, keine Monster.</span><em>Gegner suchen</em></button>
+        <button class="arena-art" data-arena-art="arcade" ${t ? "" : "disabled"}><b>🎲 Arcade</b><span>Arena, Königsmord oder Horde – das Los entscheidet.</span><em>Gegner suchen</em></button>
+        <button class="arena-art privat" id="arena-privat" ${t ? "" : "disabled"}><b>♟ Privater Kampf</b><span>Fordere einen Freund heraus und wähle den Modus. Ohne Wertung.</span><em>Freund einladen</em></button>
+      </div>` : `<div class="knoepfe arena-suchknopf"><button class="btn gross" id="arena-suchen" ${t ? "" : "disabled"}>⚔ Gegner suchen</button></div>`}
       <p class="note">${t ? `Gesucht wird ein Gegner mit Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))}. ` : ""}${L.heute != null ? `Belohnungen heute: ${Math.min(5, L.heute)} von 5 ${L.nur_siege ? "Siegen" : "Kämpfen"}. ` : ""}Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
       <div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
         <h2>So läuft ein Kampf</h2>
         <ul><li>Du legst einmal dein Team aus drei Helden fest. Es gilt für jeden Kampf, bis du es änderst.</li>
           <li>„Gegner suchen“ verbindet dich mit einem anderen Suchenden, dessen Durchschnittsstufe höchstens eine Stufe von deiner entfernt ist.</li>
-          <li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>
+          ${SERVER ? `<li><b>Normal</b> ist immer ein Duell. In <b>Arcade</b> wird zwischen Arena, Königsmord und Horde gelost. Im <b>privaten Kampf</b> forderst du einen Freund heraus und wählst den Modus; er zählt nicht für Belohnungen und kennt keine Stufengrenze.</li>
+          <li>Die Karte wird ausgelost. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>` : `<li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>`}
           <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
           <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
           <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. ${L.nur_siege ? "Erfahrung und Heldenchance gibt es bis zum fünften Sieg des Tages; Niederlagen zählen nicht mit." : "Erfahrung und Heldenchance gibt es für die ersten fünf Kämpfe des Tages."}</li></ul>
@@ -167,14 +174,73 @@
     const ta = $("#arena-team-aendern"); if (ta) ta.onclick = () => heldenWahl({ titel: "Mein Team", knopf: "Team speichern", vorwahl: t ? t.team.map((h) => h.held) : [],
       fertig: async (team) => { Z.team = await rpc("rpg_arena_squad_set", { p_team: team }); Z.modus = null; zeigen(); } });
     const su = $("#arena-suchen"); if (su) su.onclick = () => suchen();
+    document.querySelectorAll("[data-arena-art]").forEach((b) => { b.onclick = () => suchen(b.dataset.arenaArt); });
+    const pv = $("#arena-privat"); if (pv) pv.onclick = () => privatWahl();
+    if (SERVER) { einladungenZeigen(); pollen(5000, async () => { if (!seiteOffen() || Z.modus) return stoppUhr(); try { Z.einl = await rpc("rpg_arena_invites", {}); } catch (e) { if (fehlt(e)) { Z.einl = null; stoppUhr(); } } einladungenZeigen(); });
+      rpc("rpg_arena_invites", {}).then((e) => { Z.einl = e; einladungenZeigen(); }, () => {}); }
+  }
+  /** Einladungen von Freunden zu einem privaten Kampf (über der Auswahl der Spielart) */
+  function einladungenZeigen() {
+    const el = $("#arena-einladungen"); if (!el) return; const l = (Z.einl && Z.einl.an_mich) || [], team = Z.team && Z.team.team;
+    el.innerHTML = l.map((e) => `<div class="arena-einladung"><div><b>${esc(e.von)} fordert dich heraus</b><small>Privater Kampf · ${esc((MODI[e.modus] || {}).name || e.modus)} · ohne Wertung</small></div>
+      <span><button class="btn klein" data-einl-ja="${esc(e.id)}" ${team ? "" : "disabled"}>Annehmen</button><button class="btn ghost klein" data-einl-nein="${esc(e.id)}">Ablehnen</button></span></div>`).join("") + (l.length && !team ? `<p class="note">Lege zuerst dein Team fest, dann kannst du annehmen.</p>` : "");
+    el.querySelectorAll("[data-einl-ja]").forEach((b) => { b.onclick = async () => { b.disabled = true; stoppUhr();
+      try { const m = await rpc("rpg_arena_invite_answer", { p_id: b.dataset.einlJa, p_accept: true }); if (m) { Z.match = m; meinMerken(m.id); return aufstellung(m); } } catch (e) { Z.fehler = e.message; } zeigen(); }; });
+    el.querySelectorAll("[data-einl-nein]").forEach((b) => { b.onclick = async () => { b.disabled = true; try { await rpc("rpg_arena_invite_answer", { p_id: b.dataset.einlNein, p_accept: false }); } catch (e) { /* schon weg */ }
+      if (Z.einl) Z.einl.an_mich = (Z.einl.an_mich || []).filter((x) => x.id !== b.dataset.einlNein); einladungenZeigen(); }; });
+  }
+  /** Privater Kampf: Modus wählen, Freund einladen */
+  async function privatWahl(modus) {
+    stoppUhr(); Z.modus = "privat"; const gewaehlt = MODI[modus] ? modus : "duell";
+    let freunde = null, fehlerText = "";
+    try { const d = await rpc("rpg_my_friends", {}); freunde = (d && d.freunde) || []; } catch (e) { fehlerText = e.message; freunde = []; }
+    if (!seiteOffen() || Z.modus !== "privat") return;
+    seite(`<h1 class="hub-gruss">Privater Kampf</h1><p class="hub-untertitel">Wähle den Modus und fordere einen Freund heraus. Ohne Wertung, ohne Stufengrenze.</p>
+      ${Z.fehler || fehlerText ? `<p class="fb">${esc(Z.fehler || fehlerText)}</p>` : ""}
+      <h2 class="hub-zwischen">Modus</h2>
+      <div class="arena-modus-wahl">${LOS.slice().sort((a, b) => (a === "duell" ? -1 : b === "duell" ? 1 : 0)).map((k) => `<button class="arena-modus-knopf ${k === gewaehlt ? "an" : ""}" data-privat-modus="${k}"><b>${MODI[k].name}</b><span>${MODI[k].kurz}</span></button>`).join("")}</div>
+      <h2 class="hub-zwischen">Freund</h2>
+      ${freunde.length ? `<ul class="arena-liste">${freunde.map((f) => `<li><div><b>${esc(f.handle)}</b></div><button class="btn klein" data-privat-freund="${esc(f.handle)}">Einladen</button></li>`).join("")}</ul>`
+        : `<p class="note">Du hast noch keine Freunde in deiner Liste. In der Taverne kannst du Spieler suchen und als Freunde hinzufügen.</p>`}
+      <div class="knoepfe"><button class="btn ghost" id="arena-privat-zurueck">Zurück</button></div>`);
+    Z.fehler = "";
+    document.querySelectorAll("[data-privat-modus]").forEach((b) => { b.onclick = () => { document.querySelectorAll("[data-privat-modus]").forEach((x) => x.classList.toggle("an", x === b)); }; });
+    const mod = () => { const an = document.querySelector("[data-privat-modus].an"); return an ? an.dataset.privatModus : "duell"; };
+    document.querySelectorAll("[data-privat-freund]").forEach((b) => { b.onclick = async () => { b.disabled = true; const m = mod(), name = b.dataset.privatFreund;
+      try { const id = await rpc("rpg_arena_invite", { p_handle: name, p_modus: m }); einladungWarten(id, name, m); } catch (e) { Z.fehler = fehlt(e) ? "Private Kämpfe sind in der Datenbank noch nicht eingerichtet (Migration 016 fehlt)." : e.message; privatWahl(m); } }; });
+    $("#arena-privat-zurueck").onclick = zeigen;
+  }
+  /** Warten, bis der Freund annimmt oder ablehnt (das Nachfragen ist zugleich das Lebenszeichen der Einladung) */
+  function einladungWarten(id, name, modus) {
+    stoppUhr(); Z.modus = "einladung"; const seit = Date.now(); let vorbei = false, laeuft = false;
+    seite(`<div class="arena-suche" role="status" aria-live="polite">
+        <div class="arena-suche-ring"><i></i><i></i><span>♟</span></div>
+        <h1 class="hub-gruss">Warte auf ${esc(name)} …</h1>
+        <p class="hub-untertitel">Privater Kampf · ${esc(MODI[modus].name)} · <span id="arena-suche-zeit">0:00</span></p>
+        <p class="note" id="arena-suche-text">${esc(name)} sieht deine Einladung in der Arena. Lass diese Seite offen.</p>
+        <div class="knoepfe"><button class="btn ghost" id="arena-suche-ab">Einladung zurückziehen</button></div></div>`);
+    const zurueck = async (meldung) => { if (vorbei) return; vorbei = true; stoppUhr(); clearInterval(takt); try { await rpc("rpg_arena_invite_cancel", { p_id: id }); } catch (e) { /* schon beantwortet */ } Z.modus = null; if (meldung !== false) { Z.fehler = meldung || ""; privatWahl(modus); } };
+    const takt = setInterval(() => { const e = $("#arena-suche-zeit"); if (!e || Z.modus !== "einladung") { clearInterval(takt); if (!vorbei) zurueck(false); return; } const s = Math.floor((Date.now() - seit) / 1000); e.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }, 1000);
+    const fragen = async () => {
+      if (laeuft || vorbei) return; if (!seiteOffen() || Z.modus !== "einladung") return zurueck(false);
+      laeuft = true;
+      try { const d = await rpc("rpg_arena_invites", {}), e = d && d.von_mir; if (vorbei) return;
+        if (e && e.id === id && e.status === "angenommen" && e.kampf) { vorbei = true; stoppUhr(); clearInterval(takt); Z.match = e.kampf; meinMerken(e.kampf.id); return aufstellung(e.kampf); }
+        if (e && e.id === id && e.status === "abgelehnt") return zurueck(`${name} hat abgelehnt.`);
+        if (!e || e.id !== id || e.status === "zurueck") return zurueck("Die Einladung gilt nicht mehr.");
+        if (Date.now() - seit > 10 * 60000) return zurueck(`${name} hat nicht geantwortet.`);
+      } catch (e) { /* nächster Versuch */ } finally { laeuft = false; }
+    };
+    $("#arena-suche-ab").onclick = () => { $("#arena-suche-ab").disabled = true; zurueck(""); };
+    fragen(); pollen(3000, fragen);
   }
   /** Suchbildschirm: fragt alle paar Sekunden nach (das ist zugleich das Lebenszeichen), bis ein Gegner gefunden ist oder abgebrochen wird */
-  function suchen() {
-    stoppUhr(); Z.modus = "suche"; Z.fehler = ""; const t = Z.team, seit = Date.now(); let laeuft = false, vorbei = false;
+  function suchen(art) {
+    stoppUhr(); Z.modus = "suche"; Z.fehler = ""; const t = Z.team, seit = Date.now(); let laeuft = false, vorbei = false, alt = false; // alt: Datenbank ohne Migration 016 → bisherige Server-Suche
     const zeit = () => { const s = Math.floor((Date.now() - seit) / 1000); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
     seite(`<div class="arena-suche" role="status" aria-live="polite">
         <div class="arena-suche-ring"><i></i><i></i><span>⚔</span></div>
-        <h1 class="hub-gruss">Suche nach einem Gegner …</h1>
+        <h1 class="hub-gruss">${art === "normal" ? "Normal: Suche nach einem Duell …" : art === "arcade" ? "Arcade: Suche nach einem Gegner …" : "Suche nach einem Gegner …"}</h1>
         <p class="hub-untertitel">Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))} · <span id="arena-suche-zeit">0:00</span></p>
         <div class="arena-suche-team">${t.team.map((h) => `<img src="${F.bild(h.held)}" alt="${esc((F.FIGUREN[h.held] || {}).name || h.held)}">`).join("")}</div>
         <p class="note" id="arena-suche-text">Sobald ein anderer Spieler mit passender Stufe sucht, werdet ihr verbunden. Lass diese Seite offen.</p>
@@ -187,7 +253,10 @@
       if (laeuft || vorbei) return; if (!seiteOffen() || Z.modus !== "suche") return ende(false);
       laeuft = true;
       try {
-        const m = await rpc(SERVER ? "rpg_arena_search_server" : "rpg_arena_search", {}); if (vorbei) { if (m && m.status === "offen") rpc("rpg_arena_cancel", { p_match_id: m.id }).catch(() => {}); return; }
+        let m = null;
+        if (SERVER && art && !alt) { try { m = await rpc("rpg_arena_queue", { p_art: art }); } catch (e) { if (!fehlt(e)) throw e; alt = true; } }
+        if (!m) m = await rpc(SERVER ? "rpg_arena_search_server" : "rpg_arena_search", {});
+        if (vorbei) { if (m && m.status === "offen") rpc("rpg_arena_cancel", { p_match_id: m.id }).catch(() => {}); return; }
         Z.match = m; meinMerken(m && m.id);
         if (m && m.status !== "offen") { vorbei = true; stoppUhr(); clearInterval(takt); return aufstellung(m); }
         if (Date.now() - seit > 60000) { const e = $("#arena-suche-text"); if (e) e.textContent = "Gerade sucht niemand mit passender Stufe. Du kannst weiter warten oder es später noch einmal versuchen."; }
@@ -235,9 +304,9 @@
       <p class="note" id="arena-status">${ich === 1 ? "Die Verbindung wird aufgebaut …" : "Warte auf den Ersteller des Kampfes …"}</p>
       <div class="knoepfe"><button class="btn ghost klein" id="arena-abbrechen">Abbrechen</button></div>`);
     $("#arena-abbrechen").onclick = async () => { stoppUhr(); Z.kampf = null; Z.anfGeaendert = null; try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon beendet */ } await trennen(); Z.match = null; zeigen(); };
-    const k = modusVon(m), team = (ich === 1 ? m.host : m.gast).team || [];
-    const zeichneModus = () => { const el = $("#arena-modus-text"); if (!el) return; const anf = anfuehrerIdx(m);
-      el.innerHTML = `<p class="arena-los">Das Los hat entschieden</p>${modusHtml(k, true)}
+    let k = modusVon(m), bekannt = !SERVER, privat = false; const team = (ich === 1 ? m.host : m.gast).team || [];
+    const zeichneModus = () => { const el = $("#arena-modus-text"); if (!el) return; if (!bekannt) { el.innerHTML = `<p class="arena-los">Der Modus wird geladen …</p>`; return; } const anf = anfuehrerIdx(m);
+      el.innerHTML = `<p class="arena-los">${privat ? "Privater Kampf · ohne Wertung" : Z.festModus && Z.festModus.id === m.id && k === "duell" ? "Normal" : "Das Los hat entschieden"}</p>${modusHtml(k, true)}
         ${k === "koenig" ? `<div class="arena-anfuehrer"><b>♛ Bestimme deinen Anführer</b> <small>– dein Gegner erfährt nicht, wer es ist.</small><div>${team.map((h, i) => `<button data-arena-anf="${esc(h.held)}" class="${i === anf ? "an" : ""}">${i === anf ? "♛ " : ""}${esc((F.FIGUREN[h.held] || {}).name || h.held)}</button>`).join("")}</div></div>` : ""}
         <p class="note">Jeder Held hat eine Minute Zugzeit.</p>`;
       el.querySelectorAll("[data-arena-anf]").forEach((b) => { b.onclick = () => { anfuehrerMerken(m.id, b.dataset.arenaAnf); zeichneModus(); if (Z.anfGeaendert) Z.anfGeaendert(); }; }); };
@@ -246,6 +315,8 @@
       // Nur wer ausdrücklich den Serverkampf gewählt hat (?arena=server), fragt danach – die bisherige Arena ruft keine der neuen Funktionen auf.
       // Ob es wirklich ein Serverkampf ist, entscheidet der Kampf selbst: Er entsteht nur, wenn BEIDE über die Server-Suche kamen. Sonst läuft er wie bisher.
       if (SERVER) { let s = null; try { s = await rpc("rpg_arena_fight", { p_match_id: m.id, p_version: 0 }); } catch (e) { s = null; }
+        if (s && s.server && MODI[s.modus]) Z.festModus = { id: m.id, modus: s.modus };
+        privat = Boolean(s && s.privat); k = modusVon(m); bekannt = true; zeichneModus();
         if (s && s.server) return serverKampf(m, s); }
       return verbinden(m);
     }).catch((e) => { const s = $("#arena-status"); if (s) s.textContent = "Die Verbindung ist fehlgeschlagen: " + e.message; });
@@ -332,7 +403,7 @@
     return o && o.fehler ? o : { fehler: /not found|404/i.test(error.message || "") ? "Der Server für den Arena-Kampf ist noch nicht eingerichtet." : "Der Server hat nicht geantwortet." };
   }
   function serverKampf(m, s0) {
-    if (Z.kampf) return; const modus = modusVon(m); Z.kampf = { m, gemeldet: false, modus, server: true }; Z.modus = "kampf"; F.STUFEN10.aktiv = true;
+    if (Z.kampf) return; const modus = modusVon(m); Z.kampf = { m, gemeldet: false, modus, server: true, privat: Boolean(s0.privat) }; Z.modus = "kampf"; F.STUFEN10.aktiv = true;
     const ruf = (rumpf) => funktion("arena", Object.assign({ match: m.id }, rumpf));
     let gesehen = 0, gestartet = false, spielt = false, sendet = false, laeuft = false, uhrDiff = Date.now() - (s0.jetzt || Date.now()), letzterStart = 0, letzteZeit = 0, anfDa = s0.anfuehrer, fehlerN = 0;
     const schlange = [], kStatus = (t, html) => { const el = $("#arena-status"); if (el) { if (html) el.innerHTML = t; else el.textContent = t; } };
@@ -430,7 +501,7 @@
       return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>+${h.xp} XP</span></div><i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</small></div></div>`; }).join("")}</div>` : "";
     const text = g.status === "abgebrochen" ? (Z.kampf && Z.kampf.faul ? "Der Kampf wurde ohne Wertung beendet: " + esc(Z.kampf.faul) : Z.kampf && Z.kampf.m && g.sieger == null && g.runden == null && Z.kampf.gemeldetSelbst ? "Der Kampf wurde ohne Wertung beendet: Die beiden Geräte kamen nicht zum selben Ergebnis." : "Der Kampf wurde ohne Wertung beendet.") : g.status === "fehler" ? "Das Ergebnis konnte nicht gemeldet werden: " + esc(g.fehler || "") : g.status === "laeuft" ? "Dein Gegner hat das Ergebnis noch nicht bestätigt. Sobald er es tut, wird gewertet."
       : g.grund === "aufgabe" ? (sieg ? "Dein Gegner hat aufgegeben." : "Du hast aufgegeben.") : g.grund === "team" ? (Z.kampf && Z.kampf.modus === "koenig" ? (sieg ? "Der gegnerische Anführer ist gefallen." : "Dein Anführer ist gefallen.") : sieg ? "Das gegnerische Team liegt am Boden." : "Dein Team liegt am Boden.") : "Nach Punkten entschieden.";
-    const lohn = !b ? "" : !b.gewertet ? (g.grund === "aufgabe" && !sieg ? "" : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}<p class="arena-ende-note">Tagesgrenze erreicht (5 von 5): Dieser Kampf brachte keine Erfahrung mehr. Morgen gibt es wieder welche.</p>`)
+    const lohn = Z.kampf && Z.kampf.privat ? `<p class="arena-ende-note">Privater Kampf: ohne Wertung.</p>` : !b ? "" : !b.gewertet ? (g.grund === "aufgabe" && !sieg ? "" : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}<p class="arena-ende-note">Tagesgrenze erreicht (5 von 5): Dieser Kampf brachte keine Erfahrung mehr. Morgen gibt es wieder welche.</p>`)
       : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}${xp}${b.angebot ? `<p class="arena-ende-lohn held">★ Ein neuer Held will sich dir anschließen!</p>` : ""}`;
     const e = schirm(`<p class="arena-ende-eyebrow">${esc(g.host ? g.host.name : "")} gegen ${esc(g.gast ? g.gast.name : "")}</p><h1>${g.status === "abgebrochen" ? "Abgebrochen" : sieg ? "Sieg" : "Niederlage"}</h1>
       ${p ? `<p class="arena-ende-punkte">${p[1] != null ? p[1] : p["1"]} : ${p[2] != null ? p[2] : p["2"]}</p>` : ""}<p>${text}</p>${lohn}

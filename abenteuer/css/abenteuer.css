@@ -1692,6 +1692,21 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .arena-meinteam-fuss { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
 .arena-meinteam-fuss small { flex: 1 1 220px; color: #b9ad94; font-size: 14px; line-height: 1.4; }
 .arena-held.leer { opacity: .55; border-style: dashed; } .arena-held.leer span { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto; border-radius: 50%; border: 2px dashed rgba(197,162,103,.5); font: 600 26px var(--schrift-titel); color: #c5a267; }
+/* Spielarten: Normal, Arcade, privater Kampf */
+.arena-arten { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0 6px; }
+.arena-art { display: grid; gap: 6px; align-content: start; text-align: left; padding: 16px; border-radius: 14px; border: 1px solid rgba(197,162,103,.55); background: linear-gradient(180deg, rgba(120,30,34,.55), rgba(40,14,18,.7)); color: #f1e3c4; cursor: pointer; font: inherit; transition: transform .15s, border-color .15s; }
+.arena-art:hover:not(:disabled), .arena-art:focus-visible { transform: translateY(-2px); border-color: #e8b04c; }
+.arena-art:disabled { opacity: .5; cursor: default; }
+.arena-art b { font: 600 20px var(--schrift-titel); letter-spacing: .04em; } .arena-art span { font-size: 14px; line-height: 1.4; color: #d9cdb4; min-height: 2.8em; }
+.arena-art em { font-style: normal; font-weight: 600; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: #f5c96a; }
+.arena-art.privat { background: linear-gradient(180deg, rgba(40,52,84,.6), rgba(16,20,34,.75)); }
+.arena-einladung { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 0; padding: 12px 14px; border-radius: 12px; border: 1px solid #e8b04c; background: rgba(232,176,76,.14); }
+.arena-einladung small { display: block; color: #d9cdb4; font-size: 13px; } .arena-einladung span { display: flex; gap: 8px; }
+.arena-modus-wahl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.arena-modus-knopf { display: grid; gap: 4px; text-align: left; padding: 12px; border-radius: 12px; border: 1px solid rgba(197,162,103,.4); background: rgba(0,0,0,.3); color: #f1e3c4; cursor: pointer; font: inherit; }
+.arena-modus-knopf b { font: 600 17px var(--schrift-titel); } .arena-modus-knopf span { font-size: 13px; line-height: 1.35; color: #c9bda3; }
+.arena-modus-knopf.an { border-color: #e8b04c; background: rgba(232,176,76,.18); box-shadow: 0 0 0 1px #e8b04c inset; }
+@media (max-width: 760px) { .arena-arten { grid-template-columns: 1fr; } .arena-art span { min-height: 0; } .arena-modus-wahl { grid-template-columns: 1fr 1fr; } }
 .arena-suchknopf { margin: 16px 0 4px; } .arena-suchknopf .btn { min-width: min(320px, 100%); }
 .arena-suche { display: grid; justify-items: center; gap: 6px; padding: 26px 0 12px; text-align: center; }
 .arena-suche-ring { position: relative; width: 132px; height: 132px; margin-bottom: 10px; display: grid; place-items: center; }

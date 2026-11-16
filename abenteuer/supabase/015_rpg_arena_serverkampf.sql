@@ -6,6 +6,8 @@
 -- alles einfügen → Run. Darf mehrfach ausgeführt werden (idempotent) und ersetzt dabei auch eine abweichende
 -- Fassung des Serverkampfs (siehe Abschnitt 0). Bitte UNVERÄNDERT ausführen: Die Edge Function „arena“ verlässt sich
 -- auf genau diese Funktionen, Parameter und Antworten.
+-- Ist Migration 016 (Normal, Arcade, privater Kampf) schon eingespielt, nach einem erneuten Lauf dieser Datei auch 016
+-- noch einmal ausführen: Diese Datei legt rpg_arena_fight und rpg_arena_srv_load in ihrer Fassung ohne Modus an.
 -- Dazu gehört die Edge Function „arena“ (abenteuer/supabase/functions/arena/index.ts) – ohne sie bleibt alles beim Alten.
 --
 -- NUR FÜR DAS RPG. Rein additiv: drei neue Tabellen, neue Funktionen. NICHTS Vorhandenes wird geändert oder ersetzt –
@@ -58,7 +60,8 @@ begin
   for t in select * from (values ('rpg_arena_steps', 'match_id,sicht1,sicht2,v'), ('rpg_arena_fights', 'anf1,anf2,beginn,match_id,st,updated_at,v'), ('rpg_arena_search_srv', 'match_id,seen_at,user_id')) x(name, soll) loop
     if to_regclass('public.' || t.name) is null then continue; end if;
     select string_agg(column_name, ',' order by column_name) into v_ist from information_schema.columns where table_schema = 'public' and table_name = t.name;
-    if v_ist = t.soll then continue; end if;
+    -- passt, wenn alle erwarteten Spalten da sind (spätere Migrationen dürfen weitere ergänzt haben)
+    if not exists (select 1 from unnest(string_to_array(t.soll, ',')) c where not exists (select 1 from information_schema.columns k where k.table_schema = 'public' and k.table_name = t.name and k.column_name = c)) then continue; end if;
     execute format('select count(*) from public.%I', t.name) into v_n;
     if v_n > 0 then raise exception 'Die Tabelle % hat einen anderen Aufbau als erwartet (%) und enthält schon % Zeilen. Die Migration ändert nichts; bitte melden.', t.name, v_ist, v_n; end if;
     v_weg := true;

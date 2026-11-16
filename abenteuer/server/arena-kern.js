@@ -25,7 +25,8 @@
     /** Frischer Kampf aus den Angaben des Kampfes (wie auf den Geräten: js/arena.js, kampf()) */
     function neu(match, anf1, anf2) {
       if (R.FD && R.FD.STUFEN10) R.FD.STUFEN10.aktiv = true;
-      const modus = modusVon(match.seed), beg = R.BEGEGNUNGEN[match.begegnung] ? match.begegnung : "garten", alt = Math.max(1, Math.min(3, R.BEGEGNUNGEN[beg].stufe || 1));
+      // Der Modus steht am Kampf (Normal: Duell, Arcade: ausgelost, privat: gewählt); ältere Kämpfe ohne Angabe: aus der Zufallszahl
+      const modus = LOS.includes(match.modus) ? match.modus : modusVon(match.seed), beg = R.BEGEGNUNGEN[match.begegnung] ? match.begegnung : "garten", alt = Math.max(1, Math.min(3, R.BEGEGNUNGEN[beg].stufe || 1));
       const st = R.neueArena(match.seed || 1, { modus, anfuehrer: [idx(anf1), idx(anf2)],
         teams: [match.host_team, match.guest_team].map((tm) => tm.map((h) => ({ fid: h.held, stufe: h.stufe }))), namen: [match.host_name, match.guest_name],
         karte: karteVon(match.karte), begegnung: beg, bedrohung: Math.max(0, (match.kampfstufe || 1) - [1, 3, 6][alt - 1]) });

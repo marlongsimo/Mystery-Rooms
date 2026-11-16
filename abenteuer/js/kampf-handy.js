@@ -107,7 +107,8 @@
     // Karte: füllt den Platz zwischen Zugreihenfolge und Leiste; folgt dem Helden am Zug
     if (meinZug) hoehe = el.offsetHeight;
     document.body.style.setProperty("--kh-h", el.offsetHeight + "px");
-    const w = $(".karte-wrap"); if (w) { const oben = w.getBoundingClientRect().top, frei = window.innerHeight - oben - el.offsetHeight - 6; w.style.height = Math.max(180, Math.round(frei)) + "px"; }
+    const w = $(".karte-wrap"); if (w) document.body.style.setProperty("--kh-oben", Math.round(w.getBoundingClientRect().top) + "px");
+    if (w) { const oben = w.getBoundingClientRect().top, frei = window.innerHeight - oben - el.offsetHeight - 6; w.style.height = Math.max(180, Math.round(frei)) + "px"; }
     const wo = a.id + ":" + a.x + "," + a.y;
     if (wo !== mitteFuer) { mitteFuer = wo; mitteAuf(a); } else setzen(false);
   }

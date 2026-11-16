@@ -11,6 +11,8 @@
   const params = new URLSearchParams(location.search);
   const ruhig = () => params.has("schnell") || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) || (() => { try { return localStorage.getItem("ab_effekte") === "aus"; } catch (e) { return false; } })();
   const Z = 60;
+  /** Klang zum Effekt (js/klang.js); verzug in Millisekunden */
+  const klang = (name, verzug, laut) => { if (window.ABKLANG) window.ABKLANG.spiel(name, { verzug: verzug || 0, laut }); };
   let alt = null, stimmung = null, partikel = [], kanal = null, ctx = null, laeuft = false, bossGezeigt = null, endeGezeigt = null;
 
   /* ---------- Stimmung je Kampagne ---------- */
@@ -97,7 +99,7 @@
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const d = document.createElement("div"); d.className = "fx-schild"; d.style.backgroundImage = `url(${FXBILD.schild})`;
     const b = Math.max(28, p.b * 1); d.style.width = b + "px"; d.style.height = b * 1.11 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .15 + "px";
-    wrap.appendChild(d); setTimeout(() => d.remove(), 1400);
+    wrap.appendChild(d); setTimeout(() => d.remove(), 1400); klang("schild");
   }
   /** Netz: fällt von oben über die Figur und bleibt kurz liegen */
   function netz(id) {
@@ -267,16 +269,24 @@
     document.body.classList.toggle("fx-an", !ruhig());
     gruppe(st, R); bossKarte(st, R); kopf(st);
     document.body.dataset.stimmung = stil(STIMMUNG[kampagne()] || "glut");
-    const neu = { pos: {}, tp: {}, rk: {}, netz: {}, z: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st };
+    const neu = { pos: {}, tp: {}, rk: {}, netz: {}, z: {}, akt: R.aktiv(st).id, runde: st.runde, log: st.log.length, st, seed: st.seed, zeilen: st.log.slice(-12).map((l) => l.t) };
     for (const f of st.figuren) { neu.pos[f.id] = [f.x, f.y]; neu.tp[f.id] = f.tp; neu.rk[f.id] = f.rk; neu.netz[f.id] = Boolean(f.z && f.z.festgehalten && f.z.festgehalten.netz); neu.z[f.id] = Object.keys(f.z || {}).filter((k) => f.z[k] && ZUSTAND_FX[k]); }
     const wrap = $(".karte-wrap"); if (wrap) wrap.classList.toggle("mit-bild", Boolean(st.karte.bild));
-    const vorher = alt && alt.st === st ? alt : null;
+    // Derselbe Kampf? Entweder dasselbe Objekt – oder (Arena über den Server: jeder Schritt kommt als neuer Stand) derselbe Seed mit denselben Figuren.
+    let vorher = alt && alt.st === st ? alt : null;
+    if (!vorher && alt && st.arena && alt.seed === st.seed && st.runde >= alt.runde && st.figuren.every((f) => f.id in alt.tp)) {
+      // Die Chronik kann vorn gekürzt sein: Die neuen Zeilen beginnen hinter dem längsten Stück, das mit dem Ende der alten übereinstimmt
+      let ab = st.log.length; const a = alt.zeilen, n = st.log.map((l) => l.t);
+      if (!a.length) ab = 0; else for (let i = n.length - a.length; i >= 0; i--) { if (a.every((t, j) => n[i + j] === t)) { ab = i + a.length; break; } }
+      vorher = Object.assign({}, alt, { log: ab });
+    }
     alt = neu;
     if (ruhig()) return;
     const art = STIMMUNG[kampagne()] || "schnee";
     if (stimmung !== art || !partikel.some((p) => p.amb)) { stimmung = art; ambient(art); }
     starten();
     if (!fxGeladen) { fxGeladen = true; for (const k in FXBILD) new Image().src = FXBILD[k]; }
+    if (window.ABKLANG) window.ABKLANG.laden();
     if (!vorher) {
       // Kampfbeginn: Bosse bekommen einen Auftritt
       const boss = st.figuren.find((f) => f.seite === "gegner" && f.tp > 0 && (R.GEGNER[f.art] || {}).boss) || st.figuren.find((f) => f.seite === "gegner" && f.tp > 0 && istBoss(R, f));
@@ -296,6 +306,7 @@
     const logNeu = st.log.slice(vorher.log); let logTreffer = logNeu, akteur = vorher.akt, gewuerfelt = false;
     if (lage && lage.wartet) { if (!offen) offen = { log: [], akt: vorher.akt }; offen.log = offen.log.concat(logNeu); }
     else if (offen) { logTreffer = offen.log.concat(logNeu); akteur = offen.akt; offen = null; gewuerfelt = true; }
+    if (logNeu.some((l) => l.wurf)) klang("wuerfel"); // der Würfel fällt mit dem ersten Bild des Wurfs
     const krit = logTreffer.some((l) => /kritischer Treffer|kritisch/i.test(l.t) && l.art !== "gegner");
     // Fernangriffe und Zauber: Erst fällt der Würfel (etwa 0,6 s), dann fliegt das Geschoss vom Angreifer (wer vor diesem Bild am Zug war) zu jedem Getroffenen.
     // Wer verfehlt, richtet keinen Schaden an – dann fliegt auch nichts. Zahl und Treffer folgen beim Einschlag.
@@ -306,16 +317,18 @@
       if (d < 0) {
         const kr = krit && f.seite === "gegner", fern = gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite, amZiel = fern && AM_ZIEL[gArt];
         const wann = fern ? (amZiel ? wuerfel + 120 : flug(schuetze.id, f.id, gArt, wuerfel + nr++ * 90) || wuerfel + 180) : wuerfel + 180; // auch im Nahkampf erst nach dem Würfel
+        // Klang: Zauber schwellen an (Höhepunkt 0,3 s nach Beginn) und beginnen deshalb vor dem Einschlag; Hieb, Pfeil und Dolch klingen beim Treffer
+        if (amZiel || (fern && gArt === "kugel")) klang("zauber", Math.max(0, wann - 300)); else klang("hieb", wann, kr ? 1.25 : 1);
         setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && (gArt === "muenzen" || gArt === "licht") ? "gold" : amZiel && gArt === "schatten" ? "blut" : amZiel && gArt === "ranke" ? "heil" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel || !gArt ? 10 : 26);
           if (amZiel) saeule(f.id, gArt);
           else if (!gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite && Math.max(Math.abs(schuetze.x - f.x), Math.abs(schuetze.y - f.y)) <= 2) hieb(schuetze.id, f.id); // gewöhnlicher Nahkampftreffer
           const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, wann);
-      } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 6); saeule(f.id, "heil"); }
+      } else { zahl(f.id, "+" + d, "heil"); wolke(p.x, p.y, "heil", 6); saeule(f.id, "heil"); klang("heil"); }
     }
     // Zauber ohne Schaden (Furcht, Schattenfesseln, Untote vertreiben …): Der Effekt erscheint bei allen, die die Chronik als betroffen nennt
     if (gArt && AM_ZIEL[gArt] && schuetze) { const re = geschossRe(gArt), zeilen = logTreffer.filter((l) => re.test(l.t) && !/widersteht|verfehlt|weicht|niemand/.test(l.t));
       for (const f of st.figuren) { if (f.id === schuetze.id || f.seite === schuetze.seite || f.tp <= 0 || vorher.tp[f.id] !== f.tp) continue;
-        if (zeilen.some((l) => l.t.replace(/^[^:]+: /, "").includes(f.name))) setTimeout(() => saeule(f.id, gArt), wuerfel + 120); } }
+        if (zeilen.some((l) => l.t.replace(/^[^:]+: /, "").includes(f.name))) { klang("zauber", Math.max(0, wuerfel - 180)); setTimeout(() => saeule(f.id, gArt), wuerfel + 120); } } }
     // Schutz: Steigt die Rüstungsklasse einer Figur (Schild des Glaubens, Schutzhaltung, Schutzkreis …), leuchtet ein Schild auf
     const beschirmt = {};
     for (const f of st.figuren) { const v = vorher.rk && vorher.rk[f.id]; if (v != null && f.rk > v && f.tp > 0) { beschirmt[f.id] = true; schild(f.id); } }

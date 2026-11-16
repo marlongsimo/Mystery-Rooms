@@ -977,7 +977,13 @@
     if (json.arena && json.arena.jetzt) uhrVersatz = Date.now() - json.arena.jetzt; // Uhren beider Geräte angleichen
     const pruef = json.pruef; delete json.pruef;
     pruefGast(pruef, json);
-    st = R.laden(json); window.AB.st = st; wahl = null; render(); zugUhrZeigen();
+    const davor = st;
+    st = R.laden(json); window.AB.st = st; wahl = null;
+    if (davor && gezeigt.st === davor && davor.seed === st.seed && davor.log.length <= st.log.length) {
+      // derselbe Kampf, nächster Schritt: Gezeigt sind die Lebenspunkte des vorigen Schritts (ein noch laufender Würfel wird abgelöst)
+      clearTimeout(wurfWarten); wurfWarten = null; gezeigt = { st, tp: {} }; for (const f of davor.figuren) gezeigt.tp[f.id] = f.tp;
+    }
+    render(); zugUhrZeigen();
   }
   /** Arena (Ersteller): Wunsch des Beigetretenen ausführen. Zurück: Fehlertext oder null */
   function arenaWunsch(v) {

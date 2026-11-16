@@ -6,7 +6,8 @@
  * Aufruf: node abenteuer/tests/arena-server.test.js   (Webserver auf Port 8765)
  */
 const { chromium } = require("playwright"); const { ALLE } = require("./alle-helden"); const attrappe = require("./arena-server-attrappe.js"); const R = require("../js/regeln.js");
-const URL = "http://localhost:8765/abenteuer/index.html?schnell&arena=server" + (process.env.HANDY ? "&handy=neu" : ""); // HANDY=1: neue Handy-Bedienung (nur für Bilder; der Ablauf unten bedient die bisherigen Knöpfe)
+const FX = Boolean(process.env.EFFEKTE); // EFFEKTE=1: mit Effekten und Klängen (langsamer); prüft zusätzlich, dass beide Spieler Würfel und Treffer hören
+const URL = "http://localhost:8765/abenteuer/index.html?" + (FX ? "" : "schnell&") + "arena=server" + (process.env.HANDY ? "&handy=neu" : ""); // HANDY=1: neue Handy-Bedienung (nur für Bilder; der Ablauf unten bedient die bisherigen Knöpfe)
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 const S = attrappe(); Object.assign(S.db.nutzer, { "tok-A": "nutzer-A", "tok-B": "nutzer-B" });
 const ID = "00000000-0000-0000-0000-00000000d001";
@@ -82,7 +83,7 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
 const shot = async (p, name) => { if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + "/" + name + ".png" }); };
 const stand = () => R.laden(S.db.kaempfe[ID].st);
 (async () => {
-  const b = await chromium.launch();
+  const b = await chromium.launch({ args: ["--autoplay-policy=no-user-gesture-required"] });
   const A = await spieler(b, "A"), B = await spieler(b, "B", true), seite = { A: 1, B: 2 };
   // Teams festlegen
   for (const [s, helden] of [[A, ["schildwaechter", "lichtbringer", "wildnislaeufer"]], [B, ["trickser", "elementarist", "berserker"]]]) {
@@ -178,6 +179,8 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   const sieger = S.db.enden[0] ? S.db.enden[0].sieger : 0;
   const endeA = await warte(A.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Startseite|Helden wählen/.test(e.textContent); }, null, 30000);
   const endeB = await warte(B.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Startseite|Helden wählen/.test(e.textContent); }, null, 30000);
+  if (FX) for (const [n, X] of [["A", A], ["B", B]]) { const k = await X.p.evaluate(() => window.ABKLANG.gespielt.map((g) => g.name));
+    check(k.includes("wuerfel") && k.includes("hieb"), `Mit Effekten: Bei ${n} sind im Serverkampf Würfel und Treffer zu hören (${k.filter((x) => x === "wuerfel").length} Würfe, ${k.filter((x) => x === "hieb").length} Treffer)`); }
   const tA = endeA ? (await A.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "", tB = endeB ? (await B.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "";
   check(endeA && endeB && new RegExp(sieger === 1 ? "Sieg" : "Niederlage").test(tA) && new RegExp(sieger === 2 ? "Sieg" : "Niederlage").test(tB), "Ergebnis: Ein Gerät zeigt „Sieg“, das andere „Niederlage“ – ohne dass ein Gerät etwas gemeldet hat");
   check(/Privater Kampf: ohne Wertung/.test(tA) && /Privater Kampf: ohne Wertung/.test(tB) && !/XP/.test(tA + tB) && !/Seelensplitter/.test(tA + tB) && !/Tagesgrenze/.test(tA + tB), "Privater Kampf: Das Ergebnis nennt „ohne Wertung“, keine Belohnung");

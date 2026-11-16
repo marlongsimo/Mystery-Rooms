@@ -97,6 +97,14 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../020_rpg_admin_bereich.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../020_rpg_admin_bereich.sql 2>/dev/null     # zweimal: idempotent
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 019_rpg_arena_rechnergegner_test2.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //" | grep -c "✓" | sed "s/^/✓ Mit 020 und Voreinstellung verhält sich der Rechner-Gegner wie in 019 (Prüfungen bestanden: /; s/$/)/"
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 020_rpg_admin_bereich_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+# Migration 022 (Ranked): braucht 015–020 zugleich
+RANK_VOR=$(psql -q -At -d "$DB" -c "select md5(string_agg(regexp_replace(lower(pg_get_functiondef(p.oid)), '[[:space:]\\\"]+', '', 'g'), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and (p.proname like 'rpg_arena%' or p.proname like 'rpg_cosmetic%' or p.proname like 'rpg_admin%')")
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../022_rpg_ranked.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../022_rpg_ranked.sql 2>/dev/null     # zweimal: idempotent
+RANK_MIT=$(psql -q -At -d "$DB" -c "select md5(string_agg(regexp_replace(lower(pg_get_functiondef(p.oid)), '[[:space:]\\\"]+', '', 'g'), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and (p.proname like 'rpg_arena%' or p.proname like 'rpg_cosmetic%' or (p.proname like 'rpg_admin%' and p.proname not like 'rpg_admin_ranked%'))")
+if [ "$RANK_VOR" = "$RANK_MIT" ]; then echo "✓ Migration 022 verändert keine vorhandene Funktion (Arena, Ausstattung, Admin)"; else echo "✗ Migration 022 hat eine vorhandene Funktion verändert"; exit 1; fi
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 022_rpg_ranked_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../022_rpg_ranked_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../020_rpg_admin_bereich_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>/dev/null
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql      # 016 nach 019 erneut: darf nicht scheitern (danach 019 erneut)

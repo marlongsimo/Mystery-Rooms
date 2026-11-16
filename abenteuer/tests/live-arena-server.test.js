@@ -78,9 +78,11 @@ async function konto(b) {
   const imKampf = (await warte(A.p, () => window.AB.arenaAn() && window.AB.st && !document.querySelector("#spiel").hidden, null, 60000)) && (await warte(B.p, () => window.AB.arenaAn() && window.AB.st && !document.querySelector("#spiel").hidden, null, 30000));
   check(imKampf, "Die echte Edge Function startet den Kampf; beide Geräte zeigen ihn" + (imKampf ? "" : " · Status: " + await A.p.evaluate(() => (document.querySelector("#arena-status") || {}).textContent) + " · Function: " + fn.fehler.join(" | ")));
   if (imKampf) {
-    const sicht = await B.p.evaluate(() => ({ rs: window.AB.st.rs, figuren: window.AB.st.figuren.length, runden: window.AB.st.arena.runden }));
-    check(sicht.rs === undefined && sicht.figuren === 6, "Duell auf dem Server: sechs Helden, keine Monster; das Gerät bekommt keinen Zufallsstand");
-    const start = Date.now(), seite = new Map([[A, 1], [B, 2]]); let zuege = 0, letzter = Date.now();
+    const sicht = await B.p.evaluate(() => ({ rs: window.AB.st.rs, figuren: window.AB.st.figuren.length, monster: window.AB.st.figuren.filter((f) => !f.team).length, runden: window.AB.st.arena.runden }));
+    check(sicht.rs === undefined && sicht.figuren >= 6 && sicht.monster === 0, "Duell auf dem Server: nur die Helden beider Teams (mit Begleitern " + sicht.figuren + " Figuren), keine Monster; das Gerät bekommt keinen Zufallsstand");
+    // Wer Ersteller ist, entscheidet die Datenbank (wer zuerst in der Warteschlange stand): die eigene Seite vom Gerät lesen
+    const start = Date.now(), seite = new Map(); for (const S of [A, B]) seite.set(S, await S.p.evaluate(() => window.ARENA.zustand().match.seite)); let zuege = 0, letzter = Date.now();
+    check(seite.get(A) + seite.get(B) === 3, "Die beiden Geräte stehen auf verschiedenen Seiten");
     const lage = (S) => S.p.evaluate((seite) => { const e = document.querySelector("#arena-ende"); if (e && !e.hidden) return { ende: true }; const st = window.AB.st; if (!st || st.ende) return { warten: true };
       const a = window.AB.R.aktiv(st), k = document.querySelector("#ende-zug"); return { dran: window.AB.R.teamVon(st, a) === seite && a.tp > 0 && Boolean(k) && !k.disabled, id: a.id + ":" + st.runde, runde: st.runde }; }, seite.get(S));
     const getan = new Map(); let runde = 0;
@@ -99,6 +101,7 @@ async function konto(b) {
     console.log("  A:", tA.slice(0, 200)); console.log("  B:", tB.slice(0, 200));
     check(eA && eB, "Der Kampf endet; beide Geräte zeigen das Ergebnis aus der Datenbank");
     check(/Sieg|Niederlage/.test(tA) && /Sieg|Niederlage/.test(tB) && /Sieg/.test(tA) !== /Sieg/.test(tB) && !/Abgebrochen|ohne Wertung|nicht gemeldet/.test(tA + tB), "Gewertet: ein Sieg, eine Niederlage – eingetragen vom Server (rpg_arena_srv_end)");
+    check(zuege > 20, "Beide Seiten haben gezogen (" + zuege + " Züge)");
     check(/XP/.test(tA) && /XP/.test(tB), "Belohnungsbuchung: Beide bekommen Erfahrung für ihre Helden");
     check(/\+\d+ Seelensplitter/.test(/Sieg/.test(tA) ? tA : tB), "Der Sieger bekommt Seelensplitter");
   }

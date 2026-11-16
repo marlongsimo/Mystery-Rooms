@@ -19,9 +19,9 @@
     schattenlaeufer: { p: [4, 2, 1, 2, 5], anspruch: 2, spielweise: "Taucht auf, sticht zu, ist wieder weg. Findet Fallen und öffnet, was verschlossen ist." },
     trickser: { p: [3, 2, 3, 3, 4], anspruch: 3, spielweise: "Blendet, täuscht und holt Freunde aus der Gefahr. Hat immer noch einen Trick und manchmal einfach Glück." },
     assassine: { p: [5, 2, 1, 1, 4], anspruch: 2, spielweise: "Der erste Schlag entscheidet. Gift, Schatten und kein unnötiges Wort." },
-    lichtbringer: { p: [2, 4, 4, 2, 1], anspruch: 2, spielweise: "Segnet die Gruppe, heilt im Vorbeigehen und brennt Untote aus der Welt." },
+    lichtbringer: { p: [2, 4, 4, 2, 1], anspruch: 2, spielweise: "Segnet und schützt die Gruppe, heilt mit jedem Treffer ihres Lichts und blendet, was sich ihr nähert." },
     wanderheiler: { p: [1, 3, 5, 2, 2], anspruch: 2, spielweise: "Hält alle am Leben. Wer fällt, steht bei ihm wieder auf." },
-    inquisitor: { p: [4, 4, 2, 3, 1], anspruch: 2, spielweise: "Markiert sein Ziel mit heiligem Feuer und befiehlt ihm zu fliehen. Durchschaut jede Lüge." },
+    inquisitor: { p: [4, 4, 2, 3, 1], anspruch: 2, spielweise: "Markiert sein Ziel mit heiligem Feuer und lässt es nicht mehr entkommen: Richtspruch aus der Ferne, Befehle, Bann. Durchschaut jede Lüge." },
     wildnislaeufer: { p: [4, 2, 1, 2, 4], anspruch: 1, spielweise: "Trifft aus großer Entfernung und hält Abstand. Liest jede Spur." },
     tiergefaehrte: { p: [3, 3, 2, 2, 4], anspruch: 3, spielweise: "Kämpft zu zweit: mit Grau, ihrem Wolf, als zweiter Figur auf dem Feld." },
     kopfgeldjaeger: { p: [4, 2, 1, 3, 3], anspruch: 2, spielweise: "Markiert, fängt und erlegt. Gegen sein Ziel trifft er öfter kritisch." },
@@ -30,7 +30,7 @@
   const KLASSE_ZEICHEN = { krieger: "⚔", zauberer: "✦", schurke: "◆", kleriker: "☀", waldlaeufer: "❦" };
   /** Kurze Angaben je Klasse für die Klassenwahl (Werte aus figuren.js, nur die Worte stehen hier) */
   const KLASSE_INFO = {
-    krieger: { kurz: "Meister des Nahkampfs und Schild der Gefährten.", stark: "Hält am meisten aus, nagelt Gegner fest", platz: "vorn", wofuer: "Für alle, die mitten ins Getümmel wollen." },
+    krieger: { kurz: "Meister des Nahkampfs und Schild der Gefährten.", stark: "Hält am meisten aus, stürmt heran, schlägt im Nahkampf hart zu und nagelt Gegner fest", platz: "vorn", wofuer: "Für alle, die mitten ins Getümmel wollen." },
     zauberer: { kurz: "Hüter arkanen Wissens. Zerbrechlich, aber gefährlich.", stark: "Zauber auf mehrere Gegner, arkaner Schild, Runen lesen", platz: "hinten", wofuer: "Für alle, die gern planen und Wirkung sehen." },
     schurke: { kurz: "Meister der List, der Täuschung und der leisen Klinge.", stark: "Hinterhalt, Nachbluten, Fallen und Schlösser", platz: "Mitte", wofuer: "Für alle, die den richtigen Moment abpassen." },
     kleriker: { kurz: "Heiler, Beschützer und Kämpfer gegen die Finsternis.", stark: "Heilen, segnen, Beistand für Nachbarn", platz: "vorn oder Mitte", wofuer: "Für alle, die die Gruppe zusammenhalten." },

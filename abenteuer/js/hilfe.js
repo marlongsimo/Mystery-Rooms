@@ -92,7 +92,7 @@
     { id: "zug", titel: "Dein Zug im Kampf", html: `
       <p>Wer wann dran ist, bestimmt die Initiative. Die Reihenfolge steht am Rand der Karte. In deinem Zug hast du:</p>
       <ul>
-        <li><b>Bewegung:</b> Krieger 3 Felder, Zauberer und Kleriker 4, Schurken und Waldläufer 5.</li>
+        <li><b>Bewegung:</b> Krieger, Zauberer und Kleriker 4 Felder, Schurken und Waldläufer 5. Krieger laufen 2 Felder weiter, wenn zu Beginn ihres Zugs kein Gegner neben ihnen steht (Sturmangriff).</li>
         <li><b>Eine Aktion:</b> angreifen, zaubern, jemanden aufrichten oder noch einmal so weit laufen (Spurt).</li>
         <li><b>Oft eine Bonusaktion:</b> etwas Kleines nebenher, zum Beispiel einen Heiltrank trinken oder eine besondere Fähigkeit.</li>
         <li><b>Eine Reaktion:</b> Manche Fähigkeiten lösen sich von selbst aus, wenn ein anderer dran ist, etwa Torvalds Schutzhaltung.</li>
@@ -141,7 +141,7 @@
         <li><b>„Das hat Folgen“:</b> Diese Zeile erscheint, wenn eine Entscheidung später zählt.</li>
         <li><b>„Eure Spur“:</b> So markierte Absätze stehen nur da, weil ihr vorher etwas getan oder gelassen habt.</li>
         <li><b>Heldenmomente:</b> Jeder Held hat eigene Auftritte und bekommt am Lagerfeuer eine eigene Frage.</li>
-        <li><b>Am Ende</b> zeigt die Rückschau, was ihr getan habt, und deutet an, woran die anderen Enden hingen. Jedes neue Ende schaltet für euer Konto einen Helden frei.</li>
+        <li><b>Am Ende</b> zeigt die Rückschau, was ihr getan habt, und deutet an, woran die anderen Enden hingen. Mit etwas Glück schließt sich eurem Konto danach ein Held an (8 % beim ersten Mal, das ihr ein Ende erreicht, danach 2 %). Sicher bekommt ihr Helden beim Händler und in der Heldenhalle.</li>
       </ul>` },
     { id: "modus", titel: "Normal oder Hardcore", html: `
       <ul>

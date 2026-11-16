@@ -19,21 +19,24 @@ create function pg_temp.xp(h text) returns integer language sql as $$ select coa
 create function pg_temp.splitter() returns integer language sql as $$ select coalesce((select betrag from public.rpg_wallet where user_id = '00000000-0000-0000-0000-0000000025a1'), 0); $$;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000025a1', false);
 
--- fünf Siege: Erfahrung über 150 je Held hinaus, 25 Seelensplitter je Sieg
-select pg_temp.ok((select bool_and((k).gewertet and (k).waehrung = 25 and jsonb_array_length((k).xp) = 3) from (select pg_temp.kampf(true) k from generate_series(1, 5)) q), 'Fünf Siege: gewertet, je 25 Seelensplitter, Erfahrung für alle drei Helden');
-select pg_temp.ok(pg_temp.xp('schildwaechter') > 150 and pg_temp.xp('schildwaechter') = pg_temp.xp('trickser') and pg_temp.splitter() = 125,
+-- fünf Siege: Erfahrung über 150 je Held hinaus, Seelensplitter je Sieg (fest 25 – oder gewürfelt 5 bis 25, wenn der Auslöser aus 009 da ist)
+select pg_temp.ok((select bool_and((k).gewertet and (k).waehrung between 5 and 25 and jsonb_array_length((k).xp) = 3) from (select pg_temp.kampf(true) k from generate_series(1, 5)) q), 'Fünf Siege: gewertet, Seelensplitter, Erfahrung für alle drei Helden');
+select pg_temp.ok(pg_temp.xp('schildwaechter') > 150 and pg_temp.xp('schildwaechter') = pg_temp.xp('trickser'),
   'Nach fünf Siegen hat jeder Held mehr als 150 XP aus der Arena (' || pg_temp.xp('schildwaechter') || '): Die Grenze je Held und Tag ist weg');
 select (select sum(xp) from public.rpg_xp_ledger where user_id = '00000000-0000-0000-0000-0000000025a1' and adventure = 'arena') as vor6 \gset
--- sechster Sieg: weiter Erfahrung, aber keine Seelensplitter mehr
+select pg_temp.splitter() as s5 \gset
+-- sechster Sieg: Erfahrung und Seelensplitter wie bei den ersten fünf
 select pg_temp.kampf(true) as k6 \gset
 select (select sum(xp) from public.rpg_xp_ledger where user_id = '00000000-0000-0000-0000-0000000025a1' and adventure = 'arena') as nach6 \gset
-select pg_temp.ok(:nach6 > :vor6 and pg_temp.splitter() = 125 and not (:'k6'::public.rpg_arena_rewards).gewertet and (:'k6'::public.rpg_arena_rewards).waehrung = 0 and jsonb_array_length((:'k6'::public.rpg_arena_rewards).xp) = 3
-  and ((:'k6'::public.rpg_arena_rewards).xp->0->>'xp')::integer > 0, 'Sechster Sieg des Tages: bringt weiter Erfahrung (' || (:nach6 - :vor6) || ' XP), aber keine Seelensplitter');
-select pg_temp.ok((public.rpg_arena_list()->>'heute')::int = 5, 'Die Übersicht zählt weiter 5 von 5 Siegen');
+select pg_temp.ok(:nach6 > :vor6 and (:'k6'::public.rpg_arena_rewards).gewertet and (:'k6'::public.rpg_arena_rewards).waehrung between 5 and 25 and pg_temp.splitter() = :s5 + (:'k6'::public.rpg_arena_rewards).waehrung
+  and jsonb_array_length((:'k6'::public.rpg_arena_rewards).xp) = 3, 'Sechster Sieg des Tages: gewertet wie die ersten fünf – Erfahrung (' || (:nach6 - :vor6) || ' XP) und Seelensplitter');
 select pg_temp.kampf(false) as k7 \gset
-select pg_temp.ok((select sum(xp) from public.rpg_xp_ledger where user_id = '00000000-0000-0000-0000-0000000025a1' and adventure = 'arena') > :nach6 and (:'k7'::public.rpg_arena_rewards).gewertet,
-  'Auch eine Niederlage danach bringt ihre Erfahrung');
-select pg_temp.ok((select bool_and(((k).xp->0->>'xp')::integer > 0) from (select pg_temp.kampf(true) k from generate_series(1, 6)) q) and pg_temp.splitter() = 125, 'Sechs weitere Siege: jedes Mal Erfahrung, Seelensplitter bleiben bei 125');
+select pg_temp.ok((select sum(xp) from public.rpg_xp_ledger where user_id = '00000000-0000-0000-0000-0000000025a1' and adventure = 'arena') > :nach6 and (:'k7'::public.rpg_arena_rewards).gewertet
+  and (:'k7'::public.rpg_arena_rewards).waehrung = 0 and pg_temp.splitter() = :s5 + (:'k6'::public.rpg_arena_rewards).waehrung, 'Eine Niederlage bringt ihre Erfahrung, aber keine Seelensplitter');
+-- Heldenchance: 4 % bei jedem Sieg, auch nach dem fünften (das Konto hat schon alle Helden – geprüft wird deshalb am Funktionstext und an vielen Siegen ohne Fehler)
+select pg_temp.ok((select bool_and((k).gewertet and ((k).xp->0->>'xp')::integer > 0) from (select pg_temp.kampf(true) k from generate_series(1, 40)) q), '40 weitere Siege: jedes Mal gewertet, jedes Mal Erfahrung');
+select pg_temp.ok(pg_get_functiondef('public.rpg_arena_belohnen(public.rpg_arena_matches, uuid)'::regprocedure) ~ 'random\(\) < 0\.04' and pg_get_functiondef('public.rpg_arena_belohnen(public.rpg_arena_matches, uuid)'::regprocedure) !~ '0\.08|v_heute|150',
+  'Heldenchance 4 Prozent; keine Tagesgrenze und keine 150er-Grenze mehr in der Funktion');
 -- unverändert: Aufgabe, Sieg durch Aufgabe, kein Konto
 select pg_temp.xp('schildwaechter') as x0 \gset
 select pg_temp.ok(not (pg_temp.kampf(false, 'aufgabe')).gewertet and pg_temp.xp('schildwaechter') = :x0, 'Wer aufgibt, bekommt weiterhin nichts');

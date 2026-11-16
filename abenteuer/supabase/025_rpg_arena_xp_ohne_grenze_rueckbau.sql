@@ -1,7 +1,7 @@
 -- =====================================================================
 -- MYSTERY ROOMS · RPG · Rückbau von Migration 025 (Arena: Erfahrung ohne Tagesgrenzen)
 -- Stellt die bisherige Fassung von rpg_arena_belohnen wieder her: keine Erfahrung mehr nach fünf Siegen am Tag,
--- höchstens 150 XP je Held und Tag. Schon gebuchte Erfahrung bleibt bei den Helden.
+-- höchstens 150 XP je Held und Tag, Heldenchance 8 % bis zum fünften Sieg. Schon Gebuchtes bleibt.
 -- =====================================================================
 begin;
 create or replace function public.rpg_arena_belohnen(p_m public.rpg_arena_matches, p_user uuid)

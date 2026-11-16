@@ -221,13 +221,14 @@
   /* ---------- Händler: jeden Tag drei Helden, die man noch nicht hat (Migration 010) ---------- */
   const rpcFehlt = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
   let shopUhr = null;
-  /* Händler: Eingang mit zwei Feldern – Helden des Tages (mit Countdown bis zur neuen Auswahl) und Ausstattung */
-  async function shopZeigen() {
+  /* Händler: oben der Held der Woche als Sonderangebot, darunter die Felder Ausstattung, Erfahrung und Heldentoken */
+  async function shopZeigen(meldung) {
     const A = window.ARENA, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈";
+    if (typeof meldung !== "string") meldung = "";
     clearInterval(shopUhr);
-    seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
+    if (!meldung) seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
     let s = null, fehler = null;
-    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_week", {}); } catch (e) { fehler = e; }
+    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_week", {}); kaufStand = s && s.konto ? s : null; } catch (e) { fehler = e; }
     if (!document.querySelector("[data-shop]")) return;
     if (fehler && !rpcFehlt(fehler)) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Keine Verbindung</h1><p class="hub-untertitel">${esc(fehler.message)}</p></div>`);
     if (s && !s.konto) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Nur für Spielerkonten</h1><p class="hub-untertitel">Der Händler tauscht ${name} gegen Helden und Ausstattung. Beides gibt es nur mit einem Konto.</p></div>`);
@@ -235,17 +236,29 @@
     const wd = s && s.held ? window.ABF.FIGUREN[s.held] : null;
     seiteZeigen("shop", `<div class="shop" data-shop><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Was darf es sein?</h1>
         <p class="hub-untertitel">${name} bekommst du für Siege in der Arena.</p></div>${s ? `<p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p>` : ""}</div>
+      ${meldung ? `<p class="fb" role="status">${esc(meldung)}</p>` : ""}
+      ${!s ? "" : s.alle || !wd ? `<div class="shop-angebot leer" data-woche><span class="shop-angebot-band">Held der Woche</span><p class="shop-angebot-alle"><b>✓ Du hast alle Helden freigeschaltet.</b><span>Der Händler hat dir keinen Helden mehr anzubieten – vorerst.</span></p></div>`
+        : `<div class="shop-angebot ${s.gekauft ? "gekauft" : ""}" data-woche="${s.held}" style="--k:${window.ABF.KLASSEN[wd.klasse].farbe}"><span class="shop-angebot-band">★ Sonderangebot · Held der Woche</span><span class="shop-angebot-rabatt">−50 %</span>
+            <img class="shop-angebot-bild" src="${window.ABF.bild(s.held)}" alt="">
+            <div class="shop-angebot-text"><b>${esc(wd.name)}</b><small>${esc(wd.titel)} · ${esc(window.ABF.KLASSEN[wd.klasse].name)}</small><button class="my-link" data-shop-ansehen="${s.held}">Ansehen</button></div>
+            <div class="shop-angebot-kauf">${s.gekauft ? `<span class="shop-gekauft">✓ In deiner Sammlung</span>` : `<p class="shop-preis"><s><i>${zeichen}</i> ${s.preis}</s> <b><i>${zeichen}</i> ${s.angebot}</b> <span>${name}</span></p>
+              <button class="btn" data-woche-kauf ${s.angebot > s.waehrung ? "disabled" : ""}>Für <i>${zeichen}</i> ${s.angebot} holen</button>${s.angebot > s.waehrung ? `<small class="shop-fehlt">Es fehlen ${s.angebot - s.waehrung}</small>` : ""}`}
+              <em class="shop-uhr">Neuer Held in <strong id="shop-uhr">${uhr()}</strong></em></div></div>`}
       <div class="shop-felder">
-        <button class="shop-feld helden" data-shop-feld="helden" ${s ? "" : "disabled"}><span class="shop-feld-bilder woche">${wd ? `<img src="${window.ABF.bild(s.held)}" alt="">` : ""}<img class="token" src="img/shop/heldentoken.webp" alt=""></span>
-          <b>Held der Woche</b><span>${!s ? "Folgt bald." : s.alle ? "Du hast alle Helden freigeschaltet." : wd && !s.gekauft ? `${esc(wd.name)} zum halben Preis: <s>${s.preis}</s> ${s.angebot} ${name}. Dazu Heldentoken.` : "Heldentoken: einer schaltet einen Helden deiner Wahl frei."}</span>
-          ${s && s.bis && !s.alle ? `<em class="shop-uhr">Neuer Held in <strong id="shop-uhr">${uhr()}</strong></em>` : ""}</button>
         <button class="shop-feld ausstattung" data-shop-feld="ausstattung"><span class="shop-feld-bilder kos"><span class="kos-bild kos-wuerfel" data-wuerfel="w_glut"><span class="w20-box">${window.ABW ? window.ABW.svg(20) : ""}</span></span><span class="kos-bild kos-rahmen" data-rahmen="r_lorbeer"><span class="rahmen-halter"><span class="hub-avatar">${avatarHtml()}</span></span></span></span>
           <b>Ausstattung</b><span>Würfel-Designs und Profilrahmen. Ab 75 ${name}.</span><em class="shop-uhr">Rein fürs Auge</em></button>
         <button class="shop-feld erfahrung" data-shop-feld="erfahrung"><span class="shop-feld-bilder xp"><img src="img/shop/ep50.webp" alt=""><img src="img/shop/ep150.webp" alt=""><img src="img/shop/ep350.webp" alt=""></span>
           <b>Erfahrung</b><span>Pakete mit 50, 150 oder 350 EP – auf Vorrat, einsetzbar bei jedem Helden.</span><em class="shop-uhr">Täglich begrenzt</em></button>
+        <button class="shop-feld token" data-shop-feld="token" ${s ? "" : "disabled"}><span class="shop-feld-bilder woche"><img class="token" src="img/shop/heldentoken.webp" alt=""></span>
+          <b>Heldentoken</b><span>${s ? `Schaltet in der Heldenhalle einen Helden deiner Wahl frei. ${s.token_preis} ${name}.` : "Folgt bald."}</span><em class="shop-uhr">${s ? `Im Besitz: ${s.tokens}` : ""}</em></button>
       </div></div>`);
+    document.querySelectorAll("[data-shop-ansehen]").forEach((b) => { b.onclick = () => { const f = b.dataset.shopAnsehen; fenster(window.ABF.FIGUREN[f].name, window.ABH_HELDEN.detail(f, 1, "")); }; });
+    { const wk = document.querySelector("[data-woche-kauf]"); if (wk) wk.onclick = async () => {
+        if (!confirm(`${wd.name} für ${s.angebot} ${name} in deine Sammlung holen?`)) return; wk.disabled = true;
+        try { const r = await netz().rpc("rpg_shop_week_buy", {}); kaufStand = r; waehrungZeigen(r.waehrung); if (A && A.pruefen) A.pruefen(true).catch(() => {}); if (SM) await SM.laden(true); shopZeigen(`${wd.name} gehört jetzt zu deiner Sammlung.`); }
+        catch (e) { shopZeigen(e.message); } }; }
     shopUhr = setInterval(() => { const el = $("#shop-uhr"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = uhr(); }, 30000);
-    document.querySelectorAll("[data-shop-feld]").forEach((b) => { b.onclick = () => { clearInterval(shopUhr); if (b.dataset.shopFeld === "helden") shopHelden(); else if (b.dataset.shopFeld === "erfahrung") xpShop(); else if (window.ABKOS) window.ABKOS.ausstattung(); }; });
+    document.querySelectorAll("[data-shop-feld]").forEach((b) => { b.onclick = () => { clearInterval(shopUhr); if (b.dataset.shopFeld === "token") shopHelden(); else if (b.dataset.shopFeld === "erfahrung") xpShop(); else if (window.ABKOS) window.ABKOS.ausstattung(); }; });
   }
   /** „3 Tage 4 Std.“ / „5 Std. 12 Min“ / „12 Min“ bis zu einem Zeitpunkt */
   const restZeit = (bis) => { const ms = Math.max(0, new Date(bis).getTime() - Date.now()), t = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
@@ -254,7 +267,7 @@
   /** Stand für Heldenkäufe (Seelensplitter, Heldentoken, Preise) – auch für die Heldenhalle; null, solange Migration 026 fehlt */
   let kaufStand = null;
   async function kaufLaden() { try { await netz().ensureUser(); const s = await netz().rpc("rpg_shop_week", {}); kaufStand = s && s.konto ? s : null; } catch (e) { kaufStand = null; } return kaufStand; }
-  /* Händler: Held der Woche (halber Preis) und Heldentoken */
+  /* Händler: Heldentoken */
   async function shopHelden(meldung) {
     const A = window.ARENA, F = window.ABF, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈";
     const bald = (text) => seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Folgt bald</h1><p class="hub-untertitel">${text}</p></div>`);
@@ -267,17 +280,11 @@
     if (!s || !s.konto) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Nur für Spielerkonten</h1><p class="hub-untertitel">Der Händler tauscht ${name} gegen Helden. Beides gibt es nur mit einem Konto.</p></div>`);
     kaufStand = s;
     const zeichne = (meld) => {
-      const d = s.held ? F.FIGUREN[s.held] : null, fehltW = s.angebot - s.waehrung, fehltT = s.token_preis - s.waehrung;
-      seiteZeigen("shop", `<div class="shop" data-shop><button class="btn ghost klein shop-zurueck" data-shop-zurueck>← Zum Händler</button><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Held der Woche</h1>
-          <p class="hub-untertitel">Jede Woche ein Held, der dir noch fehlt – zum halben Preis. Jeden anderen schaltest du in der Heldenhalle frei.</p></div><p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p></div>
+      const fehltT = s.token_preis - s.waehrung;
+      seiteZeigen("shop", `<div class="shop" data-shop><button class="btn ghost klein shop-zurueck" data-shop-zurueck>← Zum Händler</button><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Heldentoken</h1>
+          <p class="hub-untertitel">Ein Token schaltet in der Heldenhalle einen Helden deiner Wahl frei.</p></div><p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p></div>
         ${meld ? `<p class="fb" role="status">${esc(meld)}</p>` : ""}
         <div class="shop-woche">
-          ${s.alle || !d ? `<div class="shop-held woche leer" data-woche><span class="shop-alle">✓</span><b>Du hast alle Helden freigeschaltet.</b><small>Der Händler hat dir keinen Helden mehr anzubieten – vorerst.</small></div>`
-            : `<div class="shop-held woche ${s.gekauft ? "gekauft" : ""}" data-woche="${s.held}" style="--k:${F.KLASSEN[d.klasse].farbe}"><span class="shop-band">Held der Woche</span><img src="${F.bild(s.held)}" alt="" loading="lazy"><b>${esc(d.name)}</b><small>${esc(d.titel)} · ${esc(F.KLASSEN[d.klasse].name)}</small>
-              <button class="my-link" data-shop-ansehen="${s.held}">Ansehen</button>
-              ${s.gekauft ? `<span class="shop-gekauft">✓ In deiner Sammlung</span>` : `<p class="shop-preis"><s><i>${zeichen}</i> ${s.preis}</s> <b><i>${zeichen}</i> ${s.angebot}</b> <span>${name}</span></p>
-                <button class="btn" data-woche-kauf ${fehltW > 0 ? "disabled" : ""}>Für <i>${zeichen}</i> ${s.angebot} holen</button>${fehltW > 0 ? `<small class="shop-fehlt">Es fehlen ${fehltW}</small>` : ""}`}
-              <small class="shop-rest">Neuer Held in <span id="shop-rest">${restZeit(s.bis)}</span></small></div>`}
           <div class="shop-held token" data-token>${TOKEN_BILD}<b>Heldentoken</b><small>Schaltet in der Heldenhalle einen Helden deiner Wahl frei.</small>
             <p class="shop-preis"><b><i>${zeichen}</i> ${s.token_preis}</b> <span>${name}</span></p>
             <span class="token-besitz ${s.tokens ? "hat" : ""}">Im Besitz: <b>${s.tokens}</b></span>
@@ -285,13 +292,9 @@
             <button class="my-link" data-token-halle>Zur Heldenhalle</button></div>
         </div>
         <p class="note">${name} bekommst du für Siege in der Arena. In der Heldenhalle kostet jeder Held einen Heldentoken oder ${s.preis} ${name}.</p></div>`);
-      clearInterval(shopUhr); shopUhr = setInterval(() => { const el = $("#shop-rest"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopHelden(); } el.textContent = restZeit(s.bis); }, 30000);
+      clearInterval(shopUhr);
       { const z = document.querySelector("[data-shop-zurueck]"); if (z) z.onclick = () => shopZeigen(); }
-      document.querySelectorAll("[data-shop-ansehen]").forEach((b) => { b.onclick = () => { const f = b.dataset.shopAnsehen; fenster(F.FIGUREN[f].name, window.ABH_HELDEN.detail(f, 1, "")); }; });
       const nach = async (r, text) => { s = r; kaufStand = r; waehrungZeigen(r.waehrung); if (A && A.pruefen) A.pruefen(true).catch(() => {}); if (SM) await SM.laden(true); zeichne(text); };
-      const wk = document.querySelector("[data-woche-kauf]"); if (wk) wk.onclick = async () => {
-        if (!confirm(`${d.name} für ${s.angebot} ${name} in deine Sammlung holen?`)) return; wk.disabled = true;
-        try { await nach(await netz().rpc("rpg_shop_week_buy", {}), `${d.name} gehört jetzt zu deiner Sammlung.`); } catch (e) { zeichne(e.message); } };
       const tk = document.querySelector("[data-token-kauf]"); if (tk) tk.onclick = async () => {
         if (!confirm(`Einen Heldentoken für ${s.token_preis} ${name} kaufen?`)) return; tk.disabled = true;
         try { await nach(await netz().rpc("rpg_token_buy", { p_anzahl: 1 }), "Ein Heldentoken liegt für dich bereit. Einlösen kannst du ihn in der Heldenhalle."); } catch (e) { zeichne(e.message); } };

@@ -43,7 +43,7 @@ async function seite(b, vp) {
   const { p, fehler } = await seite(b, { width: 1200, height: 950 });
   await p.click('.dorf-ort[data-hub="shop"]'); await p.waitForSelector(".shop-felder");
   const felder = await p.evaluate(() => [...document.querySelectorAll("[data-shop-feld]")].map((x) => x.dataset.shopFeld + ":" + x.querySelector("b").textContent));
-  check(felder.join(" | ") === "helden:Held der Woche | ausstattung:Ausstattung | erfahrung:Erfahrung", "Händler: dritte Karte „Erfahrung“ neben Helden des Tages und Ausstattung");
+  check(felder.join(" | ") === "ausstattung:Ausstattung | erfahrung:Erfahrung | token:Heldentoken", "Händler: Karte „Erfahrung“ zwischen Ausstattung und Heldentoken");
   check(await p.evaluate(() => document.querySelectorAll('[data-shop-feld="erfahrung"] img[src*="img/shop/ep"]').length === 3), "Die Karte zeigt die drei Truhen");
   await p.click('[data-shop-feld="erfahrung"]'); await p.waitForSelector(".xp-pakete");
   const lies = () => p.evaluate(() => ({ pakete: [...document.querySelectorAll(".xp-pakete .xp-paket")].map((x) => x.textContent.replace(/\s+/g, " ").trim()), bilder: [...document.querySelectorAll(".xp-pakete .xp-truhe")].map((x) => /ep(\d+)\.webp/.exec(x.src)[1] + (x.complete && x.naturalWidth ? "" : "!")).join(","),

@@ -57,4 +57,15 @@ check(z("suehne") > 0, `Seran: Sühne heilt ihn bei Hammertreffern auf das Brand
     `Seran: Brandmal bindet – ${a.name} erreicht von ${frei.length} Feldern nur noch ${gebunden.size}; Schritte direkt auf Seran zu bleiben frei`); }
 check(F.lichtbringer.faehig.find((x) => x.id === "segen").typ === "bonus" && F.lichtbringer.faehig.find((x) => x.id === "schutzkreis").typ === "bonus" && F.lichtbringer.faehig.find((x) => x.id === "vertreiben").name === "Gleißendes Licht"
   && F.inquisitor.faehig.some((x) => x.id === "richtspruch") && F.inquisitor.faehig.some((x) => x.id === "befehl_knie"), "Fähigkeitenlisten: Segen und Schutzkreis als Bonusaktion, Gleißendes Licht, Richtspruch, Befehl „Knie!“");
+// Krieger: Bewegung 4, Sturmangriff (+2 ohne Gegner daneben), kein Waffenabzug, +1W4 nur im Nahkampf
+{ const KK = R.FD.KLASSEN.krieger;
+  check(KK.bewegung === 4 && KK.sturm === 2 && !KK.waffenMod && KK.waffenExtraNah === "1W4" && !KK.waffenExtra, "Krieger: Bewegung 4, Sturmangriff +2, kein Abzug mehr auf Waffenschaden, +1W4 nur im Nahkampf");
+  const m = { staerke: 1, seed: 11, modus: "duell", karte: "garten", begegnung: "kobolde", kampfstufe: 5, host_name: "A", guest_name: "B", bot: true, host_team: ["berserker", "duellant", "schildwaechter"].map((held) => ({ held, stufe: 5 })), guest_team: ["berserker", "duellant", "schildwaechter"].map((held) => ({ held, stufe: 5 })) };
+  const st = K.start(m, 0, 0, 1e6).st, a = R.aktiv(st);
+  check(a.klasse === "krieger" && st.zug.bewegung === 6, `Sturmangriff: ${a.name} beginnt den Kampf ohne Gegner neben sich mit 6 Feldern Bewegung (${st.zug.bewegung})`);
+  let nah = 0, nahW4 = 0; let jetzt = 1e6, merk = { lauf: 0 }, wer = null;
+  for (let i = 0; i < 4000 && !st.ende; i++) { const f = R.aktiv(st), tm = R.teamVon(st, f); const neben = st.figuren.some((o) => o.seite !== f.seite && o.tp > 0 && Math.max(Math.abs(o.x - f.x), Math.abs(o.y - f.y)) <= 1);
+    const key = f.id + ":" + st.runde; if (key !== wer) { wer = key; merk = { lauf: 0 }; if (neben && !f.z.verlangsamt && !f.z.zeitriss && !f.z.liegend) { nah++; if (st.zug.bewegung <= 4) nahW4++; } }
+    if (tm === 2) { jetzt = Math.max(jetzt, st.arena.bot.bis) + 50; if (!K.zeit(st, jetzt).schritte.length) break; } else { jetzt += 1500; const w = BOT.entscheide(st, merk); if (w.typ === "bewegen") merk.lauf++; let r = K.zug(st, 1, w, jetzt); if (r.fehler) r = K.zug(st, 1, { typ: "ende" }, jetzt); if (r.fehler) break; } }
+  check(st.ende && nah > 0 && nahW4 === nah, `Steht ein Gegner daneben, bleibt es bei 4 Feldern (${nahW4} von ${nah} Zügen); der Kampf Krieger gegen Krieger endet`); }
 console.log(ok ? "\nKLERIKER IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

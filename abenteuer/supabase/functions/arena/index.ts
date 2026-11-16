@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v75, figuren.js v25
+// Stand der Regeln: regeln.js v76, figuren.js v26
 
 /* ===== js/figuren.js ===== */
 /*
@@ -13,7 +13,7 @@
 (function (root) {
   "use strict";
   const KLASSEN = {
-    krieger: { bewegung: 3, tpJeStufe: 3, waffenMod: -1, festnageln: 1, merkmal: "Festnageln: Ein Waffentreffer verlangsamt den Gegner in seinem nächsten Zug (halbe Bewegung).", name: "Krieger", farbe: "#a8322a", wuerfel: 10, rettung: ["STR", "KON"], zeichen: "schild" },
+    krieger: { bewegung: 4, tpJeStufe: 3, waffenExtraNah: "1W4", sturm: 2, festnageln: 1, merkmal: "Festnageln: Ein Waffentreffer verlangsamt den Gegner in seinem nächsten Zug (halbe Bewegung). Wucht: Nahkampftreffer machen +1W4 Schaden. Sturmangriff: Steht zu Beginn deines Zugs kein Gegner neben dir, läufst du 2 Felder weiter.", name: "Krieger", farbe: "#a8322a", wuerfel: 10, rettung: ["STR", "KON"], zeichen: "schild" },
     zauberer: { bewegung: 4, arkanSchild: 5, merkmal: "Arkaner Schild: Einmal je Kampf wendet ein Schild einen Treffer ab (+5 RK gegen diesen Angriff, automatisch).", name: "Zauberer", farbe: "#2f5fa8", wuerfel: 8, rettung: ["INT", "WEI"], zeichen: "buch", plaetze: true },
     schurke: { bewegung: 5, waffenExtra: "1W4", nachbluten: "1W4", merkmal: "Nachbluten: Ein Waffentreffer lässt den Gegner 3 Runden lang bluten (1W4 zu Beginn seines Zugs).", name: "Schurke", farbe: "#6b3fa0", wuerfel: 8, rettung: ["GES", "INT"], zeichen: "dolche" },
     kleriker: { bewegung: 4, beistand: 1, merkmal: "Beistand: Verbündete direkt neben dir bekommen +1 auf Rettungswürfe.", name: "Kleriker", farbe: "#c9a24a", wuerfel: 8, rettung: ["WEI", "CHA"], zeichen: "sonne", plaetze: true },
@@ -1242,6 +1242,7 @@
     const fest = (a.ohneMod ? 0 : mod(f.werte[a.attr])) + (waffe ? kl.waffenMod || 0 : 0);
     const extra = [];
     if (waffe && kl.waffenExtra) extra.push(kl.waffenExtra);
+    if (waffe && kl.waffenExtraNah && abstand(f, z) <= 1) extra.push(kl.waffenExtraNah); // Krieger: nur im Nahkampf
     let krit = 20, zusatz = "";
     if (f.z.raserei && a.attr === "STR") extra.push("0W1+1");
     // Darian, Schattenstoß (ab Stufe 2): Angriff aus dem Versteck +1W6 und kritisch ab 19
@@ -1667,6 +1668,8 @@
     let bew = f.seite === "gegner" ? Math.round((GEGNER[f.art].bewegung != null ? GEGNER[f.art].bewegung : 6) * (st.gegnerTempo || 1)) : bewegungVon(f);
     // Segen der Kampagne: Leichte Füße (+1), Ortskunde (+2 in der ersten Runde)
     if (f.seite === "spieler" && f.fid && st.segen && st.segen.length) bew += (st.segen.includes("fuesse") ? 1 : 0) + (st.segen.includes("ortskunde") && st.runde === 1 ? 2 : 0);
+    // Krieger, Sturmangriff: Steht zu Zugbeginn kein Gegner neben ihm, läuft er weiter
+    if (f.seite === "spieler" && f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].sturm && !st.figuren.some((o) => o.seite !== f.seite && lebt(o) && abstand(o, f) <= 1)) bew += FD.KLASSEN[f.klasse].sturm;
     const basis = bew;
     if (f.z.verlangsamt || f.z.zeitriss) bew = Math.floor(bew / 2);
     st.zug = { figur: f.id, bewegung: bew, basis, aktion: true, bonus: !f.z.zeitriss, hinterhalt: false, tatendrang: false, leicht: 0, schritt: 0, dolch: false, getroffen: [], wolfBiss: false };

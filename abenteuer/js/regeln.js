@@ -775,6 +775,7 @@
     const fest = (a.ohneMod ? 0 : mod(f.werte[a.attr])) + (waffe ? kl.waffenMod || 0 : 0);
     const extra = [];
     if (waffe && kl.waffenExtra) extra.push(kl.waffenExtra);
+    if (waffe && kl.waffenExtraNah && abstand(f, z) <= 1) extra.push(kl.waffenExtraNah); // Krieger: nur im Nahkampf
     let krit = 20, zusatz = "";
     if (f.z.raserei && a.attr === "STR") extra.push("0W1+1");
     // Darian, Schattenstoß (ab Stufe 2): Angriff aus dem Versteck +1W6 und kritisch ab 19
@@ -1200,6 +1201,8 @@
     let bew = f.seite === "gegner" ? Math.round((GEGNER[f.art].bewegung != null ? GEGNER[f.art].bewegung : 6) * (st.gegnerTempo || 1)) : bewegungVon(f);
     // Segen der Kampagne: Leichte Füße (+1), Ortskunde (+2 in der ersten Runde)
     if (f.seite === "spieler" && f.fid && st.segen && st.segen.length) bew += (st.segen.includes("fuesse") ? 1 : 0) + (st.segen.includes("ortskunde") && st.runde === 1 ? 2 : 0);
+    // Krieger, Sturmangriff: Steht zu Zugbeginn kein Gegner neben ihm, läuft er weiter
+    if (f.seite === "spieler" && f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].sturm && !st.figuren.some((o) => o.seite !== f.seite && lebt(o) && abstand(o, f) <= 1)) bew += FD.KLASSEN[f.klasse].sturm;
     const basis = bew;
     if (f.z.verlangsamt || f.z.zeitriss) bew = Math.floor(bew / 2);
     st.zug = { figur: f.id, bewegung: bew, basis, aktion: true, bonus: !f.z.zeitriss, hinterhalt: false, tatendrang: false, leicht: 0, schritt: 0, dolch: false, getroffen: [], wolfBiss: false };

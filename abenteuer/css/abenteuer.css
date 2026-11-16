@@ -2171,6 +2171,20 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .shop-feld-bilder.kos { gap: 18px; }
 .shop-feld-bilder.woche { gap: 10px; } .shop-feld-bilder.woche img.token { width: 72px; height: 84px; border: 0; border-radius: 0; box-shadow: none; object-fit: contain; margin: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,.6)); }
 .shop-feld s { opacity: .65; }
+.shop-angebot { position: relative; display: grid; grid-template-columns: auto 1fr auto; gap: 14px 22px; align-items: center; margin: 14px 0 18px; padding: 26px 22px 18px; border-radius: 16px; border: 2px solid #e2b860; overflow: hidden;
+  background: radial-gradient(120% 160% at 0% 0%, rgba(214,160,60,.30), transparent 55%), linear-gradient(135deg, rgba(70,20,16,.92), rgba(24,16,10,.94)); box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 0 34px rgba(226,184,96,.28), inset 0 0 40px rgba(226,184,96,.08); }
+.shop-angebot::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(110deg, transparent 35%, rgba(255,235,180,.10) 48%, transparent 60%); background-size: 250% 100%; animation: angebot-glanz 5s linear infinite; }
+@keyframes angebot-glanz { from { background-position: 120% 0; } to { background-position: -130% 0; } }
+@media (prefers-reduced-motion: reduce) { .shop-angebot::after { animation: none; } }
+.shop-angebot-band { position: absolute; top: 0; left: 0; padding: 4px 16px 5px; background: linear-gradient(180deg, #e9c46f, #b98a2c); color: #2a1606; font: 700 12px var(--schrift-titel); letter-spacing: .1em; text-transform: uppercase; border-radius: 0 0 10px 0; }
+.shop-angebot-rabatt { position: absolute; top: 10px; right: -34px; transform: rotate(35deg); padding: 4px 44px; background: #b3261f; color: #fff3d6; font: 700 15px var(--schrift-titel); box-shadow: 0 3px 10px rgba(0,0,0,.5); }
+.shop-angebot-bild { width: 118px; height: 118px; border-radius: 50%; object-fit: cover; object-position: top; border: 3px solid var(--k, #d9b46a); box-shadow: 0 0 26px rgba(226,184,96,.45); }
+.shop-angebot-text { display: grid; gap: 3px; justify-items: start; min-width: 0; } .shop-angebot-text b { font: 600 30px var(--schrift-titel); color: #f6dc9c; line-height: 1.1; } .shop-angebot-text small { color: #d9cdb4; font-size: 14px; }
+.shop-angebot-kauf { display: grid; gap: 6px; justify-items: center; padding-right: 28px; position: relative; z-index: 1; } .shop-angebot-kauf .shop-preis b { font-size: 30px; color: #ffe9a8; } .shop-angebot-kauf .shop-preis s { font-size: 17px; } .shop-angebot-kauf .btn { min-width: 190px; } .shop-angebot-kauf .btn i { font-style: normal; }
+.shop-angebot .my-link, .shop-angebot .btn { position: relative; z-index: 1; } .shop-angebot-text .my-link { justify-self: start; }
+.shop-angebot.leer { grid-template-columns: 1fr; } .shop-angebot-alle { margin: 6px 0 0; display: grid; gap: 4px; } .shop-angebot-alle b { font: 600 22px var(--schrift-titel); color: #bfe9c4; } .shop-angebot-alle span { color: #d9cdb4; font-size: 14px; }
+.shop-angebot.gekauft { border-color: rgba(191,233,196,.6); box-shadow: none; } .shop-angebot.gekauft .shop-angebot-rabatt { display: none; }
+@media (max-width: 700px) { .shop-angebot { grid-template-columns: auto 1fr; padding: 30px 14px 14px; gap: 10px 14px; } .shop-angebot-bild { width: 84px; height: 84px; } .shop-angebot-text b { font-size: 24px; } .shop-angebot-kauf { grid-column: 1 / -1; padding-right: 0; } .shop-angebot-kauf .btn { width: 100%; } .shop-angebot-rabatt { font-size: 13px; } }
 .shop-woche { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 320px)); gap: 16px; margin: 16px 0; justify-content: start; }
 .shop-woche .shop-held { position: relative; } .shop-held.woche.leer { justify-content: center; text-align: center; min-height: 220px; } .shop-alle { font-size: 40px; color: #bfe9c4; line-height: 1; }
 .shop-band { position: absolute; top: 10px; left: -4px; padding: 3px 12px; background: linear-gradient(180deg, #b3261f, #7d1512); color: #fbe9c8; font: 600 12px var(--schrift-titel); letter-spacing: .08em; text-transform: uppercase; border-radius: 0 6px 6px 0; box-shadow: 0 3px 8px rgba(0,0,0,.5); z-index: 1; }

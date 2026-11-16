@@ -7,7 +7,7 @@
 (function (root) {
   "use strict";
   const KLASSEN = {
-    krieger: { bewegung: 3, tpJeStufe: 3, waffenMod: -1, festnageln: 1, merkmal: "Festnageln: Ein Waffentreffer verlangsamt den Gegner in seinem nächsten Zug (halbe Bewegung).", name: "Krieger", farbe: "#a8322a", wuerfel: 10, rettung: ["STR", "KON"], zeichen: "schild" },
+    krieger: { bewegung: 4, tpJeStufe: 3, waffenExtraNah: "1W4", sturm: 2, festnageln: 1, merkmal: "Festnageln: Ein Waffentreffer verlangsamt den Gegner in seinem nächsten Zug (halbe Bewegung). Wucht: Nahkampftreffer machen +1W4 Schaden. Sturmangriff: Steht zu Beginn deines Zugs kein Gegner neben dir, läufst du 2 Felder weiter.", name: "Krieger", farbe: "#a8322a", wuerfel: 10, rettung: ["STR", "KON"], zeichen: "schild" },
     zauberer: { bewegung: 4, arkanSchild: 5, merkmal: "Arkaner Schild: Einmal je Kampf wendet ein Schild einen Treffer ab (+5 RK gegen diesen Angriff, automatisch).", name: "Zauberer", farbe: "#2f5fa8", wuerfel: 8, rettung: ["INT", "WEI"], zeichen: "buch", plaetze: true },
     schurke: { bewegung: 5, waffenExtra: "1W4", nachbluten: "1W4", merkmal: "Nachbluten: Ein Waffentreffer lässt den Gegner 3 Runden lang bluten (1W4 zu Beginn seines Zugs).", name: "Schurke", farbe: "#6b3fa0", wuerfel: 8, rettung: ["GES", "INT"], zeichen: "dolche" },
     kleriker: { bewegung: 4, beistand: 1, merkmal: "Beistand: Verbündete direkt neben dir bekommen +1 auf Rettungswürfe.", name: "Kleriker", farbe: "#c9a24a", wuerfel: 8, rettung: ["WEI", "CHA"], zeichen: "sonne", plaetze: true },

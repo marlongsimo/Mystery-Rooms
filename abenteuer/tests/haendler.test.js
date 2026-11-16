@@ -41,12 +41,14 @@ const shot = async (p, name) => { if (process.env.SHOT_DIR) await p.screenshot({
   // Eingang: zwei Felder, Countdown
   await p.click('.dorf-ort[data-hub="shop"]'); await p.waitForSelector(".shop-felder");
   const ein = (await p.textContent(".shop-felder")).replace(/\s+/g, " ");
-  check(/Held der Woche/.test(ein) && /Ragnar zum halben Preis: 830 415/.test(ein) && /Ausstattung/.test(ein) && /Würfel-Designs und Profilrahmen/.test(ein) && /Ab 75/.test(ein), "Händler: Felder – Held der Woche (830 durchgestrichen, 415) und Ausstattung");
-  check(/^3 Tagen 4 Std\.$|^3 Tagen 3 Std\.$/.test(await p.textContent("#shop-uhr")), `Bis zum neuen Helden: ${await p.textContent("#shop-uhr")}`);
-  check(await p.evaluate(() => document.querySelectorAll(".shop-feld.helden .shop-feld-bilder img").length === 2 && !!document.querySelector('.shop-feld.helden img[src*="heldentoken"]') && !!document.querySelector(".shop-feld.helden s") && !document.querySelector(".shop-woche")), "Das Feld zeigt den Helden der Woche und den Heldentoken");
+  const ang = await p.evaluate(() => { const a = document.querySelector(".shop-angebot"), f = document.querySelector(".shop-felder"); return a ? { vor: Boolean(a.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING), text: a.textContent.replace(/\s+/g, " "), durch: getComputedStyle(a.querySelector(".shop-preis s")).textDecorationLine, rand: getComputedStyle(a).borderTopWidth } : null; });
+  check(ang && ang.vor && /Sonderangebot · Held der Woche/.test(ang.text) && /Ragnar/.test(ang.text) && /830/.test(ang.text) && /415/.test(ang.text) && /−50 %/.test(ang.text) && /line-through/.test(ang.durch), "Händler: ganz oben der Held der Woche als Sonderangebot (830 durchgestrichen, 415, −50 %)");
+  check(/^3 Tagen [34] Std\.$/.test(await p.textContent("#shop-uhr")), `Bis zum neuen Helden: ${await p.textContent("#shop-uhr")}`);
+  const felder = await p.evaluate(() => [...document.querySelectorAll("[data-shop-feld]")].map((x) => x.dataset.shopFeld).join(","));
+  check(felder === "ausstattung,erfahrung,token" && /Würfel-Designs und Profilrahmen/.test(ein) && /Ab 75/.test(ein) && /Heldentoken/.test(ein) && /Im Besitz: 0/.test(ein), `Darunter die Felder Ausstattung, Erfahrung und Heldentoken (${felder})`);
   await shot(p, "haendler-1-eingang");
-  await p.click('[data-shop-feld="helden"]'); await p.waitForSelector(".shop-woche");
-  check(await p.evaluate(() => document.querySelectorAll(".shop-woche .shop-held").length === 2 && /Held der Woche/.test(document.querySelector("[data-shop] h1").textContent)), "Klick: der Held der Woche und daneben der Heldentoken");
+  await p.click('[data-shop-feld="token"]'); await p.waitForSelector(".shop-woche [data-token]");
+  check(await p.evaluate(() => document.querySelectorAll(".shop-woche .shop-held").length === 1 && /Heldentoken/.test(document.querySelector("[data-shop] h1").textContent)), "Klick auf „Heldentoken“: die Token-Seite");
   await p.click("[data-shop-zurueck]"); await p.waitForSelector(".shop-felder");
   // Ausstattung
   await p.click('[data-shop-feld="ausstattung"]'); await p.waitForSelector(".kos-raster");

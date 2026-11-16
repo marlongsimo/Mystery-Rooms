@@ -40,15 +40,16 @@ const shot = async (p, name, voll) => { if (process.env.SHOT_DIR) await p.screen
   const b = await chromium.launch(); console.log("Heldentoken, Held der Woche, Heldenkauf");
   // Konto mit drei Helden und 2100 Seelensplittern
   const DB = welt(["schildwaechter", "trickser", "gelehrter"], 2100), { p, fehler } = await seite(b, DB);
-  await p.click('.dorf-ort[data-hub="shop"]'); await p.waitForSelector(".shop-felder"); await p.click('[data-shop-feld="helden"]'); await p.waitForSelector(".shop-woche");
-  const w = await p.evaluate(() => { const k = document.querySelector("[data-woche]"), t = document.querySelector("[data-token]"); return { held: k.dataset.woche, band: (k.querySelector(".shop-band") || {}).textContent, alt: k.querySelector(".shop-preis s").textContent.replace(/\s+/g, " ").trim(), neu: k.querySelector(".shop-preis b").textContent.replace(/\s+/g, " ").trim(),
-    durch: getComputedStyle(k.querySelector(".shop-preis s")).textDecorationLine, knopf: k.querySelector("[data-woche-kauf]").textContent.replace(/\s+/g, " ").trim(), rest: k.querySelector("#shop-rest").textContent, token: t.textContent.replace(/\s+/g, " "), bild: t.querySelector("img").complete && t.querySelector("img").naturalWidth > 0 }; });
-  check(w.held === "berserker" && w.band === "Held der Woche" && /830/.test(w.alt) && /415/.test(w.neu) && /line-through/.test(w.durch) && /Für ◈ 415 holen/.test(w.knopf) && /^2 Tagen [45] Std\.$/.test(w.rest),
-    `Held der Woche: ein Held, der fehlt (${w.held}) – 830 durchgestrichen, daneben 415; neuer Held in ${w.rest}`);
-  check(/Heldentoken/.test(w.token) && /◈ 830/.test(w.token) && /Im Besitz: 0/.test(w.token) && w.bild, "Daneben der Heldentoken mit Bild, Preis und Vorrat");
-  await shot(p, "token-haendler");
-  await p.click("[data-woche-kauf]"); await p.waitForSelector(".shop-held.woche.gekauft");
+  await p.click('.dorf-ort[data-hub="shop"]'); await p.waitForSelector(".shop-felder");
+  const w = await p.evaluate(() => { const k = document.querySelector("[data-woche]"), t = document.querySelector('[data-shop-feld="token"]'); return { held: k.dataset.woche, band: (k.querySelector(".shop-angebot-band") || {}).textContent, oben: k.getBoundingClientRect().top < document.querySelector(".shop-felder").getBoundingClientRect().top, alt: k.querySelector(".shop-preis s").textContent.replace(/\s+/g, " ").trim(), neu: k.querySelector(".shop-preis b").textContent.replace(/\s+/g, " ").trim(),
+    durch: getComputedStyle(k.querySelector(".shop-preis s")).textDecorationLine, knopf: k.querySelector("[data-woche-kauf]").textContent.replace(/\s+/g, " ").trim(), rest: k.querySelector("#shop-uhr").textContent, token: t.textContent.replace(/\s+/g, " "), bild: t.querySelector("img").complete && t.querySelector("img").naturalWidth > 0 }; });
+  check(w.held === "berserker" && /Sonderangebot · Held der Woche/.test(w.band) && w.oben && /830/.test(w.alt) && /415/.test(w.neu) && /line-through/.test(w.durch) && /Für ◈ 415 holen/.test(w.knopf) && /^2 Tagen [45] Std\.$/.test(w.rest),
+    `Held der Woche ganz oben als Sonderangebot: ein Held, der fehlt (${w.held}) – 830 durchgestrichen, daneben 415; neuer Held in ${w.rest}`);
+  check(/Heldentoken/.test(w.token) && /830/.test(w.token) && /Im Besitz: 0/.test(w.token) && w.bild, "Unter den Feldern eine eigene Kachel für den Heldentoken mit Bild, Preis und Vorrat");
+  await shot(p, "token-haendler", true);
+  await p.click("[data-woche-kauf]"); await p.waitForSelector(".shop-angebot.gekauft");
   check(DB.helden.includes("berserker") && DB.waehrung === 1685 && /1685/.test(await p.textContent("#hub-waehrung")) && /In deiner Sammlung/.test(await p.textContent("[data-woche]")), "Held der Woche gekauft: 415 abgebucht, er steht als „In deiner Sammlung“ da");
+  await p.click('[data-shop-feld="token"]'); await p.waitForSelector("[data-token]");
   await p.click("[data-token-kauf]"); await p.waitForFunction(() => /Im Besitz: 1/.test(document.querySelector("[data-token]").textContent.replace(/\s+/g, " ")));
   check(DB.tokens === 1 && DB.waehrung === 855 && /liegt für dich bereit/.test(await p.textContent(".fb")), "Heldentoken gekauft: 830 abgebucht, 1 im Besitz");
   // Heldenhalle: gesperrten Helden freischalten
@@ -71,13 +72,12 @@ const shot = async (p, name, voll) => { if (process.env.SHOT_DIR) await p.screen
   // Alle Helden: kein Held der Woche
   const V = welt(ALLE, 500), Q = await seite(b, V);
   await Q.p.click('.dorf-ort[data-hub="shop"]'); await Q.p.waitForSelector(".shop-felder");
-  check(/Du hast alle Helden freigeschaltet/.test(await Q.p.textContent(".shop-feld.helden")), "Alle Helden freigeschaltet: Das steht schon auf der Händlerkarte");
-  await Q.p.click('[data-shop-feld="helden"]'); await Q.p.waitForSelector(".shop-woche");
-  check(await Q.p.evaluate(() => /Du hast alle Helden freigeschaltet/.test(document.querySelector("[data-woche]").textContent) && !document.querySelector("[data-woche-kauf]")), "… und auf der Seite, ohne Kaufknopf");
+  check(await Q.p.evaluate(() => /Du hast alle Helden freigeschaltet/.test(document.querySelector("[data-woche]").textContent) && !document.querySelector("[data-woche-kauf]")), "Alle Helden freigeschaltet: Das steht oben beim Händler, ohne Kaufknopf");
   check(!Q.fehler.length, "keine Skriptfehler (alle Helden)" + (Q.fehler.length ? ": " + Q.fehler.join(" | ") : ""));
   // Handy
-  const H = await seite(b, welt(["schildwaechter"], 900), { width: 390, height: 844 }); await H.p.click('.dorf-ort[data-hub="shop"]'); await H.p.waitForSelector(".shop-felder"); await H.p.click('[data-shop-feld="helden"]'); await H.p.waitForSelector(".shop-woche");
-  check(await H.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1 && [...document.querySelectorAll(".shop-woche .shop-held")].every((k) => k.getBoundingClientRect().right <= innerWidth)), "Handy: Held der Woche und Token passen in die Breite");
+  const H = await seite(b, welt(["schildwaechter"], 900), { width: 390, height: 844 }); await H.p.click('.dorf-ort[data-hub="shop"]'); await H.p.waitForSelector(".shop-felder");
+  check(await H.p.evaluate(() => { const f = [...document.querySelectorAll("[data-shop-feld]")], ep = f.find((x) => x.dataset.shopFeld === "erfahrung").getBoundingClientRect(), tk = f.find((x) => x.dataset.shopFeld === "token").getBoundingClientRect();
+    return document.documentElement.scrollWidth <= innerWidth + 1 && document.querySelector(".shop-angebot").getBoundingClientRect().right <= innerWidth && tk.top >= ep.bottom - 1; }), "Handy: Das Sonderangebot passt in die Breite, die Token-Kachel steht unter der Erfahrung");
   await shot(H.p, "token-handy", true);
   await b.close();
   console.log(ok ? "\nHELDENTOKEN IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

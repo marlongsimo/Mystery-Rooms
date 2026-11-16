@@ -77,48 +77,50 @@
   function figurPos(id) {
     const g = document.querySelector(`#karte .fig[data-id="${id}"]`), wrap = $(".karte-wrap"); if (!g || !wrap) return null;
     const r = g.getBoundingClientRect(), w = wrap.getBoundingClientRect(); if (!r.width) return null;
-    return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height, b: r.width };
+    // b: Maß für die Größe der Effekte – ein Feld breit, bei großen Figuren (Bosse) höchstens ein Viertel mehr; so wachsen Effekte nicht mit der Figur ins Riesige
+    const fd = document.querySelector("#karte .feld"), feld = fd ? fd.getBoundingClientRect().width : r.width;
+    return { x: r.left + r.width / 2 - w.left, y: r.top + r.height / 2 - w.top, h: r.height, b: feld * Math.max(1, Math.min(1.25, r.width / (feld || 1))) };
   }
   /** Lichtsäule um eine Figur: grün bei Heilung, Feuer bei Feuerzaubern. Sie steigt auf, dreht sich und verglüht */
   const FXBILD = { heil: "img/fx/heil.webp", feuer: "img/fx/feuer.webp", eis: "img/fx/eis.webp", blitz: "img/fx/blitz.webp", schild: "img/fx/schild.webp", kugel: "img/fx/kugel.webp", pfeil: "img/fx/pfeil.webp", dolch: "img/fx/dolch.webp", netz: "img/fx/netz.webp", muenzen: "img/fx/muenzen.webp", ranke: "img/fx/ranke.webp", schatten: "img/fx/schatten.webp", licht: "img/fx/licht.webp", sterne: "img/fx/sterne.webp", mal: "img/fx/mal.webp", gift: "img/fx/gift.webp", aura: "img/fx/aura.webp", hieb: "img/fx/hieb.webp", welle: "img/fx/welle.webp" };
   // Breite in Feldern, Höhe : Breite, Dauer in ms, zwei gespiegelte Lagen (Drehung)?
-  const SAEULE = { heil: [1.45, 2.27, 1500, true], feuer: [1.45, 2.27, 1500, true], eis: [1.7, 1.34, 1300, false], blitz: [1.5, 1.95, 800, false], ranke: [1.6, 1.6, 1600, false], muenzen: [1.6, 1.62, 1300, false], schatten: [2.5, 1.09, 1500, false], licht: [1.5, 2.5, 1400, false], welle: [2.8, .6, 800, false] }; let fxGeladen = false;
+  const SAEULE = { heil: [1.1, 2.27, 1500, true], feuer: [1.1, 2.27, 1500, true], eis: [1.3, 1.34, 1300, false], blitz: [1.1, 1.95, 800, false], ranke: [1.25, 1.6, 1600, false], muenzen: [1.2, 1.62, 1300, false], schatten: [1.6, 1.09, 1500, false], licht: [1.1, 2.5, 1400, false], welle: [2, .6, 800, false] }; let fxGeladen = false;
   function saeule(id, art) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const [breit, hoch, dauer, doppelt] = SAEULE[art], lage = `<i style="background-image:url(${FXBILD[art]})"></i>`;
     const d = document.createElement("div"); d.className = "fx-heil " + art; d.innerHTML = lage + (doppelt ? lage : "");
-    const b = Math.max(40, p.b * breit); d.style.width = b + "px"; d.style.height = b * hoch + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .42 + "px";
+    const b = Math.max(30, p.b * breit); d.style.width = b + "px"; d.style.height = b * hoch + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .42 + "px";
     wrap.appendChild(d); setTimeout(() => d.remove(), dauer);
   }
   /** Schutz: Ein leuchtender Schild erscheint vor der Figur, pulsiert und verblasst */
   function schild(id) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const d = document.createElement("div"); d.className = "fx-schild"; d.style.backgroundImage = `url(${FXBILD.schild})`;
-    const b = Math.max(34, p.b * 1.25); d.style.width = b + "px"; d.style.height = b * 1.11 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .15 + "px";
+    const b = Math.max(28, p.b * 1); d.style.width = b + "px"; d.style.height = b * 1.11 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .15 + "px";
     wrap.appendChild(d); setTimeout(() => d.remove(), 1400);
   }
   /** Netz: fällt von oben über die Figur und bleibt kurz liegen */
   function netz(id) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const d = document.createElement("div"); d.className = "fx-schild netz"; d.style.backgroundImage = `url(${FXBILD.netz})`;
-    const b = Math.max(44, p.b * 1.8); d.style.width = b + "px"; d.style.height = b * .69 + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .05 + "px";
+    const b = Math.max(34, p.b * 1.4); d.style.width = b + "px"; d.style.height = b * .69 + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * .05 + "px";
     wrap.appendChild(d); setTimeout(() => d.remove(), 1900);
   }
   /** Zustände: Sterne über dem Kopf (betäubt, verlangsamt …), Zielmarke (Jägermal), Giftwolke, goldene Aura (Segen und Stärkung) */
-  const MARKE = { sterne: [1.5, .85, -.62, 1700], mal: [1.5, 1.09, -.1, 1500], gift: [1.9, 1.09, -.1, 1700], aura: [1.9, 1.09, -.12, 1600] }; // Breite in Feldern, Höhe : Breite, Lage (in Figurhöhen über der Mitte), Dauer
+  const MARKE = { sterne: [1.1, .85, -.62, 1700], mal: [1.15, 1.09, -.1, 1500], gift: [1.4, 1.09, -.1, 1700], aura: [1.4, 1.09, -.12, 1600] }; // Breite in Feldern, Höhe : Breite, Lage (in Figurhöhen über der Mitte), Dauer
   const ZUSTAND_FX = { betaeubt: "sterne", verlangsamt: "sterne", geblendet: "sterne", entwaffnet: "sterne", zeitriss: "sterne", mal_jaeger: "mal", analyse: "mal", vergiftet: "gift", gift: "gift", segen: "aura", raserei: "aura", spiegel: "aura", schild: "schild", schutzkreis: "schild" };
   function marke(id, art) {
     if (art === "schild") return schild(id);
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const [breit, hoch, lage, dauer] = MARKE[art], d = document.createElement("div"); d.className = "fx-schild " + art; d.style.backgroundImage = `url(${FXBILD[art]})`;
-    const b = Math.max(40, p.b * breit); d.style.width = b + "px"; d.style.height = b * hoch + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * lage + "px";
+    const b = Math.max(30, p.b * breit); d.style.width = b + "px"; d.style.height = b * hoch + "px"; d.style.left = p.x + "px"; d.style.top = p.y + p.h * lage + "px";
     wrap.appendChild(d); setTimeout(() => d.remove(), dauer);
   }
   /** Nahkampf: Ein roter Hieb fährt über das Ziel, von der Seite des Angreifers her */
   function hieb(von, zu) {
     const a = figurPos(von), p = figurPos(zu), wrap = $(".karte-wrap"); if (!p) return;
     const d = document.createElement("div"); d.className = "fx-hieb" + (a && a.x > p.x ? " links" : ""); d.innerHTML = `<i style="background-image:url(${FXBILD.hieb})"></i>`;
-    const b = Math.max(44, p.b * 1.7); d.style.width = b + "px"; d.style.height = b * .68 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .12 + "px";
+    const b = Math.max(34, p.b * 1.3); d.style.width = b + "px"; d.style.height = b * .68 + "px"; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .12 + "px";
     wrap.appendChild(d); setTimeout(() => d.remove(), 520);
   }
   /** Womit wurde angegriffen? Aus den neuen Zeilen der Chronik gelesen: Pfeil (Bogen, Armbrust), Kugel (arkane und Schattenzauber), Feuer */
@@ -136,7 +138,7 @@
     const ay = a.y - a.h * .25, zy = z.y - z.h * .15, dx = z.x - a.x, dy = zy - ay, weg = Math.hypot(dx, dy); if (weg < a.b * 1.6) return 0;
     const spitz = art === "pfeil" || art === "dolch", dauer = Math.round(Math.max(230, Math.min(520, weg * (art === "pfeil" ? .75 : 1.1))));
     const d = document.createElement("div"); d.className = "fx-flug " + art; d.style.left = a.x + "px"; d.style.top = ay + "px";
-    const k = Math.max(26, a.b * (art === "pfeil" ? 1.5 : art === "dolch" ? .95 : .8)); d.style.setProperty("--k", k + "px");
+    const k = Math.max(20, a.b * (art === "pfeil" ? 1.2 : art === "dolch" ? .75 : .6)); d.style.setProperty("--k", k + "px");
     d.innerHTML = `<i style="background-image:url(${FXBILD[art]})"></i>`; d.style.opacity = "0";
     const w = Math.atan2(dy, dx) * 180 / Math.PI + 90, bogen = spitz ? -Math.min(46, weg * .12) : 0;
     wrap.appendChild(d);
@@ -152,6 +154,7 @@
   function zahl(id, text, art) {
     const p = figurPos(id), wrap = $(".karte-wrap"); if (!p) return;
     const d = document.createElement("div"); d.className = "fx-zahl " + art; d.textContent = text; d.style.left = p.x + "px"; d.style.top = p.y - p.h * .45 + "px";
+    d.style.fontSize = Math.round(Math.max(17, Math.min(34, p.b * .62)) * (art === "krit" ? 1.55 : 1)) + "px"; // auf kleinen Karten (Handy) kleinere Zahlen
     wrap.appendChild(d); setTimeout(() => d.remove(), 1700);
   }
   function blitz(art) { const b = document.createElement("div"); b.className = "fx-blitz " + art; ($(".karte-wrap") || document.body).appendChild(b); setTimeout(() => b.remove(), 900); }
@@ -303,7 +306,7 @@
       if (d < 0) {
         const kr = krit && f.seite === "gegner", fern = gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite, amZiel = fern && AM_ZIEL[gArt];
         const wann = fern ? (amZiel ? wuerfel + 120 : flug(schuetze.id, f.id, gArt, wuerfel + nr++ * 90) || wuerfel + 180) : wuerfel + 180; // auch im Nahkampf erst nach dem Würfel
-        setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && (gArt === "muenzen" || gArt === "licht") ? "gold" : amZiel && gArt === "schatten" ? "blut" : amZiel && gArt === "ranke" ? "heil" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel ? 10 : 26);
+        setTimeout(() => { zahl(f.id, "−" + Math.abs(d), kr ? "krit" : f.seite === "gegner" ? "schaden" : "wunde"); wolke(p.x, p.y, kr ? "gold" : amZiel && (gArt === "muenzen" || gArt === "licht") ? "gold" : amZiel && gArt === "schatten" ? "blut" : amZiel && gArt === "ranke" ? "heil" : amZiel && gArt !== "feuer" ? "eis" : f.seite === "gegner" ? "feuer" : "blut", kr ? 70 : amZiel || !gArt ? 10 : 26);
           if (amZiel) saeule(f.id, gArt);
           else if (!gArt && schuetze && schuetze.id !== f.id && schuetze.seite !== f.seite && Math.max(Math.abs(schuetze.x - f.x), Math.abs(schuetze.y - f.y)) <= 2) hieb(schuetze.id, f.id); // gewöhnlicher Nahkampftreffer
           const g = document.querySelector(`#karte .fig[data-id="${f.id}"]`); if (g) { g.classList.remove("fx-treffer"); void g.getBoundingClientRect(); g.classList.add("fx-treffer"); } }, wann);

@@ -30,8 +30,8 @@ let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") +
   const fassungen = await p.evaluate(() => { const w = window.ABKLANG.gespielt.filter((x) => x.name === "wuerfel").map((x) => x.d); return { n: w.length, gleich: w.some((d, i) => i && d === w[i - 1]) }; });
   check(fassungen.n < 2 || !fassungen.gleich, "Der Würfel wechselt die Fassung (nie zweimal dieselbe hintereinander)");
   // jeder Klang einzeln, Mindestabstand, Schalter und Regler
-  await p.waitForTimeout(600);
-  const einzeln = await p.evaluate(() => ["wuerfel", "hieb", "zauber", "heil", "schild"].map((k) => window.ABKLANG.spiel(k)));
+  // Im laufenden Kampf fallen weiter Klänge; der Mindestabstand kann einen Versuch schlucken – deshalb je Klang bis zu sechs Versuche
+  const einzeln = await p.evaluate(async () => { const aus = []; for (const k of ["wuerfel", "hieb", "zauber", "heil", "schild"]) { let ok = false; for (let i = 0; i < 6 && !ok; i++) { ok = window.ABKLANG.spiel(k); if (!ok) await new Promise((r) => setTimeout(r, 480)); } aus.push(ok); } return aus; });
   check(einzeln.every(Boolean), "Würfel, Hieb, Zauber, Heilung und Schild lassen sich abspielen");
   check(await p.evaluate(() => window.ABKLANG.spiel("heil")) === false, "Derselbe Klang zweimal im selben Augenblick: nur einmal (kein Klangbrei bei vielen Zielen)");
   await p.waitForTimeout(600);

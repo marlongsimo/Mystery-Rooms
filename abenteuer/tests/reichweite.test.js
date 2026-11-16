@@ -50,7 +50,7 @@ console.log("Reichweiten");
     }
     await p.evaluate(() => { const e = document.querySelector("#ende-zug"); if (e && !e.disabled) e.click(); }); await p.waitForTimeout(250);
   }
-  const alle = Object.values(gesehen).flat(), hilfe = /^(heilung|aufrichten|schild|tausch)$/;
+  const alle = Object.values(gesehen).flat(), hilfe = /^(heilung|aufrichten|schild|tausch|segen|bewahren|massenheil|selbstheilung)$/;
   check(Object.keys(gesehen).length === 5 && alle.length >= 10, `Fünf Helden, ${alle.length} Aktionen mit Reichweite durchgeklickt`);
   check(alle.every((a) => a.n > 0 && a.max <= a.weit && !a.selbst && !a.block), "Gewählte Aktion: Felder in Reichweite sind eingefärbt – keines weiter weg als die Reichweite, keines auf Hindernissen oder dem eigenen Feld");
   { const bogen = alle.find((a) => a.id === "langbogen"), zauber = alle.find((a) => a.id === "glutpfeil"), dolch = alle.find((a) => a.id === "dolch");

@@ -2218,3 +2218,4 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .kh-plaetze { font-style: normal; font-size: 12px; line-height: 14px; letter-spacing: 1px; color: #8fc4ff; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
 .kh-plaetze small { font-size: 10px; letter-spacing: .04em; color: #8a93a3; text-transform: uppercase; }
 .kh-plaetze u { text-decoration: none; } .kh-plaetze u.g2 { color: #d9a8ff; }
+.kh-k .kh-platz { position: absolute; top: 3px; left: 6px; font-size: 10px; line-height: 1; color: #8fc4ff; text-decoration: none; } .kh-k .kh-platz.g2 { color: #d9a8ff; }

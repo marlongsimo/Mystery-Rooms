@@ -38,6 +38,10 @@ const meinZug = async (p) => { for (let i = 0; i < 60; i++) { if (await p.evalua
     // ein Platz verbraucht → ein hohler Kreis (danach zurückgestellt)
     if (pl.da) { const t = await p.evaluate(() => { const a = window.AB.R.aktiv(window.AB.st), v = a.plaetze[0]; if (v < 1) return "leer"; a.plaetze[0] = v - 1; window.ABKH.bauen(); const x = document.querySelector(".kh-plaetze u").textContent; a.plaetze[0] = v; window.ABKH.bauen(); return x; });
       check(t === "leer" || /○/.test(t), "Ein verbrauchter Platz erscheint hohl (" + t + ")"); } }
+  // Kacheln: Zauber, die einen Platz kosten, tragen die Marke – alle anderen nicht
+  { const k = await p.evaluate(() => { const R = window.AB.R, st = window.AB.st, a = R.aktiv(st); return [...document.querySelectorAll(".kh-k")].map((x) => { const h = R.findeAktion(a, x.dataset.kh), m = x.querySelector(".kh-platz"); return { name: h ? h.a.name : x.dataset.kh, soll: h ? (h.a.platz || 0) : 0, ist: m ? (m.classList.contains("g2") ? 2 : 1) : 0 }; }); });
+    const mit = k.filter((x) => x.ist);
+    check(k.every((x) => x.ist === x.soll || (x.soll && !x.ist)) && mit.every((x) => x.soll === x.ist), mit.length ? `Kacheln mit Platzkosten sind markiert: ${mit.map((x) => x.name + (x.ist === 2 ? " ◆" : " ●")).join(", ")}` : "Dieser Held hat keine Zauber mit Platzkosten: keine Marke"); }
   // gesperrte Kachel erklärt sich
   const aus = await p.evaluate(() => { const k = document.querySelector(".kh-k.aus"); return k ? k.dataset.kh : null; });
   if (aus) { await p.tap(`.kh-k[data-kh="${aus}"]`); await p.waitForTimeout(250);

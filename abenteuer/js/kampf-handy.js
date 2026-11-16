@@ -75,9 +75,15 @@
     zeiger();
     const st = window.AB.st, R = window.AB.R, a = R.aktiv(st), F = window.ABF;
     const orig = [...document.querySelectorAll("#aktionen .akt")], endeKnopf = $("#ende-zug"), meinZug = Boolean(endeKnopf) && !st.ende;
+    // Kostet die Aktion gerade einen Zauberplatz? (wie brauchtPlatz in js/regeln.js: Brandmal einmal je Kampf frei, Meisterschaft einmal je Rast frei, Jägermal nie)
+    const platzVon = (d) => { if (!d) return 0; const g = a.genutzt || {};
+      if (d.id === "brandmal") return (g.brandmal_frei || 0) >= (d.freiJeKampf || 1) ? 1 : 0;
+      if (d.freiJeRast && (g[d.id + "_frei"] || 0) < d.freiJeRast) return 0;
+      if (d.art === "mal" && d.mal === "jaeger") return 0;
+      return d.platz || 0; };
     const kacheln = orig.map((b) => { const id = b.dataset.a, h = R.findeAktion(a, id), d = h ? h.a : null, klein = (b.querySelector("small") || {}).textContent || "";
       return { id, name: (b.querySelector("b") || {}).textContent || id, klein, text: (b.querySelector(".akt-text") || {}).textContent || "", aus: b.disabled, an: b.classList.contains("gewaehlt"), tipp: b.classList.contains("getippt"),
-        bonus: /^(Bonusaktion|frei)/.test(klein), sym: symbol(d), wert: d && d.schaden ? d.schaden : d && d.heilung ? "+" + d.heilung : "" }; });
+        bonus: /^(Bonusaktion|frei)/.test(klein), platz: platzVon(d), sym: symbol(d), wert: d && d.schaden ? d.schaden : d && d.heilung ? "+" + d.heilung : "" }; });
     const gewaehlt = kacheln.find((k) => k.an), info = gewaehlt || kacheln.find((k) => k.id === offen) || null;
     if (offen && !kacheln.some((k) => k.id === offen)) offen = null;
     const hinweis = ($("#hinweis") || {}).textContent || "";
@@ -94,8 +100,8 @@
     // Die Leiste behält ihre Höhe, wenn der Gegner zieht – sonst springt die Karte bei jedem Zugwechsel
     el.style.minHeight = meinZug ? "" : hoehe ? hoehe + "px" : "";
     const leisteHtml = kopf() + (meinZug
-      ? `<div class="kh-info ${info ? (info.aus ? "aus" : "an") : ""}">${info ? `<b>${esc(info.name)}</b> <small>${esc(info.klein)}</small><span>${esc(info.text)}</span>${gewaehlt ? `<em>Tippe ein leuchtendes Ziel an.</em><button id="kh-ab">Abbrechen</button>` : ""}` : `<span>${esc(hinweis)}</span>`}</div>
-         <div class="kh-raster">${kacheln.map((k) => `<button class="kh-k ${k.aus ? "aus" : ""} ${k.an ? "an" : ""} ${k.tipp ? "tipp" : ""} ${k.bonus ? "bonus" : ""}" data-kh="${esc(k.id)}"><i>${k.sym}</i><b>${esc(k.name)}</b>${k.wert ? `<small>${esc(k.wert)}</small>` : ""}</button>`).join("")}</div>
+      ? `<div class="kh-info ${info ? (info.aus ? "aus" : "an") : ""}">${info ? `<b>${esc(info.name)}</b> <small>${esc(info.klein)}${info.platz && !/Platz/.test(info.klein) ? ` · kostet einen Zauberplatz${info.platz === 2 ? " (Grad 2)" : ""}` : ""}</small><span>${esc(info.text)}</span>${gewaehlt ? `<em>Tippe ein leuchtendes Ziel an.</em><button id="kh-ab">Abbrechen</button>` : ""}` : `<span>${esc(hinweis)}</span>`}</div>
+         <div class="kh-raster">${kacheln.map((k) => `<button class="kh-k ${k.aus ? "aus" : ""} ${k.an ? "an" : ""} ${k.tipp ? "tipp" : ""} ${k.bonus ? "bonus" : ""}" data-kh="${esc(k.id)}">${k.platz ? `<u class="kh-platz${k.platz === 2 ? " g2" : ""}" aria-label="kostet einen Zauberplatz${k.platz === 2 ? " des 2. Grads" : ""}">${k.platz === 2 ? "◆" : "●"}</u>` : ""}<i>${k.sym}</i><b>${esc(k.name)}</b>${k.wert ? `<small>${esc(k.wert)}</small>` : ""}</button>`).join("")}</div>
          <div class="kh-fuss"><button class="kh-tipp" id="kh-tipp">💡 Tipp</button><button class="kh-ende" id="kh-ende">Zug beenden ⟳</button></div>`
       : `<div class="kh-warten"><b>${st.ende ? "Der Kampf ist vorbei." : esc(a.name) + " ist am Zug …"}</b>${letzte}</div>`);
     if (el.dataset.h !== leisteHtml) { el.dataset.h = leisteHtml; el.innerHTML = leisteHtml; } // nur bei Änderung neu anlegen (sonst blitzt das Porträt auf); die Knöpfe werden unten immer neu belegt

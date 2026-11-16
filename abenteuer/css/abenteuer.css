@@ -2195,3 +2195,20 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .arena-ende-gegner { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 4px; } .arena-ende-gegner .arena-ende-eyebrow { margin: 0; }
 .arena-einladung .kos-traeger { margin-right: 2px; } .arena-einladung > div { flex: 1 1 160px; }
 .f-liste li .kos-traeger { margin: -5px 0; } .arena-liste li .kos-traeger { margin-right: 10px; }
+
+/* ---------- Admin-Bereich: Reiter, Einstellungen des Rechner-Gegners ---------- */
+.admin-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 14px; border-bottom: 1px solid var(--line); }
+.admin-tabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); font: 600 14px var(--schrift-ui); padding: 8px 12px; cursor: pointer; margin-bottom: -1px; }
+.admin-tabs button:hover, .admin-tabs button:focus-visible { color: #efe6d4; outline: none; }
+.admin-tabs button.an { color: #f6dc9c; border-bottom-color: var(--altgold); }
+.admin-bot { display: grid; gap: 10px; }
+.admin-bot fieldset { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: grid; gap: 8px; margin: 0; min-width: 0; }
+.admin-bot legend { font: 600 13px var(--schrift-ui); color: #f6dc9c; padding: 0 6px; }
+.admin-regler { display: grid; grid-template-columns: minmax(70px, auto) 1fr 52px; align-items: center; gap: 10px; }
+.admin-regler input[type=range] { width: 100%; accent-color: var(--altgold); min-width: 0; }
+.admin-regler output { text-align: right; font-variant-numeric: tabular-nums; color: #efe6d4; }
+.admin-schnell, .admin-reihe { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.admin-schnell span { color: var(--muted); font-size: 13px; }
+.admin-reihe label { display: flex; align-items: center; gap: 8px; }
+.admin-reihe select { padding: 6px 8px; background: rgba(0,0,0,.35); color: #efe6d4; border: 1px solid var(--line); border-radius: 4px; font: 400 15px var(--schrift-ui); }
+.karte-box.admin .auswertung table + table { margin-top: 12px; }

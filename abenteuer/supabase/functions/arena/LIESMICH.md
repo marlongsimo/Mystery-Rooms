@@ -62,3 +62,9 @@ ist (`arena.takt` in der Sicht).
 alten Function, würde der Gegner nie ziehen und nach drei verstrichenen Zugzeiten als „aufgegeben“ gewertet.
 
 Tests: `node abenteuer/tests/arena-bot.test.js` (Logik, viele Kämpfe), `node abenteuer/tests/arena-bot-browser.test.js` (im Browser).
+
+## Spielstärke des Rechner-Gegners (Migration 020)
+
+Admins stellen im Spiel ein (Profil → Admin-Bereich → Rechner-Gegner): ein/aus, Wartezeit, Spielstärke von–bis, Stufen seiner
+Helden. Die Datenbank lost je Kampf eine Spielstärke aus dem Bereich und reicht sie dieser Function als `match.staerke` mit
+(0 bis 1; 1 = so gut er kann). Ohne Angabe – Migration 020 fehlt oder der Kampf ist älter – spielt er mit voller Stärke.

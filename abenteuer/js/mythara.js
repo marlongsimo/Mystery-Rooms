@@ -278,7 +278,65 @@
     zeichne();
   }
 
-  /* ---------- Auswertung der Arena (nur Admins, Migration 010) ---------- */
+  /* ---------- Admin-Bereich (nur Admins): Codes · Kampfstatistiken · Rechner-Gegner ---------- */
+  let adminTab = null;
+  const ADMIN_TABS = [["codes", "Codes", "Code-Übersicht"], ["stats", "Kampfstatistiken", "Arena-Auswertung"], ["bots", "Rechner-Gegner", "Rechner-Gegner"]];
+  function adminBereich(tab) {
+    if (!smAktiv() || !SM.istAdmin()) return toast("Den Admin-Bereich gibt es nur für Admins.");
+    adminTab = ADMIN_TABS.some((t) => t[0] === tab) ? tab : "codes";
+    return adminTab === "stats" ? arenaAuswertung() : adminTab === "bots" ? botEinstellungen() : codeUebersicht();
+  }
+  /** Rechner-Gegner der Arena: ein/aus, Wartezeit, Spielstärke, Stufen – und wie die Kämpfe gegen ihn ausgehen (Migration 020) */
+  async function botEinstellungen(meldung) {
+    if (!smAktiv() || !SM.istAdmin()) return toast("Die Einstellungen gibt es nur für Admins.");
+    let d = null;
+    try { d = await netz().rpc("rpg_admin_bot", {}); } catch (e) { return fenster("Rechner-Gegner", `<p class="note">${rpcFehlt(e) ? "Die Einstellungen sind in der Datenbank noch nicht eingerichtet (Migration 020)." : esc(e.message)}</p>`); }
+    const e = d.einstellungen, s = d.statistik || {}, pct = (a, n) => (n ? Math.round(100 * a / n) + " %" : "–"), vz = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + Math.abs(n) : "±0");
+    const MODUS = { arena: "Arena", koenig: "Königsmord", horde: "Die Horde", duell: "Duell" }, STUFE = { "1 schwach": "unter 40 %", "2 mittel": "40 bis unter 70 %", "3 stark": "ab 70 %", "4 ohne Angabe": "ohne Angabe (volle Stärke)" };
+    const wahl = (id, wert) => `<select id="${id}">${[-3, -2, -1, 0, 1, 2].map((n) => `<option value="${n}"${n === wert ? " selected" : ""}>${vz(n)}</option>`).join("")}</select>`;
+    const wann = (t) => { try { return new Date(t).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); } catch (x) { return ""; } };
+    const o = fenster("Rechner-Gegner", `<form class="admin-bot" id="admin-bot" novalidate>
+      <p class="note">Findet die Suche in der Arena keinen Menschen, springt nach der Wartezeit ein Gegner ein, den der Server spielt. Änderungen gelten für neue Kämpfe.</p>
+      <label class="schalter"><input type="checkbox" id="ab-aktiv"${e.aktiv ? " checked" : ""}><span>Rechner-Gegner eingeschaltet</span></label>
+      <label class="admin-regler"><span>Wartezeit, bis er einspringt</span><input type="range" id="ab-warten" min="10" max="180" step="5" value="${e.wartezeit}"><output id="ab-warten-w"></output></label>
+      <fieldset><legend>Spielstärke</legend>
+        <label class="admin-regler"><span>von</span><input type="range" id="ab-sv" min="0" max="100" step="5" value="${Math.round(e.staerke_von * 100)}"><output id="ab-sv-w"></output></label>
+        <label class="admin-regler"><span>bis</span><input type="range" id="ab-sb" min="0" max="100" step="5" value="${Math.round(e.staerke_bis * 100)}"><output id="ab-sb-w"></output></label>
+        <p class="note klein">100 % = er spielt, so gut er kann. Darunter lässt er öfter die Aktion eines Helden ungenutzt, greift daneben und stellt sich schlechter. Je Gegner wird ein Wert aus dem Bereich gelost – so spielen nicht alle gleich gut.</p>
+        <div class="admin-schnell"><span>Schnellwahl:</span><button type="button" class="btn ghost klein" data-ab-schnell="30,50,-1,0">Leicht</button><button type="button" class="btn ghost klein" data-ab-schnell="50,70,-1,0">Mittel</button><button type="button" class="btn ghost klein" data-ab-schnell="75,95,-1,1">Schwer</button><button type="button" class="btn ghost klein" data-ab-schnell="100,100,-1,1">Voll</button></div>
+      </fieldset>
+      <fieldset><legend>Stufen seiner Helden gegenüber denen des Spielers</legend>
+        <div class="admin-reihe"><label>von ${wahl("ab-lv", e.stufe_von)}</label><label>bis ${wahl("ab-lb", e.stufe_bis)}</label></div>
+        <p class="note klein">Je Held wird eine Verschiebung aus dem Bereich gelost. „−1 bis ±0“: nie über den Stufen des Spielers.</p>
+      </fieldset>
+      <button class="my-knopf rot" type="submit">Speichern</button><p class="my-fb" id="ab-fb" role="status">${meldung ? esc(meldung) : ""}</p>
+      ${e.geaendert && e.von ? `<p class="note klein">Zuletzt geändert von ${esc(e.von)} am ${wann(e.geaendert)}.</p>` : ""}
+    </form>
+    <div class="auswertung"><h3>Kämpfe gegen den Rechner-Gegner</h3>
+      <p class="note"><b>${s.kaempfe || 0}</b> beendet · Spieler gewannen <b>${pct(s.siege_spieler, s.kaempfe)}</b> · ${s.aufgaben || 0} durch Aufgabe · Ø ${s.runden != null ? s.runden : "–"} Runden · ${s.laufend || 0} laufend · ${s.heute || 0} in den letzten 24 Stunden</p>
+      <table><thead><tr><th>Spielstärke</th><th>Kämpfe</th><th>Spieler gewinnt</th><th>Ø Runden</th></tr></thead><tbody>
+        ${(s.nach_staerke || []).map((z) => `<tr><th>${STUFE[z.stufe] || esc(z.stufe)}</th><td>${z.kaempfe}</td><td><b>${pct(z.siege_spieler, z.kaempfe)}</b></td><td>${z.runden != null ? z.runden : "–"}</td></tr>`).join("") || `<tr><td colspan="4">Noch keine Kämpfe.</td></tr>`}</tbody></table>
+      <table><thead><tr><th>Modus</th><th>Kämpfe</th><th>Spieler gewinnt</th></tr></thead><tbody>
+        ${(s.nach_modus || []).map((z) => `<tr><th>${MODUS[z.modus] || esc(z.modus)}</th><td>${z.kaempfe}</td><td>${pct(z.siege_spieler, z.kaempfe)}</td></tr>`).join("") || `<tr><td colspan="3">Noch keine Kämpfe.</td></tr>`}</tbody></table>
+      <h3>Letzte Kämpfe</h3><table><thead><tr><th>Spieler</th><th>Gegner</th><th>Modus</th><th>Stufe</th><th>Stärke</th><th>Ausgang</th><th>Runden</th><th>Wann</th></tr></thead><tbody>
+        ${(s.letzte || []).map((k) => `<tr><th>${esc(k.spieler)}</th><td>${esc(k.gegner)}</td><td>${MODUS[k.modus] || "–"}</td><td>${k.stufe_spieler} : ${k.stufe_gegner}</td><td>${k.staerke != null ? Math.round(k.staerke * 100) + " %" : "voll"}</td><td>${k.status !== "beendet" ? esc(k.status) : k.sieger === 1 ? "<b>Spieler</b>" : "Gegner"}${k.grund === "aufgabe" ? " (Aufgabe)" : ""}</td><td>${k.runden != null ? k.runden : "–"}</td><td>${wann(k.wann)}</td></tr>`).join("") || `<tr><td colspan="8">Noch keine Kämpfe.</td></tr>`}</tbody></table></div>`);
+    const el = (id) => o.querySelector("#" + id), zeig = () => {
+      el("ab-warten-w").textContent = el("ab-warten").value + " s"; el("ab-sv-w").textContent = el("ab-sv").value + " %"; el("ab-sb-w").textContent = el("ab-sb").value + " %"; };
+    el("ab-warten").oninput = zeig;
+    el("ab-sv").oninput = () => { if (+el("ab-sv").value > +el("ab-sb").value) el("ab-sb").value = el("ab-sv").value; zeig(); };
+    el("ab-sb").oninput = () => { if (+el("ab-sb").value < +el("ab-sv").value) el("ab-sv").value = el("ab-sb").value; zeig(); };
+    el("ab-lv").onchange = () => { if (+el("ab-lv").value > +el("ab-lb").value) el("ab-lb").value = el("ab-lv").value; };
+    el("ab-lb").onchange = () => { if (+el("ab-lb").value < +el("ab-lv").value) el("ab-lv").value = el("ab-lb").value; };
+    o.querySelectorAll("[data-ab-schnell]").forEach((b) => { b.onclick = () => { const [a, c, x, y] = b.dataset.abSchnell.split(","); el("ab-sv").value = a; el("ab-sb").value = c; el("ab-lv").value = x; el("ab-lb").value = y; zeig(); el("ab-fb").textContent = "Noch nicht gespeichert."; }; });
+    zeig();
+    el("admin-bot").onsubmit = async (ev) => {
+      ev.preventDefault(); const k = ev.target.querySelector("button[type=submit]"); k.disabled = true; el("ab-fb").textContent = "Wird gespeichert …";
+      try { await netz().rpc("rpg_admin_bot_set", { p_aktiv: el("ab-aktiv").checked, p_wartezeit: +el("ab-warten").value, p_staerke_von: +el("ab-sv").value / 100, p_staerke_bis: +el("ab-sb").value / 100, p_stufe_von: +el("ab-lv").value, p_stufe_bis: +el("ab-lb").value });
+        botEinstellungen("Gespeichert."); }
+      catch (x) { k.disabled = false; el("ab-fb").textContent = x.message || "Speichern fehlgeschlagen."; }
+    };
+  }
+  /* ---------- Auswertung der Arena (nur Admins, Migration 010; ab Migration 020 mit Rechner-Gegner und Modus vom Kampf) ---------- */
   async function arenaAuswertung() {
     if (!smAktiv() || !SM.istAdmin()) return toast("Die Auswertung gibt es nur für Admins.");
     const F = window.ABF, MODUS = { arena: "Arena", koenig: "Königsmord", horde: "Die Horde", duell: "Duell" }, pct = (s, n) => (n ? Math.round(100 * s / n) + " %" : "–");
@@ -286,7 +344,7 @@
     try { a = await netz().rpc("rpg_arena_stats", {}); } catch (e) { return fenster("Arena-Auswertung", `<p class="note">${rpcFehlt(e) ? "Die Auswertung ist in der Datenbank noch nicht eingerichtet (Migration 010)." : esc(e.message)}</p>`); }
     const hn = (f) => esc((F.FIGUREN[f] || { name: f }).name), modi = Object.keys(MODUS);
     fenster("Arena-Auswertung", `<div class="auswertung">
-      <p class="note"><b>${a.kaempfe}</b> gewertete Kämpfe · ${a.offen} offen oder laufend · ${a.abgebrochen} abgebrochen. Kämpfe vor Einführung des Duells stehen unter dem Modus, den ihre Zufallszahl heute ergäbe.</p>
+      <p class="note"><b>${a.kaempfe}</b> beendete Kämpfe · ${a.offen} offen oder laufend · ${a.abgebrochen} abgebrochen.${a.gegen_bot != null ? ` Davon <b>${a.gegen_mensch}</b> gegen Menschen, <b>${a.gegen_bot}</b> gegen den Rechner-Gegner (Spieler gewannen ${pct(a.bot_siege_spieler, a.gegen_bot)}), ${a.privat} privat.` : " Kämpfe vor Einführung des Duells stehen unter dem Modus, den ihre Zufallszahl heute ergäbe."}</p>
       <h3>Modi</h3><table><thead><tr><th>Modus</th><th>Kämpfe</th><th>Ersteller gewinnt</th><th>Ø Runden</th><th>Ø Minuten</th><th>Team am Boden</th><th>Punkte</th><th>Aufgabe</th></tr></thead><tbody>
         ${(a.modi || []).map((m) => `<tr><th>${MODUS[m.modus] || esc(m.modus)}</th><td>${m.kaempfe}</td><td>${pct(m.sieg_ersteller, m.kaempfe)}</td><td>${m.runden != null ? m.runden : "–"}</td><td>${m.minuten != null ? m.minuten : "–"}</td><td>${m.team}</td><td>${m.punkte}</td><td>${m.aufgabe}</td></tr>`).join("") || `<tr><td colspan="8">Noch keine Kämpfe.</td></tr>`}</tbody></table>
       <h3>Helden</h3><table><thead><tr><th>Held</th><th>Kämpfe</th><th>Siege</th><th>Quote</th><th>Ø Stufe</th>${modi.map((k) => `<th>${MODUS[k]}</th>`).join("")}</tr></thead><tbody>
@@ -498,7 +556,7 @@
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-shop" aria-label="Händler" title="Händler"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16l1.5 5a3 3 0 0 1-2.5 3.9V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.100A3 3 0 0 1 2.500 9zm3 9v6h4v-4h3v4h3v-6a3 3 0 0 1-2.500-1.300A3 3 0 0 1 12 12.900a3 3 0 0 1-2.500-1.200A3 3 0 0 1 7 13z"/></svg></span></button>
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
-      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button><button data-profil="kosmetik">Personalisieren</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button><button data-profil="arenastats">Arena-Auswertung</button>` : ""}<button data-profil="tutorial">Tutorial ansehen</button><button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
+      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button><button data-profil="kosmetik">Personalisieren</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="admin">Admin-Bereich</button>` : ""}<button data-profil="tutorial">Tutorial ansehen</button><button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     arenaKachel();
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-shop").onclick = shopZeigen;
@@ -522,8 +580,13 @@
   setInterval(() => { if (!document.hidden && !$("#hub").hidden) posteingang(); }, 30000);
   function fenster(titel, inhalt) {
     const o = $("#qr-overlay");
-    o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-label="${esc(titel)}"><div class="k-kopf"><h2>${esc(titel)}</h2><button class="link" id="fenster-zu">Schließen</button></div>${inhalt}</div>`;
-    o.hidden = false; $("#fenster-zu").onclick = () => { o.hidden = true; hubListen(); posteingang(); };
+    // Im Admin-Bereich: gemeinsamer Kopf mit Reitern (nur für die drei Admin-Seiten)
+    const admin = adminTab && ADMIN_TABS.some((t) => t[2] === titel);
+    if (!admin) adminTab = null;
+    const reiter = admin ? `<nav class="admin-tabs" aria-label="Admin-Bereich">${ADMIN_TABS.map((t) => `<button data-admin-tab="${t[0]}" class="${t[0] === adminTab ? "an" : ""}"${t[0] === adminTab ? ' aria-current="page"' : ""}>${t[1]}</button>`).join("")}</nav>` : "";
+    o.innerHTML = `<div class="karte-box kampagnen${admin ? " admin" : ""}" role="dialog" aria-label="${esc(admin ? "Admin-Bereich" : titel)}"><div class="k-kopf"><h2>${esc(admin ? "Admin-Bereich" : titel)}</h2><button class="link" id="fenster-zu">Schließen</button></div>${reiter}${inhalt}</div>`;
+    o.hidden = false; $("#fenster-zu").onclick = () => { adminTab = null; o.hidden = true; hubListen(); posteingang(); };
+    o.querySelectorAll("[data-admin-tab]").forEach((b) => { b.onclick = () => adminBereich(b.dataset.adminTab); });
     if (window.ABKOS && o.querySelector(".kos-traeger")) window.ABKOS.schmuecken(o); // Profilrahmen der Freunde
     return o;
   }
@@ -618,7 +681,9 @@
   function profilAktion(was) {
     const m = $("#hub-menue"); if (m) m.hidden = true;
     $("#qr-overlay").hidden = true;
+    adminTab = null;
     if (was === "abmelden") return abmelden();
+    if (was === "admin") return adminBereich("codes");
     if (was === "bild") return bildWaehlen();
     if (was === "kosmetik") return window.ABKOS ? window.ABKOS.personalisieren() : null;
     if (was === "code") return codeDialog();

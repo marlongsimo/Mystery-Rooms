@@ -16,7 +16,7 @@
 (function (root) {
   "use strict";
   const LOS = ["arena", "koenig", "horde", "duell"]; // wie js/arena.js und rpg_arena_modus (Migration 010)
-  const STAERKE = [0.4, 0.6]; // Spielstärke des Rechner-Gegners: von … bis (1 = so gut er kann)
+  const STAERKE = [1, 1]; // Spielstärke des Rechner-Gegners ohne Angabe am Kampf: von … bis (1 = so gut er kann). Sonst gilt die Einstellung der Admins (Migration 020).
   const ZUGZEIT = 60000, ZEITAUS_MAX = 3, LOG_MAX = 140, MONSTER_MAX = 60;
 
   function kern(R, KARTEN, botFabrik) {

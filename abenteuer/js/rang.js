@@ -51,7 +51,10 @@
   }
   const bild = (name, avatar, rahmen) => { const F = window.ABF, img = avatar && F && F.FIGUREN[avatar] ? `<img src="img/figuren/${esc(avatar)}.jpg" alt="">` : `<span>${esc((name || "?").slice(0, 1).toUpperCase())}</span>`;
     return `<span class="kos-bild kos-rahmen rang-bild" data-rahmen="${esc(rahmen || "standard")}"><span class="rahmen-halter"><span class="hub-avatar">${img}</span></span></span>`; };
-  const wann = (t) => { try { const d = new Date(t), h = (Date.now() - d.getTime()) / 36e5; return h < 1 ? "gerade eben" : h < 24 ? `vor ${Math.floor(h)} Std.` : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }); } catch (e) { return ""; } };
+  // erste 5 Minuten „gerade eben“, bis zur Stunde in 5-Minuten-Schritten, dann Stunden, ab 24 Stunden Tage
+  const wann = (t, jetzt) => { const ms = new Date(t).getTime(); if (!isFinite(ms)) return ""; const min = Math.max(0, ((jetzt || Date.now()) - ms) / 6e4);
+    if (min < 5) return "gerade eben"; if (min < 60) return `vor ${Math.floor(min / 5) * 5} Min.`; if (min < 1440) return `vor ${Math.floor(min / 60)} Std.`;
+    const tage = Math.floor(min / 1440); return tage === 1 ? "vor 1 Tag" : `vor ${tage} Tagen`; };
   function ranglisteHtml() {
     const l = (D && D.rangliste) || [];
     if (!l.length) return `<p class="note">Noch steht niemand auf der Rangliste. Der erste gewertete Kampf bringt dich hinein.</p>`;
@@ -124,5 +127,5 @@
   /** Eine Zeile für die Profilseite */
   const zeile = () => (da() ? `${emblem((D.ich || {}).rang, "mini")} ${info((D.ich || {}).rang).name} · ${(D.ich || {}).punkte || 0} Rangpunkte (${esc(D.saison.name)})` : "");
 
-  window.ABRANG = { laden, da, laeuft, info, ausPunkten, emblem, karteHtml, reiterHtml, ranglisteHtml, binden, ergebnis, kopf, zeile, stand: () => D, LOHN };
+  window.ABRANG = { laden, da, laeuft, info, ausPunkten, emblem, karteHtml, reiterHtml, ranglisteHtml, binden, ergebnis, kopf, zeile, stand: () => D, LOHN, wann };
 })();

@@ -777,7 +777,7 @@
         const wirk = a.schaden ? ` · ${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}` : a.heilung ? ` · heilt ${a.heilung}` : "";
         // Fehlt nur das Ziel, bleibt die Aktion wählbar: Dann zeigt die Karte ihre Reichweite (auslösen lässt sie sich ohne Ziel nicht)
         const ohneZiel = g === "Kein gültiges Ziel." && a.reichweite && !SELBST.has(a.art);
-        return `<button class="akt ${wahl === a.id ? "gewaehlt" : ""} ${tipp && tipp.aktion === a.id ? "getippt" : ""} ${ohneZiel ? "ohne-ziel" : ""}" data-a="${a.id}" ${g && !ohneZiel ? "disabled" : ""}><span class="akt-kopf"><b>${esc(a.name)}${a.art === "trank" && !a.gross ? ` (${R.trankZahl(akt)})` : ""}</b><small>${typ}${kosten}${rr}${wirk}</small></span><span class="akt-text">${esc(g && g !== "Kein gültiges Ziel." ? g : a.text || "")}${g === "Kein gültiges Ziel." ? ` <em>${["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite – antippen zeigt, wie weit es reicht."}</em>` : ""}</span></button>`;
+        return `<button class="akt ${wahl === a.id ? "gewaehlt" : ""} ${tipp && tipp.aktion === a.id ? "getippt" : ""} ${ohneZiel ? "ohne-ziel" : ""} ${SELBST.has(a.art) ? "selbst" : ""}" data-a="${a.id}" ${g && !ohneZiel ? "disabled" : ""}><span class="akt-kopf"><b>${esc(a.name)}${a.art === "trank" && !a.gross ? ` (${R.trankZahl(akt)})` : ""}</b><small>${typ}${kosten}${rr}${wirk}</small></span><span class="akt-text">${esc(g && g !== "Kein gültiges Ziel." ? g : a.text || "")}${g === "Kein gültiges Ziel." ? ` <em>${["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite – antippen zeigt, wie weit es reicht."}</em>` : ""}</span></button>`;
       };
       const alle = R.aktionenVon(akt, st);
       const gruppe = (typen, titel) => { const l = alle.filter((a) => typen.includes(a.typ || "aktion")); return l.length ? `<p class="akt-gruppe">${titel}</p>${l.map(knopf).join("")}` : ""; };
@@ -786,7 +786,9 @@
       const schritte = `<div class="schritte">${schritt(true, !(st.zug.bewegung || st.zug.schritt), `① Bewegen · ${st.zug.bewegung} Felder`)}${schritt(st.zug.aktion, !st.zug.aktion, "② Aktion")}${schritt(st.zug.bonus, !st.zug.bonus, "③ Bonusaktion")}${schritt(true, false, "④ Zug beenden")}</div>`;
       $("#aktionen").innerHTML = schritte + (b ? `<details class="uebernehmen"><summary>Aktionen hier am Tisch auslösen</summary>${knoepfe}</details>` : knoepfe) + `<div class="knoepfe"><button class="btn ghost klein" id="tipp">💡 Tipp</button><button class="btn ghost" id="ende-zug">Zug beenden</button></div>`;
       const gewaehlt = wahl && R.findeAktion(akt, wahl);
-      $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>${zs.length ? "Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt." : "<b>Kein Ziel in Reichweite.</b> Die eingefärbten Felder zeigen, wie weit es reicht – geh näher heran."} Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
+      $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt && SELBST.has(gewaehlt.a.art)
+        // Fähigkeit ohne Zielwahl (Spurt, Bewahren, Trank …): erst erklären, dann bestätigen
+        ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")}<span class="hinweis-knoepfe"><button class="btn klein" id="bestaetigen">Bestätigen</button><button class="btn ghost klein" id="wahl-ab">Abbrechen</button></span>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>${zs.length ? "Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt." : "<b>Kein Ziel in Reichweite.</b> Die eingefärbten Felder zeigen, wie weit es reicht – geh näher heran."} Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
     }
     $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}${l.tm != null && ARENA ? (l.tm === ARENA.seite ? " tm-eigen" : l.tm ? " tm-gegner" : " tm-monster") : ""}">${logZeile(l)}</li>`).join("");
     zeichneGegnerInfo(); zeichneLeiste(akt, spielerDran);
@@ -1043,8 +1045,19 @@
     if (l === "faehig") { const el = $("#aktionen"); if (el) { el.scrollIntoView({ behavior: "smooth", block: "nearest" }); el.classList.remove("blink"); void el.offsetWidth; el.classList.add("blink"); } return; }
     const id = b.dataset.a; if (!id) return;
     const h = R.findeAktion(akt, id);
-    if (h && SELBST.has(h.a.art)) { if (ARENA && ARENA.gast) { ARENA.sende({ typ: "aktion", aktion: id, ziel: akt.id }); wahl = null; return; } R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
     wahl = wahl === id ? null : id; render();
+  });
+  /** Gewählte Fähigkeit ohne Zielwahl ausführen (nach „Bestätigen“) */
+  function bestaetigen() {
+    if (!st || st.ende || !wahl) return; const akt = R.aktiv(st), h = R.findeAktion(akt, wahl), id = wahl;
+    if (!h || !SELBST.has(h.a.art) || akt.seite !== "spieler") return;
+    wahl = null; tipp = null;
+    if (ARENA && ARENA.gast) { ARENA.sende({ typ: "aktion", aktion: id, ziel: akt.id }); render(); return; }
+    const r = R.handeln(st, id, akt.id); render(); if (r && r.fehler) $("#hinweis").textContent = r.fehler; veroeffentlichen(); gegnerSchleife();
+  }
+  $("#hinweis").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button"); if (!b) return;
+    if (b.id === "bestaetigen") bestaetigen(); else if (b.id === "wahl-ab") { wahl = null; render(); }
   });
   $("#aktionen").addEventListener("click", (ev) => {
     const b = ev.target.closest("button"); if (!b || b.disabled || b.tagName !== "BUTTON") return;
@@ -1053,7 +1066,6 @@
     tipp = null;
     const id = b.dataset.a; if (!id) return;
     const akt = R.aktiv(st), h = R.findeAktion(akt, id);
-    if (h && SELBST.has(h.a.art)) { if (ARENA && ARENA.gast) { ARENA.sende({ typ: "aktion", aktion: id, ziel: akt.id }); wahl = null; return; } R.handeln(st, id, akt.id); wahl = null; render(); veroeffentlichen(); gegnerSchleife(); return; }
     wahl = wahl === id ? null : id; render();
   });
   $("#start").onclick = () => { if (!SETUP.gruppe.length) SETUP.gruppe = []; zeigeSetup(); };

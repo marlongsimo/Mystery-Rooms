@@ -82,7 +82,7 @@
       if (d.art === "mal" && d.mal === "jaeger") return 0;
       return d.platz || 0; };
     const kacheln = orig.map((b) => { const id = b.dataset.a, h = R.findeAktion(a, id), d = h ? h.a : null, klein = (b.querySelector("small") || {}).textContent || "";
-      return { id, name: (b.querySelector("b") || {}).textContent || id, klein, text: (b.querySelector(".akt-text") || {}).textContent || "", aus: b.disabled, ohneZiel: b.classList.contains("ohne-ziel"), an: b.classList.contains("gewaehlt"), tipp: b.classList.contains("getippt"),
+      return { id, name: (b.querySelector("b") || {}).textContent || id, klein, text: (b.querySelector(".akt-text") || {}).textContent || "", aus: b.disabled, ohneZiel: b.classList.contains("ohne-ziel"), selbst: b.classList.contains("selbst"), an: b.classList.contains("gewaehlt"), tipp: b.classList.contains("getippt"),
         bonus: /^(Bonusaktion|frei)/.test(klein), platz: platzVon(d), sym: symbol(d), wert: d && d.schaden ? d.schaden : d && d.heilung ? "+" + d.heilung : "" }; });
     const gewaehlt = kacheln.find((k) => k.an), info = gewaehlt || kacheln.find((k) => k.id === offen) || null;
     if (offen && !kacheln.some((k) => k.id === offen)) offen = null;
@@ -100,7 +100,7 @@
     // Die Leiste behält ihre Höhe, wenn der Gegner zieht – sonst springt die Karte bei jedem Zugwechsel
     el.style.minHeight = meinZug ? "" : hoehe ? hoehe + "px" : "";
     const leisteHtml = kopf() + (meinZug
-      ? `<div class="kh-info ${info ? (info.aus ? "aus" : "an") : ""}">${info ? `<b>${esc(info.name)}</b> <small>${esc(info.klein)}${info.platz && !/Platz/.test(info.klein) ? ` · kostet einen Zauberplatz${info.platz === 2 ? " (Grad 2)" : ""}` : ""}</small><span>${esc(info.text)}</span>${gewaehlt ? `<em>${gewaehlt.ohneZiel ? "Kein Ziel in Reichweite – die eingefärbten Felder zeigen, wie weit es reicht." : "Tippe ein leuchtendes Ziel an."}</em><button id="kh-ab">${gewaehlt.ohneZiel ? "Zurück" : "Abbrechen"}</button>` : ""}` : `<span>${esc(hinweis)}</span>`}</div>
+      ? `<div class="kh-info ${info ? (info.aus ? "aus" : "an") : ""}">${info ? `<b>${esc(info.name)}</b> <small>${esc(info.klein)}${info.platz && !/Platz/.test(info.klein) ? ` · kostet einen Zauberplatz${info.platz === 2 ? " (Grad 2)" : ""}` : ""}</small><span>${esc(info.text)}</span>${gewaehlt && gewaehlt.selbst ? `<button id="kh-ok">Bestätigen</button><button id="kh-ab">Abbrechen</button>` : gewaehlt ? `<em>${gewaehlt.ohneZiel ? "Kein Ziel in Reichweite – die eingefärbten Felder zeigen, wie weit es reicht." : "Tippe ein leuchtendes Ziel an."}</em><button id="kh-ab">${gewaehlt.ohneZiel ? "Zurück" : "Abbrechen"}</button>` : ""}` : `<span>${esc(hinweis)}</span>`}</div>
          <div class="kh-raster">${kacheln.map((k) => `<button class="kh-k ${k.aus ? "aus" : ""} ${k.ohneZiel ? "ohne-ziel" : ""} ${k.an ? "an" : ""} ${k.tipp ? "tipp" : ""} ${k.bonus ? "bonus" : ""}" data-kh="${esc(k.id)}">${k.platz ? `<u class="kh-platz${k.platz === 2 ? " g2" : ""}" aria-label="kostet einen Zauberplatz${k.platz === 2 ? " des 2. Grads" : ""}">${k.platz === 2 ? "◆" : "●"}</u>` : ""}<i>${k.sym}</i><b>${esc(k.name)}</b>${k.wert ? `<small>${esc(k.wert)}</small>` : ""}</button>`).join("")}</div>
          <div class="kh-fuss"><button class="kh-tipp" id="kh-tipp">💡 Tipp</button><button class="kh-ende" id="kh-ende">Zug beenden ⟳</button></div>`
       : `<div class="kh-warten"><b>${st.ende ? "Der Kampf ist vorbei." : esc(a.name) + " ist am Zug …"}</b>${letzte}</div>`);
@@ -111,6 +111,7 @@
     const klick = (id, fn) => { const b = el.querySelector(id); if (b) b.onclick = fn; };
     klick("#kh-ende", () => { offen = null; endeKnopf && endeKnopf.click(); });
     klick("#kh-tipp", () => { const t = $("#tipp"); if (t) t.click(); });
+    klick("#kh-ok", () => { const k = $("#bestaetigen"); if (k) k.click(); });
     klick("#kh-ab", () => { const o = gewaehlt && orig.find((x) => x.dataset.a === gewaehlt.id); if (o) o.click(); });
     klick("#kh-zoom", () => { zoom = zoom > 1.05 ? 1 : ZOOM; mitteFuer = ""; bauen(); });
     klick("#kh-log", () => { logAuf = !logAuf; document.body.classList.toggle("kh-log", logAuf); });

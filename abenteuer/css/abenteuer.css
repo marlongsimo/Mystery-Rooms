@@ -2221,3 +2221,7 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .kh-k .kh-platz { position: absolute; top: 3px; left: 6px; font-size: 10px; line-height: 1; color: #8fc4ff; text-decoration: none; } .kh-k .kh-platz.g2 { color: #d9a8ff; }
 /* Aktion ohne Ziel in Reichweite: gedämpft, aber wählbar (zeigt die Reichweite auf der Karte) */
 .akt.ohne-ziel:not(.gewaehlt) { opacity: .62; } .kh-k.ohne-ziel:not(.an) { opacity: .6; }
+/* Fähigkeit ohne Zielwahl: Erklärung mit „Bestätigen“ */
+.hinweis-knoepfe { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.kh-info #kh-ok { margin-left: auto; padding: 6px 14px; border-radius: 9px; border: 1px solid rgba(232,196,106,.9); background: linear-gradient(180deg, #a8323d, #7d2029); color: #fff; font: 600 13px var(--schrift-ui, inherit); }
+.kh-info #kh-ok + #kh-ab { margin-left: 0; }

@@ -59,12 +59,16 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../013_rpg_arena_tagesgrenze_siege_rueckb
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche.sql 2>/dev/null     # zweimal: idempotent
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 014_rpg_arena_team_suche_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+# Fingerabdruck aller Arena-Funktionen aus 008 und 014 – Migration 015 darf keine davon verändern
+ARENA_VOR=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null     # zweimal: idempotent
+ARENA_NACH=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%' and p.proname not in ('rpg_arena_search_server', 'rpg_arena_fight', 'rpg_arena_fight_leader', 'rpg_arena_srv_load', 'rpg_arena_srv_save', 'rpg_arena_srv_end')")
+if [ "$ARENA_VOR" = "$ARENA_NACH" ]; then echo "✓ Migration 015 verändert keine vorhandene Arena-Funktion (008, 014)"; else echo "✗ Migration 015 hat eine vorhandene Arena-Funktion verändert"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 015_rpg_arena_serverkampf_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf_rueckbau.sql
-psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche.sql 2>/dev/null     # nach dem Rückbau von 015: stellt die Suche aus 014 wieder her
-psql -q -v ON_ERROR_STOP=1 -d "$DB" -c "select pg_get_functiondef('public.rpg_arena_search()'::regprocedure) ~ 'rpg_arena_squads' as suche_aus_014_wieder_da" -t | grep -q t && echo "✓ Nach Rückbau von 015 und erneutem 014: Die Suche aus 014 ist wieder da"
+ARENA_ENDE=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
+if [ "$ARENA_VOR" = "$ARENA_ENDE" ]; then echo "✓ Nach dem Rückbau von 015 ist alles wie vorher"; else echo "✗ Der Rückbau von 015 hinterlässt Reste"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../008_rpg_arena_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../007_rpg_heldenlevel_rueckbau.sql

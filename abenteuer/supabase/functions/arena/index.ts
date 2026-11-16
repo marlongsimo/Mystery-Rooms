@@ -2945,8 +2945,11 @@ async function arenaAnfrage(req) {
   if (req.method !== "POST") return antwort({ fehler: "Nur POST." }, 405);
   // Supabase stellt beide Werte üblicherweise selbst bereit. Fehlen sie, lassen sie sich als eigene Secrets ARENA_URL und ARENA_SERVICE_KEY hinterlegen.
   const URL_DB = Deno.env.get("SUPABASE_URL") || Deno.env.get("ARENA_URL"), DIENST = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("ARENA_SERVICE_KEY");
-  if (!URL_DB || !DIENST) return antwort({ fehler: "Der Server für den Arena-Kampf ist nicht fertig eingerichtet.", technisch: `Es fehlt: ${!URL_DB ? "SUPABASE_URL (oder ARENA_URL) " : ""}${!DIENST ? "SUPABASE_SERVICE_ROLE_KEY (oder ARENA_SERVICE_KEY)" : ""}` }, 500);
-  // Wer ruft? Das Anmelde-Token prüft der Anmeldedienst selbst – die Function vertraut keiner Angabe aus dem Rumpf
+  if (!URL_DB || !DIENST) { console.error("arena: es fehlt " + (!URL_DB ? "SUPABASE_URL (oder ARENA_URL) " : "") + (!DIENST ? "SUPABASE_SERVICE_ROLE_KEY (oder ARENA_SERVICE_KEY)" : "")); return antwort({ fehler: "Der Server für den Arena-Kampf ist nicht fertig eingerichtet." }, 500); }
+  // Reihenfolge der Zugriffskontrolle – vor dem ersten Datenbankaufruf mit dem Service-Schlüssel steht immer:
+  //   1. gültiges Anmelde-Token (der Anmeldedienst prüft es und nennt das Konto; aus dem Rumpf wird keine Identität übernommen),
+  //   2. wohlgeformte Kampf-ID.
+  // Der erste Datenbankaufruf (rpg_arena_srv_load) bekommt dieses Konto mit und liefert nur dessen eigenen Serverkampf.
   const token = req.headers.get("Authorization") || "";
   if (!/^Bearer .+/.test(token)) return antwort({ fehler: "Nicht angemeldet." }, 401);
   let nutzer = null;
@@ -2960,10 +2963,10 @@ async function arenaAnfrage(req) {
   try {
     // Hat inzwischen jemand anderes gerechnet (gleichzeitiger Aufruf beider Seiten), wird neu geladen und noch einmal versucht
     for (let versuch = 0; versuch < 3; versuch++) {
-      const d = await srv("rpg_arena_srv_load", { p_match_id: rumpf.match });
-      if (!d || !d.match) return antwort({ fehler: "Diesen Kampf rechnet nicht der Server." }, 404);
-      const m = d.match, k = d.kampf, seite = m.host_id === nutzer.id ? 1 : m.guest_id === nutzer.id ? 2 : 0;
-      if (!seite) return antwort({ fehler: "Du nimmst an diesem Kampf nicht teil." }, 403);
+      // Die Datenbank gibt den Kampf nur heraus, wenn das angemeldete Konto daran teilnimmt – sonst bekommt die Function ihn gar nicht zu sehen
+      const d = await srv("rpg_arena_srv_load", { p_match_id: rumpf.match, p_user: nutzer.id });
+      if (!d || !d.match || (d.seite !== 1 && d.seite !== 2)) return antwort({ fehler: "Diesen Kampf gibt es für dich nicht." }, 404);
+      const m = d.match, k = d.kampf, seite = d.seite;
       if (m.status !== "bereit" && m.status !== "laeuft") return antwort({ ok: true, v: k.v, status: m.status, schritte: [] });
       const jetzt = Date.now(); let st = null, schritte = [];
       if (!k.st) {
@@ -2971,19 +2974,20 @@ async function arenaAnfrage(req) {
         const s = ARENA_KERN.start(m, k.anf1, k.anf2, jetzt); st = s.st; schritte = s.schritte;
       } else {
         st = ARENA_KERN.laden(k.st);
-        if (st.ende) { const e = ARENA_KERN.ergebnis(st); await srv("rpg_arena_srv_end", { p_match_id: m.id, p_sieger: e.sieger, p_grund: e.grund, p_punkte: e.punkte, p_runden: e.runden }); return antwort({ ok: true, v: k.v, status: "beendet", schritte: [] }); }
+        // Das Ergebnis liest die Datenbank selbst aus dem gespeicherten Stand – die Function reicht keines hinein
+        if (st.ende) { await srv("rpg_arena_srv_end", { p_match_id: m.id }); return antwort({ ok: true, v: k.v, status: "beendet", schritte: [] }); }
         const r = rumpf.aktion === "zug" ? ARENA_KERN.zug(st, seite, rumpf.zug, jetzt) : ARENA_KERN.zeit(st, jetzt);
         if (r.fehler) return antwort({ fehler: r.fehler, v: k.v });
         schritte = r.schritte;
       }
       if (!schritte.length) return antwort({ ok: true, v: k.v, schritte: [] });
-      const gespeichert = await srv("rpg_arena_srv_save", { p_match_id: m.id, p_v_alt: k.v, p_st: ARENA_KERN.speichern(st), p_schritte: schritte });
+      const gespeichert = await srv("rpg_arena_srv_save", { p_match_id: m.id, p_user: nutzer.id, p_v_alt: k.v, p_st: ARENA_KERN.speichern(st), p_schritte: schritte });
       if (!gespeichert) continue;
-      if (st.ende) { const e = ARENA_KERN.ergebnis(st); await srv("rpg_arena_srv_end", { p_match_id: m.id, p_sieger: e.sieger, p_grund: e.grund, p_punkte: e.punkte, p_runden: e.runden }); }
+      if (st.ende) await srv("rpg_arena_srv_end", { p_match_id: m.id });
       return antwort({ ok: true, v: k.v + schritte.length, schritte: schritte.map((s, i) => ({ v: k.v + i + 1, st: seite === 1 ? s.sicht1 : s.sicht2 })) });
     }
     return antwort({ fehler: "Gerade rechnet der Server noch den Zug davor. Bitte noch einmal." }, 409);
-  } catch (e) { return antwort({ fehler: "Der Server konnte den Zug nicht rechnen.", technisch: String(e && e.message || e).slice(0, 300) }, 500); }
+  } catch (e) { console.error("arena:", e && e.message || e); return antwort({ fehler: "Der Server konnte den Zug nicht rechnen." }, 500); } // Einzelheiten nur ins Protokoll der Function, nicht ans Spiel
 }
 Deno.serve(arenaAnfrage);
 

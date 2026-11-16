@@ -243,9 +243,10 @@
       el.querySelectorAll("[data-arena-anf]").forEach((b) => { b.onclick = () => { anfuehrerMerken(m.id, b.dataset.arenaAnf); zeichneModus(); if (Z.anfGeaendert) Z.anfGeaendert(); }; }); };
     zeichneModus();
     Promise.resolve().then(async () => {
-      // Rechnet der Server diesen Kampf (Migration 015)? Das hängt am Kampf, nicht am Gerät – so landen beide Seiten sicher im selben Verfahren
-      let s = null; try { s = await rpc("rpg_arena_fight", { p_match_id: m.id, p_version: 0 }); } catch (e) { s = null; }
-      if (s && s.server) return serverKampf(m, s);
+      // Nur wer ausdrücklich den Serverkampf gewählt hat (?arena=server), fragt danach – die bisherige Arena ruft keine der neuen Funktionen auf.
+      // Ob es wirklich ein Serverkampf ist, entscheidet der Kampf selbst: Er entsteht nur, wenn BEIDE über die Server-Suche kamen. Sonst läuft er wie bisher.
+      if (SERVER) { let s = null; try { s = await rpc("rpg_arena_fight", { p_match_id: m.id, p_version: 0 }); } catch (e) { s = null; }
+        if (s && s.server) return serverKampf(m, s); }
       return verbinden(m);
     }).catch((e) => { const s = $("#arena-status"); if (s) s.textContent = "Die Verbindung ist fehlgeschlagen: " + e.message; });
   }

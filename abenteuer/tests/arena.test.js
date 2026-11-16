@@ -20,6 +20,7 @@ function sicht(ich) {
 }
 function server(ich, name, args) {
   const m = DB.match, fehler = (t) => ({ fehler: t });
+  if (/^rpg_arena_(fight|fight_leader|search|search_server|squad|squad_set|srv_)/.test(name)) DB.neueAufrufe = (DB.neueAufrufe || 0) + 1; // Funktionen der neuen Arena (Migration 014/015)
   if (name === "rpg_my_wallet") return { konto: true, waehrung: DB.wallet[ich] };
   if (name === "rpg_arena_list") return { konto: true, waehrung: DB.wallet[ich], heute: Number(process.env.HEUTE || 0), nur_siege: true, offen: m && m.status === "offen" && m.hostWer !== ich ? [{ id: m.id, name: m.host.name, schnitt: m.host.schnitt, erstellt: new Date().toISOString() }] : [],
     mein: m && (m.hostWer === ich || m.gastWer === ich) && ["offen", "bereit", "laeuft"].includes(m.status) ? sicht(ich) : null };
@@ -167,6 +168,7 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
       }
     }
   }
+  check(!DB.neueAufrufe, "Die bisherige Arena ruft keine einzige Funktion der neuen Arena auf (Team, Suche, Serverkampf)");
   check(!A.fehler.length && !B.fehler.length, "keine Skriptfehler" + (A.fehler.concat(B.fehler).length ? ": " + A.fehler.concat(B.fehler).slice(0, 3).join(" | ") : ""));
   await b.close();
   console.log(ok ? "\nARENA IN ORDNUNG" : "\nARENA: FEHLER"); process.exit(ok ? 0 : 1);

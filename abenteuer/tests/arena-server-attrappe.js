@@ -16,12 +16,16 @@ function attrappe() {
     const m = /\/rest\/v1\/rpc\/(\w+)$/.exec(u); if (!m) return json({ message: "unbekannt" }, 404);
     if (h.apikey !== DIENST || h.Authorization !== "Bearer " + DIENST) { db.abgewiesen++; return json({ message: "permission denied" }, 403); }
     const a = JSON.parse(opt.body || "{}"), k = db.kaempfe[a.p_match_id];
-    if (m[1] === "rpg_arena_srv_load") { db.aufrufe.load++; return json(k ? JSON.parse(JSON.stringify({ kampf: { v: k.v, st: k.st, anf1: k.anf1, anf2: k.anf2, beginn: k.beginn }, match: k.match })) : null); }
-    if (m[1] === "rpg_arena_srv_save") { db.aufrufe.save++; if (!k || k.v !== a.p_v_alt) return json(false);
+    const dabei = k && a.p_user && (k.match.host_id === a.p_user || k.match.guest_id === a.p_user);
+    if (m[1] === "rpg_arena_srv_load") { db.aufrufe.load++; if (!dabei) return json(null); const mm = Object.assign({}, k.match); delete mm.host_id; delete mm.guest_id;
+      return json(JSON.parse(JSON.stringify({ seite: k.match.host_id === a.p_user ? 1 : 2, kampf: { v: k.v, st: k.st, anf1: k.anf1, anf2: k.anf2, beginn: k.beginn }, match: mm }))); }
+    if (m[1] === "rpg_arena_srv_save") { db.aufrufe.save++; if (!dabei || !["bereit", "laeuft"].includes(k.match.status) || k.v !== a.p_v_alt) return json(false);
       k.st = a.p_st; a.p_schritte.forEach((s, i) => k.schritte.push({ v: k.v + i + 1, sicht1: s.sicht1, sicht2: s.sicht2 })); k.v += a.p_schritte.length; k.schritte = k.schritte.filter((s) => s.v > k.v - 40);
       if (k.match.status === "bereit") k.match.status = "laeuft"; return json(true); }
-    if (m[1] === "rpg_arena_srv_end") { db.aufrufe.end++; if (!k || !["bereit", "laeuft"].includes(k.match.status)) return json(false);
-      Object.assign(k.match, { status: "beendet", sieger: a.p_sieger, grund: a.p_grund, punkte: a.p_punkte, runden: a.p_runden }); db.enden.push({ id: a.p_match_id, sieger: a.p_sieger, grund: a.p_grund }); return json(true); }
+    if (m[1] === "rpg_arena_srv_end") { db.aufrufe.end++; if (Object.keys(a).some((x) => x !== "p_match_id")) { db.fremdErgebnis = true; return json({ message: "unbekannte Parameter" }, 400); }
+      if (!k || !["bereit", "laeuft"].includes(k.match.status) || !k.st || !k.st.ende) return json(false);
+      const ar = k.st.arena, grund = ar.aufgabe ? "aufgabe" : /am Boden|ist gefallen/.test(ar.grund || "") ? "team" : "punkte";
+      Object.assign(k.match, { status: "beendet", sieger: ar.sieger, grund, punkte: ar.punkte, runden: k.st.runde }); db.enden.push({ id: a.p_match_id, sieger: ar.sieger, grund }); return json(true); }
     return json({ message: "unbekannt" }, 404);
   }
   let handler = null;

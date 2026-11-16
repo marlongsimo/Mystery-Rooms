@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v72, figuren.js v23
+// Stand der Regeln: regeln.js v73, figuren.js v23
 
 /* ===== js/figuren.js ===== */
 /*
@@ -691,7 +691,7 @@
   const key = (x, y) => x + "," + y;
   const abstand = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
   /** Reichweite der Helden-Aktionen: Eine Diagonale kostet anderthalb Felder. Nahkampf (1) geht damit nur gerade – oben, unten, links, rechts –,
-   *  und Fernreichweiten sind rund statt quadratisch. Bewegung, Flächen und die Gegner rechnen weiter mit abstand(). */
+   *  und Fernreichweiten sind rund statt quadratisch. Dasselbe gilt für die Gegner (Ziele wählen, Reichweite, Stellung). Bewegung und Sichtlinie rechnen weiter mit abstand(). */
   const weite = (a, b) => { const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y); return Math.max(dx, dy) + Math.min(dx, dy) * 0.5; };
   const lebt = (f) => f.tp > 0 && !f.tot && !(f.z && f.z.verbannt);
   function blockiert(st, x, y) { return x < 0 || y < 0 || x >= st.karte.b || y >= st.karte.h || st.karte.block.has(key(x, y)); }
@@ -1873,7 +1873,7 @@
     const helden = st.figuren.filter((f) => /^f\d+$/.test(f.id));
     helden.forEach((f, i) => { f.team = i < 3 ? 1 : 2; f.arenaStart = [f.x, f.y]; });
     // Wölfe stehen bei ihrem Team (nicht auf der anderen Seite der Karte)
-    for (const w of st.figuren) if (w.art === "wolf" && w.besitzer) { const h = fig(st, w.besitzer); if (h && abstand(w, h) > 2) { const p = freiesFeldNahe(st, [h.x, h.y], 3); if (p) { w.x = p.x; w.y = p.y; } } }
+    for (const w of st.figuren) if (w.art === "wolf" && w.besitzer) { const h = fig(st, w.besitzer); if (h && weite(w, h) > 2) { const p = freiesFeldNahe(st, [h.x, h.y], 3); if (p) { w.x = p.x; w.y = p.y; } } }
     // Steht derselbe Held auf beiden Seiten, bekommt er den Namen seines Spielers dazu (sonst liest sich die Chronik nicht)
     { const sn = [(o.namen || [])[0] || "Spieler 1", (o.namen || [])[1] || "Spieler 2"]; for (const f of helden) if (helden.some((g) => g !== f && g.fid === f.fid)) f.name = `${f.name} (${sn[f.team - 1]})`; }
     // Jede Zeile der Chronik merkt sich, wessen Zug es war (1, 2 oder 0 für Monster): Die Anzeige färbt danach
@@ -1903,12 +1903,12 @@
     const d = GEGNER[g.art], sch = d.angriff ? parse(d.angriff.schaden) : null, erwartet = sch ? sch.n * (sch.s + 1) / 2 + sch.b : 4;
     let w = 0;
     if (g.z.spott === f.id) w += 100;                                  // Spott zwingt
-    if (erreicht) w += 30; else w -= abstand(g, f) * 2;                // lieber jemanden, den ich jetzt treffe
+    if (erreicht) w += 30; else w -= weite(g, f) * 2;                // lieber jemanden, den ich jetzt treffe
     w += (1 - f.tp / (f.tpMax || f.tp || 1)) * 18;                     // Angeschlagene
     if (f.tp <= erwartet) w += 14;                                     // ein Treffer könnte reichen
     w += Math.max(0, Math.min(8, 17 - (f.rk || 12))) * 1.5;            // leicht Gerüstete
     if (f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].beistand) w += 5; // Heiler
-    if (st.mech && st.mech.ziele.some((z) => !z.fertig && !z.verloren && abstand(f, z) <= 1)) w += st.mech.ziele.some((z) => !z.fertig && z.fortschritt > 0 && abstand(f, z) <= 1) ? 26 : 14; // wer am Ziel arbeitet
+    if (st.mech && st.mech.ziele.some((z) => !z.fertig && !z.verloren && weite(f, z) <= 1)) w += st.mech.ziele.some((z) => !z.fertig && z.fortschritt > 0 && weite(f, z) <= 1) ? 26 : 14; // wer am Ziel arbeitet
     if (st.kiFokus && st.kiFokus.runde === st.runde && st.kiFokus.id === f.id) w += 7; // gemeinsam auf ein Ziel
     if (f.art === "wolf") w -= 8;
     return w + st.r() * 6;
@@ -1922,10 +1922,10 @@
       let feld = null;
       for (const [k, c] of felder) {
         const [x, y] = k.split(",").map(Number), p = { x, y };
-        if (reichweite > 1 ? !(abstand(p, f) <= reichweite && sicht(st, Object.assign({}, g, p), f)) : abstand(p, f) > 1) continue;
-        const nachbarn = lebende.filter((o) => o !== f && abstand(p, o) <= 1).length;
+        if (reichweite > 1 ? !(weite(p, f) <= reichweite && sicht(st, Object.assign({}, g, p), f)) : weite(p, f) > 1) continue;
+        const nachbarn = lebende.filter((o) => o !== f && weite(p, o) <= 1).length;
         // Nahkämpfer: nicht ins Feuer, nicht mitten zwischen mehrere Helden. Fernkämpfer: Abstand halten, niemanden neben sich.
-        const wert = -gefahr(x, y) - nachbarn * (reichweite > 1 ? 9 : 3) - c * 0.2 + (reichweite > 1 ? Math.min(abstand(p, f), reichweite) * 1.5 : 0);
+        const wert = -gefahr(x, y) - nachbarn * (reichweite > 1 ? 9 : 3) - c * 0.2 + (reichweite > 1 ? Math.min(weite(p, f), reichweite) * 1.5 : 0);
         if (!feld || wert > feld.wert) feld = { x, y, wert };
       }
       const w = kiWert(st, g, f, Boolean(feld)) + (feld ? feld.wert * 0.5 : 0);
@@ -1939,11 +1939,11 @@
     const d = GEGNER[g.art];
     let lebende = zieleFuerGegner(st, g);
     if (!lebende.length || g.tp <= 0) { weiter(st); return; }
-    const naechste = () => lebende.slice().sort((a, b) => (g.z.spott === b.id) - (g.z.spott === a.id) || abstand(g, a) - abstand(g, b) || a.tp - b.tp)[0];
+    const naechste = () => lebende.slice().sort((a, b) => (g.z.spott === b.id) - (g.z.spott === a.id) || weite(g, a) - weite(g, b) || a.tp - b.tp)[0];
     const startX = g.x, startY = g.y;
     const flieheVon = (quelle) => {
       const m = erreichbar(st, g, st.zug.bewegung); let best = null;
-      for (const [k] of m) { const [x, y] = k.split(",").map(Number); const dd = Math.min(...lebende.map((f) => abstand({ x, y }, f))); if (!best || dd > best.d) best = { x, y, d: dd }; }
+      for (const [k] of m) { const [x, y] = k.split(",").map(Number); const dd = Math.min(...lebende.map((f) => weite({ x, y }, f))); if (!best || dd > best.d) best = { x, y, d: dd }; }
       if (best) { g.x = best.x; g.y = best.y; }
     };
     // Darian, Fallensteller (Zehn-Stufen-Modell): Der erste Gegner, der sich rührt, tritt in seine Falle. Meisterschaft: doppelter Schaden, hält fest.
@@ -1974,7 +1974,7 @@
     if (d.flieht && g.tp < d.flieht && !g.geflohen && !(g.z.brandmal && hs(fig(st, g.z.brandmal)) >= 10)) { g.geflohen = true; flieheVon(); st.log.push({ t: `${g.name} flieht.`, art: "gegner" }); fangschuss(st, g, startX, startY); if (!st.ende) weiter(st); return; }
     // Pilzbrut: Sporen auf alle Nachbarn
     if (d.sporen) {
-      const nach = lebende.filter((f) => abstand(g, f) <= 1);
+      const nach = lebende.filter((f) => weite(g, f) <= 1);
       for (const f of nach) {
         const rw = rettung(st, f, "KON", d.sporen.sg);
         if (rw.erfolg) st.log.push({ t: `${g.name}: Sporen – ${f.name} hält die Luft an.`, art: "gegner" });
@@ -1985,9 +1985,9 @@
     // Läufer: rennt zu seinem Feld, löst dort ein Ereignis aus
     if (g.laeufer) {
       const L = g.laeufer, m = erreichbar(st, g, st.zug.bewegung); let best = null;
-      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const d = abstand({ x, y }, L); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, d, c }; }
+      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const d = weite({ x, y }, L); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, d, c }; }
       if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
-      const amZiel = lebt(g) && abstand(g, L) <= (L.nah != null ? L.nah : 1);
+      const amZiel = lebt(g) && weite(g, L) <= (L.nah != null ? L.nah : 1);
       // Mit „warten“ greift er erst im nächsten Zug zu: Die Gruppe hat eine Runde, um ihn aufzuhalten
       if (amZiel && L.warten && !L.da) { L.da = true; st.log.push({ t: `${g.name} steht am Glockenseil und greift danach! Haltet ihn auf, bevor er zieht.`, art: "schlecht" }); }
       else if (amZiel) {
@@ -1999,8 +1999,8 @@
     }
     let ziel = naechste();
     // Aschehund: Glutatem
-    if (d.atem && g.atemBereit && abstand(g, ziel) <= 3) {
-      const betroffen = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && abstand(g, f) <= 3 && abstand(g, f) >= 1 && (() => { const vx = ziel.x - g.x, vy = ziel.y - g.y, fx = f.x - g.x, fy = f.y - g.y; return (vx * fx + vy * fy) / (Math.hypot(vx, vy) * Math.hypot(fx, fy) || 1) >= 0.7; })());
+    if (d.atem && g.atemBereit && weite(g, ziel) <= 3) {
+      const betroffen = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && weite(g, f) <= 3 && weite(g, f) >= 1 && (() => { const vx = ziel.x - g.x, vy = ziel.y - g.y, fx = f.x - g.x, fy = f.y - g.y; return (vx * fx + vy * fy) / (Math.hypot(vx, vy) * Math.hypot(fx, fy) || 1) >= 0.7; })());
       const teile = [];
       for (const f of betroffen) { const rw = rettung(st, f, d.atem.rettung || "GES", d.atem.sg); let s = roll(st.r, d.atem.schaden).total; if (rw.erfolg) s = Math.floor(s / 2); teile.push(`${f.name} ${s}`); schaden(st, f, s); }
       g.atemBereit = false; g.atemRunde = st.runde;
@@ -2008,7 +2008,7 @@
       if (!st.ende) weiter(st); return;
     }
     // Netzweber: Netz auf Entfernung
-    if (d.netz && !g.netzGenutzt && abstand(g, ziel) > 1 && abstand(g, ziel) <= d.netz.reichweite && sicht(st, g, ziel)) {
+    if (d.netz && !g.netzGenutzt && weite(g, ziel) > 1 && weite(g, ziel) <= d.netz.reichweite && sicht(st, g, ziel)) {
       g.netzGenutzt = true;
       const erg = angriffswurf(st, g, ziel, { name: "Netz", bonus: d.netz.bonus, schaden: "0W1", fest: 0, nah: false, nachTreffer: () => { ziel.z.festgehalten = { netz: true, flucht: d.netz.sg }; st.log.push({ t: `${ziel.name} hängt im Netz.`, art: "gegner" }); } });
       if (erg && !st.ende) weiter(st); return;
@@ -2016,7 +2016,7 @@
     // Fernkämpfer (Irrlicht, Kröte, Alwine): auf Reichweite gehen, mit Sicht angreifen, nicht unnötig nah heran
     const rw = d.angriff && d.angriff.reichweite > 1 ? d.angriff.reichweite : 0;
     if (rw) {
-      const trifft = (pos, f) => abstand(pos, f) <= rw && sicht(st, Object.assign({}, g, pos), f);
+      const trifft = (pos, f) => weite(pos, f) <= rw && sicht(st, Object.assign({}, g, pos), f);
       // Klug: Ziel und Standort gemeinsam wählen (Abstand halten, niemanden neben sich, lohnendes Ziel)
       const wahl = kiKlug(st) && !d.jaeger && !g.z.spott ? kiWahl(st, g, lebende, rw) : null;
       if (wahl && wahl.feld) {
@@ -2031,7 +2031,7 @@
         const m = erreichbar(st, g, st.zug.bewegung); let best = null;
         for (const [k, c] of m) {
           const [x, y] = k.split(",").map(Number), p = { x, y }, z2 = lebende.filter((f) => trifft(p, f)).sort((a, b) => a.tp - b.tp)[0];
-          const wert = z2 ? 100 + abstand(p, z2) * 2 - c * 0.1 : -Math.min(...lebende.map((f) => abstand(p, f))) - c * 0.1;
+          const wert = z2 ? 100 + weite(p, z2) * 2 - c * 0.1 : -Math.min(...lebende.map((f) => weite(p, f))) - c * 0.1;
           if (!best || wert > best.wert) best = { x, y, wert };
         }
         if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
@@ -2052,24 +2052,24 @@
         if (!lebt(g)) { if (!st.ende) weiter(st); return; }
         fangschuss(st, g, startX, startY);
         if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return; }
-        if (lebt(wahl.ziel) && abstand(g, wahl.ziel) <= 1) { st.kiFokus = { runde: st.runde, id: wahl.ziel.id }; gegnerAngriff(st, g, wahl.ziel); }
+        if (lebt(wahl.ziel) && weite(g, wahl.ziel) <= 1) { st.kiFokus = { runde: st.runde, id: wahl.ziel.id }; gegnerAngriff(st, g, wahl.ziel); }
         if (!st.ende) weiter(st); return;
       }
       if (wahl) ziel = wahl.ziel; // niemand in Reichweite: auf das lohnendste Ziel zulaufen (unten)
     }
     // Bewegen und angreifen
-    if (abstand(g, ziel) > 1 && st.zug.bewegung > 0) {
+    if (weite(g, ziel) > 1 && st.zug.bewegung > 0) {
       const m = erreichbar(st, g, st.zug.bewegung); let best = null;
-      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const dist = Math.min(...lebende.map((f) => abstand({ x, y }, f) + (g.z.spott === f.id ? -1 : 0))); if (!best || dist < best.dist || (dist === best.dist && c < best.c)) best = { x, y, dist, c }; }
+      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const dist = Math.min(...lebende.map((f) => weite({ x, y }, f) + (g.z.spott === f.id ? -1 : 0))); if (!best || dist < best.dist || (dist === best.dist && c < best.c)) best = { x, y, dist, c }; }
       if (st.mech && best && best.dist > 1) best = wegKorrektur(st, g, ziel, best, m);
       if (best) { g.x = best.x; g.y = best.y; brandFeld(st, g); }
       if (!lebt(g)) { if (!st.ende) weiter(st); return; }
       lebende = zieleFuerGegner(st, g); ziel = naechste();
-      if (d.jaeger && ziel && ziel.art === "begleiter" && abstand(g, ziel) > 1) { const daneben = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && f.art !== "begleiter" && abstand(g, f) <= 1); if (daneben.length) { lebende = daneben; ziel = naechste(); } }
+      if (d.jaeger && ziel && ziel.art === "begleiter" && weite(g, ziel) > 1) { const daneben = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && f.art !== "begleiter" && weite(g, f) <= 1); if (daneben.length) { lebende = daneben; ziel = naechste(); } }
       fangschuss(st, g, startX, startY);
       if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return; }
     }
-    if (ziel && abstand(g, ziel) <= 1 && d.angriff) gegnerAngriff(st, g, ziel);
+    if (ziel && weite(g, ziel) <= 1 && d.angriff) gegnerAngriff(st, g, ziel);
     if (!st.ende) weiter(st);
   }
   /** Valdric: Fluchhand auf Entfernung, ruft Tote, ab halben TP Phase 2 mit Fluchwelle; schont Paktierer, bis er gebunden ist */
@@ -2084,10 +2084,10 @@
     else { const verraeter = ziele.filter((f) => pakt.includes(f.fid)); if (verraeter.length) ziele = verraeter; }
     if (!ziele.length) { weiter(st); return; }
     const reich = d.angriff.reichweite || 1;
-    const nah = () => ziele.slice().sort((a, b) => abstand(g, a) - abstand(g, b) || a.tp - b.tp)[0];
-    let ziel = ziele.filter((f) => abstand(g, f) <= reich && sicht(st, g, f)).sort((a, b) => a.tp - b.tp)[0];
+    const nah = () => ziele.slice().sort((a, b) => weite(g, a) - weite(g, b) || a.tp - b.tp)[0];
+    let ziel = ziele.filter((f) => weite(g, f) <= reich && sicht(st, g, f)).sort((a, b) => a.tp - b.tp)[0];
     if (g.phase2 && g.atemBereit && (ziel || nah())) {
-      const z = ziel || nah(), betroffen = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && abstand(f, z) <= 1 && !(pakt.includes(f.fid) && !g.gebunden)), teile = [];
+      const z = ziel || nah(), betroffen = st.figuren.filter((f) => f.seite === "spieler" && lebt(f) && weite(f, z) <= 1 && !(pakt.includes(f.fid) && !g.gebunden)), teile = [];
       for (const f of betroffen) { const rw = rettung(st, f, "WEI", d.atem.sg); let s = roll(st.r, d.atem.schaden).total; if (rw.erfolg) s = Math.floor(s / 2); teile.push(`${f.name} ${s}`); schaden(st, f, s); }
       g.atemBereit = false; g.atemRunde = st.runde;
       st.log.push({ t: `${g.name}: Fluchwelle – ${teile.join(", ") || "niemand"}.`, art: "gegner" });
@@ -2095,9 +2095,9 @@
     }
     if (!ziel && st.zug.bewegung > 0) {
       const m = erreichbar(st, g, st.zug.bewegung); let best = null;
-      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number), p = { x, y }; const ok = ziele.some((f) => abstand(p, f) <= reich && sicht(st, p, f)); const dd = Math.min(...ziele.map((f) => abstand(p, f))); const w = (ok ? 0 : 50) + dd + c * 0.1; if (!best || w < best.w) best = { x, y, w }; }
+      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number), p = { x, y }; const ok = ziele.some((f) => weite(p, f) <= reich && sicht(st, p, f)); const dd = Math.min(...ziele.map((f) => weite(p, f))); const w = (ok ? 0 : 50) + dd + c * 0.1; if (!best || w < best.w) best = { x, y, w }; }
       if (best) { g.x = best.x; g.y = best.y; }
-      ziel = ziele.filter((f) => abstand(g, f) <= reich && sicht(st, g, f)).sort((a, b) => a.tp - b.tp)[0];
+      ziel = ziele.filter((f) => weite(g, f) <= reich && sicht(st, g, f)).sort((a, b) => a.tp - b.tp)[0];
     }
     if (ziel) { gegnerAngriff(st, g, ziel); if (g.phase2 && lebt(ziel) && !st.ende) gegnerAngriff(st, g, ziel); }
     if (!st.ende) weiter(st);
@@ -2115,7 +2115,7 @@
   /** Fangschuss: bewegt sich das markierte Ziel des Kopfgeldjägers, schießt er einmal */
   function fangschuss(st, g, sx, sy) {
     if (g.x === sx && g.y === sy) return;
-    const k = st.figuren.find((o) => istFig(o, "kopfgeldjaeger") && lebt(o) && o.reaktion > 0 && g.z.mal_jaeger === o.id && abstand(o, g) <= 16 && sicht(st, o, g));
+    const k = st.figuren.find((o) => istFig(o, "kopfgeldjaeger") && lebt(o) && o.reaktion > 0 && g.z.mal_jaeger === o.id && weite(o, g) <= 16 && sicht(st, o, g));
     if (!k || !lebt(g)) return;
     k.reaktion--; st.log.push({ t: `${k.name} schießt ${g.name} hinterher (Fangschuss).` });
     spielerAngriff(st, k, findeAktion(k, "armbrust").a, g, { reaktion: true });
@@ -2132,8 +2132,8 @@
   const zielOffen = (z) => !z.fertig && !z.verloren;
   function zielNeben(st, f) {
     if (!st.mech || !f) return null;
-    const bedraengt = gegnerFiguren(st).some((g) => lebt(g) && abstand(g, f) <= 1);
-    return st.mech.ziele.filter((z) => zielOffen(z) && abstand(z, f) <= 1 && !(z.ruhe && bedraengt)).sort((a, b) => b.fortschritt - a.fortschritt)[0] || null;
+    const bedraengt = gegnerFiguren(st).some((g) => lebt(g) && weite(g, f) <= 1);
+    return st.mech.ziele.filter((z) => zielOffen(z) && weite(z, f) <= 1 && !(z.ruhe && bedraengt)).sort((a, b) => b.fortschritt - a.fortschritt)[0] || null;
   }
   /** Felder, die im nächsten gegnerischen Zug getroffen werden oder sich verwandeln – Helden und Begleiter meiden sie */
   function gefahrFelder(st) {
@@ -2211,7 +2211,7 @@
       const helden = spielerFiguren(st).filter(lebt), zuf = new Map();
       const kand = m.eis.felder.filter(([x, y]) => !st.karte.block.has(key(x, y)) && !m.wandel.some((c) => c.felder.some(([a, b]) => a === x && b === y)));
       for (const p of kand) zuf.set(p, st.r());
-      const nah = (p) => Math.min(9, ...helden.map((h) => abstand(h, { x: p[0], y: p[1] })));
+      const nah = (p) => Math.min(9, ...helden.map((h) => weite(h, { x: p[0], y: p[1] })));
       kand.sort((a, b) => nah(a) - nah(b) || zuf.get(a) - zuf.get(b));
       const wahl = kand.slice(0, Math.min(m.eis.proRunde, m.eis.max - m.eis.gebrochen)); m.eis.gebrochen += wahl.length;
       if (wahl.length) { m.wandel.push({ felder: wahl, typ: "loch", runde: st.runde + 1, name: "Das Eis" }); st.log.push({ t: `Das Eis knackt! ${wahl.length === 1 ? "Ein Feld bricht" : `${wahl.length} Felder brechen`} zu Beginn der nächsten Runde ein.`, art: "schlecht" }); }
@@ -2396,7 +2396,7 @@
     let best = null;
     if (fl.form === "ring") { const felder = kreisFelder(st, g.x, g.y, fl.radius || 1).filter(([x, y]) => x !== g.x || y !== g.y); best = { felder, n: drin(felder) }; }
     else for (const z of ziele) {
-      if (abstand(g, z) > (fl.reichweite || 6) || !sicht(st, g, z)) continue;
+      if (weite(g, z) > (fl.reichweite || 6) || !sicht(st, g, z)) continue;
       const felder = fl.form === "linie" ? linienFelder(st, g, z, fl.reichweite || 6) : kreisFelder(st, z.x, z.y, fl.radius || 1), n = drin(felder);
       if (!best || n > best.n) best = { felder, n };
     }
@@ -2408,12 +2408,12 @@
   }
   /** Eiswand: Die Felder neben dem Helden, der am dichtesten bei seinen Freunden steht, frieren zu (angekündigt, für einige Runden) */
   function feldzauber(st, g, fz) {
-    const helden = spielerFiguren(st).filter((h) => lebt(h) && abstand(h, g) <= (fz.reichweite || 8) && sicht(st, g, h)); let best = null;
+    const helden = spielerFiguren(st).filter((h) => lebt(h) && weite(h, g) <= (fz.reichweite || 8) && sicht(st, g, h)); let best = null;
     for (const h of helden) {
-      const freunde = helden.filter((o) => o !== h && abstand(o, h) <= 3).length; if (!freunde) continue;
+      const freunde = helden.filter((o) => o !== h && weite(o, h) <= 3).length; if (!freunde) continue;
       const felder = [];
       for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const x = h.x + dx, y = h.y + dy; if ((dx || dy) && !blockiert(st, x, y) && !belegt(st, x, y) && !gefahrFelder(st).has(key(x, y))) felder.push([x, y]); }
-      felder.sort((a, b) => helden.filter((o) => o !== h && abstand(o, { x: b[0], y: b[1] }) <= 2).length - helden.filter((o) => o !== h && abstand(o, { x: a[0], y: a[1] }) <= 2).length);
+      felder.sort((a, b) => helden.filter((o) => o !== h && weite(o, { x: b[0], y: b[1] }) <= 2).length - helden.filter((o) => o !== h && weite(o, { x: a[0], y: a[1] }) <= 2).length);
       if (felder.length && (!best || freunde > best.freunde)) best = { felder: felder.slice(0, fz.anzahl || 3), freunde, h };
     }
     if (!best) return false;
@@ -2425,14 +2425,14 @@
   function ruferZug(st, g, rf) {
     const m = st.mech;
     const bereit = g.ruferRunde == null || st.runde - g.ruferRunde >= 2; // nur jede zweite Runde
-    const z = bereit && m && m.ziele.filter((x) => x.umkehrbar && !x.verloren && (x.fertig || x.fortschritt > 0)).sort((a, b) => abstand(a, g) - abstand(b, g))[0];
+    const z = bereit && m && m.ziele.filter((x) => x.umkehrbar && !x.verloren && (x.fertig || x.fortschritt > 0)).sort((a, b) => weite(a, g) - weite(b, g))[0];
     if (z) {
-      if (abstand(z, g) > 1 && st.zug.bewegung > 0) {
+      if (weite(z, g) > 1 && st.zug.bewegung > 0) {
         const mm = erreichbar(st, g, st.zug.bewegung); let best = null;
-        for (const [k2, c] of mm) { const [x, y] = k2.split(",").map(Number), dd = abstand({ x, y }, z); if (!best || dd < best.d || (dd === best.d && c < best.c)) best = { x, y, d: dd, c }; }
+        for (const [k2, c] of mm) { const [x, y] = k2.split(",").map(Number), dd = weite({ x, y }, z); if (!best || dd < best.d || (dd === best.d && c < best.c)) best = { x, y, d: dd, c }; }
         if (best) { const sx = g.x, sy = g.y; g.x = best.x; g.y = best.y; brandFeld(st, g); fangschuss(st, g, sx, sy); }
       }
-      if (lebt(g) && !st.ende && abstand(z, g) <= 1) {
+      if (lebt(g) && !st.ende && weite(z, g) <= 1) {
         const war = z.fertig; z.fertig = false; g.ruferRunde = st.runde; z.fortschritt = Math.max(0, (war ? z.runden : z.fortschritt) - 1);
         st.log.push({ t: `${g.name} legt die Hand auf ${z.name}: ${war ? "Er erwacht wieder" : "Der Fortschritt schwindet"} (${z.fortschritt}/${z.runden}).`, art: "schlecht" });
         if (war) zielZurueck(st, z);
@@ -2441,7 +2441,7 @@
       if (!lebt(g) || st.ende) { if (!st.ende) weiter(st); return true; }
     }
     if (rf.heilung) {
-      const v = gegnerFiguren(st).filter((o) => lebt(o) && o !== g && o.tp < o.tpMax * 0.6 && abstand(o, g) <= (rf.reichweite || 6)).sort((a, b) => a.tp / a.tpMax - b.tp / b.tpMax)[0];
+      const v = gegnerFiguren(st).filter((o) => lebt(o) && o !== g && o.tp < o.tpMax * 0.6 && weite(o, g) <= (rf.reichweite || 6)).sort((a, b) => a.tp / a.tpMax - b.tp / b.tpMax)[0];
       if (v) { const n = roll(st.r, rf.heilung).total, vor = v.tp; v.tp = Math.min(v.tpMax, v.tp + n); st.log.push({ t: `${g.name} haucht Kälte über ${v.name}: +${v.tp - vor} TP.`, art: "gegner" }); weiter(st); return true; }
     }
     return false;

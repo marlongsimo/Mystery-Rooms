@@ -68,4 +68,14 @@ check(F.lichtbringer.faehig.find((x) => x.id === "segen").typ === "bonus" && F.l
     const key = f.id + ":" + st.runde; if (key !== wer) { wer = key; merk = { lauf: 0 }; if (neben && !f.z.verlangsamt && !f.z.zeitriss && !f.z.liegend) { nah++; if (st.zug.bewegung <= 4) nahW4++; } }
     if (tm === 2) { jetzt = Math.max(jetzt, st.arena.bot.bis) + 50; if (!K.zeit(st, jetzt).schritte.length) break; } else { jetzt += 1500; const w = BOT.entscheide(st, merk); if (w.typ === "bewegen") merk.lauf++; let r = K.zug(st, 1, w, jetzt); if (r.fehler) r = K.zug(st, 1, { typ: "ende" }, jetzt); if (r.fehler) break; } }
   check(st.ende && nah > 0 && nahW4 === nah, `Steht ein Gegner daneben, bleibt es bei 4 Feldern (${nahW4} von ${nah} Zügen); der Kampf Krieger gegen Krieger endet`); }
+// Zaubertricks von Morwen und Seran streifen auch bei gelungenem Rettungswurf (halber Schaden, kein Zustand)
+{ const halb = (h, id) => Boolean(F[h].faehig.find((x) => x.id === id).halb);
+  check(halb("schattenmagier", "schattenstich") && halb("inquisitor", "richtspruch") && !halb("lichtbringer", "heiliges_licht") && !halb("wanderheiler", "dornenranke"), "Schattenstich und Richtspruch machen bei gelungenem Rettungswurf halben Schaden; Heiliges Licht und Dornenranke nicht");
+  let gestreift = 0, voll = 0, nichts = 0, stichNachStreif = 0;
+  for (let n = 0; n < 6; n++) { const m = { staerke: 1, seed: 900 + n, modus: "duell", karte: "garten", begegnung: "kobolde", kampfstufe: 5, host_name: "A", guest_name: "B", bot: true, host_team: ["schattenmagier", "inquisitor", "gelehrter"].map((held) => ({ held, stufe: 5 })), guest_team: ["lichtbringer", "wanderheiler", "schildwaechter"].map((held) => ({ held, stufe: 5 })) };
+    let jetzt = 1e6; const st = K.start(m, 0, 0, jetzt).st; let merk = { lauf: 0 }, wer = null;
+    for (let i = 0; i < 5000 && !st.ende; i++) { const a = R.aktiv(st), tm = R.teamVon(st, a); if (!tm) break; const key = a.id + ":" + st.runde;
+      if (tm === 2) { jetzt = Math.max(jetzt, st.arena.bot.bis) + 50; if (!K.zeit(st, jetzt).schritte.length) break; } else { if (wer !== key) { wer = key; merk = { lauf: 0 }; } jetzt += 1500; const w = BOT.entscheide(st, merk); if (w.typ === "bewegen") merk.lauf++; let r = K.zug(st, 1, w, jetzt); if (r.fehler) r = K.zug(st, 1, { typ: "ende" }, jetzt); if (r.fehler) break; } }
+    for (const e of st.log) { const t = e.t || ""; if (!/: (Schattenstich|Richtspruch) – /.test(t)) continue; if (/nur gestreift, \d+ Schaden/.test(t)) gestreift++; else if (/misslingt, \d+ Schaden/.test(t)) voll++; else nichts++; } }
+  check(gestreift > 0 && voll > 0 && nichts === 0, `Im Kampf: ${voll}× voller Treffer, ${gestreift}× gestreift – kein Schattenstich oder Richtspruch bleibt mehr ohne Wirkung`); }
 console.log(ok ? "\nKLERIKER IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

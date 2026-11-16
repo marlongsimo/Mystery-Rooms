@@ -121,7 +121,7 @@
       name: "Morwen", titel: "Die Schattenmagierin", klasse: "zauberer", rolle: "hinten, Kontrolle", spruch: "Was du siehst, entscheide ich.",
       werte: { INT: 16, GES: 14, KON: 13, CHA: 12, WEI: 10, STR: 8 }, rk: [14, 14, 14], ruestung: "Arkaner Schutz und Schattenmantel",
       faehig: [
-        { id: "schattenstich", name: "Schattenstich", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 5, rettung: "WEI", attr: "INT", schaden: "1W10", plusAttr: true, zustand: "stich", dauer: 1, text: "Zaubertrick. WEI-Rettungswurf, sonst Schaden und Nachteil auf den nächsten Angriff des Ziels." },
+        { id: "schattenstich", name: "Schattenstich", typ: "aktion", ab: 1, art: "rettungswurf", halb: true, reichweite: 5, rettung: "WEI", attr: "INT", schaden: "1W10", plusAttr: true, zustand: "stich", dauer: 1, text: "Zaubertrick. WEI-Rettungswurf, sonst Schaden und Nachteil auf den nächsten Angriff des Ziels. Gelingt der Wurf: halber Schaden." },
         { id: "trugbild", name: "Trugbild", typ: "passiv", ab: 1, text: "Der erste Angriff gegen dich in jeder Runde erfolgt mit Nachteil." },
         { id: "furcht", name: "Furcht", typ: "aktion", ab: 1, art: "kontrolle", zustand: "veraengstigt", dauer: 2, radius: 1, reichweite: 5, rettung: "WEI", attr: "INT", platz: 1, text: "Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf, sonst 2 Runden verängstigt." },
         { id: "fesseln", name: "Schattenfesseln", typ: "aktion", ab: 1, art: "kontrolle", zustand: "festgehalten", dauer: 2, reichweite: 5, rettung: "STR", attr: "INT", platz: 1, text: "STR-Rettungswurf, sonst 2 Runden festgehalten." },
@@ -221,7 +221,7 @@
       werte: { STR: 16, KON: 14, WEI: 14, INT: 10, CHA: 10, GES: 8 }, rk: [18, 18, 18], ruestung: "Kettenpanzer und Schild", metall: true,
       faehig: [
         { id: "kriegshammer", name: "Kriegshammer", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W8", wucht: true, text: "Nahkampf. Sühne: Ein Treffer auf dein Brandmal-Ziel heilt dich um 1W4." },
-        { id: "richtspruch", name: "Richtspruch", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 5, rettung: "WEI", attr: "WEI", schaden: "1W8", brandmal: true, text: "Zaubertrick. WEI-Rettungswurf, sonst 1W8 Schaden – auf dein Brandmal-Ziel kommt der Brandmal-Schaden dazu." },
+        { id: "richtspruch", name: "Richtspruch", typ: "aktion", ab: 1, art: "rettungswurf", halb: true, reichweite: 5, rettung: "WEI", attr: "WEI", schaden: "1W8", brandmal: true, text: "Zaubertrick. WEI-Rettungswurf, sonst 1W8 Schaden – auf dein Brandmal-Ziel kommt der Brandmal-Schaden dazu. Gelingt der Wurf: halber Schaden." },
         { id: "wahrheitsblick", name: "Wahrheitsblick", typ: "passiv", ab: 1, text: "Vorteil, Lügen zu erkennen; sieht Illusionen und Unsichtbares in 2 Feldern." },
         { id: "brandmal", name: "Brandmal", typ: "bonus", ab: 1, art: "mal", mal: "brand", reichweite: 5, platz: 1, freiJeKampf: 1, text: "1× je Kampf ohne Platz: Deine Treffer gegen das Ziel machen +1W4 (ab Stufe 3 +2W6). Das Ziel ist an dich gebunden: Jeder Schritt von dir weg kostet es doppelte Bewegung." },
         { id: "befehl", name: "Befehl: Flieh!", typ: "aktion", ab: 1, art: "kontrolle", zustand: "veraengstigt", dauer: 1, reichweite: 5, rettung: "WEI", attr: "WEI", platz: 1, text: "WEI-Rettungswurf, sonst flieht das Ziel 1 Runde." },

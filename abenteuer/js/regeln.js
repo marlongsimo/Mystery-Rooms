@@ -973,7 +973,12 @@
       }
       case "rettungswurf": {
         const sg = SG(f, a.attr), rw = rettung(st, ziel, a.rettung, sg);
-        if (rw.erfolg) st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} widersteht (Rettungswurf ${rw.total} gegen SG ${sg}).`, art: "wurf" });
+        if (rw.erfolg && a.halb) {
+          // Zaubertrick: Auch wer widersteht, wird gestreift – halber Schaden, aber kein Zustand und keine Zusatzwirkung
+          const h2 = Math.max(1, Math.floor((roll(r, a.schaden).total + (a.plusAttr ? mod(f.werte[a.attr]) : 0)) / 2));
+          st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} widersteht (Rettungswurf ${rw.total} gegen SG ${sg}): nur gestreift, ${h2} Schaden.`, art: "wurf" });
+          schaden(st, ziel, h2);
+        } else if (rw.erfolg) st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} widersteht (Rettungswurf ${rw.total} gegen SG ${sg}).`, art: "wurf" });
         else {
           const s = roll(r, a.schaden).total + (a.plusAttr ? mod(f.werte[a.attr]) : 0) + (a.brandmal && ziel.z.brandmal === f.id ? roll(r, brandW(f)).total : 0);
           st.log.push({ t: `${f.name}: ${a.name} – Rettungswurf ${rw.total} gegen SG ${sg} misslingt, ${s} Schaden.`, art: "wurf" });

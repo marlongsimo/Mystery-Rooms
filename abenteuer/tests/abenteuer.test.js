@@ -87,7 +87,7 @@ const R = require('../js/regeln.js'), F = R.FD;
     await p.waitForFunction(() => window.AB.st && window.AB.R.aktiv(window.AB.st).seite === 'spieler', null, { timeout: 15000 });
     const info = await p.evaluate(() => ({ n: window.AB.R.spielerFiguren(window.AB.st).length, wolf: window.AB.st.figuren.some((f) => f.art === 'wolf'), stufe: window.AB.st.stufe, hard: window.AB.st.schwierigkeit, gegner: window.AB.st.figuren.filter((f) => f.seite === 'gegner').map((f) => f.art) }));
     check(info.n === 5 && info.wolf && info.stufe === 2 && info.hard === 'normal' && info.gegner.every((g) => g === 'knochenwaechter'), `${vp.width}px: Kampf mit 5 Figuren + Wolf, Stufe 2, Normal, Knochenwächter`);
-    check((await p.$$('#karte image')).length >= 6, `${vp.width}px: Porträts auf der Karte`);
+    check((await p.$$('#karte image')).length >= 5, `${vp.width}px: Porträts auf der Karte`);
     const name0 = await p.evaluate(() => window.AB.R.aktiv(window.AB.st).name);
     const ziel = await p.evaluate(() => { const st = window.AB.st, f = window.AB.R.aktiv(st); for (const [k, c] of window.AB.R.bewegungsfelder(st, f)) { if (c === 'schritt') continue; const [x, y] = k.split(',').map(Number); if (x > f.x) return { x, y }; } });
     if (ziel) {

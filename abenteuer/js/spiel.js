@@ -610,12 +610,23 @@
       i.replaceWith(a); });
     svg.replaceChildren(...neu.childNodes);
   }
+  /* Bilder warm halten: Für jedes Bild, das im Kampf vorkommt, bleibt ein winziges, fast unsichtbares Bild dauerhaft in der Seite.
+     Solange es dort steht, behält der Browser das fertig entpackte Bild im Speicher – neu angelegte Figuren und Porträts
+     erscheinen dann sofort und nicht erst einen Moment später (auf iPhones verschwanden sonst kurz alle Bilder). */
+  const warmDa = new Set();
+  function bilderWarm() {
+    let box = document.getElementById("bild-warm"); if (!box) { box = document.createElement("div"); box.id = "bild-warm"; box.setAttribute("aria-hidden", "true"); document.body.appendChild(box); }
+    const urls = [...document.querySelectorAll("#karte image")].map((i) => i.getAttribute("href")).concat([...document.querySelectorAll("#reihe img, #kh img, #gruppe-kampf img")].map((i) => i.getAttribute("src")));
+    if (st && st.karte && st.karte.bild) urls.push(st.karte.bild);
+    for (const u of urls) { if (!u || warmDa.has(u)) continue; warmDa.add(u); const i = new Image(); i.decoding = "sync"; i.alt = ""; i.src = u; box.appendChild(i); }
+  }
   function renderSicht() {
     // Arena: Jedes Gerät sieht die Karte aus seiner Sicht (eigene Helden als Helden, die des Gegners rot) – danach zurückstellen
     if (st && st.arena && ARENA) { const alt = st.arena.sicht; if (alt !== ARENA.seite) { R.arenaSicht(st, ARENA.seite); try { return renderKern(); } finally { R.arenaSicht(st, alt); } } }
     return renderKern();
   }
   function renderKern() {
+    let chancen = "";
     const svg = $("#karte"), k = st.karte, akt = R.aktiv(st);
     svg.setAttribute("viewBox", `0 0 ${k.b * Z} ${k.h * Z}`);
     const spielerDran = akt.seite === "spieler" && !st.ende && akt.tp > 0;
@@ -628,7 +639,7 @@
     if (k.bild) {
       // Gemalte Karte: Bild als Boden, Raster nur auf begehbaren Feldern, leichte Vignette
       o += `<defs><radialGradient id="vignette" cx="50%" cy="50%" r="72%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient></defs>`;
-      o += `<image href="${k.bild}" x="0" y="0" width="${k.b * Z}" height="${k.h * Z}" preserveAspectRatio="none"/>`;
+      // Das Kartenbild liegt als Hintergrund am SVG selbst (siehe unten): Es wird beim Neuzeichnen nie neu angelegt und kann nicht aufblitzen
       o += `<rect width="${k.b * Z}" height="${k.h * Z}" fill="url(#vignette)"/>`;
       for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) if (!k.block.has(x + "," + y)) o += `<rect x="${x * Z + 1}" y="${y * Z + 1}" width="${Z - 2}" height="${Z - 2}" rx="3" fill="none" stroke="#e8dcc0" stroke-opacity=".16"/>`;
     }
@@ -692,7 +703,7 @@
       if (zs.includes(f)) {
         o += `<circle cx="${cx}" cy="${cy}" r="29" fill="${f.seite === "gegner" ? "#d0545e" : "#6fd06a"}" fill-opacity=".28" stroke="${f.seite === "gegner" ? "#ff6a6a" : "#7fe07a"}" stroke-width="3.5"/>`;
         const c = R.chance(st, wahl, f.id);
-        if (c.p != null && f !== akt) o += `<g transform="translate(${cx} ${cy - 34 < 12 ? cy + 42 : cy - 34})"><rect x="-26" y="-11" width="52" height="18" rx="9" fill="#1b1612" stroke="${c.p >= 0.6 ? "#7fe07a" : c.p >= 0.35 ? "#d6a23a" : "#ff7a5a"}" stroke-width="1.5"/><text y="3" text-anchor="middle" font-size="12" font-weight="700" fill="#ece4d4">${Math.round(c.p * 100)} %</text></g>`;
+        if (c.p != null && f !== akt) chancen += `<g class="chance" transform="translate(${cx} ${cy - 34 < 12 ? cy + 42 : cy - 34})"><rect x="-26" y="-11" width="52" height="18" rx="9" fill="#1b1612" stroke="${c.p >= 0.6 ? "#7fe07a" : c.p >= 0.35 ? "#d6a23a" : "#ff7a5a"}" stroke-width="1.5"/><text y="3" text-anchor="middle" font-size="12" font-weight="700" fill="#ece4d4">${Math.round(c.p * 100)} %</text></g>`;
       }
       if (tipp && tipp.ziel === f.id && !wahl) o += `<circle class="tipp-ring" cx="${cx}" cy="${cy}" r="31" fill="none" stroke="#f2d35a" stroke-width="3"/>`;
       if (f.seite === "gegner" && !heldA(f)) {
@@ -732,12 +743,15 @@
       }
       } finally { o = o.slice(0, vorFig) + `<g class="fig ${f.seite === "gegner" ? "feind" : "held"} ${f.tp > 0 && !f.tot ? "steht" : "liegt"}" data-id="${f.id}" style="--v:${-(((Date.now() / 1000) + (st.figuren.indexOf(f) % 5) * 0.6) % 3).toFixed(2)}s"><g class="fig-k">` + figSchweben(o.slice(vorFig)) + "</g></g>"; }
     }
+    o += chancen; // Trefferchancen ganz oben: Große Figuren (die alte Unke, Bosse) verdeckten sie sonst
     if (RASTER) o += rasterEbene(k);
     for (let y = 0; y < k.h; y++) for (let x = 0; x < k.b; x++) o += `<rect class="feld" data-x="${x}" data-y="${y}" x="${x * Z}" y="${y * Z}" width="${Z}" height="${Z}" fill="transparent"/>`;
+    { const hg = k.bild ? `url("${k.bild}")` : ""; if (svg.dataset.hg !== hg) { svg.dataset.hg = hg; svg.style.backgroundImage = hg; svg.style.backgroundSize = "100% 100%"; svg.style.backgroundRepeat = "no-repeat"; } }
     svgSetzen(svg, o);
 
     const mini = (f) => heldA(f) ? `<img class="mini" src="${wolfA(f) ? "img/figuren/wolf.jpg" : F.bild(f.fidA)}" alt="">` : f.seite === "gegner" ? `<svg class="mini" viewBox="-26 -26 52 52" aria-hidden="true">${B.gegner(f.art)}</svg>` : `<img class="mini" src="${F.bild(f.fid)}" alt="">`;
-    $("#reihe").innerHTML = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${heldA(f) ? "gh" : f.seite === "gegner" ? "g" : st.arena && R.teamVon(st, f) ? "eh" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${kroneA(f) ? `<i class="krone" title="Dein Anführer">♛</i>` : ""}${esc(st.arena && R.teamVon(st, f) ? f.name.replace(/ \([^)]*\)$/, "") : f.name)}${st.arena && R.teamVon(st, f) ? ` <small>${esc(st.arena.namen[R.teamVon(st, f) - 1])}</small>` : ""}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join("");
+    { const reiheHtml = `<span class="runde">Runde ${st.runde}${st.arena ? ` von ${st.arena.runden}` : ""}${st.schwierigkeit === "hardcore" ? " · Hardcore" : ""}</span>` + st.reihe.map((id, i) => { const f = R.fig(st, id), b = besitzerVon(f); return `<span class="${i === st.am && !st.ende ? "dran" : ""} ${f.tp <= 0 ? "down" : ""} ${heldA(f) ? "gh" : f.seite === "gegner" ? "g" : st.arena && R.teamVon(st, f) ? "eh" : ""}" ${f.seite === "gegner" ? `data-info="${f.id}"` : ""}>${mini(f)}${kroneA(f) ? `<i class="krone" title="Dein Anführer">♛</i>` : ""}${esc(st.arena && R.teamVon(st, f) ? f.name.replace(/ \([^)]*\)$/, "") : f.name)}${st.arena && R.teamVon(st, f) ? ` <small>${esc(st.arena.namen[R.teamVon(st, f) - 1])}</small>` : ""}${b ? ` <small>📱 ${esc(spielerName(b))}</small>` : ""}</span>`; }).join(""); const re = $("#reihe"); if (re.dataset.h !== reiheHtml) { re.dataset.h = reiheHtml; re.innerHTML = reiheHtml; } } // nur bei Änderung neu anlegen (sonst blitzen die Porträts auf)
+    bilderWarm();
 
     if (st.ende) { $("#aktiv").innerHTML = ""; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }
     else if (!spielerDran) { $("#aktiv").innerHTML = `<b>${esc(akt.name)}</b><span class="werte">${heldA(akt) ? "(Gegner) " : ""}ist am Zug …</span>`; $("#aktionen").innerHTML = ""; $("#hinweis").textContent = ""; }

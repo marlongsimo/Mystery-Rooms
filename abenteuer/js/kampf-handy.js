@@ -90,11 +90,12 @@
     el.classList.toggle("wartet", !meinZug);
     // Die Leiste behält ihre Höhe, wenn der Gegner zieht – sonst springt die Karte bei jedem Zugwechsel
     el.style.minHeight = meinZug ? "" : hoehe ? hoehe + "px" : "";
-    el.innerHTML = kopf() + (meinZug
+    const leisteHtml = kopf() + (meinZug
       ? `<div class="kh-info ${info ? (info.aus ? "aus" : "an") : ""}">${info ? `<b>${esc(info.name)}</b> <small>${esc(info.klein)}</small><span>${esc(info.text)}</span>${gewaehlt ? `<em>Tippe ein leuchtendes Ziel an.</em><button id="kh-ab">Abbrechen</button>` : ""}` : `<span>${esc(hinweis)}</span>`}</div>
          <div class="kh-raster">${kacheln.map((k) => `<button class="kh-k ${k.aus ? "aus" : ""} ${k.an ? "an" : ""} ${k.tipp ? "tipp" : ""} ${k.bonus ? "bonus" : ""}" data-kh="${esc(k.id)}"><i>${k.sym}</i><b>${esc(k.name)}</b>${k.wert ? `<small>${esc(k.wert)}</small>` : ""}</button>`).join("")}</div>
          <div class="kh-fuss"><button class="kh-tipp" id="kh-tipp">💡 Tipp</button><button class="kh-ende" id="kh-ende">Zug beenden ⟳</button></div>`
       : `<div class="kh-warten"><b>${st.ende ? "Der Kampf ist vorbei." : esc(a.name) + " ist am Zug …"}</b>${letzte}</div>`);
+    if (el.dataset.h !== leisteHtml) { el.dataset.h = leisteHtml; el.innerHTML = leisteHtml; } // nur bei Änderung neu anlegen (sonst blitzt das Porträt auf); die Knöpfe werden unten immer neu belegt
     // Auslösen: die vorhandenen Knöpfe des Spiels
     el.querySelectorAll("[data-kh]").forEach((b) => { b.onclick = () => { const k = kacheln.find((x) => x.id === b.dataset.kh), o = orig.find((x) => x.dataset.a === b.dataset.kh); if (!k || !o) return;
       if (k.aus) { offen = offen === k.id ? null : k.id; return bauen(); } offen = null; o.click(); }; });

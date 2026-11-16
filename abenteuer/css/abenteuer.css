@@ -2089,8 +2089,10 @@ body.kh-an.kh-log #log { display: block; position: fixed; left: 8px; right: 8px;
 .kh-ende { border: 1px solid #d0606a; background: linear-gradient(180deg, #a5333f, #7b2530); color: #fff; }
 .kh-warten { padding: 8px 10px 10px; border-radius: 10px; background: rgba(0,0,0,.3); font-size: 13px; line-height: 1.4; color: #b8c0cc; }
 .kh-warten b { display: block; margin-bottom: 4px; color: #f1e3c4; font-size: 15px; } .kh-warten p { margin: 2px 0 0; }
-/* „Dein Zug“ als großes Schild entfällt am Handy: Wer dran ist, steht in der Leiste und in der Zugreihenfolge */
-body.kh-an .fx-zug { display: none !important; }
+/* „Dein Zug“: am Handy etwas kleiner und unterhalb der Würfelzeile, damit sich beide nicht überdecken */
+body.kh-an .fx-zug { top: calc(var(--kh-oben, 70px) + 76px); scale: .82; }
+#bild-warm { position: fixed; left: 0; bottom: 0; width: 2px; height: 2px; overflow: hidden; opacity: .01; pointer-events: none; z-index: -1; }
+#bild-warm img { width: 2px; height: 2px; }
 /* Würfel am Handy: eine schmale Zeile am oberen Kartenrand – der Treffer darunter bleibt sichtbar */
 body.kh-an .wurf { top: calc(var(--kh-oben, 70px) + 6px); bottom: auto; left: 8px; right: 8px; width: auto; max-width: none; transform: translateY(-10px); z-index: 57;
   display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 8px; border-radius: 12px; }

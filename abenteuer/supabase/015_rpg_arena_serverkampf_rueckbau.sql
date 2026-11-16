@@ -4,6 +4,7 @@
 -- und die bisherige Arena bleiben unberührt. Die Edge Function „arena“ kann im Dashboard gelöscht werden.
 -- =====================================================================
 begin;
+drop function if exists public.rpg_arena_srv_end(uuid, uuid);
 drop function if exists public.rpg_arena_srv_end(uuid);
 drop function if exists public.rpg_arena_srv_save(uuid, uuid, integer, jsonb, jsonb);
 drop function if exists public.rpg_arena_srv_load(uuid, uuid);

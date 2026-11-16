@@ -22,7 +22,7 @@
 --   • Ausführen darf sie nur die Rolle service_role (die Edge Function), kein Spieler und kein anonymer Aufruf.
 --   • Sie prüfen trotzdem selbst: Laden und Speichern nur für ein Konto, das an genau diesem Serverkampf teilnimmt,
 --     und nur solange der Kampf bereit ist oder läuft.
---   • rpg_arena_srv_end nimmt KEIN Ergebnis entgegen: Sieger, Grund, Punkte und Runden liest sie aus dem gespeicherten
+--   • rpg_arena_srv_end prüft ebenfalls die Teilnahme und nimmt KEIN Ergebnis entgegen: Sieger, Grund, Punkte und Runden liest sie aus dem gespeicherten
 --     Stand. Ohne beendeten Stand trägt sie nichts ein. Kämpfe der bisherigen Arena kann sie nicht beenden.
 --
 -- Rückbau: 015_rpg_arena_serverkampf_rueckbau.sql
@@ -188,14 +188,15 @@ end;
 $$;
 
 -- Ergebnis eintragen und Belohnungen buchen (über die vorhandene Funktion rpg_arena_belohnen).
--- Nimmt kein Ergebnis entgegen: Sieger, Grund, Punkte und Runden stehen im gespeicherten Stand. Ist der Stand nicht
+-- Nur für ein Konto, das an diesem Serverkampf teilnimmt. Nimmt kein Ergebnis entgegen: Sieger, Grund, Punkte und Runden stehen im gespeicherten Stand. Ist der Stand nicht
 -- beendet, passiert nichts. Ein zweiter Aufruf ändert nichts. Kämpfe ohne Serverkampf-Eintrag sind ausgeschlossen.
-create or replace function public.rpg_arena_srv_end(p_match_id uuid)
+create or replace function public.rpg_arena_srv_end(p_match_id uuid, p_user uuid)
 returns boolean language plpgsql security definer set search_path = public as $$
 declare v_m public.rpg_arena_matches%rowtype; v_st jsonb; v_a jsonb; v_sieger integer; v_grund text;
 begin
   select m.* into v_m from public.rpg_arena_matches m join public.rpg_arena_fights f on f.match_id = m.id where m.id = p_match_id for update of m;
-  if not found or v_m.status not in ('bereit', 'laeuft') then return false; end if;
+  if not found or p_user is null or (v_m.host_id <> p_user and v_m.guest_id is distinct from p_user) then return false; end if;
+  if v_m.status not in ('bereit', 'laeuft') then return false; end if;
   select st into v_st from public.rpg_arena_fights where match_id = p_match_id;
   if v_st is null or coalesce(v_st->>'ende', '') = '' then return false; end if;
   v_a := v_st->'arena';
@@ -217,10 +218,11 @@ $$;
 drop function if exists public.rpg_arena_srv_load(uuid);
 drop function if exists public.rpg_arena_srv_save(uuid, integer, jsonb, jsonb);
 drop function if exists public.rpg_arena_srv_end(uuid, integer, text, jsonb, integer);
-revoke all on function public.rpg_arena_srv_load(uuid, uuid), public.rpg_arena_srv_save(uuid, uuid, integer, jsonb, jsonb), public.rpg_arena_srv_end(uuid) from public, anon, authenticated;
+drop function if exists public.rpg_arena_srv_end(uuid);
+revoke all on function public.rpg_arena_srv_load(uuid, uuid), public.rpg_arena_srv_save(uuid, uuid, integer, jsonb, jsonb), public.rpg_arena_srv_end(uuid, uuid) from public, anon, authenticated;
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then
-    grant execute on function public.rpg_arena_srv_load(uuid, uuid), public.rpg_arena_srv_save(uuid, uuid, integer, jsonb, jsonb), public.rpg_arena_srv_end(uuid) to service_role;
+    grant execute on function public.rpg_arena_srv_load(uuid, uuid), public.rpg_arena_srv_save(uuid, uuid, integer, jsonb, jsonb), public.rpg_arena_srv_end(uuid, uuid) to service_role;
   end if;
 end $$;
 revoke all on function public.rpg_arena_search_server(), public.rpg_arena_fight(uuid, integer), public.rpg_arena_fight_leader(uuid, integer) from public, anon;

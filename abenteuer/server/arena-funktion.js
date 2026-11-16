@@ -48,7 +48,7 @@ async function arenaAnfrage(req) {
       } else {
         st = ARENA_KERN.laden(k.st);
         // Das Ergebnis liest die Datenbank selbst aus dem gespeicherten Stand – die Function reicht keines hinein
-        if (st.ende) { await srv("rpg_arena_srv_end", { p_match_id: m.id }); return antwort({ ok: true, v: k.v, status: "beendet", schritte: [] }); }
+        if (st.ende) { await srv("rpg_arena_srv_end", { p_match_id: m.id, p_user: nutzer.id }); return antwort({ ok: true, v: k.v, status: "beendet", schritte: [] }); }
         const r = rumpf.aktion === "zug" ? ARENA_KERN.zug(st, seite, rumpf.zug, jetzt) : ARENA_KERN.zeit(st, jetzt);
         if (r.fehler) return antwort({ fehler: r.fehler, v: k.v });
         schritte = r.schritte;
@@ -56,7 +56,7 @@ async function arenaAnfrage(req) {
       if (!schritte.length) return antwort({ ok: true, v: k.v, schritte: [] });
       const gespeichert = await srv("rpg_arena_srv_save", { p_match_id: m.id, p_user: nutzer.id, p_v_alt: k.v, p_st: ARENA_KERN.speichern(st), p_schritte: schritte });
       if (!gespeichert) continue;
-      if (st.ende) await srv("rpg_arena_srv_end", { p_match_id: m.id });
+      if (st.ende) await srv("rpg_arena_srv_end", { p_match_id: m.id, p_user: nutzer.id });
       return antwort({ ok: true, v: k.v + schritte.length, schritte: schritte.map((s, i) => ({ v: k.v + i + 1, st: seite === 1 ? s.sicht1 : s.sicht2 })) });
     }
     return antwort({ fehler: "Gerade rechnet der Server noch den Zug davor. Bitte noch einmal." }, 409);

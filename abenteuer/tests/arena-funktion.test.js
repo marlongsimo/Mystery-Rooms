@@ -59,7 +59,8 @@ const team = (h) => h.map((held) => ({ held, stufe: 3 }));
   const nach = await A.ruf("tok-a", { match: ID, aktion: "zug", zug: { typ: "ende" } });
   check(nach.o.ok && nach.o.status === "beendet" && A.db.enden.length === 1, "Nach dem Ende wird nichts mehr gerechnet");
   check(A.db.abgewiesen === 0 && A.db.aufrufe.save > 20, "Alle Datenbankaufrufe der Function tragen den Dienstschlüssel");
-  check(!A.db.fremdErgebnis, "Die Function reicht kein Ergebnis in die Datenbank: rpg_arena_srv_end bekommt nur die Kampf-ID");
+  check(!A.db.fremdErgebnis, "Die Function reicht kein Ergebnis in die Datenbank: rpg_arena_srv_end bekommt nur Kampf und geprüftes Konto");
+  check(!A.db.endeOhneTeilnahme && A.db.aufrufe.end >= 1, "Beim Eintragen des Ergebnisses übergibt die Function das Konto eines Teilnehmers");
   // Zugriffskontrolle vor dem Service-Schlüssel: Ohne gültige Anmeldung erreicht kein Aufruf die Datenbank
   { const B2 = attrappe(); B2.kampf(ID, { match: m }); const l0 = B2.db.aufrufe.load;
     await B2.ruf(null, { match: ID, aktion: "start" }); await B2.ruf("erfunden", { match: ID, aktion: "zug", zug: { typ: "ende" } }); await B2.ruf("", { match: ID });

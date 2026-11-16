@@ -22,7 +22,8 @@ function attrappe() {
     if (m[1] === "rpg_arena_srv_save") { db.aufrufe.save++; if (!dabei || !["bereit", "laeuft"].includes(k.match.status) || k.v !== a.p_v_alt) return json(false);
       k.st = a.p_st; a.p_schritte.forEach((s, i) => k.schritte.push({ v: k.v + i + 1, sicht1: s.sicht1, sicht2: s.sicht2 })); k.v += a.p_schritte.length; k.schritte = k.schritte.filter((s) => s.v > k.v - 40);
       if (k.match.status === "bereit") k.match.status = "laeuft"; return json(true); }
-    if (m[1] === "rpg_arena_srv_end") { db.aufrufe.end++; if (Object.keys(a).some((x) => x !== "p_match_id")) { db.fremdErgebnis = true; return json({ message: "unbekannte Parameter" }, 400); }
+    if (m[1] === "rpg_arena_srv_end") { db.aufrufe.end++; if (Object.keys(a).some((x) => x !== "p_match_id" && x !== "p_user")) { db.fremdErgebnis = true; return json({ message: "unbekannte Parameter" }, 400); }
+      if (!dabei) { db.endeOhneTeilnahme = (db.endeOhneTeilnahme || 0) + 1; return json(false); }
       if (!k || !["bereit", "laeuft"].includes(k.match.status) || !k.st || !k.st.ende) return json(false);
       const ar = k.st.arena, grund = ar.aufgabe ? "aufgabe" : /am Boden|ist gefallen/.test(ar.grund || "") ? "team" : "punkte";
       Object.assign(k.match, { status: "beendet", sieger: ar.sieger, grund, punkte: ar.punkte, runden: k.st.runde }); db.enden.push({ id: a.p_match_id, sieger: ar.sieger, grund }); return json(true); }

@@ -15,7 +15,8 @@
 --       wartezeit     – Sekunden, bis er einspringt (10 bis 180; je Suche bis zu 4 Sekunden kürzer oder länger)
 --       staerke_von/bis – Spielstärke 0 bis 1 (1 = so gut er kann); je Gegner wird ein Wert aus dem Bereich gelost
 --       stufe_von/bis – Verschiebung seiner Helden gegenüber den Stufen des Spielers (−3 bis +2)
---     Voreinstellung = bisheriges Verhalten: aktiv, 30 Sekunden, Stärke 1 bis 1, Stufen −1 bis +1.
+--       schnitt_max   – so weit darf die Durchschnittsstufe seines Teams höchstens von der des Spielers abweichen (0 bis 3)
+--     Voreinstellung: aktiv, 30 Sekunden, Stärke 1 bis 1, Stufen je Held −1 bis +1, Durchschnitt höchstens ±0,5.
 --   • rpg_admin_bot(): Einstellungen und Statistik der Kämpfe gegen den Rechner-Gegner (nur Admins).
 --     rpg_admin_bot_set(…): Einstellungen ändern (nur Admins).
 --   • rpg_arena_bot, rpg_arena_queue und rpg_arena_srv_load (Fassungen aus 019) lesen die Einstellungen bzw. reichen die
@@ -48,8 +49,10 @@ create table if not exists public.rpg_arena_bot_settings (
   stufe_bis    integer      not null default 1 check (stufe_bis between -3 and 2),
   updated_at   timestamptz  not null default now(),
   updated_by   uuid         references auth.users(id) on delete set null,
+  schnitt_max  numeric(2,1) not null default 0.5 check (schnitt_max between 0 and 3),
   check (staerke_von <= staerke_bis and stufe_von <= stufe_bis)
 );
+alter table public.rpg_arena_bot_settings add column if not exists schnitt_max numeric(2,1) not null default 0.5 check (schnitt_max between 0 and 3);
 insert into public.rpg_arena_bot_settings (id) values (true) on conflict (id) do nothing;
 alter table public.rpg_arena_bot_settings enable row level security;
 revoke all on public.rpg_arena_bot_settings from anon, authenticated;
@@ -57,7 +60,7 @@ revoke all on public.rpg_arena_bot_settings from anon, authenticated;
 -- Die geltenden Einstellungen (nicht direkt aufrufbar)
 create or replace function public.rpg_arena_bot_cfg()
 returns public.rpg_arena_bot_settings language sql stable security definer set search_path = public as $$
-  select coalesce((select s from public.rpg_arena_bot_settings s where s.id), row(true, true, 30, 1, 1, -1, 1, now(), null)::public.rpg_arena_bot_settings);
+  select coalesce((select s from public.rpg_arena_bot_settings s where s.id), row(true, true, 30, 1, 1, -1, 1, now(), null, 0.5)::public.rpg_arena_bot_settings);
 $$;
 
 -- ---------------------------------------------------------------------
@@ -65,7 +68,7 @@ $$;
 -- ---------------------------------------------------------------------
 create or replace function public.rpg_arena_bot(p_match_id uuid, p_art text)
 returns jsonb language plpgsql security definer set search_path = public as $$
-declare v_m public.rpg_arena_matches%rowtype; v_helden text[]; v_stufen integer[]; v_team jsonb := '[]'::jsonb; v_name text; v_i integer; v_rahmen text; v_c public.rpg_arena_bot_settings%rowtype; v_staerke numeric;
+declare v_m public.rpg_arena_matches%rowtype; v_helden text[]; v_stufen integer[]; v_team jsonb := '[]'::jsonb; v_name text; v_i integer; v_rahmen text; v_c public.rpg_arena_bot_settings%rowtype; v_staerke numeric; v_soll integer; v_versuch integer[]; v_ab integer; v_best integer;
   v_karten text[] := array['garten', 'turm', 'gruft', 'pilze', 'schacht', 'halle', 'siegel']; v_monster text[] := array['garten', 'kobolde', 'gruft'];
   v_arcade text[] := array['arena', 'koenig', 'horde'];
   v_stamm text[] := array['Mara', 'Jonas', 'Finn', 'Lukas', 'Nele', 'Timo', 'Svenja', 'Kilian', 'Ronja', 'Malte', 'Darius', 'Elif', 'Noah', 'Jule', 'Paul', 'Leon', 'Mika', 'Lena', 'Tobi', 'Hannes',
@@ -80,7 +83,16 @@ begin
   select array_agg(hero_id) into v_helden from (select hero_id from public.rpg_hero_catalog order by random() limit 3) t;
   if v_helden is null or cardinality(v_helden) <> 3 then return null; end if;
   -- Stufen: die des Spielers in zufälliger Reihenfolge, je Held verschoben um einen Wert aus den Einstellungen (stufe_von bis stufe_bis); 1 bis 10
-  select array_agg(greatest(1, least(10, (e->>'stufe')::integer + v_c.stufe_von + floor(random() * (v_c.stufe_bis - v_c.stufe_von + 1))::integer)) order by random()) into v_stufen from jsonb_array_elements(v_m.host_team) e;
+  -- Der Durchschnitt des Teams darf höchstens schnitt_max von dem des Spielers abweichen: so lange neu losen, bis es passt;
+  -- lässt die Einstellung das nicht zu (z. B. alle Helden −2 bei höchstens ±0,5), gilt der Versuch mit der kleinsten Abweichung.
+  select sum((e->>'stufe')::integer) into v_soll from jsonb_array_elements(v_m.host_team) e;
+  for v_i in 1..40 loop
+    select array_agg(greatest(1, least(10, (e->>'stufe')::integer + v_c.stufe_von + floor(random() * (v_c.stufe_bis - v_c.stufe_von + 1))::integer)) order by random()) into v_versuch from jsonb_array_elements(v_m.host_team) e;
+    if v_versuch is null or cardinality(v_versuch) <> 3 then return null; end if;
+    v_ab := abs(v_versuch[1] + v_versuch[2] + v_versuch[3] - v_soll);
+    if v_best is null or v_ab < v_best then v_best := v_ab; v_stufen := v_versuch; end if;
+    exit when v_ab <= v_c.schnitt_max * 3;
+  end loop;
   if v_stufen is null or cardinality(v_stufen) <> 3 then return null; end if;
   for v_i in 1..3 loop v_team := v_team || jsonb_build_object('held', v_helden[v_i], 'stufe', v_stufen[v_i]); end loop;
   -- Name: wie ein Benutzername; keiner, den es als Konto gibt, und nicht der des Spielers
@@ -196,7 +208,7 @@ begin
   ), b as (select * from k where status = 'beendet' and sieger is not null)
   select jsonb_build_object(
     'einstellungen', jsonb_build_object('aktiv', v_c.aktiv, 'wartezeit', v_c.wartezeit, 'staerke_von', v_c.staerke_von, 'staerke_bis', v_c.staerke_bis,
-      'stufe_von', v_c.stufe_von, 'stufe_bis', v_c.stufe_bis, 'geaendert', v_c.updated_at, 'von', (select handle from public.rpg_profiles where user_id = v_c.updated_by)),
+      'stufe_von', v_c.stufe_von, 'stufe_bis', v_c.stufe_bis, 'schnitt_max', v_c.schnitt_max, 'geaendert', v_c.updated_at, 'von', (select handle from public.rpg_profiles where user_id = v_c.updated_by)),
     'statistik', jsonb_build_object(
       'kaempfe', (select count(*) from b), 'siege_spieler', (select count(*) from b where sieger = 1), 'aufgaben', (select count(*) from b where grund = 'aufgabe'),
       'laufend', (select count(*) from k where status in ('bereit', 'laeuft')), 'abgebrochen', (select count(*) from k where status = 'abgebrochen'),
@@ -217,18 +229,20 @@ begin
 end;
 $$;
 
-create or replace function public.rpg_admin_bot_set(p_aktiv boolean, p_wartezeit integer, p_staerke_von numeric, p_staerke_bis numeric, p_stufe_von integer, p_stufe_bis integer)
+drop function if exists public.rpg_admin_bot_set(boolean, integer, numeric, numeric, integer, integer); -- frühere Fassung ohne Durchschnitt
+create or replace function public.rpg_admin_bot_set(p_aktiv boolean, p_wartezeit integer, p_staerke_von numeric, p_staerke_bis numeric, p_stufe_von integer, p_stufe_bis integer, p_schnitt_max numeric default 0.5)
 returns jsonb language plpgsql security definer set search_path = public as $$
 begin
   if not public.rpg_ist_admin() then raise exception 'Nur Admins können den Rechner-Gegner einstellen.'; end if;
-  if p_aktiv is null or p_wartezeit is null or p_staerke_von is null or p_staerke_bis is null or p_stufe_von is null or p_stufe_bis is null then raise exception 'Bitte alle Werte angeben.'; end if;
+  if p_aktiv is null or p_wartezeit is null or p_staerke_von is null or p_staerke_bis is null or p_stufe_von is null or p_stufe_bis is null or p_schnitt_max is null then raise exception 'Bitte alle Werte angeben.'; end if;
+  if p_schnitt_max not between 0 and 3 then raise exception 'Die Abweichung des Durchschnitts muss zwischen 0 und 3 Stufen liegen.'; end if;
   if p_wartezeit not between 10 and 180 then raise exception 'Die Wartezeit muss zwischen 10 und 180 Sekunden liegen.'; end if;
   if p_staerke_von not between 0 and 1 or p_staerke_bis not between 0 and 1 or p_staerke_von > p_staerke_bis then raise exception 'Die Spielstärke muss zwischen 0 und 100 Prozent liegen, „von“ nicht über „bis“.'; end if;
   if p_stufe_von not between -3 and 2 or p_stufe_bis not between -3 and 2 or p_stufe_von > p_stufe_bis then raise exception 'Die Stufenverschiebung muss zwischen −3 und +2 liegen, „von“ nicht über „bis“.'; end if;
-  insert into public.rpg_arena_bot_settings (id, aktiv, wartezeit, staerke_von, staerke_bis, stufe_von, stufe_bis, updated_at, updated_by)
-    values (true, p_aktiv, p_wartezeit, round(p_staerke_von, 2), round(p_staerke_bis, 2), p_stufe_von, p_stufe_bis, now(), auth.uid())
+  insert into public.rpg_arena_bot_settings (id, aktiv, wartezeit, staerke_von, staerke_bis, stufe_von, stufe_bis, updated_at, updated_by, schnitt_max)
+    values (true, p_aktiv, p_wartezeit, round(p_staerke_von, 2), round(p_staerke_bis, 2), p_stufe_von, p_stufe_bis, now(), auth.uid(), round(p_schnitt_max, 1))
     on conflict (id) do update set aktiv = excluded.aktiv, wartezeit = excluded.wartezeit, staerke_von = excluded.staerke_von, staerke_bis = excluded.staerke_bis,
-      stufe_von = excluded.stufe_von, stufe_bis = excluded.stufe_bis, updated_at = now(), updated_by = excluded.updated_by;
+      stufe_von = excluded.stufe_von, stufe_bis = excluded.stufe_bis, schnitt_max = excluded.schnitt_max, updated_at = now(), updated_by = excluded.updated_by;
   return public.rpg_admin_bot();
 end;
 $$;
@@ -285,7 +299,7 @@ revoke all on function public.rpg_arena_bot(uuid, text), public.rpg_arena_bot_cf
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then grant execute on function public.rpg_arena_srv_load(uuid, uuid) to service_role; end if;
 end $$;
-revoke all on function public.rpg_arena_queue(text), public.rpg_admin_bot(), public.rpg_admin_bot_set(boolean, integer, numeric, numeric, integer, integer), public.rpg_arena_stats() from public, anon;
-grant execute on function public.rpg_arena_queue(text), public.rpg_admin_bot(), public.rpg_admin_bot_set(boolean, integer, numeric, numeric, integer, integer), public.rpg_arena_stats() to authenticated;
+revoke all on function public.rpg_arena_queue(text), public.rpg_admin_bot(), public.rpg_admin_bot_set(boolean, integer, numeric, numeric, integer, integer, numeric), public.rpg_arena_stats() from public, anon;
+grant execute on function public.rpg_arena_queue(text), public.rpg_admin_bot(), public.rpg_admin_bot_set(boolean, integer, numeric, numeric, integer, integer, numeric), public.rpg_arena_stats() to authenticated;
 
 commit;

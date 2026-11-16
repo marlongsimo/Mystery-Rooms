@@ -6,6 +6,7 @@
 -- Arena-Auswertung anschließend Migration 010 noch einmal ausführen.
 -- =====================================================================
 begin;
+drop function if exists public.rpg_admin_bot_set(boolean, integer, numeric, numeric, integer, integer, numeric);
 drop function if exists public.rpg_admin_bot_set(boolean, integer, numeric, numeric, integer, integer);
 drop function if exists public.rpg_admin_bot();
 drop function if exists public.rpg_arena_stats();

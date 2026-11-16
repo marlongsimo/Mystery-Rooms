@@ -31,6 +31,13 @@ const meinZug = async (p) => { for (let i = 0; i < 60; i++) { if (await p.evalua
   check(m.figurImBild && m.name === m.akt, "Die Karte zeigt die Figur am Zug; die Leiste nennt sie (" + m.name + ")");
   check(m.kacheln === m.origKnoepfe && m.kacheln >= 6 && /👣/.test(m.pips) && /Aktion/.test(m.pips) && /Bonus/.test(m.pips), `Alle ${m.kacheln} Aktionen als Kacheln; Bewegung, Aktion und Bonusaktion auf einen Blick`);
   check(m.rasterH <= 156 && (m.kacheln <= 8 || m.rasterVoll > m.rasterH), `Viele Aktionen (${m.kacheln}): Das Raster bleibt gut zwei Reihen hoch${m.kacheln > 8 ? " und lässt sich hochschieben" : ""}`);
+  // Zauberplätze: bei Zauberkundigen neben dem Namen, bei anderen nicht
+  { const pl = await p.evaluate(() => { const R = window.AB.R, st = window.AB.st, a = R.aktiv(st), e = document.querySelector(".kh-plaetze"), max = (a.plaetzeMax || [0, 0]), da = max[0] + max[1] > 0;
+      return { da, name: a.name, text: e ? [...e.querySelectorAll("u")].map((x) => x.textContent).join("") : null, soll: da ? "●".repeat(a.plaetze[0]) + "○".repeat(max[0] - a.plaetze[0]) + (max[1] ? "◆".repeat(a.plaetze[1]) + "◇".repeat(max[1] - a.plaetze[1]) : "") : null, label: e ? e.getAttribute("aria-label") : "", breit: document.querySelector(".kh-kopf").scrollWidth <= innerWidth }; });
+    check(pl.da ? pl.text === pl.soll && /Grad 1 noch \d+ von \d+/.test(pl.label) && pl.breit : pl.text === null, pl.da ? `Zauberplätze von ${pl.name} stehen neben dem Namen (${pl.text})` : `${pl.name} hat keine Zauberplätze: nichts angezeigt`);
+    // ein Platz verbraucht → ein hohler Kreis (danach zurückgestellt)
+    if (pl.da) { const t = await p.evaluate(() => { const a = window.AB.R.aktiv(window.AB.st), v = a.plaetze[0]; if (v < 1) return "leer"; a.plaetze[0] = v - 1; window.ABKH.bauen(); const x = document.querySelector(".kh-plaetze u").textContent; a.plaetze[0] = v; window.ABKH.bauen(); return x; });
+      check(t === "leer" || /○/.test(t), "Ein verbrauchter Platz erscheint hohl (" + t + ")"); } }
   // gesperrte Kachel erklärt sich
   const aus = await p.evaluate(() => { const k = document.querySelector(".kh-k.aus"); return k ? k.dataset.kh : null; });
   if (aus) { await p.tap(`.kh-k[data-kh="${aus}"]`); await p.waitForTimeout(250);

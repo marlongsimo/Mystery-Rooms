@@ -82,9 +82,12 @@
     if (offen && !kacheln.some((k) => k.id === offen)) offen = null;
     const hinweis = ($("#hinweis") || {}).textContent || "";
     const kopf = () => { const held = a.fid || a.fidA, bild = held && F.FIGUREN[held] ? `<img src="${F.bild(held)}" alt="">` : `<span class="kh-mon">☠</span>`, p = Math.max(0, Math.round(100 * a.tp / a.tpMax));
+      // Zauberplätze (Kleriker, Magier …): gefüllt = noch da, hohl = verbraucht; Kreise = Grad 1, Rauten = Grad 2
+      const pm = a.plaetzeMax || [0, 0], pr = a.plaetze || [0, 0], reihe = (n, max, voll, leer) => voll.repeat(Math.max(0, Math.min(n, max))) + leer.repeat(Math.max(0, max - n));
+      const plaetze = pm[0] + pm[1] > 0 ? `<i class="kh-plaetze" role="img" aria-label="Zauberplätze: Grad 1 noch ${pr[0]} von ${pm[0]}${pm[1] ? `, Grad 2 noch ${pr[1]} von ${pm[1]}` : ""}"><small>Zauber</small><u>${reihe(pr[0], pm[0], "●", "○")}</u>${pm[1] ? `<u class="g2">${reihe(pr[1], pm[1], "◆", "◇")}</u>` : ""}</i>` : "";
       const z = st.zug || {}, pip = (an, t, k) => `<i class="${an ? "an" : ""} ${k}">${t}</i>`;
       return `<div class="kh-kopf"><span class="kh-bild">${bild}</span><div class="kh-wer"><b>${esc(a.name)}</b><span class="kh-tp"><u style="width:${p}%"></u><em>${Math.max(0, a.tp)} / ${a.tpMax}</em></span></div>
-        ${meinZug ? `<div class="kh-pips">${pip((z.bewegung || 0) + (z.schritt || 0) > 0, "👣 " + ((z.bewegung || 0) + (z.schritt || 0)), "bew")}${pip(z.aktion, "Aktion", "akt")}${pip(z.bonus, "Bonus", "bon")}</div>` : ""}
+        <div class="kh-mitte">${meinZug ? `<div class="kh-pips">${pip((z.bewegung || 0) + (z.schritt || 0) > 0, "👣 " + ((z.bewegung || 0) + (z.schritt || 0)), "bew")}${pip(z.aktion, "Aktion", "akt")}${pip(z.bonus, "Bonus", "bon")}</div>` : ""}${plaetze}</div>
         <div class="kh-werkzeug"><button id="kh-zoom" aria-label="Ganze Karte zeigen oder vergrößern">${zoom > 1.05 ? "🗺" : "🔍"}</button><button id="kh-log" aria-label="Chronik">📜</button></div></div>`; };
     const letzte = (st.log || []).slice(-2).map((l) => `<p>${esc(l.t)}</p>`).join("");
     el.classList.toggle("wartet", !meinZug);

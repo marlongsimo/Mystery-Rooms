@@ -2212,3 +2212,9 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .admin-reihe label { display: flex; align-items: center; gap: 8px; }
 .admin-reihe select { padding: 6px 8px; background: rgba(0,0,0,.35); color: #efe6d4; border: 1px solid var(--line); border-radius: 4px; font: 400 15px var(--schrift-ui); }
 .karte-box.admin .auswertung table + table { margin-top: 12px; }
+
+/* Handy-Kampf: Zauberplätze unter den Zug-Marken (gefüllt = verfügbar, hohl = verbraucht; Rauten = Grad 2) */
+.kh-mitte { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.kh-plaetze { font-style: normal; font-size: 12px; line-height: 14px; letter-spacing: 1px; color: #8fc4ff; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+.kh-plaetze small { font-size: 10px; letter-spacing: .04em; color: #8a93a3; text-transform: uppercase; }
+.kh-plaetze u { text-decoration: none; } .kh-plaetze u.g2 { color: #d9a8ff; }

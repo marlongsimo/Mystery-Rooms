@@ -307,7 +307,8 @@
       </fieldset>
       <fieldset><legend>Stufen seiner Helden gegenüber denen des Spielers</legend>
         <div class="admin-reihe"><label>von ${wahl("ab-lv", e.stufe_von)}</label><label>bis ${wahl("ab-lb", e.stufe_bis)}</label></div>
-        <p class="note klein">Je Held wird eine Verschiebung aus dem Bereich gelost. „−1 bis ±0“: nie über den Stufen des Spielers.</p>
+        <div class="admin-reihe"><label>Durchschnitt des Teams höchstens <select id="ab-sm">${[0, 0.5, 1, 1.5, 2, 3].map((n) => `<option value="${n}"${Number(e.schnitt_max == null ? 0.5 : e.schnitt_max) === n ? " selected" : ""}>± ${String(n).replace(".", ",")}</option>`).join("")}</select> Stufen vom Spieler entfernt</label></div>
+        <p class="note klein">Je Held wird eine Verschiebung aus dem Bereich gelost – so oft, bis der Durchschnitt des Teams passt. „−1 bis ±0“: kein Held über den Stufen des Spielers.</p>
       </fieldset>
       <button class="my-knopf rot" type="submit">Speichern</button><p class="my-fb" id="ab-fb" role="status">${meldung ? esc(meldung) : ""}</p>
       ${e.geaendert && e.von ? `<p class="note klein">Zuletzt geändert von ${esc(e.von)} am ${wann(e.geaendert)}.</p>` : ""}
@@ -331,7 +332,7 @@
     zeig();
     el("admin-bot").onsubmit = async (ev) => {
       ev.preventDefault(); const k = ev.target.querySelector("button[type=submit]"); k.disabled = true; el("ab-fb").textContent = "Wird gespeichert …";
-      try { await netz().rpc("rpg_admin_bot_set", { p_aktiv: el("ab-aktiv").checked, p_wartezeit: +el("ab-warten").value, p_staerke_von: +el("ab-sv").value / 100, p_staerke_bis: +el("ab-sb").value / 100, p_stufe_von: +el("ab-lv").value, p_stufe_bis: +el("ab-lb").value });
+      try { await netz().rpc("rpg_admin_bot_set", { p_aktiv: el("ab-aktiv").checked, p_wartezeit: +el("ab-warten").value, p_staerke_von: +el("ab-sv").value / 100, p_staerke_bis: +el("ab-sb").value / 100, p_stufe_von: +el("ab-lv").value, p_stufe_bis: +el("ab-lb").value, p_schnitt_max: +el("ab-sm").value });
         botEinstellungen("Gespeichert."); }
       catch (x) { k.disabled = false; el("ab-fb").textContent = x.message || "Speichern fehlgeschlagen."; }
     };

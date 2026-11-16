@@ -3,7 +3,9 @@
 -- Setzt Migration 008 und 014 voraus (014 für das gespeicherte Team).
 --
 -- Einmalig im Supabase-Dashboard ausführen: SQL Editor → New query →
--- alles einfügen → Run. Darf mehrfach ausgeführt werden (idempotent).
+-- alles einfügen → Run. Darf mehrfach ausgeführt werden (idempotent) und ersetzt dabei auch eine abweichende
+-- Fassung des Serverkampfs (siehe Abschnitt 0). Bitte UNVERÄNDERT ausführen: Die Edge Function „arena“ verlässt sich
+-- auf genau diese Funktionen, Parameter und Antworten.
 -- Dazu gehört die Edge Function „arena“ (abenteuer/supabase/functions/arena/index.ts) – ohne sie bleibt alles beim Alten.
 --
 -- NUR FÜR DAS RPG. Rein additiv: drei neue Tabellen, neue Funktionen. NICHTS Vorhandenes wird geändert oder ersetzt –
@@ -35,6 +37,39 @@ do $$ begin
   end if;
   if to_regprocedure('public.rpg_arena_belohnen(public.rpg_arena_matches, uuid)') is null then
     raise exception 'Migration 015 braucht rpg_arena_belohnen(rpg_arena_matches, uuid) aus Migration 008. Die Funktion fehlt oder hat andere Parameter.';
+  end if;
+end $$;
+
+-- ---------------------------------------------------------------------
+-- 0) Aufräumen: Liegt schon eine andere Fassung dieser Migration in der Datenbank (von Hand angepasst oder aus einem
+--    früheren Stand dieser Datei), wird sie ersetzt. Betroffen sind AUSSCHLIESSLICH die sechs Funktionen und drei Tabellen
+--    des Serverkampfs – nichts aus den Migrationen 001 bis 014.
+--      • Funktionen: alle Fassungen mit diesen Namen entfernen (gleich welche Parameter), unten entstehen sie neu.
+--      • Tabellen: nur wenn ihr Aufbau nicht passt UND sie leer sind, werden sie neu angelegt. Enthält eine Tabelle mit
+--        abweichendem Aufbau schon Daten, bricht die Migration ab, ohne etwas zu ändern.
+-- ---------------------------------------------------------------------
+do $$
+declare f record; t record; v_ist text; v_n bigint; v_weg boolean := false;
+begin
+  for f in select p.oid::regprocedure as sig from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+           where n.nspname = 'public' and p.proname in ('rpg_arena_search_server', 'rpg_arena_fight', 'rpg_arena_fight_leader', 'rpg_arena_srv_load', 'rpg_arena_srv_save', 'rpg_arena_srv_end') loop
+    execute 'drop function ' || f.sig;
+  end loop;
+  for t in select * from (values ('rpg_arena_steps', 'match_id,sicht1,sicht2,v'), ('rpg_arena_fights', 'anf1,anf2,beginn,match_id,st,updated_at,v'), ('rpg_arena_search_srv', 'match_id,seen_at,user_id')) x(name, soll) loop
+    if to_regclass('public.' || t.name) is null then continue; end if;
+    select string_agg(column_name, ',' order by column_name) into v_ist from information_schema.columns where table_schema = 'public' and table_name = t.name;
+    if v_ist = t.soll then continue; end if;
+    execute format('select count(*) from public.%I', t.name) into v_n;
+    if v_n > 0 then raise exception 'Die Tabelle % hat einen anderen Aufbau als erwartet (%) und enthält schon % Zeilen. Die Migration ändert nichts; bitte melden.', t.name, v_ist, v_n; end if;
+    v_weg := true;
+  end loop;
+  if v_weg then
+    -- Aufbau passt nicht, alles leer: die drei Tabellen des Serverkampfs neu anlegen (steps hängt an fights)
+    if to_regclass('public.rpg_arena_steps') is not null then execute 'select count(*) from public.rpg_arena_steps' into v_n; if v_n > 0 then raise exception 'rpg_arena_steps enthält schon Daten. Die Migration ändert nichts; bitte melden.'; end if; end if;
+    if to_regclass('public.rpg_arena_fights') is not null then execute 'select count(*) from public.rpg_arena_fights' into v_n; if v_n > 0 then raise exception 'rpg_arena_fights enthält schon Daten. Die Migration ändert nichts; bitte melden.'; end if; end if;
+    if to_regclass('public.rpg_arena_search_srv') is not null then execute 'select count(*) from public.rpg_arena_search_srv' into v_n; if v_n > 0 then delete from public.rpg_arena_search_srv; end if; end if; -- nur Lebenszeichen laufender Suchen
+    drop table if exists public.rpg_arena_steps; drop table if exists public.rpg_arena_fights; drop table if exists public.rpg_arena_search_srv;
+    raise notice 'Die Tabellen des Serverkampfs hatten einen abweichenden Aufbau und waren leer: Sie werden neu angelegt.';
   end if;
 end $$;
 
@@ -214,11 +249,6 @@ $$;
 -- ---------------------------------------------------------------------
 -- 5) Ausführungsrechte
 -- ---------------------------------------------------------------------
--- Fassungen dieser Funktionen aus einem früheren Stand dieser Datei (andere Parameter) entfernen
-drop function if exists public.rpg_arena_srv_load(uuid);
-drop function if exists public.rpg_arena_srv_save(uuid, integer, jsonb, jsonb);
-drop function if exists public.rpg_arena_srv_end(uuid, integer, text, jsonb, integer);
-drop function if exists public.rpg_arena_srv_end(uuid);
 revoke all on function public.rpg_arena_srv_load(uuid, uuid), public.rpg_arena_srv_save(uuid, uuid, integer, jsonb, jsonb), public.rpg_arena_srv_end(uuid, uuid) from public, anon, authenticated;
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then

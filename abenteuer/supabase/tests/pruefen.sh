@@ -61,7 +61,9 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche.sql 2>/dev/nu
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 014_rpg_arena_team_suche_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
 # Fingerabdruck aller Arena-Funktionen aus 008 und 014 – Migration 015 darf keine davon verändern
 ARENA_VOR=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
-psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql
+# Vorher liegt eine ABWEICHENDE Fassung des Serverkampfs in der Datenbank (andere Parameter, anderer Tabellenaufbau, fehlerhafte Suche) – 015 muss sie ersetzen
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f 015_abweichende_fassung.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>&1 | grep -i "neu angelegt" | sed "s/^.*NOTICE:  /  /"
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null     # zweimal: idempotent
 ARENA_NACH=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%' and p.proname not in ('rpg_arena_search_server', 'rpg_arena_fight', 'rpg_arena_fight_leader', 'rpg_arena_srv_load', 'rpg_arena_srv_save', 'rpg_arena_srv_end')")
 if [ "$ARENA_VOR" = "$ARENA_NACH" ]; then echo "✓ Migration 015 verändert keine vorhandene Arena-Funktion (008, 014)"; else echo "✗ Migration 015 hat eine vorhandene Arena-Funktion verändert"; exit 1; fi

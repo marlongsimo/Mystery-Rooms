@@ -2356,3 +2356,30 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .admin-saison { display: grid; gap: 12px; } .admin-saison .sm-admin-form { margin-top: 4px; }
 .admin-saison-karte { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 6px; }
 .admin-saison-karte b { color: #f6dc9c; font: 600 18px var(--schrift-titel); }
+
+/* ---------- Erfahrungspakete: Händler, Heldenkarte, Kaufdialog ---------- */
+.shop-felder { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.shop-feld-bilder.xp { display: flex; align-items: flex-end; justify-content: center; gap: 6px; color: #9fd9ff; text-shadow: 0 0 14px rgba(120,200,255,.8); }
+.shop-feld-bilder.xp i { font-style: normal; font-size: 26px; } .shop-feld-bilder.xp i:nth-child(2) { font-size: 40px; } .shop-feld-bilder.xp i:nth-child(3) { font-size: 54px; }
+.shop-zurueck { margin-bottom: 10px; }
+.xp-pakete, .xp-wahl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+.xp-paket { display: grid; justify-items: center; gap: 3px; padding: 12px 8px; border-radius: 12px; border: 1px solid rgba(143,196,255,.35); background: linear-gradient(170deg, rgba(40,70,110,.45), rgba(14,16,22,.85)); color: #efe6d4; font: inherit; text-align: center; }
+button.xp-paket { cursor: pointer; } .xp-paket.an { border-color: #9fd9ff; box-shadow: 0 0 0 2px rgba(159,217,255,.45), 0 0 18px rgba(120,200,255,.25); }
+.xp-paket:disabled, .xp-paket.leer { opacity: .45; cursor: default; }
+.xp-zeichen { font-size: 22px; color: #9fd9ff; text-shadow: 0 0 10px rgba(120,200,255,.8); line-height: 1; }
+.xp-paket b { font: 600 20px var(--schrift-titel); color: #dff1ff; } .xp-paket small { color: var(--muted); font-size: 12px; }
+.xp-preis { font: 600 16px var(--schrift-titel); color: #d9c2ff; white-space: nowrap; } .xp-preis i { font-style: normal; }
+.xp-paket em { font-style: normal; font-size: 11px; color: var(--muted); }
+.xp-helden { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.xp-held { display: grid; gap: 4px; justify-items: center; padding: 8px 6px; border-radius: 10px; border: 1px solid rgba(176,138,69,.35); background: rgba(20,18,14,.8); color: #efe6d4; cursor: pointer; font: 400 13px var(--schrift-ui); }
+.xp-held img { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: top; border-radius: 8px; } .xp-held:disabled { opacity: .5; cursor: default; } .xp-held small { color: var(--muted); font-size: 11px; }
+.xp-held:hover:not(:disabled) { border-color: #9fd9ff; }
+.xp-kauf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 14px 0 4px; padding: 12px 14px; border: 1px solid rgba(143,196,255,.3); border-radius: 12px; background: rgba(30,50,80,.25); }
+.xp-kauf .sm-stufe { flex: 1 1 220px; margin: 0; }
+.xp-kopf { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; } .xp-kopf img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; object-position: top; border: 1px solid rgba(176,138,69,.5); }
+.xp-kopf > div { flex: 1 1 auto; min-width: 0; display: grid; gap: 6px; } .xp-kopf b { font: 600 20px var(--schrift-titel); color: #f6dc9c; } .xp-kopf .shop-stand { margin: 0; white-space: nowrap; }
+.xp-menge { display: flex; align-items: center; gap: 12px; margin: 6px 0; } .xp-menge span { color: var(--muted); } .xp-menge b { min-width: 28px; text-align: center; font: 600 20px var(--schrift-titel); }
+.xp-menge .btn { min-width: 40px; font-size: 18px; }
+.xp-summe { margin: 8px 0 12px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.05); font-size: 14px; line-height: 1.5; } .xp-fehlt { color: #e08a8a; }
+.sm-xp-zeile[data-held-stufe] { cursor: pointer; }
+@media (max-width: 520px) { .xp-pakete, .xp-wahl { gap: 6px; } .xp-paket { padding: 10px 4px; } .xp-paket b { font-size: 17px; } .xp-kopf img { width: 56px; height: 56px; } }

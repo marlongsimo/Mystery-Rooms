@@ -118,6 +118,11 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche_rueckbau.sql
+# Migration 023 (Erfahrungspakete): braucht 006 bis 008
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../023_rpg_erfahrungspakete.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../023_rpg_erfahrungspakete.sql 2>/dev/null     # zweimal: idempotent
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 023_rpg_erfahrungspakete_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../023_rpg_erfahrungspakete_rueckbau.sql
 # Migration 021 (Codes für Seelensplitter): braucht 006 und 008
 CODE_VOR=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname in ('rpg_redeem_unlock_code', 'rpg_admin_create_code', 'rpg_admin_codes')")
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../021_rpg_splitter_codes.sql

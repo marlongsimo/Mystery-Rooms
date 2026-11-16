@@ -43,6 +43,8 @@
 
   async function profilLaden() {
     try { await netz().ensureUser(); profil = await netz().rpc("rpg_my_profile", {}); } catch (e) { profil = null; }
+    // Ausstattung (Würfel, Profilrahmen): mit Konto die gespeicherte Auswahl holen, als Gast zurück auf Standard
+    if (window.ABKOS) { if (profil && profil.konto) window.ABKOS.laden().catch(() => {}); else if (profil) window.ABKOS.zuruecksetzen(); }
     return profil;
   }
   function kontoZeichnen() {
@@ -147,6 +149,7 @@
   async function abmelden() {
     if (!confirm("Abmelden? Danach spielst du auf diesem Gerät als Gast weiter.")) return;
     try { await netz().db.auth.signOut(); } catch (e) { /* trotzdem neu starten */ }
+    if (window.ABKOS) window.ABKOS.zuruecksetzen();
     try { sessionStorage.removeItem(HUB); } catch (e) { /* privat */ }
     neuStarten();
   }
@@ -218,7 +221,32 @@
   /* ---------- Händler: jeden Tag drei Helden, die man noch nicht hat (Migration 010) ---------- */
   const rpcFehlt = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
   let shopUhr = null;
+  /* Händler: Eingang mit zwei Feldern – Helden des Tages (mit Countdown bis zur neuen Auswahl) und Ausstattung */
   async function shopZeigen() {
+    const A = window.ARENA, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈";
+    clearInterval(shopUhr);
+    seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
+    let s = null, fehler = null;
+    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_today", {}); } catch (e) { fehler = e; }
+    if (!document.querySelector("[data-shop]")) return;
+    if (fehler && !rpcFehlt(fehler)) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Keine Verbindung</h1><p class="hub-untertitel">${esc(fehler.message)}</p></div>`);
+    if (s && !s.konto) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Nur für Spielerkonten</h1><p class="hub-untertitel">Der Händler tauscht ${name} gegen Helden und Ausstattung. Beides gibt es nur mit einem Konto.</p></div>`);
+    const uhr = () => { if (!s || !s.bis) return ""; const ms = Math.max(0, new Date(s.bis).getTime() - Date.now()), h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000), sek = Math.floor(ms % 60000 / 1000);
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sek).padStart(2, "0")}`; };
+    const offen = s ? s.helden.filter((h) => !h.gekauft).length : 0;
+    seiteZeigen("shop", `<div class="shop" data-shop><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Was darf es sein?</h1>
+        <p class="hub-untertitel">${name} bekommst du für Siege in der Arena.</p></div>${s ? `<p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p>` : ""}</div>
+      <div class="shop-felder">
+        <button class="shop-feld helden" data-shop-feld="helden" ${s ? "" : "disabled"}><span class="shop-feld-bilder">${s ? s.helden.slice(0, 3).map((h) => (window.ABF.FIGUREN[h.held] ? `<img src="${window.ABF.bild(h.held)}" alt="">` : "")).join("") : ""}</span>
+          <b>Helden des Tages</b><span>${!s ? "Folgt bald." : s.alle ? "Du hast alle Helden." : offen ? `${offen === 1 ? "Ein Held" : offen + " Helden"}, die dir noch fehlen. Je ${s.preis} ${name}.` : "Heute ist nichts mehr für dich dabei."}</span>
+          ${s && s.bis ? `<em class="shop-uhr">Neue Auswahl in <strong id="shop-uhr">${uhr()}</strong></em>` : ""}</button>
+        <button class="shop-feld ausstattung" data-shop-feld="ausstattung"><span class="shop-feld-bilder kos"><span class="kos-bild kos-wuerfel" data-wuerfel="w_glut"><span class="w20-box">${window.ABW ? window.ABW.svg(20) : ""}</span></span><span class="kos-bild kos-rahmen" data-rahmen="r_splitter"><span class="hub-avatar">${avatarHtml()}</span></span></span>
+          <b>Ausstattung</b><span>Würfel-Designs und Profilrahmen. Ab 75 ${name}.</span><em class="shop-uhr">Rein fürs Auge</em></button>
+      </div></div>`);
+    shopUhr = setInterval(() => { const el = $("#shop-uhr"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = uhr(); }, 1000);
+    document.querySelectorAll("[data-shop-feld]").forEach((b) => { b.onclick = () => { clearInterval(shopUhr); if (b.dataset.shopFeld === "helden") shopHelden(); else if (window.ABKOS) window.ABKOS.ausstattung(); }; });
+  }
+  async function shopHelden() {
     const A = window.ARENA, F = window.ABF, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈";
     const bald = (text) => seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Folgt bald</h1><p class="hub-untertitel">${text}</p></div>`);
     clearInterval(shopUhr);
@@ -230,7 +258,7 @@
     if (!s || !s.konto) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Nur für Spielerkonten</h1><p class="hub-untertitel">Der Händler tauscht ${name} gegen Helden. Beides gibt es nur mit einem Konto.</p></div>`);
     const zeichne = (meldung) => {
       const rest = () => { const ms = Math.max(0, new Date(s.bis).getTime() - Date.now()), h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000); return h ? `${h} Std. ${m} Min` : `${m} Min`; };
-      seiteZeigen("shop", `<div class="shop" data-shop><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Helden des Tages</h1>
+      seiteZeigen("shop", `<div class="shop" data-shop><button class="btn ghost klein shop-zurueck" data-shop-zurueck>← Zum Händler</button><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Helden des Tages</h1>
           <p class="hub-untertitel">Jeden Tag drei Helden, die dir noch fehlen. Jeder kostet ${s.preis} ${name}.</p></div><p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p></div>
         ${meldung ? `<p class="fb">${esc(meldung)}</p>` : ""}
         ${s.helden.length ? `<div class="shop-helden">${s.helden.map((h) => { const d = F.FIGUREN[h.held]; if (!d) return ""; const fehlt = s.preis - s.waehrung;
@@ -239,7 +267,8 @@
             ${h.gekauft ? `<span class="shop-gekauft">✓ In deiner Sammlung</span>` : `<button class="btn" data-shop-kauf="${h.held}" ${fehlt > 0 ? "disabled" : ""}><i>${zeichen}</i> ${s.preis}</button>${fehlt > 0 ? `<small class="shop-fehlt">Es fehlen ${fehlt}</small>` : ""}`}</div>`; }).join("")}</div>
           <p class="note">Neue Auswahl in <span id="shop-rest">${rest()}</span> – ${name} bekommst du für Siege in der Arena.</p>`
           : `<p class="note">${s.alle ? "Du hast alle Helden. Der Händler hat dir nichts mehr anzubieten – vorerst." : "Heute hat der Händler nichts für dich. Schau morgen wieder vorbei."}</p>`}</div>`);
-      clearInterval(shopUhr); shopUhr = setInterval(() => { const el = $("#shop-rest"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = rest(); }, 30000);
+      clearInterval(shopUhr); shopUhr = setInterval(() => { const el = $("#shop-rest"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopHelden(); } el.textContent = rest(); }, 30000);
+      { const z = document.querySelector("[data-shop-zurueck]"); if (z) z.onclick = () => shopZeigen(); }
       document.querySelectorAll("[data-shop-ansehen]").forEach((b) => { b.onclick = () => { const f = b.dataset.shopAnsehen; fenster(F.FIGUREN[f].name, window.ABH_HELDEN.detail(f, 1, "")); }; });
       document.querySelectorAll("[data-shop-kauf]").forEach((b) => { b.onclick = async () => { const f = b.dataset.shopKauf;
         if (!confirm(`${F.FIGUREN[f].name} für ${s.preis} ${name} in deine Sammlung holen?`)) return; b.disabled = true;
@@ -469,7 +498,7 @@
       ${konto ? `<button class="hub-rund" id="hub-glocke" aria-label="Anfragen" title="Freundschafts- und Gruppenanfragen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a6 6 0 0 0-6 6v4.5L4 16v1.5h16V16l-2-3.5V8a6 6 0 0 0-6-6zM9.5 19.5a2.5 2.5 0 0 0 5 0z"/></svg></span><span class="hub-zahl" data-zahl="alle" hidden></span></button>` : ""}
       <button class="hub-rund" id="hub-shop" aria-label="Händler" title="Händler"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16l1.5 5a3 3 0 0 1-2.5 3.9V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.100A3 3 0 0 1 2.500 9zm3 9v6h4v-4h3v4h3v-6a3 3 0 0 1-2.500-1.300A3 3 0 0 1 12 12.900a3 3 0 0 1-2.500-1.200A3 3 0 0 1 7 13z"/></svg></span></button>
       <button class="hub-rund" id="hub-einst" aria-label="Einstellungen" title="Einstellungen"><span class="my-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm9 4.6v-2.2l-2.4-.6a7 7 0 0 0-.7-1.7l1.3-2.1-1.6-1.6-2.1 1.3a7 7 0 0 0-1.7-.7L13.1 3h-2.2l-.6 2.5a7 7 0 0 0-1.7.7L6.5 4.9 4.9 6.5l1.3 2.1a7 7 0 0 0-.7 1.7L3 10.9v2.2l2.5.6c.2.6.4 1.2.7 1.7l-1.3 2.1 1.6 1.6 2.1-1.3c.5.3 1.1.5 1.7.7l.6 2.5h2.2l.6-2.5c.6-.2 1.2-.4 1.7-.7l2.1 1.3 1.6-1.6-1.3-2.1c.3-.5.5-1.1.7-1.7z"/></svg></span></button>
-      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button><button data-profil="arenastats">Arena-Auswertung</button>` : ""}<button data-profil="tutorial">Tutorial ansehen</button><button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
+      <div class="hub-menue" id="hub-menue" hidden>${konto ? `<button data-profil="bild">Profilbild wählen</button><button data-profil="kosmetik">Personalisieren</button>${smAktiv() ? `<button data-profil="stufen">Meine Helden</button><button data-profil="chronik">Chronik</button>` : ""}${smAktiv() ? `<button data-profil="code">Freischalt-Code</button>` : ""}${smAktiv() && SM.istAdmin() ? `<button data-profil="codes">Code-Übersicht</button><button data-profil="arenastats">Arena-Auswertung</button>` : ""}<button data-profil="tutorial">Tutorial ansehen</button><button data-profil="abmelden">Abmelden</button>` : `<button data-profil="anmelden">Anmelden</button><button data-profil="registrieren">Konto erstellen</button>`}</div>`;
     arenaKachel();
     $("#hub-profil-knopf").onclick = () => { const m = $("#hub-menue"); m.hidden = !m.hidden; $("#hub-profil-knopf").setAttribute("aria-expanded", String(!m.hidden)); };
     $("#hub-shop").onclick = shopZeigen;
@@ -590,6 +619,7 @@
     $("#qr-overlay").hidden = true;
     if (was === "abmelden") return abmelden();
     if (was === "bild") return bildWaehlen();
+    if (was === "kosmetik") return window.ABKOS ? window.ABKOS.personalisieren() : null;
     if (was === "code") return codeDialog();
     if (was === "stufen") return SM.laden(true).then(() => fenster("Meine Helden", SM.heldenUebersichtHtml()));
     if (was === "chronik") return SM.laden(true).then(() => fenster("Chronik", SM.chronikHtml()));
@@ -727,5 +757,5 @@
   });
   /** Die Kampagne, die in der Übersicht nach dieser kommt (für „Weiter mit der nächsten Kampagne“) */
   const naechstesAbenteuer = (id) => { const l = ABENTEUER(), i = l.findIndex((m) => m.id === id); return i >= 0 && l[i + 1] ? l[i + 1] : null; };
-  window.MYTHARA = { seite: seiteZeigen, waehrungZeigen, KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
+  window.MYTHARA = { seite: seiteZeigen, waehrungZeigen, shop: shopZeigen, fenster, toast, avatarHtml, kopfNeu: () => hubKopf(), KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
 })();

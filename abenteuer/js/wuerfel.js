@@ -5,7 +5,11 @@
   /** SVG eines W20 mit Zahl */
   function svg(zahl, klasse = "") {
     return `<svg class="w20-svg ${klasse}" viewBox="0 0 100 100" aria-hidden="true">
-      <polygon points="50,3 94,27 94,73 50,97 6,73 6,27" fill="#2a2216" stroke="currentColor" stroke-width="3"/>
+      <defs><linearGradient id="w20-glut" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a1408"/><stop offset=".55" stop-color="#b8380c"/><stop offset="1" stop-color="#f2a030"/></linearGradient>
+        <linearGradient id="w20-frost" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8f2ff"/><stop offset=".5" stop-color="#5aa4d8"/><stop offset="1" stop-color="#16406e"/></linearGradient>
+        <linearGradient id="w20-arkan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a0b3a"/><stop offset=".5" stop-color="#5a2aa8"/><stop offset="1" stop-color="#c48aff"/></linearGradient>
+        <linearGradient id="w20-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c0"/><stop offset=".45" stop-color="#d9a233"/><stop offset="1" stop-color="#7a5010"/></linearGradient></defs>
+      <polygon class="w20-koerper" points="50,3 94,27 94,73 50,97 6,73 6,27" fill="#2a2216" stroke="currentColor" stroke-width="3"/>
       <polygon points="50,15 82,66 18,66" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="2"/>
       <path d="M50 15 L50 3 M82 66 L94 73 M18 66 L6 73 M18 66 L6 27 M82 66 L94 27 M50 15 L94 27 M50 15 L6 27 M18 66 L50 97 M82 66 L50 97" stroke="currentColor" stroke-opacity=".25" stroke-width="1.5"/>
       <text x="50" y="57" text-anchor="middle" font-size="25" font-weight="700" fill="#ece4d4" class="w20-zahl">${zahl}</text></svg>`;

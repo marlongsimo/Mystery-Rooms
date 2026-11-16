@@ -227,57 +227,77 @@
     clearInterval(shopUhr);
     seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
     let s = null, fehler = null;
-    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_today", {}); } catch (e) { fehler = e; }
+    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_week", {}); } catch (e) { fehler = e; }
     if (!document.querySelector("[data-shop]")) return;
     if (fehler && !rpcFehlt(fehler)) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Keine Verbindung</h1><p class="hub-untertitel">${esc(fehler.message)}</p></div>`);
     if (s && !s.konto) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Nur für Spielerkonten</h1><p class="hub-untertitel">Der Händler tauscht ${name} gegen Helden und Ausstattung. Beides gibt es nur mit einem Konto.</p></div>`);
-    const uhr = () => { if (!s || !s.bis) return ""; const ms = Math.max(0, new Date(s.bis).getTime() - Date.now()), h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000), sek = Math.floor(ms % 60000 / 1000);
-      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sek).padStart(2, "0")}`; };
-    const offen = s ? s.helden.filter((h) => !h.gekauft).length : 0;
+    const uhr = () => (s && s.bis ? restZeit(s.bis) : "");
+    const wd = s && s.held ? window.ABF.FIGUREN[s.held] : null;
     seiteZeigen("shop", `<div class="shop" data-shop><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Was darf es sein?</h1>
         <p class="hub-untertitel">${name} bekommst du für Siege in der Arena.</p></div>${s ? `<p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p>` : ""}</div>
       <div class="shop-felder">
-        <button class="shop-feld helden" data-shop-feld="helden" ${s ? "" : "disabled"}><span class="shop-feld-bilder">${s ? s.helden.slice(0, 3).map((h) => (window.ABF.FIGUREN[h.held] ? `<img src="${window.ABF.bild(h.held)}" alt="">` : "")).join("") : ""}</span>
-          <b>Helden des Tages</b><span>${!s ? "Folgt bald." : s.alle ? "Du hast alle Helden." : offen ? `${offen === 1 ? "Ein Held" : offen + " Helden"}, die dir noch fehlen. Je ${s.preis} ${name}.` : "Heute ist nichts mehr für dich dabei."}</span>
-          ${s && s.bis ? `<em class="shop-uhr">Neue Auswahl in <strong id="shop-uhr">${uhr()}</strong></em>` : ""}</button>
+        <button class="shop-feld helden" data-shop-feld="helden" ${s ? "" : "disabled"}><span class="shop-feld-bilder woche">${wd ? `<img src="${window.ABF.bild(s.held)}" alt="">` : ""}<img class="token" src="img/shop/heldentoken.webp" alt=""></span>
+          <b>Held der Woche</b><span>${!s ? "Folgt bald." : s.alle ? "Du hast alle Helden freigeschaltet." : wd && !s.gekauft ? `${esc(wd.name)} zum halben Preis: <s>${s.preis}</s> ${s.angebot} ${name}. Dazu Heldentoken.` : "Heldentoken: einer schaltet einen Helden deiner Wahl frei."}</span>
+          ${s && s.bis && !s.alle ? `<em class="shop-uhr">Neuer Held in <strong id="shop-uhr">${uhr()}</strong></em>` : ""}</button>
         <button class="shop-feld ausstattung" data-shop-feld="ausstattung"><span class="shop-feld-bilder kos"><span class="kos-bild kos-wuerfel" data-wuerfel="w_glut"><span class="w20-box">${window.ABW ? window.ABW.svg(20) : ""}</span></span><span class="kos-bild kos-rahmen" data-rahmen="r_lorbeer"><span class="rahmen-halter"><span class="hub-avatar">${avatarHtml()}</span></span></span></span>
           <b>Ausstattung</b><span>Würfel-Designs und Profilrahmen. Ab 75 ${name}.</span><em class="shop-uhr">Rein fürs Auge</em></button>
         <button class="shop-feld erfahrung" data-shop-feld="erfahrung"><span class="shop-feld-bilder xp"><img src="img/shop/ep50.webp" alt=""><img src="img/shop/ep150.webp" alt=""><img src="img/shop/ep350.webp" alt=""></span>
           <b>Erfahrung</b><span>Pakete mit 50, 150 oder 350 EP – auf Vorrat, einsetzbar bei jedem Helden.</span><em class="shop-uhr">Täglich begrenzt</em></button>
       </div></div>`);
-    shopUhr = setInterval(() => { const el = $("#shop-uhr"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = uhr(); }, 1000);
+    shopUhr = setInterval(() => { const el = $("#shop-uhr"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = uhr(); }, 30000);
     document.querySelectorAll("[data-shop-feld]").forEach((b) => { b.onclick = () => { clearInterval(shopUhr); if (b.dataset.shopFeld === "helden") shopHelden(); else if (b.dataset.shopFeld === "erfahrung") xpShop(); else if (window.ABKOS) window.ABKOS.ausstattung(); }; });
   }
-  async function shopHelden() {
+  /** „3 Tage 4 Std.“ / „5 Std. 12 Min“ / „12 Min“ bis zu einem Zeitpunkt */
+  const restZeit = (bis) => { const ms = Math.max(0, new Date(bis).getTime() - Date.now()), t = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4);
+    return t ? `${t} ${t === 1 ? "Tag" : "Tagen"} ${h} Std.` : h ? `${h} Std. ${m} Min` : `${m} Min`; };
+  const TOKEN_BILD = `<img class="token-bild" src="img/shop/heldentoken.webp" alt="">`;
+  /** Stand für Heldenkäufe (Seelensplitter, Heldentoken, Preise) – auch für die Heldenhalle; null, solange Migration 026 fehlt */
+  let kaufStand = null;
+  async function kaufLaden() { try { await netz().ensureUser(); const s = await netz().rpc("rpg_shop_week", {}); kaufStand = s && s.konto ? s : null; } catch (e) { kaufStand = null; } return kaufStand; }
+  /* Händler: Held der Woche (halber Preis) und Heldentoken */
+  async function shopHelden(meldung) {
     const A = window.ARENA, F = window.ABF, name = A ? A.WAEHRUNG : "Seelensplitter", zeichen = A ? A.ZEICHEN : "◈";
     const bald = (text) => seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Folgt bald</h1><p class="hub-untertitel">${text}</p></div>`);
     clearInterval(shopUhr);
-    seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
+    if (!meldung) seiteZeigen("shop", `<div class="shop" data-shop><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Einen Moment …</h1></div>`);
     let s = null;
-    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_today", {}); }
-    catch (e) { if (!document.querySelector("[data-shop]")) return; return bald(rpcFehlt(e) ? `Der Händler packt seine Waren noch aus. Bald kannst du hier deine ${name} eintauschen.` : esc(e.message)); }
+    try { await netz().ensureUser(); s = await netz().rpc("rpg_shop_week", {}); }
+    catch (e) { if (!document.querySelector("[data-shop]")) return; return bald(rpcFehlt(e) ? `Der Händler packt seine Waren noch aus (Migration 026). Bald kannst du hier deine ${name} eintauschen.` : esc(e.message)); }
     if (!document.querySelector("[data-shop]")) return;
     if (!s || !s.konto) return seiteZeigen("shop", `<div class="shop-bald"><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Nur für Spielerkonten</h1><p class="hub-untertitel">Der Händler tauscht ${name} gegen Helden. Beides gibt es nur mit einem Konto.</p></div>`);
-    const zeichne = (meldung) => {
-      const rest = () => { const ms = Math.max(0, new Date(s.bis).getTime() - Date.now()), h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000); return h ? `${h} Std. ${m} Min` : `${m} Min`; };
-      seiteZeigen("shop", `<div class="shop" data-shop><button class="btn ghost klein shop-zurueck" data-shop-zurueck>← Zum Händler</button><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Helden des Tages</h1>
-          <p class="hub-untertitel">Jeden Tag drei Helden, die dir noch fehlen. Jeder kostet ${s.preis} ${name}.</p></div><p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p></div>
-        ${meldung ? `<p class="fb">${esc(meldung)}</p>` : ""}
-        ${s.helden.length ? `<div class="shop-helden">${s.helden.map((h) => { const d = F.FIGUREN[h.held]; if (!d) return ""; const fehlt = s.preis - s.waehrung;
-          return `<div class="shop-held ${h.gekauft ? "gekauft" : ""}" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt="" loading="lazy"><b>${esc(d.name)}</b><small>${esc(d.titel)} · ${esc(F.KLASSEN[d.klasse].name)}</small>
-            <button class="my-link" data-shop-ansehen="${h.held}">Ansehen</button>
-            ${h.gekauft ? `<span class="shop-gekauft">✓ In deiner Sammlung</span>` : `<button class="btn" data-shop-kauf="${h.held}" ${fehlt > 0 ? "disabled" : ""}><i>${zeichen}</i> ${s.preis}</button>${fehlt > 0 ? `<small class="shop-fehlt">Es fehlen ${fehlt}</small>` : ""}`}</div>`; }).join("")}</div>
-          <p class="note">Neue Auswahl in <span id="shop-rest">${rest()}</span> – ${name} bekommst du für Siege in der Arena.</p>`
-          : `<p class="note">${s.alle ? "Du hast alle Helden. Der Händler hat dir nichts mehr anzubieten – vorerst." : "Heute hat der Händler nichts für dich. Schau morgen wieder vorbei."}</p>`}</div>`);
-      clearInterval(shopUhr); shopUhr = setInterval(() => { const el = $("#shop-rest"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopHelden(); } el.textContent = rest(); }, 30000);
+    kaufStand = s;
+    const zeichne = (meld) => {
+      const d = s.held ? F.FIGUREN[s.held] : null, fehltW = s.angebot - s.waehrung, fehltT = s.token_preis - s.waehrung;
+      seiteZeigen("shop", `<div class="shop" data-shop><button class="btn ghost klein shop-zurueck" data-shop-zurueck>← Zum Händler</button><div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Held der Woche</h1>
+          <p class="hub-untertitel">Jede Woche ein Held, der dir noch fehlt – zum halben Preis. Jeden anderen schaltest du in der Heldenhalle frei.</p></div><p class="shop-stand"><i>${zeichen}</i> ${s.waehrung} ${name}</p></div>
+        ${meld ? `<p class="fb" role="status">${esc(meld)}</p>` : ""}
+        <div class="shop-woche">
+          ${s.alle || !d ? `<div class="shop-held woche leer" data-woche><span class="shop-alle">✓</span><b>Du hast alle Helden freigeschaltet.</b><small>Der Händler hat dir keinen Helden mehr anzubieten – vorerst.</small></div>`
+            : `<div class="shop-held woche ${s.gekauft ? "gekauft" : ""}" data-woche="${s.held}" style="--k:${F.KLASSEN[d.klasse].farbe}"><span class="shop-band">Held der Woche</span><img src="${F.bild(s.held)}" alt="" loading="lazy"><b>${esc(d.name)}</b><small>${esc(d.titel)} · ${esc(F.KLASSEN[d.klasse].name)}</small>
+              <button class="my-link" data-shop-ansehen="${s.held}">Ansehen</button>
+              ${s.gekauft ? `<span class="shop-gekauft">✓ In deiner Sammlung</span>` : `<p class="shop-preis"><s><i>${zeichen}</i> ${s.preis}</s> <b><i>${zeichen}</i> ${s.angebot}</b> <span>${name}</span></p>
+                <button class="btn" data-woche-kauf ${fehltW > 0 ? "disabled" : ""}>Für <i>${zeichen}</i> ${s.angebot} holen</button>${fehltW > 0 ? `<small class="shop-fehlt">Es fehlen ${fehltW}</small>` : ""}`}
+              <small class="shop-rest">Neuer Held in <span id="shop-rest">${restZeit(s.bis)}</span></small></div>`}
+          <div class="shop-held token" data-token>${TOKEN_BILD}<b>Heldentoken</b><small>Schaltet in der Heldenhalle einen Helden deiner Wahl frei.</small>
+            <p class="shop-preis"><b><i>${zeichen}</i> ${s.token_preis}</b> <span>${name}</span></p>
+            <span class="token-besitz ${s.tokens ? "hat" : ""}">Im Besitz: <b>${s.tokens}</b></span>
+            <button class="btn" data-token-kauf ${fehltT > 0 ? "disabled" : ""}>Token kaufen</button>${fehltT > 0 ? `<small class="shop-fehlt">Es fehlen ${fehltT}</small>` : ""}
+            <button class="my-link" data-token-halle>Zur Heldenhalle</button></div>
+        </div>
+        <p class="note">${name} bekommst du für Siege in der Arena. In der Heldenhalle kostet jeder Held einen Heldentoken oder ${s.preis} ${name}.</p></div>`);
+      clearInterval(shopUhr); shopUhr = setInterval(() => { const el = $("#shop-rest"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopHelden(); } el.textContent = restZeit(s.bis); }, 30000);
       { const z = document.querySelector("[data-shop-zurueck]"); if (z) z.onclick = () => shopZeigen(); }
       document.querySelectorAll("[data-shop-ansehen]").forEach((b) => { b.onclick = () => { const f = b.dataset.shopAnsehen; fenster(F.FIGUREN[f].name, window.ABH_HELDEN.detail(f, 1, "")); }; });
-      document.querySelectorAll("[data-shop-kauf]").forEach((b) => { b.onclick = async () => { const f = b.dataset.shopKauf;
-        if (!confirm(`${F.FIGUREN[f].name} für ${s.preis} ${name} in deine Sammlung holen?`)) return; b.disabled = true;
-        try { s = await netz().rpc("rpg_shop_buy", { p_held: f }); if (A) { await A.pruefen(true); waehrungZeigen(A.waehrung()); } if (SM) await SM.laden(true); zeichne(); toast(`${F.FIGUREN[f].name} gehört jetzt zu deiner Sammlung.`); }
-        catch (e) { try { s = await netz().rpc("rpg_shop_today", {}); } catch (e2) { /* alter Stand bleibt */ } zeichne(e.message); } }; });
+      const nach = async (r, text) => { s = r; kaufStand = r; waehrungZeigen(r.waehrung); if (A && A.pruefen) A.pruefen(true).catch(() => {}); if (SM) await SM.laden(true); zeichne(text); };
+      const wk = document.querySelector("[data-woche-kauf]"); if (wk) wk.onclick = async () => {
+        if (!confirm(`${d.name} für ${s.angebot} ${name} in deine Sammlung holen?`)) return; wk.disabled = true;
+        try { await nach(await netz().rpc("rpg_shop_week_buy", {}), `${d.name} gehört jetzt zu deiner Sammlung.`); } catch (e) { zeichne(e.message); } };
+      const tk = document.querySelector("[data-token-kauf]"); if (tk) tk.onclick = async () => {
+        if (!confirm(`Einen Heldentoken für ${s.token_preis} ${name} kaufen?`)) return; tk.disabled = true;
+        try { await nach(await netz().rpc("rpg_token_buy", { p_anzahl: 1 }), "Ein Heldentoken liegt für dich bereit. Einlösen kannst du ihn in der Heldenhalle."); } catch (e) { zeichne(e.message); } };
+      const th = document.querySelector("[data-token-halle]"); if (th) th.onclick = () => heldenSeite();
     };
-    zeichne();
+    zeichne(meldung);
   }
 
   /* ---------- Admin-Bereich (nur Admins): Codes · Kampfstatistiken · Rechner-Gegner ---------- */
@@ -432,13 +452,26 @@
   }
   function heldenSeite(klasse, fid) {
     const HL = window.ABH_HELDEN, F = window.ABF;
+    if (istKonto() && smAktiv() && kaufStand === null && !heldenSeite.laedt) { heldenSeite.laedt = true; kaufLaden().then((k) => { heldenSeite.laedt = false; const s = $("#hub-seite"); if (k && s && !s.hidden && s.querySelector("[data-heldenseite]")) heldenSeite(klasse, fid); }); }
     if (SM && !SM.zustand().geladen) SM.laden().then(() => { const s = $("#hub-seite"); if (s && !s.hidden && s.querySelector("[data-heldenseite]")) heldenSeite(klasse, fid); });
     const frei = (f) => !smAktiv() || SM.frei(f);
     if (!klasse) { seiteZeigen("helden", `<h1 class="hub-gruss">Heldenhalle</h1><p class="hub-untertitel">Fünf Klassen, fünfzehn Helden. Wähle eine Klasse, um ihre Helden kennenzulernen.</p>${sammlungKopf()}<div class="hub-helden" data-heldenseite>${HL.klassenWahl({ frei: smAktiv() ? frei : null })}</div>${smAktiv() && SM.zustand().konto && SM.zustand().stufenDa ? `<h2 class="hub-zwischen">Deine Helden</h2>${SM.heldenUebersichtHtml()}` : ""}`); return; }
     const helden = HL.vonKlasse(klasse); fid = fid || helden.find(frei) || helden[0];
-    const gesperrt = !frei(fid) ? `<div class="sm-gesperrt">${SM.SCHLOSS}<span><b>Noch gesperrt.</b> ${esc(SM.gesperrtText())}</span></div>` : "";
+    const A = window.ARENA, wName = A ? A.WAEHRUNG : "Seelensplitter", wZ = A ? A.ZEICHEN : "◈", k = kaufStand;
+    const kaufHtml = !frei(fid) && istKonto() && k ? `<div class="held-kauf" data-held-kauf="${fid}"><p class="held-kauf-stand">${TOKEN_BILD}<span>Heldentoken: <b>${k.tokens}</b></span><span><i>${wZ}</i> <b>${k.waehrung}</b> ${wName}</span></p>
+        <div class="held-kauf-knoepfe"><button class="btn" data-held-mit="token" ${k.tokens > 0 ? "" : "disabled"}>${TOKEN_BILD} Mit 1 Heldentoken freischalten</button>
+          <button class="btn" data-held-mit="splitter" ${k.waehrung >= k.preis ? "" : "disabled"}><i>${wZ}</i> Für ${k.preis} ${wName} freischalten</button></div>
+        ${k.tokens < 1 && k.waehrung < k.preis ? `<small class="shop-fehlt">Dir fehlen ${k.preis - k.waehrung} ${wName} – oder ein Heldentoken vom Händler.</small>` : ""}<p class="my-fb" id="held-kauf-fb" role="status"></p></div>` : "";
+    const gesperrt = !frei(fid) ? `<div class="sm-gesperrt">${SM.SCHLOSS}<span><b>Noch gesperrt.</b> ${esc(SM.gesperrtText())}</span></div>${kaufHtml}` : "";
     seiteZeigen("helden", `<div class="hub-helden" data-heldenseite>${HL.klassenLeiste(klasse).replace('id="klassen-zurueck"', 'data-held-klassen')}${HL.klassenKopf(klasse)}
       <div class="hub-held-reihe">${helden.map((f) => HL.kachel(f, { an: f === fid, gesperrt: !frei(f), status: !frei(f) ? "gesperrt" : "" })).join("")}</div>${HL.detail(fid, 1, gesperrt).replace('<article class="held"', `<article class="held${gesperrt ? " gesperrt" : ""}"`)}${smAktiv() && SM.fortschritt(fid) ? `<div class="xp-kauf">${SM.stufeHtml(fid)}<button class="btn" data-xp-kauf="${fid}" ${SM.fortschritt(fid).bis ? "" : "disabled"}>✦ Erfahrungspaket einsetzen</button></div>` : ""}</div>`);
+    document.querySelectorAll("[data-held-mit]").forEach((b) => { b.onclick = async () => {
+      const mit = b.dataset.heldMit, d = F.FIGUREN[fid], fb = $("#held-kauf-fb");
+      if (!confirm(mit === "token" ? `${d.name} mit einem Heldentoken freischalten?` : `${d.name} für ${kaufStand.preis} ${wName} freischalten?`)) return;
+      document.querySelectorAll("[data-held-mit]").forEach((x) => { x.disabled = true; }); if (fb) fb.textContent = "Wird freigeschaltet …";
+      try { const r = await netz().rpc("rpg_hero_buy", { p_held: fid, p_mit: mit }); kaufStand = r; waehrungZeigen(r.waehrung); if (A && A.pruefen) A.pruefen(true).catch(() => {});
+        if (SM) await SM.laden(true); toast(`${d.name} gehört jetzt zu deiner Sammlung.`); heldenSeite(klasse, fid); }
+      catch (e) { await kaufLaden(); heldenSeite(klasse, fid); const f2 = $("#held-kauf-fb"); if (f2) f2.textContent = e.message; } }; });
   }
   /** Einmal je Seitenaufruf (und nach der Registrierung): offene Startrunden oder eine wartende Belohnung zeigen */
   let sammlungGeprueft = false;

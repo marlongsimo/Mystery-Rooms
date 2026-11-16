@@ -283,7 +283,7 @@
     const k = window.KAMPAGNE && window.KAMPAGNE.aktuell && window.KAMPAGNE.aktuell();
     if (!endeErgebnis || !k || k.id !== endeErgebnis.kampagne) return "";
     const r = endeErgebnis.r;
-    return `<button class="btn gross sm-ende-knopf" data-sm-belohnung>${r.neu ? (r.angebot ? "★ Belohnung: neuer Held" : "★ Neues Ende entdeckt") : "Euer Fortschritt"}</button>`;
+    return `<button class="btn gross sm-ende-knopf" data-sm-belohnung>${r.angebot ? "★ Belohnung: neuer Held" : r.neu ? "★ Neues Ende entdeckt" : "Euer Fortschritt"}</button>`;
   }
   function endePlatzFuellen() { document.querySelectorAll("[data-sm-endeplatz]").forEach((p) => { p.innerHTML = endeKnopf(); }); }
   document.addEventListener("click", (e) => {
@@ -349,20 +349,21 @@
       if (!r.neu) {
         const rest = (r.gesamt || 0) - (r.gefunden || 0);
         const el = rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen${endName ? " · Ende: " + esc(endName) : ""}</p><h1 class="sm-gross">Sieg</h1><p class="sm-unter">${esc(K.titel)}.</p>
-          <div class="sm-box">Dieses Ende hast du schon einmal erreicht. Einen neuen Helden gibt es nur für ein Ende, das du zum ersten Mal erreichst. ${rest <= 0 ? `Alle Enden von „${esc(K.titel)}“ hast du schon entdeckt.` : `In „${esc(K.titel)}“ wartet noch ${rest === 1 ? "ein weiteres Ende" : rest + " weitere Enden"}.`}</div>
+          <div class="sm-box">Dieses Ende hast du schon einmal erreicht. ${r.angebot ? "<b>Glück gehabt:</b> Trotzdem will sich dir ein neuer Held anschließen." : "Bei einem wiederholten Abschluss schließt sich nur selten ein Held an (2 %)."} ${rest <= 0 ? `Alle Enden von „${esc(K.titel)}“ hast du schon entdeckt.` : `In „${esc(K.titel)}“ wartet noch ${rest === 1 ? "ein weiteres Ende" : rest + " weitere Enden"}.`}</div>
           ${xpHtml()}
-          <div class="sm-knoepfe">${endKnopf()}</div>`, { kopf, bild });
-        endBinden(el); return;
+          <div class="sm-knoepfe">${r.angebot ? `<button class="btn gross" id="sm-weiter">Belohnung ansehen</button>` : endKnopf()}</div>`, { kopf, bild });
+        if (r.angebot) el.querySelector("#sm-weiter").onclick = () => schrittWahl(); else endBinden(el);
+        return;
       }
-      const voll = !r.angebot;
+      const voll = !r.angebot, alleHelden = (r.sammlung || 0) >= 15;
       const el = rahmen(`<p class="sm-eyebrow">Kampagne abgeschlossen${endName ? " · Ende: " + esc(endName) : ""}</p><h1 class="sm-gross">Sieg</h1><p class="sm-unter">${esc(K.titel)} · ${fortschritt()} entdeckt.</p>
-        <div class="sm-box"><b>Neues Ende entdeckt.</b> Zum ersten Mal hast du „${esc(endName)}“ erreicht. ${voll ? "Deine Sammlung ist schon vollständig, deshalb gibt es keinen neuen Helden. Das Ende zählt aber für deinen Kampagnentitel." : "Dafür schließt sich dir ein neuer Held an."}</div>
+        <div class="sm-box"><b>Neues Ende entdeckt.</b> Zum ersten Mal hast du „${esc(endName)}“ erreicht. ${!voll ? "<b>Glück gehabt:</b> Ein neuer Held will sich dir anschließen." : alleHelden ? "Deine Sammlung ist schon vollständig, deshalb gibt es keinen neuen Helden. Das Ende zählt aber für deinen Kampagnentitel." : "Diesmal schließt sich kein Held an – beim ersten Abschluss eines Endes liegt die Chance bei 8 %. Das Ende zählt für deinen Kampagnentitel; Helden bekommst du auch beim Händler und in der Heldenhalle."}</div>
         ${xpHtml()}
         <div class="sm-knoepfe"><button class="btn gross" id="sm-weiter">${voll ? "Weiter" : "Belohnung ansehen"}</button></div>`, { kopf, bild });
       el.querySelector("#sm-weiter").onclick = voll ? schrittVoll : schrittWahl;
     };
     const schrittVoll = () => {
-      const el = rahmen(`<p class="sm-eyebrow">Sammlung vollständig · alle 15 Helden</p><h1 class="sm-gross">${alleEnden ? "Alle Enden gefunden" : "Neues Ende entdeckt"}</h1>
+      const el = rahmen(`<p class="sm-eyebrow">${(r.sammlung || 0) >= 15 ? "Sammlung vollständig · alle 15 Helden" : "Kampagne abgeschlossen"}</p><h1 class="sm-gross">${alleEnden ? "Alle Enden gefunden" : "Neues Ende entdeckt"}</h1>
         ${alleEnden ? titelHtml() : `<div class="sm-siegel"><div class="sm-zeichen">✦</div><b>${esc(endName)}</b><small>${esc(K.titel)} · ${fortschritt()}</small></div>
         <p class="sm-unter">Wer alle ${r.gesamt} Enden dieser Kampagne findet, bekommt den Titel „${esc(TITEL[r.abenteuer] || "")}“. Deinen Fortschritt siehst du unter Charaktere.</p>`}
         <div class="sm-knoepfe">${endKnopf()}</div>`, { kopf, bild });
@@ -370,7 +371,7 @@
     };
     const schrittWahl = () => {
       const a = r.angebot;
-      const el = rahmen(`<p class="sm-eyebrow">Belohnung · neues Ende</p><h1 class="sm-gross">Wähle einen neuen Helden</h1><p class="sm-unter">Einer von ${a.helden.length === 1 ? "einem" : a.helden.length === 2 ? "zweien" : "dreien"} schließt sich dir dauerhaft an. Sieh sie dir an und entscheide dich.</p>
+      const el = rahmen(`<p class="sm-eyebrow">${r.neu ? "Belohnung · neues Ende" : "Belohnung · Glück gehabt"}</p><h1 class="sm-gross">Wähle einen neuen Helden</h1><p class="sm-unter">Einer von ${a.helden.length === 1 ? "einem" : a.helden.length === 2 ? "zweien" : "dreien"} schließt sich dir dauerhaft an. Sieh sie dir an und entscheide dich.</p>
         <div class="sm-reihe" id="sm-reihe">${a.helden.map((f) => karte(f)).join("")}</div>
         <div class="sm-knoepfe"><button class="btn ghost klein" id="sm-spaeter">Später wählen</button></div>
         <p class="sm-hinweis">Wählst du jetzt nicht, wartet die Belohnung auf der Startseite auf dich.</p>`, { kopf, bild });
@@ -460,9 +461,9 @@
       const zeilen = Object.entries(v.enden).map(([id, name]) => { const e = meine.find((x) => x.ende === id); return e ? `<li class="da"><b>${esc(name)}</b><small>${esc(datum(e.am))}</small></li>` : `<li class="offen"><b>Noch nicht entdeckt</b><small>???</small></li>`; }).join("");
       return `<section class="sm-chronik-kampagne ${meine.length ? "" : "leer"}"><h3>${esc(v.titel)}<span>${meine.length} von ${n} Enden${titel ? ` · ♛ ${esc(TITEL[ab])}` : ""}</span></h3><ol>${zeilen}</ol></section>`;
     }).join("");
-    return `<p class="note">${gef.length ? `Du hast ${gef.length} ${gef.length === 1 ? "Ende" : "Enden"} entdeckt. Jedes neue Ende schaltet einen Helden frei.` : "Noch kein Ende entdeckt. Spielt eine Kampagne bis zum Schluss, dann steht sie hier."}</p><div class="sm-chronik">${teile}</div>`;
+    return `<p class="note">${gef.length ? `Du hast ${gef.length} ${gef.length === 1 ? "Ende" : "Enden"} entdeckt. Nach jedem Abschluss kann sich dir ein Held anschließen (8 % beim ersten Mal, danach 2 %).` : "Noch kein Ende entdeckt. Spielt eine Kampagne bis zum Schluss, dann steht sie hier."}</p><div class="sm-chronik">${teile}</div>`;
   }
-  const gesperrtText = () => (S.konto ? "Jedes Kampagnen-Ende, das du zum ersten Mal erreichst, schaltet einen Helden frei: Du wählst aus drei Angeboten." : "Ohne Konto spielst du mit fünf Starter-Helden. Mit einem Spielerkonto baust du dir deine eigene Sammlung auf.");
+  const gesperrtText = () => (S.konto ? "Schalte ihn hier frei – für einen Heldentoken oder für Seelensplitter. Mit etwas Glück schließt sich dir auch nach einer Kampagne ein Held an." : "Ohne Konto spielst du mit fünf Starter-Helden. Mit einem Spielerkonto baust du dir deine eigene Sammlung auf.");
   /** Neuester Kampagnentitel des Kontos (für den Kopf der Startseite) */
   const titelText = () => { const t = (S.titel || []).slice(-1)[0]; return t ? TITEL[t] : ""; };
 

@@ -21,7 +21,7 @@ async function seite(b, w, h, zustand) {
   await p.route(/\/rest\/v1\/rpc\/rpg_arena_invites(\?|$)/, (r) => json(r, { an_mich: [], von_mir: null }));
   await p.route(/\/rest\/v1\/rpc\/rpg_arena_squad(\?|$)/, (r) => json(r, { konto: true, team: null }));
   await p.route(/\/rest\/v1\/rpc\/rpg_arena_list(\?|$)/, (r) => json(r, { konto: true, waehrung: 40, heute: 0, mein: null, offen: [{ id: "x1", name: "Mondfalke", schnitt: 1.3 }] }));
-  await p.route(/\/rest\/v1\/rpc\/rpg_shop_today(\?|$)/, (r) => json(r, { konto: true, preis: 830, waehrung: 40, bis: new Date(Date.now() + 5 * 3600e3).toISOString(), alle: false, helden: ["berserker", "schattenmagier", "kopfgeldjaeger"].map((x) => ({ held: x, gekauft: false })) }));
+  await p.route(/\/rest\/v1\/rpc\/rpg_shop_week(\?|$)/, (r) => json(r, { konto: true, preis: 830, angebot: 415, token_preis: 830, tokens: 0, waehrung: 40, bis: new Date(Date.now() + 5 * 3600e3).toISOString(), alle: false, held: "berserker", gekauft: false }));
   await p.route(/\/rest\/v1\/rpc\/rpg_tutorial_state(\?|$)/, (r) => json(r, { konto: true, tutorial: zustand.offen }));
   await p.route(/\/rest\/v1\/rpc\/rpg_tutorial_done(\?|$)/, (r) => { zustand.offen = false; zustand.erledigt++; return json(r, { konto: true, tutorial: false }); });
   await p.route(/\/rest\/v1\/rpc\/rpg_tutorial_reset(\?|$)/, (r) => { zustand.offen = true; return json(r, { konto: true, tutorial: true }); });

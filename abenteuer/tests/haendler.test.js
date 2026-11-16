@@ -1,5 +1,5 @@
 /*
- * Mythara – Händler und Ausstattung im Browser: Eingang mit zwei Feldern (Helden des Tages mit Countdown, Ausstattung),
+ * Mythara – Händler und Ausstattung im Browser: Eingang mit Feldern (Held der Woche, Ausstattung),
  * Würfel-Designs und Profilrahmen kaufen, im Profil unter „Personalisieren“ auswählen, Auswahl bleibt nach dem Neuladen.
  * Die Datenbankfunktionen (Migration 010 und 017) sind nachgebildet; sie selbst prüft supabase/tests/017_rpg_ausstattung_test.sql.
  * Aufruf: node abenteuer/tests/haendler.test.js   (Webserver auf Port 8765)
@@ -14,7 +14,7 @@ const stand = () => ({ konto: true, waehrung: DB.waehrung, katalog: KATALOG, bes
 function server(name, a) {
   const fehler = (t) => ({ fehler: t });
   if (name === "rpg_my_wallet") return { konto: true, waehrung: DB.waehrung };
-  if (name === "rpg_shop_today") return { konto: true, preis: 830, waehrung: DB.waehrung, bis: new Date(Date.now() + 3 * 3600000 + 25 * 60000 + 7000).toISOString(), alle: false, helden: [{ held: "berserker", gekauft: false }, { held: "trickser", gekauft: false }, { held: "gelehrter", gekauft: true }] };
+  if (name === "rpg_shop_week") return { konto: true, preis: 830, angebot: 415, token_preis: 830, tokens: 0, waehrung: DB.waehrung, bis: new Date(Date.now() + 3 * 864e5 + 4 * 36e5 + 7000).toISOString(), alle: false, held: "berserker", gekauft: false };
   if (name === "rpg_cosmetics") return stand();
   if (name === "rpg_cosmetic_buy") { const k = KATALOG.find((x) => x.id === a.p_id); if (!k) return fehler("Das führt der Händler nicht."); if (DB.besitz.includes(k.id)) return fehler("Das besitzt du schon."); if (DB.waehrung < k.preis) return fehler("Dafür reichen deine Seelensplitter nicht.");
     DB.waehrung -= k.preis; DB.besitz.push(k.id); DB.kaeufe.push(k.id); return stand(); }
@@ -41,13 +41,12 @@ const shot = async (p, name) => { if (process.env.SHOT_DIR) await p.screenshot({
   // Eingang: zwei Felder, Countdown
   await p.click('.dorf-ort[data-hub="shop"]'); await p.waitForSelector(".shop-felder");
   const ein = (await p.textContent(".shop-felder")).replace(/\s+/g, " ");
-  check(/Helden des Tages/.test(ein) && /2 Helden, die dir noch fehlen/.test(ein) && /Ausstattung/.test(ein) && /Würfel-Designs und Profilrahmen/.test(ein) && /Ab 75/.test(ein), "Händler: zwei Felder – Helden des Tages und Ausstattung");
-  const u1 = await p.textContent("#shop-uhr"); await p.waitForTimeout(1200); const u2 = await p.textContent("#shop-uhr");
-  check(/^03:2[45]:\d\d$/.test(u1) && u1 !== u2, `Countdown bis zur neuen Auswahl läuft im Sekundentakt (${u1} → ${u2})`);
-  check(await p.evaluate(() => document.querySelectorAll(".shop-feld.helden .shop-feld-bilder img").length === 3 && !document.querySelector(".shop-helden")), "Die Helden selbst erscheinen erst nach dem Klick; das Feld zeigt nur ihre Bilder");
+  check(/Held der Woche/.test(ein) && /Ragnar zum halben Preis: 830 415/.test(ein) && /Ausstattung/.test(ein) && /Würfel-Designs und Profilrahmen/.test(ein) && /Ab 75/.test(ein), "Händler: Felder – Held der Woche (830 durchgestrichen, 415) und Ausstattung");
+  check(/^3 Tagen 4 Std\.$|^3 Tagen 3 Std\.$/.test(await p.textContent("#shop-uhr")), `Bis zum neuen Helden: ${await p.textContent("#shop-uhr")}`);
+  check(await p.evaluate(() => document.querySelectorAll(".shop-feld.helden .shop-feld-bilder img").length === 2 && !!document.querySelector('.shop-feld.helden img[src*="heldentoken"]') && !!document.querySelector(".shop-feld.helden s") && !document.querySelector(".shop-woche")), "Das Feld zeigt den Helden der Woche und den Heldentoken");
   await shot(p, "haendler-1-eingang");
-  await p.click('[data-shop-feld="helden"]'); await p.waitForSelector(".shop-helden");
-  check(await p.evaluate(() => document.querySelectorAll(".shop-held").length === 3 && /Helden des Tages/.test(document.querySelector("[data-shop] h1").textContent)), "Klick auf „Helden des Tages“: die drei Helden mit Preis");
+  await p.click('[data-shop-feld="helden"]'); await p.waitForSelector(".shop-woche");
+  check(await p.evaluate(() => document.querySelectorAll(".shop-woche .shop-held").length === 2 && /Held der Woche/.test(document.querySelector("[data-shop] h1").textContent)), "Klick: der Held der Woche und daneben der Heldentoken");
   await p.click("[data-shop-zurueck]"); await p.waitForSelector(".shop-felder");
   // Ausstattung
   await p.click('[data-shop-feld="ausstattung"]'); await p.waitForSelector(".kos-raster");

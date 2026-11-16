@@ -63,7 +63,7 @@
     { art: "info", ziel: ".held .held-aussen", titel: "Eigene Wege in der Geschichte", text: "In den Kampagnen öffnet jeder Held eigene Möglichkeiten: Schlösser knacken, Spuren lesen, Tote zur Ruhe singen." },
     { art: "klick", ziel: '.held [data-reiter="lore"]', opt: true, titel: "Die Geschichte des Helden", text: "Jeder Held hat eine Vergangenheit. Tippe auf „Geschichte“." },
     { art: "info", ziel: ".held .held-lore", opt: true, titel: "Herkunft und Geheimnis", text: "Woher der Held kommt, was ihn antreibt – und etwas, das kaum jemand weiß." },
-    { art: "info", ziel: ".hub-held-reihe .fkarte.gesperrt", opt: true, titel: "Weitere Helden finden", text: "Neue Helden bekommst du auf drei Wegen: für jedes neue Kampagnen-Ende, mit etwas Glück nach einem Sieg in der Arena und beim Händler gegen Seelensplitter." },
+    { art: "info", ziel: ".hub-held-reihe .fkarte.gesperrt", opt: true, titel: "Weitere Helden finden", text: "Einen gesperrten Helden schaltest du hier frei: für einen Heldentoken oder für Seelensplitter. Mit etwas Glück schließt sich dir auch nach einer Kampagne oder einem Sieg in der Arena ein Held an." },
     // --- Abenteurergilde ---
     { art: "klick", ziel: nav("kampagnen"), titel: "Die Abenteurergilde", text: "Weiter zur Abenteurergilde. Tippe oben in der Leiste darauf." },
     { art: "info", ziel: ".karte-box.gilde .k-kopf, #hub-seite .hub-gruss", titel: "Das Auftragsbrett", text: "Hier hängen deine Kampagnen. Eine Kampagne ist ein ganzes Abenteuer mit Geschichte, Entscheidungen und Kämpfen." },
@@ -86,8 +86,8 @@
     { art: "info", ziel: "[data-arena] .arena-waehrung", opt: true, titel: "Belohnungen", text: "Ein Sieg bringt Seelensplitter und Erfahrung für deine Helden, mit etwas Glück sogar einen neuen Helden. Erfahrung gibt es bis zum fünften Sieg am Tag." },
     // --- Händler ---
     { art: "klick", ziel: nav("shop"), titel: "Der Händler", text: "Weiter zum Händler. Tippe darauf." },
-    { art: "info", ziel: ".shop-held, .shop-bald .hub-gruss, .shop .hub-gruss", titel: "Helden des Tages", text: "Jeden Tag bietet der Händler drei Helden an, die dir noch fehlen. Um Mitternacht wechselt die Auswahl." },
-    { art: "info", ziel: ".shop-stand", opt: true, titel: "Bezahlt wird mit Seelensplittern", text: "Hier steht, wie viele du hast. Reicht es noch nicht, zeigt jeder Held, wie viele fehlen." },
+    { art: "info", ziel: ".shop-held, .shop-bald .hub-gruss, .shop .hub-gruss", titel: "Held der Woche", text: "Jede Woche bietet der Händler einen Helden, der dir noch fehlt, zum halben Preis an – dazu Heldentoken, Ausstattung und Erfahrungspakete." },
+    { art: "info", ziel: ".shop-stand", opt: true, titel: "Bezahlt wird mit Seelensplittern", text: "Hier steht, wie viele du hast. Du gewinnst sie in der Arena." },
     // --- Hilfe ---
     { art: "klick", ziel: nav("regeln"), titel: "Hilfe und Regeln", text: "Zum Schluss: die Hilfe. Tippe darauf." },
     { art: "ende", ziel: "#hub-seite .hub-gruss", titel: "Alles Weitere steht hier", text: "Hier findest du jederzeit die Regeln, einfach erklärt. Auswendig musst du nichts können – das Spiel rechnet für dich. Viel Erfolg in den Splitterlanden!" },

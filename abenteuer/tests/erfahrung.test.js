@@ -20,7 +20,7 @@ function server(name, a) {
     const alt = DB.xp[a.p_held] || 0; DB.besitz[p[0]] -= a.p_anzahl; DB.xp[a.p_held] = alt + p[1] * a.p_anzahl; DB.einsatz.push(a);
     return { held: a.p_held, xp: p[1] * a.p_anzahl, gesamt: DB.xp[a.p_held], stufe_vorher: stufe(alt), stufe: stufe(DB.xp[a.p_held]), laden: laden() }; }
   if (name === "rpg_my_wallet") return { konto: true, waehrung: DB.waehrung };
-  if (name === "rpg_shop_today") return { konto: true, preis: 830, waehrung: DB.waehrung, bis: new Date(Date.now() + 3 * 36e5).toISOString(), alle: false, helden: [{ held: "duellant", gekauft: false }] };
+  if (name === "rpg_shop_week") return { konto: true, preis: 830, angebot: 415, token_preis: 830, tokens: 0, waehrung: DB.waehrung, bis: new Date(Date.now() + 3 * 864e5).toISOString(), alle: false, held: "duellant", gekauft: false };
   if (name === "rpg_cosmetics") return { konto: true, waehrung: DB.waehrung, katalog: [], besitz: [], aktiv: { wuerfel: null, rahmen: null } };
   if (name === "rpg_arena_list") return { konto: true, waehrung: DB.waehrung, heute: 0, offen: [], mein: null };
   return { fehler: "nicht erwartet: " + name };
@@ -43,7 +43,7 @@ async function seite(b, vp) {
   const { p, fehler } = await seite(b, { width: 1200, height: 950 });
   await p.click('.dorf-ort[data-hub="shop"]'); await p.waitForSelector(".shop-felder");
   const felder = await p.evaluate(() => [...document.querySelectorAll("[data-shop-feld]")].map((x) => x.dataset.shopFeld + ":" + x.querySelector("b").textContent));
-  check(felder.join(" | ") === "helden:Helden des Tages | ausstattung:Ausstattung | erfahrung:Erfahrung", "Händler: dritte Karte „Erfahrung“ neben Helden des Tages und Ausstattung");
+  check(felder.join(" | ") === "helden:Held der Woche | ausstattung:Ausstattung | erfahrung:Erfahrung", "Händler: dritte Karte „Erfahrung“ neben Helden des Tages und Ausstattung");
   check(await p.evaluate(() => document.querySelectorAll('[data-shop-feld="erfahrung"] img[src*="img/shop/ep"]').length === 3), "Die Karte zeigt die drei Truhen");
   await p.click('[data-shop-feld="erfahrung"]'); await p.waitForSelector(".xp-pakete");
   const lies = () => p.evaluate(() => ({ pakete: [...document.querySelectorAll(".xp-pakete .xp-paket")].map((x) => x.textContent.replace(/\s+/g, " ").trim()), bilder: [...document.querySelectorAll(".xp-pakete .xp-truhe")].map((x) => /ep(\d+)\.webp/.exec(x.src)[1] + (x.complete && x.naturalWidth ? "" : "!")).join(","),

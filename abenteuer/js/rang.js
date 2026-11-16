@@ -20,7 +20,7 @@
   const fortschritt = (p) => { const r = ausPunkten(p); return r >= 14 ? { in: p - 1400, von: null, anteil: 1, naechster: null } : { in: p % 100, von: 100, anteil: (p % 100) / 100, naechster: info(r + 1).name }; };
   const rpc = async (name, args = {}) => { const c = window.AB.liveClient(); await c.ensureUser(); return c.rpc(name, args); };
   const fehltF = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
-  let D = null, fehlt = false, zeit = 0, reiter = "rangliste";
+  let D = null, fehlt = false, zeit = 0, reiter = "chronik";
 
   /** Stand holen (höchstens alle 20 Sekunden neu, außer neu = true). null, wenn die Datenbank Ranked nicht kennt. */
   async function laden(neu) {
@@ -78,11 +78,11 @@
         <span class="kos-bild kos-rahmen" data-rahmen="r_s0_${t[0]}" title="Rahmen ${t[1]}"><span class="rahmen-halter"><span class="hub-avatar">${window.MYTHARA && window.MYTHARA.avatarHtml ? window.MYTHARA.avatarHtml() : ""}</span></span></span>
         ${gespielt && n === meiner ? `<em>dein Stand</em>` : ""}</li>`).reverse().join("")}</ul>`;
   }
-  const REITER = [["rangliste", "Rangliste"], ["chronik", "Letzte Kämpfe"], ["belohnungen", "Belohnungen"]];
-  const reiterInhalt = () => (reiter === "chronik" ? chronikHtml() : reiter === "belohnungen" ? belohnungenHtml() : ranglisteHtml());
+  const REITER = [["chronik", "Letzte Kämpfe"], ["belohnungen", "Belohnungen"]]; // die Rangliste hat in der Arena einen eigenen Reiter
+  const reiterInhalt = () => (reiter === "belohnungen" ? belohnungenHtml() : chronikHtml());
   function reiterHtml() {
     if (!da()) return "";
-    return `<section class="rang-reiter" id="rang-reiter"><nav class="admin-tabs" aria-label="Ranked">${REITER.map((r) => `<button data-rang-reiter="${r[0]}" class="${r[0] === reiter ? "an" : ""}"${r[0] === reiter ? ' aria-current="page"' : ""}>${r[1]}</button>`).join("")}</nav>
+    return `<section class="rang-reiter" id="rang-reiter"><nav class="rang-unter" aria-label="Ranked">${REITER.map((r) => `<button data-rang-reiter="${r[0]}" class="${r[0] === reiter ? "an" : ""}"${r[0] === reiter ? ' aria-current="page"' : ""}>${r[1]}</button>`).join("")}</nav>
       <div class="rang-reiter-inhalt">${reiterInhalt()}</div></section>`;
   }
   function binden() {
@@ -124,5 +124,5 @@
   /** Eine Zeile für die Profilseite */
   const zeile = () => (da() ? `${emblem((D.ich || {}).rang, "mini")} ${info((D.ich || {}).rang).name} · ${(D.ich || {}).punkte || 0} Rangpunkte (${esc(D.saison.name)})` : "");
 
-  window.ABRANG = { laden, da, laeuft, info, ausPunkten, emblem, karteHtml, reiterHtml, binden, ergebnis, kopf, zeile, stand: () => D, LOHN };
+  window.ABRANG = { laden, da, laeuft, info, ausPunkten, emblem, karteHtml, reiterHtml, ranglisteHtml, binden, ergebnis, kopf, zeile, stand: () => D, LOHN };
 })();

@@ -280,11 +280,50 @@
 
   /* ---------- Admin-Bereich (nur Admins): Codes · Kampfstatistiken · Rechner-Gegner ---------- */
   let adminTab = null;
-  const ADMIN_TABS = [["codes", "Codes", "Code-Übersicht"], ["stats", "Kampfstatistiken", "Arena-Auswertung"], ["bots", "Rechner-Gegner", "Rechner-Gegner"]];
+  const ADMIN_TABS = [["codes", "Codes", "Code-Übersicht"], ["stats", "Kampfstatistiken", "Arena-Auswertung"], ["bots", "Rechner-Gegner", "Rechner-Gegner"], ["saison", "Ranked", "Ranked-Saison"]];
   function adminBereich(tab) {
     if (!smAktiv() || !SM.istAdmin()) return toast("Den Admin-Bereich gibt es nur für Admins.");
     adminTab = ADMIN_TABS.some((t) => t[0] === tab) ? tab : "codes";
-    return adminTab === "stats" ? arenaAuswertung() : adminTab === "bots" ? botEinstellungen() : codeUebersicht();
+    return adminTab === "stats" ? arenaAuswertung() : adminTab === "bots" ? botEinstellungen() : adminTab === "saison" ? saisonVerwalten() : codeUebersicht();
+  }
+  /** Ranked-Saison: Stand sehen, die laufende beenden (verteilt die Belohnungen) und eine neue beginnen (Migration 022) */
+  async function saisonVerwalten(meldung) {
+    if (!smAktiv() || !SM.istAdmin()) return toast("Die Saisons gibt es nur für Admins.");
+    let l = null;
+    try { l = await netz().rpc("rpg_admin_ranked", {}); } catch (e) { return fenster("Ranked-Saison", `<p class="note">${rpcFehlt(e) ? "Ranked ist in der Datenbank noch nicht eingerichtet (Migration 022)." : esc(e.message)}</p>`); }
+    const d = (t) => { try { return new Date(t).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }); } catch (e) { return ""; } };
+    const TIER = ["Bronze", "Silber", "Gold", "Platin", "Meister"], lauf = (l || []).find((s) => s.status === "laeuft"), rest = lauf ? Math.ceil((new Date(lauf.ende).getTime() - Date.now()) / 864e5) : 0;
+    const verteilung = (s) => TIER.map((n, i) => `${n} ${(s.je_rang || {})[i] || 0}`).join(" · ");
+    const o = fenster("Ranked-Saison", `<div class="admin-saison">
+      ${meldung ? `<p class="my-fb" data-art="ok" role="status">${esc(meldung)}</p>` : ""}
+      ${lauf ? `<div class="admin-saison-karte"><b>${esc(lauf.name)} läuft</b>
+          <span>${d(lauf.beginn)} bis ${d(lauf.ende)} · ${rest > 0 ? `noch ${rest} ${rest === 1 ? "Tag" : "Tage"}` : "Zeit abgelaufen – es kann nicht mehr gesucht werden"}</span>
+          <span>${lauf.spieler} Spieler · ${lauf.kaempfe} gewertete Kämpfe, davon ${lauf.gegen_bot} gegen den Rechner-Gegner</span>
+          <span class="note klein">Aktueller Rang: ${verteilung(lauf)}</span>
+          <div class="knoepfe"><button class="btn gefahr" id="saison-ende">Saison jetzt beenden und Belohnungen verteilen</button></div>
+          <p class="note klein">Beenden verteilt sofort an alle, die mindestens einen gewerteten Kampf gespielt haben: Seelensplitter, Würfel und Rahmen nach dem höchsten erreichten Rang. Das lässt sich nicht zurücknehmen. Die Saison endet nicht von selbst – läuft ihre Zeit ab, kann nur nicht mehr gesucht werden.</p></div>`
+        : `<form class="sm-admin-form" id="saison-neu" novalidate><h3 class="f-unter">Neue Saison beginnen</h3>
+          <label>Name <input id="saison-name" maxlength="40" placeholder="z. B. Season 1" required></label>
+          <label>Dauer <select id="saison-tage"><option value="14">2 Wochen</option><option value="28">4 Wochen</option><option value="42" selected>6 Wochen</option><option value="56">8 Wochen</option><option value="84">12 Wochen</option></select></label>
+          <button class="my-knopf rot" type="submit">Saison beginnen</button><p class="my-fb" id="saison-fb" role="status"></p>
+          <p class="note klein">Alle beginnen wieder bei 0 Punkten in Bronze III. Die Belohnungen (Würfel und Rahmen) tragen weiter den Namen „Season 0“.</p></form>`}
+      <div class="auswertung"><h3>Alle Saisons</h3><table><thead><tr><th>Saison</th><th>Zeitraum</th><th>Status</th><th>Spieler</th><th>Kämpfe</th><th>gegen Rechner</th></tr></thead><tbody>
+        ${(l || []).map((s) => `<tr><th>${esc(s.name)}</th><td>${d(s.beginn)} – ${d(s.ende)}</td><td>${s.status === "laeuft" ? "läuft" : "beendet" + (s.abgerechnet ? ", belohnt" : "")}</td><td>${s.spieler}</td><td>${s.kaempfe}</td><td>${s.gegen_bot}</td></tr>`).join("") || `<tr><td colspan="6">Noch keine Saison.</td></tr>`}</tbody></table></div></div>`);
+    const en = o.querySelector("#saison-ende");
+    if (en) en.onclick = async () => {
+      if (!confirm(`„${lauf.name}“ jetzt beenden und die Belohnungen an ${lauf.spieler} Spieler verteilen? Das lässt sich nicht zurücknehmen.`)) return;
+      en.disabled = true;
+      try { const r = await netz().rpc("rpg_admin_ranked_end", {}); if (window.ABRANG) window.ABRANG.laden(true).then(() => window.ABRANG.kopf()).catch(() => {}); saisonVerwalten(`${r.saison} ist beendet: ${r.belohnt} Spieler belohnt, zusammen ${r.seelensplitter} Seelensplitter.`); }
+      catch (e) { en.disabled = false; toast(e.message); }
+    };
+    const f = o.querySelector("#saison-neu");
+    if (f) f.onsubmit = async (ev) => {
+      ev.preventDefault(); const name = $("#saison-name").value.trim(), fb2 = (t) => { $("#saison-fb").textContent = t; };
+      if (!name) return fb2("Bitte einen Namen angeben.");
+      const k = f.querySelector("button[type=submit]"); k.disabled = true; fb2("Saison wird angelegt …");
+      try { const r = await netz().rpc("rpg_admin_ranked_start", { p_name: name, p_tage: +$("#saison-tage").value || 42 }); if (window.ABRANG) window.ABRANG.laden(true).then(() => window.ABRANG.kopf()).catch(() => {}); saisonVerwalten(`${r.name} hat begonnen.`); }
+      catch (e) { k.disabled = false; fb2(e.message); }
+    };
   }
   /** Rechner-Gegner der Arena: ein/aus, Wartezeit, Spielstärke, Stufen – und wie die Kämpfe gegen ihn ausgehen (Migration 020) */
   async function botEinstellungen(meldung) {

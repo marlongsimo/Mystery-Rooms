@@ -69,17 +69,22 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   const { p, fehler } = await seite(b, { width: 1200, height: 1000 });
   check(await p.waitForFunction(() => { const e = document.querySelector("#hub-rang"); return e && !e.hidden && /Bronze II/.test(e.textContent); }, null, { timeout: 10000 }).then(() => true, () => false), "Der Rang steht in der Kopfzeile des Dorfs (Bronze II)");
   await p.click('.dorf-ort[data-hub="arena"]'); await p.waitForSelector("#arena-team-aendern"); await p.waitForSelector(".rang-karte");
-  const k = await p.evaluate(() => { const e = document.querySelector(".rang-karte"); return { text: e.textContent.replace(/\s+/g, " "), tier: e.dataset.tier, balken: e.querySelector(".rang-balken u").style.width, knopf: e.querySelector(".rang-spielen").disabled, vorTeam: e.compareDocumentPosition(document.querySelector(".arena-meinteam")) & 4 }; });
-  check(/Season 0 · noch 41 Tage/.test(k.text) && /Bronze II/.test(k.text) && /5 \/ 100 bis Bronze I/.test(k.text) && k.balken === "5%" && /Punkte\s*105/.test(k.text) && /5 : 2/.test(k.text) && /#3/.test(k.text) && k.tier === "bronze" && k.vorTeam, "Ranked-Karte ganz oben: Saison mit Restzeit, Rang, Fortschritt zur nächsten Stufe, Punkte, Bilanz, Platz");
+  const k = await p.evaluate(() => { const e = document.querySelector(".rang-karte"); return { text: e.textContent.replace(/\s+/g, " "), tier: e.dataset.tier, balken: e.querySelector(".rang-balken u").style.width, knopf: e.querySelector(".rang-spielen").disabled, tabs: [...document.querySelectorAll("[data-arena-tab]")].map((x) => x.textContent.trim() + (x.classList.contains("an") ? "*" : "")).join(" | "), teamKarte: Boolean(document.querySelector(".arena-meinteam")), teamKnopf: document.querySelector("#arena-team-aendern").textContent.trim(), ohne: (document.querySelector(".arena-ohne-team") || {}).textContent || "" }; });
+  check(k.tabs === "Ranked* | Fun | Rangliste" && !k.teamKarte && /Mein Team/.test(k.teamKnopf) && /Lege zuerst dein Team/.test(k.ohne), "Aufbau: drei Reiter (Ranked · Fun · Rangliste); das Team steckt hinter dem Knopf „Mein Team“ oben rechts – ohne Team ein Hinweis mit Knopf");
+  check(/Season 0 · noch 41 Tage/.test(k.text) && /Bronze II/.test(k.text) && /5 \/ 100 bis Bronze I/.test(k.text) && k.balken === "5%" && /Punkte\s*105/.test(k.text) && /5 : 2/.test(k.text) && /#3/.test(k.text) && k.tier === "bronze", "Reiter Ranked: Saison mit Restzeit, Rang, Fortschritt zur nächsten Stufe, Punkte, Bilanz, Platz");
   check(k.knopf, "Ohne Team ist „Ranked spielen“ gesperrt");
-  await p.click("#arena-team-aendern"); for (const f of ["schildwaechter", "lichtbringer", "wildnislaeufer"]) await p.click(`[data-arena-held="${f}"]`);
+  await p.click("[data-team-auf]"); await p.waitForSelector("[data-arena-held]"); for (const f of ["schildwaechter", "lichtbringer", "wildnislaeufer"]) await p.click(`[data-arena-held="${f}"]`);
   await p.click("#arena-wahl-ok"); await p.waitForSelector('.rang-spielen:not([disabled])');
-  check(await p.evaluate(() => document.querySelectorAll("[data-arena-art]").length === 3 && Boolean(document.querySelector("#arena-privat")) && /Weitere Spielarten/.test(document.querySelector(".arena-zwischen").textContent)), "Darunter die weiteren Spielarten: Normal, Arcade, Privater Kampf");
+  check(await p.evaluate(() => /Mein Team\s*Ø 4,0/.test(document.querySelector("#arena-team-aendern").textContent) && /Torvald/.test(document.querySelector("#arena-team-aendern").title) && !document.querySelector(".arena-ohne-team")), "Nach dem Speichern: Der Knopf zeigt „Mein Team Ø 4,0“ (die Helden nur als Hinweis beim Darüberfahren)");
+  await p.click('[data-arena-tab="fun"]'); await p.waitForSelector(".arena-arten");
+  check(await p.evaluate(() => document.querySelectorAll(".arena-arten [data-arena-art]").length === 2 && Boolean(document.querySelector("#arena-privat")) && !document.querySelector(".rang-karte") && /Ohne Rangpunkte/.test(document.querySelector(".arena-tab").textContent)), "Reiter Fun: Normal, Arcade, Privater Kampf – ohne Rangpunkte");
+  await p.click('[data-arena-tab="rangliste"]'); await p.waitForSelector(".rang-liste");
   // Reiter
   const reiter = await p.evaluate(() => ({ tabs: [...document.querySelectorAll("[data-rang-reiter]")].map((x) => x.textContent + (x.classList.contains("an") ? "*" : "")).join(" | "), zeilen: [...document.querySelectorAll(".rang-liste li")].map((x) => x.textContent.replace(/\s+/g, " ").trim()), ich: (document.querySelector(".rang-liste li.ich b") || {}).textContent, rahmen: document.querySelector(".rang-liste li .rang-bild").dataset.rahmen, embleme: document.querySelectorAll(".rang-liste .rang-emblem").length }));
-  check(reiter.tabs === "Rangliste* | Letzte Kämpfe | Belohnungen" && reiter.zeilen.length === 4 && /^1\s*Nachtfalke.*640/.test(reiter.zeilen[0]) && reiter.ich === "Spieler A" && reiter.rahmen === "r_krone" && reiter.embleme === 4, "Rangliste: Platz, Bild mit Rahmen, Name, Bilanz, Rang und Punkte – die eigene Zeile ist hervorgehoben");
+  check(reiter.tabs === "" && reiter.zeilen.length === 4 && /^1\s*Nachtfalke.*640/.test(reiter.zeilen[0]) && reiter.ich === "Spieler A" && reiter.rahmen === "r_krone" && reiter.embleme === 4, "Reiter Rangliste: Platz, Bild mit Rahmen, Name, Bilanz, Rang und Punkte – die eigene Zeile ist hervorgehoben");
+  await p.click('[data-arena-tab="ranked"]'); await p.waitForSelector(".rang-karte");
+  check(await p.evaluate(() => [...document.querySelectorAll("[data-rang-reiter]")].map((x) => x.textContent + (x.classList.contains("an") ? "*" : "")).join(" | ")) === "Letzte Kämpfe* | Belohnungen", "Unter der Ranked-Karte: Letzte Kämpfe und Belohnungen");
   await shot(p, "ranked-1-arena");
-  await p.click('[data-rang-reiter="chronik"]');
   const ch = await p.evaluate(() => [...document.querySelectorAll(".rang-chronik li")].map((x) => ({ k: x.className, t: x.textContent.replace(/\s+/g, " ").trim(), bilder: x.querySelectorAll(".rang-teams img").length })));
   check(ch.length === 2 && ch[0].k === "sieg" && /Sieg gegen Lena/.test(ch[0].t) && /\+35/.test(ch[0].t) && /▲ Bronze II/.test(ch[0].t) && ch[0].bilder === 6 && ch[1].k === "niederlage" && /durch Aufgabe/.test(ch[1].t) && /-15/.test(ch[1].t), "Letzte Kämpfe: Sieg oder Niederlage, Gegner, beide Teams, Punkte – mit Aufstieg, wo es einen gab");
   await p.click('[data-rang-reiter="belohnungen"]');
@@ -87,7 +92,7 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   check(lo.length === 5 && /Meister ◈ 1200/.test(lo[0].t) && lo[0].w === "w_s0_meister" && lo[0].r === "r_s0_meister" && /Bronze ◈ 150/.test(lo[4].t) && lo[4].m && lo.filter((x) => x.m).length === 1 && lo.every((x) => x.zier), "Belohnungen: je Rang Seelensplitter (1200 bis 150), Würfel und Rahmen; der eigene Stand ist markiert");
   await shot(p, "ranked-2-belohnungen");
   // Suche und Kampf
-  await p.click(".rang-spielen"); await p.waitForSelector(".arena-suche");
+  await p.click('[data-rang-reiter="chronik"]'); await p.click(".rang-spielen"); await p.waitForSelector(".arena-suche");
   check(/Ranked: Suche nach einem Gegner in deinem Rang/.test(await p.textContent(".arena-suche")) && /Bronze II/.test(await p.textContent(".arena-suche")) && /nach 25 Sekunden/.test(await p.textContent(".arena-suche")), "Suche: „in deinem Rang“, mit Abzeichen und dem Hinweis auf die 25 Sekunden");
   const auf = await p.waitForSelector(".arena-gegenueber", { timeout: 20000 }).then(() => true, () => false);
   check(auf && DB.queue.every((x) => x === "ranked") && DB.queue.length >= 3, "Gesucht wird nur in der Ranked-Warteschlange; danach steht ein Gegner bereit");
@@ -103,8 +108,10 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   check(!fehler.length, "keine Skriptfehler" + (fehler.length ? ": " + fehler.join(" | ") : ""));
   // Handy
   const H = await seite(b, { width: 390, height: 844 }); await H.p.click('.dorf-ort[data-hub="arena"]'); await H.p.waitForSelector(".rang-karte");
-  check(await H.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1 && document.querySelector(".rang-karte").getBoundingClientRect().right <= innerWidth && document.querySelector(".rang-liste li").getBoundingClientRect().right <= innerWidth), "Handy: Karte und Rangliste passen in die Breite");
-  await shot(H.p, "ranked-4-handy");
+  const hoch = await H.p.evaluate(() => ({ breit: document.documentElement.scrollWidth <= innerWidth + 1 && document.querySelector(".rang-karte").getBoundingClientRect().right <= innerWidth, seite: document.documentElement.scrollHeight, fenster: innerHeight, knopf: Math.round(document.querySelector(".rang-spielen").getBoundingClientRect().bottom + scrollY) }));
+  check(hoch.breit && hoch.seite <= hoch.fenster * 1.8 && hoch.knopf <= hoch.fenster * 1.15, `Handy: passt in die Breite, kein langes Scrollen mehr (Seite ${hoch.seite}px bei ${hoch.fenster}px Bildschirm; „Ranked spielen“ liegt bei ${hoch.knopf}px)`);
+  await shot(H.p, "ranked-4-handy"); await H.p.click('[data-arena-tab="rangliste"]'); await H.p.waitForSelector(".rang-liste");
+  check(await H.p.evaluate(() => document.querySelector(".rang-liste li").getBoundingClientRect().right <= innerWidth), "Handy: Die Rangliste passt in die Breite");
   check(!H.fehler.length, "keine Skriptfehler am Handy" + (H.fehler.length ? ": " + H.fehler.join(" | ") : ""));
   await b.close();
   console.log(ok ? "\nRANKED IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

@@ -6,7 +6,7 @@
 const { chromium } = require("playwright"); const { ALLE } = require("./alle-helden");
 const URL = "http://localhost:8765/abenteuer/index.html?schnell";
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
-const DB = { e: { aktiv: true, wartezeit: 30, staerke_von: 1, staerke_bis: 1, stufe_von: -1, stufe_bis: 1, schnitt_max: 0.5, geaendert: null, von: null }, gesetzt: [], rufe: [] };
+const DB = { e: { aktiv: true, wartezeit: 30, staerke_von: 1, staerke_bis: 1, stufe_von: -1, stufe_bis: 1, schnitt_max: 0.5, geaendert: null, von: null }, gesetzt: [], rufe: [], saisonRufe: [], saisons: [{ id: 1, name: "Season 0", beginn: new Date(Date.now() - 10 * 864e5).toISOString(), ende: new Date(Date.now() + 32 * 864e5).toISOString(), status: "laeuft", abgerechnet: null, spieler: 7, kaempfe: 41, gegen_bot: 30, je_rang: { 0: 5, 1: 2 } }] };
 const bot = () => ({ einstellungen: DB.e, statistik: { kaempfe: 12, siege_spieler: 5, aufgaben: 1, laufend: 2, abgebrochen: 0, runden: 6.4, heute: 3,
   nach_staerke: [{ stufe: "2 mittel", kaempfe: 4, siege_spieler: 3, runden: 7.1 }, { stufe: "4 ohne Angabe", kaempfe: 8, siege_spieler: 2, runden: 6 }], nach_modus: [{ modus: "duell", kaempfe: 9, siege_spieler: 4 }, { modus: "horde", kaempfe: 3, siege_spieler: 1 }],
   letzte: [{ spieler: "Julian", gegner: "Brotzeit", modus: "duell", status: "beendet", sieger: 2, grund: "team", runden: 3, staerke: null, stufe_spieler: 1, stufe_gegner: 1.3, wann: new Date().toISOString() },
@@ -18,6 +18,9 @@ function server(name, a) {
     helden: [{ held: "berserker", kaempfe: 9, siege: 6, stufe: 2.4, modi: { duell: [7, 5] } }], teams: [], karten: { gruft: 5 } };
   if (name === "rpg_admin_bot") return bot();
   if (name === "rpg_admin_bot_set") { DB.gesetzt.push(a); Object.assign(DB.e, { aktiv: a.p_aktiv, wartezeit: a.p_wartezeit, staerke_von: a.p_staerke_von, staerke_bis: a.p_staerke_bis, stufe_von: a.p_stufe_von, stufe_bis: a.p_stufe_bis, schnitt_max: a.p_schnitt_max, geaendert: new Date().toISOString(), von: "Chef" }); return bot(); }
+  if (name === "rpg_admin_ranked") return DB.saisons;
+  if (name === "rpg_admin_ranked_end") { const s = DB.saisons.find((x) => x.status === "laeuft"); if (!s) return { fehler: "Es läuft keine Saison." }; s.status = "beendet"; s.abgerechnet = new Date().toISOString(); DB.saisonRufe.push("ende"); return { saison: s.name, belohnt: 7, seelensplitter: 2350 }; }
+  if (name === "rpg_admin_ranked_start") { if (DB.saisons.some((x) => x.status === "laeuft")) return { fehler: "Es läuft noch eine Saison. Beende sie zuerst." }; DB.saisonRufe.push(a); DB.saisons.unshift({ id: 2, name: a.p_name, beginn: new Date().toISOString(), ende: new Date(Date.now() + a.p_tage * 864e5).toISOString(), status: "laeuft", abgerechnet: null, spieler: 0, kaempfe: 0, gegen_bot: 0, je_rang: {} }); return { id: 2, name: a.p_name }; }
   if (name === "rpg_arena_list") return { konto: true, waehrung: 0, heute: 0, offen: [], mein: null };
   if (name === "rpg_my_wallet") return { konto: true, waehrung: 0 };
   return { fehler: "nicht erwartet: " + name };
@@ -45,13 +48,13 @@ async function seite(b, admin, vp) {
   await p.click('[data-profil="admin"]'); await p.waitForSelector(".admin-tabs");
   const kopf = () => p.evaluate(() => ({ h: document.querySelector("#qr-overlay h2").textContent, tabs: [...document.querySelectorAll(".admin-tabs button")].map((x) => x.textContent + (x.classList.contains("an") ? "*" : "")).join(" | ") }));
   let k = await kopf();
-  check(k.h === "Admin-Bereich" && k.tabs === "Codes* | Kampfstatistiken | Rechner-Gegner" && await p.evaluate(() => Boolean(document.querySelector("#sm-admin-form")) && /Beta-Runde/.test(document.querySelector(".sm-code-liste").textContent)), "Reiter Codes: Formular für neue Codes und die Liste");
+  check(k.h === "Admin-Bereich" && k.tabs === "Codes* | Kampfstatistiken | Rechner-Gegner | Ranked" && await p.evaluate(() => Boolean(document.querySelector("#sm-admin-form")) && /Beta-Runde/.test(document.querySelector(".sm-code-liste").textContent)), "Reiter Codes: Formular für neue Codes und die Liste");
   await p.click('[data-admin-tab="stats"]'); await p.waitForFunction(() => /Kämpfe/.test((document.querySelector(".auswertung") || {}).textContent || ""));
   k = await kopf(); const st = (await p.textContent(".auswertung")).replace(/\s+/g, " ");
-  check(k.tabs === "Codes | Kampfstatistiken* | Rechner-Gegner" && /20 beendete Kämpfe/.test(st) && /6 gegen Menschen/.test(st) && /12 gegen den Rechner-Gegner \(Spieler gewannen 42 %\)/.test(st) && /2 privat/.test(st) && /Duell/.test(st), "Reiter Kampfstatistiken: Auswertung, getrennt nach Mensch, Rechner-Gegner und privat");
+  check(k.tabs === "Codes | Kampfstatistiken* | Rechner-Gegner | Ranked" && /20 beendete Kämpfe/.test(st) && /6 gegen Menschen/.test(st) && /12 gegen den Rechner-Gegner \(Spieler gewannen 42 %\)/.test(st) && /2 privat/.test(st) && /Duell/.test(st), "Reiter Kampfstatistiken: Auswertung, getrennt nach Mensch, Rechner-Gegner und privat");
   await p.click('[data-admin-tab="bots"]'); await p.waitForSelector("#admin-bot");
   k = await kopf(); const bt = (await p.textContent("#qr-overlay")).replace(/\s+/g, " ");
-  check(k.tabs === "Codes | Kampfstatistiken | Rechner-Gegner*" && await p.evaluate(() => document.querySelector("#ab-aktiv").checked && document.querySelector("#ab-warten").value === "30" && document.querySelector("#ab-sv").value === "100" && document.querySelector("#ab-sb").value === "100" && document.querySelector("#ab-lv").value === "-1" && document.querySelector("#ab-lb").value === "1" && document.querySelector("#ab-sm").value === "0.5"
+  check(k.tabs === "Codes | Kampfstatistiken | Rechner-Gegner* | Ranked" && await p.evaluate(() => document.querySelector("#ab-aktiv").checked && document.querySelector("#ab-warten").value === "30" && document.querySelector("#ab-sv").value === "100" && document.querySelector("#ab-sb").value === "100" && document.querySelector("#ab-lv").value === "-1" && document.querySelector("#ab-lb").value === "1" && document.querySelector("#ab-sm").value === "0.5"
     && document.querySelector("#ab-warten-w").textContent === "30 s" && document.querySelector("#ab-sb-w").textContent === "100 %"), "Reiter Rechner-Gegner: zeigt die geltenden Einstellungen (an, 30 s, 100 %, Stufen −1 bis +1, Durchschnitt ± 0,5)");
   check(/12 beendet/.test(bt) && /Spieler gewannen 42 %/.test(bt) && /40 bis unter 70 %/.test(bt) && /75 %/.test(bt) && /Brotzeit/.test(bt) && /Elif_87/.test(bt) && /55 %/.test(bt), "… und die Statistik: Siegquote der Spieler gesamt und je Spielstärke, letzte Kämpfe");
   // Schnellwahl und Regler
@@ -63,9 +66,19 @@ async function seite(b, admin, vp) {
   await p.click("#admin-bot button[type=submit]"); await p.waitForFunction(() => /Gespeichert/.test((document.querySelector("#ab-fb") || {}).textContent || ""));
   const g = DB.gesetzt[0] || {};
   check(DB.gesetzt.length === 1 && g.p_aktiv === true && g.p_wartezeit === 45 && Math.abs(g.p_staerke_von - 0.4) < 1e-9 && Math.abs(g.p_staerke_bis - 0.6) < 1e-9 && g.p_stufe_von === -1 && g.p_stufe_bis === 0 && g.p_schnitt_max === 0.5, "Speichern schickt genau die eingestellten Werte (45 s, 40–60 %, Stufen −1 bis ±0, Durchschnitt ± 0,5)");
-  check(await p.evaluate(() => document.querySelector("#ab-warten").value === "45" && document.querySelector("#ab-sv").value === "40" && /Zuletzt geändert von Chef/.test(document.querySelector("#admin-bot").textContent)) && (await kopf()).tabs.endsWith("Rechner-Gegner*"), "Danach: gespeicherte Werte, „Zuletzt geändert von …“, der Reiter bleibt");
+  check(await p.evaluate(() => document.querySelector("#ab-warten").value === "45" && document.querySelector("#ab-sv").value === "40" && /Zuletzt geändert von Chef/.test(document.querySelector("#admin-bot").textContent)) && (await kopf()).tabs.includes("Rechner-Gegner*"), "Danach: gespeicherte Werte, „Zuletzt geändert von …“, der Reiter bleibt");
   await p.click("#ab-aktiv"); await p.click("#admin-bot button[type=submit]"); await p.waitForFunction(() => /Gespeichert/.test((document.querySelector("#ab-fb") || {}).textContent || "") && !document.querySelector("#ab-aktiv").checked);
   check(DB.gesetzt[1] && DB.gesetzt[1].p_aktiv === false, "Ausschalten lässt sich speichern");
+  // Reiter Ranked: Saison beenden, neue beginnen
+  await p.click('[data-admin-tab="saison"]'); await p.waitForSelector("#saison-ende");
+  const sa = (await p.textContent(".admin-saison")).replace(/\s+/g, " ");
+  check(/Season 0 läuft/.test(sa) && /noch 32 Tage/.test(sa) && /7 Spieler · 41 gewertete Kämpfe, davon 30 gegen den Rechner-Gegner/.test(sa) && /Bronze 5 · Silber 2/.test(sa) && !(await p.$("#saison-neu")), "Reiter Ranked: laufende Saison mit Restzeit, Spielern, Kämpfen und Rangverteilung; eine neue lässt sich erst danach beginnen");
+  await p.click("#saison-ende"); await p.waitForSelector("#saison-neu");
+  check(DB.saisonRufe[0] === "ende" && /Season 0 ist beendet: 7 Spieler belohnt, zusammen 2350 Seelensplitter/.test(await p.textContent(".admin-saison")) && /beendet, belohnt/.test(await p.textContent(".admin-saison table")), "„Saison beenden“ (nach Rückfrage): Belohnungen verteilt, die Meldung nennt Spieler und Seelensplitter");
+  await p.click("#saison-neu button[type=submit]"); await p.waitForTimeout(200);
+  check(DB.saisonRufe.length === 1 && /Namen angeben/.test(await p.textContent("#saison-fb")), "Neue Saison ohne Namen: abgewiesen");
+  await p.fill("#saison-name", "Frostmond"); await p.selectOption("#saison-tage", "28"); await p.click("#saison-neu button[type=submit]"); await p.waitForSelector("#saison-ende");
+  check(DB.saisonRufe[1] && DB.saisonRufe[1].p_name === "Frostmond" && DB.saisonRufe[1].p_tage === 28 && /Frostmond läuft/.test(await p.textContent(".admin-saison")) && /Frostmond hat begonnen/.test(await p.textContent(".admin-saison")), "Neue Saison mit eigenem Namen und Dauer (4 Wochen) begonnen");
   // Schließen, danach ein anderes Fenster: keine Reiter
   await p.click("#fenster-zu"); await p.click("#hub-profil-knopf"); await p.click('[data-profil="profil"]'); await p.waitForFunction(() => { const o = document.querySelector("#qr-overlay"); return !o.hidden && /Mein Profil/.test(o.querySelector("h2").textContent); });
   check(await p.evaluate(() => !document.querySelector("[data-admin-tab]")), "Andere Fenster (z. B. „Mein Profil“) zeigen keine Admin-Reiter");

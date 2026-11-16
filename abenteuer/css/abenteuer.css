@@ -2340,3 +2340,19 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .kh-k b { font-size: 11px; line-height: 1.14; max-height: 2.3em; display: block; -webkit-line-clamp: unset; overflow: hidden; hyphens: auto; overflow-wrap: anywhere; }
 .kh-k small { line-height: 1.1; }
 .kh-raster.viele .kh-k b { font-size: 10px; } .kh-raster.viele .kh-k i { font-size: 16px; } .kh-raster.viele .kh-k small { font-size: 9px; }
+
+/* ---------- Arena mit Ranked: kurze Seite – Team als Knopf oben rechts, drei Reiter ---------- */
+.arena-kopf.kurz { align-items: center; margin-bottom: 6px; } .arena-kopf.kurz h1 { margin: 0; }
+.arena-team-knopf small { opacity: .75; font-weight: 400; margin-left: 4px; }
+.arena-ohne-team { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0 10px; padding: 10px 12px; border-radius: 10px; background: rgba(232,196,106,.12); border: 1px solid rgba(232,196,106,.4); font-size: 14px; }
+.arena-tabs { margin: 8px 0 12px; } .arena-tabs button { font-size: 16px; padding: 10px 16px; flex: 1 1 0; text-align: center; }
+.arena-punkt { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #e0434f; vertical-align: 2px; margin-left: 4px; box-shadow: 0 0 6px #e0434f; }
+.arena-tab .rang-karte { margin-top: 0; }
+.arena-rangliste { max-height: min(62vh, 640px); overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
+.rang-unter { display: flex; gap: 6px; margin: 2px 0 10px; }
+.rang-unter button { flex: none; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(197,162,103,.35); background: none; color: var(--muted); font: 600 13px var(--schrift-ui); cursor: pointer; }
+.rang-unter button.an { background: rgba(232,196,106,.16); color: #f6dc9c; border-color: rgba(232,196,106,.6); }
+.rang-reiter { margin-top: 12px; }
+.admin-saison { display: grid; gap: 12px; } .admin-saison .sm-admin-form { margin-top: 4px; }
+.admin-saison-karte { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 6px; }
+.admin-saison-karte b { color: #f6dc9c; font: 600 18px var(--schrift-titel); }

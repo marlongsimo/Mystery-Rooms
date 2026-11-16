@@ -156,6 +156,36 @@
     const held = (h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
       return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b>${F.meistertitel(h.held, h.stufe) ? `<small class="meister">♛ ${esc(F.meistertitel(h.held, h.stufe))}</small>` : ""}<em>Stufe ${h.stufe}</em></div>`; };
     const leer = `<div class="arena-held fest leer"><span>?</span><b>frei</b><em>&nbsp;</em></div>`;
+    const infoBlock = `<div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
+        <h2>So läuft ein Kampf</h2>
+        <ul><li>Du legst einmal dein Team aus drei Helden fest. Es gilt für jeden Kampf, bis du es änderst.</li>
+          <li>„Gegner suchen“ verbindet dich mit einem anderen Suchenden, dessen Durchschnittsstufe höchstens eine Stufe von deiner entfernt ist.</li>
+          ${SERVER ? `<li><b>Normal</b> ist immer ein Duell. In <b>Arcade</b> wird zwischen Arena, Königsmord und Horde gelost. Im <b>privaten Kampf</b> forderst du einen Freund heraus und wählst den Modus; er zählt nicht für Belohnungen und kennt keine Stufengrenze.</li>
+          <li>Die Karte wird ausgelost. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>` : `<li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>`}
+          <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
+          <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
+          <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. ${L.nur_siege ? "Erfahrung und Heldenchance gibt es bis zum fünften Sieg des Tages; Niederlagen zählen nicht mit." : "Erfahrung und Heldenchance gibt es für die ersten fünf Kämpfe des Tages."}</li></ul>
+        <h2>Die Modi</h2><div class="arena-modus-reihe vier">${LOS.map((k) => modusHtml(k)).join("")}</div></div>`;
+    // Mit Ranked (Migration 022): kurze Seite mit drei Reitern – Ranked · Fun · Rangliste. Das Team steckt hinter einem Knopf oben rechts.
+    if (SERVER && RG()) {
+      const rg = RG(), tab = ["ranked", "fun", "rangliste"].includes(Z.reiter) ? Z.reiter : "ranked", ruft = Boolean(Z.einl && (Z.einl.an_mich || []).length);
+      const inhalt = tab === "ranked" ? rg.karteHtml(Boolean(t)) + rg.reiterHtml()
+        : tab === "rangliste" ? `<div class="arena-rangliste">${rg.ranglisteHtml()}</div>`
+        : `<div id="arena-einladungen"></div><div class="arena-arten">
+            <button class="arena-art" data-arena-art="normal" ${t ? "" : "disabled"}><b>⚔ Normal</b><span>Duell: drei gegen drei, keine Monster.</span><em>Gegner suchen</em></button>
+            <button class="arena-art" data-arena-art="arcade" ${t ? "" : "disabled"}><b>🎲 Arcade</b><span>Arena, Königsmord oder Horde – das Los entscheidet.</span><em>Gegner suchen</em></button>
+            <button class="arena-art privat" id="arena-privat" ${t ? "" : "disabled"}><b>♟ Privater Kampf</b><span>Fordere einen Freund heraus und wähle den Modus. Ohne Wertung.</span><em>Freund einladen</em></button></div>
+          <p class="note">${t ? `Normal und Arcade: Gegner mit Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))}. ` : ""}Ohne Rangpunkte – Erfahrung und ${WAEHRUNG} gibt es wie in Ranked.</p>`;
+      seite(`<div class="arena-kopf kurz"><h1 class="hub-gruss">Arena</h1>
+          <div class="arena-kopf-rechts">${waehrungHtml()}<button class="btn ${t ? "ghost" : ""} klein arena-team-knopf" id="arena-team-aendern" ${eigene < 3 || Z.teamFehlt ? "disabled" : ""} title="${t ? esc(t.team.map((h) => (F.FIGUREN[h.held] || { name: h.held }).name + " (Stufe " + h.stufe + ")").join(", ")) : "Team festlegen"}">👥 Mein Team${t ? ` <small>Ø ${komma(t.schnitt)}</small>` : ""}</button>
+            <button class="btn ghost klein arena-info-knopf" id="arena-info" aria-label="Regeln und Modi" title="Regeln und Modi">i</button></div></div>
+        ${grenzeHtml()}
+        ${Z.fehler ? `<p class="fb">${esc(Z.fehler)}</p>` : ""}
+        ${t ? "" : `<p class="arena-ohne-team">${eigene < 3 ? "Du brauchst mindestens drei Helden in deiner Sammlung." : `Lege zuerst dein Team aus drei Helden fest. <button class="btn klein" data-team-auf>Team festlegen</button>`}</p>`}
+        <nav class="admin-tabs arena-tabs" aria-label="Arena"><button data-arena-tab="ranked" class="${tab === "ranked" ? "an" : ""}">Ranked</button><button data-arena-tab="fun" class="${tab === "fun" ? "an" : ""}">Fun${ruft ? ` <i class="arena-punkt" title="Einladung"></i>` : ""}</button><button data-arena-tab="rangliste" class="${tab === "rangliste" ? "an" : ""}">Rangliste</button></nav>
+        <div class="arena-tab" data-tab="${tab}">${inhalt}</div>
+        ${infoBlock}`);
+    } else
     seite(`<div class="arena-kopf"><div><h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">Du gegen einen anderen Spieler, jeder mit drei Helden.</p></div>
         <div class="arena-kopf-rechts">${waehrungHtml()}<button class="btn ghost klein arena-info-knopf" id="arena-info" aria-label="Regeln und Modi" title="Regeln und Modi">i</button></div></div>
       ${grenzeHtml()}
@@ -174,21 +204,14 @@
         <button class="arena-art privat" id="arena-privat" ${t ? "" : "disabled"}><b>♟ Privater Kampf</b><span>Fordere einen Freund heraus und wähle den Modus. Ohne Wertung.</span><em>Freund einladen</em></button>
       </div>${RG() ? RG().reiterHtml() : ""}` : `<div class="knoepfe arena-suchknopf"><button class="btn gross" id="arena-suchen" ${t ? "" : "disabled"}>⚔ Gegner suchen</button></div>`}
       <p class="note">${t ? `Gesucht wird ein Gegner mit Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))}. ` : ""}${L.heute != null ? `Belohnungen heute: ${Math.min(5, L.heute)} von 5 ${L.nur_siege ? "Siegen" : "Kämpfen"}. ` : ""}Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
-      <div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
-        <h2>So läuft ein Kampf</h2>
-        <ul><li>Du legst einmal dein Team aus drei Helden fest. Es gilt für jeden Kampf, bis du es änderst.</li>
-          <li>„Gegner suchen“ verbindet dich mit einem anderen Suchenden, dessen Durchschnittsstufe höchstens eine Stufe von deiner entfernt ist.</li>
-          ${SERVER ? `<li><b>Normal</b> ist immer ein Duell. In <b>Arcade</b> wird zwischen Arena, Königsmord und Horde gelost. Im <b>privaten Kampf</b> forderst du einen Freund heraus und wählst den Modus; er zählt nicht für Belohnungen und kennt keine Stufengrenze.</li>
-          <li>Die Karte wird ausgelost. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>` : `<li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>`}
-          <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
-          <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
-          <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. ${L.nur_siege ? "Erfahrung und Heldenchance gibt es bis zum fünften Sieg des Tages; Niederlagen zählen nicht mit." : "Erfahrung und Heldenchance gibt es für die ersten fünf Kämpfe des Tages."}</li></ul>
-        <h2>Die Modi</h2><div class="arena-modus-reihe vier">${LOS.map((k) => modusHtml(k)).join("")}</div></div>`);
+      ${infoBlock}`);
     Z.fehler = "";
     const inf = $("#arena-info"); if (inf) inf.onclick = () => { Z.infoAuf = !Z.infoAuf; $("#arena-info-text").hidden = !Z.infoAuf; };
     const ta = $("#arena-team-aendern"); if (ta) ta.onclick = () => heldenWahl({ titel: "Mein Team", knopf: "Team speichern", vorwahl: t ? t.team.map((h) => h.held) : [],
       fertig: async (team) => { Z.team = await rpc("rpg_arena_squad_set", { p_team: team }); Z.modus = null; zeigen(); } });
     const su = $("#arena-suchen"); if (su) su.onclick = () => suchen();
+    document.querySelectorAll("[data-arena-tab]").forEach((b) => { b.onclick = () => { Z.reiter = b.dataset.arenaTab; zeichneNeu(); }; });
+    { const auf = document.querySelector("[data-team-auf]"); if (auf && ta) auf.onclick = () => ta.click(); }
     if (RG()) RG().binden();
     document.querySelectorAll("[data-arena-art]").forEach((b) => { b.onclick = () => suchen(b.dataset.arenaArt); });
     const pv = $("#arena-privat"); if (pv) pv.onclick = () => privatWahl();
@@ -197,6 +220,7 @@
   }
   /** Einladungen von Freunden zu einem privaten Kampf (über der Auswahl der Spielart) */
   function einladungenZeigen() {
+    { const fun = document.querySelector('[data-arena-tab="fun"]'), n = ((Z.einl && Z.einl.an_mich) || []).length; if (fun && Boolean(fun.querySelector(".arena-punkt")) !== Boolean(n)) fun.innerHTML = "Fun" + (n ? ' <i class="arena-punkt" title="Einladung"></i>' : ""); }
     const el = $("#arena-einladungen"); if (!el) return; const l = (Z.einl && Z.einl.an_mich) || [], team = Z.team && Z.team.team;
     const einlHtml = l.map((e) => `<div class="arena-einladung">${bildVon(e.von)}<div><b>${esc(e.von)} fordert dich heraus</b><small>Privater Kampf · ${esc((MODI[e.modus] || {}).name || e.modus)} · ohne Wertung</small></div>
       <span><button class="btn klein" data-einl-ja="${esc(e.id)}" ${team ? "" : "disabled"}>Annehmen</button><button class="btn ghost klein" data-einl-nein="${esc(e.id)}">Ablehnen</button></span></div>`).join("") + (l.length && !team ? `<p class="note">Lege zuerst dein Team fest, dann kannst du annehmen.</p>` : "");

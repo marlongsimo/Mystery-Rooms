@@ -2841,6 +2841,8 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
  *     nach der Aktion gehen Fernkämpfer und Angeschlagene aus der Reichweite.
  *   • Spielstärke (merk.staerke, 0 bis 1; 1 = so gut er kann): Je niedriger, desto öfter greift er daneben – er schätzt ungenauer,
  *     nimmt manchmal irgendeine brauchbare Aktion statt der besten, verteilt seine Angriffe und lässt das Stellungsspiel aus.
+ *   • Entfernungen rechnet er wie die Regeln für Aktionen (R.weite: Diagonale = anderthalb Felder) – er stellt sich also gerade
+ *     neben ein Ziel, wenn er zuschlagen will, und schätzt Gefahr nur von Gegnern, die ihn so auch erreichen.
  * Benutzt nur die öffentliche Schnittstelle der Regeln (js/regeln.js).
  */
 (function (root) {
@@ -2927,18 +2929,18 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       const reich = Math.max(1, ...R.aktionenVon(g, c).filter((a) => a.art === "angriff" || a.art === "rettungswurf" || a.art === "geschoss" || a.art === "flaeche").map((a) => a.reichweite || 1));
       const fern = reich >= 4, schwach = g.tp < g.tpMax * 0.4;
       const amBoden = c.figuren.filter((o) => o.seite === g.seite && o !== g && o.tp <= 0 && !o.tot && o.team);
-      const nebenJetzt = feinde.filter((o) => R.abstand(o, { x: x0, y: y0 }) <= 1);
+      const nebenJetzt = feinde.filter((o) => R.weite(o, { x: x0, y: y0 }) <= 1);
       const gefahrGewicht = (fern ? 1.2 : 0.15) * (schwach ? 1.8 : 1);
       const note = (x, y, kosten) => {
         g.x = x; g.y = y;
         const pot = aktionFrei ? potenzial(c, g) : 0;
-        let gefahr = 0; for (const o of feinde) { const d = R.abstand(o, g); gefahr += d <= 1 ? 1 : d <= 3 ? 0.25 : 0; }
+        let gefahr = 0; for (const o of feinde) { const d = R.weite(o, g); gefahr += d <= 1 ? 1 : d <= 3 ? 0.25 : 0; }
         let s = pot * 3 - gefahr * gefahrGewicht - kosten * 0.03;
         // sich von einem Gegner lösen kostet meist einen Gelegenheitsangriff
-        if (!(g.z && g.z.rueckzug) && nebenJetzt.some((o) => R.abstand(o, g) > 1)) s -= fern ? 0.6 : 1.1;
+        if (!(g.z && g.z.rueckzug) && nebenJetzt.some((o) => R.weite(o, g) > 1)) s -= fern ? 0.6 : 1.1;
         if (aktionFrei && pot === 0) {
           const zu = amBoden.length ? amBoden : helden.length ? helden : feinde;
-          if (zu.length) s -= 0.5 * Math.min(...zu.map((o) => R.abstand(o, g)));
+          if (zu.length) s -= 0.5 * Math.min(...zu.map((o) => R.weite(o, g)));
         }
         return { x, y, s, pot };
       };

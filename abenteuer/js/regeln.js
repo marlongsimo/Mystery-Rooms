@@ -237,9 +237,11 @@
   /** Erreichbare Felder (8 Richtungen, keine Ecken durch Hindernisse), Map key → Kosten */
   function erreichbar(st, f, max) {
     const ziel = new Map([[key(f.x, f.y), 0]]), q = [[f.x, f.y, 0]];
+    // Serans Brandmal bindet: Jeder Schritt, der vom Inquisitor wegführt, kostet doppelt
+    const richter = f.z && f.z.brandmal ? st.figuren.find((o) => o.id === f.z.brandmal && lebt(o) && !gleichesTeam(st, o, f)) : null;
     while (q.length) {
       const [x, y, d] = q.shift();
-      if (d >= max) continue;
+      if (d >= max || d > ziel.get(key(x, y))) continue;
       for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
         if (!dx && !dy) continue;
         const nx = x + dx, ny = y + dy;
@@ -248,8 +250,9 @@
         const k = key(nx, ny);
         const anderer = st.figuren.find((o) => o !== f && lebt(o) && o.x === nx && o.y === ny);
         if (anderer && anderer.seite !== f.seite) continue; // durch Gegner nicht hindurch
-        if (ziel.has(k)) continue;
-        ziel.set(k, d + 1); q.push([nx, ny, d + 1]);
+        const nd = d + (richter && weite({ x: nx, y: ny }, richter) > weite({ x, y }, richter) ? 2 : 1);
+        if (nd > max || (ziel.has(k) && ziel.get(k) <= nd)) continue;
+        ziel.set(k, nd); q.push([nx, ny, nd]);
       }
     }
     for (const k of [...ziel.keys()]) { const [x, y] = k.split(",").map(Number); if (belegt(st, x, y, f)) ziel.delete(k); }
@@ -308,6 +311,16 @@
   const bewegungVon = (f) => ((f.fid && FD.FIGUREN[f.fid] && FD.FIGUREN[f.fid].bewegung) || (f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].bewegung) || 6) + (hatDing(f, "stiefel") ? 1 : 0);
   const aktiv = (st) => fig(st, st.reihe[st.am]);
   const istFig = (f, fid) => f && f.fid === fid;
+  /* Arena: Das Team, das nicht am Zug ist, steht intern auf der Seite „gegner“ (fid liegt dann in fidA). Diese Hilfen erkennen
+     Helden auch in dieser Lage – damit Reaktionen und Schutzwirkungen der Verteidiger in der Arena genauso gelten wie in der Kampagne. */
+  const istFigA = (f, fid) => f && (f.fid === fid || f.fidA === fid);
+  const hsA = (f) => (FD.STUFEN10 && FD.STUFEN10.aktiv && f && (f.seite === "spieler" || f.fidA) ? f.stufe || 1 : 0);
+  const heldZ = (st, z) => z.seite === "spieler" || Boolean(st.arena && teamVon(st, z) && (z.fidA || z.artA === "wolf"));
+  const gleichesTeam = (st, a, b) => (st.arena && (teamVon(st, a) || teamVon(st, b)) ? teamVon(st, a) === teamVon(st, b) : a.seite === b.seite);
+  const feindHeld = (st, a, z) => (a.seite === "gegner" && z.seite === "spieler") || Boolean(st.arena && teamVon(st, a) && teamVon(st, z) && teamVon(st, a) !== teamVon(st, z));
+  const ZAUBER_NAME = { segen: "Segen", schild: "Schild des Glaubens", raserei: "Raserei", spiegel: "Spiegelbilder", schutzkreis: "Schutzkreis", finte: "Finte" };
+  const zauberAuf = (o) => Object.keys(ZAUBER_NAME).filter((k) => o.z && o.z[k] && !(k === "schutzkreis" && !(o.z[k] > 0)));
+  const brandW = (f) => (hsA(f) >= 10 ? "3W6" : FD.altStufe(f.stufe) >= 3 ? "2W6" : "1W4");
   const wolfVon = (st, f) => st.figuren.find((o) => o.art === "wolf" && o.besitzer === f.id);
   const spielerFiguren = (st) => st.figuren.filter((f) => f.seite === "spieler" && f.art !== "wolf" && f.art !== "begleiter");
   const begleiterVon = (st) => st.figuren.find((f) => f.art === "begleiter");
@@ -502,7 +515,8 @@
   function rkEff(st, z, a, spec = {}) {
     let rk = z.rk + (hatDing(z, "amulett") ? 1 : 0);
     if (z.z.schild) rk += 2;
-    if (z.seite === "spieler" && st.figuren.some((l) => istFig(l, "lichtbringer") && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2)) rk += st.figuren.some((l) => istFig(l, "lichtbringer") && hs(l) >= 10 && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2) ? 3 : 2;
+    { const kreis = heldZ(st, z) ? st.figuren.filter((l) => istFigA(l, "lichtbringer") && gleichesTeam(st, l, z) && lebt(l) && l.z.schutzkreis > st.runde && abstand(l, z) <= 2) : [];
+      if (kreis.length) rk += kreis.some((l) => hsA(l) >= 10) ? 3 : 2; }
     if (z.z.analyse === st.runde) rk -= 2;
     if (z.z.zeitriss) rk -= 2;
     if (z.z.bruch && z.z.bruch.bis > st.runde) rk -= z.z.bruch.n; // Waldläufer: Durchbrechen
@@ -559,9 +573,9 @@
     let v = 0; if (attr === "GES" && z.z.festgehalten) v = -1;
     if (((attr === "STR" || attr === "KON") && hatDing(z, "baerenguertel")) || (attr === "GES" && hatDing(z, "katzenbrosche"))) v += 1;
     let { w } = w20(st, v);
-    const bon = () => mod(z.werte[attr]) + (z.seite === "spieler" && z.klasse && FD.KLASSEN[z.klasse].rettung.includes(attr) ? ueb(z) : 0);
+    const bon = () => mod(z.werte[attr]) + (heldZ(st, z) && z.klasse && FD.KLASSEN[z.klasse] && FD.KLASSEN[z.klasse].rettung.includes(attr) ? ueb(z) : 0);
     // Klassenmerkmal Kleriker: Beistand – Verbündete direkt neben einem Kleriker +1
-    const glueck = (hatDing(z, "gluecksbringer") ? 1 : 0) + (z.seite === "spieler" && st.segen && st.segen.includes("atem") ? 1 : 0) + (z.seite === "spieler" && st.figuren.some((k) => k !== z && k.seite === "spieler" && lebt(k) && FD.KLASSEN[k.klasse] && FD.KLASSEN[k.klasse].beistand && abstand(k, z) <= 1) ? 1 : 0);
+    const glueck = (hatDing(z, "gluecksbringer") ? 1 : 0) + (z.seite === "spieler" && st.segen && st.segen.includes("atem") ? 1 : 0) + (heldZ(st, z) && st.figuren.some((k) => k !== z && heldZ(st, k) && gleichesTeam(st, k, z) && lebt(k) && FD.KLASSEN[k.klasse] && FD.KLASSEN[k.klasse].beistand && abstand(k, z) <= 1) ? 1 : 0);
     let total = w + bon() + glueck + (z.z.segen ? W(st.r, 4) : 0);
     if (total < sg) { const g = gedankenstuetze(st, z, sg - total); if (g) { w = W(st.r, 20); total = w + bon() + (z.z.segen ? W(st.r, 4) : 0); st.log.push({ t: `${g.name}: Gedankenstütze – ${z.name} würfelt noch einmal.`, art: "gut" }); } }
     return { erfolg: total >= sg, w, total };
@@ -673,8 +687,8 @@
     const vt = vorteil(st, a, z, spec);
     let v = vt.v;
     // Schutzhaltung: Angriff gegen Verbündeten neben dem Schildwächter
-    if (a.seite === "gegner" && z.seite === "spieler") {
-      const s = st.figuren.find((o) => istFig(o, "schildwaechter") && o !== z && lebt(o) && o.reaktion > 0 && abstand(o, z) <= (hs(o) >= 10 ? 2 : 1));
+    if (feindHeld(st, a, z)) {
+      const s = st.figuren.find((o) => istFigA(o, "schildwaechter") && gleichesTeam(st, o, z) && o !== z && lebt(o) && o.reaktion > 0 && abstand(o, z) <= (hsA(o) >= 10 ? 2 : 1));
       if (s) { s.reaktion--; vt.minus.push("Schutzhaltung"); v = vt.plus.length ? 0 : -1; st.log.push({ t: `${s.name} stellt sich mit dem Schild dazwischen (Schutzhaltung).` }); }
     }
     let rk = rkEff(st, z, a, spec);
@@ -697,19 +711,19 @@
       st.log.push({ t: `${z.name} weicht im letzten Moment aus: ${a.name} muss neu würfeln.` });
     }
     // Schutzglyphe (Gelehrte): knapper Treffer, der viel kosten würde
-    if (treffer && w < kritAb && a.seite === "gegner" && z.seite === "spieler") {
+    if (treffer && w < kritAb && feindHeld(st, a, z)) {
       // ab Stufe 8: +7 statt +5 und einmal je Kampf ohne Zauberplatz
-      const glFrei = (o) => hs(o) >= 8 && !(o.genutzt.glyphe_frei);
-      const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.reaktion > 0 && (platzIndex(o, 1) >= 0 || glFrei(o)) && abstand(o, z) <= 5);
-      const glPlus = g && hs(g) >= 8 ? 7 : 5;
+      const glFrei = (o) => hsA(o) >= 8 && !(o.genutzt.glyphe_frei);
+      const g = st.figuren.find((o) => istFigA(o, "gelehrter") && gleichesTeam(st, o, z) && lebt(o) && o.reaktion > 0 && (platzIndex(o, 1) >= 0 || glFrei(o)) && abstand(o, z) <= 5);
+      const glPlus = g && hsA(g) >= 8 ? 7 : 5;
       if (g && total < rk + glPlus && z.tp - mittel(spec.schaden) <= z.tpMax / 2) {
         g.reaktion--; if (glFrei(g)) g.genutzt.glyphe_frei = 1; else g.plaetze[platzIndex(g, 1)]--; rk += glPlus; treffer = false;
         st.log.push({ t: `${g.name} wirft eine Schutzglyphe vor ${z.name}: RK ${rk}.`, art: "gut" });
       }
     }
     // Klassenmerkmal Zauberer: Arkaner Schild – einmal je Kampf, wenn er einen Treffer abwendet
-    const ks = z.seite === "spieler" && FD.KLASSEN[z.klasse] && FD.KLASSEN[z.klasse].arkanSchild;
-    if (ks && treffer && w < kritAb && a.seite === "gegner" && !z.arkanSchild && total < rk + ks) {
+    const ks = heldZ(st, z) && FD.KLASSEN[z.klasse] && FD.KLASSEN[z.klasse].arkanSchild;
+    if (ks && treffer && w < kritAb && feindHeld(st, a, z) && !z.arkanSchild && total < rk + ks) {
       z.arkanSchild = true; rk += ks; treffer = false;
       st.log.push({ t: `${z.name} reißt einen arkanen Schild hoch: RK ${rk}, der Angriff prallt ab.`, art: "gut" });
     }
@@ -736,6 +750,11 @@
       if (spec.nah && istFig(z, "duellant") && a.seite === "gegner" && lebt(z) && z.reaktion > 0) {
         z.reaktion--; st.log.push({ t: `${z.name} pariert und sticht zurück.` });
         spielerAngriff(st, z, findeAktion(z, "rapier").a, a, { reaktion: true });
+      } else if (st.arena && spec.nah && istFigA(z, "duellant") && feindHeld(st, a, z) && lebt(z) && z.reaktion > 0) {
+        // Arena: Für den Gegenstoß wird kurz aus Sicht der Duellantin gerechnet, danach wieder aus Sicht des Angreifers
+        z.reaktion--; st.log.push({ t: `${z.name} pariert und sticht zurück.` });
+        const ta = teamVon(st, a), zugA = st.zug; arenaSicht(st, teamVon(st, z)); st.zug = Object.assign({}, zugA, { getroffen: [] });
+        try { spielerAngriff(st, z, findeAktion(z, "rapier").a, a, { reaktion: true }); } finally { st.zug = zugA; if (!st.ende) arenaSicht(st, ta); }
       }
     }
     nachAngriff(st, a, z);
@@ -768,7 +787,7 @@
     if (abstand(f, z) <= 1 ? hatDing(f, "schleifstein") : hatDing(f, "eisenspitzen")) extra.push("0W1+1");
     if (f.z.gift) extra.push(FD.altStufe(f.stufe) >= 2 ? "2W6" : "1W6");
     if (z.z.mal_jaeger === f.id) extra.push(FD.FIGUREN[f.fid].malWuerfel || (istFig(f, "wildnislaeufer") && hs(f) >= 5 ? "1W8" : "1W6"));
-    if (z.z.brandmal === f.id) extra.push(hs(f) >= 10 ? "3W6" : FD.altStufe(f.stufe) >= 3 ? "2W6" : "1W4");
+    if (z.z.brandmal === f.id) extra.push(brandW(f));
     if (istFig(f, "elementarist") && a.id === "glutpfeil" && FD.altStufe(f.stufe) >= 2) extra.push("1W6");
     if (istFig(f, "assassine") && FD.altStufe(f.stufe) >= 3 && z.tp < z.tpMax / 2) extra.push(hs(f) >= 10 ? "2W6" : "1W6");
     if (istFig(f, "kopfgeldjaeger") && FD.altStufe(f.stufe) >= 3 && z.z.mal_jaeger === f.id && z.tp < z.tpMax / 2 && (f.genutzt.erlegen || 0) < (hs(f) >= 10 ? 2 : 1)) { extra.push(hs(f) >= 10 ? "4W6" : "2W6"); f.genutzt.erlegen = (f.genutzt.erlegen || 0) + 1; zusatz = " Erlegen!"; }
@@ -785,6 +804,8 @@
       hinterhaltImmer: istFig(f, "trickser") && hs(f) >= 10 && /dolch/.test(a.id),
       nachTreffer: () => {
         if (giftAktiv && lebt(z)) { z.z.vergiftet = 1; delete f.z.gift; }
+        // Seran, Sühne: Jeder Waffentreffer auf sein Brandmal-Ziel heilt ihn um 1W4
+        if (istFig(f, "inquisitor") && z.z.brandmal === f.id && a.art === "angriff" && f.tp > 0 && f.tp < f.tpMax) heilen(st, f, W(st.r, 4), `${f.name}: Sühne`);
         // Brogars Kräutermesser: ab Stufe 5 vergiftet der erste Treffer je Kampf (Betäubungskraut); ab Stufe 10 heilt jeder Treffer den am schwersten Verletzten in 5 Feldern
         if (a.id === "kraeutermesser") {
           if (hs(f) >= 5 && lebt(z) && !f.genutzt.kraut) { f.genutzt.kraut = 1; z.z.vergiftet = Math.max(z.z.vergiftet || 0, 1); st.log.push({ t: `${f.name}: Betäubungskraut – ${z.name} ist vergiftet.`, art: "gut" }); }
@@ -841,7 +862,7 @@
       case "angriff": if (a.nachDolch && !st.zug.dolch) return []; return gegner.filter((o) => inReich(o, a.reichweite));
       case "rettungswurf": case "geschoss": case "albtraum": case "bannkreis": case "spott": case "analyse":
         return gegner.filter((o) => inReich(o, a.reichweite));
-      case "kontrolle": return gegner.filter((o) => inReich(o, a.reichweite) && (!a.nurUntot || GEGNER[o.art].untot) && !(a.zustand === "netz" && o.z.festgehalten));
+      case "kontrolle": return gegner.filter((o) => inReich(o, a.reichweite) && (!a.nurUntot || GEGNER[o.art].untot || (a.entzaubert && zauberAuf(o).length)) && !(a.zustand === "netz" && o.z.festgehalten) && !(a.zustand === "liegend" && o.z.liegend));
       case "flaeche": return gegner.filter((o) => inReich(o, a.reichweite));
       case "stoss": case "entwaffnen": return gegner.filter((o) => weite(f, o) <= 1);
       case "mal": {
@@ -870,7 +891,7 @@
       case "spiegelbilder": return f.z.spiegel ? [] : [f];
       case "segen": return !st.figuren.some((o) => o.z && o.z.segen === f.id && lebt(o)) && freunde.some((o) => o.tp > 0 && o.art !== "wolf" && !o.z.segen && weite(f, o) <= (a.reichweite || 5)) ? [f] : [];
       case "schutzkreis": return f.z.schutzkreis > st.runde ? [] : [f];
-      case "vertreiben": return gegner.some((o) => GEGNER[o.art].untot && weite(f, o) <= a.reichweite) ? [f] : [];
+      case "vertreiben": return gegner.some((o) => weite(f, o) <= a.reichweite) ? [f] : [];
       case "bewahren": case "massenheil": return freunde.some((o) => o.tp < o.tpMax && weite(f, o) <= a.reichweite) ? [f] : [];
       case "rauch": case "spurt": return [f];
       case "tatendrang": return !st.zug.aktion && !st.zug.tatendrang ? [f] : [];
@@ -953,10 +974,13 @@
         const sg = SG(f, a.attr), rw = rettung(st, ziel, a.rettung, sg);
         if (rw.erfolg) st.log.push({ t: `${f.name}: ${a.name} – ${ziel.name} widersteht (Rettungswurf ${rw.total} gegen SG ${sg}).`, art: "wurf" });
         else {
-          const s = roll(r, a.schaden).total + (a.plusAttr ? mod(f.werte[a.attr]) : 0);
+          const s = roll(r, a.schaden).total + (a.plusAttr ? mod(f.werte[a.attr]) : 0) + (a.brandmal && ziel.z.brandmal === f.id ? roll(r, brandW(f)).total : 0);
           st.log.push({ t: `${f.name}: ${a.name} – Rettungswurf ${rw.total} gegen SG ${sg} misslingt, ${s} Schaden.`, art: "wurf" });
           schaden(st, ziel, s);
           if (a.zustand && lebt(ziel)) setzeZustand(st, ziel, a, f);
+          // Elaras Heiliges Licht: Der Treffer heilt den am schwersten Verletzten in der Nähe (auch sie selbst)
+          if (a.heiltMit && !st.ende) { const v = st.figuren.filter((o) => o.seite === f.seite && !o.tot && o.tp > 0 && o.tp < o.tpMax && o.art !== "begleiter" && abstand(f, o) <= (a.heiltReichweite || 3)).sort((x, y) => x.tp / x.tpMax - y.tp / y.tpMax)[0];
+            if (v) heilen(st, v, roll(r, a.heiltMit).total, `${f.name}: ${a.name}`); }
         }
         break;
       }
@@ -965,7 +989,11 @@
         for (const o of betroffen) {
           const rw = rettung(st, o, a.rettung, sg);
           if (rw.erfolg) st.log.push({ t: `${f.name}: ${a.name} – ${o.name} widersteht (${rw.total} gegen SG ${sg}).`, art: "wurf" });
-          else { setzeZustand(st, o, a, f); st.log.push({ t: `${f.name}: ${a.name} – ${o.name} ist ${ZUSTAND_NAME[a.zustand === "netz" ? "festgehalten" : a.zustand]} (${rw.total} gegen SG ${sg}).`, art: "gut" }); }
+          else if (a.entzaubert && !(GEGNER[o.art] && GEGNER[o.art].untot)) {
+            // Bannen gegen Lebende: nimmt alle Verstärkungen
+            const weg = zauberAuf(o); for (const k of weg) { delete o.z[k]; if (k === "segen") delete o.z.segenBis; }
+            st.log.push({ t: `${f.name}: ${a.name} – ${o.name} verliert ${weg.map((k) => ZAUBER_NAME[k]).join(", ") || "nichts"} (${rw.total} gegen SG ${sg}).`, art: "gut" });
+          } else { setzeZustand(st, o, a, f); st.log.push({ t: `${f.name}: ${a.name} – ${o.name} ist ${ZUSTAND_NAME[a.zustand === "netz" ? "festgehalten" : a.zustand]} (${rw.total} gegen SG ${sg}).`, art: "gut" }); }
         }
         break;
       }
@@ -1038,13 +1066,14 @@
         zs2.forEach((o) => { o.z.segen = f.id; o.z.segenBis = st.runde + (a.dauer || 99); });
         st.log.push({ t: `${f.name} segnet ${zs2.map((o) => o.name).join(", ")}.`, art: "gut" }); break;
       }
-      case "schutzkreis": f.z.schutzkreis = st.runde + a.dauer; st.log.push({ t: `${f.name} zieht einen Schutzkreis: Verbündete in 2 Feldern +2 RK.`, art: "gut" }); break;
+      case "schutzkreis": f.z.schutzkreis = st.runde + a.dauer; st.log.push({ t: `${f.name} zieht einen Schutzkreis: Verbündete in 2 Feldern +${hs(f) >= 10 ? 3 : 2} RK.`, art: "gut" }); break;
       case "vertreiben": {
+        // Gleißendes Licht: Untote fliehen 2 Runden; alle anderen sind eine Runde geblendet (WEI-Rettungswurf)
         const sg = SG(f, a.attr);
-        for (const o of gegnerFiguren(st).filter((o) => lebt(o) && GEGNER[o.art].untot && abstand(f, o) <= a.reichweite)) {
-          const rw = rettung(st, o, "WEI", sg);
-          if (!rw.erfolg) o.z.veraengstigt = { rest: 2, von: f.id };
-          st.log.push({ t: `${f.name}: Untote vertreiben – ${o.name} ${rw.erfolg ? "widersteht" : "flieht"}.`, art: "wurf" });
+        for (const o of gegnerFiguren(st).filter((o) => lebt(o) && abstand(f, o) <= a.reichweite)) {
+          const untot = Boolean(GEGNER[o.art] && GEGNER[o.art].untot), rw = rettung(st, o, "WEI", sg);
+          if (!rw.erfolg) { if (untot) o.z.veraengstigt = { rest: 2, von: f.id }; else setzeZustand(st, o, { zustand: "geblendet", dauer: 1, attr: a.attr }, f); }
+          st.log.push({ t: `${f.name}: ${a.name} – ${o.name} ${rw.erfolg ? "widersteht" : untot ? "flieht" : "ist geblendet"}.`, art: "wurf" });
         }
         break;
       }
@@ -1183,7 +1212,8 @@
     // Arena: Ein verängstigter Held kann in diesem Zug nur laufen (keine Aktion, keine Bonusaktion)
     if (st.arena && f.team && f.z.veraengstigt) { st.zug.aktion = false; st.zug.bonus = false; st.log.push({ t: `${f.name} ist verängstigt und kann in diesem Zug nur laufen.`, art: "schlecht" }); }
     // Strahlende Aura gegen Untote
-    if (f.seite === "gegner") for (const l of st.figuren) if (istFig(l, "lichtbringer") && lebt(l) && abstand(l, f) <= (hs(l) >= 8 ? 2 : 1) && lebt(f)) { const n = GEGNER[f.art].untot ? 2 : 1; st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
+    for (const l of st.figuren) if (istFigA(l, "lichtbringer") && (st.arena && teamVon(st, f) ? teamVon(st, l) && teamVon(st, l) !== teamVon(st, f) : f.seite === "gegner" && l.seite === "spieler") && lebt(l) && abstand(l, f) <= (hsA(l) >= 5 ? 2 : 1) && lebt(f)) {
+      const n = (GEGNER[f.art] && GEGNER[f.art].untot ? 2 : 1) + (hsA(l) >= 8 ? 1 : 0); st.log.push({ t: `${l.name}s Aura sengt ${f.name}: ${n} Schaden.` }); schaden(st, f, n); }
     if (f.z.blutung && lebt(f)) { const b = f.z.blutung, s2 = roll(st.r, b.w).total; b.rest--; if (b.rest <= 0) delete f.z.blutung; st.log.push({ t: `${f.name} blutet: ${s2} Schaden.` }); schaden(st, f, s2); }
     if (f.z.bruch && f.z.bruch.bis <= st.runde) delete f.z.bruch;
     if (lebt(f)) brandFeld(st, f);

@@ -6,7 +6,7 @@
  * Aufruf: node abenteuer/tests/arena-server.test.js   (Webserver auf Port 8765)
  */
 const { chromium } = require("playwright"); const { ALLE } = require("./alle-helden"); const attrappe = require("./arena-server-attrappe.js"); const R = require("../js/regeln.js");
-const URL = "http://localhost:8765/abenteuer/index.html?schnell&arena=server";
+const URL = "http://localhost:8765/abenteuer/index.html?schnell&arena=server" + (process.env.HANDY ? "&handy=neu" : ""); // HANDY=1: neue Handy-Bedienung (nur für Bilder; der Ablauf unten bedient die bisherigen Knöpfe)
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 const S = attrappe(); Object.assign(S.db.nutzer, { "tok-A": "nutzer-A", "tok-B": "nutzer-B" });
 const ID = "00000000-0000-0000-0000-00000000d001";

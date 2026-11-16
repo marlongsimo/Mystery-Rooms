@@ -104,6 +104,16 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../022_rpg_ranked.sql 2>/dev/null     # z
 RANK_MIT=$(psql -q -At -d "$DB" -c "select md5(string_agg(regexp_replace(lower(pg_get_functiondef(p.oid)), '[[:space:]\\\"]+', '', 'g'), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and (p.proname like 'rpg_arena%' or p.proname like 'rpg_cosmetic%' or (p.proname like 'rpg_admin%' and p.proname not like 'rpg_admin_ranked%'))")
 if [ "$RANK_VOR" = "$RANK_MIT" ]; then echo "✓ Migration 022 verändert keine vorhandene Funktion (Arena, Ausstattung, Admin)"; else echo "✗ Migration 022 hat eine vorhandene Funktion verändert"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 022_rpg_ranked_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+# Migration 025 (Arena: Erfahrung ohne Tagesgrenzen): ersetzt rpg_arena_belohnen; der Rückbau stellt die Fassung davor genau wieder her
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../013_rpg_arena_tagesgrenze_siege.sql >/dev/null 2>&1      # 025 baut auf 013 auf (live eingespielt)
+BEL_VOR=$(psql -q -At -d "$DB" -c "select md5(regexp_replace(lower(pg_get_functiondef('public.rpg_arena_belohnen(public.rpg_arena_matches, uuid)'::regprocedure)), '[[:space:]]+', '', 'g'))")
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../025_rpg_arena_xp_ohne_grenze.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../025_rpg_arena_xp_ohne_grenze.sql 2>/dev/null     # zweimal: idempotent
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 025_rpg_arena_xp_ohne_grenze_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../025_rpg_arena_xp_ohne_grenze_rueckbau.sql
+BEL_NACH=$(psql -q -At -d "$DB" -c "select md5(regexp_replace(lower(pg_get_functiondef('public.rpg_arena_belohnen(public.rpg_arena_matches, uuid)'::regprocedure)), '[[:space:]]+', '', 'g'))")
+if [ "$BEL_VOR" = "$BEL_NACH" ]; then echo "✓ Nach dem Rückbau von 025 ist rpg_arena_belohnen wie vorher"; else echo "✗ Der Rückbau von 025 stellt rpg_arena_belohnen nicht wieder her"; exit 1; fi
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../013_rpg_arena_tagesgrenze_siege_rueckbau.sql >/dev/null 2>&1
 # Migration 024 (Rang des Gegners in der Aufstellung): braucht 022
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../024_rpg_ranked_gegenueber.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../024_rpg_ranked_gegenueber.sql 2>/dev/null     # zweimal: idempotent

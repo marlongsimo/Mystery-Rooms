@@ -103,7 +103,7 @@ const R = require('../js/regeln.js'), F = R.FD;
       if (s === 'spieler' && !geklickt) {
         const a = await p.evaluate(() => { const st = window.AB.st, R = window.AB.R, f = R.aktiv(st); const a = R.aktionenVon(f, st).find((a) => a.typ === 'aktion' && R.verfuegbar(st, a.id) && R.ziele(st, a.id).some((z) => z.seite === 'gegner')); return a && a.id; });
         if (a) {
-          await p.click(`#aktionen [data-a="${a}"]`);
+          await p.click((await p.$(`.kh-k[data-kh="${a}"]`)) ? `.kh-k[data-kh="${a}"]` : `#aktionen [data-a="${a}"]`); // am Handy: Kachel der Bedienleiste
           const hinweis = /leuchtendes Ziel/.test(await p.textContent('#hinweis'));
           const z = await p.evaluate((id) => { const t = window.AB.R.ziele(window.AB.st, id).find((z) => z.seite === 'gegner'); return { x: t.x, y: t.y }; }, a);
           const vorher = await p.evaluate(() => window.AB.st.log.length);
@@ -114,7 +114,7 @@ const R = require('../js/regeln.js'), F = R.FD;
       }
       if (s === 'spieler' && !selbst) {
         const id = await p.evaluate(() => { const st = window.AB.st, R = window.AB.R, f = R.aktiv(st); const a = R.aktionenVon(f, st).find((a) => ['raserei', 'finte', 'gift', 'verstecken', 'spurt', 'segen', 'spiegelbilder', 'rueckzug'].includes(a.art) && R.verfuegbar(st, a.id)); return a && a.id; });
-        if (id) { const v = await p.evaluate(() => window.AB.st.log.length); await p.click(`#aktionen [data-a="${id}"]`); check(await p.evaluate((v) => window.AB.st.log.length > v, v), `${vp.width}px: Selbst-Aktion „${id}“ mit einem Tipp`); selbst = true; }
+        if (id) { const v = await p.evaluate(() => window.AB.st.log.length); await p.click((await p.$(`.kh-k[data-kh="${id}"]`)) ? `.kh-k[data-kh="${id}"]` : `#aktionen [data-a="${id}"]`); check(await p.evaluate((v) => window.AB.st.log.length > v, v), `${vp.width}px: Selbst-Aktion „${id}“ mit einem Tipp`); selbst = true; }
       }
       if (s === 'spieler') { if (!(await p.evaluate(() => window.AB.st.ende))) await p.evaluate(() => window.AB.auto()); }
       else await p.waitForTimeout(20);

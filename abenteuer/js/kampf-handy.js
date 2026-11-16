@@ -1,16 +1,16 @@
 /*
- * Mythara – Kampf am Handy (Prototyp): eigene Bedienung für schmale Bildschirme, wenn auf DIESEM Gerät gespielt wird
- * (Solo-Modus und Arena). Am Spieltisch mit verbundenen Handys bleibt alles, wie es ist.
+ * Mythara – Kampf am Handy: eigene Bedienung für schmale Bildschirme, wenn auf DIESEM Gerät gespielt wird
+ * (Solo-Modus und Arena). Am Spieltisch mit verbundenen Handys und auf großen Bildschirmen bleibt alles, wie es ist.
  *
- * Was sich ändert:
- *   • Kein Scrollen mehr: oben die Karte, unten eine feste Bedienleiste.
- *   • Die Karte ist vergrößert (Felder gut fingerbreit), folgt dem Helden am Zug und lässt sich mit dem Finger verschieben.
- *     Der Knopf „Übersicht“ zeigt die ganze Karte.
- *   • Aktionen als Kacheln statt als lange Liste; ein Tipp wählt, die Erklärung steht direkt über den Kacheln.
- *   • Oben in der Leiste: wer am Zug ist, Lebenspunkte und was in diesem Zug noch geht (Bewegung, Aktion, Bonusaktion).
+ *   • Kein Scrollen: oben die Karte, unten eine feste Bedienleiste.
+ *   • Die Karte ist vergrößert (Felder gut fingerbreit), folgt der Figur am Zug, lässt sich mit einem Finger verschieben
+ *     und mit zwei Fingern vergrößern oder verkleinern. Der Knopf mit der Karte zeigt die ganze Karte.
+ *   • Aktionen als Kacheln; ein Tipp wählt, die Erklärung steht direkt über den Kacheln. Graue Kacheln sagen beim
+ *     Antippen, warum sie gerade nicht gehen.
+ *   • In der Leiste: wer am Zug ist, Lebenspunkte und was in diesem Zug noch geht (Bewegung, Aktion, Bonusaktion).
  *
  * Die Spiellogik bleibt, wo sie ist: Diese Datei zeigt nur anders an und löst die vorhandenen Knöpfe aus (#aktionen, #ende-zug).
- * Ein/Aus: …/abenteuer/?handy=neu  bzw.  ?handy=alt  (gilt, bis der Tab geschlossen wird).
+ * Abschalten für diesen Tab: …/abenteuer/?handy=alt   (wieder ein: ?handy=neu)
  * Globaler Name: window.ABKH = { an(), bauen() }
  */
 (function () {
@@ -18,15 +18,16 @@
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const GEWAEHLT = (() => { let a = ""; const p = new URLSearchParams(location.search).get("handy");
-    try { if (p === "neu" || p === "alt") sessionStorage.setItem("ab_handy", p); a = sessionStorage.getItem("ab_handy") || ""; } catch (e) { a = p || ""; } return a === "neu"; })();
+    try { if (p === "neu" || p === "alt") sessionStorage.setItem("ab_handy", p); a = sessionStorage.getItem("ab_handy") || ""; } catch (e) { a = p || ""; } return a !== "alt"; })();
   const schmal = () => window.matchMedia("(max-width: 700px)").matches;
-  const ZOOM = 1.7;
-  let zoom = ZOOM, tx = 0, ty = 0, mitteFuer = "", offen = null, zieht = null, gezogen = false, logAuf = false;
+  const ZOOM = 1.7, ZOOM_MAX = 2.6;
+  let zoom = ZOOM, tx = 0, ty = 0, mitteFuer = "", offen = null, zieht = null, gezogen = false, logAuf = false, hoehe = 0;
+  const finger = new Map(); let kniff = null; // Zwei-Finger-Zoom
 
   /** Nur wenn hier auf diesem Gerät gespielt wird: schmaler Bildschirm, Kampf sichtbar, kein Spieltisch mit Handys */
   function an() {
-    const sp = $("#spiel"), live = $("#livebar");
-    return GEWAEHLT && schmal() && sp && !sp.hidden && (!live || live.hidden) && window.AB && window.AB.st;
+    const sp = $("#spiel"), live = $("#livebar"), ende = $("#ende");
+    return GEWAEHLT && schmal() && sp && !sp.hidden && (!live || live.hidden) && (!ende || ende.hidden) && window.AB && window.AB.st;
   }
   const symbol = (a) => !a ? "✧" : a.art === "trank" ? "🧪" : a.art === "selbstheilung" || a.heilung ? "✚" : a.art === "spurt" ? "👟" : a.art === "stoss" ? "🛡" : a.art === "verstecken" ? "🌫" : a.art === "spott" ? "📣"
     : a.art === "flaeche" ? "✹" : a.art === "kontrolle" || a.art === "rettungswurf" ? "✦" : a.art === "angriff" ? ((a.reichweite || 1) > 1 ? (a.wurfwaffe ? "🗡" : "🏹") : "⚔") : "✧";
@@ -48,19 +49,28 @@
   }
   function zeiger() {
     const w = $(".karte-wrap"); if (!w || w.dataset.kh) return; w.dataset.kh = "1";
-    w.addEventListener("pointerdown", (e) => { if (!document.body.classList.contains("kh-an")) return; zieht = { x: e.clientX, y: e.clientY, tx, ty }; gezogen = false; });
-    w.addEventListener("pointermove", (e) => { if (!zieht) return; const dx = e.clientX - zieht.x, dy = e.clientY - zieht.y; if (!gezogen && Math.hypot(dx, dy) < 9) return; gezogen = true; tx = zieht.tx + dx; ty = zieht.ty + dy; setzen(false); });
-    const ende = () => { zieht = null; setTimeout(() => { gezogen = false; }, 60); };
-    w.addEventListener("pointerup", ende); w.addEventListener("pointercancel", ende);
-    // Wer die Karte verschoben hat, wollte kein Feld antippen
-    w.addEventListener("click", (e) => { if (gezogen && document.body.classList.contains("kh-an")) { e.stopPropagation(); e.preventDefault(); } }, true);
+    const aktiv = () => document.body.classList.contains("kh-an");
+    w.addEventListener("pointerdown", (e) => { if (!aktiv()) return; finger.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (finger.size === 2) { const [a, b] = [...finger.values()], r = w.getBoundingClientRect(); kniff = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, zoom, mx: (a.x + b.x) / 2 - r.left, my: (a.y + b.y) / 2 - r.top, tx, ty }; zieht = null; gezogen = true; }
+      else { zieht = { x: e.clientX, y: e.clientY, tx, ty }; gezogen = false; } });
+    w.addEventListener("pointermove", (e) => { if (!aktiv() || !finger.has(e.pointerId)) return; finger.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (kniff && finger.size >= 2) { // Zwei Finger: vergrößern um die Stelle zwischen den Fingern
+        const [a, b] = [...finger.values()], d = Math.hypot(a.x - b.x, a.y - b.y) || 1, neu = Math.max(1, Math.min(ZOOM_MAX, kniff.zoom * d / kniff.d)), f = neu / kniff.zoom;
+        tx = kniff.mx - (kniff.mx - kniff.tx) * f; ty = kniff.my - (kniff.my - kniff.ty) * f; zoom = neu; setzen(false); return; }
+      if (!zieht) return; const dx = e.clientX - zieht.x, dy = e.clientY - zieht.y; if (!gezogen && Math.hypot(dx, dy) < 9) return; gezogen = true; tx = zieht.tx + dx; ty = zieht.ty + dy; setzen(false); });
+    const ende = (e) => { finger.delete(e.pointerId); if (finger.size < 2 && kniff) { kniff = null; const k = $("#kh-zoom"); if (k) k.textContent = zoom > 1.05 ? "🗺" : "🔍"; }
+      if (finger.size === 1) { const [a] = [...finger.values()]; zieht = { x: a.x, y: a.y, tx, ty }; return; } // ein Finger bleibt liegen: weiter verschieben
+      zieht = null; setTimeout(() => { if (!finger.size) gezogen = false; }, 80); };
+    w.addEventListener("pointerup", ende); w.addEventListener("pointercancel", ende); w.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") ende(e); });
+    // Wer die Karte verschoben oder gezoomt hat, wollte kein Feld antippen
+    w.addEventListener("click", (e) => { if (gezogen && aktiv()) { e.stopPropagation(); e.preventDefault(); } }, true);
   }
 
   /* ---------- Bedienleiste ---------- */
   function bauen() {
     const ein = Boolean(an()); document.body.classList.toggle("kh-an", ein);
     let el = $("#kh");
-    if (!ein) { if (el) el.remove(); const k = $("#karte"), w = $(".karte-wrap"); if (k && k.style.transform && /scale/.test(k.style.transform)) { k.style.transform = ""; k.style.transition = ""; k.style.transformOrigin = ""; } if (w) w.style.height = ""; return; }
+    if (!ein) { finger.clear(); kniff = null; zieht = null; gezogen = false; document.body.classList.remove("kh-log"); logAuf = false; if (el) el.remove(); const k = $("#karte"), w = $(".karte-wrap"); if (k && k.style.transform && /scale/.test(k.style.transform)) { k.style.transform = ""; k.style.transition = ""; k.style.transformOrigin = ""; } if (w) w.style.height = ""; return; }
     if (!el) { el = document.createElement("div"); el.id = "kh"; el.className = "kh"; document.body.appendChild(el); }
     zeiger();
     const st = window.AB.st, R = window.AB.R, a = R.aktiv(st), F = window.ABF;
@@ -75,9 +85,11 @@
       const z = st.zug || {}, pip = (an, t, k) => `<i class="${an ? "an" : ""} ${k}">${t}</i>`;
       return `<div class="kh-kopf"><span class="kh-bild">${bild}</span><div class="kh-wer"><b>${esc(a.name)}</b><span class="kh-tp"><u style="width:${p}%"></u><em>${Math.max(0, a.tp)} / ${a.tpMax}</em></span></div>
         ${meinZug ? `<div class="kh-pips">${pip((z.bewegung || 0) + (z.schritt || 0) > 0, "👣 " + ((z.bewegung || 0) + (z.schritt || 0)), "bew")}${pip(z.aktion, "Aktion", "akt")}${pip(z.bonus, "Bonus", "bon")}</div>` : ""}
-        <div class="kh-werkzeug"><button id="kh-zoom" aria-label="${zoom > 1 ? "Ganze Karte zeigen" : "Karte vergrößern"}">${zoom > 1 ? "🗺" : "🔍"}</button><button id="kh-log" aria-label="Chronik">📜</button></div></div>`; };
+        <div class="kh-werkzeug"><button id="kh-zoom" aria-label="Ganze Karte zeigen oder vergrößern">${zoom > 1.05 ? "🗺" : "🔍"}</button><button id="kh-log" aria-label="Chronik">📜</button></div></div>`; };
     const letzte = (st.log || []).slice(-2).map((l) => `<p>${esc(l.t)}</p>`).join("");
     el.classList.toggle("wartet", !meinZug);
+    // Die Leiste behält ihre Höhe, wenn der Gegner zieht – sonst springt die Karte bei jedem Zugwechsel
+    el.style.minHeight = meinZug ? "" : hoehe ? hoehe + "px" : "";
     el.innerHTML = kopf() + (meinZug
       ? `<div class="kh-info ${info ? (info.aus ? "aus" : "an") : ""}">${info ? `<b>${esc(info.name)}</b> <small>${esc(info.klein)}</small><span>${esc(info.text)}</span>${gewaehlt ? `<em>Tippe ein leuchtendes Ziel an.</em><button id="kh-ab">Abbrechen</button>` : ""}` : `<span>${esc(hinweis)}</span>`}</div>
          <div class="kh-raster">${kacheln.map((k) => `<button class="kh-k ${k.aus ? "aus" : ""} ${k.an ? "an" : ""} ${k.tipp ? "tipp" : ""} ${k.bonus ? "bonus" : ""}" data-kh="${esc(k.id)}"><i>${k.sym}</i><b>${esc(k.name)}</b>${k.wert ? `<small>${esc(k.wert)}</small>` : ""}</button>`).join("")}</div>
@@ -90,21 +102,22 @@
     klick("#kh-ende", () => { offen = null; endeKnopf && endeKnopf.click(); });
     klick("#kh-tipp", () => { const t = $("#tipp"); if (t) t.click(); });
     klick("#kh-ab", () => { const o = gewaehlt && orig.find((x) => x.dataset.a === gewaehlt.id); if (o) o.click(); });
-    klick("#kh-zoom", () => { zoom = zoom > 1 ? 1 : ZOOM; mitteFuer = ""; bauen(); });
+    klick("#kh-zoom", () => { zoom = zoom > 1.05 ? 1 : ZOOM; mitteFuer = ""; bauen(); });
     klick("#kh-log", () => { logAuf = !logAuf; document.body.classList.toggle("kh-log", logAuf); });
     // Karte: füllt den Platz zwischen Zugreihenfolge und Leiste; folgt dem Helden am Zug
+    if (meinZug) hoehe = el.offsetHeight;
     document.body.style.setProperty("--kh-h", el.offsetHeight + "px");
     const w = $(".karte-wrap"); if (w) { const oben = w.getBoundingClientRect().top, frei = window.innerHeight - oben - el.offsetHeight - 6; w.style.height = Math.max(180, Math.round(frei)) + "px"; }
-    const wo = a.id + ":" + a.x + "," + a.y + ":" + zoom;
+    const wo = a.id + ":" + a.x + "," + a.y;
     if (wo !== mitteFuer) { mitteFuer = wo; mitteAuf(a); } else setzen(false);
   }
 
   if (!GEWAEHLT) { window.ABKH = { an: () => false, bauen: () => {} }; return; }
   // Neu aufbauen, sobald das Spiel seine Bedienung neu gezeichnet hat
-  let geplant = false; const spaeter = () => { if (geplant) return; geplant = true; requestAnimationFrame(() => { geplant = false; try { bauen(); } catch (e) { /* Prototyp: im Zweifel bleibt die bisherige Ansicht */ document.body.classList.remove("kh-an"); } }); };
+  let geplant = false; const spaeter = () => { if (geplant) return; geplant = true; requestAnimationFrame(() => { geplant = false; try { bauen(); } catch (e) { /* im Zweifel bleibt die bisherige Ansicht benutzbar */ document.body.classList.remove("kh-an"); const el = $("#kh"); if (el) el.remove(); } }); };
   function start() {
     const mo = new MutationObserver(spaeter);
-    for (const s of ["#aktionen", "#aktiv", "#hinweis", "#spiel", "#livebar"]) { const e = $(s); if (e) mo.observe(e, { childList: true, attributes: true, attributeFilter: ["hidden"] }); }
+    for (const s of ["#aktionen", "#aktiv", "#hinweis", "#spiel", "#livebar", "#ende"]) { const e = $(s); if (e) mo.observe(e, { childList: true, attributes: true, attributeFilter: ["hidden"] }); }
     window.addEventListener("resize", () => { mitteFuer = ""; spaeter(); });
     document.addEventListener("click", (e) => { if (logAuf && !e.target.closest("#kh-log") && !e.target.closest("#log")) { logAuf = false; document.body.classList.remove("kh-log"); } });
     spaeter();

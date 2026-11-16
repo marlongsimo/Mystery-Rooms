@@ -148,7 +148,7 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   check(bewegtIch && fs.x === ziel.x && fs.y === ziel.y && k.v > vVor, "Zug per Tipp auf ein Feld: Der Server rechnet ihn, das eigene Gerät zeigt ihn sofort");
   check(bewegtAndere, "Das andere Gerät sieht den Zug nach kurzer Zeit");
   // Zug beenden – der nächste Held ist dran, auf beiden Geräten derselbe
-  await d.ich.p.click("#ende-zug");
+  await d.ich.p.click((await d.ich.p.$("#kh-ende")) ? "#kh-ende" : "#ende-zug"); // am Handy: Knopf der Bedienleiste
   const weiter = await warte(d.ich.p, (id) => window.AB.R.aktiv(window.AB.st).id !== id, ziel.id, 8000);
   const neu = dran(), gleich = await warte(A.p, (id) => window.AB.R.aktiv(window.AB.st).id === id, neu.a.id, 8000) && await warte(B.p, (id) => window.AB.R.aktiv(window.AB.st).id === id, neu.a.id, 8000);
   check(weiter && gleich, "Zug beenden: Auf beiden Geräten ist derselbe nächste Held an der Reihe");
@@ -160,7 +160,7 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   while (S.db.kaempfe[ID].match.status === "laeuft" && n++ < 40) {
     d = dran(); if (d.st.ende) break;
     const meins = await warte(d.ich.p, (id) => { const st = window.AB.st, a = window.AB.R.aktiv(st); return a.id === id && !document.querySelector("#ende-zug").disabled; }, d.a.id, 10000);
-    if (!meins) break; const v = k.v; await d.ich.p.click("#ende-zug");
+    if (!meins) break; const v = k.v; await d.ich.p.click((await d.ich.p.$("#kh-ende")) ? "#kh-ende" : "#ende-zug"); // am Handy: Knopf der Bedienleiste
     for (let i = 0; i < 40 && k.v === v && k.match.status === "laeuft"; i++) await d.ich.p.waitForTimeout(150);
   }
   check(k.match.status === "beendet" && S.db.enden.length === 1 && k.v > vSprung, `Der Kampf läuft bis zum Ende, der Server trägt das Ergebnis ein (Sieger Team ${S.db.enden[0] && S.db.enden[0].sieger})`);

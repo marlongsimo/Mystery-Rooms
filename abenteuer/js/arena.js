@@ -467,6 +467,9 @@
       // Zugzeit abgelaufen (auch die des Gegners): Der Server beendet den Zug, sobald ihn eine Seite darauf hinweist
       const st = window.AB.st, bis = st && !st.ende && st.arena && st.arena.zugBis;
       if (laeuft && bis && jetzt > bis + 1500 && !schlange.length && Date.now() - letzteZeit > 4000) { letzteZeit = Date.now(); ruf({ aktion: "zeit" }).then((r) => nimm(r.schritte), () => {}); }
+      // Der Server nennt, wann der nächste Schritt fällig ist (arena.takt): dann nachfragen
+      const tk = st && !st.ende && st.arena && st.arena.takt;
+      if (laeuft && tk && jetzt >= tk && !schlange.length && !spielt && !sendet && Date.now() - letzteZeit > 600) { letzteZeit = Date.now(); ruf({ aktion: "zeit" }).then((r) => nimm(r.schritte), () => {}); }
       // Aufgabe oder Abbruch durch den Gegner: Das Ende kommt dann nicht als Schritt, sondern nur als Status
       if ((s.status === "beendet" || s.status === "abgebrochen") && !schlange.length && !spielt && aktiv() && !(window.AB.st && window.AB.st.ende)) {
         Z.kampf.gemeldet = true; stoppUhr(); const g = await rpc("rpg_arena_get", { p_match_id: m.id }); ergebnisZeigen(g, null); }

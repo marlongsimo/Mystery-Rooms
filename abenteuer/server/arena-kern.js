@@ -10,13 +10,18 @@
  *   • Monster ziehen sofort nach; jeder Schritt wird einzeln festgehalten, damit die Geräte ihn einzeln zeigen können.
  *   • Zugzeit: eine Minute je Held. Ist sie abgelaufen, darf jede Seite das Zugende auslösen. Lässt ein Team dreimal
  *     hintereinander die Zeit verstreichen, hat es aufgegeben.
+ *   • Rechner-Gegner (match.bot): Team 2 wird vom Server gespielt (server/arena-bot.js), Schritt für Schritt und mit Bedenkzeit.
+ *     Die Sicht der Spieler nennt nur den Zeitpunkt, zu dem der nächste Schritt fällig ist (arena.takt).
  */
 (function (root) {
   "use strict";
   const LOS = ["arena", "koenig", "horde", "duell"]; // wie js/arena.js und rpg_arena_modus (Migration 010)
   const ZUGZEIT = 60000, ZEITAUS_MAX = 3, LOG_MAX = 140, MONSTER_MAX = 60;
 
-  function kern(R, KARTEN) {
+  function kern(R, KARTEN, botFabrik) {
+    const fabrik = botFabrik || root.ABARENABOT, BOT = fabrik ? fabrik(R) : null;
+    // Bedenkzeit: vor dem ersten Schritt eines Zugs länger (manchmal deutlich), zwischen den Schritten kurz
+    const denkZeit = () => 1800 + Math.random() * 3600 + (Math.random() < 0.15 ? 2500 + Math.random() * 4000 : 0), zwischenZeit = () => 700 + Math.random() * 1700;
     const modusVon = (seed) => LOS[Math.abs(Math.trunc(Number(seed) || 0)) % LOS.length];
     const karteVon = (k) => (k !== "garten" && KARTEN && KARTEN[String(k || "").toUpperCase()]) || R.KARTE_GARTEN;
     const idx = (n) => Math.max(0, Math.min(2, Math.trunc(Number(n) || 0)));
@@ -31,6 +36,10 @@
         teams: [match.host_team, match.guest_team].map((tm) => tm.map((h) => ({ fid: h.held, stufe: h.stufe }))), namen: [match.host_name, match.guest_name],
         karte: karteVon(match.karte), begegnung: beg, bedrohung: Math.max(0, (match.kampfstufe || 1) - [1, 3, 6][alt - 1]) });
       st.arena.zeitaus = { 1: 0, 2: 0 };
+      if (match.bot && BOT) {
+        st.arena.bot = { seite: 2, bis: 0, lauf: 0, n: 0 };
+        if (st.arena.koenig) { const h = st.figuren.filter((f) => f.team === 2)[BOT.anfuehrer(st, 2)]; if (h) st.arena.koenig[2] = h.id; }
+      }
       return st;
     }
     /** Zugzeit stellen, sobald ein anderer Held an die Reihe kommt */
@@ -38,12 +47,14 @@
       const a = R.aktiv(st), held = !st.ende && a && !istMonster(st, a) && a.tp > 0, k = held ? a.id + ":" + st.runde : null;
       if (st.arena.zugWer === k) return;
       st.arena.zugWer = k; st.arena.zugBis = k ? jetzt + ZUGZEIT : null;
+      const b = st.arena.bot; if (b && held && R.teamVon(st, a) === b.seite) { b.bis = jetzt + denkZeit(); b.lauf = 0; b.n = 0; }
     }
     /** Was eine Seite sehen darf */
     function sicht(st, seite, jetzt) {
       const j = R.speichern(st);
       delete j.rs; j.log = (j.log || []).slice(-LOG_MAX);
       j.arena = Object.assign({}, j.arena, { jetzt });
+      if (j.arena.bot) { const a = R.aktiv(st); j.arena.takt = !st.ende && a && a.tp > 0 && R.teamVon(st, a) === j.arena.bot.seite ? j.arena.bot.bis : null; delete j.arena.bot; }
       if (j.arena.koenig && !st.ende) j.arena.koenig = { 1: seite === 1 ? j.arena.koenig[1] : null, 2: seite === 2 ? j.arena.koenig[2] : null };
       return j;
     }
@@ -76,7 +87,21 @@
       return { schritte };
     }
     /** Zugzeit abgelaufen? Dann endet der Zug des Helden. Zurück: { schritte } (leer, wenn noch Zeit ist) */
+    /** Rechner-Gegner: ein Schritt (bewegen, Aktion oder Zugende) */
+    function botSchritt(st, jetzt) {
+      const b = st.arena.bot; b.n = (b.n || 0) + 1;
+      let w = { typ: "ende" };
+      if (b.n <= 12) { try { w = BOT.entscheide(st, b); } catch (e) { w = { typ: "ende" }; } }
+      if (w.typ === "bewegen") b.lauf = (b.lauf || 0) + 1;
+      b.letzt = w; // nur im Stand des Servers (für Tests und Fehlersuche)
+      b.bis = jetzt + zwischenZeit(); // gilt, solange derselbe Held weiterzieht; beim nächsten Helden stellt uhr() neu
+      let r = zug(st, b.seite, w, jetzt);
+      if (r.fehler && w.typ !== "ende") r = zug(st, b.seite, { typ: "ende" }, jetzt);
+      return r.fehler ? { schritte: [] } : r;
+    }
     function zeit(st, jetzt) {
+      if (st && !st.ende && st.arena.bot && BOT) { const a = R.aktiv(st);
+        if (a && R.teamVon(st, a) === st.arena.bot.seite) return jetzt < st.arena.bot.bis ? { schritte: [] } : botSchritt(st, jetzt); }
       if (!st || st.ende || !st.arena.zugBis || jetzt < st.arena.zugBis) return { schritte: [] };
       const a = R.aktiv(st), tm = a ? R.teamVon(st, a) : 0; if (!tm) return { schritte: [] };
       st.arena.zeitaus = st.arena.zeitaus || { 1: 0, 2: 0 }; st.arena.zeitaus[tm]++;
@@ -97,7 +122,7 @@
       const a = st.arena;
       return { sieger: a.sieger, grund: a.aufgabe ? "aufgabe" : /am Boden|ist gefallen/.test(a.grund || "") ? "team" : "punkte", punkte: a.punkte, runden: st.runde };
     }
-    return { modusVon, neu, start, zug, zeit, sicht, ergebnis, laden: R.laden, speichern: R.speichern, ZUGZEIT };
+    return { modusVon, neu, start, zug, zeit, sicht, ergebnis, laden: R.laden, speichern: R.speichern, ZUGZEIT, bot: BOT };
   }
 
   if (typeof module !== "undefined" && module.exports) module.exports = kern;

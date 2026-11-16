@@ -50,3 +50,15 @@ als der Server zulässt. Der Stand der Regeln steht in der vierten Zeile von `in
 
 Tests: `node abenteuer/tests/arena-kern.test.js`, `node abenteuer/tests/arena-funktion.test.js`,
 `node abenteuer/tests/arena-server.test.js` (dieser braucht den Webserver auf Port 8765).
+
+## Rechner-Gegner (Migration 019)
+
+Findet die Suche etwa 30 Sekunden lang keinen Menschen, stellt die Datenbank einen Gegner ohne Konto (zufälliger Name, drei
+Helden auf den Stufen des Spielers). Seine Züge rechnet diese Function (`server/arena-bot.js`): Schritt für Schritt, mit
+Bedenkzeit, ohne Kenntnis der kommenden Würfel und des verdeckten Anführers. Das Spiel fragt nach, sobald ein Schritt fällig
+ist (`arena.takt` in der Sicht).
+
+**Reihenfolge beim Einspielen: erst diese Function neu ausrollen, dann Migration 019 ausführen.** Mit der Migration, aber einer
+alten Function, würde der Gegner nie ziehen und nach drei verstrichenen Zugzeiten als „aufgegeben“ gewertet.
+
+Tests: `node abenteuer/tests/arena-bot.test.js` (Logik, viele Kämpfe), `node abenteuer/tests/arena-bot-browser.test.js` (im Browser).

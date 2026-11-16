@@ -2817,6 +2817,165 @@
 /* ===== Arena-Karten (aus daten/grauwacht.js) ===== */
 const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/welt/glockenturm.webp","hindernisse":[["X",0,0],["X",0,1],["X",0,8],["X",1,0],["X",1,1],["X",1,8],["X",2,0],["X",2,1],["X",2,8],["X",3,0],["X",3,1],["X",3,8],["X",4,0],["X",4,1],["X",4,8],["X",5,0],["X",5,1],["X",5,8],["X",6,0],["X",6,1],["X",6,8],["X",7,0],["X",7,1],["X",7,8],["X",8,0],["X",8,1],["X",8,8],["X",9,0],["X",9,1],["X",9,8],["X",10,0],["X",10,1],["X",10,8],["X",11,0],["X",11,1],["X",11,8],["X",0,2],["X",10,2],["X",11,2],["X",0,3],["X",10,3],["X",11,3],["X",0,4],["X",10,4],["X",11,4],["X",0,5],["X",10,5],["X",11,5],["X",0,6],["X",10,6],["X",11,6],["X",0,7],["X",10,7],["X",11,7],["X",1,2],["X",1,3],["X",2,2],["X",2,3],["X",3,2],["X",4,2],["X",8,2],["X",9,2],["X",9,3],["X",9,4],["X",9,7],["X",4,7],["X",7,7],["P",2,5],["P",3,5],["P",2,6],["P",3,6]],"start":{"spieler":[[5,7],[6,7],[1,6],[1,7],[2,7],[3,7]],"wolf":[[4,6],[5,6],[1,5],[3,4]],"gegner":[[8,3],[8,4],[8,5],[8,6],[9,5],[9,6],[7,2],[6,2],[5,2],[7,3],[3,3],[8,7]]}},"GRUFT":{"name":"Die Gruft der Brüder","b":12,"h":9,"bild":"img/welt/gruft.webp","hindernisse":[["X",0,0],["X",0,1],["X",1,0],["X",1,1],["X",2,0],["X",2,1],["X",3,0],["X",3,1],["X",4,0],["X",4,1],["X",5,0],["X",5,1],["X",6,0],["X",6,1],["X",7,0],["X",7,1],["X",8,0],["X",8,1],["X",9,0],["X",9,1],["X",10,0],["X",10,1],["X",11,0],["X",11,1],["X",0,2],["X",11,2],["X",0,3],["X",11,3],["X",0,4],["X",11,4],["X",0,5],["X",11,5],["X",0,6],["X",11,6],["X",0,7],["X",11,7],["X",0,8],["X",11,8],["X",1,2],["X",2,2],["X",3,2],["X",4,2],["X",7,2],["X",8,2],["X",9,2],["X",10,2],["X",1,3],["X",1,4],["X",1,5],["X",1,6],["X",1,7],["X",2,3],["X",10,3],["X",10,4],["X",10,5],["X",10,7],["X",9,3],["X",3,3],["X",4,3],["X",7,3],["X",8,3],["X",2,4],["X",3,4],["X",4,4],["X",8,4],["X",9,4],["X",2,6],["X",3,6],["X",8,6],["X",9,6],["X",10,6]],"start":{"spieler":[[5,8],[6,8],[4,8],[7,8],[3,8],[8,8]],"wolf":[[2,8],[9,8],[4,7],[7,7]],"gegner":[[5,3],[6,3],[5,4],[6,4],[2,5],[9,5],[4,5],[7,5],[5,2],[6,2],[3,5],[8,5]]}},"PILZE":{"name":"Die Pilzkammer","b":12,"h":9,"bild":"img/welt/pilzkammer.webp","hindernisse":[["X",0,0],["X",0,8],["X",1,0],["X",1,8],["X",2,0],["X",2,8],["X",3,0],["X",3,8],["X",4,0],["X",4,8],["X",5,0],["X",5,8],["X",6,0],["X",6,8],["X",7,0],["X",7,8],["X",8,0],["X",8,8],["X",9,0],["X",9,8],["X",10,0],["X",10,8],["X",11,0],["X",11,8],["X",0,1],["X",11,1],["X",0,2],["X",11,2],["X",0,3],["X",11,3],["X",0,4],["X",11,4],["X",0,5],["X",11,5],["X",0,6],["X",11,6],["X",0,7],["X",11,7],["X",1,1],["X",1,2],["X",1,3],["X",4,1],["X",5,1],["X",1,4],["X",1,7],["X",6,1],["X",7,1],["X",5,2],["X",6,2],["X",4,3],["X",5,3],["X",7,4],["X",4,5],["X",5,5],["X",6,5],["X",4,6],["X",5,6],["X",9,2],["X",10,2],["X",10,3],["X",10,4],["X",9,6],["X",10,6],["X",9,7],["X",10,7]],"start":{"spieler":[[2,5],[3,5],[2,6],[3,4],[2,3],[3,7]],"wolf":[[1,5],[1,6],[3,3],[2,4]],"gegner":[[8,3],[7,3],[8,4],[9,4],[8,2],[7,2],[9,5],[8,5],[9,1],[6,3],[7,6],[8,6]]}},"SCHACHT":{"name":"Der Schacht","b":12,"h":9,"bild":"img/welt/schacht.webp","hindernisse":[["X",0,0],["X",0,8],["X",1,0],["X",1,8],["X",2,0],["X",2,8],["X",3,0],["X",3,8],["X",4,0],["X",4,8],["X",5,0],["X",5,8],["X",6,0],["X",6,8],["X",7,0],["X",7,8],["X",8,0],["X",8,8],["X",9,0],["X",9,8],["X",10,0],["X",10,8],["X",11,0],["X",11,8],["X",0,1],["X",11,1],["X",0,2],["X",11,2],["X",0,3],["X",11,3],["X",0,4],["X",11,4],["X",0,5],["X",11,5],["X",0,6],["X",11,6],["X",0,7],["X",11,7],["P",4,2],["P",5,2],["P",6,2],["P",7,2],["P",4,3],["P",5,3],["P",6,3],["P",7,3],["P",4,4],["P",5,4],["P",6,4],["P",7,4],["X",1,1],["X",1,2],["X",9,1],["X",10,1],["X",10,2],["X",1,4],["X",1,5],["X",1,6],["X",1,7],["X",10,5],["X",10,6],["X",10,7]],"start":{"spieler":[[2,3],[2,4],[2,5],[2,6],[3,4],[3,5]],"wolf":[[3,3],[3,6],[2,2],[2,7]],"gegner":[[9,4],[8,3],[8,5],[10,3],[10,4],[9,2],[9,6],[8,2],[8,6],[9,3],[9,5],[8,7]]}},"HALLE":{"name":"Die Halle der Asche","b":12,"h":9,"bild":"img/welt/halle.webp","hindernisse":[["X",0,0],["X",0,8],["X",0,1],["X",1,0],["X",1,8],["X",1,1],["X",2,0],["X",2,8],["X",2,1],["X",3,0],["X",3,8],["X",3,1],["X",4,0],["X",4,8],["X",4,1],["X",5,0],["X",5,8],["X",5,1],["X",6,0],["X",6,8],["X",6,1],["X",7,0],["X",7,8],["X",7,1],["X",8,0],["X",8,8],["X",8,1],["X",9,0],["X",9,8],["X",9,1],["X",10,0],["X",10,8],["X",10,1],["X",11,0],["X",11,8],["X",11,1],["X",0,2],["X",11,2],["X",0,3],["X",11,3],["X",0,4],["X",11,4],["X",0,5],["X",11,5],["X",0,6],["X",11,6],["X",0,7],["X",11,7],["X",1,2],["X",1,3],["X",1,4],["X",1,5],["X",1,6],["X",1,7],["X",2,2],["X",2,3],["X",2,4],["X",3,2],["X",8,2],["X",9,2],["X",9,3],["X",9,4],["X",10,2],["X",10,3],["X",10,4],["X",10,5],["X",10,6],["X",10,7]],"start":{"spieler":[[5,7],[6,7],[4,7],[7,7],[3,7],[8,7]],"wolf":[[2,7],[9,7],[3,6],[8,6]],"gegner":[[6,2],[4,3],[7,3],[5,2],[7,2],[4,2],[3,3],[8,3]]}},"SIEGEL":{"name":"Die Siegelkammer","b":12,"h":9,"bild":"img/welt/siegelkammer.webp","hindernisse":[["X",0,0],["X",0,8],["X",0,1],["X",1,0],["X",1,8],["X",1,1],["X",2,0],["X",2,8],["X",2,1],["X",3,0],["X",3,8],["X",3,1],["X",4,0],["X",4,8],["X",4,1],["X",5,0],["X",5,8],["X",5,1],["X",6,0],["X",6,8],["X",6,1],["X",7,0],["X",7,8],["X",7,1],["X",8,0],["X",8,8],["X",8,1],["X",9,0],["X",9,8],["X",9,1],["X",10,0],["X",10,8],["X",10,1],["X",11,0],["X",11,8],["X",11,1],["X",0,2],["X",11,2],["X",0,3],["X",11,3],["X",0,4],["X",11,4],["X",0,5],["X",11,5],["X",0,6],["X",11,6],["X",0,7],["X",11,7],["X",1,2],["X",1,3],["X",2,2],["X",9,2],["X",10,2],["X",10,3],["X",1,6],["X",1,7],["X",2,7],["X",10,7],["X",5,3],["X",6,3],["Z",3,2],["Z",8,2],["Z",3,6],["Z",8,6]],"start":{"spieler":[[5,7],[6,7],[4,7],[7,7],[3,7],[8,7]],"wolf":[[4,6],[7,6],[2,6],[9,6]],"gegner":[[6,4],[4,3],[7,3],[4,5],[7,5],[5,2],[6,2],[3,4],[8,4]]}}};
 
+/* ===== server/arena-bot.js ===== */
+/*
+ * Mythara – Arena, Serverkampf: der Rechner-Gegner. Entscheidet für den Helden am Zug genau EINEN Schritt
+ * (bewegen, Aktion mit Ziel oder Zugende) – der Kern (arena-kern.js) führt ihn wie den Zug eines Spielers aus.
+ *
+ * Wie er entscheidet:
+ *   • Jede erlaubte Aktion mit jedem erlaubten Ziel wird mehrmals mit frischen Würfeln durchgespielt (auf Kopien des Stands);
+ *     gewählt wird, was die Lage im Schnitt am meisten verbessert. So nutzt er alle Fähigkeiten, die ein Held hat –
+ *     Angriffe, Zauber, Kontrolle, Stärkungen, Heilung, Tränke, Aufrichten –, ohne dass sie hier einzeln aufgezählt sind.
+ *   • Er kennt die kommenden Würfel NICHT (die Kopien würfeln neu) und den verdeckten Anführer des Gegners auch nicht.
+ *   • Bewegung: erst dorthin, wo die beste Aktion möglich ist (Fernkämpfer auf Abstand, Nahkämpfer heran, Heiler zu Verletzten),
+ *     nach der Aktion gehen Fernkämpfer und Angeschlagene aus der Reichweite.
+ * Benutzt nur die öffentliche Schnittstelle der Regeln (js/regeln.js).
+ */
+(function (root) {
+  "use strict";
+  const SCHLECHT = new Set(["festgehalten", "liegend", "verbannt", "spott", "bruch", "mal_jaeger", "verlangsamt", "veraengstigt", "brandmal", "blutung", "analyse", "zeitriss", "vergiftet", "betaeubt", "stich", "geblendet", "entwaffnet"]);
+  const GUT = new Set(["segen", "versteckt", "spiegel", "rueckzug", "schutzkreis", "raserei", "finte", "schild", "gift"]);
+  const PROBEN = 5, SCHWELLE = 0.8;
+
+  function bot(R) {
+    const zahl = (c) => (c === "schritt" ? 0 : c);
+    /** Stand als Vorlage für Proben: ohne Chronik (spart Zeit), ohne den verdeckten Anführer des Gegners */
+    function vorlage(st, tm) {
+      const j = R.speichern(st); j.log = [];
+      if (j.arena && j.arena.koenig) { j.arena = Object.assign({}, j.arena, { koenig: Object.assign({}, j.arena.koenig) }); j.arena.koenig[3 - tm] = null; }
+      return j;
+    }
+    const probe = (j) => { const c = R.laden(j); c.rs = Math.floor(Math.random() * 4294967296) >>> 0; return c; };
+    /** Wie gut steht Team tm da? */
+    function wert(st, tm) {
+      const a = st.arena;
+      if (st.ende) return a.sieger === tm ? 1000 : -1000;
+      let w = ((a.punkte[tm] || 0) - (a.punkte[3 - tm] || 0)) * 4;
+      for (const f of st.figuren) {
+        const t = R.teamVon(st, f); if (!t) continue;
+        const held = Boolean(f.team); let v = 0;
+        if (f.tot) v = 0;
+        else if (f.tp <= 0) v = held ? 4 : 0;
+        else { v = (held ? 12 : 4) + (held ? 22 : 8) * Math.min(1, f.tp / f.tpMax); for (const k in f.z || {}) if (f.z[k]) v += SCHLECHT.has(k) ? -3 : GUT.has(k) ? 2 : 0; }
+        if (a.koenig && t === tm && a.koenig[tm] === f.id) v *= 2.2; // der eigene Anführer zählt doppelt
+        w += t === tm ? v : -v;
+      }
+      return w;
+    }
+    /** Alle Aktionen mit Ziel, die jetzt gehen */
+    function wahlen(st, f) {
+      const aus = [];
+      for (const a of R.aktionenVon(f, st)) {
+        if (!R.verfuegbar(st, a.id)) continue;
+        for (const z of R.ziele(st, a.id)) {
+          // Heilen lohnt erst, wenn wirklich etwas fehlt
+          if ((a.art === "heilung" || a.art === "selbstheilung" || a.art === "trank") && z.tp > z.tpMax * 0.65) continue;
+          aus.push({ a, z });
+        }
+      }
+      return aus;
+    }
+    /** Beste Aktion nach Proben: { aktion, ziel, gewinn, typ } oder null */
+    function besteAktion(j, st, f, tm, basis) {
+      let best = null;
+      for (const { a, z } of wahlen(st, f)) {
+        if (a.art === "spurt") continue; // Spurt bringt allein nichts; siehe unten
+        let sum = 0, n = 0;
+        for (let i = 0; i < PROBEN; i++) { const c = probe(j); const r = R.handeln(c, a.id, z.id); if (r && r.fehler) break; sum += wert(c, tm) - basis; n++; }
+        if (!n) continue;
+        const g = sum / n + Math.random() * 0.6;
+        if (!best || g > best.gewinn) best = { aktion: a.id, ziel: z.id, gewinn: g, typ: a.typ || "aktion", art: a.art };
+      }
+      return best;
+    }
+    /** Was ließe sich von einem Feld aus mit der Aktion anfangen? (ohne zu würfeln) */
+    function potenzial(c, f) {
+      let best = 0;
+      for (const a of R.aktionenVon(f, c)) {
+        if ((a.typ || "aktion") !== "aktion" || a.art === "spurt" || !R.verfuegbar(c, a.id)) continue;
+        for (const z of R.ziele(c, a.id)) {
+          let p;
+          if (z.seite !== f.seite) { const ch = R.chance(c, a.id, z.id).p; p = (ch == null ? 0.6 : ch) * (1 + (1 - Math.max(0, z.tp) / z.tpMax) * 0.8) * (R.teamVon(c, z) ? 1 : 0.45); }
+          else if (a.art === "aufrichten") p = 2.2;
+          else if (a.art === "heilung") p = z === f ? 0 : z.tp < z.tpMax * 0.55 ? 1.6 : 0;
+          else p = 0;
+          if (p > best) best = p;
+        }
+      }
+      return best;
+    }
+    /** Felder bewerten. Zurück: { hier, best: { x, y, s, pot } } */
+    function felder(j, st, f, tm, aktionFrei) {
+      const c = probe(j), g = R.aktiv(c), x0 = g.x, y0 = g.y;
+      const feinde = c.figuren.filter((o) => o.seite !== g.seite && R.lebt(o)), helden = feinde.filter((o) => R.teamVon(c, o));
+      const reich = Math.max(1, ...R.aktionenVon(g, c).filter((a) => a.art === "angriff" || a.art === "rettungswurf" || a.art === "geschoss" || a.art === "flaeche").map((a) => a.reichweite || 1));
+      const fern = reich >= 4, schwach = g.tp < g.tpMax * 0.4;
+      const amBoden = c.figuren.filter((o) => o.seite === g.seite && o !== g && o.tp <= 0 && !o.tot && o.team);
+      const nebenJetzt = feinde.filter((o) => R.abstand(o, { x: x0, y: y0 }) <= 1);
+      const gefahrGewicht = (fern ? 1.2 : 0.15) * (schwach ? 1.8 : 1);
+      const note = (x, y, kosten) => {
+        g.x = x; g.y = y;
+        const pot = aktionFrei ? potenzial(c, g) : 0;
+        let gefahr = 0; for (const o of feinde) { const d = R.abstand(o, g); gefahr += d <= 1 ? 1 : d <= 3 ? 0.25 : 0; }
+        let s = pot * 3 - gefahr * gefahrGewicht - kosten * 0.03;
+        // sich von einem Gegner lösen kostet meist einen Gelegenheitsangriff
+        if (!(g.z && g.z.rueckzug) && nebenJetzt.some((o) => R.abstand(o, g) > 1)) s -= fern ? 0.6 : 1.1;
+        if (aktionFrei && pot === 0) {
+          const zu = amBoden.length ? amBoden : helden.length ? helden : feinde;
+          if (zu.length) s -= 0.5 * Math.min(...zu.map((o) => R.abstand(o, g)));
+        }
+        return { x, y, s, pot };
+      };
+      const hier = note(x0, y0, 0); let best = null;
+      for (const [k, kosten] of R.bewegungsfelder(st, f)) {
+        const [x, y] = k.split(",").map(Number); if (x === x0 && y === y0) continue;
+        const n = note(x, y, zahl(kosten)); n.s += Math.random() * 0.15;
+        if (!best || n.s > best.s) best = n;
+      }
+      g.x = x0; g.y = y0;
+      return { hier, best };
+    }
+
+    /**
+     * Ein Schritt für den Helden am Zug. merk: { lauf } zählt die Bewegungen dieses Zugs (der Kern setzt es je Zug zurück).
+     * Zurück: { typ: "bewegen", x, y } | { typ: "aktion", aktion, ziel } | { typ: "ende" }
+     */
+    function entscheide(st, merk) {
+      const f = R.aktiv(st), tm = f ? R.teamVon(st, f) : 0;
+      if (!f || !tm || st.ende || f.tp <= 0 || f.seite !== "spieler") return { typ: "ende" };
+      merk = merk || {};
+      const j = vorlage(st, tm), basis = wert(probe(j), tm);
+      const aktionFrei = Boolean(st.zug.aktion), kannLaufen = (st.zug.bewegung > 0 || st.zug.schritt > 0) && (merk.lauf || 0) < 3;
+      const akt = besteAktion(j, st, f, tm, basis), lohnt = akt && akt.gewinn > SCHWELLE;
+      const fd = kannLaufen ? felder(j, st, f, tm, aktionFrei) : null;
+      const geh = (b) => ({ typ: "bewegen", x: b.x, y: b.y }), tu = (a) => ({ typ: "aktion", aktion: a.aktion, ziel: a.ziel });
+      if (aktionFrei) {
+        // erst in Stellung gehen, wenn von dort deutlich mehr möglich ist
+        if (fd && fd.best && fd.best.pot > fd.hier.pot * 1.15 + 0.2 && fd.best.s > fd.hier.s) return geh(fd.best);
+        if (lohnt) return tu(akt);
+        if (fd && fd.best && fd.best.s > fd.hier.s + 0.3) return geh(fd.best);
+        // niemand erreichbar: spurten und weiterlaufen
+        if (!(st.zug.bewegung > 0) && (merk.lauf || 0) < 3 && R.SPURT && R.verfuegbar(st, R.SPURT.id) && R.ziele(st, R.SPURT.id).length) return { typ: "aktion", aktion: R.SPURT.id, ziel: f.id };
+        return { typ: "ende" };
+      }
+      if (lohnt) return tu(akt); // Bonusaktionen und freie Aktionen
+      if (fd && fd.best && fd.best.s > fd.hier.s + 0.5) return geh(fd.best);
+      return { typ: "ende" };
+    }
+    /** Königsmord: Der Anführer ist der zäheste der eigenen Helden (Platz 0–2) */
+    function anfuehrer(st, tm) {
+      const h = st.figuren.filter((f) => f.team === tm); let best = 0;
+      h.forEach((f, i) => { if (f.tpMax * (f.rk || 10) > h[best].tpMax * (h[best].rk || 10)) best = i; });
+      return Math.max(0, Math.min(2, best));
+    }
+    return { entscheide, anfuehrer, wert };
+  }
+
+  if (typeof module !== "undefined" && module.exports) module.exports = bot;
+  else root.ABARENABOT = bot;
+})(typeof window !== "undefined" ? window : globalThis);
+
+
 /* ===== server/arena-kern.js ===== */
 /*
  * Mythara – Arena, Serverkampf: der Teil, der auf dem Server rechnet (ohne Netz und ohne Datenbank, testbar in Node).
@@ -2830,13 +2989,18 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
  *   • Monster ziehen sofort nach; jeder Schritt wird einzeln festgehalten, damit die Geräte ihn einzeln zeigen können.
  *   • Zugzeit: eine Minute je Held. Ist sie abgelaufen, darf jede Seite das Zugende auslösen. Lässt ein Team dreimal
  *     hintereinander die Zeit verstreichen, hat es aufgegeben.
+ *   • Rechner-Gegner (match.bot): Team 2 wird vom Server gespielt (server/arena-bot.js), Schritt für Schritt und mit Bedenkzeit.
+ *     Die Sicht der Spieler nennt nur den Zeitpunkt, zu dem der nächste Schritt fällig ist (arena.takt).
  */
 (function (root) {
   "use strict";
   const LOS = ["arena", "koenig", "horde", "duell"]; // wie js/arena.js und rpg_arena_modus (Migration 010)
   const ZUGZEIT = 60000, ZEITAUS_MAX = 3, LOG_MAX = 140, MONSTER_MAX = 60;
 
-  function kern(R, KARTEN) {
+  function kern(R, KARTEN, botFabrik) {
+    const fabrik = botFabrik || root.ABARENABOT, BOT = fabrik ? fabrik(R) : null;
+    // Bedenkzeit: vor dem ersten Schritt eines Zugs länger (manchmal deutlich), zwischen den Schritten kurz
+    const denkZeit = () => 1800 + Math.random() * 3600 + (Math.random() < 0.15 ? 2500 + Math.random() * 4000 : 0), zwischenZeit = () => 700 + Math.random() * 1700;
     const modusVon = (seed) => LOS[Math.abs(Math.trunc(Number(seed) || 0)) % LOS.length];
     const karteVon = (k) => (k !== "garten" && KARTEN && KARTEN[String(k || "").toUpperCase()]) || R.KARTE_GARTEN;
     const idx = (n) => Math.max(0, Math.min(2, Math.trunc(Number(n) || 0)));
@@ -2851,6 +3015,10 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
         teams: [match.host_team, match.guest_team].map((tm) => tm.map((h) => ({ fid: h.held, stufe: h.stufe }))), namen: [match.host_name, match.guest_name],
         karte: karteVon(match.karte), begegnung: beg, bedrohung: Math.max(0, (match.kampfstufe || 1) - [1, 3, 6][alt - 1]) });
       st.arena.zeitaus = { 1: 0, 2: 0 };
+      if (match.bot && BOT) {
+        st.arena.bot = { seite: 2, bis: 0, lauf: 0, n: 0 };
+        if (st.arena.koenig) { const h = st.figuren.filter((f) => f.team === 2)[BOT.anfuehrer(st, 2)]; if (h) st.arena.koenig[2] = h.id; }
+      }
       return st;
     }
     /** Zugzeit stellen, sobald ein anderer Held an die Reihe kommt */
@@ -2858,12 +3026,14 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       const a = R.aktiv(st), held = !st.ende && a && !istMonster(st, a) && a.tp > 0, k = held ? a.id + ":" + st.runde : null;
       if (st.arena.zugWer === k) return;
       st.arena.zugWer = k; st.arena.zugBis = k ? jetzt + ZUGZEIT : null;
+      const b = st.arena.bot; if (b && held && R.teamVon(st, a) === b.seite) { b.bis = jetzt + denkZeit(); b.lauf = 0; b.n = 0; }
     }
     /** Was eine Seite sehen darf */
     function sicht(st, seite, jetzt) {
       const j = R.speichern(st);
       delete j.rs; j.log = (j.log || []).slice(-LOG_MAX);
       j.arena = Object.assign({}, j.arena, { jetzt });
+      if (j.arena.bot) { const a = R.aktiv(st); j.arena.takt = !st.ende && a && a.tp > 0 && R.teamVon(st, a) === j.arena.bot.seite ? j.arena.bot.bis : null; delete j.arena.bot; }
       if (j.arena.koenig && !st.ende) j.arena.koenig = { 1: seite === 1 ? j.arena.koenig[1] : null, 2: seite === 2 ? j.arena.koenig[2] : null };
       return j;
     }
@@ -2896,7 +3066,21 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       return { schritte };
     }
     /** Zugzeit abgelaufen? Dann endet der Zug des Helden. Zurück: { schritte } (leer, wenn noch Zeit ist) */
+    /** Rechner-Gegner: ein Schritt (bewegen, Aktion oder Zugende) */
+    function botSchritt(st, jetzt) {
+      const b = st.arena.bot; b.n = (b.n || 0) + 1;
+      let w = { typ: "ende" };
+      if (b.n <= 12) { try { w = BOT.entscheide(st, b); } catch (e) { w = { typ: "ende" }; } }
+      if (w.typ === "bewegen") b.lauf = (b.lauf || 0) + 1;
+      b.letzt = w; // nur im Stand des Servers (für Tests und Fehlersuche)
+      b.bis = jetzt + zwischenZeit(); // gilt, solange derselbe Held weiterzieht; beim nächsten Helden stellt uhr() neu
+      let r = zug(st, b.seite, w, jetzt);
+      if (r.fehler && w.typ !== "ende") r = zug(st, b.seite, { typ: "ende" }, jetzt);
+      return r.fehler ? { schritte: [] } : r;
+    }
     function zeit(st, jetzt) {
+      if (st && !st.ende && st.arena.bot && BOT) { const a = R.aktiv(st);
+        if (a && R.teamVon(st, a) === st.arena.bot.seite) return jetzt < st.arena.bot.bis ? { schritte: [] } : botSchritt(st, jetzt); }
       if (!st || st.ende || !st.arena.zugBis || jetzt < st.arena.zugBis) return { schritte: [] };
       const a = R.aktiv(st), tm = a ? R.teamVon(st, a) : 0; if (!tm) return { schritte: [] };
       st.arena.zeitaus = st.arena.zeitaus || { 1: 0, 2: 0 }; st.arena.zeitaus[tm]++;
@@ -2917,7 +3101,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       const a = st.arena;
       return { sieger: a.sieger, grund: a.aufgabe ? "aufgabe" : /am Boden|ist gefallen/.test(a.grund || "") ? "team" : "punkte", punkte: a.punkte, runden: st.runde };
     }
-    return { modusVon, neu, start, zug, zeit, sicht, ergebnis, laden: R.laden, speichern: R.speichern, ZUGZEIT };
+    return { modusVon, neu, start, zug, zeit, sicht, ergebnis, laden: R.laden, speichern: R.speichern, ZUGZEIT, bot: BOT };
   }
 
   if (typeof module !== "undefined" && module.exports) module.exports = kern;

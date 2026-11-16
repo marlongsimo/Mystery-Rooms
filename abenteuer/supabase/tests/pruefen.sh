@@ -84,6 +84,25 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 017_rpg_ausstattung_test.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../018_rpg_ausstattung_sichtbar.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../018_rpg_ausstattung_sichtbar.sql 2>/dev/null     # zweimal: idempotent
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 018_rpg_ausstattung_sichtbar_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+# Migration 019 (Rechner-Gegner) braucht 014 bis 018 zugleich: Arena-Suche und Serverkampf noch einmal einspielen
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql
+ARENA_VOR19=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  /  /"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  /  /"     # zweimal: idempotent
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 019_rpg_arena_rechnergegner_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql      # 016 nach 019 erneut: darf nicht scheitern (danach 019 erneut)
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>/dev/null
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner_rueckbau.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../018_rpg_ausstattung_sichtbar.sql
+ARENA_NACH19=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
+if [ "$ARENA_VOR19" = "$ARENA_NACH19" ]; then echo "✓ Nach dem Rückbau von 019 (und erneutem 016 und 018) sind alle Arena-Funktionen wie vorher"; else echo "✗ Der Rückbau von 019 hinterlässt Reste"; exit 1; fi
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten_rueckbau.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf_rueckbau.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../018_rpg_ausstattung_sichtbar_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../017_rpg_ausstattung_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../008_rpg_arena_rueckbau.sql

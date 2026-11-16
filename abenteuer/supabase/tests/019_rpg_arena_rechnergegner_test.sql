@@ -40,9 +40,9 @@ reset role;
 select pg_temp.ok((select count(distinct e->>'held') = 3 and bool_and(exists (select 1 from public.rpg_hero_catalog c where c.hero_id = e->>'held')) from jsonb_array_elements(:'a3'::jsonb->'gast'->'team') e), 'Drei verschiedene Helden aus dem Katalog');
 set role authenticated;
 select pg_temp.ok(abs((:'a3'::jsonb->'gast'->>'schnitt')::numeric - (:'a3'::jsonb->'host'->>'schnitt')::numeric) <= 1.0
-  and (select bool_and(abs(g.s - h.s) <= 1) from (select (e->>'stufe')::integer s, row_number() over (order by (e->>'stufe')::integer) n from jsonb_array_elements(:'a3'::jsonb->'gast'->'team') e) g
+  and (select bool_and(g.s between h.s - 1 and h.s) from (select (e->>'stufe')::integer s, row_number() over (order by (e->>'stufe')::integer) n from jsonb_array_elements(:'a3'::jsonb->'gast'->'team') e) g
        join (select (e->>'stufe')::integer s, row_number() over (order by (e->>'stufe')::integer) n from jsonb_array_elements(:'a3'::jsonb->'host'->'team') e) h using (n)),
-  'Stufen wie beim Spieler: Durchschnitt ' || (:'a3'::jsonb->'gast'->>'schnitt') || ' gegen ' || (:'a3'::jsonb->'host'->>'schnitt') || ', je Held höchstens eine Stufe Unterschied');
+  'Stufen wie beim Spieler: Durchschnitt ' || (:'a3'::jsonb->'gast'->>'schnitt') || ' gegen ' || (:'a3'::jsonb->'host'->>'schnitt') || ', je Held gleich oder eine Stufe darunter, nie darüber');
 select pg_temp.ok(:'a3'::jsonb->>'karte' is not null and :'a3'::jsonb->>'begegnung' is not null and (:'a3'::jsonb->>'seed') is not null, 'Karte, Monster und Startwert sind gelost');
 select pg_temp.ok(public.rpg_arena_get((:'a1'::jsonb->>'id')::uuid)->'gast'->>'name' = :'a3'::jsonb->'gast'->>'name' and public.rpg_arena_queue('normal')->>'id' = :'a1'::jsonb->>'id', 'Der Kampf lässt sich abrufen; die Suche führt zu ihm zurück');
 select public.rpg_arena_fight((:'a1'::jsonb->>'id')::uuid, 0) as f1 \gset
@@ -101,7 +101,7 @@ begin
       values ('offen', '00000000-0000-0000-0000-0000000019a3', 'Rech_C', jsonb_build_array(jsonb_build_object('held', 'trickser', 'stufe', 1 + i % 10), jsonb_build_object('held', 'berserker', 'stufe', 1 + (i * 3) % 10), jsonb_build_object('held', 'gelehrter', 'stufe', 10)), 5) returning id into v_id;
     update public.rpg_arena_matches set host_schnitt = public.rpg_arena_schnitt(host_team) where id = v_id;
     v_j := public.rpg_arena_bot(v_id, case when i % 2 = 0 then 'normal' else 'arcade' end);
-    insert into pg_temp_namen values (v_j->'gast'->>'name', v_j is not null and abs((v_j->'gast'->>'schnitt')::numeric - (v_j->'host'->>'schnitt')::numeric) <= 1.0
+    insert into pg_temp_namen values (v_j->'gast'->>'name', v_j is not null and (v_j->'gast'->>'schnitt')::numeric between (v_j->'host'->>'schnitt')::numeric - 1.0 and (v_j->'host'->>'schnitt')::numeric
       and (select count(distinct e->>'held') = 3 and bool_and((e->>'stufe')::integer between 1 and 10) from jsonb_array_elements(v_j->'gast'->'team') e));
     update public.rpg_arena_matches set status = 'abgebrochen' where id = v_id;
   end loop;

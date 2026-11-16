@@ -2829,13 +2829,15 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
  *   • Er kennt die kommenden Würfel NICHT (die Kopien würfeln neu) und den verdeckten Anführer des Gegners auch nicht.
  *   • Bewegung: erst dorthin, wo die beste Aktion möglich ist (Fernkämpfer auf Abstand, Nahkämpfer heran, Heiler zu Verletzten),
  *     nach der Aktion gehen Fernkämpfer und Angeschlagene aus der Reichweite.
+ *   • Spielstärke (merk.staerke, 0 bis 1; 1 = so gut er kann): Je niedriger, desto öfter greift er daneben – er schätzt ungenauer,
+ *     nimmt manchmal irgendeine brauchbare Aktion statt der besten, verteilt seine Angriffe und lässt das Stellungsspiel aus.
  * Benutzt nur die öffentliche Schnittstelle der Regeln (js/regeln.js).
  */
 (function (root) {
   "use strict";
   const SCHLECHT = new Set(["festgehalten", "liegend", "verbannt", "spott", "bruch", "mal_jaeger", "verlangsamt", "veraengstigt", "brandmal", "blutung", "analyse", "zeitriss", "vergiftet", "betaeubt", "stich", "geblendet", "entwaffnet"]);
   const GUT = new Set(["segen", "versteckt", "spiegel", "rueckzug", "schutzkreis", "raserei", "finte", "schild", "gift"]);
-  const PROBEN = 5, SCHWELLE = 0.8;
+  const PROBEN = 5, SCHWELLE = 0.8, PATZER = 0.5;
 
   function bot(R) {
     const zahl = (c) => (c === "schritt" ? 0 : c);
@@ -2876,16 +2878,20 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       return aus;
     }
     /** Beste Aktion nach Proben: { aktion, ziel, gewinn, typ } oder null */
-    function besteAktion(j, st, f, tm, basis) {
-      let best = null;
+    function besteAktion(j, st, f, tm, basis, s) {
+      let best = null; const gut = [], proben = s > 0.8 ? PROBEN : 3, rauschen = 0.6 + (1 - s) * 7;
       for (const { a, z } of wahlen(st, f)) {
         if (a.art === "spurt") continue; // Spurt bringt allein nichts; siehe unten
         let sum = 0, n = 0;
-        for (let i = 0; i < PROBEN; i++) { const c = probe(j); const r = R.handeln(c, a.id, z.id); if (r && r.fehler) break; sum += wert(c, tm) - basis; n++; }
+        for (let i = 0; i < proben; i++) { const c = probe(j); const r = R.handeln(c, a.id, z.id); if (r && r.fehler) break; sum += wert(c, tm) - basis; n++; }
         if (!n) continue;
-        const g = sum / n + Math.random() * 0.6;
-        if (!best || g > best.gewinn) best = { aktion: a.id, ziel: z.id, gewinn: g, typ: a.typ || "aktion", art: a.art };
+        const echt = sum / n, g = echt + Math.random() * rauschen, k = { aktion: a.id, ziel: z.id, gewinn: g, echt, typ: a.typ || "aktion", art: a.art };
+        if (echt > SCHWELLE) gut.push(k);
+        if (!best || g > best.gewinn) best = k;
       }
+      // Fehlgriff: irgendeine brauchbare Aktion statt der besten
+      if (gut.length > 1 && Math.random() < (1 - s) * 0.45) best = gut[Math.floor(Math.random() * gut.length)];
+      if (best) best.gewinn = Math.max(best.gewinn, best.echt);
       return best;
     }
     /** Was ließe sich von einem Feld aus mit der Aktion anfangen? (ohne zu würfeln) */
@@ -2944,14 +2950,19 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       const f = R.aktiv(st), tm = f ? R.teamVon(st, f) : 0;
       if (!f || !tm || st.ende || f.tp <= 0 || f.seite !== "spieler") return { typ: "ende" };
       merk = merk || {};
+      const s = merk.staerke == null ? 1 : Math.max(0, Math.min(1, merk.staerke)), traege = Math.random() < (1 - s) * 0.6; // träge: kein Stellungsspiel in diesem Schritt
+      // Verschenkter Zug: Je schwächer, desto öfter bleibt die Aktion eines Helden ungenutzt (er läuft nur). Einmal je Zug ausgelost.
+      const zugKey = f.id + ":" + st.runde; if (merk.patzKey !== zugKey) { merk.patzKey = zugKey; merk.patzt = Math.random() < (1 - s) * PATZER; }
       const j = vorlage(st, tm), basis = wert(probe(j), tm);
       const aktionFrei = Boolean(st.zug.aktion), kannLaufen = (st.zug.bewegung > 0 || st.zug.schritt > 0) && (merk.lauf || 0) < 3;
-      const akt = besteAktion(j, st, f, tm, basis), lohnt = akt && akt.gewinn > SCHWELLE;
+      let akt = besteAktion(j, st, f, tm, basis, s);
+      if (merk.patzt && akt && akt.typ === "aktion" && !/aufrichten|heilung|trank/.test(akt.art)) akt = null;
+      const lohnt = akt && akt.gewinn > SCHWELLE;
       const fd = kannLaufen ? felder(j, st, f, tm, aktionFrei) : null;
       const geh = (b) => ({ typ: "bewegen", x: b.x, y: b.y }), tu = (a) => ({ typ: "aktion", aktion: a.aktion, ziel: a.ziel });
       if (aktionFrei) {
         // erst in Stellung gehen, wenn von dort deutlich mehr möglich ist
-        if (fd && fd.best && fd.best.pot > fd.hier.pot * 1.15 + 0.2 && fd.best.s > fd.hier.s) return geh(fd.best);
+        if (fd && fd.best && fd.best.pot > fd.hier.pot * 1.15 + 0.2 && fd.best.s > fd.hier.s && !(traege && fd.hier.pot > 0)) return geh(fd.best);
         if (lohnt) return tu(akt);
         if (fd && fd.best && fd.best.s > fd.hier.s + 0.3) return geh(fd.best);
         // niemand erreichbar: spurten und weiterlaufen
@@ -2959,7 +2970,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
         return { typ: "ende" };
       }
       if (lohnt) return tu(akt); // Bonusaktionen und freie Aktionen
-      if (fd && fd.best && fd.best.s > fd.hier.s + 0.5) return geh(fd.best);
+      if (fd && fd.best && fd.best.s > fd.hier.s + 0.5 && !traege) return geh(fd.best);
       return { typ: "ende" };
     }
     /** Königsmord: Der Anführer ist der zäheste der eigenen Helden (Platz 0–2) */
@@ -2995,6 +3006,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
 (function (root) {
   "use strict";
   const LOS = ["arena", "koenig", "horde", "duell"]; // wie js/arena.js und rpg_arena_modus (Migration 010)
+  const STAERKE = [0.4, 0.6]; // Spielstärke des Rechner-Gegners: von … bis (1 = so gut er kann)
   const ZUGZEIT = 60000, ZEITAUS_MAX = 3, LOG_MAX = 140, MONSTER_MAX = 60;
 
   function kern(R, KARTEN, botFabrik) {
@@ -3016,7 +3028,8 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
         karte: karteVon(match.karte), begegnung: beg, bedrohung: Math.max(0, (match.kampfstufe || 1) - [1, 3, 6][alt - 1]) });
       st.arena.zeitaus = { 1: 0, 2: 0 };
       if (match.bot && BOT) {
-        st.arena.bot = { seite: 2, bis: 0, lauf: 0, n: 0 };
+        // Spielstärke je Gegner verschieden (manche spielen besser als andere); fest je Kampf
+        st.arena.bot = { seite: 2, bis: 0, lauf: 0, n: 0, staerke: match.staerke != null ? Number(match.staerke) : STAERKE[0] + Math.random() * (STAERKE[1] - STAERKE[0]) };
         if (st.arena.koenig) { const h = st.figuren.filter((f) => f.team === 2)[BOT.anfuehrer(st, 2)]; if (h) st.arena.koenig[2] = h.id; }
       }
       return st;

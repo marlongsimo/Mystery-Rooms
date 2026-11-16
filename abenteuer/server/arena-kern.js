@@ -16,6 +16,7 @@
 (function (root) {
   "use strict";
   const LOS = ["arena", "koenig", "horde", "duell"]; // wie js/arena.js und rpg_arena_modus (Migration 010)
+  const STAERKE = [0.4, 0.6]; // Spielstärke des Rechner-Gegners: von … bis (1 = so gut er kann)
   const ZUGZEIT = 60000, ZEITAUS_MAX = 3, LOG_MAX = 140, MONSTER_MAX = 60;
 
   function kern(R, KARTEN, botFabrik) {
@@ -37,7 +38,8 @@
         karte: karteVon(match.karte), begegnung: beg, bedrohung: Math.max(0, (match.kampfstufe || 1) - [1, 3, 6][alt - 1]) });
       st.arena.zeitaus = { 1: 0, 2: 0 };
       if (match.bot && BOT) {
-        st.arena.bot = { seite: 2, bis: 0, lauf: 0, n: 0 };
+        // Spielstärke je Gegner verschieden (manche spielen besser als andere); fest je Kampf
+        st.arena.bot = { seite: 2, bis: 0, lauf: 0, n: 0, staerke: match.staerke != null ? Number(match.staerke) : STAERKE[0] + Math.random() * (STAERKE[1] - STAERKE[0]) };
         if (st.arena.koenig) { const h = st.figuren.filter((f) => f.team === 2)[BOT.anfuehrer(st, 2)]; if (h) st.arena.koenig[2] = h.id; }
       }
       return st;

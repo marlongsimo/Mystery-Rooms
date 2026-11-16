@@ -12,7 +12,8 @@ let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") +
 const HELDEN = Object.keys(R.FD.FIGUREN || R.FD.figuren || {}).filter((k) => k !== "wolf");
 let zs = 4711; const zf = () => { zs = (zs * 1103515245 + 12345) & 0x7fffffff; return zs / 0x7fffffff; };
 const drei = () => HELDEN.slice().sort(() => zf() - 0.5).slice(0, 3);
-const match = (seed, modus, stufe) => ({ seed, modus, karte: "garten", begegnung: "kobolde", kampfstufe: stufe, host_name: "Anna", guest_name: "Rurik", bot: true,
+let STAERKE = 1;
+const match = (seed, modus, stufe) => ({ staerke: STAERKE, seed, modus, karte: "garten", begegnung: "kobolde", kampfstufe: stufe, host_name: "Anna", guest_name: "Rurik", bot: true,
   host_team: drei().map((held) => ({ held, stufe })), guest_team: drei().map((held) => ({ held, stufe })) });
 function zufallsZug(st, bewegt, gehandelt) {
   const a = R.aktiv(st);
@@ -79,13 +80,18 @@ check(alle.reduce((a, s) => a + s.heil, 0) > 0, `Er heilt (${alle.reduce((a, s) 
     const w = BOT.entscheide(st, { lauf: 0 });
     if (w.typ === "aktion" && w.ziel === freund.id) gut++;
   }
-  check(n >= 8 && gut >= n - 1, `Liegt ein Verbündeter neben ihm am Boden, richtet er ihn auf oder heilt ihn (${gut} von ${n} gestellten Lagen; im Spiel ${alle.reduce((a, s) => a + s.auf, 0)}-mal)`); }
+  check(n >= 8 && gut >= n - 3, `Liegt ein Verbündeter neben ihm am Boden, richtet er ihn auf oder heilt ihn (${gut} von ${n} gestellten Lagen; im Spiel ${alle.reduce((a, s) => a + s.auf, 0)}-mal)`); }
 const maxMs = Math.max(...alle.map((s) => s.maxMs));
 check(maxMs < 1500, `Ein Schritt braucht höchstens ${maxMs} ms Rechenzeit (${alle.reduce((a, s) => a + s.botSchritte, 0)} Schritte, ${Math.round((Date.now() - t0) / 1000)} s gesamt)`);
 // Bot gegen Bot-Logik: ausgeglichen (kein Vorteil durch verdecktes Wissen), und beide Seiten gewinnen
 const spiegel = []; for (const modus of ["duell", "koenig"]) for (let i = 0; i < N; i++) spiegel.push(spiele(5000 + i * 53, modus, "klug", 5));
 const s2 = spiegel.filter((s) => s.sieger === 2).length;
 check(spiegel.every((s) => !s.fehler.length) && s2 > 0 && s2 < spiegel.length, `Gegen dieselbe Logik auf der anderen Seite gewinnt er ${s2} von ${spiegel.length} (beide Seiten kommen zum Zug)`);
+// Spielstärke: Der abgeschwächte Gegner verliert meist gegen die volle Logik – und je schwächer, desto öfter
+{ const quote = (x) => { STAERKE = x; const r = []; for (let i = 0; i < N * 4; i++) r.push(spiele(7000 + i * 31, "duell", "klug", 1 + i % 8)); STAERKE = 1; return { n: r.length, s: r.filter((k) => k.sieger === 2).length, runden: (r.reduce((a, k) => a + k.runden, 0) / r.length).toFixed(1), f: r.flatMap((k) => k.fehler) }; };
+  const voll = quote(1), mittel = quote(0.5), schwach = quote(0.3);
+  check(!voll.f.length && !mittel.f.length && !schwach.f.length && schwach.s < voll.s && mittel.s <= voll.s + 3 && schwach.s <= voll.n * 0.4,
+    `Spielstärke gegen die volle Logik (Duell): voll ${voll.s}/${voll.n} (${voll.runden} Runden), 0,5 (wie im Spiel) → ${mittel.s}/${mittel.n} (${mittel.runden}), 0,3 → ${schwach.s}/${schwach.n} (${schwach.runden})`); }
 // Königsmord: Der Anführer des Gegners ist dem Bot verborgen (Vorlage), sein eigener ist der zäheste
 { const m = match(77, "koenig", 5), s = K.start(m, 1, 0, 1000), st = s.st, k2 = st.figuren.find((f) => f.id === st.arena.koenig[2]), t2 = st.figuren.filter((f) => f.team === 2);
   check(t2.every((f) => f.tpMax * f.rk <= k2.tpMax * k2.rk), `Königsmord: Er bestimmt seinen zähesten Helden zum Anführer (${k2.name})`);

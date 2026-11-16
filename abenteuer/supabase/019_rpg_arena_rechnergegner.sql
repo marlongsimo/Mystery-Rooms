@@ -10,8 +10,8 @@
 --
 -- Was diese Migration bringt:
 --   • Findet die Suche (Normal oder Arcade) etwa 30 Sekunden lang keinen Menschen, stellt der Server einen Gegner:
---     zufälliger Name, drei zufällige Helden, deren Stufen denen des Spielers entsprechen (je Held höchstens eine Stufe
---     Unterschied – der Durchschnitt liegt damit immer im erlaubten Bereich), Karte, Monster und Modus wie sonst auch.
+--     zufälliger Name, drei zufällige Helden, deren Stufen denen des Spielers entsprechen (je Held gleich oder eine Stufe
+--     darunter, nie darüber – der Durchschnitt liegt damit immer im erlaubten Bereich), Karte, Monster und Modus wie sonst auch.
 --   • Der Kampf läuft als gewöhnlicher Serverkampf und wird gewöhnlich gewertet (Tagesgrenze, Erfahrung, Seelensplitter).
 --     Die Züge des Gegners rechnet die Edge Function.
 --   • Der Gegner hat kein Konto: Am Kampf steht kein guest_id, nur Name und Aufstellung. Dafür:
@@ -117,8 +117,8 @@ begin
   if not found then return null; end if;
   select array_agg(hero_id) into v_helden from (select hero_id from public.rpg_hero_catalog order by random() limit 3) t;
   if v_helden is null or cardinality(v_helden) <> 3 then return null; end if;
-  -- Stufen: die des Spielers in zufälliger Reihenfolge, je Held um höchstens eine Stufe verschoben (1 bis 10)
-  select array_agg(greatest(1, least(10, (e->>'stufe')::integer + floor(random() * 3)::integer - 1)) order by random()) into v_stufen from jsonb_array_elements(v_m.host_team) e;
+  -- Stufen: die des Spielers in zufälliger Reihenfolge, je Held gleich oder eine Stufe darunter – nie darüber (1 bis 10)
+  select array_agg(greatest(1, least(10, (e->>'stufe')::integer + floor(random() * 2)::integer - 1)) order by random()) into v_stufen from jsonb_array_elements(v_m.host_team) e;
   if v_stufen is null or cardinality(v_stufen) <> 3 then return null; end if;
   for v_i in 1..3 loop v_team := v_team || jsonb_build_object('held', v_helden[v_i], 'stufe', v_stufen[v_i]); end loop;
   -- Name: wie ein Benutzername; keiner, den es als Konto gibt, und nicht der des Spielers

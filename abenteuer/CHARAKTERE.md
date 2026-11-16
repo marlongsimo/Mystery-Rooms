@@ -55,7 +55,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Langschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
-| **Spott** | 1 | Bonusaktion · 6 Felder · 1× je Rast | Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir. |
+| **Spott** | 1 | Bonusaktion · 5 Felder · 1× je Rast | Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir. |
 | **Schildstoß** | 1 | Aktion · Nahkampf · STR-Rettung SG 13 · 1× je Kampf | STR-Rettungswurf, sonst wird das Ziel 1 Feld weggestoßen und liegt. |
 | **Zweiter Atem** | 1 | Bonusaktion · heilt 1W10 + Stufe · 1× je Rast | Heilt dich um 1W10 + Stufe. |
 | **Tatendrang** | 2 | frei · 1× je lange Rast | Eine zusätzliche Aktion in diesem Zug, einmal je lange Rast. |
@@ -121,11 +121,11 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Arkaner Funke** | 1 | Aktion · 12 Felder · Angriff +5 · 1W10 + 3 | Zaubertrick. |
-| **Analyse** | 1 | Bonusaktion · 12 Felder | Der nächste Angriff gegen den Gegner (bis Rundenende) trifft gegen −2 RK; seine Werte sind für alle sichtbar. |
-| **Zeitriss** | 1 | Aktion · 12 Felder · WEI-Rettung SG 13 · 1 Zauberplatz | WEI-Rettungswurf, sonst 2 Runden verlangsamt, ohne Bonusaktion und −2 RK. |
-| **Bannkreis** | 3 | Aktion · 12 Felder · Radius 2 · Platz vom 2. Grad | Kreis mit 2 Feldern Radius um ein Ziel, 3 Runden: Gegner darin −2 RK. |
-| **Schutzglyphe** | 1 | passiv | Reaktion, automatisch, kostet einen Platz: +5 RK für einen Verbündeten in 6 Feldern gegen einen Treffer, wenn es ihn sonst schwer erwischt. |
+| **Arkaner Funke** | 1 | Aktion · 5 Felder · Angriff +5 · 1W10 + 3 | Zaubertrick. |
+| **Analyse** | 1 | Bonusaktion · 5 Felder | Der nächste Angriff gegen den Gegner (bis Rundenende) trifft gegen −2 RK; seine Werte sind für alle sichtbar. |
+| **Zeitriss** | 1 | Aktion · 5 Felder · WEI-Rettung SG 13 · 1 Zauberplatz | WEI-Rettungswurf, sonst 2 Runden verlangsamt, ohne Bonusaktion und −2 RK. |
+| **Bannkreis** | 3 | Aktion · 5 Felder · Radius 2 · Platz vom 2. Grad | Kreis mit 2 Feldern Radius um ein Ziel, 3 Runden: Gegner darin −2 RK. |
+| **Schutzglyphe** | 1 | passiv | Reaktion, automatisch, kostet einen Platz: +5 RK für einen Verbündeten in 5 Feldern gegen einen Treffer, wenn es ihn sonst schwer erwischt. |
 | **Gedankenstütze** | 2 | passiv · 2× je Rast | Automatisch, 2× je Rast: Ein Verbündeter wiederholt einen knapp misslungenen W20. |
 | **Arkaner Schutz und Arkane Wucht** | 1 | passiv | RK 11 + GES ohne Rüstung. Deine Zaubertricks machen + INT Schaden. |
 | **Alte Schriften** | – | außerhalb des Kampfes | Liest jede Schrift der Abtei, zusätzlicher Hinweis bei Rätseln. |
@@ -142,11 +142,11 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Glutpfeil** | 1 | Aktion · 12 Felder · Angriff +5 · 1W10 + 3 | Zaubertrick. Das Feld des Ziels brennt 1 Runde (1W4). |
-| **Frosthauch** | 1 | Aktion · 12 Felder · Radius 1 · KON-Rettung SG 13 · 2W6 · 1 Zauberplatz | Eiswolke um ein Ziel (1 Feld Radius), 2W6 Kälte, Rettung halbiert; wer verfehlt, ist verlangsamt. |
-| **Magisches Geschoss** | 1 | Aktion · 12 Felder · 1W4 ×3 + 1 · 1 Zauberplatz | Drei Pfeile, je 1W4 + 1, treffen immer. |
-| **Donnerwelle** | 2 | Aktion · 6 Felder · Radius 1 · KON-Rettung SG 13 · 2W8 · 1 Zauberplatz | Donnerschlag um ein Ziel in 6 Feldern (1 Feld Radius), 2W8, Rettung halbiert, wer verfehlt, wird 2 Felder weggestoßen. |
-| **Glutsphäre** | 3 | Aktion · 12 Felder · Radius 2 · GES-Rettung SG 13 · 3W6 · Platz vom 2. Grad | 3W6 Feuer in 2 Feldern Radius um ein Ziel, Rettung halbiert. |
+| **Glutpfeil** | 1 | Aktion · 5 Felder · Angriff +5 · 1W10 + 3 | Zaubertrick. Das Feld des Ziels brennt 1 Runde (1W4). |
+| **Frosthauch** | 1 | Aktion · 5 Felder · Radius 1 · KON-Rettung SG 13 · 2W6 · 1 Zauberplatz | Eiswolke um ein Ziel (1 Feld Radius), 2W6 Kälte, Rettung halbiert; wer verfehlt, ist verlangsamt. |
+| **Magisches Geschoss** | 1 | Aktion · 5 Felder · 1W4 ×3 + 1 · 1 Zauberplatz | Drei Pfeile, je 1W4 + 1, treffen immer. |
+| **Donnerwelle** | 2 | Aktion · 5 Felder · Radius 1 · KON-Rettung SG 13 · 2W8 · 1 Zauberplatz | Donnerschlag um ein Ziel in 5 Feldern (1 Feld Radius), 2W8, Rettung halbiert, wer verfehlt, wird 2 Felder weggestoßen. |
+| **Glutsphäre** | 3 | Aktion · 5 Felder · Radius 2 · GES-Rettung SG 13 · 3W6 · Platz vom 2. Grad | 3W6 Feuer in 2 Feldern Radius um ein Ziel, Rettung halbiert. |
 | **Zauberformung** | 1 | passiv | Deine Flächenzauber treffen keine Verbündeten. |
 | **Elementarer Nachhall** | 2 | passiv | Glutpfeil macht +1W6. |
 | **Arkaner Schutz und Arkane Wucht** | 1 | passiv | RK 11 + GES ohne Rüstung. Deine Zaubertricks machen + INT Schaden. |
@@ -164,12 +164,12 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Schattenstich** | 1 | Aktion · 12 Felder · WEI-Rettung SG 13 · 1W10 + 3 | Zaubertrick. WEI-Rettungswurf, sonst Schaden und Nachteil auf den nächsten Angriff des Ziels. |
-| **Furcht** | 1 | Aktion · 12 Felder · Radius 1 · WEI-Rettung SG 13 · 1 Zauberplatz | Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf, sonst 2 Runden verängstigt. |
-| **Schattenfesseln** | 1 | Aktion · 12 Felder · STR-Rettung SG 13 · 1 Zauberplatz | STR-Rettungswurf, sonst 2 Runden festgehalten. |
+| **Schattenstich** | 1 | Aktion · 5 Felder · WEI-Rettung SG 13 · 1W10 + 3 | Zaubertrick. WEI-Rettungswurf, sonst Schaden und Nachteil auf den nächsten Angriff des Ziels. |
+| **Furcht** | 1 | Aktion · 5 Felder · Radius 1 · WEI-Rettung SG 13 · 1 Zauberplatz | Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf, sonst 2 Runden verängstigt. |
+| **Schattenfesseln** | 1 | Aktion · 5 Felder · STR-Rettung SG 13 · 1 Zauberplatz | STR-Rettungswurf, sonst 2 Runden festgehalten. |
 | **Schattenschritt** | 2 | Bonusaktion · 2× je Rast | Bis zu 6 Felder durch Schatten, über Hindernisse hinweg und ohne Gelegenheitsangriffe. |
 | **Spiegelbilder** | 2 | Aktion · 1 Zauberplatz | 3 Bilder: Jeder Angriff trifft zu 50 % ein Bild statt dich. |
-| **Albtraum** | 3 | Aktion · 12 Felder · Radius 1 · WEI-Rettung SG 13 · 2W8 · Platz vom 2. Grad | Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf; bei Fehlschlag 2W8 und 1 Runde verängstigt, sonst 1W8. |
+| **Albtraum** | 3 | Aktion · 5 Felder · Radius 1 · WEI-Rettung SG 13 · 2W8 · Platz vom 2. Grad | Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf; bei Fehlschlag 2W8 und 1 Runde verängstigt, sonst 1W8. |
 | **Trugbild** | 1 | passiv | Der erste Angriff gegen dich in jeder Runde erfolgt mit Nachteil. |
 | **Arkaner Schutz und Arkane Wucht** | 1 | passiv | RK 11 + GES ohne Rüstung. Deine Zaubertricks machen + INT Schaden. |
 | **Blendwerk** | – | außerhalb des Kampfes | Erzeugt Geräusche und Trugbilder als Ablenkung, erkennt Illusionen. |
@@ -191,7 +191,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
-| **Kurzbogen** | 1 | Aktion · 16 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
+| **Kurzbogen** | 1 | Aktion · 7 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
 | **Rauchbombe** | 1 | Aktion · Radius 2 · 1× je Rast | 2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus. |
 | **Schattenwirbel** | 1 | Aktion · Nahkampf · Radius 1 · GES-Rettung SG 13 · 2W6 · 2× je Rast | Wirbel mit beiden Klingen um einen Gegner neben dir: er und alle direkt um ihn nehmen 2W6, GES-Rettung halbiert. Verbündete bleiben verschont. Zählt nicht als Waffentreffer (kein Nachbluten). Zweimal je Rast. |
 | **Gerissener Spurt** | 1 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
@@ -216,10 +216,10 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Dolch** | 1 | Aktion · 8 Felder · Angriff +5 · 1W4 + 3 | Nah oder geworfen (8 Felder). |
-| **Zweiter Dolch** | 1 | Bonusaktion · 8 Felder · Angriff +5 · 1W4 | Nach einem Dolchangriff: ein zweiter Dolch, 1W4. |
+| **Dolch** | 1 | Aktion · 3 Felder · Angriff +5 · 1W4 + 3 | Nah oder geworfen (3 Felder). |
+| **Zweiter Dolch** | 1 | Bonusaktion · 3 Felder · Angriff +5 · 1W4 | Nach einem Dolchangriff: ein zweiter Dolch, 1W4. |
 | **Schmutziger Trick** | 1 | Bonusaktion · Nahkampf · GES-Rettung SG 13 · 2/2/3× je Rast | Ein Gegner neben dir: GES-Rettungswurf, sonst 1 Runde geblendet. |
-| **Platztausch** | 1 | Bonusaktion · 6 Felder · 1× je Rast | Tausche den Platz mit einem Verbündeten in 6 Feldern. |
+| **Platztausch** | 1 | Bonusaktion · 5 Felder · 1× je Rast | Tausche den Platz mit einem Verbündeten in 5 Feldern. |
 | **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
 | **Verstecken** | 2 | Bonusaktion | Gerissene Aktion: Neben Deckung oder im Rauch verbirgst du dich. Dein nächster Angriff hat Vorteil, Gegner greifen lieber andere an. |
 | **Rückzug** | 2 | Bonusaktion | Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich. |
@@ -240,7 +240,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Klinge der Gilde** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
-| **Leichte Armbrust** | 1 | Aktion · 16 Felder · Angriff +5 · 1W8 + 3 | Fernkampf. |
+| **Leichte Armbrust** | 1 | Aktion · 5 Felder · Angriff +5 · 1W8 + 3 | Fernkampf. |
 | **Gift** | 1 | Bonusaktion · 2× je Rast | Dein nächster Treffer macht +1W6 Gift (ab Stufe 2 +2W6), das Ziel ist 1 Runde vergiftet. |
 | **Aus dem Schatten** | 1 | Bonusaktion | Neben Deckung oder im Rauch: verstecken. |
 | **Gerissener Spurt** | 2 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
@@ -267,12 +267,12 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Heiliges Licht** | 1 | Aktion · 12 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst 1W8 + WEI gleißender Schaden. |
+| **Heiliges Licht** | 1 | Aktion · 5 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst 1W8 + WEI gleißender Schaden. |
 | **Streitkolben** | 1 | Aktion · Nahkampf · Angriff +3 · 1W6 + 1 | Nahkampf. |
-| **Segen** | 1 | Aktion · 6 Felder · 1 Zauberplatz | 3 Runden lang: 3 Verbündete in 6 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit. |
-| **Untote vertreiben** | 2 | Aktion · 6 Felder · WEI-Rettung SG 13 · 1× je Rast | Göttliche Macht: Untote in 6 Feldern fliehen 2 Runden (WEI-Rettungswurf). |
+| **Segen** | 1 | Aktion · 5 Felder · 1 Zauberplatz | 3 Runden lang: 3 Verbündete in 5 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit. |
+| **Untote vertreiben** | 2 | Aktion · 5 Felder · WEI-Rettung SG 13 · 1× je Rast | Göttliche Macht: Untote in 5 Feldern fliehen 2 Runden (WEI-Rettungswurf). |
 | **Schutzkreis** | 3 | Aktion · Platz vom 2. Grad | Verbündete in 2 Feldern um dich +2 RK, 3 Runden. |
-| **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
+| **Heilendes Wort** | 1 | Bonusaktion · 5 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 5 Feldern um 1W4 + WEI, auch am Boden. |
 | **Strahlende Aura** | 1 | passiv | Gegner neben dir nehmen zu Beginn ihres Zugs 1 gleißenden Schaden, Untote 2. |
 | **Geweihtes Wissen** | – | außerhalb des Kampfes | Erkennt Flüche und Untote; bringt schwache Untote ohne Kampf zur Ruhe. |
 
@@ -288,12 +288,12 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Dornenranke** | 1 | Aktion · 8 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt. |
-| **Schild des Glaubens** | 1 | Bonusaktion · 6 Felder · 1 Zauberplatz | Ein Verbündeter +2 RK bis Kampfende. |
-| **Lebenshauch** | 1 | Aktion · 6 Felder · 1× je Kampf | Ein Verbündeter am Boden in 6 Feldern steht mit 1 TP auf. |
-| **Bewahren** | 2 | Aktion · 6 Felder · 1× je Rast | Göttliche Macht: 5 × Stufe TP auf Verbündete in 6 Feldern verteilen. |
-| **Massenheilwort** | 3 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · Platz vom 2. Grad | 3 Verbündete je 1W4 + 3 (+ Gesegnete Heilung). |
-| **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
+| **Dornenranke** | 1 | Aktion · 5 Felder · GES-Rettung SG 13 · 1W8 + 3 | Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt. |
+| **Schild des Glaubens** | 1 | Bonusaktion · 5 Felder · 1 Zauberplatz | Ein Verbündeter +2 RK bis Kampfende. |
+| **Lebenshauch** | 1 | Aktion · 5 Felder · 1× je Kampf | Ein Verbündeter am Boden in 5 Feldern steht mit 1 TP auf. |
+| **Bewahren** | 2 | Aktion · 5 Felder · 1× je Rast | Göttliche Macht: 5 × Stufe TP auf Verbündete in 5 Feldern verteilen. |
+| **Massenheilwort** | 3 | Bonusaktion · 5 Felder · heilt 1W4 + WEI · Platz vom 2. Grad | 3 Verbündete je 1W4 + 3 (+ Gesegnete Heilung). |
+| **Heilendes Wort** | 1 | Bonusaktion · 5 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 5 Feldern um 1W4 + WEI, auch am Boden. |
 | **Gesegnete Heilung** | 1 | passiv | Deine Heilzauber heilen zusätzlich 1 + Grad des Platzes. |
 | **Kräuterkunde** | – | außerhalb des Kampfes | Erkennt Gifte und Flüche; nach jedem Kampf heilt die Gruppe je 1W4. |
 
@@ -310,10 +310,10 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Kriegshammer** | 1 | Aktion · Nahkampf · Angriff +5 · 1W8 + 3 | Nahkampf. |
-| **Brandmal** | 1 | Bonusaktion · 12 Felder · 1 Zauberplatz | 1× je Kampf ohne Platz: Deine Treffer gegen das Ziel machen +1W4 (ab Stufe 3 +2W6). |
-| **Befehl: Flieh!** | 1 | Aktion · 12 Felder · WEI-Rettung SG 12 · 1 Zauberplatz | WEI-Rettungswurf, sonst flieht das Ziel 1 Runde. |
-| **Bannen** | 2 | Aktion · 12 Felder · WEI-Rettung SG 12 · 1× je Rast | Göttliche Macht: Ein Untoter oder Fluchwesen ist 2 Runden aus dem Kampf verbannt. |
-| **Heilendes Wort** | 1 | Bonusaktion · 6 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden. |
+| **Brandmal** | 1 | Bonusaktion · 5 Felder · 1 Zauberplatz | 1× je Kampf ohne Platz: Deine Treffer gegen das Ziel machen +1W4 (ab Stufe 3 +2W6). |
+| **Befehl: Flieh!** | 1 | Aktion · 5 Felder · WEI-Rettung SG 12 · 1 Zauberplatz | WEI-Rettungswurf, sonst flieht das Ziel 1 Runde. |
+| **Bannen** | 2 | Aktion · 5 Felder · WEI-Rettung SG 12 · 1× je Rast | Göttliche Macht: Ein Untoter oder Fluchwesen ist 2 Runden aus dem Kampf verbannt. |
+| **Heilendes Wort** | 1 | Bonusaktion · 5 Felder · heilt 1W4 + WEI · 1 Zauberplatz | Heilt eine Figur in 5 Feldern um 1W4 + WEI, auch am Boden. |
 | **Wahrheitsblick** | 1 | passiv | Vorteil, Lügen zu erkennen; sieht Illusionen und Unsichtbares in 2 Feldern. |
 | **Gerechter Zorn** | 3 | passiv | Brandmal +2W6. |
 | **Verhör** | – | außerhalb des Kampfes | Erkennt Flüche, Pakte und Lügen; Vorteil, um Anselm zu durchschauen. |
@@ -334,10 +334,10 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Langbogen** | 1 | Aktion · 20 Felder · Angriff +6 · 1W8 + 3 | Fernkampf, +1 zum Treffen. |
-| **Fesselnder Pfeil** | 1 | Aktion · 20 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde). |
-| **Doppelschuss** | 2 | Aktion · 20 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Zwei Ziele nebeneinander, je ein Angriff. |
-| **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Langbogen** | 1 | Aktion · 7 Felder · Angriff +6 · 1W8 + 3 | Fernkampf, +1 zum Treffen. |
+| **Fesselnder Pfeil** | 1 | Aktion · 7 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde). |
+| **Doppelschuss** | 2 | Aktion · 7 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Zwei Ziele nebeneinander, je ein Angriff. |
+| **Jägermal** | 1 | Bonusaktion · 7 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Scharfes Auge** | 1 | passiv | Ignoriert Deckung. |
 | **Leichtfüßig** | 1 | passiv | Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff. |
 | **Bogenschütze** | 1 | passiv | +1 auf Fernkampf. |
@@ -357,10 +357,10 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
-| **Kurzbogen** | 1 | Aktion · 16 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
+| **Kurzbogen** | 1 | Aktion · 7 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
 | **Befehl an Grau** | 1 | Bonusaktion · 20 Felder | Grau läuft bis zu 8 Felder zum Ziel und beißt. |
 | **Grau: Umreißen** | 1 | Bonusaktion · 20 Felder · 2× je Rast | Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel. |
-| **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Jägermal** | 1 | Bonusaktion · 7 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Rudeltaktik** | 1 | passiv | Du und Grau habt Vorteil gegen ein Ziel, neben dem der andere steht. |
 | **Eingespielt** | 2 | passiv | Grau beißt am Ende deines Zugs auch ohne Befehl, wenn er neben einem Gegner steht, den du getroffen hast. |
 | **Ein Rudel** | 3 | passiv | Jägermal gilt auch für Grau, Grau +1 zum Treffen. |
@@ -379,9 +379,9 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Schwere Armbrust** | 1 | Aktion · 16 Felder · Angriff +5 · 1W10 + 3 | Fernkampf. |
-| **Netz** | 1 | Aktion · 6 Felder · STR-Rettung SG 13 · 2× je Rast | STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13). |
-| **Jägermal** | 1 | Bonusaktion · 20 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Schwere Armbrust** | 1 | Aktion · 5 Felder · Angriff +5 · 1W10 + 3 | Fernkampf. |
+| **Netz** | 1 | Aktion · 3 Felder · STR-Rettung SG 13 · 2× je Rast | STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13). |
+| **Jägermal** | 1 | Bonusaktion · 7 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Schwachstelle** | 1 | passiv | Gegen dein markiertes Ziel kritisch bei 19–20. |
 | **Fangschuss** | 1 | passiv | Reaktion, automatisch: Bewegt sich dein markiertes Ziel, schießt du einmal. |
 | **Jagdvorbereitung** | 1 | passiv | Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz). |

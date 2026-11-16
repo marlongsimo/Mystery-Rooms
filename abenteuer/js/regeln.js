@@ -697,7 +697,7 @@
     if (treffer && w < kritAb && a.seite === "gegner" && z.seite === "spieler") {
       // ab Stufe 8: +7 statt +5 und einmal je Kampf ohne Zauberplatz
       const glFrei = (o) => hs(o) >= 8 && !(o.genutzt.glyphe_frei);
-      const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.reaktion > 0 && (platzIndex(o, 1) >= 0 || glFrei(o)) && abstand(o, z) <= 6);
+      const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.reaktion > 0 && (platzIndex(o, 1) >= 0 || glFrei(o)) && abstand(o, z) <= 5);
       const glPlus = g && hs(g) >= 8 ? 7 : 5;
       if (g && total < rk + glPlus && z.tp - mittel(spec.schaden) <= z.tpMax / 2) {
         g.reaktion--; if (glFrei(g)) g.genutzt.glyphe_frei = 1; else g.plaetze[platzIndex(g, 1)]--; rk += glPlus; treffer = false;
@@ -859,7 +859,7 @@
       case "rueckzug": return f.z.rueckzug ? [] : [f];
       case "schattenschritt": return st.zug.schritt ? [] : [f];
       case "spiegelbilder": return f.z.spiegel ? [] : [f];
-      case "segen": return !st.figuren.some((o) => o.z && o.z.segen === f.id && lebt(o)) && freunde.some((o) => o.tp > 0 && o.art !== "wolf" && !o.z.segen && abstand(f, o) <= 6) ? [f] : [];
+      case "segen": return !st.figuren.some((o) => o.z && o.z.segen === f.id && lebt(o)) && freunde.some((o) => o.tp > 0 && o.art !== "wolf" && !o.z.segen && abstand(f, o) <= (a.reichweite || 5)) ? [f] : [];
       case "schutzkreis": return f.z.schutzkreis > st.runde ? [] : [f];
       case "vertreiben": return gegner.some((o) => GEGNER[o.art].untot && abstand(f, o) <= a.reichweite) ? [f] : [];
       case "bewahren": case "massenheil": return freunde.some((o) => o.tp < o.tpMax && abstand(f, o) <= a.reichweite) ? [f] : [];
@@ -1025,7 +1025,7 @@
       case "schattenschritt": st.zug.schritt = 6; st.log.push({ t: `${f.name} tritt in die Schatten.` }); break;
       case "spiegelbilder": f.z.spiegel = a.bilder || 3; st.log.push({ t: `${f.name} teilt sich in ${a.bilder === 4 ? "vier" : "drei"} Spiegelbilder.`, art: "gut" }); break;
       case "segen": {
-        const zs2 = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).sort((x, y) => abstand(f, x) - abstand(f, y)).slice(0, a.ziele || 3);
+        const zs2 = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= (a.reichweite || 5)).sort((x, y) => abstand(f, x) - abstand(f, y)).slice(0, a.ziele || 3);
         zs2.forEach((o) => { o.z.segen = f.id; o.z.segenBis = st.runde + (a.dauer || 99); });
         st.log.push({ t: `${f.name} segnet ${zs2.map((o) => o.name).join(", ")}.`, art: "gut" }); break;
       }
@@ -2012,10 +2012,10 @@
       case "stoss": case "entwaffnen": return z.tp > 8 ? 3.5 - begrenzt : -1;
       case "heilung": return z.tp <= 0 ? 15 : z.tp < z.tpMax * 0.45 ? Math.min(z.tpMax - z.tp, 7) - slot * 0.5 : -1;
       case "aufrichten": return (z.aufgerichtet || 0) >= 3 ? -1 : 15; // Automatik: nicht endlos dieselbe Figur aufrichten
-      case "segen": { const n = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).slice(0, 3).length; return n >= 2 ? n * 2.4 * Math.max(1, 4 - st.runde) / 2 - slot : -1; }
+      case "segen": { const n = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= (a.reichweite || 5)).slice(0, 3).length; return n >= 2 ? n * 2.4 * Math.max(1, 4 - st.runde) / 2 - slot : -1; }
       case "schutzkreis": return spielerFiguren(st).filter((o) => o.tp > 0 && abstand(o, f) <= 2).length * 2.5 - slot;
       case "spiegelbilder": return f.tp < f.tpMax && gegnerFiguren(st).some((g) => lebt(g) && abstand(g, f) <= 7) ? 6 - slot : -1;
-      case "vertreiben": return gegnerFiguren(st).filter((o) => lebt(o) && GEGNER[o.art].untot && abstand(o, f) <= 6).length * 5 - begrenzt;
+      case "vertreiben": return gegnerFiguren(st).filter((o) => lebt(o) && GEGNER[o.art].untot && abstand(o, f) <= (a.reichweite || 5)).length * 5 - begrenzt;
       case "bewahren": return spielerFiguren(st).some((o) => o.tp < o.tpMax * 0.5) ? 5 * f.stufe * 0.8 - begrenzt : -1;
       case "bannkreis": return gegnerFiguren(st).filter((o) => lebt(o) && abstand(o, z) <= 2).length * 3 - slot;
       case "rauch": return -1;

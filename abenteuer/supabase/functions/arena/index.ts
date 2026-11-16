@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v69, figuren.js v20
+// Stand der Regeln: regeln.js v70, figuren.js v21
 
 /* ===== js/figuren.js ===== */
 /*
@@ -38,10 +38,10 @@
       { id: "rueckzug", name: "Rückzug", typ: "bonus", ab: 2, art: "rueckzug", gerissen: true, text: "Gerissene Aktion: Diesen Zug keine Gelegenheitsangriffe gegen dich." },
     ],
     kleriker: [
-      { id: "heilendes_wort", name: "Heilendes Wort", typ: "bonus", ab: 1, art: "heilung", reichweite: 6, heilung: "1W4", plusAttr: "WEI", platz: 1, text: "Heilt eine Figur in 6 Feldern um 1W4 + WEI, auch am Boden." },
+      { id: "heilendes_wort", name: "Heilendes Wort", typ: "bonus", ab: 1, art: "heilung", reichweite: 5, heilung: "1W4", plusAttr: "WEI", platz: 1, text: "Heilt eine Figur in 5 Feldern um 1W4 + WEI, auch am Boden." },
     ],
     waldlaeufer: [
-      { id: "jaegermal", name: "Jägermal", typ: "bonus", ab: 1, art: "mal", mal: "jaeger", reichweite: 20, pro: { lange: [2, 3, 3] }, text: "Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben." },
+      { id: "jaegermal", name: "Jägermal", typ: "bonus", ab: 1, art: "mal", mal: "jaeger", reichweite: 7, pro: { lange: [2, 3, 3] }, text: "Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben." },
       { id: "faehrtenleser", name: "Fährtenleser", typ: "passiv", ab: 1, text: "Vorteil auf Spuren und Wahrnehmung im Freien." },
     ],
   };
@@ -54,7 +54,7 @@
       faehig: [
         { id: "langschwert", name: "Langschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W8", text: "Nahkampf." },
         { id: "schutzhaltung", name: "Schutzhaltung", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Ein Angriff gegen einen Verbündeten neben dir erfolgt mit Nachteil (ab Stufe 3 zweimal je Runde)." },
-        { id: "spott", name: "Spott", typ: "bonus", ab: 1, art: "spott", reichweite: 6, pro: { rast: 1 }, text: "Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir." },
+        { id: "spott", name: "Spott", typ: "bonus", ab: 1, art: "spott", reichweite: 5, pro: { rast: 1 }, text: "Ein Gegner hat bis zu seinem nächsten Zug Nachteil gegen alle außer dir." },
         { id: "schildstoss", name: "Schildstoß", typ: "aktion", ab: 1, art: "stoss", reichweite: 1, rettung: "STR", attr: "STR", pro: { kampf: 1 }, wucht: true, text: "STR-Rettungswurf, sonst wird das Ziel 1 Feld weggestoßen und liegt." },
         { id: "bollwerk", name: "Bollwerk", typ: "passiv", ab: 3, text: "Schutzhaltung zweimal je Runde." },
       ],
@@ -96,12 +96,12 @@
       name: "Lyra", titel: "Die Gelehrte", klasse: "zauberer", rolle: "hinten, Schwächen aufdecken, schützen", spruch: "Alles hat eine Ordnung. Auch das hier.",
       werte: { INT: 16, GES: 14, KON: 13, WEI: 12, CHA: 10, STR: 8 }, rk: [13, 13, 13], ruestung: "Arkaner Schutz",
       faehig: [
-        { id: "funke", name: "Arkaner Funke", typ: "aktion", ab: 1, art: "angriff", reichweite: 12, attr: "INT", schaden: "1W10", plusAttr: true, fern: true, magisch: true, text: "Zaubertrick." },
-        { id: "analyse", name: "Analyse", typ: "bonus", ab: 1, art: "analyse", reichweite: 12, text: "Der nächste Angriff gegen den Gegner (bis Rundenende) trifft gegen −2 RK; seine Werte sind für alle sichtbar." },
-        { id: "schutzglyphe", name: "Schutzglyphe", typ: "passiv", ab: 1, platzReaktion: 1, text: "Reaktion, automatisch, kostet einen Platz: +5 RK für einen Verbündeten in 6 Feldern gegen einen Treffer, wenn es ihn sonst schwer erwischt." },
-        { id: "zeitriss", name: "Zeitriss", typ: "aktion", ab: 1, art: "kontrolle", zustand: "zeitriss", dauer: 2, reichweite: 12, rettung: "WEI", attr: "INT", platz: 1, text: "WEI-Rettungswurf, sonst 2 Runden verlangsamt, ohne Bonusaktion und −2 RK." },
+        { id: "funke", name: "Arkaner Funke", typ: "aktion", ab: 1, art: "angriff", reichweite: 5, attr: "INT", schaden: "1W10", plusAttr: true, fern: true, magisch: true, text: "Zaubertrick." },
+        { id: "analyse", name: "Analyse", typ: "bonus", ab: 1, art: "analyse", reichweite: 5, text: "Der nächste Angriff gegen den Gegner (bis Rundenende) trifft gegen −2 RK; seine Werte sind für alle sichtbar." },
+        { id: "schutzglyphe", name: "Schutzglyphe", typ: "passiv", ab: 1, platzReaktion: 1, text: "Reaktion, automatisch, kostet einen Platz: +5 RK für einen Verbündeten in 5 Feldern gegen einen Treffer, wenn es ihn sonst schwer erwischt." },
+        { id: "zeitriss", name: "Zeitriss", typ: "aktion", ab: 1, art: "kontrolle", zustand: "zeitriss", dauer: 2, reichweite: 5, rettung: "WEI", attr: "INT", platz: 1, text: "WEI-Rettungswurf, sonst 2 Runden verlangsamt, ohne Bonusaktion und −2 RK." },
         { id: "gedankenstuetze", name: "Gedankenstütze", typ: "passiv", ab: 2, pro: { rast: 2 }, text: "Automatisch, 2× je Rast: Ein Verbündeter wiederholt einen knapp misslungenen W20." },
-        { id: "bannkreis", name: "Bannkreis", typ: "aktion", ab: 3, art: "bannkreis", reichweite: 12, radius: 2, dauer: 3, platz: 2, text: "Kreis mit 2 Feldern Radius um ein Ziel, 3 Runden: Gegner darin −2 RK." },
+        { id: "bannkreis", name: "Bannkreis", typ: "aktion", ab: 3, art: "bannkreis", reichweite: 5, radius: 2, dauer: 3, platz: 2, text: "Kreis mit 2 Feldern Radius um ein Ziel, 3 Runden: Gegner darin −2 RK." },
       ],
       aussen: { name: "Alte Schriften", text: "Liest jede Schrift der Abtei, zusätzlicher Hinweis bei Rätseln." },
       versuchung: "„Ich gebe dir Wissen, das niemand sonst besitzen darf.“ Wahr, aber man kann es nie wieder vergessen und nie jemandem sagen.",
@@ -111,13 +111,13 @@
       name: "Vaelin", titel: "Der Elementarist", klasse: "zauberer", rolle: "hinten, Flächenschaden", spruch: "Feuer fragt nicht.",
       werte: { INT: 16, GES: 14, KON: 13, WEI: 12, CHA: 10, STR: 8 }, rk: [13, 13, 13], ruestung: "Arkaner Schutz",
       faehig: [
-        { id: "glutpfeil", name: "Glutpfeil", typ: "aktion", ab: 1, art: "angriff", reichweite: 12, attr: "INT", schaden: "1W10", plusAttr: true, fern: true, magisch: true, brennt: true, text: "Zaubertrick. Das Feld des Ziels brennt 1 Runde (1W4)." },
+        { id: "glutpfeil", name: "Glutpfeil", typ: "aktion", ab: 1, art: "angriff", reichweite: 5, attr: "INT", schaden: "1W10", plusAttr: true, fern: true, magisch: true, brennt: true, text: "Zaubertrick. Das Feld des Ziels brennt 1 Runde (1W4)." },
         { id: "zauberformung", name: "Zauberformung", typ: "passiv", ab: 1, text: "Deine Flächenzauber treffen keine Verbündeten." },
         { id: "nachhall", name: "Elementarer Nachhall", typ: "passiv", ab: 2, text: "Glutpfeil macht +1W6." },
-        { id: "frosthauch", name: "Frosthauch", typ: "aktion", ab: 1, art: "flaeche", form: "kreis", groesse: 1, reichweite: 12, schaden: "2W6", rettung: "KON", attr: "INT", halb: true, zustand: "verlangsamt", dauer: 1, platz: 1, text: "Eiswolke um ein Ziel (1 Feld Radius), 2W6 Kälte, Rettung halbiert; wer verfehlt, ist verlangsamt." },
-        { id: "geschoss", name: "Magisches Geschoss", typ: "aktion", ab: 1, art: "geschoss", reichweite: 12, schaden: "1W4", plus: 1, anzahl: 3, platz: 1, text: "Drei Pfeile, je 1W4 + 1, treffen immer." },
-        { id: "donnerwelle", name: "Donnerwelle", typ: "aktion", ab: 2, art: "flaeche", form: "kreis", groesse: 1, reichweite: 6, schaden: "2W8", rettung: "KON", attr: "INT", halb: true, stoss: 2, platz: 1, text: "Donnerschlag um ein Ziel in 6 Feldern (1 Feld Radius), 2W8, Rettung halbiert, wer verfehlt, wird 2 Felder weggestoßen." },
-        { id: "glutsphaere", name: "Glutsphäre", typ: "aktion", ab: 3, art: "flaeche", form: "kreis", groesse: 2, reichweite: 12, schaden: "3W6", rettung: "GES", attr: "INT", halb: true, platz: 2, text: "3W6 Feuer in 2 Feldern Radius um ein Ziel, Rettung halbiert." },
+        { id: "frosthauch", name: "Frosthauch", typ: "aktion", ab: 1, art: "flaeche", form: "kreis", groesse: 1, reichweite: 5, schaden: "2W6", rettung: "KON", attr: "INT", halb: true, zustand: "verlangsamt", dauer: 1, platz: 1, text: "Eiswolke um ein Ziel (1 Feld Radius), 2W6 Kälte, Rettung halbiert; wer verfehlt, ist verlangsamt." },
+        { id: "geschoss", name: "Magisches Geschoss", typ: "aktion", ab: 1, art: "geschoss", reichweite: 5, schaden: "1W4", plus: 1, anzahl: 3, platz: 1, text: "Drei Pfeile, je 1W4 + 1, treffen immer." },
+        { id: "donnerwelle", name: "Donnerwelle", typ: "aktion", ab: 2, art: "flaeche", form: "kreis", groesse: 1, reichweite: 5, schaden: "2W8", rettung: "KON", attr: "INT", halb: true, stoss: 2, platz: 1, text: "Donnerschlag um ein Ziel in 5 Feldern (1 Feld Radius), 2W8, Rettung halbiert, wer verfehlt, wird 2 Felder weggestoßen." },
+        { id: "glutsphaere", name: "Glutsphäre", typ: "aktion", ab: 3, art: "flaeche", form: "kreis", groesse: 2, reichweite: 5, schaden: "3W6", rettung: "GES", attr: "INT", halb: true, platz: 2, text: "3W6 Feuer in 2 Feldern Radius um ein Ziel, Rettung halbiert." },
       ],
       aussen: { name: "Elementarsinn", text: "Spürt Hitze, Kälte und Luftzug: findet Geheimgänge, entzündet und löscht Feuer." },
       versuchung: "„Ich gebe dir das Feuer, das nie erlischt.“ Wahr, aber es brennt in dir weiter.",
@@ -127,13 +127,13 @@
       name: "Morwen", titel: "Die Schattenmagierin", klasse: "zauberer", rolle: "hinten, Kontrolle", spruch: "Was du siehst, entscheide ich.",
       werte: { INT: 16, GES: 14, KON: 13, CHA: 12, WEI: 10, STR: 8 }, rk: [14, 14, 14], ruestung: "Arkaner Schutz und Schattenmantel",
       faehig: [
-        { id: "schattenstich", name: "Schattenstich", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 12, rettung: "WEI", attr: "INT", schaden: "1W10", plusAttr: true, zustand: "stich", dauer: 1, text: "Zaubertrick. WEI-Rettungswurf, sonst Schaden und Nachteil auf den nächsten Angriff des Ziels." },
+        { id: "schattenstich", name: "Schattenstich", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 5, rettung: "WEI", attr: "INT", schaden: "1W10", plusAttr: true, zustand: "stich", dauer: 1, text: "Zaubertrick. WEI-Rettungswurf, sonst Schaden und Nachteil auf den nächsten Angriff des Ziels." },
         { id: "trugbild", name: "Trugbild", typ: "passiv", ab: 1, text: "Der erste Angriff gegen dich in jeder Runde erfolgt mit Nachteil." },
-        { id: "furcht", name: "Furcht", typ: "aktion", ab: 1, art: "kontrolle", zustand: "veraengstigt", dauer: 2, radius: 1, reichweite: 12, rettung: "WEI", attr: "INT", platz: 1, text: "Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf, sonst 2 Runden verängstigt." },
-        { id: "fesseln", name: "Schattenfesseln", typ: "aktion", ab: 1, art: "kontrolle", zustand: "festgehalten", dauer: 2, reichweite: 12, rettung: "STR", attr: "INT", platz: 1, text: "STR-Rettungswurf, sonst 2 Runden festgehalten." },
+        { id: "furcht", name: "Furcht", typ: "aktion", ab: 1, art: "kontrolle", zustand: "veraengstigt", dauer: 2, radius: 1, reichweite: 5, rettung: "WEI", attr: "INT", platz: 1, text: "Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf, sonst 2 Runden verängstigt." },
+        { id: "fesseln", name: "Schattenfesseln", typ: "aktion", ab: 1, art: "kontrolle", zustand: "festgehalten", dauer: 2, reichweite: 5, rettung: "STR", attr: "INT", platz: 1, text: "STR-Rettungswurf, sonst 2 Runden festgehalten." },
         { id: "schattenschritt", name: "Schattenschritt", typ: "bonus", ab: 2, art: "schattenschritt", pro: { rast: 2 }, text: "Bis zu 6 Felder durch Schatten, über Hindernisse hinweg und ohne Gelegenheitsangriffe." },
         { id: "spiegelbilder", name: "Spiegelbilder", typ: "aktion", ab: 2, art: "spiegelbilder", platz: 1, text: "3 Bilder: Jeder Angriff trifft zu 50 % ein Bild statt dich." },
-        { id: "albtraum", name: "Albtraum", typ: "aktion", ab: 3, art: "albtraum", reichweite: 12, radius: 1, rettung: "WEI", attr: "INT", schaden: "2W8", platz: 2, text: "Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf; bei Fehlschlag 2W8 und 1 Runde verängstigt, sonst 1W8." },
+        { id: "albtraum", name: "Albtraum", typ: "aktion", ab: 3, art: "albtraum", reichweite: 5, radius: 1, rettung: "WEI", attr: "INT", schaden: "2W8", platz: 2, text: "Das Ziel und alle Gegner direkt daneben: WEI-Rettungswurf; bei Fehlschlag 2W8 und 1 Runde verängstigt, sonst 1W8." },
       ],
       aussen: { name: "Blendwerk", text: "Erzeugt Geräusche und Trugbilder als Ablenkung, erkennt Illusionen." },
       versuchung: "„Niemand wird je wieder sehen, wer du wirklich bist.“ Wahr, auch nicht die, die dich lieben.",
@@ -147,7 +147,7 @@
       gerissenAb: 1,
       faehig: [
         { id: "kurzschwert", name: "Kurzschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W6", text: "Nahkampf." },
-        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
+        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
         { id: "leiser_schritt", name: "Leiser Schritt", typ: "passiv", ab: 1, text: "Du kannst dich auch ohne Deckung verstecken, solange kein Gegner neben dir steht. Gerissene Aktion schon ab Stufe 1." },
         { id: "rauchbombe", name: "Rauchbombe", typ: "aktion", ab: 1, art: "rauch", radius: 2, dauer: 2, pro: { rast: 1 }, text: "2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus." },
         { id: "schattenwirbel", name: "Schattenwirbel", typ: "aktion", ab: 1, art: "flaeche", form: "kreis", groesse: 1, reichweite: 1, schaden: "2W6", rettung: "GES", attr: "GES", halb: true, pro: { rast: 2 }, text: "Wirbel mit beiden Klingen um einen Gegner neben dir: er und alle direkt um ihn nehmen 2W6, GES-Rettung halbiert. Verbündete bleiben verschont. Zählt nicht als Waffentreffer (kein Nachbluten). Zweimal je Rast." },
@@ -163,12 +163,12 @@
       name: "Silra", titel: "Die Trickserin", klasse: "schurke", rolle: "Mitte, Ablenkung", spruch: "Schau mal da drüben.",
       werte: { GES: 16, CHA: 14, KON: 13, INT: 12, WEI: 10, STR: 8 }, rk: [14, 14, 14], ruestung: "Leder",
       faehig: [
-        { id: "dolch", name: "Dolch", typ: "aktion", ab: 1, art: "angriff", reichweite: 8, attr: "GES", schaden: "1W4", wurfwaffe: true, text: "Nah oder geworfen (8 Felder)." },
-        { id: "zweiter_dolch", name: "Zweiter Dolch", typ: "bonus", ab: 1, art: "angriff", reichweite: 8, attr: "GES", schaden: "1W4", ohneMod: true, nachDolch: true, wurfwaffe: true, text: "Nach einem Dolchangriff: ein zweiter Dolch, 1W4." },
+        { id: "dolch", name: "Dolch", typ: "aktion", ab: 1, art: "angriff", reichweite: 3, attr: "GES", schaden: "1W4", wurfwaffe: true, text: "Nah oder geworfen (3 Felder)." },
+        { id: "zweiter_dolch", name: "Zweiter Dolch", typ: "bonus", ab: 1, art: "angriff", reichweite: 3, attr: "GES", schaden: "1W4", ohneMod: true, nachDolch: true, wurfwaffe: true, text: "Nach einem Dolchangriff: ein zweiter Dolch, 1W4." },
         { id: "glueckspilz", name: "Glückspilz", typ: "passiv", ab: 1, pro: { kampf: 1 }, text: "Automatisch, 1× je Kampf: einen knapp verfehlten eigenen Angriff wiederholen oder einen Gegner seinen Treffer gegen dich wiederholen lassen." },
         { id: "trick", name: "Schmutziger Trick", typ: "bonus", ab: 1, art: "kontrolle", zustand: "geblendet", dauer: 1, reichweite: 1, rettung: "GES", attr: "GES", pro: { rast: [2, 2, 3] }, text: "Ein Gegner neben dir: GES-Rettungswurf, sonst 1 Runde geblendet." },
         { id: "gluecksstraehne", name: "Glückssträhne", typ: "passiv", ab: 3, nur10: true, text: "Glückspilz 2× je Kampf, Platztausch 2× je Rast." },
-        { id: "platztausch", name: "Platztausch", typ: "bonus", ab: 1, art: "tausch", reichweite: 6, pro: { rast: 1 }, text: "Tausche den Platz mit einem Verbündeten in 6 Feldern." },
+        { id: "platztausch", name: "Platztausch", typ: "bonus", ab: 1, art: "tausch", reichweite: 5, pro: { rast: 1 }, text: "Tausche den Platz mit einem Verbündeten in 5 Feldern." },
       ],
       aussen: { name: "Täuschen", text: "Vorteil auf Lügen, Verkleiden, Taschendiebstahl." },
       versuchung: "„Ich mache, dass dir jeder glaubt.“ Wahr, du wirst nie wieder wissen, ob jemand dich mag oder nur glaubt.",
@@ -179,7 +179,7 @@
       werte: { GES: 16, INT: 14, KON: 13, WEI: 12, CHA: 10, STR: 8 }, rk: [15, 15, 15], ruestung: "Leder", tpMinus: -2,
       faehig: [
         { id: "klinge", name: "Klinge der Gilde", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W8", text: "Nahkampf." },
-        { id: "armbrust", name: "Leichte Armbrust", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W8", fern: true, text: "Fernkampf." },
+        { id: "armbrust", name: "Leichte Armbrust", typ: "aktion", ab: 1, art: "angriff", reichweite: 5, attr: "GES", schaden: "1W8", fern: true, text: "Fernkampf." },
         { id: "todesstoss", name: "Todesstoß", typ: "passiv", ab: 1, text: "Vorteil gegen Gegner, die im Kampf noch nicht gehandelt haben." },
         { id: "gift", name: "Gift", typ: "bonus", ab: 1, art: "gift", pro: { rast: 2 }, text: "Dein nächster Treffer macht +1W6 Gift (ab Stufe 2 +2W6), das Ziel ist 1 Runde vergiftet." },
         { id: "aus_dem_schatten", name: "Aus dem Schatten", typ: "bonus", ab: 1, art: "verstecken", text: "Neben Deckung oder im Rauch: verstecken." },
@@ -195,11 +195,11 @@
       name: "Elara", titel: "Die Lichtbringerin", klasse: "kleriker", rolle: "vorn/Mitte, gegen Untote", spruch: "Das Licht weicht nicht.",
       werte: { WEI: 16, KON: 14, STR: 13, CHA: 12, INT: 10, GES: 8 }, rk: [18, 18, 18], ruestung: "Kettenpanzer und Schild", metall: true,
       faehig: [
-        { id: "heiliges_licht", name: "Heiliges Licht", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 12, rettung: "GES", attr: "WEI", schaden: "1W8", plusAttr: true, text: "Zaubertrick. GES-Rettungswurf, sonst 1W8 + WEI gleißender Schaden." },
+        { id: "heiliges_licht", name: "Heiliges Licht", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 5, rettung: "GES", attr: "WEI", schaden: "1W8", plusAttr: true, text: "Zaubertrick. GES-Rettungswurf, sonst 1W8 + WEI gleißender Schaden." },
         { id: "streitkolben", name: "Streitkolben", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W6", wucht: true, text: "Nahkampf." },
         { id: "aura", name: "Strahlende Aura", typ: "passiv", ab: 1, text: "Gegner neben dir nehmen zu Beginn ihres Zugs 1 gleißenden Schaden, Untote 2." },
-        { id: "segen", name: "Segen", typ: "aktion", ab: 1, art: "segen", reichweite: 6, platz: 1, dauer: 3, text: "3 Runden lang: 3 Verbündete in 6 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit." },
-        { id: "vertreiben", name: "Untote vertreiben", typ: "aktion", ab: 2, art: "vertreiben", reichweite: 6, rettung: "WEI", attr: "WEI", pro: { rast: 1 }, text: "Göttliche Macht: Untote in 6 Feldern fliehen 2 Runden (WEI-Rettungswurf)." },
+        { id: "segen", name: "Segen", typ: "aktion", ab: 1, art: "segen", reichweite: 5, platz: 1, dauer: 3, text: "3 Runden lang: 3 Verbündete in 5 Feldern +1W4 auf Angriffe und Rettungswürfe. Nur ein Segen zur Zeit." },
+        { id: "vertreiben", name: "Untote vertreiben", typ: "aktion", ab: 2, art: "vertreiben", reichweite: 5, rettung: "WEI", attr: "WEI", pro: { rast: 1 }, text: "Göttliche Macht: Untote in 5 Feldern fliehen 2 Runden (WEI-Rettungswurf)." },
         { id: "schutzkreis", name: "Schutzkreis", typ: "aktion", ab: 3, art: "schutzkreis", dauer: 3, platz: 2, text: "Verbündete in 2 Feldern um dich +2 RK, 3 Runden." },
       ],
       aussen: { name: "Geweihtes Wissen", text: "Erkennt Flüche und Untote; bringt schwache Untote ohne Kampf zur Ruhe." },
@@ -210,12 +210,12 @@
       name: "Brogar", titel: "Der Wanderheiler", klasse: "kleriker", rolle: "Mitte, Heilung, Schutz", spruch: "Erst die Wunde. Dann die Frage.",
       werte: { WEI: 16, KON: 14, GES: 13, INT: 12, CHA: 10, STR: 8 }, rk: [15, 15, 15], ruestung: "Schuppenpanzer", metall: true,
       faehig: [
-        { id: "dornenranke", name: "Dornenranke", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 8, rettung: "GES", attr: "WEI", schaden: "1W8", plusAttr: true, zustand: "verlangsamt", dauer: 1, text: "Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt." },
+        { id: "dornenranke", name: "Dornenranke", typ: "aktion", ab: 1, art: "rettungswurf", reichweite: 5, rettung: "GES", attr: "WEI", schaden: "1W8", plusAttr: true, zustand: "verlangsamt", dauer: 1, text: "Zaubertrick. GES-Rettungswurf, sonst Schaden und 1 Runde verlangsamt." },
         { id: "gesegnete_heilung", name: "Gesegnete Heilung", typ: "passiv", ab: 1, text: "Deine Heilzauber heilen zusätzlich 1 + Grad des Platzes." },
-        { id: "schild_glaube", name: "Schild des Glaubens", typ: "bonus", ab: 1, art: "schild", reichweite: 6, platz: 1, text: "Ein Verbündeter +2 RK bis Kampfende." },
-        { id: "lebenshauch", name: "Lebenshauch", typ: "aktion", ab: 1, art: "aufrichten", reichweite: 6, pro: { kampf: 1 }, text: "Ein Verbündeter am Boden in 6 Feldern steht mit 1 TP auf." },
-        { id: "bewahren", name: "Bewahren", typ: "aktion", ab: 2, art: "bewahren", reichweite: 6, pro: { rast: 1 }, text: "Göttliche Macht: 5 × Stufe TP auf Verbündete in 6 Feldern verteilen." },
-        { id: "massenheilwort", name: "Massenheilwort", typ: "bonus", ab: 3, art: "massenheil", reichweite: 6, heilung: "1W4", plusAttr: "WEI", platz: 2, text: "3 Verbündete je 1W4 + 3 (+ Gesegnete Heilung)." },
+        { id: "schild_glaube", name: "Schild des Glaubens", typ: "bonus", ab: 1, art: "schild", reichweite: 5, platz: 1, text: "Ein Verbündeter +2 RK bis Kampfende." },
+        { id: "lebenshauch", name: "Lebenshauch", typ: "aktion", ab: 1, art: "aufrichten", reichweite: 5, pro: { kampf: 1 }, text: "Ein Verbündeter am Boden in 5 Feldern steht mit 1 TP auf." },
+        { id: "bewahren", name: "Bewahren", typ: "aktion", ab: 2, art: "bewahren", reichweite: 5, pro: { rast: 1 }, text: "Göttliche Macht: 5 × Stufe TP auf Verbündete in 5 Feldern verteilen." },
+        { id: "massenheilwort", name: "Massenheilwort", typ: "bonus", ab: 3, art: "massenheil", reichweite: 5, heilung: "1W4", plusAttr: "WEI", platz: 2, text: "3 Verbündete je 1W4 + 3 (+ Gesegnete Heilung)." },
       ],
       aussen: { name: "Kräuterkunde", text: "Erkennt Gifte und Flüche; nach jedem Kampf heilt die Gruppe je 1W4." },
       versuchung: "„Ich zeige dir, wie man jede Wunde schließt.“ Wahr, aber jede geschlossene Wunde öffnet sich bei dir.",
@@ -227,9 +227,9 @@
       faehig: [
         { id: "kriegshammer", name: "Kriegshammer", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "STR", schaden: "1W8", wucht: true, text: "Nahkampf." },
         { id: "wahrheitsblick", name: "Wahrheitsblick", typ: "passiv", ab: 1, text: "Vorteil, Lügen zu erkennen; sieht Illusionen und Unsichtbares in 2 Feldern." },
-        { id: "brandmal", name: "Brandmal", typ: "bonus", ab: 1, art: "mal", mal: "brand", reichweite: 12, platz: 1, freiJeKampf: 1, text: "1× je Kampf ohne Platz: Deine Treffer gegen das Ziel machen +1W4 (ab Stufe 3 +2W6)." },
-        { id: "befehl", name: "Befehl: Flieh!", typ: "aktion", ab: 1, art: "kontrolle", zustand: "veraengstigt", dauer: 1, reichweite: 12, rettung: "WEI", attr: "WEI", platz: 1, text: "WEI-Rettungswurf, sonst flieht das Ziel 1 Runde." },
-        { id: "bannen", name: "Bannen", typ: "aktion", ab: 2, art: "kontrolle", zustand: "verbannt", dauer: 2, nurUntot: true, reichweite: 12, rettung: "WEI", attr: "WEI", pro: { rast: 1 }, text: "Göttliche Macht: Ein Untoter oder Fluchwesen ist 2 Runden aus dem Kampf verbannt." },
+        { id: "brandmal", name: "Brandmal", typ: "bonus", ab: 1, art: "mal", mal: "brand", reichweite: 5, platz: 1, freiJeKampf: 1, text: "1× je Kampf ohne Platz: Deine Treffer gegen das Ziel machen +1W4 (ab Stufe 3 +2W6)." },
+        { id: "befehl", name: "Befehl: Flieh!", typ: "aktion", ab: 1, art: "kontrolle", zustand: "veraengstigt", dauer: 1, reichweite: 5, rettung: "WEI", attr: "WEI", platz: 1, text: "WEI-Rettungswurf, sonst flieht das Ziel 1 Runde." },
+        { id: "bannen", name: "Bannen", typ: "aktion", ab: 2, art: "kontrolle", zustand: "verbannt", dauer: 2, nurUntot: true, reichweite: 5, rettung: "WEI", attr: "WEI", pro: { rast: 1 }, text: "Göttliche Macht: Ein Untoter oder Fluchwesen ist 2 Runden aus dem Kampf verbannt." },
         { id: "gerechter_zorn", name: "Gerechter Zorn", typ: "passiv", ab: 3, text: "Brandmal +2W6." },
       ],
       aussen: { name: "Verhör", text: "Erkennt Flüche, Pakte und Lügen; Vorteil, um Anselm zu durchschauen." },
@@ -242,13 +242,13 @@
       name: "Kael", titel: "Der Wildnisläufer", klasse: "waldlaeufer", rolle: "hinten, Fernkampf, Spuren", spruch: "Ich sehe dich, lange bevor du mich siehst.",
       werte: { GES: 16, WEI: 14, KON: 13, INT: 12, STR: 10, CHA: 8 }, rk: [14, 14, 14], ruestung: "Leder",
       faehig: [
-        { id: "langbogen", name: "Langbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, text: "Fernkampf, +1 zum Treffen." },
-        { id: "fesselpfeil", name: "Fesselnder Pfeil", typ: "aktion", ab: 1, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, fesseln: true, pro: { rast: 2 }, text: "Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde)." },
+        { id: "langbogen", name: "Langbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W8", fern: true, bogen: true, text: "Fernkampf, +1 zum Treffen." },
+        { id: "fesselpfeil", name: "Fesselnder Pfeil", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W8", fern: true, bogen: true, fesseln: true, pro: { rast: 2 }, text: "Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde)." },
         { id: "scharfes_auge", name: "Scharfes Auge", typ: "passiv", ab: 1, text: "Ignoriert Deckung." },
         { id: "leichtfuessig", name: "Leichtfüßig", typ: "passiv", ab: 1, text: "Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff." },
         { id: "bogenschuetze", name: "Bogenschütze", typ: "passiv", ab: 1, text: "+1 auf Fernkampf." },
-        { id: "pfeilregen", name: "Pfeilregen", typ: "aktion", ab: 3, nur10: true, art: "flaeche", form: "kreis", groesse: 1, reichweite: 20, schaden: "1W8+3", rettung: "GES", attr: "GES", halb: true, pro: { rast: 1 }, text: "Pfeile regnen auf ein Ziel und alle Gegner direkt daneben: 1W8 + 3, GES-Rettung halbiert." },
-        { id: "doppelschuss", name: "Doppelschuss", typ: "aktion", ab: 2, art: "angriff", reichweite: 20, attr: "GES", schaden: "1W8", fern: true, bogen: true, doppel: true, pro: { rast: 2 }, text: "Zwei Ziele nebeneinander, je ein Angriff." },
+        { id: "pfeilregen", name: "Pfeilregen", typ: "aktion", ab: 3, nur10: true, art: "flaeche", form: "kreis", groesse: 1, reichweite: 7, schaden: "1W8+3", rettung: "GES", attr: "GES", halb: true, pro: { rast: 1 }, text: "Pfeile regnen auf ein Ziel und alle Gegner direkt daneben: 1W8 + 3, GES-Rettung halbiert." },
+        { id: "doppelschuss", name: "Doppelschuss", typ: "aktion", ab: 2, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W8", fern: true, bogen: true, doppel: true, pro: { rast: 2 }, text: "Zwei Ziele nebeneinander, je ein Angriff." },
       ],
       aussen: { name: "Fährtenleser", text: "Liest Spuren genau, findet sichere Wege." },
       versuchung: "„Du wirst nie wieder jemanden verlieren, den du beschützen willst.“ Wahr, weil du niemanden mehr nah genug heranlässt.",
@@ -260,7 +260,7 @@
       wolf: { name: "Grau", tp: [8, 12, 20], rk: 13, angriff: [4, 4, 5], schaden: "1W6", plus: 2, bewegung: 8 },
       faehig: [
         { id: "kurzschwert", name: "Kurzschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W6", text: "Nahkampf." },
-        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
+        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
         { id: "rudeltaktik", name: "Rudeltaktik", typ: "passiv", ab: 1, text: "Du und Grau habt Vorteil gegen ein Ziel, neben dem der andere steht." },
         { id: "wolf_befehl", name: "Befehl an Grau", typ: "bonus", ab: 1, art: "wolf", reichweite: 20, text: "Grau läuft bis zu 8 Felder zum Ziel und beißt." },
         { id: "wolf_umreissen", name: "Grau: Umreißen", typ: "bonus", ab: 1, art: "wolf", umreissen: true, reichweite: 20, pro: { rast: 2 }, text: "Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel." },
@@ -275,12 +275,12 @@
       name: "Orin", titel: "Der Kopfgeldjäger", klasse: "waldlaeufer", rolle: "hinten, markiert und erlegt", spruch: "Jeder hat einen Preis. Und eine Schwäche.",
       werte: { GES: 16, WEI: 14, KON: 13, INT: 12, STR: 10, CHA: 8 }, rk: [15, 15, 15], ruestung: "beschlagenes Leder",
       faehig: [
-        { id: "armbrust", name: "Schwere Armbrust", typ: "aktion", ab: 1, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W10", fern: true, text: "Fernkampf." },
+        { id: "armbrust", name: "Schwere Armbrust", typ: "aktion", ab: 1, art: "angriff", reichweite: 5, attr: "GES", schaden: "1W10", fern: true, text: "Fernkampf." },
         { id: "schwachstelle", name: "Schwachstelle", typ: "passiv", ab: 1, text: "Gegen dein markiertes Ziel kritisch bei 19–20." },
-        { id: "netz", name: "Netz", typ: "aktion", ab: 1, art: "kontrolle", zustand: "netz", reichweite: 6, rettung: "STR", attr: "GES", pro: { rast: 2 }, text: "STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13)." },
+        { id: "netz", name: "Netz", typ: "aktion", ab: 1, art: "kontrolle", zustand: "netz", reichweite: 3, rettung: "STR", attr: "GES", pro: { rast: 2 }, text: "STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13)." },
         { id: "fangschuss", name: "Fangschuss", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Bewegt sich dein markiertes Ziel, schießt du einmal." },
         { id: "jagdvorbereitung", name: "Jagdvorbereitung", typ: "passiv", ab: 1, text: "Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz)." },
-        { id: "laehmbolzen", name: "Lähmender Bolzen", typ: "aktion", ab: 2, nur10: true, art: "angriff", reichweite: 16, attr: "GES", schaden: "1W10", fern: true, lahm: true, pro: { rast: 2 }, text: "Treffer, und das Ziel ist 1 Runde verlangsamt." },
+        { id: "laehmbolzen", name: "Lähmender Bolzen", typ: "aktion", ab: 2, nur10: true, art: "angriff", reichweite: 5, attr: "GES", schaden: "1W10", fern: true, lahm: true, pro: { rast: 2 }, text: "Treffer, und das Ziel ist 1 Runde verlangsamt." },
         { id: "erlegen", name: "Erlegen", typ: "passiv", ab: 3, pro: { kampf: 1 }, text: "1× je Kampf gegen dein markiertes Ziel unter halben TP: +2W6." },
       ],
       aussen: { name: "Steckbriefe", text: "Kennt Kreaturen: vor einem Kampf eine Schwäche des Gegners." },
@@ -359,11 +359,11 @@
     trickser: { 5: "Schmutziger Trick: ein Einsatz mehr, Reichweite 2 Felder", 8: "Zweiter Dolch mit vollem Schaden", 10: "Hinterhalt mit jedem Dolch, nicht nur einmal je Zug", titel: "Königin der Gassen" },
     assassine: { 5: "Gift 3× je Rast", 8: "Todesstoß: Vorteil aus dem Versteck in jeder Runde", 10: "Hinrichtung +2W6 statt 1W6; Gegner (keine Bosse) unter 8 Lebenspunkten fallen bei einem Treffer", titel: "Die letzte Klinge" },
     lichtbringer: { 5: "Segen auf 4 Verbündete", 8: "Strahlende Aura wirkt in 2 Feldern", 10: "Schutzkreis +3 RK und heilt jede Runde 1W6", titel: "Licht von Grauwacht" },
-    wanderheiler: { 5: "Lebenshauch 2× je Kampf", 8: "Bewahren verteilt 6 × Stufe statt 5 × Stufe", 10: "Massenheilwort heilt alle Verbündeten in 6 Feldern", titel: "Der Barmherzige" },
+    wanderheiler: { 5: "Lebenshauch 2× je Kampf", 8: "Bewahren verteilt 6 × Stufe statt 5 × Stufe", 10: "Massenheilwort heilt alle Verbündeten in 5 Feldern", titel: "Der Barmherzige" },
     inquisitor: { 5: "Brandmal 2× je Kampf ohne Zauberplatz", 8: "Befehl „Flieh!“ trifft zwei Ziele", 10: "Gerechter Zorn +3W6, und das Brandmal-Ziel kann nicht fliehen", titel: "Hammer der Wahrheit" },
     wildnislaeufer: { 5: "Jägermal +1W8 statt +1W6", 8: "Fesselnder Pfeil 3× je Rast", 10: "Doppelschuss trifft drei Ziele", titel: "Falke des Nordens" },
     tiergefaehrte: { 5: "Grau hat 10 Lebenspunkte mehr", 8: "Grau: Umreißen 3× je Rast", 10: "Grau greift zweimal je Zug an", titel: "Herrin der Wölfe" },
-    kopfgeldjaeger: { 5: "Netz mit 8 Feldern Reichweite, Befreien gegen SG +2", 8: "Fangschuss zweimal je Runde", 10: "Erlegen 2× je Kampf, +4W6 statt +2W6", titel: "Der Unentrinnbare" },
+    kopfgeldjaeger: { 5: "Netz mit 5 Feldern Reichweite, Befreien gegen SG +2", 8: "Fangschuss zweimal je Runde", 10: "Erlegen 2× je Kampf, +4W6 statt +2W6", titel: "Der Unentrinnbare" },
   };
   /** Verbesserungen als Änderungen an den Fähigkeiten: [ab Heldenstufe, Fähigkeit, geänderte Felder].
    *  Was sich nicht als Feld ausdrücken lässt (z. B. „Parade zweimal je Runde“), steht in regeln.js bei der jeweiligen Regel (hs(f) >= Stufe). */
@@ -382,7 +382,7 @@
     inquisitor: [[5, "brandmal", { freiJeKampf: 2 }], [8, "befehl", { radius: 1 }]],
     wildnislaeufer: [[8, "fesselpfeil", { pro: { rast: 3 } }], [10, "doppelschuss", { ziele: 3 }]],
     tiergefaehrte: [[8, "wolf_umreissen", { pro: { rast: 3 } }]],
-    kopfgeldjaeger: [[5, "netz", { reichweite: 8, sgPlus: 2 }], [10, "erlegen", { pro: { kampf: 2 } }]],
+    kopfgeldjaeger: [[5, "netz", { reichweite: 5, sgPlus: 2 }], [10, "erlegen", { pro: { kampf: 2 } }]],
   };
   /** Meistertitel eines Helden (ab Stufe 10), sonst null – und der Titel, der gerade gilt */
   const meistertitel = (fid, stufe) => (stufe >= 10 && AUFSTIEG[fid] && AUFSTIEG[fid].titel) || null;
@@ -1161,7 +1161,7 @@
     if (treffer && w < kritAb && a.seite === "gegner" && z.seite === "spieler") {
       // ab Stufe 8: +7 statt +5 und einmal je Kampf ohne Zauberplatz
       const glFrei = (o) => hs(o) >= 8 && !(o.genutzt.glyphe_frei);
-      const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.reaktion > 0 && (platzIndex(o, 1) >= 0 || glFrei(o)) && abstand(o, z) <= 6);
+      const g = st.figuren.find((o) => istFig(o, "gelehrter") && lebt(o) && o.reaktion > 0 && (platzIndex(o, 1) >= 0 || glFrei(o)) && abstand(o, z) <= 5);
       const glPlus = g && hs(g) >= 8 ? 7 : 5;
       if (g && total < rk + glPlus && z.tp - mittel(spec.schaden) <= z.tpMax / 2) {
         g.reaktion--; if (glFrei(g)) g.genutzt.glyphe_frei = 1; else g.plaetze[platzIndex(g, 1)]--; rk += glPlus; treffer = false;
@@ -1323,7 +1323,7 @@
       case "rueckzug": return f.z.rueckzug ? [] : [f];
       case "schattenschritt": return st.zug.schritt ? [] : [f];
       case "spiegelbilder": return f.z.spiegel ? [] : [f];
-      case "segen": return !st.figuren.some((o) => o.z && o.z.segen === f.id && lebt(o)) && freunde.some((o) => o.tp > 0 && o.art !== "wolf" && !o.z.segen && abstand(f, o) <= 6) ? [f] : [];
+      case "segen": return !st.figuren.some((o) => o.z && o.z.segen === f.id && lebt(o)) && freunde.some((o) => o.tp > 0 && o.art !== "wolf" && !o.z.segen && abstand(f, o) <= (a.reichweite || 5)) ? [f] : [];
       case "schutzkreis": return f.z.schutzkreis > st.runde ? [] : [f];
       case "vertreiben": return gegner.some((o) => GEGNER[o.art].untot && abstand(f, o) <= a.reichweite) ? [f] : [];
       case "bewahren": case "massenheil": return freunde.some((o) => o.tp < o.tpMax && abstand(f, o) <= a.reichweite) ? [f] : [];
@@ -1489,7 +1489,7 @@
       case "schattenschritt": st.zug.schritt = 6; st.log.push({ t: `${f.name} tritt in die Schatten.` }); break;
       case "spiegelbilder": f.z.spiegel = a.bilder || 3; st.log.push({ t: `${f.name} teilt sich in ${a.bilder === 4 ? "vier" : "drei"} Spiegelbilder.`, art: "gut" }); break;
       case "segen": {
-        const zs2 = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).sort((x, y) => abstand(f, x) - abstand(f, y)).slice(0, a.ziele || 3);
+        const zs2 = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= (a.reichweite || 5)).sort((x, y) => abstand(f, x) - abstand(f, y)).slice(0, a.ziele || 3);
         zs2.forEach((o) => { o.z.segen = f.id; o.z.segenBis = st.runde + (a.dauer || 99); });
         st.log.push({ t: `${f.name} segnet ${zs2.map((o) => o.name).join(", ")}.`, art: "gut" }); break;
       }
@@ -2476,10 +2476,10 @@
       case "stoss": case "entwaffnen": return z.tp > 8 ? 3.5 - begrenzt : -1;
       case "heilung": return z.tp <= 0 ? 15 : z.tp < z.tpMax * 0.45 ? Math.min(z.tpMax - z.tp, 7) - slot * 0.5 : -1;
       case "aufrichten": return (z.aufgerichtet || 0) >= 3 ? -1 : 15; // Automatik: nicht endlos dieselbe Figur aufrichten
-      case "segen": { const n = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= 6).slice(0, 3).length; return n >= 2 ? n * 2.4 * Math.max(1, 4 - st.runde) / 2 - slot : -1; }
+      case "segen": { const n = spielerFiguren(st).filter((o) => o.tp > 0 && !o.z.segen && abstand(f, o) <= (a.reichweite || 5)).slice(0, 3).length; return n >= 2 ? n * 2.4 * Math.max(1, 4 - st.runde) / 2 - slot : -1; }
       case "schutzkreis": return spielerFiguren(st).filter((o) => o.tp > 0 && abstand(o, f) <= 2).length * 2.5 - slot;
       case "spiegelbilder": return f.tp < f.tpMax && gegnerFiguren(st).some((g) => lebt(g) && abstand(g, f) <= 7) ? 6 - slot : -1;
-      case "vertreiben": return gegnerFiguren(st).filter((o) => lebt(o) && GEGNER[o.art].untot && abstand(o, f) <= 6).length * 5 - begrenzt;
+      case "vertreiben": return gegnerFiguren(st).filter((o) => lebt(o) && GEGNER[o.art].untot && abstand(o, f) <= (a.reichweite || 5)).length * 5 - begrenzt;
       case "bewahren": return spielerFiguren(st).some((o) => o.tp < o.tpMax * 0.5) ? 5 * f.stufe * 0.8 - begrenzt : -1;
       case "bannkreis": return gegnerFiguren(st).filter((o) => lebt(o) && abstand(o, z) <= 2).length * 3 - slot;
       case "rauch": return -1;

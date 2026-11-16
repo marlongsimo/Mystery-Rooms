@@ -662,6 +662,18 @@
         : `<rect x="${x0 * Z + 2}" y="${y0 * Z + 2}" width="${(x1 - x0 + 1) * Z - 4}" height="${(y1 - y0 + 1) * Z - 4}" rx="12" fill="#9a6ad0" fill-opacity=".12" stroke="#b58cff" stroke-width="3" stroke-dasharray="8 6"/>`;
     }
     for (const b of st.brand) o += `<rect x="${b.x * Z + 4}" y="${b.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#ff7a2a" fill-opacity=".35"/>`;
+    // Reichweite der gewählten Aktion: alle Felder, die sie von hier aus erreicht (mit Sichtlinie) – Angriffe und Zauber rötlich, Heilung und Hilfe grünlich
+    if (spielerDran && wahl) {
+      const h = R.findeAktion(akt, wahl), d = h && h.a, weit = d && d.reichweite;
+      if (weit) {
+        const hilfe = /^(heilung|aufrichten|schild|tausch|segen|bewahren|massenheil|selbstheilung)$/.test(d.art), f1 = hilfe ? "#4caf6a" : "#d9534f", f2 = hilfe ? "#8fe0a6" : "#f29a94", frei = /^(tausch|aufrichten)$/.test(d.art); // Platztausch und Aufrichten brauchen keine Sichtlinie
+        for (let y = Math.max(0, akt.y - weit); y <= Math.min(k.h - 1, akt.y + weit); y++) for (let x = Math.max(0, akt.x - weit); x <= Math.min(k.b - 1, akt.x + weit); x++) {
+          if ((x === akt.x && y === akt.y) || k.block.has(x + "," + y)) continue;
+          const p = { x, y }; if (!frei && R.abstand(akt, p) > 1 && !R.sicht(st, akt, p)) continue;
+          o += `<rect class="rw ${hilfe ? "hilfe" : "angriff"}" x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${f1}" fill-opacity="${k.bild ? ".26" : ".18"}" stroke="${f2}" stroke-opacity=".5" stroke-width="1.2"/>`;
+        }
+      }
+    }
     for (const [kk, c] of reach) { const [x, y] = kk.split(",").map(Number); if (x === akt.x && y === akt.y) continue; o += `<rect x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${c === "schritt" ? "#b58cff" : "#4D9DB6"}" fill-opacity="${k.bild ? ".32" : ".2"}" stroke="${c === "schritt" ? "#c9a8ff" : "#8fd0e6"}" stroke-opacity=".7" stroke-width="1.5"/>`; }
     if (tipp && tipp.feld && spielerDran) o += `<rect class="tipp-ring" x="${tipp.feld.x * Z + 4}" y="${tipp.feld.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#f2d35a" fill-opacity=".18" stroke="#f2d35a" stroke-width="3"/>`;
     // Auf gemalten Karten ist alles im Bild; nur berührte Siegelsteine leuchten zusätzlich auf
@@ -763,7 +775,9 @@
         const g = R.grund(st, a.id), r = R.rest(akt, a), typ = a.typ === "bonus" ? "Bonusaktion" : a.typ === "frei" ? "frei" : "Aktion";
         const kosten = a.platz ? ` · ${a.platz === 2 ? "Platz Grad 2" : "1 Platz"}` : "", gz = R.grenze(akt, a), rr = r !== Infinity ? ` · noch ${Math.max(0, r)}${gz ? ` von ${gz.n} je ${gz.je}` : ""}` : "";
         const wirk = a.schaden ? ` · ${a.schaden}${a.anzahl ? " ×" + a.anzahl : ""}` : a.heilung ? ` · heilt ${a.heilung}` : "";
-        return `<button class="akt ${wahl === a.id ? "gewaehlt" : ""} ${tipp && tipp.aktion === a.id ? "getippt" : ""}" data-a="${a.id}" ${g ? "disabled" : ""}><span class="akt-kopf"><b>${esc(a.name)}${a.art === "trank" && !a.gross ? ` (${R.trankZahl(akt)})` : ""}</b><small>${typ}${kosten}${rr}${wirk}</small></span><span class="akt-text">${esc(g && g !== "Kein gültiges Ziel." ? g : a.text || "")}${g === "Kein gültiges Ziel." ? ` <em>${["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite."}</em>` : ""}</span></button>`;
+        // Fehlt nur das Ziel, bleibt die Aktion wählbar: Dann zeigt die Karte ihre Reichweite (auslösen lässt sie sich ohne Ziel nicht)
+        const ohneZiel = g === "Kein gültiges Ziel." && a.reichweite && !SELBST.has(a.art);
+        return `<button class="akt ${wahl === a.id ? "gewaehlt" : ""} ${tipp && tipp.aktion === a.id ? "getippt" : ""} ${ohneZiel ? "ohne-ziel" : ""}" data-a="${a.id}" ${g && !ohneZiel ? "disabled" : ""}><span class="akt-kopf"><b>${esc(a.name)}${a.art === "trank" && !a.gross ? ` (${R.trankZahl(akt)})` : ""}</b><small>${typ}${kosten}${rr}${wirk}</small></span><span class="akt-text">${esc(g && g !== "Kein gültiges Ziel." ? g : a.text || "")}${g === "Kein gültiges Ziel." ? ` <em>${["trank", "selbstheilung"].includes(a.art) ? "Nicht nötig – du bist unverletzt." : SELBST.has(a.art) ? "Gerade nicht möglich." : "Gerade kein Ziel in Reichweite – antippen zeigt, wie weit es reicht."}</em>` : ""}</span></button>`;
       };
       const alle = R.aktionenVon(akt, st);
       const gruppe = (typen, titel) => { const l = alle.filter((a) => typen.includes(a.typ || "aktion")); return l.length ? `<p class="akt-gruppe">${titel}</p>${l.map(knopf).join("")}` : ""; };
@@ -772,7 +786,7 @@
       const schritte = `<div class="schritte">${schritt(true, !(st.zug.bewegung || st.zug.schritt), `① Bewegen · ${st.zug.bewegung} Felder`)}${schritt(st.zug.aktion, !st.zug.aktion, "② Aktion")}${schritt(st.zug.bonus, !st.zug.bonus, "③ Bonusaktion")}${schritt(true, false, "④ Zug beenden")}</div>`;
       $("#aktionen").innerHTML = schritte + (b ? `<details class="uebernehmen"><summary>Aktionen hier am Tisch auslösen</summary>${knoepfe}</details>` : knoepfe) + `<div class="knoepfe"><button class="btn ghost klein" id="tipp">💡 Tipp</button><button class="btn ghost" id="ende-zug">Zug beenden</button></div>`;
       const gewaehlt = wahl && R.findeAktion(akt, wahl);
-      $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt. Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
+      $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>${zs.length ? "Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt." : "<b>Kein Ziel in Reichweite.</b> Die eingefärbten Felder zeigen, wie weit es reicht – geh näher heran."} Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
     }
     $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}${l.tm != null && ARENA ? (l.tm === ARENA.seite ? " tm-eigen" : l.tm ? " tm-gegner" : " tm-monster") : ""}">${logZeile(l)}</li>`).join("");
     zeichneGegnerInfo(); zeichneLeiste(akt, spielerDran);
@@ -869,7 +883,7 @@
     if (st.ende || akt.seite !== "spieler") return;
     if (wahl) {
       const z = R.ziele(st, wahl).find((f) => f.x === x && f.y === y);
-      if (!z) { $("#hinweis").textContent = "Dort ist kein gültiges Ziel."; return; }
+      if (!z) { if (!R.ziele(st, wahl).length) { wahl = null; render(); return; } $("#hinweis").textContent = "Dort ist kein gültiges Ziel."; return; } // ohne jedes Ziel: Antippen der Karte hebt die Wahl auf (zurück zum Laufen)
       if (ARENA && ARENA.gast) { ARENA.sende({ typ: "aktion", aktion: wahl, ziel: z.id }); wahl = null; tipp = null; render(); return; }
       R.handeln(st, wahl, z.id); wahl = null; tipp = null; render(); veroeffentlichen(); gegnerSchleife(); return;
     }

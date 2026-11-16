@@ -17,7 +17,8 @@
 --   • Der Gegner hat kein Konto: Am Kampf steht kein guest_id, nur Name und Aufstellung. Dafür:
 --       – rpg_arena_json zeigt den Gegner auch dann, wenn nur Name und Aufstellung vorhanden sind;
 --       – rpg_arena_belohnen bucht für „kein Konto“ nichts (statt mit einem Fehler abzubrechen).
---     Beide Funktionen werden NICHT neu geschrieben: In ihrer vorhandenen Fassung wird nur diese eine Stelle ergänzt.
+--     Beide Funktionen werden in ihrer vorhandenen Fassung nur an dieser einen Stelle ergänzt – unabhängig von ihrer
+--     Formatierung. Nur wenn rpg_arena_json den Gegner ganz anders prüft als erwartet, wird sie in der Fassung aus 008 neu gesetzt.
 --   • rpg_arena_queue, rpg_arena_srv_load und rpg_arena_looks werden in der Fassung aus 016/018 neu gesetzt, ergänzt
 --     um den Rechner-Gegner. (Wer 015, 016 oder 018 später noch einmal ausführt, führt danach auch 019 noch einmal aus.)
 --   • Neue Spalten: rpg_arena_fights.bot (Profilbild und Rahmen des Gegners; leer = Mensch), rpg_arena_search_srv.seit
@@ -60,16 +61,41 @@ begin
     if v_neu = v_alt then raise exception 'rpg_arena_belohnen sieht anders aus als erwartet. Die Migration ändert nichts; bitte melden.'; end if;
     execute v_neu; raise notice 'rpg_arena_belohnen: bucht für „kein Konto“ nichts';
   end loop;
-  -- rpg_arena_json: Der Gegner ist da, sobald seine Aufstellung feststeht (auch ohne Konto)
+  -- rpg_arena_json: Der Gegner ist da, sobald seine Aufstellung feststeht (auch ohne Konto).
+  -- Unabhängig von der Formatierung der vorhandenen Fassung (Zeilenumbrüche, Groß-/Kleinschreibung, Anführungszeichen):
+  --   „<m>.guest_id is not null“ → „(<m>.guest_id is not null or <m>.guest_team is not null)“
+  --   „<m>.guest_id is null“     → „(<m>.guest_id is null and <m>.guest_team is null)“
   for f in select p.oid from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = 'rpg_arena_json' loop
     v_alt := pg_get_functiondef(f.oid);
-    if v_alt ~ 'p_m\.guest_team is not null' then raise notice 'rpg_arena_json: nichts zu ändern'; continue; end if;
-    v_neu := replace(v_alt, 'p_m.host_id = p_user or p_m.guest_id is not null then', 'p_m.host_id = p_user or p_m.guest_id is not null or p_m.guest_team is not null then');
-    v_neu := replace(v_neu, 'case when p_m.guest_id is null then null else', 'case when p_m.guest_id is null and p_m.guest_team is null then null else');
-    if v_neu = v_alt or v_neu !~ 'guest_id is null and p_m\.guest_team is null' or v_neu !~ 'guest_id is not null or p_m\.guest_team is not null' then
-      raise exception 'rpg_arena_json sieht anders aus als erwartet. Die Migration ändert nichts; bitte melden.';
+    if v_alt ~* 'guest_team"?\s+is\s+not\s+null' then raise notice 'rpg_arena_json: nichts zu ändern'; continue; end if;
+    v_neu := regexp_replace(v_alt, '(\w+)\."?guest_id"?\s+is\s+not\s+null', '(\1.guest_id is not null or \1.guest_team is not null)', 'gi');
+    v_neu := regexp_replace(v_neu, '(\w+)\."?guest_id"?\s+is\s+null', '(\1.guest_id is null and \1.guest_team is null)', 'gi');
+    if v_neu ~* 'guest_id is not null or \w+\.guest_team is not null' and v_neu ~* 'guest_id is null and \w+\.guest_team is null' then
+      execute v_neu; raise notice 'rpg_arena_json: zeigt den Gegner, sobald seine Aufstellung feststeht (vorhandene Fassung ergänzt)';
+    else
+      -- Die vorhandene Fassung prüft den Gegner anders als erwartet: Dann wird die Funktion in der Fassung aus Migration 008
+      -- (mit der Ergänzung) neu gesetzt. Gleiche Felder, gleiche Sichtregeln.
+      begin
+        execute $f$
+          create or replace function public.rpg_arena_json(p_m public.rpg_arena_matches, p_user uuid)
+          returns jsonb language sql stable security definer set search_path = public as $j$
+            select jsonb_build_object(
+              'id', p_m.id, 'status', p_m.status, 'seite', case when p_m.host_id = p_user then 1 else 2 end,
+              'host', jsonb_build_object('name', p_m.host_name, 'schnitt', p_m.host_schnitt, 'team', case when p_m.host_id = p_user or (p_m.guest_id is not null or p_m.guest_team is not null) then p_m.host_team else null end),
+              'gast', case when (p_m.guest_id is null and p_m.guest_team is null) then null else jsonb_build_object('name', p_m.guest_name, 'schnitt', p_m.guest_schnitt, 'team', p_m.guest_team) end,
+              'karte', p_m.karte, 'begegnung', p_m.begegnung, 'seed', p_m.seed, 'room_code', p_m.room_code,
+              'kampfstufe', round(greatest(p_m.host_schnitt, coalesce(p_m.guest_schnitt, p_m.host_schnitt)))::integer,
+              'sieger', p_m.sieger, 'grund', p_m.grund, 'punkte', p_m.punkte, 'runden', p_m.runden, 'erstellt', p_m.created_at,
+              'belohnung', (select jsonb_build_object('sieg', r.sieg, 'gewertet', r.gewertet, 'xp', r.xp, 'waehrung', r.waehrung,
+                              'angebot', (select public.rpg_hero_angebot_json(o) from public.rpg_hero_offers o where o.id = r.offer_id and o.status = 'offen'))
+                            from public.rpg_arena_rewards r where r.match_id = p_m.id and r.user_id = p_user));
+          $j$;
+        $f$;
+        raise notice 'rpg_arena_json: in der Fassung aus Migration 008 neu gesetzt (mit Gegner ohne Konto)';
+      exception when others then
+        raise exception 'rpg_arena_json ließ sich weder ergänzen noch neu setzen (%). Die Migration ändert nichts. Bitte die Ausgabe von: select pg_get_functiondef(''public.rpg_arena_json(public.rpg_arena_matches, uuid)''::regprocedure); melden.', sqlerrm;
+      end;
     end if;
-    execute v_neu; raise notice 'rpg_arena_json: zeigt den Gegner, sobald seine Aufstellung feststeht';
   end loop;
 end $$;
 

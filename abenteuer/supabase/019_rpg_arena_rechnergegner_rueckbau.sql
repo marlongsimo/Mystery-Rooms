@@ -20,8 +20,8 @@ begin
   end loop;
   for f in select p.oid from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = 'rpg_arena_json' loop
     v_alt := pg_get_functiondef(f.oid);
-    v_neu := replace(v_alt, 'p_m.host_id = p_user or p_m.guest_id is not null or p_m.guest_team is not null then', 'p_m.host_id = p_user or p_m.guest_id is not null then');
-    v_neu := replace(v_neu, 'case when p_m.guest_id is null and p_m.guest_team is null then null else', 'case when p_m.guest_id is null then null else');
+    v_neu := regexp_replace(v_alt, '\((\w+)\.guest_id is not null or \1\.guest_team is not null\)', '\1.guest_id is not null', 'g');
+    v_neu := regexp_replace(v_neu, '\((\w+)\.guest_id is null and \1\.guest_team is null\)', '\1.guest_id is null', 'g');
     if v_neu <> v_alt then execute v_neu; end if;
   end loop;
 end $$;

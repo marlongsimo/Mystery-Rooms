@@ -88,7 +88,8 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 018_rpg_ausstattung_sichtbar
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../014_rpg_arena_team_suche.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql
-ARENA_VOR19=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -c "do \$\$ declare d text := pg_get_functiondef('public.rpg_arena_json(public.rpg_arena_matches, uuid)'::regprocedure); n text; begin n := regexp_replace(regexp_replace(d, 'p_m\\.guest_id is not null then', E'p_m.guest_id\\n        IS NOT NULL\\n      THEN'), 'case when p_m\\.guest_id is null then', E'CASE\\n      WHEN p_m.\\\"guest_id\\\" IS NULL THEN'); if n = d then raise exception 'Umformatierung für den Test greift nicht'; end if; execute n; end \$\$;"
+ARENA_VOR19=$(psql -q -At -d "$DB" -c "select md5(string_agg(regexp_replace(lower(pg_get_functiondef(p.oid)), '[[:space:]\"]+', '', 'g'), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  /  /"
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  /  /"     # zweimal: idempotent
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 019_rpg_arena_rechnergegner_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
@@ -97,8 +98,8 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>/dev
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../018_rpg_ausstattung_sichtbar.sql
-ARENA_NACH19=$(psql -q -At -d "$DB" -c "select md5(string_agg(pg_get_functiondef(p.oid), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
-if [ "$ARENA_VOR19" = "$ARENA_NACH19" ]; then echo "✓ Nach dem Rückbau von 019 (und erneutem 016 und 018) sind alle Arena-Funktionen wie vorher"; else echo "✗ Der Rückbau von 019 hinterlässt Reste"; exit 1; fi
+ARENA_NACH19=$(psql -q -At -d "$DB" -c "select md5(string_agg(regexp_replace(lower(pg_get_functiondef(p.oid)), '[[:space:]\"]+', '', 'g'), '' order by p.oid::regprocedure::text)) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_arena%'")
+if [ "$ARENA_VOR19" = "$ARENA_NACH19" ]; then echo "✓ Nach dem Rückbau von 019 (und erneutem 016 und 018) sind alle Arena-Funktionen wie vorher (bis auf Leerraum und Schreibweise)"; else echo "✗ Der Rückbau von 019 hinterlässt Reste"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../016_rpg_arena_spielarten_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf.sql 2>/dev/null
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../015_rpg_arena_serverkampf_rueckbau.sql

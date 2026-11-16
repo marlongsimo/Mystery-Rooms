@@ -1,6 +1,7 @@
 /*
  * Mythara – Reichweiten der Helden und ihre Anzeige auf der Karte.
- * Regeln: Bogen 7 Felder · Armbrust, Zauber, Heilung 5 · Dolch und Netz geworfen 3 · Nahkampf 1.
+ * Regeln: Bogen 6 Felder · Armbrust, Zauber, Heilung 5 · Dolch und Netz geworfen 3 · Nahkampf 1. Eine Diagonale kostet anderthalb Felder:
+ * Nahkampf und Stabilisieren gehen nur gerade (oben, unten, links, rechts), Fernreichweiten sind rund statt quadratisch.
  * Anzeige: Ist eine Aktion gewählt, sind alle Felder in Reichweite (mit Sichtlinie) eingefärbt – Angriffe rötlich, Heilung und Hilfe grünlich.
  * Aufruf: node abenteuer/tests/reichweite.test.js   (Webserver auf Port 8765)
  */
@@ -9,15 +10,18 @@ const BASIS = "http://localhost:8765/abenteuer/index.html?testlauf&schnell";
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 console.log("Reichweiten");
 // Regeln: jede Fähigkeit jedes Helden
-{ const F = R.FD, BOGEN = /^(kurzbogen|langbogen|fesselpfeil|pfeilregen|doppelschuss|jaegermal)$/, WURF = /^(dolch|zweiter_dolch|netz)$/, falsch = [], zahl = { 7: 0, 5: 0, 3: 0, 1: 0 };
+{ const F = R.FD, BOGEN = /^(kurzbogen|langbogen|fesselpfeil|pfeilregen|doppelschuss|jaegermal)$/, WURF = /^(dolch|zweiter_dolch|netz|kraeutermesser)$/, falsch = [], zahl = { 6: 0, 5: 0, 3: 0, 1: 0 };
   F.STUFEN10.aktiv = true;
   for (const fid of Object.keys(F.FIGUREN)) for (const stufe of [1, 10]) for (const a of F.faehigVon(fid, stufe)) {
     if (!a.reichweite || /^wolf_/.test(a.id)) continue;
-    const nah = a.reichweite <= 2 && !WURF.test(a.id), soll = nah ? a.reichweite : BOGEN.test(a.id) ? 7 : WURF.test(a.id) ? (a.id === "netz" && stufe === 10 ? 5 : 3) : 5;
+    const nah = a.reichweite <= 2 && !WURF.test(a.id), soll = nah ? a.reichweite : BOGEN.test(a.id) ? 6 : WURF.test(a.id) ? (a.id === "netz" && stufe === 10 ? 5 : 3) : 5;
     if (a.reichweite !== soll) falsch.push(`${fid}/${a.id}: ${a.reichweite} statt ${soll}`); else zahl[soll > 2 ? soll : 1]++;
   }
-  check(!falsch.length && zahl[7] > 0 && zahl[5] > 0 && zahl[3] > 0 && zahl[1] > 0, `Alle Fähigkeiten: Bogen 7, Armbrust/Zauber/Heilung 5, Dolch und Netz 3, Nahkampf 1` + (falsch.length ? " – " + falsch.join("; ") : ` (${zahl[7] / 2} mit 7, ${zahl[5] / 2} mit 5, ${zahl[3] / 2} mit 3 Feldern)`));
-  check(Math.max(...Object.keys(F.FIGUREN).flatMap((fid) => F.faehigVon(fid, 10).filter((a) => a.reichweite && !/^wolf_/.test(a.id)).map((a) => a.reichweite))) === 7, "Nichts reicht weiter als 7 Felder"); }
+  check(!falsch.length && zahl[6] > 0 && zahl[5] > 0 && zahl[3] > 0 && zahl[1] > 0, `Alle Fähigkeiten: Bogen 6, Armbrust/Zauber/Heilung 5, Dolch und Netz 3, Nahkampf 1` + (falsch.length ? " – " + falsch.join("; ") : ` (${zahl[6] / 2} mit 6, ${zahl[5] / 2} mit 5, ${zahl[3] / 2} mit 3 Feldern)`));
+  check(Math.max(...Object.keys(F.FIGUREN).flatMap((fid) => F.faehigVon(fid, 10).filter((a) => a.reichweite && !/^wolf_/.test(a.id)).map((a) => a.reichweite))) === 6, "Nichts reicht weiter als 6 Felder");
+  // Diagonalen kosten anderthalb Felder
+  const w = (dx, dy) => R.weite({ x: 0, y: 0 }, { x: dx, y: dy });
+  check(w(1, 0) === 1 && w(0, 1) === 1 && w(1, 1) === 1.5 && w(3, 3) === 4.5 && w(4, 4) === 6 && w(5, 0) === 5 && w(4, 2) === 5 && w(4, 3) === 5.5, "Entfernung für Aktionen: gerade 1 je Feld, diagonal 1,5 (z. B. 3 diagonal = 4,5; 4 gerade + 3 quer = 5,5)"); }
 (async () => {
   const b = await chromium.launch();
   const p = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage(), fehler = []; p.on("pageerror", (e) => fehler.push(e.message));
@@ -41,8 +45,8 @@ console.log("Reichweiten");
         await knopf.click(); await p.waitForTimeout(120);
         if (!(await p.$("#aktionen .akt.gewaehlt"))) continue; // sofort ausgeführt (kein Ziel zu wählen)
         const r = await p.evaluate(() => { const R = window.AB.R, st = window.AB.st, a = R.aktiv(st), Z = 60, f = [...document.querySelectorAll("#karte .rw")].map((x) => ({ x: Math.round((+x.getAttribute("x") - 3) / Z), y: Math.round((+x.getAttribute("y") - 3) / Z), k: x.getAttribute("class"), farbe: x.getAttribute("fill") }));
-          const ab = f.map((q) => Math.max(Math.abs(q.x - a.x), Math.abs(q.y - a.y)));
-          return { ohneZiel: document.querySelector("#aktionen .akt.gewaehlt").classList.contains("ohne-ziel") && /Kein Ziel in Reichweite/.test(document.querySelector("#hinweis").textContent), n: f.length, max: ab.length ? Math.max(...ab) : 0, selbst: f.some((q) => q.x === a.x && q.y === a.y), block: f.some((q) => st.karte.block.has(q.x + "," + q.y)), klassen: [...new Set(f.map((q) => q.k))].join(","), farbe: f[0] && f[0].farbe, blau: document.querySelectorAll('#karte rect[fill="#4D9DB6"]').length,
+          const ab = f.map((q) => Math.max(Math.abs(q.x - a.x), Math.abs(q.y - a.y))), wt = f.map((q) => R.weite(a, q));
+          return { maxWeite: wt.length ? Math.max(...wt) : 0, diagonal: f.some((q) => Math.abs(q.x - a.x) === 1 && Math.abs(q.y - a.y) === 1), ohneZiel: document.querySelector("#aktionen .akt.gewaehlt").classList.contains("ohne-ziel") && /Kein Ziel in Reichweite/.test(document.querySelector("#hinweis").textContent), n: f.length, max: ab.length ? Math.max(...ab) : 0, selbst: f.some((q) => q.x === a.x && q.y === a.y), block: f.some((q) => st.karte.block.has(q.x + "," + q.y)), klassen: [...new Set(f.map((q) => q.k))].join(","), farbe: f[0] && f[0].farbe, blau: document.querySelectorAll('#karte rect[fill="#4D9DB6"]').length,
             zieleDrin: R.ziele(st, document.querySelector("#aktionen .akt.gewaehlt").dataset.a).every((z) => z === a || f.some((q) => q.x === z.x && q.y === z.y)) }; });
         gesehen[wer].push(Object.assign({ id }, d, r));
         await p.evaluate(() => { const g = document.querySelector("#aktionen .akt.gewaehlt"); if (g) g.click(); }); await p.waitForTimeout(80); // Wahl aufheben
@@ -52,12 +56,13 @@ console.log("Reichweiten");
   }
   const alle = Object.values(gesehen).flat(), hilfe = /^(heilung|aufrichten|schild|tausch|segen|bewahren|massenheil|selbstheilung)$/;
   check(Object.keys(gesehen).length === 5 && alle.length >= 10, `Fünf Helden, ${alle.length} Aktionen mit Reichweite durchgeklickt`);
-  check(alle.every((a) => a.n > 0 && a.max <= a.weit && !a.selbst && !a.block), "Gewählte Aktion: Felder in Reichweite sind eingefärbt – keines weiter weg als die Reichweite, keines auf Hindernissen oder dem eigenen Feld");
+  check(alle.every((a) => a.n > 0 && a.maxWeite <= a.weit && !a.selbst && !a.block), "Gewählte Aktion: Felder in Reichweite sind eingefärbt – keines weiter weg als die Reichweite, keines auf Hindernissen oder dem eigenen Feld");
   { const bogen = alle.find((a) => a.id === "langbogen"), zauber = alle.find((a) => a.id === "glutpfeil"), dolch = alle.find((a) => a.id === "dolch");
-    check(bogen && bogen.max === 7 && zauber && zauber.max === 5 && dolch && dolch.max === 3, `Die Markierung reicht bis zur Reichweite: Langbogen ${bogen && bogen.max}, Glutpfeil ${zauber && zauber.max}, Dolch ${dolch && dolch.max} Felder (am Kartenrand und hinter Hindernissen entsprechend weniger)`);
+    check(bogen && bogen.max === 6 && zauber && zauber.max === 5 && dolch && dolch.max === 3, `Die Markierung reicht bis zur Reichweite: Langbogen ${bogen && bogen.max}, Glutpfeil ${zauber && zauber.max}, Dolch ${dolch && dolch.max} Felder (am Kartenrand und hinter Hindernissen entsprechend weniger)`);
     const ohne = alle.filter((a) => a.ohneZiel);
     check(ohne.length > 0 && ohne.every((a) => a.n > 0), `Aktionen ohne Ziel in Reichweite bleiben wählbar und zeigen ihre Reichweite (${[...new Set(ohne.map((a) => a.name))].join(", ")})`); }
-  check(alle.filter((a) => a.weit === 1).every((a) => a.n <= 8) && alle.some((a) => a.weit === 1), "Nahkampf: nur die Felder direkt um den Helden");
+  check(alle.filter((a) => a.weit === 1).every((a) => a.n <= 4 && !a.diagonal) && alle.some((a) => a.weit === 1), "Nahkampf: nur die vier Felder gerade neben dem Helden – diagonal nicht");
+  check(alle.filter((a) => a.weit >= 3).every((a) => !a.diagonal || a.weit >= 2), "Fernreichweiten: rund statt quadratisch (keine Ecke weiter als die Reichweite)");
   const rot = alle.filter((a) => !hilfe.test(a.art)), gruen = alle.filter((a) => hilfe.test(a.art));
   check(rot.length > 0 && rot.every((a) => a.klassen === "rw angriff" && a.farbe === "#d9534f"), `Angriffe und Zauber rötlich (${rot.length})`);
   check(gruen.length > 0 && gruen.every((a) => a.klassen === "rw hilfe" && a.farbe === "#4caf6a"), `Heilung und Hilfe grünlich (${gruen.map((a) => a.name).join(", ")})`);

@@ -35,7 +35,7 @@
       { id: "heilendes_wort", name: "Heilendes Wort", typ: "bonus", ab: 1, art: "heilung", reichweite: 5, heilung: "1W4", plusAttr: "WEI", platz: 1, text: "Heilt eine Figur in 5 Feldern um 1W4 + WEI, auch am Boden." },
     ],
     waldlaeufer: [
-      { id: "jaegermal", name: "Jägermal", typ: "bonus", ab: 1, art: "mal", mal: "jaeger", reichweite: 7, pro: { lange: [2, 3, 3] }, text: "Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben." },
+      { id: "jaegermal", name: "Jägermal", typ: "bonus", ab: 1, art: "mal", mal: "jaeger", reichweite: 6, pro: { lange: [2, 3, 3] }, text: "Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben." },
       { id: "faehrtenleser", name: "Fährtenleser", typ: "passiv", ab: 1, text: "Vorteil auf Spuren und Wahrnehmung im Freien." },
     ],
   };
@@ -141,7 +141,7 @@
       gerissenAb: 1,
       faehig: [
         { id: "kurzschwert", name: "Kurzschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W6", text: "Nahkampf." },
-        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
+        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 6, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
         { id: "leiser_schritt", name: "Leiser Schritt", typ: "passiv", ab: 1, text: "Du kannst dich auch ohne Deckung verstecken, solange kein Gegner neben dir steht. Gerissene Aktion schon ab Stufe 1." },
         { id: "rauchbombe", name: "Rauchbombe", typ: "aktion", ab: 1, art: "rauch", radius: 2, dauer: 2, pro: { rast: 1 }, text: "2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus." },
         { id: "schattenwirbel", name: "Schattenwirbel", typ: "aktion", ab: 1, art: "flaeche", form: "kreis", groesse: 1, reichweite: 1, schaden: "2W6", rettung: "GES", attr: "GES", halb: true, pro: { rast: 2 }, text: "Wirbel mit beiden Klingen um einen Gegner neben dir: er und alle direkt um ihn nehmen 2W6, GES-Rettung halbiert. Verbündete bleiben verschont. Zählt nicht als Waffentreffer (kein Nachbluten). Zweimal je Rast." },
@@ -237,13 +237,13 @@
       name: "Kael", titel: "Der Wildnisläufer", klasse: "waldlaeufer", rolle: "hinten, Fernkampf, Spuren", spruch: "Ich sehe dich, lange bevor du mich siehst.",
       werte: { GES: 16, WEI: 14, KON: 13, INT: 12, STR: 10, CHA: 8 }, rk: [14, 14, 14], ruestung: "Leder",
       faehig: [
-        { id: "langbogen", name: "Langbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W8", fern: true, bogen: true, text: "Fernkampf, +1 zum Treffen." },
-        { id: "fesselpfeil", name: "Fesselnder Pfeil", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W8", fern: true, bogen: true, fesseln: true, pro: { rast: 2 }, text: "Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde)." },
+        { id: "langbogen", name: "Langbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 6, attr: "GES", schaden: "1W8", fern: true, bogen: true, text: "Fernkampf, +1 zum Treffen." },
+        { id: "fesselpfeil", name: "Fesselnder Pfeil", typ: "aktion", ab: 1, art: "angriff", reichweite: 6, attr: "GES", schaden: "1W8", fern: true, bogen: true, fesseln: true, pro: { rast: 2 }, text: "Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde)." },
         { id: "scharfes_auge", name: "Scharfes Auge", typ: "passiv", ab: 1, text: "Ignoriert Deckung." },
         { id: "leichtfuessig", name: "Leichtfüßig", typ: "passiv", ab: 1, text: "Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff." },
         { id: "bogenschuetze", name: "Bogenschütze", typ: "passiv", ab: 1, text: "+1 auf Fernkampf." },
-        { id: "pfeilregen", name: "Pfeilregen", typ: "aktion", ab: 3, nur10: true, art: "flaeche", form: "kreis", groesse: 1, reichweite: 7, schaden: "1W8+3", rettung: "GES", attr: "GES", halb: true, pro: { rast: 1 }, text: "Pfeile regnen auf ein Ziel und alle Gegner direkt daneben: 1W8 + 3, GES-Rettung halbiert." },
-        { id: "doppelschuss", name: "Doppelschuss", typ: "aktion", ab: 2, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W8", fern: true, bogen: true, doppel: true, pro: { rast: 2 }, text: "Zwei Ziele nebeneinander, je ein Angriff." },
+        { id: "pfeilregen", name: "Pfeilregen", typ: "aktion", ab: 3, nur10: true, art: "flaeche", form: "kreis", groesse: 1, reichweite: 6, schaden: "1W8+3", rettung: "GES", attr: "GES", halb: true, pro: { rast: 1 }, text: "Pfeile regnen auf ein Ziel und alle Gegner direkt daneben: 1W8 + 3, GES-Rettung halbiert." },
+        { id: "doppelschuss", name: "Doppelschuss", typ: "aktion", ab: 2, art: "angriff", reichweite: 6, attr: "GES", schaden: "1W8", fern: true, bogen: true, doppel: true, pro: { rast: 2 }, text: "Zwei Ziele nebeneinander, je ein Angriff." },
       ],
       aussen: { name: "Fährtenleser", text: "Liest Spuren genau, findet sichere Wege." },
       versuchung: "„Du wirst nie wieder jemanden verlieren, den du beschützen willst.“ Wahr, weil du niemanden mehr nah genug heranlässt.",
@@ -255,7 +255,7 @@
       wolf: { name: "Grau", tp: [8, 12, 20], rk: 13, angriff: [4, 4, 5], schaden: "1W6", plus: 2, bewegung: 8 },
       faehig: [
         { id: "kurzschwert", name: "Kurzschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W6", text: "Nahkampf." },
-        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 7, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
+        { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 6, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
         { id: "rudeltaktik", name: "Rudeltaktik", typ: "passiv", ab: 1, text: "Du und Grau habt Vorteil gegen ein Ziel, neben dem der andere steht." },
         { id: "wolf_befehl", name: "Befehl an Grau", typ: "bonus", ab: 1, art: "wolf", reichweite: 20, text: "Grau läuft bis zu 8 Felder zum Ziel und beißt." },
         { id: "wolf_umreissen", name: "Grau: Umreißen", typ: "bonus", ab: 1, art: "wolf", umreissen: true, reichweite: 20, pro: { rast: 2 }, text: "Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel." },

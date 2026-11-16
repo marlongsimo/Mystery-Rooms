@@ -669,6 +669,7 @@
         const hilfe = /^(heilung|aufrichten|schild|tausch|segen|bewahren|massenheil|selbstheilung)$/.test(d.art), f1 = hilfe ? "#4caf6a" : "#d9534f", f2 = hilfe ? "#8fe0a6" : "#f29a94", frei = /^(tausch|aufrichten)$/.test(d.art); // Platztausch und Aufrichten brauchen keine Sichtlinie
         for (let y = Math.max(0, akt.y - weit); y <= Math.min(k.h - 1, akt.y + weit); y++) for (let x = Math.max(0, akt.x - weit); x <= Math.min(k.b - 1, akt.x + weit); x++) {
           if ((x === akt.x && y === akt.y) || k.block.has(x + "," + y)) continue;
+          if (R.weite(akt, { x, y }) > weit) continue; // Diagonalen kosten anderthalb Felder
           const p = { x, y }; if (!frei && R.abstand(akt, p) > 1 && !R.sicht(st, akt, p)) continue;
           o += `<rect class="rw ${hilfe ? "hilfe" : "angriff"}" x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="${f1}" fill-opacity="${k.bild ? ".26" : ".18"}" stroke="${f2}" stroke-opacity=".5" stroke-width="1.2"/>`;
         }

@@ -191,7 +191,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
-| **Kurzbogen** | 1 | Aktion · 7 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
+| **Kurzbogen** | 1 | Aktion · 6 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
 | **Rauchbombe** | 1 | Aktion · Radius 2 · 1× je Rast | 2 Felder Radius um dich, 2 Runden: Niemand sieht hinein oder hinaus. |
 | **Schattenwirbel** | 1 | Aktion · Nahkampf · Radius 1 · GES-Rettung SG 13 · 2W6 · 2× je Rast | Wirbel mit beiden Klingen um einen Gegner neben dir: er und alle direkt um ihn nehmen 2W6, GES-Rettung halbiert. Verbündete bleiben verschont. Zählt nicht als Waffentreffer (kein Nachbluten). Zweimal je Rast. |
 | **Gerissener Spurt** | 1 | Bonusaktion | Gerissene Aktion: noch einmal so weit laufen, wie du ohnehin kannst. |
@@ -335,10 +335,10 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
-| **Langbogen** | 1 | Aktion · 7 Felder · Angriff +6 · 1W8 + 3 | Fernkampf, +1 zum Treffen. |
-| **Fesselnder Pfeil** | 1 | Aktion · 7 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde). |
-| **Doppelschuss** | 2 | Aktion · 7 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Zwei Ziele nebeneinander, je ein Angriff. |
-| **Jägermal** | 1 | Bonusaktion · 7 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Langbogen** | 1 | Aktion · 6 Felder · Angriff +6 · 1W8 + 3 | Fernkampf, +1 zum Treffen. |
+| **Fesselnder Pfeil** | 1 | Aktion · 6 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Treffer und STR-Rettungswurf, sonst festgehalten (befreit sich mit Glück nach 1 Runde). |
+| **Doppelschuss** | 2 | Aktion · 6 Felder · Angriff +6 · 1W8 + 3 · 2× je Rast | Zwei Ziele nebeneinander, je ein Angriff. |
+| **Jägermal** | 1 | Bonusaktion · 6 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Scharfes Auge** | 1 | passiv | Ignoriert Deckung. |
 | **Leichtfüßig** | 1 | passiv | Nach einem Schuss bis zu 2 Felder ohne Gelegenheitsangriff. |
 | **Bogenschütze** | 1 | passiv | +1 auf Fernkampf. |
@@ -358,10 +358,10 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 | Fähigkeit | Stufe | Werte | Wirkung |
 |---|---|---|---|
 | **Kurzschwert** | 1 | Aktion · Nahkampf · Angriff +5 · 1W6 + 3 | Nahkampf. |
-| **Kurzbogen** | 1 | Aktion · 7 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
+| **Kurzbogen** | 1 | Aktion · 6 Felder · Angriff +5 · 1W6 + 3 | Fernkampf. |
 | **Befehl an Grau** | 1 | Bonusaktion · 20 Felder | Grau läuft bis zu 8 Felder zum Ziel und beißt. |
 | **Grau: Umreißen** | 1 | Bonusaktion · 20 Felder · 2× je Rast | Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel. |
-| **Jägermal** | 1 | Bonusaktion · 7 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Jägermal** | 1 | Bonusaktion · 6 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Rudeltaktik** | 1 | passiv | Du und Grau habt Vorteil gegen ein Ziel, neben dem der andere steht. |
 | **Eingespielt** | 2 | passiv | Grau beißt am Ende deines Zugs auch ohne Befehl, wenn er neben einem Gegner steht, den du getroffen hast. |
 | **Ein Rudel** | 3 | passiv | Jägermal gilt auch für Grau, Grau +1 zum Treffen. |
@@ -382,7 +382,7 @@ Fünf Klassen mit je drei Charakteren. Jede Figur hat:
 |---|---|---|---|
 | **Schwere Armbrust** | 1 | Aktion · 5 Felder · Angriff +5 · 1W10 + 3 | Fernkampf. |
 | **Netz** | 1 | Aktion · 3 Felder · STR-Rettung SG 13 · 2× je Rast | STR-Rettungswurf, sonst festgehalten, bis es sich befreit (Aktion, STR gegen SG 13). |
-| **Jägermal** | 1 | Bonusaktion · 7 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
+| **Jägermal** | 1 | Bonusaktion · 6 Felder · 2/3/3× je lange Rast | Markiert einen Gegner bis Kampfende: +1W6 Schaden bei jedem deiner Treffer. Fällt das Ziel, kannst du das Mal ohne Einsatz weitergeben. |
 | **Schwachstelle** | 1 | passiv | Gegen dein markiertes Ziel kritisch bei 19–20. |
 | **Fangschuss** | 1 | passiv | Reaktion, automatisch: Bewegt sich dein markiertes Ziel, schießt du einmal. |
 | **Jagdvorbereitung** | 1 | passiv | Zu Beginn jedes Kampfes ist ein Gegner schon markiert (ohne Einsatz). |

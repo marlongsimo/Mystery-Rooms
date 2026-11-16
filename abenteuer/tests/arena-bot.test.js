@@ -74,7 +74,7 @@ check(alle.reduce((a, s) => a + s.heil, 0) > 0, `Er heilt (${alle.reduce((a, s) 
     const s = K.start(match(900 + seed, "duell", 5), 0, 0, 1000), st = s.st;
     for (let i = 0; i < 12 && R.teamVon(st, R.aktiv(st)) !== 2; i++) K.zug(st, 1, { typ: "ende" }, 2000);
     const f = R.aktiv(st); if (R.teamVon(st, f) !== 2) continue;
-    const freund = st.figuren.find((o) => o.team === 2 && o !== f), frei = [...R.bewegungsfelder(st, f).keys()].map((k) => k.split(",").map(Number)).find(([x, y]) => Math.max(Math.abs(x - f.x), Math.abs(y - f.y)) === 1);
+    const freund = st.figuren.find((o) => o.team === 2 && o !== f), frei = [...R.bewegungsfelder(st, f).keys()].map((k) => k.split(",").map(Number)).find(([x, y]) => Math.abs(x - f.x) + Math.abs(y - f.y) === 1); // gerade daneben: Aufrichten geht nicht diagonal
     if (!freund || !frei) continue;
     freund.x = frei[0]; freund.y = frei[1]; freund.tp = 0; n++;
     const w = BOT.entscheide(st, { lauf: 0 });

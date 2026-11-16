@@ -41,22 +41,45 @@ async function konto(b) {
     const h = await S.p.evaluate(() => [...document.querySelectorAll("[data-arena-held]")].map((x) => x.dataset.arenaHeld));
     for (const f of h) await S.p.click(`[data-arena-held="${f}"]`);
     await S.p.click("#arena-wahl-ok");
-    const gespeichert = await warte(S.p, () => document.querySelector("#arena-suchen") && !document.querySelector("#arena-suchen").disabled, null, 30000);
-    if (S === A) check(gespeichert, "Team in der echten Datenbank gespeichert");
-    await S.p.click("#arena-suchen");
+    const gespeichert = await warte(S.p, () => document.querySelector('[data-arena-art="normal"]') && !document.querySelector('[data-arena-art="normal"]').disabled, null, 30000);
+    if (S === A) check(gespeichert, "Team in der echten Datenbank gespeichert; die drei Spielarten stehen zur Wahl");
   }
+  // Privater Kampf zuerst (kurz): Freundschaft schließen, einladen, annehmen, Modus prüfen, abbrechen
+  const ruf = (S, n, a) => S.p.evaluate(async ([n, a]) => { const c = window.AB.liveClient(); await c.ensureUser(); const { data, error } = await c.db.rpc(n, a); return error ? { FEHLER: error.message } : data; }, [n, a]);
+  const f1 = await ruf(A, "rpg_request_friend", { p_handle: B.name }), f2 = await ruf(B, "rpg_answer_friend", { p_handle: A.name, p_accept: true });
+  check(!(f1 && f1.FEHLER) && !(f2 && f2.FEHLER), "Die beiden Testkonten sind befreundet" + ((f1 && f1.FEHLER) || (f2 && f2.FEHLER) ? " · " + JSON.stringify([f1, f2]) : ""));
+  await A.p.click("#arena-privat"); const liste = await warte(A.p, (n) => document.querySelector(`[data-privat-freund="${n}"]`), B.name, 30000);
+  check(liste, "Privater Kampf: Die Freundesliste aus der echten Datenbank zeigt den Freund");
+  if (liste) {
+    await A.p.click('[data-privat-modus="horde"]'); await A.p.click(`[data-privat-freund="${B.name}"]`);
+    const wartet = await warte(A.p, () => /Warte auf/.test((document.querySelector(".arena-suche") || {}).textContent || ""), null, 20000);
+    check(wartet, "Einladung verschickt (rpg_arena_invite)" + (wartet ? "" : " · " + await A.p.evaluate(() => (document.querySelector("[data-arena] .fb") || {}).textContent || "")));
+    const einl = await warte(B.p, (n) => { const e = document.querySelector(".arena-einladung"); return e && e.textContent.includes(n) && /Die Horde/.test(e.textContent); }, A.name, 25000);
+    check(einl, "Der Freund sieht die Einladung mit dem gewählten Modus (Die Horde)");
+    if (einl) { await B.p.click("[data-einl-ja]");
+      const da = (await warte(A.p, () => document.querySelector(".arena-gegenueber"), null, 30000)) && (await warte(B.p, () => document.querySelector(".arena-gegenueber"), null, 30000));
+      const txt = da ? await warte(B.p, () => /Privater Kampf · ohne Wertung/.test((document.querySelector("#arena-modus-text") || {}).textContent || "") && /Die Horde/.test(document.querySelector("#arena-modus-text").textContent), null, 20000) : false;
+      check(da && txt, "Annehmen: Beide in der Aufstellung, Modus „Die Horde“, gekennzeichnet als privater Kampf ohne Wertung");
+      await A.p.click("#arena-abbrechen"); await warte(A.p, () => document.querySelector(".arena-arten"), null, 30000);
+      await B.p.waitForTimeout(3000); await B.p.click('.dorf-ort[data-hub="dorf"], [data-hub="dorf"]').catch(() => {}); await B.p.goto(URL); await warte(B.p, () => document.querySelector('.dorf-ort[data-hub="arena"]'), null, 30000); await B.p.click('.dorf-ort[data-hub="arena"]');
+      await A.p.goto(URL); await warte(A.p, () => document.querySelector('.dorf-ort[data-hub="arena"]'), null, 30000); await A.p.click('.dorf-ort[data-hub="arena"]');
+    } else { await A.p.click("#arena-suche-ab").catch(() => {}); }
+  }
+  // Normal: Beide suchen – gespielt wird ein Duell
+  for (const S of [A, B]) { const da = await warte(S.p, () => document.querySelector('[data-arena-art="normal"]') && !document.querySelector('[data-arena-art="normal"]').disabled, null, 40000); if (!da) console.log("   (Übersicht fehlt bei " + S.name + ")"); await S.p.click('[data-arena-art="normal"]'); }
   const auf = (await warte(A.p, () => document.querySelector(".arena-gegenueber"), null, 40000)) && (await warte(B.p, () => document.querySelector(".arena-gegenueber"), null, 40000));
   const fehlerText = async (S) => S.p.evaluate(() => { const f = document.querySelector("[data-arena] .fb"); return f ? f.textContent : ""; });
-  check(auf, "Server-Suche (rpg_arena_search_server): Beide werden verbunden und sehen die Aufstellung" + (auf ? "" : " · " + (await fehlerText(A)) + " | " + (await fehlerText(B))));
-  const modus = auf ? await A.p.evaluate(() => (document.querySelector("#arena-modus-text h3") || {}).textContent || "") : "";
-  console.log("  Ausgeloster Modus:", modus || "?");
+  check(auf, "Normal-Suche (rpg_arena_queue): Beide werden verbunden und sehen die Aufstellung" + (auf ? "" : " · " + (await fehlerText(A)) + " | " + (await fehlerText(B))));
+  const modusDa = auf ? await warte(A.p, () => document.querySelector("#arena-modus-text h3"), null, 20000) : false;
+  const modus = modusDa ? await A.p.evaluate(() => document.querySelector("#arena-modus-text h3").textContent) : "";
+  check(modus === "Duell", "Normal: Der Modus ist Duell (angezeigt: " + (modus || "?") + ")");
   const zaehlt = await warte(A.p, () => /beginnt in \d+|Der Kampf beginnt/.test((document.querySelector("#arena-status") || {}).textContent || ""), null, 20000);
   check(zaehlt, "rpg_arena_fight antwortet: Es ist ein Serverkampf, der Countdown läuft" + (zaehlt ? "" : " · Status: " + await A.p.evaluate(() => (document.querySelector("#arena-status") || {}).textContent)));
   const imKampf = (await warte(A.p, () => window.AB.arenaAn() && window.AB.st && !document.querySelector("#spiel").hidden, null, 60000)) && (await warte(B.p, () => window.AB.arenaAn() && window.AB.st && !document.querySelector("#spiel").hidden, null, 30000));
   check(imKampf, "Die echte Edge Function startet den Kampf; beide Geräte zeigen ihn" + (imKampf ? "" : " · Status: " + await A.p.evaluate(() => (document.querySelector("#arena-status") || {}).textContent) + " · Function: " + fn.fehler.join(" | ")));
   if (imKampf) {
     const sicht = await B.p.evaluate(() => ({ rs: window.AB.st.rs, figuren: window.AB.st.figuren.length, runden: window.AB.st.arena.runden }));
-    check(sicht.rs === undefined && sicht.figuren >= 6, "Das Gerät bekommt keinen Zufallsstand vom Server");
+    check(sicht.rs === undefined && sicht.figuren === 6, "Duell auf dem Server: sechs Helden, keine Monster; das Gerät bekommt keinen Zufallsstand");
     const start = Date.now(), seite = new Map([[A, 1], [B, 2]]); let zuege = 0, letzter = Date.now();
     const lage = (S) => S.p.evaluate((seite) => { const e = document.querySelector("#arena-ende"); if (e && !e.hidden) return { ende: true }; const st = window.AB.st; if (!st || st.ende) return { warten: true };
       const a = window.AB.R.aktiv(st), k = document.querySelector("#ende-zug"); return { dran: window.AB.R.teamVon(st, a) === seite && a.tp > 0 && Boolean(k) && !k.disabled, id: a.id + ":" + st.runde, runde: st.runde }; }, seite.get(S));

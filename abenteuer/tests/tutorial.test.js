@@ -18,6 +18,8 @@ async function seite(b, w, h, zustand) {
   await p.route(/\/rest\/v1\/rpc\/rpg_my_friends(\?|$)/, (r) => json(r, { freunde: [], an_mich: [], von_mir: [], blockiert: [] }));
   await p.route(/\/rest\/v1\/rpc\/rpg_my_wallet(\?|$)/, (r) => json(r, { konto: true, waehrung: 40 }));
   await p.route(/\/rest\/v1\/rpc\/rpg_arena_modes(\?|$)/, (r) => json(r, {}));
+  await p.route(/\/rest\/v1\/rpc\/rpg_arena_invites(\?|$)/, (r) => json(r, { an_mich: [], von_mir: null }));
+  await p.route(/\/rest\/v1\/rpc\/rpg_arena_squad(\?|$)/, (r) => json(r, { konto: true, team: null }));
   await p.route(/\/rest\/v1\/rpc\/rpg_arena_list(\?|$)/, (r) => json(r, { konto: true, waehrung: 40, heute: 0, mein: null, offen: [{ id: "x1", name: "Mondfalke", schnitt: 1.3 }] }));
   await p.route(/\/rest\/v1\/rpc\/rpg_shop_today(\?|$)/, (r) => json(r, { konto: true, preis: 830, waehrung: 40, bis: new Date(Date.now() + 5 * 3600e3).toISOString(), alle: false, helden: ["berserker", "schattenmagier", "kopfgeldjaeger"].map((x) => ({ held: x, gekauft: false })) }));
   await p.route(/\/rest\/v1\/rpc\/rpg_tutorial_state(\?|$)/, (r) => json(r, { konto: true, tutorial: zustand.offen }));

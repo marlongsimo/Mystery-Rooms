@@ -20,14 +20,23 @@
   const rpc = async (name, args = {}) => { const c = window.AB.liveClient(); await c.ensureUser(); return c.rpc(name, args); };
   const fehlt = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
   const sm = () => window.ABSAMMLUNG;
-  /* Neue Arena (Vorschau): gespeichertes Team und Gegnersuche statt „Kampf erstellen“.
-     …/abenteuer/?arena=suche   – Suche, der Kampf läuft wie bisher auf dem Gerät des Erstellers (braucht Migration 014)
-     …/abenteuer/?arena=server  – Suche, und der Server rechnet den Kampf (braucht Migration 015 und die Edge Function „arena“)
-     …/abenteuer/?arena=liste   – zurück zur bisherigen Arena. Die Wahl gilt, bis der Tab geschlossen wird. */
-  const ART = (() => { let a = ""; const p = new URLSearchParams(location.search).get("arena");
-    try { if (p === "suche" || p === "server") sessionStorage.setItem("ab_arena_neu", p); else if (p === "liste") sessionStorage.removeItem("ab_arena_neu");
-      a = sessionStorage.getItem("ab_arena_neu") || ""; if (a === "1") a = "suche"; } catch (e) { a = p === "suche" || p === "server" ? p : ""; } return a; })();
-  const NEU = ART === "suche" || ART === "server", SERVER = ART === "server";
+  /* Welche Arena? Standard ist die Server-Arena: gespeichertes Team, Suche in drei Spielarten, der Server rechnet den Kampf
+     (Migration 014 bis 016 und die Edge Function „arena“). Sie gilt für alle, sobald die Datenbank sie kennt – das prüft das Spiel
+     beim ersten Öffnen der Arena selbst (artKlaeren). Kennt die Datenbank sie noch nicht, bleibt es bei der früheren Arena.
+     Über den Link lässt sich für diesen Tab ausdrücklich wählen:
+     …/abenteuer/?arena=liste   – die frühere Arena (Kampf erstellen, Liste, Kampf auf dem Gerät des Erstellers)
+     …/abenteuer/?arena=suche   – Suche, aber der Kampf läuft auf dem Gerät des Erstellers
+     …/abenteuer/?arena=server  – die Server-Arena, auch wenn die Prüfung sie nicht gefunden hat */
+  const WAHL = (() => { let a = ""; const p = new URLSearchParams(location.search).get("arena"), ok = (x) => x === "suche" || x === "server" || x === "liste";
+    try { if (ok(p)) sessionStorage.setItem("ab_arena_neu", p); a = sessionStorage.getItem("ab_arena_neu") || ""; if (a === "1") a = "suche"; } catch (e) { a = ok(p) ? p : ""; } return ok(a) ? a : null; })();
+  let ART = WAHL || "liste", NEU = ART === "suche" || ART === "server", SERVER = ART === "server", artGeklaert = Boolean(WAHL);
+  const artSetzen = (a) => { ART = a; NEU = a === "suche" || a === "server"; SERVER = a === "server"; };
+  /** Ohne ausdrückliche Wahl: Kennt die Datenbank die Server-Arena mit ihren Spielarten (Migration 016)? Dann gilt sie. */
+  async function artKlaeren() {
+    if (artGeklaert) return; 
+    try { await rpc("rpg_arena_invites", {}); artSetzen("server"); artGeklaert = true; }
+    catch (e) { if (fehlt(e)) { artSetzen("liste"); artGeklaert = true; } /* sonst (keine Verbindung): beim nächsten Öffnen noch einmal prüfen */ }
+  }
   const stufe = (fid) => { const p = sm() && sm().fortschritt ? sm().fortschritt(fid) : null; return p ? p.stufe : 1; };
 
   // Z: Zustand der Arena-Seite
@@ -90,6 +99,7 @@
     seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">Einen Moment …</p>`);
     if (sm()) await sm().laden(true);
     await laden();
+    if (Z.liste && Z.liste.konto) await artKlaeren();
     if (!seiteOffen()) return;
     if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match);
     if (NEU) return zeigenNeu();

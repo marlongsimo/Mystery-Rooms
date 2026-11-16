@@ -5,7 +5,7 @@
  * Aufruf: node abenteuer/tests/live-arena.test.js   (Webserver auf Port 8765)
  */
 const { chromium } = require("playwright");
-const URL = "http://localhost:8765/abenteuer/index.html?schnell";
+const URL = "http://localhost:8765/abenteuer/index.html?schnell&arena=liste";
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t }).then(() => true, () => false);
 async function konto(b) {

@@ -80,9 +80,9 @@
     { art: "klick", ziel: nav("arena"), titel: "Die Arena", text: "Jetzt zur Arena. Tippe darauf." },
     { art: "info", ziel: "[data-arena] .hub-gruss", titel: "Spieler gegen Spieler", text: "In der Arena trittst du mit drei deiner Helden gegen einen anderen Spieler an. Niemand stirbt hier: Ihr kämpft gegen Spiegelbilder." },
     { art: "klick", ziel: "#arena-info", opt: true, titel: "Regeln und Modi", text: "Hinter dem „i“ stehen alle Regeln. Tippe darauf." },
-    { art: "info", ziel: "#arena-info-text", opt: true, titel: "Vier Modi, das Los entscheidet", text: "Arena, Königsmord, Die Horde oder Duell: Welcher Modus gespielt wird, wird ausgelost. Jeder Held hat eine Minute Zugzeit." },
-    { art: "info", ziel: "#arena-erstellen", opt: true, titel: "Kampf erstellen", text: "Du wählst drei Helden und wartest auf einen Gegner. Die Durchschnittsstufen beider Teams dürfen höchstens eine Stufe auseinanderliegen." },
-    { art: "info", ziel: "[data-arena] .arena-liste, [data-arena] .hub-zwischen", opt: true, titel: "Offene Kämpfe", text: "Hier siehst du, wer gerade einen Gegner sucht, und trittst bei." },
+    { art: "info", ziel: "#arena-info-text", opt: true, titel: "Vier Modi", text: "Duell, Arena, Königsmord und Die Horde. Jeder Held hat eine Minute Zugzeit." },
+    { art: "info", ziel: "[data-arena] .arena-meinteam, #arena-erstellen", opt: true, titel: "Mein Team", text: "Lege einmal drei Helden fest. Mit ihnen trittst du in jedem Kampf an, bis du das Team änderst." },
+    { art: "info", ziel: "[data-arena] .arena-art, [data-arena] .arena-liste, [data-arena] .hub-zwischen", opt: true, titel: "Drei Spielarten", text: "Normal sucht ein Duell, Arcade lost einen anderen Modus aus. Im privaten Kampf forderst du einen Freund heraus." },
     { art: "info", ziel: "[data-arena] .arena-waehrung", opt: true, titel: "Belohnungen", text: "Ein Sieg bringt Seelensplitter und Erfahrung für deine Helden, mit etwas Glück sogar einen neuen Helden. Erfahrung gibt es bis zum fünften Sieg am Tag." },
     // --- Händler ---
     { art: "klick", ziel: nav("shop"), titel: "Der Händler", text: "Weiter zum Händler. Tippe darauf." },

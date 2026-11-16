@@ -91,10 +91,10 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
     "Übersicht: drei Spielarten – Normal (Duell), Arcade (Los aus drei Modi), Privater Kampf");
   await shot(A.p, "arten-1-uebersicht"); await shot(B.p, "arten-2-uebersicht-handy");
   // Normal und Arcade: suchen mit der gewählten Spielart, abbrechen
-  await A.p.click('[data-arena-art="normal"]'); await A.p.waitForSelector(".arena-suche");
+  await A.p.click('[data-arena-art="normal"]'); await A.p.waitForSelector(".arena-suche"); for (let i = 0; i < 40 && !DB.arten.includes("A:normal"); i++) await A.p.waitForTimeout(100);
   check(/Normal: Suche nach einem Duell/.test(await A.p.textContent(".arena-suche")) && DB.arten.includes("A:normal"), "Normal: Suchbildschirm, die Suche läuft in der Warteschlange „normal“");
   await A.p.click("#arena-suche-ab"); await A.p.waitForSelector(".arena-arten");
-  await A.p.click('[data-arena-art="arcade"]'); await A.p.waitForSelector(".arena-suche");
+  await A.p.click('[data-arena-art="arcade"]'); await A.p.waitForSelector(".arena-suche"); for (let i = 0; i < 40 && !DB.arten.includes("A:arcade"); i++) await A.p.waitForTimeout(100);
   check(/Arcade/.test(await A.p.textContent(".arena-suche")) && DB.arten.includes("A:arcade") && DB.suchAb >= 1, "Arcade: eigene Warteschlange; Abbrechen trägt die Suche aus");
   await A.p.click("#arena-suche-ab"); await A.p.waitForSelector(".arena-arten");
   // Privater Kampf: Modus wählen, Freund einladen
@@ -173,6 +173,21 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   await shot(A.p, "server-3-ende-a");
   await A.p.click("#arena-ende-zu"); const zurueck = await warte(A.p, () => { const h = document.querySelector("#hub"); return h && !h.hidden; }, null, 15000);
   check(zurueck, "„Zur Startseite“ führt zurück ins Dorf");
+  // Ohne Link: Die Server-Arena gilt von selbst, sobald die Datenbank sie kennt – sonst bleibt die frühere Arena
+  { const ohne = async (kennt) => { const ctx = await b.newContext({ viewport: { width: 1200, height: 900 } }), p = await ctx.newPage(); const j = (r, o, st = 200) => r.fulfill({ status: st, contentType: "application/json", body: JSON.stringify(o) });
+      await p.route(/\/rest\/v1\/rpc\/rpg_my_profile(\?|$)/, (r) => j(r, { konto: true, handle: "Spieler C", avatar_key: null, created_at: new Date().toISOString() }));
+      await p.route(/\/rest\/v1\/rpc\/rpg_(my_heroes|campaign_heroes)(\?|$)/, (r) => j(r, { konto: true, helden: ALLE, start_offen: false, angebote: [], enden: [], alle_enden: {}, titel: [] }));
+      await p.route(/\/rest\/v1\/rpc\/rpg_hero_levels(\?|$)/, (r) => j(r, { konto: true, xp: {} }));
+      await p.route(/\/rest\/v1\/rpc\/rpg_(my_inbox|my_campaigns)(\?|$)/, (r) => j(r, r.request().url().includes("inbox") ? { freunde: [], kampagnen: [] } : []));
+      await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z_]+|my_wallet)(\?|$)/, (r) => { const n = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1];
+        if (n === "rpg_my_wallet") return j(r, { konto: true, waehrung: 0 }); if (n === "rpg_arena_list") return j(r, { konto: true, waehrung: 0, heute: 0, offen: [], mein: null }); if (n === "rpg_arena_modes") return j(r, {});
+        if (n === "rpg_arena_invites") return kennt ? j(r, { an_mich: [], von_mir: null }) : j(r, { code: "PGRST202", message: "Could not find the function public.rpg_arena_invites without parameters in the schema cache" }, 404);
+        if (n === "rpg_arena_squad") return j(r, { konto: true, team: null }); return j(r, { code: "P0001", message: "nicht erwartet: " + n }, 400); });
+      await p.goto("http://localhost:8765/abenteuer/index.html?schnell"); await p.waitForSelector('.dorf-ort[data-hub="arena"]', { timeout: 20000 }); await p.click('.dorf-ort[data-hub="arena"]');
+      await p.waitForSelector(".arena-arten, #arena-erstellen", { timeout: 20000 }); const neu = Boolean(await p.$(".arena-arten")), alt = Boolean(await p.$("#arena-erstellen")); await ctx.close(); return { neu, alt }; };
+    const mit = await ohne(true), nicht = await ohne(false);
+    check(mit.neu && !mit.alt, "Ohne Link, Datenbank kennt die Server-Arena: Alle sehen die neue Arena mit den drei Spielarten");
+    check(nicht.alt && !nicht.neu, "Ohne Link, Datenbank kennt sie noch nicht: Es bleibt bei der früheren Arena (nichts geht kaputt)"); }
   for (const s of [A, B]) check(s.fehler.length === 0, `keine Skriptfehler bei ${s.ich}${s.fehler.length ? ": " + s.fehler.join(" | ") : ""}`);
   await b.close();
   console.log(ok ? "\nARENA-SERVER IN ORDNUNG" : "\nARENA-SERVER: FEHLER"); process.exit(ok ? 0 : 1);

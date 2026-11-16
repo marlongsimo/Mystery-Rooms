@@ -5,7 +5,7 @@
  * Aufruf: node abenteuer/tests/arena.test.js   (Webserver auf Port 8765)
  */
 const { chromium } = require("playwright"); const { ALLE } = require("./alle-helden");
-const URL = "http://localhost:8765/abenteuer/index.html?schnell";
+const URL = "http://localhost:8765/abenteuer/index.html?schnell&arena=liste";
 const MODUS = process.env.MODUS || "arena", MODUSNAME = { arena: "Arena", koenig: "Königsmord", horde: "Die Horde", duell: "Duell" }[MODUS]; // MODUS=koenig|horde: Das Los (die Zufallszahl des Kampfes) fällt auf diesen Modus
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 // Nachgebildeter Server

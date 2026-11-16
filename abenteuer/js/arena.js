@@ -20,11 +20,14 @@
   const rpc = async (name, args = {}) => { const c = window.AB.liveClient(); await c.ensureUser(); return c.rpc(name, args); };
   const fehlt = (e) => Boolean(e && (e.code === "PGRST202" || e.code === "42883" || /Could not find the function|schema cache|does not exist/i.test(e.roh || e.message || "")));
   const sm = () => window.ABSAMMLUNG;
-  /* Neue Arena (Vorschau): gespeichertes Team und Gegnersuche statt „Kampf erstellen“. Eingeschaltet über den Link …/abenteuer/?arena=suche,
-     ausgeschaltet über ?arena=liste; die Wahl gilt, bis der Tab geschlossen wird. Braucht Migration 014. */
-  const NEU = (() => { let an = false; try { const p = new URLSearchParams(location.search).get("arena");
-    if (p === "suche") sessionStorage.setItem("ab_arena_neu", "1"); else if (p === "liste") sessionStorage.removeItem("ab_arena_neu");
-    an = sessionStorage.getItem("ab_arena_neu") === "1"; } catch (e) { an = new URLSearchParams(location.search).get("arena") === "suche"; } return an; })();
+  /* Neue Arena (Vorschau): gespeichertes Team und Gegnersuche statt „Kampf erstellen“.
+     …/abenteuer/?arena=suche   – Suche, der Kampf läuft wie bisher auf dem Gerät des Erstellers (braucht Migration 014)
+     …/abenteuer/?arena=server  – Suche, und der Server rechnet den Kampf (braucht Migration 015 und die Edge Function „arena“)
+     …/abenteuer/?arena=liste   – zurück zur bisherigen Arena. Die Wahl gilt, bis der Tab geschlossen wird. */
+  const ART = (() => { let a = ""; const p = new URLSearchParams(location.search).get("arena");
+    try { if (p === "suche" || p === "server") sessionStorage.setItem("ab_arena_neu", p); else if (p === "liste") sessionStorage.removeItem("ab_arena_neu");
+      a = sessionStorage.getItem("ab_arena_neu") || ""; if (a === "1") a = "suche"; } catch (e) { a = p === "suche" || p === "server" ? p : ""; } return a; })();
+  const NEU = ART === "suche" || ART === "server", SERVER = ART === "server";
   const stufe = (fid) => { const p = sm() && sm().fortschritt ? sm().fortschritt(fid) : null; return p ? p.stufe : 1; };
 
   // Z: Zustand der Arena-Seite
@@ -184,11 +187,11 @@
       if (laeuft || vorbei) return; if (!seiteOffen() || Z.modus !== "suche") return ende(false);
       laeuft = true;
       try {
-        const m = await rpc("rpg_arena_search", {}); if (vorbei) { if (m && m.status === "offen") rpc("rpg_arena_cancel", { p_match_id: m.id }).catch(() => {}); return; }
+        const m = await rpc(SERVER ? "rpg_arena_search_server" : "rpg_arena_search", {}); if (vorbei) { if (m && m.status === "offen") rpc("rpg_arena_cancel", { p_match_id: m.id }).catch(() => {}); return; }
         Z.match = m; meinMerken(m && m.id);
         if (m && m.status !== "offen") { vorbei = true; stoppUhr(); clearInterval(takt); return aufstellung(m); }
         if (Date.now() - seit > 60000) { const e = $("#arena-suche-text"); if (e) e.textContent = "Gerade sucht niemand mit passender Stufe. Du kannst weiter warten oder es später noch einmal versuchen."; }
-      } catch (e) { vorbei = true; stoppUhr(); clearInterval(takt); Z.modus = null; Z.fehler = fehlt(e) ? "Die Gegnersuche ist in der Datenbank noch nicht eingerichtet (Migration 014 fehlt)." : e.message; zeichneNeu(); }
+      } catch (e) { vorbei = true; stoppUhr(); clearInterval(takt); Z.modus = null; Z.fehler = fehlt(e) ? `Die Gegnersuche ist in der Datenbank noch nicht eingerichtet (Migration ${SERVER ? "015" : "014"} fehlt).` : e.message; zeichneNeu(); }
       finally { laeuft = false; }
     };
     $("#arena-suche-ab").onclick = () => { $("#arena-suche-ab").disabled = true; ende(true); };
@@ -231,15 +234,18 @@
       <div class="arena-gegenueber">${teamHtml(m.host, m.host.name, ich === 1)}<span class="arena-vs">gegen</span>${teamHtml(m.gast, m.gast.name, ich === 2)}</div>
       <p class="note" id="arena-status">${ich === 1 ? "Die Verbindung wird aufgebaut …" : "Warte auf den Ersteller des Kampfes …"}</p>
       <div class="knoepfe"><button class="btn ghost klein" id="arena-abbrechen">Abbrechen</button></div>`);
-    $("#arena-abbrechen").onclick = async () => { stoppUhr(); try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon beendet */ } await trennen(); Z.match = null; zeigen(); };
+    $("#arena-abbrechen").onclick = async () => { stoppUhr(); Z.kampf = null; Z.anfGeaendert = null; try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon beendet */ } await trennen(); Z.match = null; zeigen(); };
     const k = modusVon(m), team = (ich === 1 ? m.host : m.gast).team || [];
     const zeichneModus = () => { const el = $("#arena-modus-text"); if (!el) return; const anf = anfuehrerIdx(m);
       el.innerHTML = `<p class="arena-los">Das Los hat entschieden</p>${modusHtml(k, true)}
         ${k === "koenig" ? `<div class="arena-anfuehrer"><b>♛ Bestimme deinen Anführer</b> <small>– dein Gegner erfährt nicht, wer es ist.</small><div>${team.map((h, i) => `<button data-arena-anf="${esc(h.held)}" class="${i === anf ? "an" : ""}">${i === anf ? "♛ " : ""}${esc((F.FIGUREN[h.held] || {}).name || h.held)}</button>`).join("")}</div></div>` : ""}
         <p class="note">Jeder Held hat eine Minute Zugzeit.</p>`;
-      el.querySelectorAll("[data-arena-anf]").forEach((b) => { b.onclick = () => { anfuehrerMerken(m.id, b.dataset.arenaAnf); zeichneModus(); }; }); };
+      el.querySelectorAll("[data-arena-anf]").forEach((b) => { b.onclick = () => { anfuehrerMerken(m.id, b.dataset.arenaAnf); zeichneModus(); if (Z.anfGeaendert) Z.anfGeaendert(); }; }); };
     zeichneModus();
-    Promise.resolve().then(() => {
+    Promise.resolve().then(async () => {
+      // Rechnet der Server diesen Kampf (Migration 015)? Das hängt am Kampf, nicht am Gerät – so landen beide Seiten sicher im selben Verfahren
+      let s = null; try { s = await rpc("rpg_arena_fight", { p_match_id: m.id, p_version: 0 }); } catch (e) { s = null; }
+      if (s && s.server) return serverKampf(m, s);
       return verbinden(m);
     }).catch((e) => { const s = $("#arena-status"); if (s) s.textContent = "Die Verbindung ist fehlgeschlagen: " + e.message; });
   }
@@ -314,6 +320,72 @@
     // Hat der andere aufgegeben oder die Verbindung verloren?
     pollen(6000, async () => { const g = await rpc("rpg_arena_get", { p_match_id: m.id }); if ((g.status === "beendet" || g.status === "abgebrochen") && !Z.kampf.gemeldet) { Z.kampf.gemeldet = true; ergebnisZeigen(g, t); } });
     t.on("lost", () => { if (Z.kampf && !Z.kampf.gemeldet) rpc("rpg_arena_get", { p_match_id: m.id }).then((g) => { if (g.status === "laeuft") return rpc("rpg_arena_cancel", { p_match_id: m.id }).then((x) => x, () => g); return g; }).then((g) => { if (!Z.kampf || Z.kampf.gemeldet) return; Z.kampf.gemeldet = true; ergebnisZeigen(g, t); }).catch(() => {}); });
+  }
+  /* ---------- Serverkampf: Der Server rechnet, beide Geräte zeigen an und schicken ihre Züge ---------- */
+  /** Edge Function aufrufen (angemeldet). Zurück: die Antwort – auch bei einem Fehlerstatus, dann mit { fehler } */
+  async function funktion(name, rumpf) {
+    const c = window.AB.liveClient(); await c.ensureUser();
+    const { data, error } = await c.db.functions.invoke(name, { body: rumpf });
+    if (!error) return data || {};
+    let o = null; try { if (error.context && error.context.json) o = await error.context.json(); } catch (e) { o = null; }
+    return o && o.fehler ? o : { fehler: /not found|404/i.test(error.message || "") ? "Der Server für den Arena-Kampf ist noch nicht eingerichtet." : "Der Server hat nicht geantwortet." };
+  }
+  function serverKampf(m, s0) {
+    if (Z.kampf) return; const modus = modusVon(m); Z.kampf = { m, gemeldet: false, modus, server: true }; Z.modus = "kampf"; F.STUFEN10.aktiv = true;
+    const ruf = (rumpf) => funktion("arena", Object.assign({ match: m.id }, rumpf));
+    let gesehen = 0, gestartet = false, spielt = false, sendet = false, laeuft = false, uhrDiff = Date.now() - (s0.jetzt || Date.now()), letzterStart = 0, letzteZeit = 0, anfDa = s0.anfuehrer, fehlerN = 0;
+    const schlange = [], kStatus = (t, html) => { const el = $("#arena-status"); if (el) { if (html) el.innerHTML = t; else el.textContent = t; } };
+    const hinweis = (t) => { const h = $("#hinweis"); if (h && t) h.textContent = t; };
+    const aktiv = () => Z.kampf && Z.kampf.m === m && !Z.kampf.gemeldet;
+    // Schritte der Reihe nach zeigen: jeder bleibt kurz stehen (Würfel, Bewegung), nach einer Pause wird aufgeholt
+    const abspielen = async () => {
+      if (spielt) return; spielt = true;
+      try { while (schlange.length && Z.kampf && Z.kampf.m === m) {
+        const s = schlange.shift();
+        if (!gestartet) { gestartet = true; kStatus("Der Kampf beginnt …");
+          window.AB.arenaStart({ st: null, seite: m.seite, gast: true, server: true, sende, ende: () => fertig() }); aufgebenKnopf(m, null); }
+        window.AB.arenaStand(s.st);
+        if (schlange.length) await new Promise((r) => setTimeout(r, schlange.length > 8 ? 120 : 850));
+      } } finally { spielt = false; }
+    };
+    const nimm = (schritte) => { for (const s of schritte || []) if (s && s.v > gesehen && s.st) { gesehen = s.v; schlange.push(s); } abspielen(); };
+    // Eigener Zug: an den Server; die Antwort bringt die neuen Schritte gleich mit
+    const sende = (w) => { if (sendet || !aktiv()) return; sendet = true;
+      ruf({ aktion: "zug", zug: w }).then((r) => { if (r.fehler) hinweis(r.fehler); nimm(r.schritte); }, () => hinweis("Der Server hat nicht geantwortet. Versuch es noch einmal.")).then(() => { sendet = false; }); };
+    // Ende: Das Ergebnis steht in der Datenbank, sobald der Server den letzten Schritt gerechnet hat
+    const fertig = async () => {
+      if (!aktiv()) return; Z.kampf.gemeldet = true; stoppUhr();
+      const st = window.AB.st, a = st && st.arena; if (a && a.modus) Z.kampf.modus = a.modus;
+      if (a) schirm(`<p class="arena-ende-eyebrow">Der Kampf ist vorbei</p><h1>${a.sieger === m.seite ? "Sieg" : "Niederlage"}</h1><p>Das Ergebnis wird gewertet …</p>`, a.sieger === m.seite);
+      let g = null;
+      try { for (let i = 0; i < 10; i++) { g = await rpc("rpg_arena_get", { p_match_id: m.id }); if (g.status === "beendet" || g.status === "abgebrochen") break; await ruf({ aktion: "zeit" }).catch(() => {}); await new Promise((r) => setTimeout(r, 1500)); } }
+      catch (e) { g = { status: "fehler", fehler: e.message, seite: m.seite, sieger: a && a.sieger, punkte: a && a.punkte, host: m.host, gast: m.gast }; }
+      ergebnisZeigen(Object.assign({ punkteLokal: a && a.punkte }, g), null);
+    };
+    // Königsmord: den eigenen Anführer beim Server hinterlegen, solange der Kampf noch nicht begonnen hat
+    const anfSenden = () => { if (modus !== "koenig" || laeuft) return; const i = anfuehrerIdx(m); if (i === anfDa) return; anfDa = i; rpc("rpg_arena_fight_leader", { p_match_id: m.id, p_idx: i }).catch(() => { anfDa = null; }); };
+    Z.anfGeaendert = anfSenden; anfSenden();
+    const takt = async () => {
+      if (!Z.kampf || Z.kampf.m !== m) return stoppUhr();
+      let s = null; try { s = await rpc("rpg_arena_fight", { p_match_id: m.id, p_version: gesehen }); fehlerN = 0; } catch (e) { if (++fehlerN === 5) kStatus("Die Verbindung zum Server ist unterbrochen …"); return; }
+      if (!Z.kampf || Z.kampf.m !== m) return;
+      uhrDiff = Date.now() - s.jetzt; laeuft = Boolean(s.laeuft); nimm(s.schritte);
+      const jetzt = Date.now() - uhrDiff;
+      if (!laeuft && (s.status === "bereit" || s.status === "laeuft")) {
+        anfSenden();
+        const rest = Math.ceil((s.beginn - jetzt) / 1000);
+        if (rest > 0) kStatus(`Der Kampf beginnt in <b>${rest}</b> …`, true);
+        else { kStatus("Der Kampf beginnt …"); if (Date.now() - letzterStart > 2500) { letzterStart = Date.now(); ruf({ aktion: "start" }).then((r) => { if (r.fehler) kStatus(r.fehler); nimm(r.schritte); }, () => {}); } }
+        return;
+      }
+      // Zugzeit abgelaufen (auch die des Gegners): Der Server beendet den Zug, sobald ihn eine Seite darauf hinweist
+      const st = window.AB.st, bis = st && !st.ende && st.arena && st.arena.zugBis;
+      if (laeuft && bis && jetzt > bis + 1500 && !schlange.length && Date.now() - letzteZeit > 4000) { letzteZeit = Date.now(); ruf({ aktion: "zeit" }).then((r) => nimm(r.schritte), () => {}); }
+      // Aufgabe oder Abbruch durch den Gegner: Das Ende kommt dann nicht als Schritt, sondern nur als Status
+      if ((s.status === "beendet" || s.status === "abgebrochen") && !schlange.length && !spielt && aktiv() && !(window.AB.st && window.AB.st.ende)) {
+        Z.kampf.gemeldet = true; stoppUhr(); const g = await rpc("rpg_arena_get", { p_match_id: m.id }); ergebnisZeigen(g, null); }
+    };
+    pollen(1200, takt); takt();
   }
   function aufgebenKnopf(m, t) {
     let b = $("#arena-aufgeben"); if (!b) { b = document.createElement("button"); b.id = "arena-aufgeben"; b.className = "btn ghost klein arena-aufgeben"; b.textContent = "Aufgeben"; document.body.appendChild(b); }

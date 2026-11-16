@@ -948,6 +948,7 @@
     clearInterval(uhrTakt); uhrVersatz = 0; uhrTakt = setInterval(zugUhrTakt, 500);
     pruefAus();
     if (st) pruefErsteller();
+    else if (o.server) { /* Serverkampf: Der Server rechnet, hier wird nur angezeigt – nichts mitzurechnen */ }
     else { // Beigetretener: eigenen Kampf aus derselben Zufallszahl aufbauen (der Anführer des Erstellers bleibt unbekannt)
       let s = null; try { s = o.schatten ? o.schatten() : null; if (s && s.arena.koenig) s.arena.koenig[3 - o.seite] = null; } catch (e) { s = null; }
       PRUEF = { st: s, n: 0, ok: true, grund: "", v: PRUEF_V(), zusage: null, gesendet: [], gefallen: {}, seit: Date.now(), dran: "" };

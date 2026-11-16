@@ -10,15 +10,15 @@ create function pg_temp.fehler(sql text, muster text, t text) returns void langu
 begin begin execute sql; exception when others then if sqlerrm ~ muster then raise notice '✓ % (%)', t, sqlerrm; return; end if; raise exception '✗ %: unerwartete Meldung „%“', t, sqlerrm; end;
   raise exception '✗ %: kein Fehler', t; end $$;
 grant execute on all functions in schema pg_temp to authenticated;
-select pg_temp.ok((select count(*) = 16 and count(*) filter (where art = 'wuerfel') = 8 and count(*) filter (where preis = 75) = 8 and count(*) filter (where preis = 150) = 8 from public.rpg_cosmetic_items),
-  'Katalog: 8 Würfel und 8 Rahmen, je zur Hälfte für 75 und 150 Seelensplitter');
+select pg_temp.ok((select count(*) = 23 and count(*) filter (where art = 'wuerfel') = 8 and count(*) filter (where art = 'rahmen') = 15 and count(*) filter (where preis = 75) = 10 and count(*) filter (where preis = 150) = 13 from public.rpg_cosmetic_items),
+  'Katalog: 8 Würfel und 15 Rahmen; einfache für 75, ausgefallene für 150 Seelensplitter');
 set role authenticated;
 select pg_temp.als('A');
 select pg_temp.fehler('select * from public.rpg_cosmetic_items', 'permission denied', 'Der Katalog ist nicht direkt lesbar');
 select pg_temp.fehler('update public.rpg_cosmetic_items set preis = 0', 'permission denied', 'Preise sind nicht änderbar');
 select pg_temp.fehler('insert into public.rpg_cosmetic_owned (user_id, item_id, preis) values (''00000000-0000-0000-0000-0000000017a1'', ''w_gold'', 0)', 'permission denied', 'Besitz lässt sich nicht selbst eintragen');
 select public.rpg_cosmetics() as c0 \gset
-select pg_temp.ok((:'c0'::jsonb->>'konto')::boolean and (:'c0'::jsonb->>'waehrung')::int = 240 and jsonb_array_length(:'c0'::jsonb->'katalog') = 16 and jsonb_array_length(:'c0'::jsonb->'besitz') = 0
+select pg_temp.ok((:'c0'::jsonb->>'konto')::boolean and (:'c0'::jsonb->>'waehrung')::int = 240 and jsonb_array_length(:'c0'::jsonb->'katalog') = 23 and jsonb_array_length(:'c0'::jsonb->'besitz') = 0
   and :'c0'::jsonb->'aktiv'->'wuerfel' = 'null'::jsonb, 'Übersicht: Kontostand, ganzer Katalog, noch kein Besitz, Standard ausgewählt');
 select pg_temp.fehler('select public.rpg_cosmetic_equip(''wuerfel'', ''w_gold'')', 'besitzt du nicht', 'Auswählen ohne Besitz wird abgelehnt');
 select pg_temp.fehler('select public.rpg_cosmetic_buy(''w_gibt_es_nicht'')', 'führt der Händler nicht', 'Unbekanntes Stück wird abgelehnt');
@@ -51,7 +51,7 @@ update public.rpg_wallet set betrag = 500 where user_id = '00000000-0000-0000-00
 set role authenticated;
 select pg_temp.als('A');
 select pg_temp.fehler('select public.rpg_cosmetic_buy(''w_rubin'')', 'führt der Händler nicht', 'Aus dem Angebot genommen: nicht mehr kaufbar');
-select pg_temp.ok(jsonb_array_length(public.rpg_cosmetics()->'katalog') = 15 and public.rpg_cosmetic_equip('wuerfel', 'w_obsidian')->'aktiv'->>'wuerfel' = 'w_obsidian', '… wer es schon hat, sieht und benutzt es weiter');
+select pg_temp.ok(jsonb_array_length(public.rpg_cosmetics()->'katalog') = 22 and public.rpg_cosmetic_equip('wuerfel', 'w_obsidian')->'aktiv'->>'wuerfel' = 'w_obsidian', '… wer es schon hat, sieht und benutzt es weiter');
 reset role;
 select pg_temp.ok((select count(*) = 2 and sum(preis) = 225 from public.rpg_cosmetic_owned where user_id = '00000000-0000-0000-0000-0000000017a1'), 'Gebucht sind genau die beiden Käufe (75 + 150)');
 select pg_temp.ok(has_function_privilege('authenticated', 'public.rpg_cosmetic_buy(text)', 'execute') and not has_function_privilege('anon', 'public.rpg_cosmetic_buy(text)', 'execute')

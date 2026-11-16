@@ -8,7 +8,7 @@ const { chromium } = require("playwright"); const { ALLE } = require("./alle-hel
 const URL = "http://localhost:8765/abenteuer/index.html?schnell";
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 const KATALOG = [["w_obsidian", "wuerfel", 75], ["w_elfenbein", "wuerfel", 75], ["w_smaragd", "wuerfel", 75], ["w_rubin", "wuerfel", 75], ["w_glut", "wuerfel", 150], ["w_frost", "wuerfel", 150], ["w_arkan", "wuerfel", 150], ["w_gold", "wuerfel", 150],
-  ["r_bronze", "rahmen", 75], ["r_silber", "rahmen", 75], ["r_eisen", "rahmen", 75], ["r_wald", "rahmen", 75], ["r_gold", "rahmen", 150], ["r_flammen", "rahmen", 150], ["r_frost", "rahmen", 150], ["r_splitter", "rahmen", 150]].map(([id, art, preis]) => ({ id, art, preis }));
+  ["r_bronze", "rahmen", 75], ["r_silber", "rahmen", 75], ["r_eisen", "rahmen", 75], ["r_wald", "rahmen", 75], ["r_gold", "rahmen", 150], ["r_flammen", "rahmen", 150], ["r_frost", "rahmen", 150], ["r_splitter", "rahmen", 150], ["r_dornen", "rahmen", 75], ["r_zahnrad", "rahmen", 75], ["r_lorbeer", "rahmen", 150], ["r_krone", "rahmen", 150], ["r_schwingen", "rahmen", 150], ["r_stern", "rahmen", 150], ["r_runen", "rahmen", 150]].map(([id, art, preis]) => ({ id, art, preis }));
 const DB = { waehrung: 260, besitz: [], aktiv: { wuerfel: null, rahmen: null }, kaeufe: [] };
 const stand = () => ({ konto: true, waehrung: DB.waehrung, katalog: KATALOG, besitz: DB.besitz.slice(), aktiv: Object.assign({}, DB.aktiv) });
 function server(name, a) {
@@ -53,11 +53,11 @@ const shot = async (p, name) => { if (process.env.SHOT_DIR) await p.screenshot({
   await p.click('[data-shop-feld="ausstattung"]'); await p.waitForSelector(".kos-raster");
   const aus = await p.evaluate(() => ({ karten: document.querySelectorAll(".kos-karte").length, wuerfel: document.querySelectorAll(".kos-karte .kos-wuerfel").length, rahmen: document.querySelectorAll(".kos-karte .kos-rahmen").length,
     p75: [...document.querySelectorAll("[data-kos-kauf]")].filter((x) => /75/.test(x.textContent)).length, p150: [...document.querySelectorAll("[data-kos-kauf]")].filter((x) => /150/.test(x.textContent)).length, stand: document.querySelector(".shop-stand").textContent }));
-  check(aus.karten === 16 && aus.wuerfel === 8 && aus.rahmen === 8 && aus.p75 === 8 && aus.p150 === 8 && /260/.test(aus.stand), "Ausstattung: 8 Würfel und 8 Rahmen, einfache für 75, ausgefallene für 150; der Kontostand steht oben");
+  check(aus.karten === 23 && aus.wuerfel === 8 && aus.rahmen === 15 && aus.p75 === 10 && aus.p150 === 13 && /260/.test(aus.stand), "Ausstattung: 8 Würfel und 15 Rahmen, einfache für 75, ausgefallene für 150; der Kontostand steht oben");
   // Die Vorschauen sehen wirklich verschieden aus
   const farben = await p.evaluate(() => [...document.querySelectorAll(".kos-karte .kos-wuerfel")].map((v) => getComputedStyle(v.querySelector(".w20-koerper")).fill + "|" + getComputedStyle(v.querySelector(".w20-zahl")).fill));
-  const raender = await p.evaluate(() => [...document.querySelectorAll(".kos-karte .kos-rahmen .hub-avatar")].map((v) => getComputedStyle(v).borderTopColor + "|" + getComputedStyle(v).boxShadow));
-  check(new Set(farben).size === 8 && new Set(raender).size === 8, "Jedes der 16 Stücke hat ein eigenes Aussehen in der Vorschau");
+  const raender = await p.evaluate(() => [...document.querySelectorAll(".kos-karte .kos-rahmen .hub-avatar")].map((v) => getComputedStyle(v).borderTopColor + "|" + getComputedStyle(v).boxShadow + "|" + getComputedStyle(v.parentElement, "::after").backgroundImage.length + "|" + getComputedStyle(v.parentElement, "::before").backgroundImage.length));
+  check(new Set(farben).size === 8 && new Set(raender).size === 15, "Jedes der 23 Stücke hat ein eigenes Aussehen in der Vorschau");
   await shot(p, "haendler-2-ausstattung");
   // Kaufen
   await p.click('[data-kos-kauf="w_glut"]'); await p.waitForSelector('.kos-karte.mein');
@@ -66,11 +66,11 @@ const shot = async (p, name) => { if (process.env.SHOT_DIR) await p.screenshot({
   await p.click('[data-kos-kauf="r_silber"]'); await p.waitForFunction(() => document.querySelectorAll(".kos-karte.mein").length === 2);
   check(DB.waehrung === 35 && DB.aktiv.rahmen === "r_silber" && await p.evaluate(() => document.body.dataset.rahmen === "r_silber" && getComputedStyle(document.querySelector("#hub-profil-knopf .hub-avatar")).borderTopColor === "rgb(216, 221, 230)"),
     "Kauf „Silber“-Rahmen (75): Das eigene Profilbild oben trägt ihn sofort");
-  check(await p.evaluate(() => [...document.querySelectorAll("[data-kos-kauf]")].every((x) => x.disabled) && document.querySelectorAll(".shop-fehlt").length === 14), "Mit 35 Seelensplittern: alle übrigen Stücke gesperrt, mit Hinweis, wie viel fehlt");
+  check(await p.evaluate(() => [...document.querySelectorAll("[data-kos-kauf]")].every((x) => x.disabled) && document.querySelectorAll(".shop-fehlt").length === 21), "Mit 35 Seelensplittern: alle übrigen Stücke gesperrt, mit Hinweis, wie viel fehlt");
   // Personalisieren
   await p.click("#hub-profil-knopf"); await p.click('[data-profil="kosmetik"]'); await p.waitForSelector(".kos-profil");
   const pers = await p.evaluate(() => ({ wuerfel: [...document.querySelectorAll('[data-kos-wahl][data-art="wuerfel"]')].map((x) => x.dataset.kosWahl), rahmen: [...document.querySelectorAll('[data-kos-wahl][data-art="rahmen"]')].map((x) => x.dataset.kosWahl), an: [...document.querySelectorAll(".kos-wahl.an")].map((x) => x.dataset.kosWahl), text: document.querySelector(".kos-profil").textContent }));
-  check(pers.wuerfel.join() === ",w_glut" && pers.rahmen.join() === ",r_silber" && pers.an.join() === "w_glut,r_silber" && /7 weitere beim Händler/.test(pers.text), "Profil → Personalisieren: je Art „Standard“ und das Gekaufte; das Ausgewählte ist markiert");
+  check(pers.wuerfel.join() === ",w_glut" && pers.rahmen.join() === ",r_silber" && pers.an.join() === "w_glut,r_silber" && /14 weitere beim Händler/.test(pers.text), "Profil → Personalisieren: je Art „Standard“ und das Gekaufte; das Ausgewählte ist markiert");
   await shot(p, "haendler-3-personalisieren");
   await p.click('[data-kos-wahl=""][data-art="wuerfel"]'); await p.waitForFunction(() => !document.body.dataset.wuerfel);
   check(DB.aktiv.wuerfel === null && DB.besitz.includes("w_glut") && await p.evaluate(() => document.querySelector('[data-kos-wahl=""][data-art="wuerfel"]').classList.contains("an")), "Zurück auf Standard: gespeichert, das Stück bleibt im Besitz");
@@ -86,7 +86,7 @@ const shot = async (p, name) => { if (process.env.SHOT_DIR) await p.screenshot({
   // Handy
   const H = await seite(b, { width: 390, height: 844 }); await H.p.click('.dorf-ort[data-hub="shop"]'); await H.p.waitForSelector(".shop-felder"); await shot(H.p, "haendler-4-handy");
   await H.p.click('[data-shop-feld="ausstattung"]'); await H.p.waitForSelector(".kos-raster");
-  check(await H.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1 && document.querySelectorAll(".kos-karte").length === 16), "Handy: Ausstattung passt in die Breite");
+  check(await H.p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1 && document.querySelectorAll(".kos-karte").length === 23), "Handy: Ausstattung passt in die Breite");
   await shot(H.p, "haendler-5-handy-ausstattung");
   check(H.fehler.length === 0, "keine Skriptfehler am Handy");
   await b.close();

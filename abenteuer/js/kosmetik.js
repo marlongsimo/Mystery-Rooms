@@ -28,6 +28,13 @@
     r_flammen: { name: "Flammen", text: "Ein Rand, der brennt." },
     r_frost: { name: "Frost", text: "Eis, das leise leuchtet." },
     r_splitter: { name: "Seelensplitter", text: "Violett, pulsierend wie ein Splitter." },
+    r_dornen: { name: "Dornenkranz", text: "Geflochten, mit langen Dornen." },
+    r_zahnrad: { name: "Zahnrad", text: "Für Tüftler und Fallensteller." },
+    r_lorbeer: { name: "Lorbeerkranz", text: "Der Kranz der Sieger." },
+    r_krone: { name: "Krone", text: "Eine Krone über dem Haupt." },
+    r_schwingen: { name: "Schwingen", text: "Weiße Flügel zu beiden Seiten." },
+    r_stern: { name: "Kompassstern", text: "Acht Zacken, die den Weg weisen." },
+    r_runen: { name: "Runenkreis", text: "Ein Kreis aus Zeichen, der sich dreht." },
   };
   const ART = { wuerfel: { titel: "Würfel", einzahl: "Würfel", standard: "Der Würfel, wie ihn alle kennen." }, rahmen: { titel: "Profilrahmen", einzahl: "Rahmen", standard: "Der schlichte Goldrand." } };
   const MERKER = "ab_kosmetik";
@@ -62,7 +69,7 @@
   function vorschau(art, id) {
     if (art === "wuerfel") return `<span class="kos-bild kos-wuerfel" data-wuerfel="${id || "standard"}"><span class="w20-box">${window.ABW.svg(20)}</span></span>`;
     const bild = window.MYTHARA && window.MYTHARA.avatarHtml ? window.MYTHARA.avatarHtml() : "";
-    return `<span class="kos-bild kos-rahmen" data-rahmen="${id || "standard"}"><span class="hub-avatar">${bild}</span></span>`;
+    return `<span class="kos-bild kos-rahmen" data-rahmen="${id || "standard"}"><span class="rahmen-halter"><span class="hub-avatar">${bild}</span></span></span>`;
   }
   const stuecke = (art) => (D && D.katalog ? D.katalog.filter((k) => k.art === art && STUECKE[k.id]) : []);
   const hat = (id) => Boolean(D && (D.besitz || []).includes(id));

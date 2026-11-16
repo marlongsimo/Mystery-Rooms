@@ -59,7 +59,9 @@ insert into public.rpg_cosmetic_items (id, art, preis, reihe) values
   ('w_obsidian', 'wuerfel',  75, 10), ('w_elfenbein', 'wuerfel',  75, 20), ('w_smaragd', 'wuerfel',  75, 30), ('w_rubin', 'wuerfel',  75, 40),
   ('w_glut',     'wuerfel', 150, 50), ('w_frost',     'wuerfel', 150, 60), ('w_arkan',   'wuerfel', 150, 70), ('w_gold',  'wuerfel', 150, 80),
   ('r_bronze',   'rahmen',   75, 10), ('r_silber',    'rahmen',   75, 20), ('r_eisen',   'rahmen',   75, 30), ('r_wald',  'rahmen',   75, 40),
-  ('r_gold',     'rahmen',  150, 50), ('r_flammen',   'rahmen',  150, 60), ('r_frost',   'rahmen',  150, 70), ('r_splitter', 'rahmen', 150, 80)
+  ('r_gold',     'rahmen',  150, 50), ('r_flammen',   'rahmen',  150, 60), ('r_frost',   'rahmen',  150, 70), ('r_splitter', 'rahmen', 150, 80),
+  ('r_dornen',   'rahmen',   75, 42), ('r_zahnrad',   'rahmen',   75, 44),
+  ('r_lorbeer',  'rahmen',  150, 90), ('r_krone',     'rahmen',  150, 100), ('r_schwingen', 'rahmen', 150, 110), ('r_stern', 'rahmen', 150, 120), ('r_runen', 'rahmen', 150, 130)
 on conflict (id) do update set art = excluded.art, preis = excluded.preis, reihe = excluded.reihe;
 
 -- ---------------------------------------------------------------------

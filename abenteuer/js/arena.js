@@ -192,8 +192,9 @@
   /** Einladungen von Freunden zu einem privaten Kampf (über der Auswahl der Spielart) */
   function einladungenZeigen() {
     const el = $("#arena-einladungen"); if (!el) return; const l = (Z.einl && Z.einl.an_mich) || [], team = Z.team && Z.team.team;
-    el.innerHTML = l.map((e) => `<div class="arena-einladung"><div><b>${esc(e.von)} fordert dich heraus</b><small>Privater Kampf · ${esc((MODI[e.modus] || {}).name || e.modus)} · ohne Wertung</small></div>
+    const einlHtml = l.map((e) => `<div class="arena-einladung">${bildVon(e.von)}<div><b>${esc(e.von)} fordert dich heraus</b><small>Privater Kampf · ${esc((MODI[e.modus] || {}).name || e.modus)} · ohne Wertung</small></div>
       <span><button class="btn klein" data-einl-ja="${esc(e.id)}" ${team ? "" : "disabled"}>Annehmen</button><button class="btn ghost klein" data-einl-nein="${esc(e.id)}">Ablehnen</button></span></div>`).join("") + (l.length && !team ? `<p class="note">Lege zuerst dein Team fest, dann kannst du annehmen.</p>` : "");
+    if (el.dataset.h !== einlHtml) { el.dataset.h = einlHtml; el.innerHTML = einlHtml; if (kos()) kos().schmuecken(el); }
     el.querySelectorAll("[data-einl-ja]").forEach((b) => { b.onclick = async () => { b.disabled = true; stoppUhr();
       try { const m = await rpc("rpg_arena_invite_answer", { p_id: b.dataset.einlJa, p_accept: true }); if (m) { Z.match = m; meinMerken(m.id); return aufstellung(m); } } catch (e) { Z.fehler = e.message; } zeigen(); }; });
     el.querySelectorAll("[data-einl-nein]").forEach((b) => { b.onclick = async () => { b.disabled = true; try { await rpc("rpg_arena_invite_answer", { p_id: b.dataset.einlNein, p_accept: false }); } catch (e) { /* schon weg */ }
@@ -210,10 +211,11 @@
       <h2 class="hub-zwischen">Modus</h2>
       <div class="arena-modus-wahl">${LOS.slice().sort((a, b) => (a === "duell" ? -1 : b === "duell" ? 1 : 0)).map((k) => `<button class="arena-modus-knopf ${k === gewaehlt ? "an" : ""}" data-privat-modus="${k}"><b>${MODI[k].name}</b><span>${MODI[k].kurz}</span></button>`).join("")}</div>
       <h2 class="hub-zwischen">Freund</h2>
-      ${freunde.length ? `<ul class="arena-liste">${freunde.map((f) => `<li><div><b>${esc(f.handle)}</b></div><button class="btn klein" data-privat-freund="${esc(f.handle)}">Einladen</button></li>`).join("")}</ul>`
+      ${freunde.length ? `<ul class="arena-liste">${freunde.map((f) => `<li>${bildVon(f.handle)}<div><b>${esc(f.handle)}</b></div><button class="btn klein" data-privat-freund="${esc(f.handle)}">Einladen</button></li>`).join("")}</ul>`
         : `<p class="note">Du hast noch keine Freunde in deiner Liste. In der Taverne kannst du Spieler suchen und als Freunde hinzufügen.</p>`}
       <div class="knoepfe"><button class="btn ghost" id="arena-privat-zurueck">Zurück</button></div>`);
     Z.fehler = "";
+    if (kos()) kos().schmuecken($("[data-arena]"));
     document.querySelectorAll("[data-privat-modus]").forEach((b) => { b.onclick = () => { document.querySelectorAll("[data-privat-modus]").forEach((x) => x.classList.toggle("an", x === b)); }; });
     const mod = () => { const an = document.querySelector("[data-privat-modus].an"); return an ? an.dataset.privatModus : "duell"; };
     document.querySelectorAll("[data-privat-freund]").forEach((b) => { b.onclick = async () => { b.disabled = true; const m = mod(), name = b.dataset.privatFreund;
@@ -302,7 +304,8 @@
 
   /* ---------- Aufstellung beider Seiten, dann der Kampf ---------- */
   const KARTE = (k) => (k === "garten" ? R.KARTE_GARTEN : ((window.ABD_ALLE || {}).grauwacht || { KARTEN: {} }).KARTEN[String(k || "").toUpperCase()]) || R.KARTE_GARTEN;
-  const teamHtml = (t, name, mein) => `<div class="arena-team ${mein ? "mein" : "gegner"}"><h3>${esc(name)}${mein ? " (du)" : ""}<span>Ø ${komma(t.schnitt)}</span></h3><div class="arena-team-helden">${t.team.map((h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
+  const kos = () => window.ABKOS, bildVon = (name, klasse) => (kos() ? kos().traeger(name, klasse) : "");
+  const teamHtml = (t, name, mein) => `<div class="arena-team ${mein ? "mein" : "gegner"}"><h3>${bildVon(name)}<b class="arena-team-name">${esc(name)}${mein ? " (du)" : ""}</b><span>Ø ${komma(t.schnitt)}</span></h3><div class="arena-team-helden">${t.team.map((h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
     return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b>${F.meistertitel(h.held, h.stufe) ? `<small class="meister">♛ ${esc(F.meistertitel(h.held, h.stufe))}</small>` : ""}<em>Stufe ${h.stufe}</em></div>`; }).join("")}</div></div>`;
   function aufstellung(m) {
     stoppUhr(); Z.modus = "aufstellung"; Z.match = m;
@@ -313,6 +316,7 @@
       <div class="arena-gegenueber">${teamHtml(m.host, m.host.name, ich === 1)}<span class="arena-vs">gegen</span>${teamHtml(m.gast, m.gast.name, ich === 2)}</div>
       <p class="note" id="arena-status">${ich === 1 ? "Die Verbindung wird aufgebaut …" : "Warte auf den Ersteller des Kampfes …"}</p>
       <div class="knoepfe"><button class="btn ghost klein" id="arena-abbrechen">Abbrechen</button></div>`);
+    if (kos()) kos().arena(m.id, $("[data-arena]")); // Profilbild und Rahmen beider Teilnehmer
     $("#arena-abbrechen").onclick = async () => { stoppUhr(); Z.kampf = null; Z.anfGeaendert = null; try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { /* schon beendet */ } await trennen(); Z.match = null; zeigen(); };
     let k = modusVon(m), bekannt = !SERVER, privat = false; const team = (ich === 1 ? m.host : m.gast).team || [];
     const zeichneModus = () => { const el = $("#arena-modus-text"); if (!el) return; if (!bekannt) { el.innerHTML = `<p class="arena-los">Der Modus wird geladen …</p>`; return; } const anf = anfuehrerIdx(m);
@@ -513,9 +517,10 @@
       : g.grund === "aufgabe" ? (sieg ? "Dein Gegner hat aufgegeben." : "Du hast aufgegeben.") : g.grund === "team" ? (Z.kampf && Z.kampf.modus === "koenig" ? (sieg ? "Der gegnerische Anführer ist gefallen." : "Dein Anführer ist gefallen.") : sieg ? "Das gegnerische Team liegt am Boden." : "Dein Team liegt am Boden.") : "Nach Punkten entschieden.";
     const lohn = Z.kampf && Z.kampf.privat ? `<p class="arena-ende-note">Privater Kampf: ohne Wertung.</p>` : !b ? "" : !b.gewertet ? (g.grund === "aufgabe" && !sieg ? "" : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}<p class="arena-ende-note">Tagesgrenze erreicht (5 von 5): Dieser Kampf brachte keine Erfahrung mehr. Morgen gibt es wieder welche.</p>`)
       : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}${xp}${b.angebot ? `<p class="arena-ende-lohn held">★ Ein neuer Held will sich dir anschließen!</p>` : ""}`;
-    const e = schirm(`<p class="arena-ende-eyebrow">${esc(g.host ? g.host.name : "")} gegen ${esc(g.gast ? g.gast.name : "")}</p><h1>${g.status === "abgebrochen" ? "Abgebrochen" : sieg ? "Sieg" : "Niederlage"}</h1>
+    const e = schirm(`<div class="arena-ende-gegner">${g.host ? bildVon(g.host.name, "gross") : ""}<p class="arena-ende-eyebrow">${esc(g.host ? g.host.name : "")} gegen ${esc(g.gast ? g.gast.name : "")}</p>${g.gast ? bildVon(g.gast.name, "gross") : ""}</div><h1>${g.status === "abgebrochen" ? "Abgebrochen" : sieg ? "Sieg" : "Niederlage"}</h1>
       ${p ? `<p class="arena-ende-punkte">${p[1] != null ? p[1] : p["1"]} : ${p[2] != null ? p[2] : p["2"]}</p>` : ""}<p>${text}</p>${lohn}
       <div class="knoepfe mitte"><button class="btn gross" id="arena-ende-zu">${b && b.angebot ? "Helden wählen" : "Zur Startseite"}</button></div>`, sieg && g.status !== "abgebrochen");
+    if (kos()) kos().arena(g.id || (Z.kampf && Z.kampf.m && Z.kampf.m.id), e);
     $("#arena-ende-zu").onclick = async () => {
       e.hidden = true; e.innerHTML = ""; window.AB.arenaEnde(); Z.kampf = null; Z.match = null; Z.modus = null; await trennen();
       await pruefen(true); if (window.MYTHARA.waehrungZeigen) window.MYTHARA.waehrungZeigen(Z.waehrung);

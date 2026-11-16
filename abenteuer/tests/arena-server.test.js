@@ -11,6 +11,7 @@ let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") +
 const S = attrappe(); Object.assign(S.db.nutzer, { "tok-A": "nutzer-A", "tok-B": "nutzer-B" });
 const ID = "00000000-0000-0000-0000-00000000d001";
 const DB = { teams: {}, suchend: null, arten: [], einl: null, suchAb: 0, xp: { A: { schildwaechter: 1350, lichtbringer: 260 }, B: { berserker: 850 } }, live: 0, anf: 0 };
+const LOOK = { A: { name: "Spieler A", avatar: "schildwaechter", rahmen: "r_lorbeer" }, B: { name: "Spieler B", avatar: "berserker", rahmen: "r_krone" } };
 const stufe = (xp) => { const bis = [100, 150, 250, 350, 500, 700, 900, 1200, 1500]; let s = 1, r = xp || 0; while (s < 10 && r >= bis[s - 1]) { r -= bis[s - 1]; s++; } return s; };
 const team = (ich, helden) => helden.map((h) => ({ held: h, stufe: stufe(DB.xp[ich][h]) }));
 const schnitt = (t) => Math.round(t.reduce((a, h) => a + h.stufe, 0) / t.length * 10) / 10;
@@ -51,6 +52,9 @@ function server(ich, name, args) {
     const t1 = team(e.von, DB.teams[e.von]), t2 = team(ich, DB.teams[ich]);
     S.kampf(ID, { beginn: Date.now() + 5000, match: { host_id: "nutzer-" + e.von, guest_id: "nutzer-" + ich, host_name: "Spieler " + e.von, guest_name: "Spieler " + ich, host_team: t1, guest_team: t2, seed: 4712, modus: e.modus, karte: "gruft", begegnung: "kobolde", kampfstufe: Math.round(Math.max(schnitt(t1), schnitt(t2))) } });
     S.db.kaempfe[ID].privat = true; e.status = "angenommen"; return sicht(ich); }
+  // Migration 018: Aussehen (Profilbild, Rahmen) – A trägt den Lorbeerkranz, B die Krone
+  if (name === "rpg_arena_looks") { DB.looks = (DB.looks || 0) + 1; return { host: LOOK[S.db.kaempfe[ID].match.host_id.slice(-1)], gast: LOOK[S.db.kaempfe[ID].match.guest_id.slice(-1)] }; }
+  if (name === "rpg_looks") { const o = {}; for (const n of args.p_handles || []) { const k = n.slice(-1); if (LOOK[k] && k !== ich) o[LOOK[k].name] = LOOK[k]; } return o; }
   if (name === "rpg_arena_get") return sicht(ich) || fehler("Diesen Kampf gibt es nicht.");
   if (name === "rpg_arena_fight") return S.sicht(ID, "nutzer-" + ich, args.p_version);
   if (name === "rpg_arena_fight_leader") { const k = S.db.kaempfe[ID]; if (!k || k.st) return false; DB.anf++; if (k.match.host_id === "nutzer-" + ich) k.anf1 = args.p_idx; else k.anf2 = args.p_idx; return true; }
@@ -66,7 +70,7 @@ async function spieler(b, ich, mobil) {
   await p.route(/\/rest\/v1\/rpc\/rpg_hero_levels(\?|$)/, (r) => json(r, { konto: true, xp: DB.xp[ich] }));
   await p.route(/\/rest\/v1\/rpc\/rpg_(my_inbox|my_campaigns)(\?|$)/, (r) => json(r, r.request().url().includes("inbox") ? { freunde: [], kampagnen: [] } : []));
   await p.route(/\/rest\/v1\/rpc\/(create_game_session|join_game_session|set_session_state)(\?|$)/, (r) => { DB.live++; return json(r, { message: "nicht erwartet" }, 400); });
-  await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z_]+|my_wallet|my_friends)(\?|$)/, (r) => { const name = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1]; let args = {}; try { args = JSON.parse(r.request().postData() || "{}"); } catch (e) { /* leer */ }
+  await p.route(/\/rest\/v1\/rpc\/rpg_(arena_[a-z_]+|my_wallet|my_friends|looks)(\?|$)/, (r) => { const name = /rpc\/(rpg_[a-z_]+)/.exec(r.request().url())[1]; let args = {}; try { args = JSON.parse(r.request().postData() || "{}"); } catch (e) { /* leer */ }
     const e = server(ich, name, args); return e && e.fehler ? r.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ code: "P0001", message: e.fehler }) }) : json(r, e); });
   // Die Edge Function: die gebaute Datei, in Node ausgeführt. Wer anfragt, bestimmt hier das Gerät (im Echtbetrieb das Anmelde-Token).
   await p.route(/\/functions\/v1\/arena(\?|$)/, async (r) => { if (r.request().method() === "OPTIONS") return json(r, {});
@@ -107,6 +111,8 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   const einl = await B.p.waitForSelector(".arena-einladung", { timeout: 12000 }).then(() => true, () => false);
   const et = einl ? (await B.p.textContent(".arena-einladung")).replace(/\s+/g, " ") : "";
   check(einl && /Spieler A fordert dich heraus/.test(et) && /Königsmord/.test(et) && /ohne Wertung/.test(et), "Der Freund sieht die Einladung in seiner Arena: wer, welcher Modus, ohne Wertung");
+  check(await B.p.waitForFunction(() => { const t = document.querySelector(".arena-einladung .kos-traeger"); return t && t.dataset.rahmen === "r_lorbeer" && t.querySelector("img"); }, null, { timeout: 8000 }).then(() => true, () => false),
+    "Einladung: Profilbild des Freundes mit seinem Rahmen (Lorbeerkranz)");
   await shot(B.p, "arten-4-einladung-handy");
   await B.p.click("[data-einl-ja]");
   const auf = await A.p.waitForSelector(".arena-gegenueber", { timeout: 15000 }).then(() => true, () => false) && await B.p.waitForSelector(".arena-gegenueber", { timeout: 15000 }).then(() => true, () => false);
@@ -115,6 +121,11 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   await B.p.waitForSelector('[data-arena-anf="berserker"]', { timeout: 10000 });
   const mt = (await B.p.textContent("#arena-modus-text")).replace(/\s+/g, " ");
   check(/Privater Kampf · ohne Wertung/.test(mt) && /Königsmord/.test(mt) && !/Das Los hat entschieden/.test(mt), "Aufstellung: gewählter Modus Königsmord (die Zufallszahl hätte „Arena“ ergeben), gekennzeichnet als privat");
+  const rahmen = (p) => p.waitForFunction(() => { const t = [...document.querySelectorAll(".arena-team h3 .kos-traeger")]; return t.length === 2 && t.every((x) => x.dataset.rahmen !== "standard" && x.querySelector("img")); }, null, { timeout: 8000 })
+    .then(() => p.evaluate(() => [...document.querySelectorAll(".arena-team h3 .kos-traeger")].map((x) => x.dataset.von + ":" + x.dataset.rahmen + ":" + (getComputedStyle(x.querySelector(".rahmen-halter"), "::after").backgroundImage.length > 20)).join(" | ")), () => "");
+  const rA = await rahmen(A.p), rB = await rahmen(B.p);
+  check(rA === "Spieler A:r_lorbeer:true | Spieler B:r_krone:true" && rA === rB, "Aufstellung: Beide sehen Profilbild und Rahmen des anderen (" + (rB || "nichts") + ")");
+  await shot(A.p, "rahmen-1-aufstellung");
   await B.p.click('[data-arena-anf="berserker"]'); await A.p.click('[data-arena-anf="lichtbringer"]');
   const zaehlt = await warte(A.p, () => /beginnt in \d+/.test((document.querySelector("#arena-status") || {}).textContent || ""), null, 8000);
   check(zaehlt, "Aufstellung: Der Countdown kommt vom Server");
@@ -170,6 +181,7 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   const tA = endeA ? (await A.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "", tB = endeB ? (await B.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "";
   check(endeA && endeB && new RegExp(sieger === 1 ? "Sieg" : "Niederlage").test(tA) && new RegExp(sieger === 2 ? "Sieg" : "Niederlage").test(tB), "Ergebnis: Ein Gerät zeigt „Sieg“, das andere „Niederlage“ – ohne dass ein Gerät etwas gemeldet hat");
   check(/Privater Kampf: ohne Wertung/.test(tA) && /Privater Kampf: ohne Wertung/.test(tB) && !/XP/.test(tA + tB) && !/Seelensplitter/.test(tA + tB) && !/Tagesgrenze/.test(tA + tB), "Privater Kampf: Das Ergebnis nennt „ohne Wertung“, keine Belohnung");
+  check(await A.p.evaluate(() => { const t = [...document.querySelectorAll("#arena-ende .kos-traeger")]; return t.length === 2 && t[0].dataset.rahmen === "r_lorbeer" && t[1].dataset.rahmen === "r_krone"; }), "Ergebnis: beide Profilbilder mit Rahmen");
   await shot(A.p, "server-3-ende-a");
   await A.p.click("#arena-ende-zu"); const zurueck = await warte(A.p, () => { const h = document.querySelector("#hub"); return h && !h.hidden; }, null, 15000);
   check(zurueck, "„Zur Startseite“ führt zurück ins Dorf");

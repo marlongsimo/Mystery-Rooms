@@ -2187,3 +2187,11 @@ body.kh-an .wurf .w20-erg span, body.kh-an .wurf span { font-size: 13px; }
 .kos-wahl.an { border-color: #e8b04c; background: rgba(232,176,76,.16); box-shadow: 0 0 0 1px #e8b04c inset; }
 .kos-profil .kos-raster { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 @media (max-width: 760px) { .shop-felder { grid-template-columns: 1fr; } .kos-raster { grid-template-columns: 1fr 1fr; } .shop-feld > span:not(.shop-feld-bilder) { min-height: 0; } }
+
+/* Profilbild mit Rahmen eines anderen Spielers (Arena, Taverne) */
+.kos-traeger { display: inline-grid; place-items: center; flex: none; width: 44px; height: 44px; vertical-align: middle; }
+.kos-traeger.gross { width: 76px; height: 76px; } .kos-traeger.gross .hub-avatar.klein { width: 56px; height: 56px; font-size: 22px; }
+.arena-team h3 { display: flex; align-items: center; gap: 10px; } .arena-team h3 .arena-team-name { flex: 1 1 auto; min-width: 0; font: inherit; overflow: hidden; text-overflow: ellipsis; }
+.arena-ende-gegner { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 4px; } .arena-ende-gegner .arena-ende-eyebrow { margin: 0; }
+.arena-einladung .kos-traeger { margin-right: 2px; } .arena-einladung > div { flex: 1 1 160px; }
+.f-liste li .kos-traeger { margin: -5px 0; } .arena-liste li .kos-traeger { margin-right: 10px; }

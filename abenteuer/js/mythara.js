@@ -524,6 +524,7 @@
     const o = $("#qr-overlay");
     o.innerHTML = `<div class="karte-box kampagnen" role="dialog" aria-label="${esc(titel)}"><div class="k-kopf"><h2>${esc(titel)}</h2><button class="link" id="fenster-zu">Schließen</button></div>${inhalt}</div>`;
     o.hidden = false; $("#fenster-zu").onclick = () => { o.hidden = true; hubListen(); posteingang(); };
+    if (window.ABKOS && o.querySelector(".kos-traeger")) window.ABKOS.schmuecken(o); // Profilrahmen der Freunde
     return o;
   }
   async function anfragenZeigen() {
@@ -551,7 +552,7 @@
   async function freundeZeigen(suchErgebnis) {
     if (!istKonto()) { fenster("Taverne", `<p class="note">Freunde gibt es mit einem Spielerkonto: Dann kannst du andere über ihren Benutzernamen finden und zu deinen Kampagnen einladen.</p><button class="my-knopf rot" data-profil="registrieren">Konto erstellen</button>`); return; }
     let d; try { d = await netz().rpc("rpg_my_friends", {}); } catch (e) { fenster("Taverne", `<p class="fb">${esc(e.message)}</p>`); return; }
-    const zeile = (x, knoepfe) => `<li><span class="hub-avatar klein">${ava(x.avatar_key, x.handle)}</span><b>${esc(x.handle)}</b><span class="f-knoepfe">${knoepfe}</span></li>`;
+    const zeile = (x, knoepfe) => `<li>${window.ABKOS ? window.ABKOS.traeger(x.handle) : `<span class="hub-avatar klein">${ava(x.avatar_key, x.handle)}</span>`}<b>${esc(x.handle)}</b><span class="f-knoepfe">${knoepfe}</span></li>`;
     const s = suchErgebnis;
     const sKnopf = !s ? "" : s.beziehung === "freund" ? `<span class="f-info">Ihr seid befreundet.</span>` : s.beziehung === "angefragt" ? `<span class="f-info">Anfrage gesendet.</span>` : s.beziehung === "anfrage_an_mich" ? `<button class="btn klein" data-f="annehmen" data-name="${esc(s.handle)}">Anfrage annehmen</button>` : s.beziehung === "blockiert" ? `<button class="btn ghost klein" data-f="entsperren" data-name="${esc(s.handle)}">Entsperren</button>` : `<button class="btn klein" data-f="anfragen" data-name="${esc(s.handle)}">Freundschaftsanfrage senden</button>`;
     const o = fenster("Taverne", `<form class="f-suche" id="f-suche"><label for="f-name">Spieler finden</label><div><input id="f-name" placeholder="Genauer Benutzername" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn klein" type="submit">Suchen</button></div><p class="my-fb" id="f-fb" role="status"></p></form>
@@ -757,5 +758,5 @@
   });
   /** Die Kampagne, die in der Übersicht nach dieser kommt (für „Weiter mit der nächsten Kampagne“) */
   const naechstesAbenteuer = (id) => { const l = ABENTEUER(), i = l.findIndex((m) => m.id === id); return i >= 0 && l[i + 1] ? l[i + 1] : null; };
-  window.MYTHARA = { seite: seiteZeigen, waehrungZeigen, shop: shopZeigen, fenster, toast, avatarHtml, kopfNeu: () => hubKopf(), KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
+  window.MYTHARA = { ava, seite: seiteZeigen, waehrungZeigen, shop: shopZeigen, fenster, toast, avatarHtml, kopfNeu: () => hubKopf(), KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
 })();

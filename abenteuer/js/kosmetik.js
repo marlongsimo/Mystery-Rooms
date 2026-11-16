@@ -127,7 +127,36 @@
     zeichne();
   }
 
+  /* ---------- Rahmen anderer Spieler (Migration 018) ----------
+     Ein „Träger“ ist ein Profilbild mit Platz für einen Rahmen. Er steht zunächst auf Standard (mit dem Anfangsbuchstaben)
+     und wird nachträglich gefüllt: in der Arena mit beiden Teilnehmern des Kampfes, sonst mit dem, was die Datenbank über
+     die eigenen Freunde herausgibt. Für alle anderen bleibt es beim Standard. */
+  const gemerkt = new Map(); let looksFehlt = false; // Benutzername (klein) → { avatar, rahmen, bis }
+  const ava = (k, name) => (window.MYTHARA && window.MYTHARA.ava ? window.MYTHARA.ava(k, name) : `<span>${esc((name || "?").slice(0, 1).toUpperCase())}</span>`);
+  function traeger(name, klasse) {
+    return `<span class="kos-traeger ${klasse || ""}" data-rahmen="standard" data-von="${esc(name || "")}"><span class="rahmen-halter"><span class="hub-avatar klein">${ava(null, name)}</span></span></span>`;
+  }
+  function fuellen(wurzel) {
+    (wurzel || document).querySelectorAll(".kos-traeger[data-von]").forEach((t) => { const l = gemerkt.get((t.dataset.von || "").toLowerCase()); if (!l) return;
+      t.dataset.rahmen = STUECKE[l.rahmen] ? l.rahmen : "standard"; const b = t.querySelector(".hub-avatar"); if (b && t.dataset.bild !== String(l.avatar)) { t.dataset.bild = String(l.avatar); b.innerHTML = ava(l.avatar, t.dataset.von); } });
+  }
+  const merken = (o) => { for (const k of Object.keys(o || {})) if (o[k] && o[k].name) gemerkt.set(o[k].name.toLowerCase(), { avatar: o[k].avatar || null, rahmen: o[k].rahmen || null, bis: Date.now() + 120000 }); };
+  /** Träger in wurzel füllen; fehlendes Aussehen der Freunde holt die Datenbank */
+  async function schmuecken(wurzel) {
+    fuellen(wurzel);
+    if (looksFehlt) return;
+    const namen = [...new Set([...(wurzel || document).querySelectorAll(".kos-traeger[data-von]")].map((t) => t.dataset.von).filter((n) => { const l = gemerkt.get((n || "").toLowerCase()); return n && (!l || l.bis < Date.now()); }))].slice(0, 60);
+    if (!namen.length) return;
+    try { await netz().ensureUser(); merken(await netz().rpc("rpg_looks", { p_handles: namen })); fuellen(wurzel); } catch (e) { if (fehlt(e)) looksFehlt = true; }
+  }
+  /** Arena: beide Teilnehmer eines Kampfes holen (auch wenn sie keine Freunde sind) und die Träger füllen */
+  async function arena(matchId, wurzel) {
+    if (looksFehlt || !matchId) return fuellen(wurzel);
+    try { const l = await netz().rpc("rpg_arena_looks", { p_match_id: matchId }); merken({ a: l && l.host, b: l && l.gast }); } catch (e) { if (fehlt(e)) looksFehlt = true; }
+    fuellen(wurzel);
+  }
+
   anwenden();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", anwenden);
-  window.ABKOS = { laden, anwenden, zuruecksetzen, ausstattung, personalisieren, STUECKE, aktiv: () => Object.assign({}, aktiv), da: () => Boolean(D && D.konto) };
+  window.ABKOS = { laden, anwenden, zuruecksetzen, ausstattung, personalisieren, traeger, schmuecken, arena, fuellen, STUECKE, aktiv: () => Object.assign({}, aktiv), da: () => Boolean(D && D.konto) };
 })();

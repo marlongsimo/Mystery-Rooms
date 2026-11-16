@@ -183,7 +183,7 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
     check(k.includes("wuerfel") && k.includes("hieb"), `Mit Effekten: Bei ${n} sind im Serverkampf Würfel und Treffer zu hören (${k.filter((x) => x === "wuerfel").length} Würfe, ${k.filter((x) => x === "hieb").length} Treffer)`); }
   const tA = endeA ? (await A.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "", tB = endeB ? (await B.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "";
   check(endeA && endeB && new RegExp(sieger === 1 ? "Sieg" : "Niederlage").test(tA) && new RegExp(sieger === 2 ? "Sieg" : "Niederlage").test(tB), "Ergebnis: Ein Gerät zeigt „Sieg“, das andere „Niederlage“ – ohne dass ein Gerät etwas gemeldet hat");
-  check(/Privater Kampf: ohne Wertung/.test(tA) && /Privater Kampf: ohne Wertung/.test(tB) && !/XP/.test(tA + tB) && !/Seelensplitter/.test(tA + tB) && !/Tagesgrenze/.test(tA + tB), "Privater Kampf: Das Ergebnis nennt „ohne Wertung“, keine Belohnung");
+  check(/Privater Kampf: ohne Wertung/.test(tA) && /Privater Kampf: ohne Wertung/.test(tB) && !/EP/.test(tA + tB) && !/Seelensplitter/.test(tA + tB) && !/Tagesgrenze/.test(tA + tB), "Privater Kampf: Das Ergebnis nennt „ohne Wertung“, keine Belohnung");
   check(await A.p.evaluate(() => { const t = [...document.querySelectorAll("#arena-ende .kos-traeger")]; return t.length === 2 && t[0].dataset.rahmen === "r_lorbeer" && t[1].dataset.rahmen === "r_krone"; }), "Ergebnis: beide Profilbilder mit Rahmen");
   await shot(A.p, "server-3-ende-a");
   await A.p.click("#arena-ende-zu"); const zurueck = await warte(A.p, () => { const h = document.querySelector("#hub"); return h && !h.hidden; }, null, 15000);

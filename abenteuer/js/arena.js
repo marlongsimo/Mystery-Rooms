@@ -548,7 +548,7 @@
   }
   async function ergebnisZeigen(g, t) {
     stoppUhr(); const ab = $("#arena-aufgeben"); if (ab) ab.hidden = true; meinMerken(null);
-    // Die XP-Einträge kommen je nach Datenbank mit „vorher/stufe/gesamt“ oder „stufe_vorher/stufe_danach“: vereinheitlichen
+    // Die EP-Einträge kommen je nach Datenbank mit „vorher/stufe/gesamt“ oder „stufe_vorher/stufe_danach“: vereinheitlichen
     if (g.belohnung && g.belohnung.xp && g.belohnung.xp.length) {
       if (sm()) { try { await sm().laden(true); } catch (e) { /* ohne Verbindung: ohne Balken */ } }
       const xpJetzt = (sm() && sm().zustand().xp) || {};
@@ -556,7 +556,7 @@
     }
     const gewertet = g.status === "beendet", sieg = gewertet ? g.sieger === g.seite : g.sieger === g.seite, b = g.belohnung || null, p = g.punkte || g.punkteLokal || null;
     const xp = b && b.xp && b.xp.length ? `<div class="arena-xp">${b.xp.map((h) => { const d = F.FIGUREN[h.held]; if (!d) return ""; const f = F.stufeAusXp(h.gesamt || 0), auf = h.stufe > h.vorher, voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
-      return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>+${h.xp} XP</span></div><i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</small></div></div>`; }).join("")}</div>` : "";
+      return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>+${h.xp} EP</span></div><i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} EP bis Stufe ${f.stufe + 1}`}</small></div></div>`; }).join("")}</div>` : "";
     const text = g.status === "abgebrochen" ? (Z.kampf && Z.kampf.faul ? "Der Kampf wurde ohne Wertung beendet: " + esc(Z.kampf.faul) : Z.kampf && Z.kampf.m && g.sieger == null && g.runden == null && Z.kampf.gemeldetSelbst ? "Der Kampf wurde ohne Wertung beendet: Die beiden Geräte kamen nicht zum selben Ergebnis." : "Der Kampf wurde ohne Wertung beendet.") : g.status === "fehler" ? "Das Ergebnis konnte nicht gemeldet werden: " + esc(g.fehler || "") : g.status === "laeuft" ? "Dein Gegner hat das Ergebnis noch nicht bestätigt. Sobald er es tut, wird gewertet."
       : g.grund === "aufgabe" ? (sieg ? "Dein Gegner hat aufgegeben." : "Du hast aufgegeben.") : g.grund === "team" ? (Z.kampf && Z.kampf.modus === "koenig" ? (sieg ? "Der gegnerische Anführer ist gefallen." : "Dein Anführer ist gefallen.") : sieg ? "Das gegnerische Team liegt am Boden." : "Dein Team liegt am Boden.") : "Nach Punkten entschieden.";
     const lohn = Z.kampf && Z.kampf.privat ? `<p class="arena-ende-note">Privater Kampf: ohne Wertung.</p>` : !b ? "" : !b.gewertet && !(b.xp && b.xp.length) && !b.waehrung ? (g.grund === "aufgabe" && !sieg ? "" : `<p class="arena-ende-note">Dieser Kampf brachte keine Belohnung.</p>`)

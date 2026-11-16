@@ -1,19 +1,19 @@
 /*
  * Mythara – Heldenstufen im Browser (Migration 007), mit nachgebildeten Antworten des Servers:
- * Charaktere-Seite und Profil zeigen Stufe und XP-Balken, eine neue Kampagne spielt im Zehn-Stufen-Modell mit eigener
- * Stufe je Held (ohne Anhebung), ein Kampf läuft durch, die Belohnung zeigt XP und Aufstieg.
+ * Charaktere-Seite und Profil zeigen Stufe und EP-Balken, eine neue Kampagne spielt im Zehn-Stufen-Modell mit eigener
+ * Stufe je Held (ohne Anhebung), ein Kampf läuft durch, die Belohnung zeigt EP und Aufstieg.
  * Ohne die Funktionen in der Datenbank bleibt alles beim bisherigen Modell.
  * Aufruf: node abenteuer/tests/stufen-browser.test.js   (Webserver auf Port 8765)
  */
 const { chromium } = require("playwright"); const { ALLE } = require("./alle-helden");
 const URL = "http://localhost:8765/abenteuer/index.html?schnell";
-const XP = { schildwaechter: 1350, lichtbringer: 260, wildnislaeufer: 0 }; // Stufe 6, Stufe 3, Stufe 1
+const EP = { schildwaechter: 1350, lichtbringer: 260, wildnislaeufer: 0 }; // Stufe 6, Stufe 3, Stufe 1
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 async function seite(b, mit007) {
   const p = await b.newPage({ viewport: { width: 1200, height: 900 } }); const fehler = []; p.on("pageerror", (e) => fehler.push(e.message)); p.on("dialog", (d) => d.accept());
   const json = (route, body) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
   await p.route(/\/rest\/v1\/rpc\/rpg_(my_heroes|campaign_heroes)(\?|$)/, (r) => json(r, { konto: true, helden: ALLE, start_offen: false, angebote: [], enden: [], alle_enden: {}, titel: [] }));
-  await p.route(/\/rest\/v1\/rpc\/rpg_hero_levels(\?|$)/, (r) => (mit007 ? json(r, { konto: true, xp: XP }) : r.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ code: "PGRST202", message: "Could not find the function public.rpg_hero_levels" }) })));
+  await p.route(/\/rest\/v1\/rpc\/rpg_hero_levels(\?|$)/, (r) => (mit007 ? json(r, { konto: true, xp: EP }) : r.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ code: "PGRST202", message: "Could not find the function public.rpg_hero_levels" }) })));
   await p.route(/\/rest\/v1\/rpc\/rpg_claim_ending(\?|$)/, (r) => json(r, { konto: true, neu: false, abenteuer: "grauwacht", ende: "ende_waechter", schon_gemeldet: false, angebot: null, gefunden: 1, gesamt: 5, sammlung: 15 }));
   await p.route(/\/rest\/v1\/rpc\/rpg_award_xp(\?|$)/, (r) => json(r, { konto: true, abenteuer: "grauwacht", helden: [
     { held: "wildnislaeufer", xp: 320, vorher: 1, stufe: 3, gesamt: 320, neu: true }, { held: "lichtbringer", xp: 200, vorher: 3, stufe: 4, gesamt: 460, neu: true }, { held: "schildwaechter", xp: 50, vorher: 6, stufe: 6, gesamt: 1400, neu: true }] }));
@@ -27,7 +27,7 @@ async function seite(b, mit007) {
     await p.evaluate(() => window.ABSAMMLUNG.laden(true));
     await p.evaluate(() => document.querySelector('.hub-nav-punkt[data-hub="helden"]').click()); await p.waitForSelector(".sm-helden-liste");
     const liste = await p.evaluate(() => [...document.querySelectorAll(".sm-helden-liste .sm-xp-zeile")].slice(0, 3).map((z) => z.textContent.replace(/\s+/g, " ").trim()));
-    check(/Torvald.*Stufe 6/.test(liste[0]) && /0 \/ 700 XP bis Stufe 7/.test(liste[0]) && /Stufe 3/.test(liste[1]) && /10 \/ 250 XP/.test(liste[1]), "Charaktere: Übersicht mit Stufe und XP bis zur nächsten Stufe (" + liste[0].slice(0, 60) + " …)");
+    check(/Torvald.*Stufe 6/.test(liste[0]) && /0 \/ 700 EP bis Stufe 7/.test(liste[0]) && /Stufe 3/.test(liste[1]) && /10 \/ 250 EP/.test(liste[1]), "Charaktere: Übersicht mit Stufe und EP bis zur nächsten Stufe (" + liste[0].slice(0, 60) + " …)");
     await p.click('#hub-seite [data-klasse="krieger"]'); await p.waitForSelector("article.held");
     const karte = await p.evaluate(() => ({ kopf: document.querySelector("article.held .sm-stufe").textContent, kachel: document.querySelector('.fkarte[data-fid="schildwaechter"] .sm-stufe').textContent, tp: document.querySelector(".held-kern b").textContent, jetzt: (document.querySelector(".held-pfad tr.aktuell th") || {}).textContent, an: window.ABF.STUFEN10.aktiv }));
     check(/Stufe 6/.test(karte.kopf) && /Stufe 6/.test(karte.kachel) && karte.tp === String(await p.evaluate(() => { const F = window.ABF; F.STUFEN10.aktiv = true; const t = F.tpVon("schildwaechter", 6); F.STUFEN10.aktiv = false; return t; })) && /6/.test(karte.jetzt) && !karte.an, `Heldenkarte: Stufe 6 mit Balken, Leben der Stufe (${karte.tp}), Zeile „jetzt“ in der Stufentabelle`);
@@ -67,16 +67,16 @@ async function seite(b, mit007) {
     const orts = await p.evaluate(async () => { const A = window.ABT.A(); A.segen = ["ortskunde"]; A.szene = "kampf_markt"; window.ABT.render(); await new Promise((r) => setTimeout(r, 300));
       const v = window.ABS.gegnerVorschau(A); return { offen: v.arten.filter((a) => a.wissen && !a.wissen.wer).length, verdeckt: v.arten.filter((a) => a.verdeckt).length, knopf: Boolean(document.querySelector("#sz-kampf")), text: /Ortskunde:/.test(document.querySelector("#szene").textContent) }; });
     check(orts.knopf && orts.verdeckt === 0 && (orts.offen === 0 || orts.text), `Ortskunde: Vorschau ohne verdeckte Schwächen (${orts.offen} durch den Segen aufgedeckt), Szene wird angezeigt`);
-    // Belohnung mit XP
+    // Belohnung mit EP
     await p.evaluate(() => { window.ABSAMMLUNG.endeMelden("00000000-0000-0000-0000-000000000001", { versuche: 1 }); }); await p.waitForSelector(".sm-xp");
     const xp = await p.evaluate(() => [...document.querySelectorAll(".sm-xp .sm-xp-zeile")].map((z) => (z.classList.contains("auf") ? "AUF " : "") + z.textContent.replace(/\s+/g, " ").trim()));
-    check(xp.length === 3 && /^AUF .*Kael.*\+320 XP.*Aufstieg: Stufe 1 → 3/.test(xp[0]) && /^AUF .*\+200 XP.*Stufe 3 → 4/.test(xp[1]) && !/^AUF/.test(xp[2]) && /\+50 XP.*Stufe 6/.test(xp[2]), "Belohnung: XP je Held, Balken und Aufstieg (" + xp[0].slice(0, 70) + " …)");
+    check(xp.length === 3 && /^AUF .*Kael.*\+320 EP.*Aufstieg: Stufe 1 → 3/.test(xp[0]) && /^AUF .*\+200 EP.*Stufe 3 → 4/.test(xp[1]) && !/^AUF/.test(xp[2]) && /\+50 EP.*Stufe 6/.test(xp[2]), "Belohnung: EP je Held, Balken und Aufstieg (" + xp[0].slice(0, 70) + " …)");
     await p.screenshot({ path: (process.env.SHOT_DIR || "/tmp") + "/xp-belohnung.png" });
     // Abschlussbildschirm am Spieltisch: Belohnungen und darunter „Zur Startseite“ / „Weiter: nächste Kampagne“
     await p.evaluate(() => document.querySelector("#sm-zu").click());
     const ziel = await p.evaluate(() => new Promise((res) => { window.ABSAMMLUNG.abschluss({ kampagne: "00000000-0000-0000-0000-000000000002", abenteuer: "weidenhain", start: () => res("start"), weiterTitel: window.MYTHARA.naechstesAbenteuer("weidenhain").titel, weiter: () => res("weiter") });
       const warte = () => { const n = document.querySelector("#sm-naechste"), s = document.querySelector("#sm-start"), xp = document.querySelectorAll(".sm-xp .sm-xp-zeile").length; if (n && s && xp === 3) { window.__knopf = n.textContent; n.click(); } else setTimeout(warte, 100); }; warte(); }));
-    check(ziel === "weiter" && /Weiter: Das Moor der stummen Lichter/.test(await p.evaluate(() => window.__knopf)) && await p.evaluate(() => document.querySelector("#sm-buehne").hidden), "Abschluss: XP-Übersicht, darunter „Zur Startseite“ und „Weiter: Das Moor der stummen Lichter“; der Knopf führt weiter");
+    check(ziel === "weiter" && /Weiter: Das Moor der stummen Lichter/.test(await p.evaluate(() => window.__knopf)) && await p.evaluate(() => document.querySelector("#sm-buehne").hidden), "Abschluss: EP-Übersicht, darunter „Zur Startseite“ und „Weiter: Das Moor der stummen Lichter“; der Knopf führt weiter");
     // Im Spiel: Endszene → „Weiter zu den Belohnungen“ → „Zur Startseite“ landet im Hub, nicht in der Heldenwahl
     const hub = await p.evaluate(() => new Promise((res) => { const A = window.ABT.A(); A.szene = "ende_stabil"; window.ABT.render(); const b = document.querySelector("#sz-schluss"), text = b.textContent; b.click();
       const warte = () => { const s = document.querySelector("#sm-start"); if (s) { s.click(); setTimeout(() => res({ text, hub: !document.querySelector("#hub").hidden, lobby: !document.querySelector("#lobby").hidden, A: Boolean(window.ABT.A()) }), 300); } else setTimeout(warte, 100); }; warte(); }));

@@ -243,7 +243,7 @@
         <button class="shop-feld ausstattung" data-shop-feld="ausstattung"><span class="shop-feld-bilder kos"><span class="kos-bild kos-wuerfel" data-wuerfel="w_glut"><span class="w20-box">${window.ABW ? window.ABW.svg(20) : ""}</span></span><span class="kos-bild kos-rahmen" data-rahmen="r_lorbeer"><span class="rahmen-halter"><span class="hub-avatar">${avatarHtml()}</span></span></span></span>
           <b>Ausstattung</b><span>Würfel-Designs und Profilrahmen. Ab 75 ${name}.</span><em class="shop-uhr">Rein fürs Auge</em></button>
         <button class="shop-feld erfahrung" data-shop-feld="erfahrung"><span class="shop-feld-bilder xp"><img src="img/shop/ep50.webp" alt=""><img src="img/shop/ep150.webp" alt=""><img src="img/shop/ep350.webp" alt=""></span>
-          <b>Erfahrung</b><span>Pakete mit 50, 150 oder 350 XP – auf Vorrat, einsetzbar bei jedem Helden.</span><em class="shop-uhr">Täglich begrenzt</em></button>
+          <b>Erfahrung</b><span>Pakete mit 50, 150 oder 350 EP – auf Vorrat, einsetzbar bei jedem Helden.</span><em class="shop-uhr">Täglich begrenzt</em></button>
       </div></div>`);
     shopUhr = setInterval(() => { const el = $("#shop-uhr"); if (!el) return clearInterval(shopUhr); if (new Date(s.bis).getTime() <= Date.now()) { clearInterval(shopUhr); return shopZeigen(); } el.textContent = uhr(); }, 1000);
     document.querySelectorAll("[data-shop-feld]").forEach((b) => { b.onclick = () => { clearInterval(shopUhr); if (b.dataset.shopFeld === "helden") shopHelden(); else if (b.dataset.shopFeld === "erfahrung") xpShop(); else if (window.ABKOS) window.ABKOS.ausstattung(); }; });
@@ -501,7 +501,7 @@
     seiteZeigen("shop", `<div class="shop" data-shop>${zurueck}<div class="shop-kopf"><div><p class="shop-eyebrow">Der Händler</p><h1 class="hub-gruss">Erfahrung</h1>
         <p class="hub-untertitel">Kauf Pakete auf Vorrat. Einsetzen kannst du sie später in der Heldenhalle – an der Karte des Helden, der sie bekommen soll.</p></div><p class="shop-stand"><i>${zeichen}</i> <span id="xp-stand">${d.waehrung}</span> ${name}</p></div>
       ${meldung ? `<p class="my-fb xp-meldung" data-art="ok" role="status">${esc(meldung)}</p>` : ""}
-      <div class="xp-pakete">${d.pakete.map((p) => `<div class="xp-paket ${frei(p) ? "" : "leer"}" data-xp-paket="${esc(p.id)}">${xpBild(p)}<b>+${p.xp} XP</b><small>${esc(XP_NAME[p.id] || p.id)}</small><span class="xp-preis"><i>${zeichen}</i> ${p.preis}</span>
+      <div class="xp-pakete">${d.pakete.map((p) => `<div class="xp-paket ${frei(p) ? "" : "leer"}" data-xp-paket="${esc(p.id)}">${xpBild(p)}<b>+${p.xp} EP</b><small>${esc(XP_NAME[p.id] || p.id)}</small><span class="xp-preis"><i>${zeichen}</i> ${p.preis}</span>
         <em>${frei(p) ? `heute noch ${frei(p)} von ${p.pro_tag}` : "heute aufgebraucht"}</em><span class="xp-besitz ${p.besitz ? "hat" : ""}">Im Vorrat: <b>${p.besitz || 0}</b></span>
         <div class="xp-menge"><button class="btn ghost klein" data-xp-minus aria-label="weniger">−</button><b data-xp-n>1</b><button class="btn ghost klein" data-xp-plus aria-label="mehr">+</button></div>
         <button class="my-knopf rot xp-kaufen" data-xp-kaufen></button></div>`).join("")}</div>
@@ -540,7 +540,7 @@
       <div class="xp-kopf"><img src="${F.bild(fid)}" alt=""><div><b>${esc(h.name)}</b>${SM.stufeHtml(fid)}</div></div>
       ${meldung ? `<p class="my-fb" data-art="ok" role="status">${esc(meldung)}</p>` : ""}
       ${voll ? `<p class="note">${esc(h.name)} hat die höchste Stufe erreicht.</p>` : !vorrat ? `<p class="note" id="xp-leer">Du hast gerade keine Erfahrungspakete im Vorrat. Der Händler führt welche.</p><button class="my-knopf" id="xp-zum-haendler">Zum Händler</button>` : `
-      <div class="xp-wahl" role="radiogroup" aria-label="Paket">${d.pakete.map((p) => `<button class="xp-paket" role="radio" data-xp-pack="${esc(p.id)}" ${p.besitz ? "" : "disabled"}>${xpBild(p)}<b>+${p.xp} XP</b><em>${p.besitz ? `im Vorrat: ${p.besitz}` : "keines im Vorrat"}</em></button>`).join("")}</div>
+      <div class="xp-wahl" role="radiogroup" aria-label="Paket">${d.pakete.map((p) => `<button class="xp-paket" role="radio" data-xp-pack="${esc(p.id)}" ${p.besitz ? "" : "disabled"}>${xpBild(p)}<b>+${p.xp} EP</b><em>${p.besitz ? `im Vorrat: ${p.besitz}` : "keines im Vorrat"}</em></button>`).join("")}</div>
       <div class="xp-menge"><span>Anzahl</span><button class="btn ghost klein" id="xp-minus" aria-label="weniger">−</button><b id="xp-n">1</b><button class="btn ghost klein" id="xp-plus" aria-label="mehr">+</button></div>
       <p class="xp-summe" id="xp-summe"></p>
       <p class="xp-warnung" id="xp-warnung" role="alert" hidden></p>
@@ -553,22 +553,22 @@
       const p = paket(), max = hoechstens(p); o.querySelectorAll("[data-xp-pack]").forEach((b) => { b.classList.toggle("an", b.dataset.xpPack === st.pack); b.setAttribute("aria-checked", String(b.dataset.xpPack === st.pack)); });
       st.n = Math.max(1, Math.min(st.n, max)); $("#xp-n").textContent = st.n; $("#xp-minus").disabled = st.n <= 1; $("#xp-plus").disabled = st.n >= max;
       const xp = p.xp * st.n, nach = F.stufeAusXp(gesamt + xp);
-      $("#xp-summe").innerHTML = `<b>+${xp} XP</b> für ${esc(h.name)} · ${nach.stufe > jetzt.stufe ? `Stufe ${jetzt.stufe} → <b>Stufe ${nach.stufe}</b>` : `bleibt Stufe ${jetzt.stufe}${nach.bis ? ` (${nach.xp} / ${nach.bis} XP)` : ""}`}`;
+      $("#xp-summe").innerHTML = `<b>+${xp} EP</b> für ${esc(h.name)} · ${nach.stufe > jetzt.stufe ? `Stufe ${jetzt.stufe} → <b>Stufe ${nach.stufe}</b>` : `bleibt Stufe ${jetzt.stufe}${nach.bis ? ` (${nach.xp} / ${nach.bis} EP)` : ""}`}`;
       // geht das (letzte) Paket über Stufe 10 hinaus, verfällt der Rest: warnen und eigens bestätigen lassen
       st.verfall = 0; if (!nach.bis) while (st.verfall < xp && !F.stufeAusXp(gesamt + xp - st.verfall - 1).bis) st.verfall++;
       st.sicher = false; const w = $("#xp-warnung"); w.hidden = !st.verfall;
-      if (st.verfall) w.innerHTML = `<b>Achtung:</b> ${esc(h.name)} braucht bis Stufe 10 nur noch <b>${xp - st.verfall} XP</b>. Von ${st.n > 1 ? "diesen Paketen" : "diesem Paket"} verfallen <b>${st.verfall} XP</b> – sie lassen sich nicht auf einen anderen Helden übertragen.`;
+      if (st.verfall) w.innerHTML = `<b>Achtung:</b> ${esc(h.name)} braucht bis Stufe 10 nur noch <b>${xp - st.verfall} EP</b>. Von ${st.n > 1 ? "diesen Paketen" : "diesem Paket"} verfallen <b>${st.verfall} EP</b> – sie lassen sich nicht auf einen anderen Helden übertragen.`;
       $("#xp-einsetzen").textContent = st.verfall ? "Einsetzen …" : `${st.n} × einsetzen`; $("#xp-fb").textContent = "";
     };
     o.querySelectorAll("[data-xp-pack]").forEach((b) => { b.onclick = () => { st.pack = b.dataset.xpPack; st.n = 1; zeig(); }; });
     $("#xp-minus").onclick = () => { st.n--; zeig(); }; $("#xp-plus").onclick = () => { st.n++; zeig(); };
     $("#xp-einsetzen").onclick = async () => {
       const p = paket(); if (!p) return; const k = $("#xp-einsetzen");
-      if (st.verfall && !st.sicher) { st.sicher = true; k.textContent = `Trotzdem einsetzen (${st.verfall} XP verfallen)`; $("#xp-fb").textContent = "Bitte bestätige noch einmal."; return; }
+      if (st.verfall && !st.sicher) { st.sicher = true; k.textContent = `Trotzdem einsetzen (${st.verfall} EP verfallen)`; $("#xp-fb").textContent = "Bitte bestätige noch einmal."; return; }
       k.disabled = true; $("#xp-fb").textContent = "Wird eingesetzt …";
       try { const r = await netz().rpc("rpg_xp_use", { p_held: fid, p_pack: p.id, p_anzahl: st.n });
         if (r.stufe > r.stufe_vorher) toast(`${h.name} erreicht Stufe ${r.stufe}!`);
-        await xpDialog(fid, `+${r.xp} XP für ${h.name}${r.stufe > r.stufe_vorher ? ` – jetzt Stufe ${r.stufe}` : ""}.`);
+        await xpDialog(fid, `+${r.xp} EP für ${h.name}${r.stufe > r.stufe_vorher ? ` – jetzt Stufe ${r.stufe}` : ""}.`);
         // die Heldenhalle dahinter zeigt die neue Stufe
         const hs = $("#hub-seite"); if (hs && !hs.hidden && hs.querySelector("[data-heldenseite]")) { const kl = F.FIGUREN[fid].klasse, offen = hs.querySelector("article.held"); heldenSeite(offen ? kl : null, offen ? fid : undefined); }
       } catch (e) { k.disabled = false; $("#xp-fb").textContent = xpAlt(e); }

@@ -50,7 +50,7 @@ async function seite(b, vp) {
     helden: document.querySelectorAll(".xp-held, [data-xp-kauf]").length, stand: document.querySelector(".shop-stand").textContent.replace(/\s+/g, " ").trim(), knoepfe: [...document.querySelectorAll("[data-xp-kaufen]")].map((x) => x.textContent + (x.disabled ? " (aus)" : "")) }));
   await p.waitForFunction(() => [...document.querySelectorAll(".xp-pakete .xp-truhe")].every((x) => x.complete));
   const pk = await lies();
-  check(pk.pakete.length === 3 && /\+50 XP.*90.*heute noch 3 von 3.*Im Vorrat: 0/.test(pk.pakete[0]) && /\+150 XP.*250.*noch 2 von 2/.test(pk.pakete[1]) && /\+350 XP.*550.*noch 1 von 1/.test(pk.pakete[2]) && /700/.test(pk.stand), "Die drei Pakete mit Preis, Tagesgrenze und Vorrat: 50 XP für 90, 150 für 250, 350 für 550");
+  check(pk.pakete.length === 3 && /\+50 EP.*90.*heute noch 3 von 3.*Im Vorrat: 0/.test(pk.pakete[0]) && /\+150 EP.*250.*noch 2 von 2/.test(pk.pakete[1]) && /\+350 EP.*550.*noch 1 von 1/.test(pk.pakete[2]) && /700/.test(pk.stand), "Die drei Pakete mit Preis, Tagesgrenze und Vorrat: 50 EP für 90, 150 für 250, 350 für 550");
   check(pk.bilder === "50,150,350", `Jedes Paket zeigt seine Truhe (${pk.bilder})`);
   check(pk.helden === 0, "Beim Händler wird kein Held gewählt");
   check(pk.knoepfe.join(" | ") === "Kaufen · ◈ 90 | Kaufen · ◈ 250 | Kaufen · ◈ 550", `Je Paket ein Kaufknopf mit Preis (${pk.knoepfe.join(" | ")})`);
@@ -68,12 +68,12 @@ async function seite(b, vp) {
   await p.click('.sm-xp-zeile[data-held-stufe="berserker"]'); await p.waitForSelector(".xp-dialog #xp-einsetzen");
   const d0 = await p.evaluate(() => ({ titel: document.querySelector(".xp-dialog").closest("[role=dialog], .fenster, body").textContent.includes("Erfahrungspaket einsetzen"), name: document.querySelector(".xp-kopf b").textContent, an: document.querySelector(".xp-wahl .an").dataset.xpPack, aus: [...document.querySelectorAll(".xp-wahl [data-xp-pack]")].filter((x) => x.disabled).map((x) => x.dataset.xpPack).join(","),
     n: document.querySelector("#xp-n").textContent, summe: document.querySelector("#xp-summe").textContent.replace(/\s+/g, " "), knopf: document.querySelector("#xp-einsetzen").textContent, preis: /◈/.test(document.querySelector(".xp-dialog").textContent) }));
-  check(d0.titel && d0.name === "Ragnar" && d0.an === "mittel" && d0.aus === "klein,gross" && d0.n === "1" && /\+150 XP für Ragnar/.test(d0.summe) && /Stufe 1 → Stufe 2/.test(d0.summe) && /1 × einsetzen/.test(d0.knopf) && !d0.preis,
+  check(d0.titel && d0.name === "Ragnar" && d0.an === "mittel" && d0.aus === "klein,gross" && d0.n === "1" && /\+150 EP für Ragnar/.test(d0.summe) && /Stufe 1 → Stufe 2/.test(d0.summe) && /1 × einsetzen/.test(d0.knopf) && !d0.preis,
     "Heldenhalle, „Deine Helden“: Tipp auf Ragnar öffnet „Erfahrungspaket einsetzen“ – nur das Paket aus dem Vorrat ist wählbar, kein Preis mehr");
   await p.click("#xp-plus");
   if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + "/xp-dialog.png" });
-  check(await p.evaluate(() => document.querySelector("#xp-n").textContent === "2" && document.querySelector("#xp-plus").disabled && /\+300 XP/.test(document.querySelector("#xp-summe").textContent) && /Stufe 1 → Stufe 3/.test(document.querySelector("#xp-summe").textContent)), "Anzahl 2 (mehr liegt nicht im Vorrat): +300 XP, Stufe 1 → 3");
-  await p.click("#xp-minus"); await p.click("#xp-einsetzen"); await p.waitForFunction(() => /\+150 XP für Ragnar/.test((document.querySelector(".xp-dialog .my-fb") || {}).textContent || ""));
+  check(await p.evaluate(() => document.querySelector("#xp-n").textContent === "2" && document.querySelector("#xp-plus").disabled && /\+300 EP/.test(document.querySelector("#xp-summe").textContent) && /Stufe 1 → Stufe 3/.test(document.querySelector("#xp-summe").textContent)), "Anzahl 2 (mehr liegt nicht im Vorrat): +300 EP, Stufe 1 → 3");
+  await p.click("#xp-minus"); await p.click("#xp-einsetzen"); await p.waitForFunction(() => /\+150 EP für Ragnar/.test((document.querySelector(".xp-dialog .my-fb") || {}).textContent || ""));
   const e = DB.einsatz[0] || {};
   check(e.p_held === "berserker" && e.p_pack === "mittel" && e.p_anzahl === 1 && DB.besitz.mittel === 1 && DB.waehrung === 200 && DB.xp.berserker === 230, "Eingesetzt: Held, Paket und Anzahl gehen an die Datenbank; eines bleibt im Vorrat, es kostet nichts mehr");
   check(await p.evaluate(() => document.querySelector(".xp-kopf .sm-stufe b").textContent === "Stufe 2" && /im Vorrat: 1/.test(document.querySelector('[data-xp-pack="mittel"]').textContent)), "Danach: Ragnar ist Stufe 2, im Dialog steht „im Vorrat: 1“");
@@ -89,9 +89,9 @@ async function seite(b, vp) {
   DB.xp.berserker = 5600; DB.besitz.gross = 1; const vorher = DB.einsatz.length;
   await p.click("[data-xp-kauf]"); await p.waitForSelector(".xp-dialog #xp-einsetzen");
   const w0 = await p.evaluate(() => ({ warn: !document.querySelector("#xp-warnung").hidden, text: document.querySelector("#xp-warnung").textContent.replace(/\s+/g, " "), knopf: document.querySelector("#xp-einsetzen").textContent }));
-  check(w0.warn && /nur noch 50 XP/.test(w0.text) && /verfallen 300 XP/.test(w0.text), `Großes Paket bei 50 fehlenden XP: Warnhinweis „nur noch 50 XP … verfallen 300 XP“`);
+  check(w0.warn && /nur noch 50 EP/.test(w0.text) && /verfallen 300 EP/.test(w0.text), `Großes Paket bei 50 fehlenden EP: Warnhinweis „nur noch 50 EP … verfallen 300 EP“`);
   await p.click("#xp-einsetzen");
-  check(DB.einsatz.length === vorher && await p.evaluate(() => /Trotzdem einsetzen \(300 XP verfallen\)/.test(document.querySelector("#xp-einsetzen").textContent)), "Der erste Klick setzt noch nichts ein – der Knopf verlangt die Bestätigung „Trotzdem einsetzen“");
+  check(DB.einsatz.length === vorher && await p.evaluate(() => /Trotzdem einsetzen \(300 EP verfallen\)/.test(document.querySelector("#xp-einsetzen").textContent)), "Der erste Klick setzt noch nichts ein – der Knopf verlangt die Bestätigung „Trotzdem einsetzen“");
   if (process.env.SHOT_DIR) await p.screenshot({ path: process.env.SHOT_DIR + "/xp-warnung.png" });
   await p.click("#xp-einsetzen"); await p.waitForFunction(() => /höchste Stufe/.test((document.querySelector(".xp-dialog") || {}).textContent || ""));
   check(DB.einsatz.length === vorher + 1 && DB.besitz.gross === 0, "Nach der Bestätigung wird das Paket eingesetzt: Stufe 10");

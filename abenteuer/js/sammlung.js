@@ -50,12 +50,12 @@
     if (!S.geladen || !S.stufenDa || !S.konto || !S.helden.includes(fid)) return null;
     return window.ABF.stufeAusXp((S.xp || {})[fid] || 0);
   }
-  /** Stufe und XP-Balken als HTML (klein: nur Stufe mit schmalem Balken) */
+  /** Stufe und EP-Balken als HTML (klein: nur Stufe mit schmalem Balken) */
   function stufeHtml(fid, klein) {
     const f = fortschritt(fid); if (!f) return "";
     const voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
-    return klein ? `<span class="sm-stufe klein" title="${voll ? "Höchste Stufe" : `${f.xp} von ${f.bis} XP bis Stufe ${f.stufe + 1}`}"><b>Stufe ${f.stufe}</b><i><u style="width:${pct}%"></u></i></span>`
-      : `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${f.stufe}</b><span>${voll ? "Höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</span></div><i><u style="width:${pct}%"></u></i></div>`;
+    return klein ? `<span class="sm-stufe klein" title="${voll ? "Höchste Stufe" : `${f.xp} von ${f.bis} EP bis Stufe ${f.stufe + 1}`}"><b>Stufe ${f.stufe}</b><i><u style="width:${pct}%"></u></i></span>`
+      : `<div class="sm-stufe"><div class="sm-stufe-kopf"><b>Stufe ${f.stufe}</b><span>${voll ? "Höchste Stufe erreicht" : `${f.xp} / ${f.bis} EP bis Stufe ${f.stufe + 1}`}</span></div><i><u style="width:${pct}%"></u></i></div>`;
   }
 
   /** Eigene Sammlung laden (neu: Zwischenspeicher übergehen) */
@@ -88,7 +88,7 @@
   let T = { kampagne: undefined, frei: null }; // frei: null = alle Helden
   async function tischLaden(kampagne) {
     kampagne = kampagne || null;
-    // Stufen: host = XP der Tisch-Helden (null: Gastgeber ohne Konto), spieler = XP der Handy-Helden von Mitspielern mit Konto
+    // Stufen: host = EP der Tisch-Helden (null: Gastgeber ohne Konto), spieler = EP der Handy-Helden von Mitspielern mit Konto
     if (!kampagne) { await laden(); T = { kampagne: null, frei: !S.installiert || S.offline ? null : S.konto ? S.helden.slice() : STARTER.slice(), stufenDa: Boolean(S.stufenDa), xp: { host: S.konto ? S.xp || {} : null, spieler: {} } }; return T; }
     const lv = await stufenHolen("rpg_campaign_levels", { p_campaign_id: kampagne });
     const mitStufen = (o) => Object.assign(o, { stufenDa: Boolean(lv), xp: lv || { host: null, spieler: {} } });
@@ -265,7 +265,7 @@
     }
     if (!r || !r.konto) return null;
     gemeldet.add(kampagne);
-    // Erfahrung für diesen Abschluss (Migration 007; fehlt sie, gibt es einfach keine XP-Anzeige)
+    // Erfahrung für diesen Abschluss (Migration 007; fehlt sie, gibt es einfach keine EP-Anzeige)
     const xp = await stufenHolen("rpg_award_xp", { p_campaign_id: kampagne });
     r.xp = xp && xp.konto ? xp.helden || [] : [];
     const xpNeu = r.xp.some((h) => h.neu);
@@ -341,8 +341,8 @@
       return `<div class="sm-xp"><p class="sm-xp-titel">Erfahrung</p>${liste.map((h) => {
         const d = F.FIGUREN[h.held]; if (!d) return "";
         const f = F.stufeAusXp(h.gesamt || 0), auf = h.stufe > h.vorher, voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
-        return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>${h.xp > 0 ? "+" + h.xp + " XP" : voll ? "Höchste Stufe" : "+0 XP"}</span></div>
-          <i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} XP bis Stufe ${f.stufe + 1}`}</small></div></div>`;
+        return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>${h.xp > 0 ? "+" + h.xp + " EP" : voll ? "Höchste Stufe" : "+0 EP"}</span></div>
+          <i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} EP bis Stufe ${f.stufe + 1}`}</small></div></div>`;
       }).join("")}</div>`;
     };
     const schritt0 = () => {
@@ -441,7 +441,7 @@
     }).join("")}</div>`;
   }
   /** Chronik des Kontos: je Kampagne alle Enden, gefundene mit Namen und Datum, die übrigen verdeckt */
-  /** Alle eigenen Helden mit Stufe und XP-Balken (Charaktere-Seite und Profil) */
+  /** Alle eigenen Helden mit Stufe und EP-Balken (Charaktere-Seite und Profil) */
   function heldenUebersichtHtml() {
     const F = window.ABF;
     if (!S.konto) return `<p class="note">Stufen und Erfahrung gehören zu einem Spielerkonto. Als Gast spielst du deine Helden auf der empfohlenen Stufe der Kampagne.</p>`;
@@ -449,7 +449,7 @@
     const liste = S.helden.filter((f) => F.FIGUREN[f]).map((f) => ({ f, p: fortschritt(f), xp: (S.xp || {})[f] || 0 })).sort((a, b) => b.xp - a.xp || F.REIHE.indexOf(a.f) - F.REIHE.indexOf(b.f));
     return `<div class="sm-helden-liste">${liste.map(({ f, p }) => { const d = F.FIGUREN[f], voll = !p.bis, pct = voll ? 100 : Math.round(100 * p.xp / p.bis);
       return `<div class="sm-xp-zeile" data-held-stufe="${f}"><img src="${F.bild(f)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>Stufe ${p.stufe}</span></div>
-        <i><u style="width:${pct}%"></u></i><small>${esc(F.KLASSEN[d.klasse].name)} · ${voll ? "höchste Stufe erreicht" : `${p.xp} / ${p.bis} XP bis Stufe ${p.stufe + 1}`}</small></div></div>`; }).join("")}</div>
+        <i><u style="width:${pct}%"></u></i><small>${esc(F.KLASSEN[d.klasse].name)} · ${voll ? "höchste Stufe erreicht" : `${p.xp} / ${p.bis} EP bis Stufe ${p.stufe + 1}`}</small></div></div>`; }).join("")}</div>
       <p class="note">Erfahrung gibt es für jeden erfolgreichen Abschluss einer Kampagne, für jeden Helden der Gruppe. Wer unter der empfohlenen Stufe liegt, bekommt mehr, wer darüber liegt, weniger.</p>`;
   }
   function chronikHtml() {

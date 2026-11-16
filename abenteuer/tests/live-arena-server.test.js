@@ -102,7 +102,7 @@ async function konto(b) {
     check(eA && eB, "Der Kampf endet; beide Geräte zeigen das Ergebnis aus der Datenbank");
     check(/Sieg|Niederlage/.test(tA) && /Sieg|Niederlage/.test(tB) && /Sieg/.test(tA) !== /Sieg/.test(tB) && !/Abgebrochen|ohne Wertung|nicht gemeldet/.test(tA + tB), "Gewertet: ein Sieg, eine Niederlage – eingetragen vom Server (rpg_arena_srv_end)");
     check(zuege > 20, "Beide Seiten haben gezogen (" + zuege + " Züge)");
-    check(/XP/.test(tA) && /XP/.test(tB), "Belohnungsbuchung: Beide bekommen Erfahrung für ihre Helden");
+    check(/EP/.test(tA) && /EP/.test(tB), "Belohnungsbuchung: Beide bekommen Erfahrung für ihre Helden");
     check(/\+\d+ Seelensplitter/.test(/Sieg/.test(tA) ? tA : tB), "Der Sieger bekommt Seelensplitter");
   }
   check(fn.fehler.length === 0, "Alle Aufrufe der Edge Function wurden mit Status 200 beantwortet" + (fn.fehler.length ? ": " + [...new Set(fn.fehler)].slice(0, 4).join(" | ") : ` (${fn.n} Aufrufe)`));

@@ -153,13 +153,13 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
       if (process.env.DEBUG) console.log("    Ende:", await A.p.evaluate(() => window.AB.st.arena.grund + " | Sieger " + window.AB.st.arena.sieger));
       if (process.env.SCHUMMELN) {
         check(pr && !pr.ok && /weicht/.test(pr.grund), "Mitrechnen: Der Beigetretene bemerkt die Manipulation (" + (pr && pr.grund) + ")");
-        check(/Nicht gewertet|Abgebrochen/.test(tB) && /Abgebrochen/.test(tA) && !/Seelensplitter/.test(tA + tB) && !/XP/.test(tA + tB) && DB.match.status === "abgebrochen" && DB.wallet.A === 0 && DB.wallet.B === 0, "Der manipulierte Kampf endet ohne Wertung: keine Seelensplitter, keine Erfahrung");
+        check(/Nicht gewertet|Abgebrochen/.test(tB) && /Abgebrochen/.test(tA) && !/Seelensplitter/.test(tA + tB) && !/EP/.test(tA + tB) && DB.match.status === "abgebrochen" && DB.wallet.A === 0 && DB.wallet.B === 0, "Der manipulierte Kampf endet ohne Wertung: keine Seelensplitter, keine Erfahrung");
         if (process.env.SHOT_DIR) await B.p.screenshot({ path: process.env.SHOT_DIR + "/arena-nicht-gewertet.png" });
       } else {
       check(pr && pr.ok && pr.schritte > 10, `Mitrechnen: Der Beigetretene hat alle ${pr && pr.schritte} Schritte nachgerechnet, ohne Abweichung${pr && !pr.ok ? " – ABWEICHUNG: " + pr.grund : ""}`);
       const siegA = /Sieg/.test(tA) && !/Niederlage/.test(tA), siegB = /Sieg/.test(tB) && !/Niederlage/.test(tB);
       check(siegA !== siegB && /Niederlage/.test(siegA ? tB : tA), "Ein Gerät zeigt „Sieg“, das andere „Niederlage“");
-      check(/\+25 Seelensplitter/.test(siegA ? tA : tB) && !/Seelensplitter/.test(siegA ? tB : tA) && /XP/.test(tA) && /XP/.test(tB), "Sieger: +25 Seelensplitter; beide sehen die Erfahrung ihrer Helden");
+      check(/\+25 Seelensplitter/.test(siegA ? tA : tB) && !/Seelensplitter/.test(siegA ? tB : tA) && /EP/.test(tA) && /EP/.test(tB), "Sieger: +25 Seelensplitter; beide sehen die Erfahrung ihrer Helden");
       if (process.env.SHOT_DIR) { await A.p.screenshot({ path: process.env.SHOT_DIR + "/arena-ende-a.png" }); await B.p.screenshot({ path: process.env.SHOT_DIR + "/arena-ende-b.png" }); }
       const S = siegA ? A : B;
       await S.p.click("#arena-ende-zu");

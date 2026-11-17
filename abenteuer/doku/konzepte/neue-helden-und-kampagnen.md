@@ -40,9 +40,9 @@ Rolle: Mitte, reine Unterstützerin. Ihre Stärke hängt davon ab, wen sie binde
 
 Noch offen für alle drei: Werte, Meisterschaften auf Stufe 5, 8 und 10, Bilder.
 
-## Kampagne Stufe 3: „Die Maske von Dornbach“
+## Kampagne Schwierigkeit 3 (Anspruchsvoll): „Die Maske von Dornbach“
 
-Platz in der Geschichte: nach Graufurt, neben Grauwacht – ein zweiter Weg von Stufe 3 auf 4.
+Ausgelegt für Heldenstufe 4, wie Hochwacht. Platz in der Geschichte: vor der Krone, nach Grauwacht – ein zweiter Weg neben Hochwacht.
 
 Prämisse: Auf dem Herbstmarkt der Handelsstadt Dornbach wird ein Bruchstück eines Siegels versteigert. Ein Sammler, die Siegeljäger und die letzte Schreiberin des Wachtordens wollen es. Die Gruppe soll es vor der Auktion beschaffen.
 
@@ -58,9 +58,9 @@ Enden: Bruchstück beim Wachtorden · Bruchstück behalten · an die Siegeljäge
 
 Verknüpfung: Wer in Graufurt den grauen Stein gefunden hat, erfährt hier, was er ist. Bewusst wenige Pflichtkämpfe.
 
-## Kampagne Stufe 5: „Das bebende Siegel“
+## Kampagne Schwierigkeit 5 (Legendär): „Das bebende Siegel“
 
-Platz in der Geschichte: nach der Krone. Alle drei Enden der Krone führen in den Süden zur Küstenfestung Brandwacht, die auf dem südlichsten Siegel steht.
+Die schwerste Kampagne und das Ende der Reihe, ausgelegt für Helden auf Stufe 10. Platz in der Geschichte: Nachfolger der Krone. Alle drei Enden der Krone führen in den Süden zur Küstenfestung Brandwacht, die auf dem südlichsten Siegel steht.
 
 Prämisse: Brandwacht weiß seit Generationen, worauf es steht. Jetzt bebt der Fels. Drei Nächte, bis das Siegel bricht oder hält.
 
@@ -71,6 +71,6 @@ Je nach Ende der Krone:
 
 Neue Mechanik „Belagerung mit Vorbereitung“: Tagsüber knappe Zeit auf Barrikaden, Verbündete und Erkundung verteilen. Nachts Verteidigung auf derselben Karte (Wellen, Ziele halten). Was gefallen ist, fehlt in der nächsten Nacht.
 
-Enden: Siegel hält, Festung steht · Siegel hält, Festung geopfert · Siegel bricht (Haken für eine spätere Stufe-8-Kampagne).
+Enden: Siegel hält, Festung steht · Siegel hält, Festung geopfert · Siegel bricht, und die Gruppe entscheidet, was mit dem geschieht, was herauskommt. Als Abschluss der Reihe bleibt kein Faden offen.
 
-Offen: Einordnung der Stufe gegenüber der Krone (im Code hat die Krone Schwierigkeit 4, daraus ergibt sich die empfohlene Heldenstufe 6).
+Beim Bau zu ändern: Schwierigkeit 5 empfiehlt im Code bisher Heldenstufe 8 (js/figuren.js, SCHWIERIGKEIT); das wird auf 10 gesetzt. Die Skala der Kampagnen geht von 1 bis 5 (Krone: 4 – Schwer, empfohlene Heldenstufe 6).

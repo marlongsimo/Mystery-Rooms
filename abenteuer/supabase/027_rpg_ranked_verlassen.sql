@@ -1,29 +1,32 @@
 -- =====================================================================
--- MYSTERY ROOMS · RPG · Migration 027: Arena – Zwangsaufgabe nach drei verstrichenen Zügen und eine Stunde Zeitstrafe
+-- MYSTERY ROOMS · RPG · Migration 027: Arena – Zwangsaufgabe nach drei verstrichenen Zügen; Zeitstrafe beim dritten Verstoß in 24 Stunden
 -- =====================================================================
 -- Voraussetzung: Migrationen 015 (Serverkampf), 019/020 (Rechner-Gegner) und 022 (Ranked) sind eingespielt.
--- (Eine frühere Fassung dieser Datei regelte nur verlassene Kämpfe gegen den Rechner-Gegner. Diese Fassung ersetzt sie;
---  es ist gleich, ob die frühere schon eingespielt wurde.)
+-- (Frühere Fassungen dieser Datei regelten nur verlassene Kämpfe gegen den Rechner-Gegner bzw. verhängten die Zeitstrafe
+--  schon beim ersten Mal. Diese Fassung ersetzt sie; es ist gleich, ob eine frühere schon eingespielt wurde.)
 --
 -- Die Regel:
 --   Wer dreimal in Folge seine Zugzeit verstreichen lässt, gibt den Kampf zwangsweise auf – gegen Menschen wie gegen den
---   Rechner-Gegner – und bekommt eine ZEITSTRAFE: eine Stunde lang keine Gegnersuche (Ranked, Normal, Arcade).
---   Wer freiwillig über „Aufgeben“ aufgibt, bekommt keine Zeitstrafe.
+--   Rechner-Gegner. Das zählt als VERSTOSS. Beim dritten Verstoß innerhalb von 24 Stunden gibt es eine ZEITSTRAFE:
+--   eine Stunde lang keine Gegnersuche (Ranked, Normal, Arcade).
+--     – Mit dem ersten Verstoß beginnen die 24 Stunden. Sind sie um, steht der Zähler wieder auf 0.
+--     – Mit einer verhängten Zeitstrafe steht der Zähler ebenfalls wieder auf 0.
+--   Wer freiwillig über „Aufgeben“ aufgibt, begeht keinen Verstoß.
 --
 -- Was diese Migration tut:
---   1) Neue Tabelle rpg_arena_sperren (je Konto: gesperrt bis wann, weshalb). Nur über Funktionen erreichbar.
+--   1) Neue Tabelle rpg_arena_sperren (je Konto: Zahl der Verstöße, Beginn der 24 Stunden, gesperrt bis wann). Nur über Funktionen erreichbar.
 --   2) Neuer Auslöser an rpg_arena_matches: Endet ein Kampf durch Aufgabe und steht im gespeicherten Stand des Serverkampfs
---      „dreimal die Zugzeit verstreichen lassen“, bekommt der Verlierer die Zeitstrafe. Sie zählt ab dem Zeitpunkt der
---      Zwangsaufgabe (steht im Stand), sonst ab jetzt. An den vorhandenen Funktionen des Serverkampfs ändert sich nichts.
+--      „dreimal die Zugzeit verstreichen lassen“, wird dem Verlierer ein Verstoß angerechnet – zum Zeitpunkt der
+--      Zwangsaufgabe (steht im Stand), sonst jetzt. An den vorhandenen Funktionen des Serverkampfs ändert sich nichts.
 --   3) rpg_ranked_nachholen (aus Migration 022) wird ersetzt: Ein Kampf gegen den Rechner-Gegner, in dem seit über
 --      5 Minuten kein Schritt mehr gerechnet wurde, gilt als zwangsweise aufgegeben (der Spieler ist nicht zurückgekehrt) –
---      mit Zeitstrafe ab dem Zeitpunkt, an dem der dritte Zug verstrichen wäre. Danach wird wie bisher gewertet.
+--      ein Verstoß zu dem Zeitpunkt, an dem der dritte Zug verstrichen wäre. Danach wird wie bisher gewertet.
 --   4) Die beiden Suchfunktionen prüfen die Zeitstrafe. Sie werden NICHT neu geschrieben; in ihre vorhandene Fassung wird
 --      je eine Zeile eingefügt:
 --        – rpg_arena_queue(text): am Anfang – verlassene Kämpfe abschließen, dann die Zeitstrafe prüfen
 --        – rpg_ranked_queue():    nach dem vorhandenen Aufruf von rpg_ranked_nachholen – die Zeitstrafe prüfen
 --      Passt eine Stelle nicht, bricht die ganze Migration ab und ändert nichts.
---   5) Neue Funktion rpg_arena_sperre(): nennt dem eigenen Konto eine laufende Zeitstrafe (für die Anzeige im Spiel).
+--   5) Neue Funktion rpg_arena_sperre(): nennt dem eigenen Konto eine laufende Zeitstrafe und die Zahl der Verstöße (für die Anzeige).
 --
 -- Private Kämpfe (Einladungen unter Freunden) sind von der Sperre nicht betroffen.
 -- NUR FÜR DAS RPG. Rückbau: 027_rpg_ranked_verlassen_rueckbau.sql
@@ -44,32 +47,54 @@ end $$;
 -- ---------------------------------------------------------------------
 create table if not exists public.rpg_arena_sperren (
   user_id     uuid         primary key references auth.users(id) on delete cascade,
-  bis         timestamptz  not null,
+  bis         timestamptz,                          -- gesperrt bis (null: keine Zeitstrafe)
   grund       text         not null default 'zugzeit',
   match_id    uuid,
-  created_at  timestamptz  not null default now()
+  created_at  timestamptz  not null default now(),
+  verstoesse  integer      not null default 0,      -- Zwangsaufgaben im laufenden 24-Stunden-Fenster
+  fenster_ab  timestamptz                           -- Beginn des Fensters (erster Verstoß)
 );
+-- frühere Fassung dieser Migration: Spalten nachziehen
+alter table public.rpg_arena_sperren add column if not exists verstoesse integer not null default 0;
+alter table public.rpg_arena_sperren add column if not exists fenster_ab timestamptz;
+alter table public.rpg_arena_sperren alter column bis drop not null;
 alter table public.rpg_arena_sperren enable row level security;
 revoke all on public.rpg_arena_sperren from anon, authenticated;
 
 create or replace function public.rpg_arena_strafdauer() returns interval language sql immutable as $$ select interval '1 hour'; $$;
 
--- Zeitstrafe eintragen (ab p_ab; eine längere bestehende Strafe bleibt)
+create or replace function public.rpg_arena_verstoss_fenster() returns interval language sql immutable as $$ select interval '24 hours'; $$;
+create or replace function public.rpg_arena_verstoss_max() returns integer language sql immutable as $$ select 3; $$;
+
+-- Einen Verstoß anrechnen (Zeitpunkt p_ab). Beim dritten im Fenster: Zeitstrafe ab diesem Zeitpunkt, Zähler zurück auf 0.
 create or replace function public.rpg_arena_sperren_setzen(p_user uuid, p_ab timestamptz, p_match uuid)
 returns void language plpgsql security definer set search_path = public as $$
-declare v_bis timestamptz := coalesce(p_ab, now()) + public.rpg_arena_strafdauer();
+declare v_t timestamptz := least(coalesce(p_ab, now()), now()); v_s public.rpg_arena_sperren%rowtype; v_n integer; v_ab timestamptz;
 begin
-  if p_user is null or v_bis <= now() then return; end if;
-  insert into public.rpg_arena_sperren (user_id, bis, grund, match_id) values (p_user, v_bis, 'zugzeit', p_match)
-    on conflict (user_id) do update set bis = greatest(public.rpg_arena_sperren.bis, excluded.bis), match_id = excluded.match_id, created_at = now();
+  if p_user is null then return; end if;
+  insert into public.rpg_arena_sperren (user_id) values (p_user) on conflict (user_id) do nothing;
+  select * into v_s from public.rpg_arena_sperren where user_id = p_user for update;
+  -- Fenster abgelaufen (oder noch keines): neu beginnen
+  if v_s.fenster_ab is null or v_s.verstoesse <= 0 or v_t > v_s.fenster_ab + public.rpg_arena_verstoss_fenster() then v_n := 0; v_ab := v_t; else v_n := v_s.verstoesse; v_ab := v_s.fenster_ab; end if;
+  v_n := v_n + 1;
+  if v_n >= public.rpg_arena_verstoss_max() then
+    update public.rpg_arena_sperren set verstoesse = 0, fenster_ab = null, bis = greatest(coalesce(bis, '-infinity'::timestamptz), v_t + public.rpg_arena_strafdauer()), match_id = p_match, created_at = now() where user_id = p_user;
+  else
+    update public.rpg_arena_sperren set verstoesse = v_n, fenster_ab = v_ab, match_id = p_match where user_id = p_user;
+  end if;
 end;
 $$;
 
 -- Für die Anzeige: die eigene laufende Zeitstrafe
 create or replace function public.rpg_arena_sperre()
 returns jsonb language sql stable security definer set search_path = public as $$
-  select coalesce((select jsonb_build_object('gesperrt', true, 'bis', s.bis, 'sekunden', ceil(extract(epoch from s.bis - now()))::integer)
-                   from public.rpg_arena_sperren s where s.user_id = auth.uid() and s.bis > now()), jsonb_build_object('gesperrt', false));
+  select coalesce((select jsonb_build_object('gesperrt', s.bis is not null and s.bis > now(), 'bis', case when s.bis > now() then s.bis end,
+      'sekunden', case when s.bis > now() then ceil(extract(epoch from s.bis - now()))::integer else 0 end,
+      'verstoesse', case when s.fenster_ab is not null and now() <= s.fenster_ab + public.rpg_arena_verstoss_fenster() then s.verstoesse else 0 end,
+      'verstoesse_max', public.rpg_arena_verstoss_max(),
+      'fenster_bis', case when s.verstoesse > 0 and s.fenster_ab is not null and now() <= s.fenster_ab + public.rpg_arena_verstoss_fenster() then s.fenster_ab + public.rpg_arena_verstoss_fenster() end)
+    from public.rpg_arena_sperren s where s.user_id = auth.uid()),
+    jsonb_build_object('gesperrt', false, 'sekunden', 0, 'verstoesse', 0, 'verstoesse_max', public.rpg_arena_verstoss_max()));
 $$;
 
 -- Für die Suche: bricht mit einer Meldung ab, solange die Zeitstrafe läuft
@@ -79,13 +104,13 @@ declare v_bis timestamptz;
 begin
   select bis into v_bis from public.rpg_arena_sperren where user_id = auth.uid() and bis > now();
   if found then
-    raise exception 'Zeitstrafe: Du hast dreimal deine Zugzeit verstreichen lassen. Einen neuen Gegner kannst du in % Minuten suchen.', greatest(1, ceil(extract(epoch from v_bis - now()) / 60))::integer;
+    raise exception 'Zeitstrafe: Du hast innerhalb von 24 Stunden dreimal einen Kampf durch verstrichene Zugzeit verloren. Einen neuen Gegner kannst du in % Minuten suchen.', greatest(1, ceil(extract(epoch from v_bis - now()) / 60))::integer;
   end if;
 end;
 $$;
 
 -- ---------------------------------------------------------------------
--- 2) Auslöser: Zwangsaufgabe im Serverkampf → Zeitstrafe für den Verlierer
+-- 2) Auslöser: Zwangsaufgabe im Serverkampf → ein Verstoß für den Verlierer
 -- ---------------------------------------------------------------------
 create or replace function public.rpg_arena_strafe_bei_ende()
 returns trigger language plpgsql security definer set search_path = public as $$
@@ -93,7 +118,7 @@ declare v_a jsonb; v_wer uuid; v_ab timestamptz;
 begin
   if new.status <> 'beendet' or old.status = 'beendet' or new.grund is distinct from 'aufgabe' or new.sieger not in (1, 2) then return new; end if;
   select f.st->'arena' into v_a from public.rpg_arena_fights f where f.match_id = new.id;
-  if v_a is null or coalesce(v_a->>'grund', '') !~ 'Zugzeit' then return new; end if;      -- freiwillige Aufgabe: keine Strafe
+  if v_a is null or coalesce(v_a->>'grund', '') !~ 'Zugzeit' then return new; end if;      -- freiwillige Aufgabe: kein Verstoß
   v_wer := case when new.sieger = 1 then new.guest_id else new.host_id end;
   if (v_a->>'aufgabeZeit') ~ '^[0-9]{10,15}$' then v_ab := to_timestamp((v_a->>'aufgabeZeit')::bigint / 1000.0); end if;
   perform public.rpg_arena_sperren_setzen(v_wer, least(coalesce(v_ab, now()), now()), new.id);
@@ -119,7 +144,7 @@ begin
       where id = v_rec.id and status = 'laeuft' returning * into v_m;
     if found then
       perform public.rpg_arena_belohnen(v_m, v_m.host_id);
-      -- Zeitstrafe ab dem Zeitpunkt, an dem der dritte Zug verstrichen wäre (rund vier Minuten nach dem letzten Schritt)
+      -- Verstoß zu dem Zeitpunkt, an dem der dritte Zug verstrichen wäre (rund vier Minuten nach dem letzten Schritt)
       perform public.rpg_arena_sperren_setzen(p_user, v_rec.updated_at + interval '4 minutes', v_rec.id);
     end if;
   end loop;
@@ -130,7 +155,7 @@ begin
 end;
 $$;
 
-revoke all on function public.rpg_arena_strafdauer(), public.rpg_arena_sperren_setzen(uuid, timestamptz, uuid), public.rpg_arena_sperre(), public.rpg_arena_sperre_pruefen(),
+revoke all on function public.rpg_arena_strafdauer(), public.rpg_arena_verstoss_fenster(), public.rpg_arena_verstoss_max(), public.rpg_arena_sperren_setzen(uuid, timestamptz, uuid), public.rpg_arena_sperre(), public.rpg_arena_sperre_pruefen(),
   public.rpg_arena_strafe_bei_ende(), public.rpg_ranked_nachholen(uuid) from public, anon, authenticated;
 grant execute on function public.rpg_arena_sperre() to authenticated;
 

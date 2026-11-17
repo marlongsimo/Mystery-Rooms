@@ -42,7 +42,7 @@ function server(name, args) {
   if (name === "rpg_ranked_result") { DB.ergebnis++; const m = (S.db.kaempfe[ID] || {}).match; if (!m || m.status !== "beendet") return { ranked: true, gewertet: false, vor: 105 };
     if (DB.punkte === 105) { DB.punkte = 90; DB.niederlagen++; } return { ranked: true, gewertet: true, vor: 105, delta: -15, nach: 90, rang_vor: 1, rang_nach: 0, weit: false }; }
   if (name === "rpg_ranked_gegenueber") return { da: true, ranked: true, host: 1, gast: 1 };
-  if (name === "rpg_arena_sperre") return DB.sperre ? { gesperrt: true, bis: new Date(Date.now() + 3400e3).toISOString(), sekunden: 3400 } : { gesperrt: false };
+  if (name === "rpg_arena_sperre") return DB.sperre === true ? { gesperrt: true, bis: new Date(Date.now() + 3400e3).toISOString(), sekunden: 3400, verstoesse: 0, verstoesse_max: 3 } : { gesperrt: false, sekunden: 0, verstoesse: DB.sperre === "warnung" ? 2 : 0, verstoesse_max: 3 };
   if (name === "rpg_arena_looks") return { host: { name: "Spieler A", avatar: "schildwaechter", rahmen: null }, gast: { name: "Runenwolf_3", avatar: "trickser", rahmen: null } };
   if (name === "rpg_looks") return {};
   if (name === "rpg_arena_get") return sicht() || { fehler: "Diesen Kampf gibt es nicht." };
@@ -129,7 +129,10 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   const sp = await Sp.p.evaluate(() => ({ text: (document.querySelector(".arena-sperre") || {}).textContent || "", ranked: document.querySelector(".rang-spielen").disabled }));
   await Sp.p.click('[data-arena-tab="fun"]'); await Sp.p.waitForTimeout(300);
   const spFun = await Sp.p.evaluate(() => [...document.querySelectorAll("[data-arena-art]")].map((x) => x.disabled));
-  check(/Zeitstrafe/.test(sp.text) && /dreimal in Folge deine Zugzeit/.test(sp.text) && /in 57 Minuten/.test(sp.text) && sp.ranked && spFun.length > 0 && spFun.every(Boolean), `Zeitstrafe: Die Arena nennt Grund und Restzeit, alle Suchknöpfe sind gesperrt (${sp.text.replace(/\s+/g, " ").slice(0, 70)} …)`);
+  check(/Zeitstrafe/.test(sp.text) && /innerhalb von 24 Stunden dreimal/.test(sp.text) && /in 57 Minuten/.test(sp.text) && sp.ranked && spFun.length > 0 && spFun.every(Boolean), `Zeitstrafe: Die Arena nennt Grund und Restzeit, alle Suchknöpfe sind gesperrt (${sp.text.replace(/\s+/g, " ").slice(0, 70)} …)`);
+  DB.sperre = "warnung"; await Sp.p.click('.hub-zurueck[data-hub="uebersicht"]'); await Sp.p.waitForSelector('.dorf-ort[data-hub="arena"]'); await Sp.p.click('.dorf-ort[data-hub="arena"]'); await Sp.p.waitForSelector("#arena-team-aendern"); await Sp.p.click('[data-arena-tab="ranked"]'); await Sp.p.waitForSelector(".rang-karte"); await Sp.p.waitForTimeout(300);
+  const wn = await Sp.p.evaluate(() => ({ text: (document.querySelector(".arena-verwarnung") || {}).textContent || "", sperre: !!document.querySelector(".arena-sperre"), ranked: document.querySelector(".rang-spielen").disabled }));
+  check(/Verwarnung: 2 von 3 Verstößen/.test(wn.text) && /dritten Mal innerhalb von 24 Stunden/.test(wn.text) && !wn.sperre && !wn.ranked, "Zwei Verstöße ohne Zeitstrafe: Die Arena verwarnt („2 von 3“), suchen geht weiter");
   check(!Sp.fehler.length, "keine Skriptfehler mit Zeitstrafe" + (Sp.fehler.length ? ": " + Sp.fehler.join(" | ") : "")); DB.sperre = false;
   await b.close();
   console.log(ok ? "\nRANKED IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

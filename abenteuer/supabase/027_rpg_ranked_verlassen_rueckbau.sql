@@ -34,5 +34,7 @@ drop function if exists public.rpg_arena_sperre_pruefen();
 drop function if exists public.rpg_arena_sperre();
 drop function if exists public.rpg_arena_sperren_setzen(uuid, timestamptz, uuid);
 drop function if exists public.rpg_arena_strafdauer();
+drop function if exists public.rpg_arena_verstoss_fenster();
+drop function if exists public.rpg_arena_verstoss_max();
 drop table if exists public.rpg_arena_sperren;
 commit;

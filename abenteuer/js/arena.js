@@ -96,13 +96,13 @@
   // Der eigene offene Kampf wird auf diesem Gerät gemerkt (falls die Übersicht der Datenbank ihn nicht mitliefert)
   const meinId = () => { try { return localStorage.getItem("ab_arena_match") || null; } catch (e) { return null; } };
   const meinMerken = (id) => { try { if (id) localStorage.setItem("ab_arena_match", id); else localStorage.removeItem("ab_arena_match"); } catch (e) { /* privat */ } };
-  function seite(html) { window.MYTHARA.seite("arena", `<div data-arena>${html}</div>`); }
+  function seite(html) { window.MYTHARA.seite("arena", `<div data-arena>${html}</div>`); setTimeout(sperreAnwenden, 0); }
   async function zeigen() {
     stoppUhr(); Z.modus = null;
     seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">Einen Moment …</p>`);
     if (sm()) await sm().laden(true);
     await laden();
-    if (Z.liste && Z.liste.konto) await artKlaeren();
+    if (Z.liste && Z.liste.konto) { await artKlaeren(); await sperreLaden(); }
     if (!seiteOffen()) return;
     if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match);
     if (NEU) return zeigenNeu();
@@ -110,7 +110,13 @@
     if (Z.match) pollen(8000, async () => { await laden(); if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match); if (seiteOffen() && !Z.modus) zeichneListe(); });
   }
   /** Tagesgrenze erreicht? Dann steht die Warnung schon in der Arena, nicht erst nach dem Kampf */
-  const grenzeHtml = () => "";   // seit Migration 025 gibt es in der Arena keine Tagesgrenze mehr
+  /* Zeitstrafe (Migration 027): Wer dreimal in Folge seine Zugzeit verstreichen lässt, gibt zwangsweise auf und kann eine Stunde lang nicht suchen */
+  async function sperreLaden() { try { const r = await rpc("rpg_arena_sperre", {}); Z.sperre = r && r.gesperrt ? { bis: Date.now() + (r.sekunden || 0) * 1000 } : null; } catch (e) { Z.sperre = null; } }
+  const sperreAktiv = () => Boolean(Z.sperre && Z.sperre.bis > Date.now());
+  const sperreRest = () => { const min = Math.max(1, Math.ceil((Z.sperre.bis - Date.now()) / 60000)); return min >= 60 ? "1 Stunde" : `${min} ${min === 1 ? "Minute" : "Minuten"}`; };
+  const grenzeHtml = () => (sperreAktiv() ? `<p class="arena-grenze arena-sperre" role="status"><b>Zeitstrafe.</b> Du hast in einem Kampf dreimal in Folge deine Zugzeit verstreichen lassen. Einen neuen Gegner kannst du in <b>${sperreRest()}</b> wieder suchen. Private Kämpfe mit Freunden gehen weiter.</p>` : "");
+  /** Während der Zeitstrafe sind die Suchknöpfe gesperrt (der Server lehnt die Suche ohnehin ab) */
+  function sperreAnwenden() { if (!sperreAktiv()) return; document.querySelectorAll("[data-arena] .rang-spielen, [data-arena] [data-arena-art]").forEach((b) => { b.disabled = true; b.title = "Zeitstrafe: noch " + sperreRest(); }); }
   function zeichneListe() {
     const L = Z.liste || {}, offen = L.offen || [], m = Z.match;
     if (!L.konto) return seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">${esc(Z.fehler || "Die Arena gibt es nur mit einem Spielerkonto: Hier treten deine eigenen Helden mit ihren Stufen an.")}</p>`);
@@ -567,7 +573,9 @@
     const gewertet = g.status === "beendet", sieg = gewertet ? g.sieger === g.seite : g.sieger === g.seite, b = g.belohnung || null, p = g.punkte || g.punkteLokal || null;
     const xp = b && b.xp && b.xp.length ? `<div class="arena-xp">${b.xp.map((h) => { const d = F.FIGUREN[h.held]; if (!d) return ""; const f = F.stufeAusXp(h.gesamt || 0), auf = h.stufe > h.vorher, voll = !f.bis, pct = voll ? 100 : Math.round(100 * f.xp / f.bis);
       return `<div class="sm-xp-zeile${auf ? " auf" : ""}"><img src="${F.bild(h.held)}" alt=""><div class="sm-xp-mitte"><div class="sm-xp-kopf"><b>${esc(d.name)}</b><span>+${h.xp} EP</span></div><i><u style="width:${pct}%"></u></i><small>${auf ? `<strong>Aufstieg: Stufe ${h.vorher} → ${h.stufe}</strong> · ` : `Stufe ${h.stufe} · `}${voll ? "höchste Stufe erreicht" : `${f.xp} / ${f.bis} EP bis Stufe ${f.stufe + 1}`}</small></div></div>`; }).join("")}</div>` : "";
+    const zwang = Boolean(window.AB.st && window.AB.st.arena && /Zugzeit/.test(window.AB.st.arena.grund || "")); // Zwangsaufgabe nach drei verstrichenen Zügen
     const text = g.status === "abgebrochen" ? (Z.kampf && Z.kampf.faul ? "Der Kampf wurde ohne Wertung beendet: " + esc(Z.kampf.faul) : Z.kampf && Z.kampf.m && g.sieger == null && g.runden == null && Z.kampf.gemeldetSelbst ? "Der Kampf wurde ohne Wertung beendet: Die beiden Geräte kamen nicht zum selben Ergebnis." : "Der Kampf wurde ohne Wertung beendet.") : g.status === "fehler" ? "Das Ergebnis konnte nicht gemeldet werden: " + esc(g.fehler || "") : g.status === "laeuft" ? "Dein Gegner hat das Ergebnis noch nicht bestätigt. Sobald er es tut, wird gewertet."
+      : g.grund === "aufgabe" && zwang ? (sieg ? "Dein Gegner hat dreimal in Folge seine Zugzeit verstreichen lassen. Der Kampf gilt als aufgegeben." : "Du hast dreimal in Folge deine Zugzeit verstreichen lassen. Der Kampf gilt als aufgegeben – dazu eine Zeitstrafe: Eine Stunde lang kannst du keinen neuen Gegner suchen.")
       : g.grund === "aufgabe" ? (sieg ? "Dein Gegner hat aufgegeben." : "Du hast aufgegeben.") : g.grund === "team" ? (Z.kampf && Z.kampf.modus === "koenig" ? (sieg ? "Der gegnerische Anführer ist gefallen." : "Dein Anführer ist gefallen.") : sieg ? "Das gegnerische Team liegt am Boden." : "Dein Team liegt am Boden.") : "Nach Punkten entschieden.";
     const lohn = Z.kampf && Z.kampf.privat ? `<p class="arena-ende-note">Privater Kampf: ohne Wertung.</p>` : !b ? "" : !b.gewertet && !(b.xp && b.xp.length) && !b.waehrung ? (g.grund === "aufgabe" && !sieg ? "" : `<p class="arena-ende-note">Dieser Kampf brachte keine Belohnung.</p>`)
       : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}${xp}${b.angebot ? `<p class="arena-ende-lohn held">★ Ein neuer Held will sich dir anschließen!</p>` : ""}`;

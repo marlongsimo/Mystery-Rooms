@@ -129,7 +129,7 @@
       const schritte = [];
       if (st.arena.zeitaus[tm] >= ZEITAUS_MAX) {
         // Dreimal hintereinander nichts getan: Das Team gilt als aufgegeben
-        R.arenaSicht(st, 0); st.arena.sieger = 3 - tm; st.arena.grund = `${st.arena.namen[tm - 1]} hat dreimal die Zugzeit verstreichen lassen.`; st.arena.aufgabe = true; st.ende = "arena";
+        R.arenaSicht(st, 0); st.arena.sieger = 3 - tm; st.arena.grund = `${st.arena.namen[tm - 1]} hat dreimal die Zugzeit verstreichen lassen.`; st.arena.aufgabe = true; st.arena.aufgabeZeit = Math.round(jetzt); st.ende = "arena"; // Zwangsaufgabe: Die Datenbank verhängt dafür eine Zeitstrafe
         st.log.push({ t: `${st.arena.grund} Sieg für ${st.arena.namen[2 - tm]}.`, art: "ende" });
         schritt(st, schritte, jetzt); return { schritte };
       }

@@ -42,6 +42,7 @@ function server(name, args) {
   if (name === "rpg_ranked_result") { DB.ergebnis++; const m = (S.db.kaempfe[ID] || {}).match; if (!m || m.status !== "beendet") return { ranked: true, gewertet: false, vor: 105 };
     if (DB.punkte === 105) { DB.punkte = 90; DB.niederlagen++; } return { ranked: true, gewertet: true, vor: 105, delta: -15, nach: 90, rang_vor: 1, rang_nach: 0, weit: false }; }
   if (name === "rpg_ranked_gegenueber") return { da: true, ranked: true, host: 1, gast: 1 };
+  if (name === "rpg_arena_sperre") return DB.sperre ? { gesperrt: true, bis: new Date(Date.now() + 3400e3).toISOString(), sekunden: 3400 } : { gesperrt: false };
   if (name === "rpg_arena_looks") return { host: { name: "Spieler A", avatar: "schildwaechter", rahmen: null }, gast: { name: "Runenwolf_3", avatar: "trickser", rahmen: null } };
   if (name === "rpg_looks") return {};
   if (name === "rpg_arena_get") return sicht() || { fehler: "Diesen Kampf gibt es nicht." };
@@ -123,6 +124,13 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   await shot(H.p, "ranked-4-handy"); await H.p.click('[data-arena-tab="rangliste"]'); await H.p.waitForSelector(".rang-liste");
   check(await H.p.evaluate(() => document.querySelector(".rang-liste li").getBoundingClientRect().right <= innerWidth), "Handy: Die Rangliste passt in die Breite");
   check(!H.fehler.length, "keine Skriptfehler am Handy" + (H.fehler.length ? ": " + H.fehler.join(" | ") : ""));
+  // Zeitstrafe: Hinweis in der Arena, Suchknöpfe gesperrt
+  DB.sperre = true; const Sp = await seite(b, { width: 1200, height: 950 }); await Sp.p.click('.dorf-ort[data-hub="arena"]'); await Sp.p.waitForSelector(".rang-karte"); await Sp.p.waitForTimeout(300);
+  const sp = await Sp.p.evaluate(() => ({ text: (document.querySelector(".arena-sperre") || {}).textContent || "", ranked: document.querySelector(".rang-spielen").disabled }));
+  await Sp.p.click('[data-arena-tab="fun"]'); await Sp.p.waitForTimeout(300);
+  const spFun = await Sp.p.evaluate(() => [...document.querySelectorAll("[data-arena-art]")].map((x) => x.disabled));
+  check(/Zeitstrafe/.test(sp.text) && /dreimal in Folge deine Zugzeit/.test(sp.text) && /in 57 Minuten/.test(sp.text) && sp.ranked && spFun.length > 0 && spFun.every(Boolean), `Zeitstrafe: Die Arena nennt Grund und Restzeit, alle Suchknöpfe sind gesperrt (${sp.text.replace(/\s+/g, " ").slice(0, 70)} …)`);
+  check(!Sp.fehler.length, "keine Skriptfehler mit Zeitstrafe" + (Sp.fehler.length ? ": " + Sp.fehler.join(" | ") : "")); DB.sperre = false;
   await b.close();
   console.log(ok ? "\nRANKED IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);
 })().catch((e) => { console.error(e); process.exit(1); });

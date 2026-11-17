@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v78, figuren.js v27
+// Stand der Regeln: regeln.js v79, figuren.js v27
 
 /* ===== js/figuren.js ===== */
 /*
@@ -3171,7 +3171,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       const schritte = [];
       if (st.arena.zeitaus[tm] >= ZEITAUS_MAX) {
         // Dreimal hintereinander nichts getan: Das Team gilt als aufgegeben
-        R.arenaSicht(st, 0); st.arena.sieger = 3 - tm; st.arena.grund = `${st.arena.namen[tm - 1]} hat dreimal die Zugzeit verstreichen lassen.`; st.arena.aufgabe = true; st.ende = "arena";
+        R.arenaSicht(st, 0); st.arena.sieger = 3 - tm; st.arena.grund = `${st.arena.namen[tm - 1]} hat dreimal die Zugzeit verstreichen lassen.`; st.arena.aufgabe = true; st.arena.aufgabeZeit = Math.round(jetzt); st.ende = "arena"; // Zwangsaufgabe: Die Datenbank verhängt dafür eine Zeitstrafe
         st.log.push({ t: `${st.arena.grund} Sieg für ${st.arena.namen[2 - tm]}.`, art: "ende" });
         schritt(st, schritte, jetzt); return { schritte };
       }

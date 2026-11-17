@@ -664,7 +664,10 @@
     for (const b of st.brand) o += `<rect x="${b.x * Z + 4}" y="${b.y * Z + 4}" width="${Z - 8}" height="${Z - 8}" rx="8" fill="#ff7a2a" fill-opacity=".35"/>`;
     // Reichweite der gewählten Aktion: alle Felder, die sie von hier aus erreicht (mit Sichtlinie) – Angriffe und Zauber rötlich, Heilung und Hilfe grünlich
     if (spielerDran && wahl) {
-      const h = R.findeAktion(akt, wahl), d = h && h.a, weit = d && d.reichweite;
+      const h = R.findeAktion(akt, wahl), d = h && h.a, grau = d && (d.art === "wolf" || d.art === "wolflauf"), weit = !grau && d && d.reichweite;
+      // Befehle an Grau: nicht die Reichweite der Heldin zeigen, sondern die Felder, die Grau in diesem Zug erreicht
+      if (grau && R.wolfFelder) for (const k2 of R.wolfFelder(st, akt).keys()) { const [x, y] = k2.split(",").map(Number);
+        o += `<rect class="rw grau" x="${x * Z + 3}" y="${y * Z + 3}" width="${Z - 6}" height="${Z - 6}" rx="6" fill="#d9534f" fill-opacity="${k.bild ? ".22" : ".16"}" stroke="#f29a94" stroke-opacity=".5" stroke-width="1.2"/>`; }
       if (weit) {
         const hilfe = /^(heilung|aufrichten|schild|tausch|segen|bewahren|massenheil|selbstheilung)$/.test(d.art), f1 = hilfe ? "#4caf6a" : "#d9534f", f2 = hilfe ? "#8fe0a6" : "#f29a94", frei = /^(tausch|aufrichten)$/.test(d.art); // Platztausch und Aufrichten brauchen keine Sichtlinie
         for (let y = Math.max(0, akt.y - weit); y <= Math.min(k.h - 1, akt.y + weit); y++) for (let x = Math.max(0, akt.x - weit); x <= Math.min(k.b - 1, akt.x + weit); x++) {

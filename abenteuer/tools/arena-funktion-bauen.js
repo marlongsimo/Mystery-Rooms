@@ -21,6 +21,7 @@ const teile = [
   "", "/* ===== Arena-Karten (aus daten/grauwacht.js) ===== */", "const ARENA_KARTEN = " + JSON.stringify(KARTEN) + ";",
   "", "/* ===== server/arena-bot.js ===== */", lies("server/arena-bot.js"),
   "", "/* ===== server/arena-kern.js ===== */", lies("server/arena-kern.js"),
+  "", "/* ===== Stand der Regeln (für den Abgleich mit dem Spiel) ===== */", `const ARENA_REGELN_V = "${ver("regeln.js")}.${ver("figuren.js")}";`,
   "", "/* ===== server/arena-funktion.js ===== */", lies("server/arena-funktion.js"), ""];
 const ziel = path.join(wurzel, "supabase/functions/arena/index.ts");
 fs.mkdirSync(path.dirname(ziel), { recursive: true });

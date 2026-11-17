@@ -7,7 +7,7 @@ const R = require("../js/regeln.js"); const D = require("../daten/grauwacht.js")
 const K = kern(R, D.KARTEN, botF), BOT = botF(R);
 let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") + m); if (!c) ok = false; };
 const weite = (a, b) => { const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y); return Math.max(dx, dy) + 0.5 * Math.min(dx, dy); };
-let befehle = 0, gerade = 0, schraeg = 0, zuWeit = 0, verpufft = 0, bisse = 0, ausgeschlossen = 0, nahAberUnerreichbar = 0, maxWeg = 0, eingespieltSchraeg = 0;
+let laeufe = 0, laufFehler = 0, nurLauf = 0, befehle = 0, gerade = 0, schraeg = 0, zuWeit = 0, verpufft = 0, bisse = 0, ausgeschlossen = 0, nahAberUnerreichbar = 0, maxWeg = 0, eingespieltSchraeg = 0;
 console.log("Grau: Befehl, Reichweite, Biss");
 for (let n = 0; n < 24; n++) {
   const gegner = [["duellant", "schildwaechter", "lichtbringer"], ["berserker", "inquisitor", "tiergefaehrte"], ["assassine", "gelehrter", "wanderheiler"]][n % 3];
@@ -21,6 +21,11 @@ for (let n = 0; n < 24; n++) {
       const w0 = st.figuren.find((o) => o.art === "wolf" && o.besitzer === a.id);
       if (w0 && w0.tp > 0) { const ziele = R.ziele(st, "wolf_befehl"), feinde = st.figuren.filter((o) => o.seite !== a.seite && o.tp > 0);
         ausgeschlossen += feinde.length - ziele.length; nahAberUnerreichbar += feinde.filter((o) => !ziele.includes(o) && weite(w0, o) <= 9).length;
+        // „Grau: Heranlaufen“: läuft näher, beißt nicht, höchstens 8 Felder
+        for (const z of R.ziele(st, "wolf_lauf")) { const k = R.laden(R.speichern(st)), l0 = k.log.length, d0 = weite(w0, z); const r = R.handeln(k, "wolf_lauf", z.id); laeufe++;
+          const w = k.figuren.find((o) => o.id === w0.id), zz = k.figuren.find((o) => o.id === z.id), neu = k.log.slice(l0).map((e) => e.t || "").join(" | ");
+          if ((r && r.fehler) || !(weite(w, zz) < d0) || /Biss/.test(neu) || !/läuft auf/.test(neu) || k.zug.bonus || weite(w0, w) > 8) laufFehler++; }
+        if (!ziele.length && R.ziele(st, "wolf_lauf").length) nurLauf++;
         for (const z of ziele) { const k = R.laden(R.speichern(st)), l0 = k.log.length; const r = R.handeln(k, "wolf_befehl", z.id); befehle++;
           const w = k.figuren.find((o) => o.id === w0.id), zz = k.figuren.find((o) => o.id === z.id), neu = k.log.slice(l0).map((e) => e.t || "").join(" | ");
           if (r && r.fehler) { verpufft++; continue; }
@@ -36,6 +41,8 @@ check(befehle > 60 && verpufft === 0 && bisse === befehle, `Jeder wählbare Befe
 check(schraeg === 0 && gerade === befehle, `Grau steht beim Biss immer gerade neben dem Ziel, nie schräg (${gerade} gerade, ${schraeg} schräg)`);
 check(zuWeit === 0 && maxWeg > 4, `Grau läuft höchstens 8 Felder, schräge Schritte zählen 1,5 (weitester Lauf: ${maxWeg})`);
 check(ausgeschlossen > 0, `Gegner, an die Grau nicht herankommt, lassen sich gar nicht erst wählen (${ausgeschlossen}× ausgeschlossen, davon ${nahAberUnerreichbar}× in der Nähe, aber versperrt oder zu weit)`);
+check(laeufe > 60 && laufFehler === 0, `„Grau: Heranlaufen“: Grau kommt dem gewählten Gegner näher, beißt nicht, läuft höchstens 8 Felder, die Bonusaktion ist verbraucht (${laeufe} Läufe, ${laufFehler} Abweichungen)`);
+check(nurLauf > 0, `Ist kein Gegner für den Biss erreichbar, bleibt das Heranlaufen als Möglichkeit (${nurLauf}× so vorgekommen)`);
 const F = R.FD.FIGUREN.tiergefaehrte;
 check(/schräge Schritte zählen 1,5/.test(F.faehig.find((x) => x.id === "wolf_befehl").text) && /gerade neben/.test(F.faehig.find((x) => x.id === "eingespielt").text), "Die Heldenkarte beschreibt die Regeln so");
 console.log(ok ? "\nGRAU IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

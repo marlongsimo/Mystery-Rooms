@@ -260,6 +260,7 @@
         { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 6, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
         { id: "rudeltaktik", name: "Rudeltaktik", typ: "passiv", ab: 1, text: "Du und Grau habt Vorteil gegen ein Ziel, neben dem der andere steht." },
         { id: "wolf_befehl", name: "Befehl an Grau", typ: "bonus", ab: 1, art: "wolf", reichweite: 20, text: "Grau läuft bis zu 8 Felder zum Ziel (schräge Schritte zählen 1,5) und beißt. Er muss gerade neben dem Ziel stehen können – wählbar sind nur Gegner, an die er herankommt." },
+        { id: "wolf_lauf", name: "Grau: Heranlaufen", typ: "bonus", ab: 1, art: "wolflauf", reichweite: 20, text: "Grau läuft bis zu 8 Felder auf einen Gegner zu, ohne zu beißen – für Gegner, die er in diesem Zug nicht erreicht, oder um ihn in Stellung zu bringen." },
         { id: "wolf_umreissen", name: "Grau: Umreißen", typ: "bonus", ab: 1, art: "wolf", umreissen: true, reichweite: 20, pro: { rast: 2 }, text: "Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel." },
         { id: "eingespielt", name: "Eingespielt", typ: "passiv", ab: 2, text: "Grau beißt am Ende deines Zugs auch ohne Befehl, wenn er gerade neben einem Gegner steht, den du getroffen hast." },
         { id: "ein_rudel", name: "Ein Rudel", typ: "passiv", ab: 3, text: "Jägermal gilt auch für Grau, Grau +1 zum Treffen." },

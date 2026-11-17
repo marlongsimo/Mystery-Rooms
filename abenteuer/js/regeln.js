@@ -878,6 +878,7 @@
       case "schild": return freunde.filter((o) => o.tp > 0 && !o.z.schild && inReich(o, a.reichweite));
       case "tausch": return freunde.filter((o) => o !== f && o.tp > 0 && weite(f, o) <= a.reichweite);
       case "wolf": { const w = wolfVon(st, f); if (!w || !lebt(w)) return []; return gegner.filter((o) => wolfPlatz(st, f, w, o)); } // nur Ziele, an die Grau wirklich herankommt
+      case "wolflauf": { const w = wolfVon(st, f); if (!w || !lebt(w)) return []; return gegner.filter((o) => wolfNaeher(st, f, w, o)); } // nur laufen: jeder Gegner, dem Grau näher kommen kann
       case "verstecken": {
         if (f.z.versteckt) return [];
         if (gegner.some((o) => weite(o, f) <= 1)) return [];
@@ -896,7 +897,7 @@
       case "bewahren": case "massenheil": return freunde.some((o) => o.tp < o.tpMax && weite(f, o) <= a.reichweite) ? [f] : [];
       case "rauch": case "spurt": return [f];
       case "tatendrang": return !st.zug.aktion && !st.zug.tatendrang ? [f] : [];
-      case "siegel": return !imPakt(st, f) && st.siegel.some((z) => !z.beruehrt && weite(z, f) <= 1) && bossVon(st) ? [f] : [];
+      case "siegel": return !imPakt(st, f) && st.siegel.some((z) => !z.beruehrt && abstand(z, f) <= 1) && bossVon(st) ? [f] : []; // Dinge bedient man auch von schräg daneben
       case "ziel": return zielNeben(st, f) ? [f] : [];
       case "name": { const b = bossVon(st); return b && !st.boss.nameGenutzt && weite(f, b) <= 12 && sicht(st, f, b) ? [b] : []; }
       case "silber": return !st.boss.silberGenutzt && gegnerFiguren(st).some((g) => lebt(g) && g.art === "knochenwaechter" && weite(g, f) <= 6) ? [f] : [];
@@ -1058,6 +1059,7 @@
       }
       case "schild": ziel.z.schild = true; st.log.push({ t: `${f.name}: Schild des Glaubens auf ${ziel.name} (+2 RK).`, art: "gut" }); break;
       case "tausch": { const x = f.x, y = f.y; f.x = ziel.x; f.y = ziel.y; ziel.x = x; ziel.y = y; st.log.push({ t: `${f.name} tauscht den Platz mit ${ziel.name}.` }); break; }
+      case "wolflauf": { const w = wolfVon(st, f), pl = w && wolfNaeher(st, f, w, ziel); if (pl) { w.x = pl.x; w.y = pl.y; st.log.push({ t: `${w.name} läuft auf ${ziel.name} zu.` }); } break; }
       case "wolf": wolfBeisst(st, f, ziel, Boolean(a.umreissen)); if (hs(f) >= 10 && lebt(ziel) && !st.ende) wolfBeisst(st, f, ziel, false); break; // Meisterschaft: Grau beißt zweimal
       case "verstecken": f.z.versteckt = true; st.log.push({ t: `${f.name} verschwindet im Schatten.` }); break;
       case "raserei": f.z.raserei = true; st.log.push({ t: `${f.name} gerät in Raserei!`, art: "gut" }); break;
@@ -1129,10 +1131,19 @@
    *  schräge Schritte kosten 1,5. null, wenn er nicht herankommt (dann lässt sich das Ziel gar nicht erst wählen). */
   function wolfPlatz(st, f, w, z) {
     if (weite(w, z) <= 1) return { x: w.x, y: w.y, c: 0 };
-    const m = erreichbar(st, w, FD.FIGUREN[f.fid].wolf.bewegung, 1.5); let best = null;
-    for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); if (weite({ x, y }, z) <= 1 && (!best || c < best.c)) best = { x, y, c }; }
+    let best = null;
+    for (const [k, c] of wolfFelder(st, f, w)) { const [x, y] = k.split(",").map(Number); if (weite({ x, y }, z) <= 1 && (!best || c < best.c)) best = { x, y, c }; }
     return best;
   }
+  /** Nur laufen: das erreichbare Feld, das dem Ziel am nächsten liegt (bei Gleichstand das mit dem kürzesten Weg). null, wenn Grau nicht näher kommt. */
+  function wolfNaeher(st, f, w, z) {
+    const jetzt = weite(w, z); if (jetzt <= 1) return null;
+    let best = null;
+    for (const [k, c] of wolfFelder(st, f, w)) { const [x, y] = k.split(",").map(Number), d = weite({ x, y }, z); if (d < jetzt && (!best || d < best.d || (d === best.d && c < best.c))) best = { x, y, d, c }; }
+    return best;
+  }
+  /** Felder, die Grau in diesem Zug erreicht (höchstens 8, schräge Schritte 1,5) – auch für die Anzeige */
+  function wolfFelder(st, f, w) { w = w || wolfVon(st, f); const d = f && FD.FIGUREN[f.fid || f.fidA]; return w && lebt(w) && d && d.wolf ? erreichbar(st, w, d.wolf.bewegung, 1.5) : new Map(); }
   function wolfBeisst(st, f, z, umreissen) {
     const w = wolfVon(st, f); if (!w || !lebt(w) || !lebt(z)) return;
     const platz = wolfPlatz(st, f, w, z);
@@ -1486,7 +1497,7 @@
     if (f.tp <= erwartet) w += 14;                                     // ein Treffer könnte reichen
     w += Math.max(0, Math.min(8, 17 - (f.rk || 12))) * 1.5;            // leicht Gerüstete
     if (f.klasse && FD.KLASSEN[f.klasse] && FD.KLASSEN[f.klasse].beistand) w += 5; // Heiler
-    if (st.mech && st.mech.ziele.some((z) => !z.fertig && !z.verloren && weite(f, z) <= 1)) w += st.mech.ziele.some((z) => !z.fertig && z.fortschritt > 0 && weite(f, z) <= 1) ? 26 : 14; // wer am Ziel arbeitet
+    if (st.mech && st.mech.ziele.some((z) => !z.fertig && !z.verloren && abstand(f, z) <= 1)) w += st.mech.ziele.some((z) => !z.fertig && z.fortschritt > 0 && abstand(f, z) <= 1) ? 26 : 14; // wer am Ziel arbeitet
     if (st.kiFokus && st.kiFokus.runde === st.runde && st.kiFokus.id === f.id) w += 7; // gemeinsam auf ein Ziel
     if (f.art === "wolf") w -= 8;
     return w + st.r() * 6;
@@ -1711,7 +1722,8 @@
   function zielNeben(st, f) {
     if (!st.mech || !f) return null;
     const bedraengt = gegnerFiguren(st).some((g) => lebt(g) && weite(g, f) <= 1);
-    return st.mech.ziele.filter((z) => zielOffen(z) && weite(z, f) <= 1 && !(z.ruhe && bedraengt)).sort((a, b) => b.fortschritt - a.fortschritt)[0] || null;
+    // Ziele (Siegelstein, Laterne, Eisblock …) bedient man auch von schräg daneben: Manche stehen so, dass nur ein schräges Feld frei ist.
+    return st.mech.ziele.filter((z) => zielOffen(z) && abstand(z, f) <= 1 && !(z.ruhe && bedraengt)).sort((a, b) => b.fortschritt - a.fortschritt)[0] || null;
   }
   /** Felder, die im nächsten gegnerischen Zug getroffen werden oder sich verwandeln – Helden und Begleiter meiden sie */
   function gefahrFelder(st) {
@@ -2005,12 +2017,12 @@
     const bereit = g.ruferRunde == null || st.runde - g.ruferRunde >= 2; // nur jede zweite Runde
     const z = bereit && m && m.ziele.filter((x) => x.umkehrbar && !x.verloren && (x.fertig || x.fortschritt > 0)).sort((a, b) => weite(a, g) - weite(b, g))[0];
     if (z) {
-      if (weite(z, g) > 1 && st.zug.bewegung > 0) {
+      if (abstand(z, g) > 1 && st.zug.bewegung > 0) {
         const mm = erreichbar(st, g, st.zug.bewegung); let best = null;
-        for (const [k2, c] of mm) { const [x, y] = k2.split(",").map(Number), dd = weite({ x, y }, z); if (!best || dd < best.d || (dd === best.d && c < best.c)) best = { x, y, d: dd, c }; }
+        for (const [k2, c] of mm) { const [x, y] = k2.split(",").map(Number), dd = abstand({ x, y }, z); if (!best || dd < best.d || (dd === best.d && c < best.c)) best = { x, y, d: dd, c }; }
         if (best) { const sx = g.x, sy = g.y; g.x = best.x; g.y = best.y; brandFeld(st, g); fangschuss(st, g, sx, sy); }
       }
-      if (lebt(g) && !st.ende && weite(z, g) <= 1) {
+      if (lebt(g) && !st.ende && abstand(z, g) <= 1) {
         const war = z.fertig; z.fertig = false; g.ruferRunde = st.runde; z.fortschritt = Math.max(0, (war ? z.runden : z.fortschritt) - 1);
         st.log.push({ t: `${g.name} legt die Hand auf ${z.name}: ${war ? "Er erwacht wieder" : "Der Fortschritt schwindet"} (${z.fortschritt}/${z.runden}).`, art: "schlecht" });
         if (war) zielZurueck(st, z);
@@ -2119,7 +2131,7 @@
       if (kann("siegelstein")) { handeln(st, "siegelstein", f.id); }
       else if (!gegner().some((g) => weite(g, f) <= 1)) {
         let best = null;
-        for (const [k, c] of bf()) { const [x, y] = k.split(",").map(Number); if (st.siegel.some((z) => !z.beruehrt && weite(z, { x, y }) <= 1) && (!best || (c === "schritt" ? 0 : c) < best.c)) best = { x, y, c: c === "schritt" ? 0 : c }; }
+        for (const [k, c] of bf()) { const [x, y] = k.split(",").map(Number); if (st.siegel.some((z) => !z.beruehrt && abstand(z, { x, y }) <= 1) && (!best || (c === "schritt" ? 0 : c) < best.c)) best = { x, y, c: c === "schritt" ? 0 : c }; }
         if (best) { bewegen(st, best.x, best.y); if (lebt(f) && kann("siegelstein")) handeln(st, "siegelstein", f.id); }
       }
       if (st.ende || !lebt(f)) { if (!st.ende) zugEnde(st); return; }
@@ -2394,7 +2406,7 @@
     for (let r = 0; r < 3; r++) for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i) + r * 131; h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c ^ (h1 >>> 15), 1597334677); }
     return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36); }
 
-  const API = { arenaAbdruck, pruefwert, begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { wolfFelder, arenaAbdruck, pruefwert, begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, weite, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, heilenTest: heilen, neueArena, teamVon, arenaSicht, KARTE_GARTEN, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;

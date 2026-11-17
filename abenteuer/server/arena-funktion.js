@@ -11,7 +11,8 @@
  */
 const ARENA_KERN = globalThis.ABARENAKERN(globalThis.ABR, ARENA_KARTEN);
 const KOPF = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
-const antwort = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: Object.assign({ "Content-Type": "application/json" }, KOPF) });
+// Jede Antwort nennt den Stand der Regeln, mit dem der Server rechnet (rv) – das Spiel gleicht ihn mit seinem eigenen ab
+const antwort = (o, status = 200) => new Response(JSON.stringify(Object.assign({ rv: typeof ARENA_REGELN_V === "string" ? ARENA_REGELN_V : null }, o)), { status, headers: Object.assign({ "Content-Type": "application/json" }, KOPF) });
 
 async function arenaAnfrage(req) {
   if (req.method === "OPTIONS") return new Response("ok", { headers: KOPF });

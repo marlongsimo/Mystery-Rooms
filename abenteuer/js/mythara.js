@@ -1004,6 +1004,25 @@
     if (Boolean(profil && profil.konto) && window.ABRANG) { await window.ABRANG.laden().catch(() => null); window.ABRANG.kopf(); } // Rang in der Kopfzeile
   }
 
+  /* ---------- Veraltete Fassung erkennen: Die Seite kann noch aus dem Zwischenspeicher stammen, während schon eine neue Fassung online ist ---------- */
+  /** Seite frisch vom Server holen (am Zwischenspeicher vorbei). Höchstens einmal je Fassung, damit es keine Schleife gibt. */
+  function neuLaden(text) {
+    let schon = false; try { schon = sessionStorage.getItem("ab-neu-geladen") === fassung(document.documentElement.innerHTML); } catch (e) { /* ohne Speicher */ }
+    if (schon) return toast("Es gibt eine neuere Fassung des Spiels. Bitte schließe das Spiel ganz und öffne es erneut.");
+    try { sessionStorage.setItem("ab-neu-geladen", fassung(document.documentElement.innerHTML)); } catch (e) { /* ohne Speicher */ }
+    toast(text || "Das Spiel wurde aktualisiert. Es lädt jetzt neu."); setTimeout(() => { const u = new URL(location.href); u.searchParams.set("neu", String(Date.now())); location.replace(u.toString()); }, 1600);
+  }
+  /** Kennzeichen einer Fassung: die Versionsnummern aller eingebundenen Dateien */
+  const fassung = (html) => (String(html).match(/\.(?:js|css)\?v=\d+/g) || []).join("|");
+  let fassungGeprueft = 0;
+  async function fassungPruefen() {
+    if (Date.now() - fassungGeprueft < 5 * 60000 || location.protocol === "file:") return; fassungGeprueft = Date.now();
+    try { const r = await fetch(location.pathname + "?frisch=" + Date.now(), { cache: "no-store" }); if (!r.ok) return; const neu = fassung(await r.text()), alt = fassung([...document.querySelectorAll("script[src], link[rel=stylesheet]")].map((e) => e.getAttribute("src") || e.getAttribute("href")).join(" "));
+      if (neu && alt && neu !== alt) neuLaden(); } catch (e) { /* offline: später wieder */ }
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) fassungPruefen(); });
+  setTimeout(fassungPruefen, 4000); setInterval(fassungPruefen, 10 * 60000);
+
   /* ---------- Zur Startseite (MYTHARA oben rechts und das Logo) ---------- */
   const SPIELANSICHT = ["szene", "spiel", "ende", "lobby", "einleitung", "einladen", "kodex", "intro"];
   async function nachHause() {
@@ -1047,5 +1066,5 @@
   });
   /** Die Kampagne, die in der Übersicht nach dieser kommt (für „Weiter mit der nächsten Kampagne“) */
   const naechstesAbenteuer = (id) => { const l = ABENTEUER(), i = l.findIndex((m) => m.id === id); return i >= 0 && l[i + 1] ? l[i + 1] : null; };
-  window.MYTHARA = { profil: profilSeite, ava, seite: seiteZeigen, waehrungZeigen, shop: shopZeigen, fenster, toast, avatarHtml, kopfNeu: () => hubKopf(), KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
+  window.MYTHARA = { neuLaden, profil: profilSeite, ava, seite: seiteZeigen, waehrungZeigen, shop: shopZeigen, fenster, toast, avatarHtml, kopfNeu: () => hubKopf(), KONTEN, zeige: () => zeige("mythara"), zeigeHub, imHub, freundeEinladen, istKonto: () => istKonto(), naechstesAbenteuer, abenteuerStarten };
 })();

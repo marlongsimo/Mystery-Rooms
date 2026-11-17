@@ -465,13 +465,26 @@
     pollen(6000, async () => { const g = await rpc("rpg_arena_get", { p_match_id: m.id }); if ((g.status === "beendet" || g.status === "abgebrochen") && !Z.kampf.gemeldet) { Z.kampf.gemeldet = true; ergebnisZeigen(g, t); } });
     t.on("lost", () => { if (Z.kampf && !Z.kampf.gemeldet) rpc("rpg_arena_get", { p_match_id: m.id }).then((g) => { if (g.status === "laeuft") return rpc("rpg_arena_cancel", { p_match_id: m.id }).then((x) => x, () => g); return g; }).then((g) => { if (!Z.kampf || Z.kampf.gemeldet) return; Z.kampf.gemeldet = true; ergebnisZeigen(g, t); }).catch(() => {}); });
   }
+  /* ---------- Stand der Regeln: Spiel und Server müssen mit denselben Regeln rechnen ---------- */
+  const eigeneRegeln = () => { const v = (n) => { const s = document.querySelector(`script[src*="js/${n}.js"]`), m = s && /[?&]v=(\d+)/.exec(s.getAttribute("src") || ""); return m ? Number(m[1]) : 0; }; return [v("regeln"), v("figuren")]; };
+  let regelnGemeldet = false;
+  /** rv: „Regeln.Figuren“ des Servers. Ist der Server neuer, läuft hier eine veraltete Fassung des Spiels: neu laden.
+   *  Ist der Server älter, wurde die Edge Function noch nicht aktualisiert: einmal darauf hinweisen. */
+  function regelnAbgleichen(rv) {
+    const m = /^(\d+)\.(\d+)$/.exec(String(rv || "")); if (!m || regelnGemeldet) return; const [r, f] = eigeneRegeln(), sr = Number(m[1]), sf = Number(m[2]); if (!r || !f) return;
+    if (sr === r && sf === f) return;
+    regelnGemeldet = true; Z.regelnServer = rv;
+    if (sr > r || (sr === r && sf > f)) { if (window.MYTHARA && window.MYTHARA.neuLaden) window.MYTHARA.neuLaden("Das Spiel wurde aktualisiert. Es lädt jetzt neu – dein Kampf geht danach weiter."); }
+    else if (window.MYTHARA && window.MYTHARA.toast) window.MYTHARA.toast(`Hinweis: Der Arena-Server rechnet noch mit einem älteren Regelstand (${rv}, Spiel ${r}.${f}). Einzelne Züge können deshalb abgelehnt werden.`);
+  }
   /* ---------- Serverkampf: Der Server rechnet, beide Geräte zeigen an und schicken ihre Züge ---------- */
   /** Edge Function aufrufen (angemeldet). Zurück: die Antwort – auch bei einem Fehlerstatus, dann mit { fehler } */
   async function funktion(name, rumpf) {
     const c = window.AB.liveClient(); await c.ensureUser();
     const { data, error } = await c.db.functions.invoke(name, { body: rumpf });
-    if (!error) return data || {};
+    if (!error) { if (data && data.rv) regelnAbgleichen(data.rv); return data || {}; }
     let o = null; try { if (error.context && error.context.json) o = await error.context.json(); } catch (e) { o = null; }
+    if (o && o.rv) regelnAbgleichen(o.rv);
     return o && o.fehler ? o : { fehler: /not found|404/i.test(error.message || "") ? "Der Server für den Arena-Kampf ist noch nicht eingerichtet." : "Der Server hat nicht geantwortet." };
   }
   function serverKampf(m, s0) {

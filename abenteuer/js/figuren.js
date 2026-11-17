@@ -75,7 +75,7 @@
       werte: { GES: 16, KON: 14, CHA: 13, WEI: 12, STR: 10, INT: 8 }, rk: [15, 15, 15], ruestung: "beschlagenes Leder", metall: false, tpMinus: -2,
       faehig: [
         { id: "rapier", name: "Rapier", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W8", text: "Nahkampf." },
-        { id: "parade", name: "Parade", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Verfehlt dich ein Nahangriff, greifst du sofort an." },
+        { id: "parade", name: "Parade", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Verfehlt dich ein Nahangriff, stichst du sofort zurück – mit einem Drittel des Schadens." },
         { id: "finte", name: "Finte", typ: "bonus", ab: 1, art: "finte", pro: { rast: 2 }, text: "Dein nächster Angriff hat Vorteil und macht +1W6." },
         { id: "entwaffnen", name: "Entwaffnen", typ: "aktion", ab: 1, art: "entwaffnen", reichweite: 1, rettung: "STR", attr: "GES", pro: { kampf: 1 }, text: "STR-Rettungswurf, sonst macht das Ziel 2 Runden nur halben Schaden." },
         { id: "klingenmeister", name: "Klingenmeisterin", typ: "passiv", ab: 3, text: "Kritischer Treffer schon bei 19–20." },

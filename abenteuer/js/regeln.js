@@ -739,6 +739,7 @@
       if (a.z.entwaffnet) s = Math.floor(s / 2);
       if (z.z.raserei && !spec.magisch) s = Math.floor(s / 2);
       if (z.seite === "gegner" && GEGNER[z.art].anfaellig === "wucht" && spec.wucht) s = Math.floor(s * 1.5);
+      if (spec.drittel) s = Math.max(1, Math.floor(s / 3)); // Gegenstoß aus der Parade: nur ein Drittel
       erg.schaden = s;
       st.log.push({ t: `${a.name}: ${spec.name}${st.arena ? " auf " + z.name : ""} – W20 ${w}${vtext} + ${spec.bonus} = ${total} gegen RK ${rk}: ${krit ? "kritischer Treffer" : "Treffer"}, ${s} Schaden.${spec.zusatzText || ""}`, art: a.seite === "gegner" ? "gegner" : "wurf", wurf: w });
       schaden(st, z, s, { krit });
@@ -801,6 +802,7 @@
     const spec = {
       name: a.name, bonus, schaden: a.schaden, fest, extra, krit, nah: abstand(f, z) <= 1, fern: Boolean(a.fern) || (a.wurfwaffe && abstand(f, z) > 1),
       magisch: Boolean(a.magisch), wucht: Boolean(a.wucht), ruecksichtslos: Boolean(a.ruecksichtslos), zusatzText: zusatz,
+      drittel: Boolean(opt.reaktion && istFig(f, "duellant")), // Isoldes Parade: Der Gegenstoß macht ein Drittel des Schadens
       hinterhalt: f.klasse === "schurke" ? (FD.altStufe(f.stufe) >= 2 ? "2W6" : "1W6") : null,
       hinterhaltImmer: istFig(f, "trickser") && hs(f) >= 10 && /dolch/.test(a.id),
       nachTreffer: () => {

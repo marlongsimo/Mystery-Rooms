@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v81, figuren.js v29
+// Stand der Regeln: regeln.js v82, figuren.js v30
 
 /* ===== js/figuren.js ===== */
 /*
@@ -81,7 +81,7 @@
       werte: { GES: 16, KON: 14, CHA: 13, WEI: 12, STR: 10, INT: 8 }, rk: [15, 15, 15], ruestung: "beschlagenes Leder", metall: false, tpMinus: -2,
       faehig: [
         { id: "rapier", name: "Rapier", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W8", text: "Nahkampf." },
-        { id: "parade", name: "Parade", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Verfehlt dich ein Nahangriff, greifst du sofort an." },
+        { id: "parade", name: "Parade", typ: "passiv", ab: 1, text: "Reaktion, automatisch: Verfehlt dich ein Nahangriff, stichst du sofort zurück – mit einem Drittel des Schadens." },
         { id: "finte", name: "Finte", typ: "bonus", ab: 1, art: "finte", pro: { rast: 2 }, text: "Dein nächster Angriff hat Vorteil und macht +1W6." },
         { id: "entwaffnen", name: "Entwaffnen", typ: "aktion", ab: 1, art: "entwaffnen", reichweite: 1, rettung: "STR", attr: "GES", pro: { kampf: 1 }, text: "STR-Rettungswurf, sonst macht das Ziel 2 Runden nur halben Schaden." },
         { id: "klingenmeister", name: "Klingenmeisterin", typ: "passiv", ab: 3, text: "Kritischer Treffer schon bei 19–20." },
@@ -1207,6 +1207,7 @@
       if (a.z.entwaffnet) s = Math.floor(s / 2);
       if (z.z.raserei && !spec.magisch) s = Math.floor(s / 2);
       if (z.seite === "gegner" && GEGNER[z.art].anfaellig === "wucht" && spec.wucht) s = Math.floor(s * 1.5);
+      if (spec.drittel) s = Math.max(1, Math.floor(s / 3)); // Gegenstoß aus der Parade: nur ein Drittel
       erg.schaden = s;
       st.log.push({ t: `${a.name}: ${spec.name}${st.arena ? " auf " + z.name : ""} – W20 ${w}${vtext} + ${spec.bonus} = ${total} gegen RK ${rk}: ${krit ? "kritischer Treffer" : "Treffer"}, ${s} Schaden.${spec.zusatzText || ""}`, art: a.seite === "gegner" ? "gegner" : "wurf", wurf: w });
       schaden(st, z, s, { krit });
@@ -1269,6 +1270,7 @@
     const spec = {
       name: a.name, bonus, schaden: a.schaden, fest, extra, krit, nah: abstand(f, z) <= 1, fern: Boolean(a.fern) || (a.wurfwaffe && abstand(f, z) > 1),
       magisch: Boolean(a.magisch), wucht: Boolean(a.wucht), ruecksichtslos: Boolean(a.ruecksichtslos), zusatzText: zusatz,
+      drittel: Boolean(opt.reaktion && istFig(f, "duellant")), // Isoldes Parade: Der Gegenstoß macht ein Drittel des Schadens
       hinterhalt: f.klasse === "schurke" ? (FD.altStufe(f.stufe) >= 2 ? "2W6" : "1W6") : null,
       hinterhaltImmer: istFig(f, "trickser") && hs(f) >= 10 && /dolch/.test(a.id),
       nachTreffer: () => {
@@ -3211,7 +3213,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
 
 
 /* ===== Stand der Regeln (für den Abgleich mit dem Spiel) ===== */
-const ARENA_REGELN_V = "81.29";
+const ARENA_REGELN_V = "82.30";
 
 /* ===== server/arena-funktion.js ===== */
 /*

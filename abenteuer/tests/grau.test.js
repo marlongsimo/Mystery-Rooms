@@ -83,4 +83,14 @@ check(/schräge Schritte zählen 1,5/.test(F.faehig.find((x) => x.id === "wolf_b
   check(botZiehtGrau > 3, `Auch der Rechner-Gegner führt Grau allein weiter (${botZiehtGrau}×)`);
   check(ohneWolfUebersprungen, "Liegt auch Grau am Boden, wird Fayes Zug wie bisher übersprungen");
 }
+// Grau am Boden: Ein Verbündeter daneben kann ihn stabilisieren
+{ const m = { staerke: 1, seed: 77, modus: "duell", karte: "garten", begegnung: "kobolde", kampfstufe: 4, host_name: "A", guest_name: "B", bot: true,
+    host_team: ["assassine", "tiergefaehrte", "wanderheiler"].map((held) => ({ held, stufe: 4 })), guest_team: ["duellant", "schildwaechter", "lichtbringer"].map((held) => ({ held, stufe: 4 })) };
+  let jetzt = 1e6; const st = K.start(m, 0, 0, jetzt).st; let erg = null;
+  for (let i = 0; i < 400 && !st.ende && !erg; i++) { const a = R.aktiv(st), tm = R.teamVon(st, a);
+    if (tm === 1 && a.fid === "assassine") { const w = st.figuren.find((o) => o.art === "wolf"); w.tp = 0; w.x = a.x + 1; w.y = a.y; for (const o of st.figuren) if (o !== w && o !== a && o.x === w.x && o.y === w.y) { o.x = 0; o.y = 0; }
+      const kann = R.ziele(st, "stabilisieren").includes(w), r = K.zug(st, 1, { typ: "aktion", aktion: "stabilisieren", ziel: w.id }, ++jetzt); erg = { kann, fehler: r.fehler || null, tp: w.tp }; }
+    else K.zug(st, tm, { typ: "ende" }, ++jetzt); }
+  check(erg && erg.kann && !erg.fehler && erg.tp === 1, "Vex kann Grau stabilisieren: Er steht mit 1 TP wieder auf");
+}
 console.log(ok ? "\nGRAU IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

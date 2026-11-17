@@ -463,7 +463,7 @@
     if (trankZahl(f)) liste.push(TRANK);
     if (hatDing(f, "grosser_trank")) liste.push(GROSS_TRANK);
     if (hatDing(f, "rauchbeutel")) liste.push(RAUCH_DING);
-    if (!st || st.figuren.some((o) => o.seite === "spieler" && o.art !== "wolf" && o.tp <= 0 && !o.tot)) liste.push(STABIL);
+    if (!st || st.figuren.some((o) => o.seite === "spieler" && o.tp <= 0 && !o.tot)) liste.push(STABIL);
     if (st && !st.arena && st.siegel && st.siegel.some((z) => !z.beruehrt) && !imPakt(st, f)) liste.push(SIEGEL_A); // in der Arena gibt es keinen Endgegner: dort wäre die Aktion nie nutzbar
     if (st && st.mech && st.mech.ziele.some(zielOffen)) { const zn = zielNeben(st, f); liste.push(zn && zn.aktion ? Object.assign({}, ZIEL_A, { name: zn.aktion }) : ZIEL_A); }
     if (st && st.boss && st.boss.name && !st.boss.nameGenutzt) liste.push(NAME_A);
@@ -877,7 +877,8 @@
       }
       case "heilung": return freunde.filter((o) => o.tp < o.tpMax && inReich(o, a.reichweite));
       case "selbstheilung": case "trank": return f.tp < f.tpMax ? [f] : [];
-      case "aufrichten": return freunde.filter((o) => o.tp <= 0 && o.art !== "wolf" && !o.tot && !(a.stabil && o.stabil) && weite(f, o) <= a.reichweite);
+      case "aufrichten": return freunde.filter((o) => o.tp <= 0 && !o.tot && // auch Grau lässt sich aufrichten
+        !(a.stabil && o.stabil) && weite(f, o) <= a.reichweite);
       case "schild": return freunde.filter((o) => o.tp > 0 && !o.z.schild && inReich(o, a.reichweite));
       case "tausch": return freunde.filter((o) => o !== f && o.tp > 0 && weite(f, o) <= a.reichweite);
       case "wolf": { const w = wolfVon(st, f); if (!w || !lebt(w)) return []; return gegner.filter((o) => wolfPlatz(st, f, w, o)); } // nur Ziele, an die Grau wirklich herankommt

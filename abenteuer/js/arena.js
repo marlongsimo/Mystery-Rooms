@@ -483,6 +483,8 @@
       const neu = (schritte || []).filter((s) => s && s.v > gesehen && s.st);
       // Wiedereinstieg in einen laufenden Kampf: nicht alle bisherigen Züge nachspielen, sondern gleich beim aktuellen Stand weitermachen
       if (!gestartet && !schlange.length && neu.length > 2) { const letzter = neu[neu.length - 1]; gesehen = letzter.v; schlange.push(letzter); Z.kampf.wieder = true; return abspielen(); }
+      // Viele Schritte auf einmal (der Server hat nachgeholt, was während der Abwesenheit geschah): ebenfalls gleich zum aktuellen Stand
+      if (neu.length > 6) { const letzter = neu[neu.length - 1]; gesehen = letzter.v; schlange.length = 0; schlange.push(letzter); return abspielen(); }
       for (const s of neu) { gesehen = s.v; schlange.push(s); } abspielen(); };
     // Eigener Zug: an den Server; die Antwort bringt die neuen Schritte gleich mit
     const sende = (w) => { if (sendet || !aktiv()) return; sendet = true;

@@ -120,6 +120,14 @@ psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../024_rpg_ranked_gegenueber.sql 2>/dev/n
 RANK_24=$(psql -q -At -d "$DB" -c "select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'rpg_%'")
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 024_rpg_ranked_gegenueber_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../024_rpg_ranked_gegenueber_rueckbau.sql
+# Migration 027 (verlassener Kampf gegen den Rechner-Gegner): ersetzt rpg_ranked_nachholen aus 022; der Rückbau stellt sie wieder her
+NH_VOR=$(psql -q -At -d "$DB" -c "select md5(regexp_replace(lower(pg_get_functiondef('public.rpg_ranked_nachholen(uuid)'::regprocedure)), '[[:space:]]+', '', 'g'))")
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../027_rpg_ranked_verlassen.sql
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../027_rpg_ranked_verlassen.sql 2>/dev/null     # zweimal: idempotent
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -o /dev/null -f 027_rpg_ranked_verlassen_test.sql 2>&1 | sed "s/^psql:[^ ]* NOTICE:  //"
+psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../027_rpg_ranked_verlassen_rueckbau.sql
+NH_NACH=$(psql -q -At -d "$DB" -c "select md5(regexp_replace(lower(pg_get_functiondef('public.rpg_ranked_nachholen(uuid)'::regprocedure)), '[[:space:]]+', '', 'g'))")
+if [ "$NH_VOR" = "$NH_NACH" ]; then echo "✓ Nach dem Rückbau von 027 ist rpg_ranked_nachholen wie vorher"; else echo "✗ Der Rückbau von 027 stellt rpg_ranked_nachholen nicht wieder her"; exit 1; fi
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../022_rpg_ranked_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../020_rpg_admin_bereich_rueckbau.sql
 psql -q -v ON_ERROR_STOP=1 -d "$DB" -f ../019_rpg_arena_rechnergegner.sql 2>/dev/null

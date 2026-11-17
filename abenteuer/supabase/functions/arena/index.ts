@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v77, figuren.js v27
+// Stand der Regeln: regeln.js v78, figuren.js v27
 
 /* ===== js/figuren.js ===== */
 /*
@@ -3060,6 +3060,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
   const LOS = ["arena", "koenig", "horde", "duell"]; // wie js/arena.js und rpg_arena_modus (Migration 010)
   const STAERKE = [1, 1]; // Spielstärke des Rechner-Gegners ohne Angabe am Kampf: von … bis (1 = so gut er kann). Sonst gilt die Einstellung der Admins (Migration 020).
   const ZUGZEIT = 60000, ZEITAUS_MAX = 3, LOG_MAX = 140, MONSTER_MAX = 60;
+  const NACHHOL_AB = 8000, NACHHOL_MAX = 60; // Rechner-Gegner: ab 8 Sekunden Verzug wird nachgeholt, höchstens 60 Schritte je Aufruf
 
   function kern(R, KARTEN, botFabrik) {
     const fabrik = botFabrik || root.ABARENABOT, BOT = fabrik ? fabrik(R) : null;
@@ -3143,7 +3144,24 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       if (r.fehler && w.typ !== "ende") r = zug(st, b.seite, { typ: "ende" }, jetzt);
       return r.fehler ? { schritte: [] } : r;
     }
+    /** Zeit vergeht. Gegen einen Menschen wie bisher: ein fälliger Schritt je Aufruf (das Gerät des Gegners hält den Kampf in Gang).
+     *  Gegen den Rechner-Gegner hält niemand den Kampf in Gang, wenn der Spieler weg ist. Deshalb wird hier NACHGEHOLT, was in der
+     *  Zwischenzeit geschehen wäre: abgelaufene Zugzeiten des Spielers (dreimal in Folge = verloren) und die Züge des Rechners –
+     *  jeweils zu dem Zeitpunkt, an dem sie fällig waren. So läuft ein verlassener Kampf weiter wie gegen einen Menschen. */
     function zeit(st, jetzt) {
+      if (!st || st.ende || !st.arena.bot || !BOT) return zeitEin(st, jetzt);
+      const alle = [];
+      for (let n = 0; n < NACHHOL_MAX && !st.ende; n++) {
+        const a = R.aktiv(st), botDran = a && R.teamVon(st, a) === st.arena.bot.seite, faellig = botDran ? st.arena.bot.bis : st.arena.zugBis;
+        if (!faellig || jetzt < faellig) break;
+        const spaet = jetzt - faellig > NACHHOL_AB;            // deutlich überfällig: in der Vergangenheit rechnen und weitermachen
+        const r = zeitEin(st, spaet ? faellig : jetzt); if (!r.schritte.length) break;
+        for (const x of r.schritte) alle.push(x);
+        if (!spaet) break;                                     // im laufenden Spiel: ein Schritt je Aufruf, wie bisher
+      }
+      return { schritte: alle };
+    }
+    function zeitEin(st, jetzt) {
       if (st && !st.ende && st.arena.bot && BOT) { const a = R.aktiv(st);
         if (a && R.teamVon(st, a) === st.arena.bot.seite) return jetzt < st.arena.bot.bis ? { schritte: [] } : botSchritt(st, jetzt); }
       if (!st || st.ende || !st.arena.zugBis || jetzt < st.arena.zugBis) return { schritte: [] };

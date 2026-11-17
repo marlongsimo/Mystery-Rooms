@@ -50,7 +50,7 @@
     }
     /** Zugzeit stellen, sobald ein anderer Held an die Reihe kommt */
     function uhr(st, jetzt) {
-      const a = R.aktiv(st), held = !st.ende && a && !istMonster(st, a) && a.tp > 0, k = held ? a.id + ":" + st.runde : null;
+      const a = R.aktiv(st), held = !st.ende && a && !istMonster(st, a) && R.kannZiehen(st, a), k = held ? a.id + ":" + st.runde : null;
       if (st.arena.zugWer === k) return;
       st.arena.zugWer = k; st.arena.zugBis = k ? jetzt + ZUGZEIT : null;
       const b = st.arena.bot; if (b && held && R.teamVon(st, a) === b.seite) { b.bis = jetzt + denkZeit(); b.lauf = 0; b.n = 0; }
@@ -60,7 +60,7 @@
       const j = R.speichern(st);
       delete j.rs; j.log = (j.log || []).slice(-LOG_MAX);
       j.arena = Object.assign({}, j.arena, { jetzt });
-      if (j.arena.bot) { const a = R.aktiv(st); j.arena.takt = !st.ende && a && a.tp > 0 && R.teamVon(st, a) === j.arena.bot.seite ? j.arena.bot.bis : null; delete j.arena.bot; }
+      if (j.arena.bot) { const a = R.aktiv(st); j.arena.takt = !st.ende && a && R.kannZiehen(st, a) && R.teamVon(st, a) === j.arena.bot.seite ? j.arena.bot.bis : null; delete j.arena.bot; }
       if (j.arena.koenig && !st.ende) j.arena.koenig = { 1: seite === 1 ? j.arena.koenig[1] : null, 2: seite === 2 ? j.arena.koenig[2] : null };
       return j;
     }

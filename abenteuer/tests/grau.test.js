@@ -45,4 +45,42 @@ check(laeufe > 60 && laufFehler === 0, `„Grau: Heranlaufen“: Grau kommt dem 
 check(nurLauf > 0, `Ist kein Gegner für den Biss erreichbar, bleibt das Heranlaufen als Möglichkeit (${nurLauf}× so vorgekommen)`);
 const F = R.FD.FIGUREN.tiergefaehrte;
 check(/schräge Schritte zählen 1,5/.test(F.faehig.find((x) => x.id === "wolf_befehl").text) && /gerade neben/.test(F.faehig.find((x) => x.id === "eingespielt").text), "Die Heldenkarte beschreibt die Regeln so");
+// Faye am Boden: Grau zieht allein – halbe Laufweite, halber Schaden, sonst nichts
+{ console.log("Grau ohne Herrin");
+  let zuege = 0, andereAktion = 0, bewegt = 0, weitMax = 0, bisseA = 0, schadenMax = 0, schadenVollMax = 0, botZiehtGrau = 0, ohneWolfUebersprungen = true, steht = 0, endet = 0;
+  for (let n = 0; n < 12; n++) { const stufe = [1, 4, 10][n % 3];
+    const m = { staerke: 1, seed: 900 + n * 13, modus: "duell", karte: ["garten", "gruft", "pilze", "halle"][n % 4], begegnung: "kobolde", kampfstufe: stufe, host_name: "A", guest_name: "B", bot: true,
+      host_team: ["tiergefaehrte", "schildwaechter", "wanderheiler"].map((held) => ({ held, stufe })), guest_team: ["tiergefaehrte", "duellant", "lichtbringer"].map((held) => ({ held, stufe })) };
+    let jetzt = 1e6; const st = K.start(m, 0, 0, jetzt).st; let merk = { lauf: 0 }, wer = null, gefaellt = false, wolfWeg = n % 4 === 3;
+    for (let i = 0; i < 4000 && !st.ende; i++) {
+      const a = R.aktiv(st), tm = R.teamVon(st, a); if (!tm) break; const key = a.id + ":" + st.runde; if (wer !== key) { wer = key; merk = { lauf: 0 }; }
+      if (st.runde >= 2) { const neu = !gefaellt; gefaellt = true; // beide Fayes bleiben am Boden (der Rechner richtet sie sonst gleich wieder auf)
+        for (const f of st.figuren) if ((f.fid || f.fidA) === "tiergefaehrte" && f.tp > 0) f.tp = 0; if (wolfWeg) for (const w of st.figuren) if (/wolf/.test(w.art || "")) w.tp = 0;
+        if (a.tp <= 0 && (neu || !R.kannZiehen(st, a))) { K.zug(st, tm, { typ: "ende" }, ++jetzt); if (R.aktiv(st) === a) R.zugEnde(st); continue; } }
+      if (a.fid === "tiergefaehrte" && a.tp <= 0) {
+        if (wolfWeg && st.runde >= 2) ohneWolfUebersprungen = false; // in Runde 1 steht Grau noch
+        zuege++; const w0 = R.wolfVon(st, a), vx = w0.x, vy = w0.y;
+        if (R.kannZiehen(st, a) && st.zug.allein && !st.zug.aktion && st.zug.bewegung === 0) steht++;
+        for (const x of ["kurzbogen", "kurzschwert", "spurt", "jaegermal", "trank"]) if (R.verfuegbar(st, x)) andereAktion++;
+        if (R.bewegungsfelder(st, a).size > 1 || !K.zug(st, tm, { typ: "bewegen", x: a.x + 1, y: a.y }, ++jetzt).fehler) bewegt++;
+        for (const k2 of R.wolfFelder(st, a).keys()) { const [x, y] = k2.split(",").map(Number); weitMax = Math.max(weitMax, weite({ x: vx, y: vy }, { x, y })); }
+        const w = tm === 2 ? BOT.entscheide(st, merk) : (() => { for (const id of ["wolf_befehl", "wolf_lauf"]) { const z = R.verfuegbar(st, id) && R.ziele(st, id)[0]; if (z) return { typ: "aktion", aktion: id, ziel: z.id }; } return { typ: "ende" }; })();
+        if (tm === 2 && w.typ === "aktion") botZiehtGrau++;
+        const l0 = st.log.length; const r = K.zug(st, tm, w, ++jetzt);
+        for (const e of st.log.slice(l0)) { const t = e.t || "", mm = /Grau.*Biss.*Treffer, (\d+) Schaden/.exec(t); if (mm) { bisseA++; schadenMax = Math.max(schadenMax, Number(mm[1])); } }
+        if (!r.fehler && w.typ !== "ende" && R.aktiv(st) === a) { K.zug(st, tm, { typ: "ende" }, ++jetzt); endet++; }
+        continue;
+      }
+      if (a.fid === "tiergefaehrte") { /* steht noch */ }
+      const w = BOT.entscheide(st, merk); if (w.typ === "bewegen") merk.lauf++; const l0 = st.log.length; const r = K.zug(st, tm, w, ++jetzt); if (r.fehler) K.zug(st, tm, { typ: "ende" }, ++jetzt);
+      for (const e of st.log.slice(l0)) { const mm = /Grau.*Biss.*Treffer, (\d+) Schaden/.exec(e.t || ""); if (mm) schadenVollMax = Math.max(schadenVollMax, Number(mm[1])); }
+    }
+  }
+  check(zuege > 30 && steht === zuege, `Liegt Faye am Boden und steht Grau, bekommt sie weiter ihren Zug – ohne Aktion, ohne Bewegung, nur mit der Bonusaktion (${zuege} Züge)`);
+  check(andereAktion === 0 && bewegt === 0, "Faye selbst kann dabei nichts tun: kein Angriff, kein Trank, kein Schritt");
+  check(weitMax > 2 && weitMax <= 4, `Grau läuft ohne Herrin höchstens 4 Felder (weitestes Feld: ${weitMax})`);
+  check(bisseA > 5 && schadenMax <= 7, `Graus Biss macht ohne Herrin halben Schaden (${bisseA} Treffer, höchster Schaden ${schadenMax})`);
+  check(botZiehtGrau > 3, `Auch der Rechner-Gegner führt Grau allein weiter (${botZiehtGrau}×)`);
+  check(ohneWolfUebersprungen, "Liegt auch Grau am Boden, wird Fayes Zug wie bisher übersprungen");
+}
 console.log(ok ? "\nGRAU IN ORDNUNG" : "\nFEHLER"); process.exit(ok ? 0 : 1);

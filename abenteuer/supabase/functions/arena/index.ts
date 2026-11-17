@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v83, figuren.js v30
+// Stand der Regeln: regeln.js v84, figuren.js v31
 
 /* ===== js/figuren.js ===== */
 /*
@@ -268,6 +268,7 @@
         { id: "wolf_befehl", name: "Befehl an Grau", typ: "bonus", ab: 1, art: "wolf", reichweite: 20, text: "Grau läuft bis zu 8 Felder zum Ziel (schräge Schritte zählen 1,5) und beißt. Er muss gerade neben dem Ziel stehen können – wählbar sind nur Gegner, an die er herankommt." },
         { id: "wolf_lauf", name: "Grau: Heranlaufen", typ: "bonus", ab: 1, art: "wolflauf", reichweite: 20, text: "Grau läuft bis zu 8 Felder auf einen Gegner zu, ohne zu beißen – für Gegner, die er in diesem Zug nicht erreicht, oder um ihn in Stellung zu bringen." },
         { id: "wolf_umreissen", name: "Grau: Umreißen", typ: "bonus", ab: 1, art: "wolf", umreissen: true, reichweite: 20, pro: { rast: 2 }, text: "Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel." },
+        { id: "treu", name: "Treuer Gefährte", typ: "passiv", ab: 1, text: "Liegst du am Boden, kämpft Grau allein weiter: In deinem Zug kannst du ihm weiter Befehle geben – er läuft dann aber nur halb so weit (4 Felder) und macht halben Schaden." },
         { id: "eingespielt", name: "Eingespielt", typ: "passiv", ab: 2, text: "Grau beißt am Ende deines Zugs auch ohne Befehl, wenn er gerade neben einem Gegner steht, den du getroffen hast." },
         { id: "ein_rudel", name: "Ein Rudel", typ: "passiv", ab: 3, text: "Jägermal gilt auch für Grau, Grau +1 zum Treffen." },
       ],
@@ -1207,6 +1208,7 @@
       if (a.z.entwaffnet) s = Math.floor(s / 2);
       if (z.z.raserei && !spec.magisch) s = Math.floor(s / 2);
       if (z.seite === "gegner" && GEGNER[z.art].anfaellig === "wucht" && spec.wucht) s = Math.floor(s * 1.5);
+      if (spec.halbS) s = Math.max(1, Math.floor(s / 2)); // Grau ohne Herrin
       if (spec.drittel) s = Math.max(1, Math.floor(s / 3)); // Gegenstoß aus der Parade: nur ein Drittel
       erg.schaden = s;
       st.log.push({ t: `${a.name}: ${spec.name}${st.arena ? " auf " + z.name : ""} – W20 ${w}${vtext} + ${spec.bonus} = ${total} gegen RK ${rk}: ${krit ? "kritischer Treffer" : "Treffer"}, ${s} Schaden.${spec.zusatzText || ""}`, art: a.seite === "gegner" ? "gegner" : "wurf", wurf: w });
@@ -1378,8 +1380,8 @@
   function grund(st, aktionId) {
     const f = aktiv(st), h = findeAktion(f, aktionId);
     if (!h || st.ende || f.seite !== "spieler") return "Nicht am Zug.";
-    if (f.tp <= 0) return "Am Boden.";
     const a = h.a;
+    if (f.tp <= 0 && !(st.zug && st.zug.allein && st.zug.figur === f.id && (a.art === "wolf" || a.art === "wolflauf"))) return "Am Boden.";
     if (h.typ === "aktion" && !st.zug.aktion) return "Aktion schon verbraucht.";
     if (h.typ === "bonus" && !st.zug.bonus) return f.z.zeitriss ? "Keine Bonusaktion (Zeitriss)." : "Bonusaktion schon verbraucht.";
     if (rest(f, a) <= 0 && !(a.art === "mal" && a.mal === "jaeger" && f.malFrei)) return "Schon aufgebraucht.";
@@ -1530,7 +1532,7 @@
       case "schild": ziel.z.schild = true; st.log.push({ t: `${f.name}: Schild des Glaubens auf ${ziel.name} (+2 RK).`, art: "gut" }); break;
       case "tausch": { const x = f.x, y = f.y; f.x = ziel.x; f.y = ziel.y; ziel.x = x; ziel.y = y; st.log.push({ t: `${f.name} tauscht den Platz mit ${ziel.name}.` }); break; }
       case "wolflauf": { const w = wolfVon(st, f), pl = w && wolfNaeher(st, f, w, ziel); if (pl) { w.x = pl.x; w.y = pl.y; st.log.push({ t: `${w.name} läuft auf ${ziel.name} zu.` }); } break; }
-      case "wolf": wolfBeisst(st, f, ziel, Boolean(a.umreissen)); if (hs(f) >= 10 && lebt(ziel) && !st.ende) wolfBeisst(st, f, ziel, false); break; // Meisterschaft: Grau beißt zweimal
+      case "wolf": wolfBeisst(st, f, ziel, Boolean(a.umreissen)); if (hs(f) >= 10 && f.tp > 0 && lebt(ziel) && !st.ende) wolfBeisst(st, f, ziel, false); break; // Meisterschaft: Grau beißt zweimal
       case "verstecken": f.z.versteckt = true; st.log.push({ t: `${f.name} verschwindet im Schatten.` }); break;
       case "raserei": f.z.raserei = true; st.log.push({ t: `${f.name} gerät in Raserei!`, art: "gut" }); break;
       case "finte": f.z.finte = true; st.log.push({ t: `${f.name} täuscht einen Angriff an.` }); break;
@@ -1613,7 +1615,7 @@
     return best;
   }
   /** Felder, die Grau in diesem Zug erreicht (höchstens 8, schräge Schritte 1,5) – auch für die Anzeige */
-  function wolfFelder(st, f, w) { w = w || wolfVon(st, f); const d = f && FD.FIGUREN[f.fid || f.fidA]; return w && lebt(w) && d && d.wolf ? erreichbar(st, w, d.wolf.bewegung, 1.5) : new Map(); }
+  function wolfFelder(st, f, w) { w = w || wolfVon(st, f); const d = f && FD.FIGUREN[f.fid || f.fidA]; return w && lebt(w) && d && d.wolf ? erreichbar(st, w, f.tp <= 0 ? Math.floor(d.wolf.bewegung / 2) : d.wolf.bewegung, 1.5) : new Map(); }
   function wolfBeisst(st, f, z, umreissen) {
     const w = wolfVon(st, f); if (!w || !lebt(w) || !lebt(z)) return;
     const platz = wolfPlatz(st, f, w, z);
@@ -1623,7 +1625,7 @@
     if (FD.altStufe(f.stufe) >= 3 && z.z.mal_jaeger === f.id) extra.push("1W6");
     if (st.zug) st.zug.wolfBiss = true;
     angriffswurf(st, w, z, {
-      name: umreissen ? "Biss (Umreißen)" : "Biss", bonus: wd.angriff[FD.altStufe(f.stufe) - 1], schaden: wd.schaden, fest: wd.plus, extra, nah: true,
+      name: umreissen ? "Biss (Umreißen)" : "Biss", bonus: wd.angriff[FD.altStufe(f.stufe) - 1], schaden: wd.schaden, fest: wd.plus, extra, nah: true, halbS: f.tp <= 0, // ohne Herrin: halber Schaden
       nachTreffer: () => { if (umreissen && lebt(z)) { const rw = rettung(st, z, "STR", 12); if (!rw.erfolg) { z.z.liegend = true; st.log.push({ t: `${z.name} wird umgerissen.` }); } } },
     });
   }
@@ -1674,9 +1676,10 @@
               st.log.push({ t: `${f.name}: Todeswurf ${w} – ${w >= 10 ? "Erfolg" : "Fehlschlag"} (${f.todes.e} ✓ / ${f.todes.f} ✗).`, art: w >= 10 ? "gut" : "schlecht", wurf: w });
               if (f.todes.f >= 3) { stirbt(st, f); pruefeEnde(st); }
               else if (f.todes.e >= 3) { f.stabil = true; st.log.push({ t: `${f.name} ist stabil, bleibt aber bewusstlos.` }); }
-              weiter(st, true); continue;
+              if (st.ende) return;
+              if (f.tot || !grauAllein(st, f)) { weiter(st, true); continue; }
             }
-          } else { weiter(st, true); continue; }
+          } else if (!grauAllein(st, f)) { weiter(st, true); continue; }
         }
       }
       break;
@@ -1697,6 +1700,8 @@
     const basis = bew;
     if (f.z.verlangsamt || f.z.zeitriss) bew = Math.floor(bew / 2);
     st.zug = { figur: f.id, bewegung: bew, basis, aktion: true, bonus: !f.z.zeitriss, hinterhalt: false, tatendrang: false, leicht: 0, schritt: 0, dolch: false, getroffen: [], wolfBiss: false };
+    // Faye liegt am Boden, Grau steht noch: Er lässt sich allein führen – ohne Herrin aber nur mit halber Laufweite und halbem Schaden
+    if (f.tp <= 0) { Object.assign(st.zug, { bewegung: 0, basis: 0, aktion: false, bonus: true, allein: true }); const w = wolfVon(st, f); st.log.push({ t: `${w.name} kämpft ohne ${f.name} weiter (halbe Laufweite, halber Schaden).` }); return; }
     if (f.z.festgehalten) {
       const fg = f.z.festgehalten;
       if (fg.flucht && !fg.netz) { const rw = rettung(st, f, "STR", fg.flucht); if (rw.erfolg) { delete f.z.festgehalten; st.log.push({ t: `${f.name} reißt sich los.` }); } }
@@ -1714,6 +1719,10 @@
     if (st.ende) return;
     if (!lebt(f)) weiter(st);
   }
+  /** Liegt die Herrin am Boden und steht Grau noch, gehört ihr Zug ihm allein */
+  const grauAllein = (st, f) => Boolean(f && istFig(f, "tiergefaehrte") && f.tp <= 0 && !f.tot && (() => { const w = wolfVon(st, f); return w && lebt(w); })());
+  /** Darf diese Figur gerade etwas tun? Stehende Helden – und Faye am Boden, solange Grau für sie zieht */
+  const kannZiehen = (st, f) => Boolean(f && !f.tot && (f.tp > 0 || (st.zug && st.zug.allein && st.zug.figur === f.id)));
   function tick(f) {
     const z = f.z;
     for (const k of ["verlangsamt", "geblendet", "vergiftet", "entwaffnet", "zeitriss", "stich"]) if (z[k]) { z[k]--; if (z[k] <= 0) delete z[k]; }
@@ -1746,7 +1755,7 @@
   const mitZugende = (fn) => function (st) {
     const wer = aktiv(st), erg = fn.apply(this, arguments);
     if (!st.ende) platzKlaeren(st);
-    if (!st.ende && wer && wer.seite === "spieler" && wer.art !== "begleiter" && aktiv(st) === wer && wer.tp <= 0) {
+    if (!st.ende && wer && wer.seite === "spieler" && wer.art !== "begleiter" && aktiv(st) === wer && wer.tp <= 0 && !(st.zug && st.zug.allein && st.zug.figur === wer.id)) {
       st.log.push({ t: `${wer.name} geht zu Boden. Der Zug endet.`, art: "schlecht" }); zugEnde(st);
     }
     return erg;
@@ -2885,7 +2894,7 @@
     for (let r = 0; r < 3; r++) for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i) + r * 131; h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c ^ (h1 >>> 15), 1597334677); }
     return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36); }
 
-  const API = { wolfFelder, arenaAbdruck, pruefwert, begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
+  const API = { kannZiehen, wolfFelder, arenaAbdruck, pruefwert, begleiterVon, begleiterPhase, GEGNER_TP, TIERE, GEGENSTAENDE, hatDing, bewegungVon, chance, vorschlag, BEGEGNUNGEN, SKALA, SKALA_HARDCORE, SKALA10, gegnerFuer, nachKampf, kurzeRast, neuerKampf, rng, roll, parse, mittel, mod, SG, DINGE, TRANK, STABIL, SPURT, GEGNER, KARTE_GARTEN, FD, zufall, speichern, laden, ansicht, trankZahl,
     neuesSpiel, aktiv, fig, wolfVon, lebt, erreichbar, bewegungsfelder, sicht, deckung, abstand, weite, bewegen: mitZugende(bewegen), ziele, grund, verfuegbar, handeln: mitZugende(handeln), zugEnde, schadenTest: schaden, heilenTest: heilen, neueArena, teamVon, arenaSicht, KARTE_GARTEN, gegnerZug, autoZug,
     zielNeben, gefahrFelder, ZIEL_A, schaden, findeAktion, grenze, aktionenVon, faehigkeiten, flaecheZiele, rest, rkEff, vorteil, zustaende, key, spielerFiguren, gegnerFiguren };
   if (typeof module !== "undefined" && module.exports) module.exports = API;
@@ -3029,7 +3038,12 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
      */
     function entscheide(st, merk) {
       const f = R.aktiv(st), tm = f ? R.teamVon(st, f) : 0;
-      if (!f || !tm || st.ende || f.tp <= 0 || f.seite !== "spieler") return { typ: "ende" };
+      if (!f || !tm || st.ende || f.seite !== "spieler") return { typ: "ende" };
+      if (f.tp <= 0) { // Faye am Boden: Grau zieht allein – beißen, wen er erreicht, sonst heranlaufen
+        if (!R.kannZiehen(st, f)) return { typ: "ende" };
+        for (const id of ["wolf_befehl", "wolf_lauf"]) if (R.verfuegbar(st, id)) { const z = R.ziele(st, id).sort((a, b) => a.tp - b.tp)[0]; if (z) return { typ: "aktion", aktion: id, ziel: z.id }; }
+        return { typ: "ende" };
+      }
       merk = merk || {};
       const s = merk.staerke == null ? 1 : Math.max(0, Math.min(1, merk.staerke)), traege = Math.random() < (1 - s) * 0.6; // träge: kein Stellungsspiel in diesem Schritt
       // Verschenkter Zug: Je schwächer, desto öfter bleibt die Aktion eines Helden ungenutzt (er läuft nur). Einmal je Zug ausgelost.
@@ -3121,7 +3135,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
     }
     /** Zugzeit stellen, sobald ein anderer Held an die Reihe kommt */
     function uhr(st, jetzt) {
-      const a = R.aktiv(st), held = !st.ende && a && !istMonster(st, a) && a.tp > 0, k = held ? a.id + ":" + st.runde : null;
+      const a = R.aktiv(st), held = !st.ende && a && !istMonster(st, a) && R.kannZiehen(st, a), k = held ? a.id + ":" + st.runde : null;
       if (st.arena.zugWer === k) return;
       st.arena.zugWer = k; st.arena.zugBis = k ? jetzt + ZUGZEIT : null;
       const b = st.arena.bot; if (b && held && R.teamVon(st, a) === b.seite) { b.bis = jetzt + denkZeit(); b.lauf = 0; b.n = 0; }
@@ -3131,7 +3145,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
       const j = R.speichern(st);
       delete j.rs; j.log = (j.log || []).slice(-LOG_MAX);
       j.arena = Object.assign({}, j.arena, { jetzt });
-      if (j.arena.bot) { const a = R.aktiv(st); j.arena.takt = !st.ende && a && a.tp > 0 && R.teamVon(st, a) === j.arena.bot.seite ? j.arena.bot.bis : null; delete j.arena.bot; }
+      if (j.arena.bot) { const a = R.aktiv(st); j.arena.takt = !st.ende && a && R.kannZiehen(st, a) && R.teamVon(st, a) === j.arena.bot.seite ? j.arena.bot.bis : null; delete j.arena.bot; }
       if (j.arena.koenig && !st.ende) j.arena.koenig = { 1: seite === 1 ? j.arena.koenig[1] : null, 2: seite === 2 ? j.arena.koenig[2] : null };
       return j;
     }
@@ -3225,7 +3239,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
 
 
 /* ===== Stand der Regeln (für den Abgleich mit dem Spiel) ===== */
-const ARENA_REGELN_V = "83.30";
+const ARENA_REGELN_V = "84.31";
 
 /* ===== server/arena-funktion.js ===== */
 /*

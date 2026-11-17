@@ -130,7 +130,12 @@
      */
     function entscheide(st, merk) {
       const f = R.aktiv(st), tm = f ? R.teamVon(st, f) : 0;
-      if (!f || !tm || st.ende || f.tp <= 0 || f.seite !== "spieler") return { typ: "ende" };
+      if (!f || !tm || st.ende || f.seite !== "spieler") return { typ: "ende" };
+      if (f.tp <= 0) { // Faye am Boden: Grau zieht allein – beißen, wen er erreicht, sonst heranlaufen
+        if (!R.kannZiehen(st, f)) return { typ: "ende" };
+        for (const id of ["wolf_befehl", "wolf_lauf"]) if (R.verfuegbar(st, id)) { const z = R.ziele(st, id).sort((a, b) => a.tp - b.tp)[0]; if (z) return { typ: "aktion", aktion: id, ziel: z.id }; }
+        return { typ: "ende" };
+      }
       merk = merk || {};
       const s = merk.staerke == null ? 1 : Math.max(0, Math.min(1, merk.staerke)), traege = Math.random() < (1 - s) * 0.6; // träge: kein Stellungsspiel in diesem Schritt
       // Verschenkter Zug: Je schwächer, desto öfter bleibt die Aktion eines Helden ungenutzt (er läuft nur). Einmal je Zug ausgelost.

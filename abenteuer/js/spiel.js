@@ -152,7 +152,7 @@
   let uhrTakt = null, uhrVersatz = 0;
   function zugUhrStellen() {
     if (!st || !st.arena) return;
-    const a = R.aktiv(st), held = !st.ende && a && R.teamVon(st, a) && a.tp > 0, k = held ? a.id + ":" + st.runde : null;
+    const a = R.aktiv(st), held = !st.ende && a && R.teamVon(st, a) && R.kannZiehen(st, a), k = held ? a.id + ":" + st.runde : null;
     if (st.arena.zugWer === k) return;
     st.arena.zugWer = k; st.arena.zugBis = k ? Date.now() + ZUGZEIT : null;
   }
@@ -629,7 +629,7 @@
     let chancen = "";
     const svg = $("#karte"), k = st.karte, akt = R.aktiv(st);
     svg.setAttribute("viewBox", `0 0 ${k.b * Z} ${k.h * Z}`);
-    const spielerDran = akt.seite === "spieler" && !st.ende && akt.tp > 0;
+    const spielerDran = akt.seite === "spieler" && !st.ende && R.kannZiehen(st, akt);
     const reach = spielerDran && !wahl ? R.bewegungsfelder(st, akt) : new Map();
     const zs = spielerDran && wahl ? R.ziele(st, wahl) : [];
     let o = "";
@@ -792,7 +792,7 @@
       const gewaehlt = wahl && R.findeAktion(akt, wahl);
       $("#hinweis").innerHTML = tipp && !wahl ? `<b>${esc(tipp.text)}</b>` : gewaehlt && SELBST.has(gewaehlt.a.art)
         // Fähigkeit ohne Zielwahl (Spurt, Bewahren, Trank …): erst erklären, dann bestätigen
-        ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")}<span class="hinweis-knoepfe"><button class="btn klein" id="bestaetigen">Bestätigen</button><button class="btn ghost klein" id="wahl-ab">Abbrechen</button></span>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>${zs.length ? "Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt." : "<b>Kein Ziel in Reichweite.</b> Die eingefärbten Felder zeigen, wie weit es reicht – geh näher heran."} Noch einmal auf die Aktion tippen bricht ab.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
+        ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")}<span class="hinweis-knoepfe"><button class="btn klein" id="bestaetigen">Bestätigen</button><button class="btn ghost klein" id="wahl-ab">Abbrechen</button></span>` : gewaehlt ? `<b>${esc(gewaehlt.a.name)}:</b> ${esc(gewaehlt.a.text || "")} <br>${zs.length ? "Tippe ein leuchtendes Ziel an. Die Zahl darüber ist die Chance, dass es gelingt." : "<b>Kein Ziel in Reichweite.</b> Die eingefärbten Felder zeigen, wie weit es reicht – geh näher heran."} Noch einmal auf die Aktion tippen bricht ab.` : st.zug.allein ? `<b>${esc(akt.name)} liegt am Boden.</b> Grau kämpft allein weiter – mit halber Laufweite und halbem Schaden. Gib ihm einen Befehl oder beende den Zug.` : st.zug.bewegung || st.zug.schritt ? "Tippe ein blaues Feld an, um dich zu bewegen, oder wähle eine Aktion. Unsicher? Tippe auf 💡 Tipp." : "Wähle eine Aktion oder beende den Zug.";
     }
     $("#log").innerHTML = st.log.slice().reverse().map((l) => `<li class="${l.art || ""}${l.tm != null && ARENA ? (l.tm === ARENA.seite ? " tm-eigen" : l.tm ? " tm-gegner" : " tm-monster") : ""}">${logZeile(l)}</li>`).join("");
     zeichneGegnerInfo(); zeichneLeiste(akt, spielerDran);

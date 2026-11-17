@@ -80,10 +80,11 @@
     { art: "klick", ziel: nav("arena"), titel: "Die Arena", text: "Jetzt zur Arena. Tippe darauf." },
     { art: "info", ziel: "[data-arena] .hub-gruss", titel: "Spieler gegen Spieler", text: "In der Arena trittst du mit drei deiner Helden gegen einen anderen Spieler an. Niemand stirbt hier: Ihr kämpft gegen Spiegelbilder." },
     { art: "klick", ziel: "#arena-info", opt: true, titel: "Regeln und Modi", text: "Hinter dem „i“ stehen alle Regeln. Tippe darauf." },
-    { art: "info", ziel: "#arena-info-text", opt: true, titel: "Vier Modi", text: "Duell, Arena, Königsmord und Die Horde. Jeder Held hat eine Minute Zugzeit." },
+    { art: "info", ziel: "#arena-info-fenster", opt: true, titel: "Vier Modi", text: "Duell, Arena, Königsmord und Die Horde. Jeder Held hat eine Minute Zugzeit." },
+    { art: "klick", ziel: "#fenster-zu", opt: true, titel: "Weiter", text: "Schließe die Regeln wieder." },
     { art: "info", ziel: "[data-arena] .arena-meinteam, #arena-erstellen", opt: true, titel: "Mein Team", text: "Lege einmal drei Helden fest. Mit ihnen trittst du in jedem Kampf an, bis du das Team änderst." },
     { art: "info", ziel: "[data-arena] .arena-art, [data-arena] .arena-liste, [data-arena] .hub-zwischen", opt: true, titel: "Drei Spielarten", text: "Normal sucht ein Duell, Arcade lost einen anderen Modus aus. Im privaten Kampf forderst du einen Freund heraus." },
-    { art: "info", ziel: "[data-arena] .arena-waehrung", opt: true, titel: "Belohnungen", text: "Ein Sieg bringt Seelensplitter und Erfahrung für deine Helden, mit etwas Glück sogar einen neuen Helden. Erfahrung gibt es bis zum fünften Sieg am Tag." },
+    { art: "info", ziel: "[data-arena] .arena-waehrung", opt: true, titel: "Belohnungen", text: "Ein Sieg bringt Seelensplitter und Erfahrung für deine Helden, mit etwas Glück sogar einen neuen Helden. Erfahrung gibt es auch bei einer Niederlage." },
     // --- Händler ---
     { art: "klick", ziel: nav("shop"), titel: "Der Händler", text: "Weiter zum Händler. Tippe darauf." },
     { art: "info", ziel: ".shop-held, .shop-bald .hub-gruss, .shop .hub-gruss", titel: "Held der Woche", text: "Jede Woche bietet der Händler einen Helden, der dir noch fehlt, zum halben Preis an – dazu Heldentoken, Ausstattung und Erfahrungspakete." },
@@ -135,6 +136,8 @@
     const bh = blase.offsetHeight, bw = blase.offsetWidth, mitteY = (y + u) / 2;
     if (W < 700) { // Handy: unten oder oben angeheftet – dort, wo die Stelle frei bleibt (sonst dort, wo mehr Platz ist)
       const untenFrei = u <= H - bh - 20, obenFrei = y >= 54 + bh + 8;
+      // Weder oben noch unten Platz: die Stelle einmal nach oben schieben, dann passt die Sprechblase darunter (wenn die Stelle nicht zu hoch ist)
+      if (!untenFrei && !obenFrei && L.geschoben !== L.nr && u - y < H - bh - 90) { L.geschoben = L.nr; window.scrollBy(0, y - 62); requestAnimationFrame(legen); return; }
       blase.classList.add(untenFrei ? "unten" : obenFrei ? "oben" : H - u >= y ? "unten" : "oben"); return; }
     const lage = [[(x + r) / 2 - bw / 2, u + 14], [(x + r) / 2 - bw / 2, y - bh - 14], [r + 14, (y + u) / 2 - bh / 2], [x - bw - 14, (y + u) / 2 - bh / 2]]
       .map(([lx, ty]) => [Math.max(12, Math.min(W - bw - 12, lx)), Math.max(56, Math.min(H - bh - 10, ty))])

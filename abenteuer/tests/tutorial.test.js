@@ -11,6 +11,9 @@ let ok = true; const check = (c, m) => { console.log((c ? "  ✓ " : "  ✗ ") +
 async function seite(b, w, h, zustand) {
   const p = await (await b.newContext({ viewport: { width: w, height: h } })).newPage(); const fehler = []; p.on("pageerror", (e) => fehler.push(e.message)); p.on("dialog", (d) => d.accept());
   const json = (r, body) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
+  // alles, was hier nicht eigens nachgebildet ist, gibt es in dieser Test-Datenbank nicht (statt echter, langsamer Netzaufrufe)
+  await p.route(/\/rest\/v1\/rpc\/rpg_[a-z_]+(\?|$)/, (r) => r.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ code: "PGRST202", message: "Could not find the function" }) }));
+  await p.route(/\/rest\/v1\/rpc\/rpg_arena_sperre(\?|$)/, (r) => json(r, { gesperrt: false, sekunden: 0, verstoesse: 0, verstoesse_max: 3 }));
   await p.route(/\/rest\/v1\/rpc\/rpg_my_profile(\?|$)/, (r) => json(r, { konto: true, handle: "Neuling", avatar_key: null, created_at: new Date().toISOString() }));
   await p.route(/\/rest\/v1\/rpc\/rpg_(my_heroes|campaign_heroes)(\?|$)/, (r) => json(r, { konto: true, helden: ["lichtbringer", "trickser", "schildwaechter"], start_offen: false, angebote: [], enden: [], alle_enden: {}, titel: [] }));
   await p.route(/\/rest\/v1\/rpc\/rpg_hero_levels(\?|$)/, (r) => json(r, { konto: true, xp: { lichtbringer: 120 } }));

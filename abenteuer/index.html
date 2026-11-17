@@ -3,26 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>
+    /* Umzug: Mythara liegt jetzt unter mythara-dungeon.de. Wer das Spiel noch über Case Unlocked öffnet, wird dorthin geleitet –
+       aber nur, wenn die neue Adresse sicher (https) antwortet. Sonst bleibt alles, wie es ist. Unter der neuen Adresse tut das Skript nichts. */
+    (function () {
+      if (!/(^|\.)case-unlocked\.de$/.test(location.hostname)) return;
+      var neu = "https://mythara-dungeon.de/", ziel = neu + (location.pathname.split("/").pop() || "index.html") + location.search + location.hash;
+      fetch(neu + "verbindung.js", { mode: "no-cors", cache: "no-store" }).then(function () { location.replace(ziel); }).catch(function () { /* neue Adresse nicht erreichbar: hier weiterspielen */ });
+    })();
+  </script>
   <title>Mythara spielen – Das Strategie-Rollenspiel für den Spieltisch | Case Unlocked</title>
   <meta name="description" content="Mythara direkt im Browser spielen: Fantasy-Rollenspiel für den Spieleabend, ein Tablet als Spieltisch, die Handys als Charakterbögen. Open Beta, kostenlos.">
-  <link rel="canonical" href="https://case-unlocked.de/abenteuer/index.html">
+  <link rel="canonical" href="https://mythara-dungeon.de/">
   <meta property="og:title" content="Mythara – Rollenspiel-Abend ohne Spielleiter">
   <meta property="og:description" content="Ein Tablet in der Mitte, eure Handys als Charakterbögen. Open Beta – kostenlos im Browser.">
-  <meta property="og:image" content="https://case-unlocked.de/abenteuer/img/vorstellung/teilen.jpg">
+  <meta property="og:image" content="https://mythara-dungeon.de/img/vorstellung/teilen.jpg">
   <meta name="theme-color" content="#14110d">
-  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
+  <link rel="icon" href="img/app/mythara-64.png" type="image/png">
+  <link rel="apple-touch-icon" href="img/app/mythara-180.png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mythara">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/abenteuer.css?v=121">
+  <link rel="stylesheet" href="css/abenteuer.css?v=122">
   <link rel="stylesheet" href="css/sammlung.css?v=5">
 </head>
 <body>
   <header class="top">
-    <a class="back" href="https://case-unlocked.de/">← Case Unlocked</a>
     <button class="brand" id="brand-heim" title="Zur Startseite">MYTHARA</button>
   </header>
   <main id="app">

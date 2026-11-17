@@ -2430,3 +2430,7 @@ button.xp-paket { cursor: pointer; } .xp-paket.an { border-color: #9fd9ff; box-s
 /* Rechtliches (Startseite und Einstellungen) */
 .my-recht { margin: 14px 0 0; text-align: center; font: 400 13px/1.5 var(--schrift-ui); color: #9c927f; }
 .my-recht a { color: #c9b98f; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Auf der Startseite und im Dorf gibt es keine Kopfzeile (dort führt sie nirgends hin); im Abenteuer bleibt MYTHARA als Weg nach Hause */
+body:has(#mythara:not([hidden])) header.top, body:has(#hub:not([hidden])) header.top { display: none; }
+header.top { justify-content: flex-end; }

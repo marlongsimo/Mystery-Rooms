@@ -323,7 +323,9 @@
           return `<button class="arena-held ${an ? "an" : ""}" data-arena-held="${f}" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(f)}" alt="" loading="lazy"><b>${esc(d.name)}</b><small>${esc(F.KLASSEN[d.klasse].name)}</small><em>Stufe ${stufe(f)}</em></button>`; }).join("")}</div>
         <div class="knoepfe"><button class="btn gross" id="arena-wahl-ok" ${voll && passt ? "" : "disabled"}>${esc(o.knopf)}</button><button class="btn ghost" id="arena-wahl-zurueck">Zurück</button></div>
         ${voll && !passt ? `<p class="note">Dein Team liegt mehr als eine Stufe vom Gegner entfernt. Tausche einen Helden.</p>` : ""}`);
-      document.querySelectorAll("[data-arena-held]").forEach((b) => { b.onclick = () => { const f = b.dataset.arenaHeld; if (Z.wahl.includes(f)) Z.wahl = Z.wahl.filter((x) => x !== f); else if (Z.wahl.length < 3) Z.wahl.push(f); zeichne(); }; });
+      document.querySelectorAll("[data-arena-held]").forEach((b) => { b.onclick = () => { const f = b.dataset.arenaHeld; if (Z.wahl.includes(f)) Z.wahl = Z.wahl.filter((x) => x !== f); else if (Z.wahl.length < 3) Z.wahl.push(f);
+        // neu zeichnen, ohne dass die Seite nach oben springt
+        const y = window.scrollY, x = window.scrollX; zeichne(); window.scrollTo(x, y); }; });
       $("#arena-wahl-zurueck").onclick = zeigen;
       $("#arena-wahl-ok").onclick = async () => { $("#arena-wahl-ok").disabled = true; try { await o.fertig(Z.wahl.slice()); } catch (e) { Z.fehler = e.message; zeichne(); } };
     };

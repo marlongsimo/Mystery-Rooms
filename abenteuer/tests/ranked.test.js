@@ -74,7 +74,13 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   check(k.tabs === "Ranked* | Fun | Rangliste" && !k.teamKarte && /Mein Team/.test(k.teamKnopf) && /Lege zuerst dein Team/.test(k.ohne), "Aufbau: drei Reiter (Ranked · Fun · Rangliste); das Team steckt hinter dem Knopf „Mein Team“ oben rechts – ohne Team ein Hinweis mit Knopf");
   check(/Season 0 · noch 41 Tage/.test(k.text) && /Bronze II/.test(k.text) && /5 \/ 100 bis Bronze I/.test(k.text) && k.balken === "5%" && /Punkte\s*105/.test(k.text) && /5 : 2/.test(k.text) && /#3/.test(k.text) && k.tier === "bronze", "Reiter Ranked: Saison mit Restzeit, Rang, Fortschritt zur nächsten Stufe, Punkte, Bilanz, Platz");
   check(k.knopf, "Ohne Team ist „Ranked spielen“ gesperrt");
-  await p.click("[data-team-auf]"); await p.waitForSelector("[data-arena-held]"); for (const f of ["schildwaechter", "lichtbringer", "wildnislaeufer"]) await p.click(`[data-arena-held="${f}"]`);
+  await p.click("[data-team-auf]"); await p.waitForSelector("[data-arena-held]");
+  { await p.setViewportSize({ width: 390, height: 640 }); await p.evaluate(() => document.querySelector('[data-arena-held="kopfgeldjaeger"]').scrollIntoView({ block: "center" }));
+    const y0 = await p.evaluate(() => window.scrollY); await p.evaluate(() => document.querySelector('[data-arena-held="kopfgeldjaeger"]').click()); const y1 = await p.evaluate(() => window.scrollY);
+    const an = await p.evaluate(() => document.querySelector('[data-arena-held="kopfgeldjaeger"]').classList.contains("an")); await p.evaluate(() => document.querySelector('[data-arena-held="kopfgeldjaeger"]').click()); const y2 = await p.evaluate(() => window.scrollY);
+    check(y0 > 100 && an && Math.abs(y1 - y0) <= 2 && Math.abs(y2 - y0) <= 2, `Held an- und abwählen: Die Seite springt nicht nach oben (Position ${y0} → ${y1} → ${y2})`);
+    await p.setViewportSize({ width: 1200, height: 950 }); }
+  for (const f of ["schildwaechter", "lichtbringer", "wildnislaeufer"]) await p.click(`[data-arena-held="${f}"]`);
   await p.click("#arena-wahl-ok"); await p.waitForSelector('.rang-spielen:not([disabled])');
   check(await p.evaluate(() => /Mein Team\s*Ø 4,0/.test(document.querySelector("#arena-team-aendern").textContent) && /Torvald/.test(document.querySelector("#arena-team-aendern").title) && !document.querySelector(".arena-ohne-team")), "Nach dem Speichern: Der Knopf zeigt „Mein Team Ø 4,0“ (die Helden nur als Hinweis beim Darüberfahren)");
   await p.click('[data-arena-tab="fun"]'); await p.waitForSelector(".arena-arten");

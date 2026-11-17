@@ -2012,6 +2012,8 @@ body.intro-an { overflow: hidden; }
 .tut-blase.wartet { opacity: 0; pointer-events: none; }
 .tut-blase.mitte { left: 50%; top: 50%; transform: translate(-50%, -50%); }
 .tut-blase.unten { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); width: auto; }
+/* Tutorial am Handy: unten Luft lassen, damit sich auch eine hohe Stelle am Seitenende über die Sprechblase schieben lässt */
+@media (max-width: 700px) { body.tut-an { padding-bottom: 280px; } }
 .tut-blase.oben { left: 12px; right: 12px; top: 54px; width: auto; }
 .tut-zahl { margin: 0 0 4px; font: 600 11px var(--schrift-titel); letter-spacing: .14em; text-transform: uppercase; color: #d9b26a; }
 .tut-blase h3 { margin: 0 0 6px; font: 600 21px var(--schrift-titel); color: #f6dc9c; }

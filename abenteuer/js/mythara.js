@@ -997,6 +997,10 @@
   async function arenaKachel() {
     if (!window.ARENA) return;
     if (Boolean(profil && profil.konto) && await window.ARENA.pruefen()) waehrungZeigen(window.ARENA.waehrung());
+    // Wiedereinstieg: Läuft noch ein Arena-Kampf (Fenster geschlossen, neu geladen), geht es direkt dorthin zurück – einmal je Seitenaufruf
+    if (Boolean(profil && profil.konto) && !arenaKachel.geprueft && window.ARENA.laufend) { arenaKachel.geprueft = true;
+      const frei = () => { const h = $("#hub"), s = $("#hub-seite"), b = $("#sm-buehne"); return h && !h.hidden && (!s || s.hidden) && !(b && !b.hidden) && !document.body.classList.contains("tut-an"); };
+      if (frei() && await window.ARENA.laufend().catch(() => false) && frei()) { toast("Dein Arena-Kampf läuft noch – weiter geht es."); window.ARENA.zeigen(); } }
     if (Boolean(profil && profil.konto) && window.ABRANG) { await window.ABRANG.laden().catch(() => null); window.ABRANG.kopf(); } // Rang in der Kopfzeile
   }
 

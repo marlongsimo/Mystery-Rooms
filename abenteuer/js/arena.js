@@ -63,6 +63,8 @@
   const seiteOffen = () => { const s = $("#hub-seite"); return Boolean(s && !s.hidden && s.querySelector("[data-arena]")); };
 
   /** Gibt es die Arena in der Datenbank, und wie viel Währung hat das Konto? Ergebnis wird gemerkt. */
+  /** Läuft für dieses Konto gerade ein Arena-Kampf (schon begonnen)? Für den Wiedereinstieg nach dem Schließen des Fensters */
+  async function laufend() { try { await laden(); } catch (e) { return false; } return Boolean(Z.match && Z.match.status === "laeuft"); }
   async function pruefen(neu) {
     if (Z.da != null && !neu) return Z.da;
     try { const r = await rpc("rpg_my_wallet", {}); Z.da = Boolean(r && r.konto); Z.waehrung = (r && r.waehrung) || 0; }
@@ -477,7 +479,11 @@
         if (schlange.length) await new Promise((r) => setTimeout(r, schlange.length > 8 ? 120 : 850));
       } } finally { spielt = false; }
     };
-    const nimm = (schritte) => { for (const s of schritte || []) if (s && s.v > gesehen && s.st) { gesehen = s.v; schlange.push(s); } abspielen(); };
+    const nimm = (schritte) => {
+      const neu = (schritte || []).filter((s) => s && s.v > gesehen && s.st);
+      // Wiedereinstieg in einen laufenden Kampf: nicht alle bisherigen Züge nachspielen, sondern gleich beim aktuellen Stand weitermachen
+      if (!gestartet && !schlange.length && neu.length > 2) { const letzter = neu[neu.length - 1]; gesehen = letzter.v; schlange.push(letzter); Z.kampf.wieder = true; return abspielen(); }
+      for (const s of neu) { gesehen = s.v; schlange.push(s); } abspielen(); };
     // Eigener Zug: an den Server; die Antwort bringt die neuen Schritte gleich mit
     const sende = (w) => { if (sendet || !aktiv()) return; sendet = true;
       ruf({ aktion: "zug", zug: w }).then((r) => { if (r.fehler) hinweis(r.fehler); nimm(r.schritte); }, () => hinweis("Der Server hat nicht geantwortet. Versuch es noch einmal.")).then(() => { sendet = false; }); };
@@ -577,5 +583,5 @@
     };
   }
 
-  window.ARENA = { pruefen, zeigen, waehrung: () => Z.waehrung || 0, WAEHRUNG, ZEICHEN, zustand: () => Z };
+  window.ARENA = { pruefen, laufend, zeigen, waehrung: () => Z.waehrung || 0, WAEHRUNG, ZEICHEN, zustand: () => Z };
 })();

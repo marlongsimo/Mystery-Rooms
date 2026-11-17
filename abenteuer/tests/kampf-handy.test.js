@@ -76,6 +76,21 @@ const meinZug = async (p) => { for (let i = 0; i < 60; i++) { if (await p.evalua
   const z0 = await zoomVon(); await kneifen(60, 20); await p.waitForTimeout(150); const z1 = await zoomVon(); await kneifen(30, 110); await p.waitForTimeout(150); const z2 = await zoomVon(); await kneifen(40, 400); const z3 = await zoomVon();
   check(z1 < z0 && z1 >= 1 && z2 > z1 && z3 <= 2.61, `Zwei Finger: zusammenziehen verkleinert (${z0} → ${z1.toFixed(2)}), auseinanderziehen vergrößert (${z2.toFixed(2)}), begrenzt auf ${z3.toFixed(2)}`);
   check((await lage()).pos === v2.pos, "… und auch dabei wird kein Zug ausgelöst");
+  // Hängender Finger: Ein Finger wird AUSSERHALB der Karte gehoben – danach muss ein einzelner Finger wieder verschieben (nicht zoomen) und Antippen wieder gehen
+  { const erg = await p.evaluate(async () => { const w = document.querySelector(".karte-wrap"), r = w.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, k = document.querySelector("#karte");
+      const zoom = () => Number((/scale\(([\d.]+)\)/.exec(k.style.transform) || [])[1]), trans = () => k.style.transform;
+      const ev = (ziel, typ, id, x, y, prim) => ziel.dispatchEvent(new PointerEvent(typ, { pointerId: id, pointerType: "touch", isPrimary: prim, clientX: x, clientY: y, bubbles: true }));
+      ev(w, "pointerdown", 21, cx - 40, cy, true); ev(w, "pointerdown", 22, cx + 40, cy, false); ev(w, "pointermove", 22, cx + 70, cy, false);   // zwei Finger
+      ev(w, "pointerup", 22, cx + 70, cy, false); ev(document.body, "pointerup", 21, 5, 5, true);                                               // der erste wird außerhalb gehoben
+      await new Promise((r2) => setTimeout(r2, 150)); const z0 = zoom(), t0 = trans();
+      ev(w, "pointerdown", 23, cx, cy, true); for (let i = 1; i <= 5; i++) ev(w, "pointermove", 23, cx - i * 14, cy - i * 6, true); const z1 = zoom(), t1 = trans(); ev(w, "pointerup", 23, cx - 70, cy - 30, true);
+      // Variante ohne jedes Loslassen (das Gerät verschluckt es): Der nächste erste Finger beginnt trotzdem neu
+      ev(w, "pointerdown", 31, cx - 30, cy, true); ev(w, "pointerdown", 32, cx + 30, cy, false); await new Promise((r2) => setTimeout(r2, 50)); const z2 = zoom();
+      ev(w, "pointerdown", 33, cx, cy, true); for (let i = 1; i <= 5; i++) ev(w, "pointermove", 33, cx + i * 12, cy, true); const z3 = zoom(); ev(w, "pointerup", 33, cx + 60, cy, true);
+      await new Promise((r2) => setTimeout(r2, 200)); let geklickt = false; const h = () => { geklickt = true; }; k.addEventListener("click", h); w.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: cx, clientY: cy })); const fig = k.querySelector(".fig, rect, [data-x]") || k; fig.dispatchEvent(new MouseEvent("click", { bubbles: true })); k.removeEventListener("click", h);
+      return { z0, z1, t0, t1, z2, z3, geklickt }; });
+    check(Math.abs(erg.z1 - erg.z0) < 0.001 && erg.t1 !== erg.t0, `Finger außerhalb der Karte gehoben: Der nächste einzelne Finger verschiebt die Karte und zoomt nicht (Zoom ${erg.z0} → ${erg.z1})`);
+    check(Math.abs(erg.z3 - erg.z2) < 0.001 && erg.geklickt, "Auch wenn das Loslassen ganz ausbleibt: ein neuer erster Finger verschiebt nur, und Antippen kommt danach wieder an"); }
   // Übersicht
   await p.waitForTimeout(150); await p.tap("#kh-zoom"); await p.waitForTimeout(400);
   const ueb = await p.evaluate(() => { const k = document.querySelector("#karte").getBoundingClientRect(), w = document.querySelector(".karte-wrap").getBoundingClientRect(); return k.width <= w.width + 1 && k.left >= w.left - 1; });

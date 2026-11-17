@@ -50,7 +50,10 @@
   function zeiger() {
     const w = $(".karte-wrap"); if (!w || w.dataset.kh) return; w.dataset.kh = "1";
     const aktiv = () => document.body.classList.contains("kh-an");
-    w.addEventListener("pointerdown", (e) => { if (!aktiv()) return; finger.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    w.addEventListener("pointerdown", (e) => { if (!aktiv()) return;
+      // Ein erster Finger (oder die Maus) beginnt immer neu: Reste eines Fingers, dessen Loslassen die Karte nicht mitbekommen hat, verwerfen
+      if (e.isPrimary || e.pointerType === "mouse") { finger.clear(); kniff = null; }
+      finger.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (finger.size === 2) { const [a, b] = [...finger.values()], r = w.getBoundingClientRect(); kniff = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, zoom, mx: (a.x + b.x) / 2 - r.left, my: (a.y + b.y) / 2 - r.top, tx, ty }; zieht = null; gezogen = true; }
       else { zieht = { x: e.clientX, y: e.clientY, tx, ty }; gezogen = false; } });
     w.addEventListener("pointermove", (e) => { if (!aktiv() || !finger.has(e.pointerId)) return; finger.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -62,6 +65,12 @@
       if (finger.size === 1) { const [a] = [...finger.values()]; zieht = { x: a.x, y: a.y, tx, ty }; return; } // ein Finger bleibt liegen: weiter verschieben
       zieht = null; setTimeout(() => { if (!finger.size) gezogen = false; }, 80); };
     w.addEventListener("pointerup", ende); w.addEventListener("pointercancel", ende); w.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") ende(e); });
+    // Wird der Finger außerhalb der Karte gehoben (oder bricht das Gerät die Geste ab), kommt das Loslassen nicht bei der Karte an:
+    // deshalb auch am Fenster mithören – sonst zählt der nächste einzelne Finger als zweiter und die Karte zoomt statt zu wandern
+    const draussen = (e) => { if (finger.has(e.pointerId)) ende(e); };
+    window.addEventListener("pointerup", draussen, true); window.addEventListener("pointercancel", draussen, true);
+    const allesLos = () => { finger.clear(); kniff = null; zieht = null; gezogen = false; };
+    window.addEventListener("blur", allesLos); document.addEventListener("visibilitychange", () => { if (document.hidden) allesLos(); });
     // Wer die Karte verschoben oder gezoomt hat, wollte kein Feld antippen
     w.addEventListener("click", (e) => { if (gezogen && aktiv()) { e.stopPropagation(); e.preventDefault(); } }, true);
   }

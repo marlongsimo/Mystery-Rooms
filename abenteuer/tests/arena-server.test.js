@@ -166,6 +166,11 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   check(weiter && gleich, "Zug beenden: Auf beiden Geräten ist derselbe nächste Held an der Reihe");
   const uhr = await A.p.evaluate(() => { const u = document.querySelector("#arena-uhr"); return u && !u.hidden ? u.textContent : ""; });
   check(/Zugzeit 0:[0-5]\d|Zugzeit 1:00/.test(uhr), `Die Zugzeit läuft auf dem Gerät mit (${uhr.replace(/\s+/g, " ").trim().slice(0, 40)})`);
+  // Wiedereinstieg: Fenster neu laden – das Spiel kehrt von selbst in den laufenden Kampf zurück und spielt die bisherigen Züge nicht nach
+  { const vVor = k.v, t0 = Date.now(); await B.p.reload();
+    const zurueck = await warte(B.p, () => window.ARENA && window.ARENA.zustand().kampf && document.querySelectorAll("#karte .fig").length > 0, null, 25000), dauer = Date.now() - t0;
+    const w = zurueck ? await B.p.evaluate(() => ({ wieder: Boolean(window.ARENA.zustand().kampf.wieder), runde: window.AB.st.runde, figuren: document.querySelectorAll("#karte .fig").length, dorf: !document.querySelector("#hub-start").hidden })) : {};
+    check(zurueck && vVor > 3 && w.wieder && w.runde === k.st.runde && !w.dorf, `Neu geladen mitten im Kampf: Das Spiel kehrt von selbst in den Kampf zurück und steht sofort beim aktuellen Stand (Runde ${w.runde}, ${vVor} Schritte übersprungen, ${(dauer / 1000).toFixed(1)} s)`); }
   // Abkürzen: Der Server steht kurz vor der letzten Runde; danach beenden beide nur noch ihre Züge
   k.st.runde = k.st.arena.runden; const vSprung = k.v;
   let n = 0;

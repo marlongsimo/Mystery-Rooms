@@ -2,46 +2,13 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <script>
-    /* Umzug: Mythara liegt jetzt unter mythara-dungeon.de. Wer das Spiel noch über Case Unlocked öffnet, wird dorthin geleitet –
-       aber nur, wenn die neue Adresse sicher (https) antwortet. Sonst bleibt alles, wie es ist. Unter der neuen Adresse tut das Skript nichts. */
-    (function () {
-      if (!/(^|\.)case-unlocked\.de$/.test(location.hostname)) return;
-      var neu = "https://mythara-dungeon.de/", ziel = neu + (location.pathname.split("/").pop() || "index.html") + location.search + location.hash;
-      fetch(neu + "verbindung.js", { mode: "no-cors", cache: "no-store" }).then(function () { location.replace(ziel); }).catch(function () { /* neue Adresse nicht erreichbar: hier weiterspielen */ });
-    })();
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mythara ist umgezogen</title>
   <meta name="robots" content="noindex">
-  <title>Abenteuer – Charakterbogen | Case Unlocked</title>
-  <meta name="theme-color" content="#14110d">
-  <link rel="icon" href="img/app/mythara-64.png" type="image/png">
-  <link rel="apple-touch-icon" href="img/app/mythara-180.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Mythara">
-  <link rel="stylesheet" href="css/abenteuer.css?v=123">
-  <link rel="stylesheet" href="css/sammlung.css?v=5">
+  <link rel="canonical" href="https://mythara-dungeon.de/handy.html">
+  <script>location.replace("https://mythara-dungeon.de/handy.html" + location.search + location.hash);</script>
+  <meta http-equiv="refresh" content="2; url=https://mythara-dungeon.de/handy.html">
+  <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0a0e;color:#ece4d4;font:16px/1.5 system-ui,sans-serif;text-align:center}a{color:#e9c77e}</style>
 </head>
-<body class="handy">
-  <header class="top">
-    <span class="brand">ABENTEUER</span>
-    <button class="btn ghost klein" id="verlassen" hidden>Verlassen</button>
-  </header>
-  <main id="app" aria-live="polite"></main>
-  <script src="js/figuren.js?v=31"></script>
-  <script src="js/regeln.js?v=85"></script>
-  <script src="js/bild.js?v=14"></script>
-  <script src="js/wuerfel.js?v=3"></script>
-  <script src="js/lore.js?v=2"></script>
-  <script src="js/helden.js?v=17"></script>
-  <script src="vendor/supabase-js-2.45.4.js"></script>
-  <script src="verbindung.js?v=1"></script>
-  <script src="js/rpg-netz.js?v=2"></script>
-  <script src="js/enden.js?v=3"></script>
-  <script src="js/sammlung.js?v=11"></script>
-  <script src="js/handy.js?v=32"></script>
-  <script src="js/app.js?v=1"></script>
-</body>
+<body><p>Mythara ist umgezogen.<br><a href="https://mythara-dungeon.de/handy.html">Weiter zu mythara-dungeon.de</a></p></body>
 </html>

@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v79, figuren.js v27
+// Stand der Regeln: regeln.js v80, figuren.js v28
 
 /* ===== js/figuren.js ===== */
 /*
@@ -265,9 +265,9 @@
         { id: "kurzschwert", name: "Kurzschwert", typ: "aktion", ab: 1, art: "angriff", reichweite: 1, attr: "GES", schaden: "1W6", text: "Nahkampf." },
         { id: "kurzbogen", name: "Kurzbogen", typ: "aktion", ab: 1, art: "angriff", reichweite: 6, attr: "GES", schaden: "1W6", fern: true, text: "Fernkampf." },
         { id: "rudeltaktik", name: "Rudeltaktik", typ: "passiv", ab: 1, text: "Du und Grau habt Vorteil gegen ein Ziel, neben dem der andere steht." },
-        { id: "wolf_befehl", name: "Befehl an Grau", typ: "bonus", ab: 1, art: "wolf", reichweite: 20, text: "Grau läuft bis zu 8 Felder zum Ziel und beißt." },
+        { id: "wolf_befehl", name: "Befehl an Grau", typ: "bonus", ab: 1, art: "wolf", reichweite: 20, text: "Grau läuft bis zu 8 Felder zum Ziel (schräge Schritte zählen 1,5) und beißt. Er muss gerade neben dem Ziel stehen können – wählbar sind nur Gegner, an die er herankommt." },
         { id: "wolf_umreissen", name: "Grau: Umreißen", typ: "bonus", ab: 1, art: "wolf", umreissen: true, reichweite: 20, pro: { rast: 2 }, text: "Wie Befehl, dazu STR-Rettungswurf, sonst liegt das Ziel." },
-        { id: "eingespielt", name: "Eingespielt", typ: "passiv", ab: 2, text: "Grau beißt am Ende deines Zugs auch ohne Befehl, wenn er neben einem Gegner steht, den du getroffen hast." },
+        { id: "eingespielt", name: "Eingespielt", typ: "passiv", ab: 2, text: "Grau beißt am Ende deines Zugs auch ohne Befehl, wenn er gerade neben einem Gegner steht, den du getroffen hast." },
         { id: "ein_rudel", name: "Ein Rudel", typ: "passiv", ab: 3, text: "Jägermal gilt auch für Grau, Grau +1 zum Treffen." },
       ],
       aussen: { name: "Witterung", text: "Grau riecht Untote und Hinterhalte. Die Gruppe kann nicht überrascht werden." },
@@ -702,7 +702,7 @@
   const imRauch = (st, x, y) => st.zonen.some((z) => z.art === "rauch" && Math.max(Math.abs(z.x - x), Math.abs(z.y - y)) <= z.radius);
 
   /** Erreichbare Felder (8 Richtungen, keine Ecken durch Hindernisse), Map key → Kosten */
-  function erreichbar(st, f, max) {
+  function erreichbar(st, f, max, diag) {
     const ziel = new Map([[key(f.x, f.y), 0]]), q = [[f.x, f.y, 0]];
     // Serans Brandmal bindet: Jeder Schritt, der vom Inquisitor wegführt, kostet doppelt
     const richter = f.z && f.z.brandmal ? st.figuren.find((o) => o.id === f.z.brandmal && lebt(o) && !gleichesTeam(st, o, f)) : null;
@@ -717,7 +717,7 @@
         const k = key(nx, ny);
         const anderer = st.figuren.find((o) => o !== f && lebt(o) && o.x === nx && o.y === ny);
         if (anderer && anderer.seite !== f.seite) continue; // durch Gegner nicht hindurch
-        const nd = d + (richter && weite({ x: nx, y: ny }, richter) > weite({ x, y }, richter) ? 2 : 1);
+        const nd = d + (dx && dy ? diag || 1 : 1) * (richter && weite({ x: nx, y: ny }, richter) > weite({ x, y }, richter) ? 2 : 1); // diag: Kosten eines schrägen Schritts (Grau: 1,5)
         if (nd > max || (ziel.has(k) && ziel.get(k) <= nd)) continue;
         ziel.set(k, nd); q.push([nx, ny, nd]);
       }
@@ -1344,7 +1344,7 @@
       case "aufrichten": return freunde.filter((o) => o.tp <= 0 && o.art !== "wolf" && !o.tot && !(a.stabil && o.stabil) && weite(f, o) <= a.reichweite);
       case "schild": return freunde.filter((o) => o.tp > 0 && !o.z.schild && inReich(o, a.reichweite));
       case "tausch": return freunde.filter((o) => o !== f && o.tp > 0 && weite(f, o) <= a.reichweite);
-      case "wolf": { const w = wolfVon(st, f); if (!w || !lebt(w)) return []; return gegner.filter((o) => weite(w, o) <= 9); }
+      case "wolf": { const w = wolfVon(st, f); if (!w || !lebt(w)) return []; return gegner.filter((o) => wolfPlatz(st, f, w, o)); } // nur Ziele, an die Grau wirklich herankommt
       case "verstecken": {
         if (f.z.versteckt) return [];
         if (gegner.some((o) => weite(o, f) <= 1)) return [];
@@ -1592,14 +1592,19 @@
   }
 
   /** Grau läuft zum Ziel und beißt */
+  /** Wohin läuft Grau, um z zu beißen? Ein freies Feld gerade neben dem Ziel (nicht schräg), höchstens so weit, wie Grau laufen kann –
+   *  schräge Schritte kosten 1,5. null, wenn er nicht herankommt (dann lässt sich das Ziel gar nicht erst wählen). */
+  function wolfPlatz(st, f, w, z) {
+    if (weite(w, z) <= 1) return { x: w.x, y: w.y, c: 0 };
+    const m = erreichbar(st, w, FD.FIGUREN[f.fid].wolf.bewegung, 1.5); let best = null;
+    for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); if (weite({ x, y }, z) <= 1 && (!best || c < best.c)) best = { x, y, c }; }
+    return best;
+  }
   function wolfBeisst(st, f, z, umreissen) {
     const w = wolfVon(st, f); if (!w || !lebt(w) || !lebt(z)) return;
-    if (abstand(w, z) > 1) {
-      const m = erreichbar(st, w, FD.FIGUREN[f.fid].wolf.bewegung); let best = null;
-      for (const [k, c] of m) { const [x, y] = k.split(",").map(Number); const d = abstand({ x, y }, z); if (!best || d < best.d || (d === best.d && c < best.c)) best = { x, y, d, c }; }
-      if (best) { w.x = best.x; w.y = best.y; }
-    }
-    if (abstand(w, z) > 1) { st.log.push({ t: `${w.name} kommt nicht an ${z.name} heran.` }); return; }
+    const platz = wolfPlatz(st, f, w, z);
+    if (!platz) { st.log.push({ t: `${w.name} kommt nicht an ${z.name} heran.` }); return; }
+    w.x = platz.x; w.y = platz.y;
     const wd = FD.FIGUREN[f.fid].wolf, extra = [];
     if (FD.altStufe(f.stufe) >= 3 && z.z.mal_jaeger === f.id) extra.push("1W6");
     if (st.zug) st.zug.wolfBiss = true;
@@ -1738,7 +1743,7 @@
     // Eingespielt: Grau beißt ohne Befehl
     if (istFig(f, "tiergefaehrte") && FD.altStufe(f.stufe) >= 2 && !st.zug.wolfBiss) {
       const w = wolfVon(st, f);
-      const z = w && lebt(w) && gegnerFiguren(st).find((o) => lebt(o) && abstand(w, o) <= 1 && st.zug.getroffen.includes(o.id));
+      const z = w && lebt(w) && gegnerFiguren(st).find((o) => lebt(o) && weite(w, o) <= 1 && st.zug.getroffen.includes(o.id)); // gerade daneben, nicht schräg
       if (z) wolfBeisst(st, f, z, false);
     }
     if (st.ende) return;

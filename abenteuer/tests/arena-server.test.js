@@ -182,8 +182,8 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   }
   check(k.match.status === "beendet" && S.db.enden.length === 1 && k.v > vSprung, `Der Kampf läuft bis zum Ende, der Server trägt das Ergebnis ein (Sieger Team ${S.db.enden[0] && S.db.enden[0].sieger})`);
   const sieger = S.db.enden[0] ? S.db.enden[0].sieger : 0;
-  const endeA = await warte(A.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Startseite|Helden wählen/.test(e.textContent); }, null, 30000);
-  const endeB = await warte(B.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Startseite|Helden wählen/.test(e.textContent); }, null, 30000);
+  const endeA = await warte(A.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Arena|Helden wählen/.test(e.textContent); }, null, 30000);
+  const endeB = await warte(B.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Arena|Helden wählen/.test(e.textContent); }, null, 30000);
   if (FX) for (const [n, X] of [["A", A], ["B", B]]) { const k = await X.p.evaluate(() => window.ABKLANG.gespielt.map((g) => g.name));
     check(k.includes("wuerfel") && k.includes("hieb"), `Mit Effekten: Bei ${n} sind im Serverkampf Würfel und Treffer zu hören (${k.filter((x) => x === "wuerfel").length} Würfe, ${k.filter((x) => x === "hieb").length} Treffer)`); }
   const tA = endeA ? (await A.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "", tB = endeB ? (await B.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "";
@@ -191,8 +191,8 @@ const stand = () => R.laden(S.db.kaempfe[ID].st);
   check(/Privater Kampf: ohne Wertung/.test(tA) && /Privater Kampf: ohne Wertung/.test(tB) && !/EP/.test(tA + tB) && !/Seelensplitter/.test(tA + tB) && !/Tagesgrenze/.test(tA + tB), "Privater Kampf: Das Ergebnis nennt „ohne Wertung“, keine Belohnung");
   check(await A.p.evaluate(() => { const t = [...document.querySelectorAll("#arena-ende .kos-traeger")]; return t.length === 2 && t[0].dataset.rahmen === "r_lorbeer" && t[1].dataset.rahmen === "r_krone"; }), "Ergebnis: beide Profilbilder mit Rahmen");
   await shot(A.p, "server-3-ende-a");
-  await A.p.click("#arena-ende-zu"); const zurueck = await warte(A.p, () => { const h = document.querySelector("#hub"); return h && !h.hidden; }, null, 15000);
-  check(zurueck, "„Zur Startseite“ führt zurück ins Dorf");
+  await A.p.click("#arena-ende-zu"); const zurueck = await warte(A.p, () => { const h = document.querySelector("#hub"); return h && !h.hidden && /Arena/.test((h.querySelector("h1") || {}).textContent || ""); }, null, 15000);
+  check(zurueck, "„Zur Arena“ führt nach dem Kampf zurück in die Arena (nicht ins Dorf)");
   // Ohne Link: Die Server-Arena gilt von selbst, sobald die Datenbank sie kennt – sonst bleibt die frühere Arena
   { const ohne = async (kennt) => { const ctx = await b.newContext({ viewport: { width: 1200, height: 900 } }), p = await ctx.newPage(); const j = (r, o, st = 200) => r.fulfill({ status: st, contentType: "application/json", body: JSON.stringify(o) });
       await p.route(/\/rest\/v1\/rpc\/rpg_my_profile(\?|$)/, (r) => j(r, { konto: true, handle: "Spieler C", avatar_key: null, created_at: new Date().toISOString() }));

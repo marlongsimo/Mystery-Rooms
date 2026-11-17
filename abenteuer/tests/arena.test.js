@@ -164,7 +164,7 @@ const warte = (p, fn, arg, t = 30000) => p.waitForFunction(fn, arg, { timeout: t
       const S = siegA ? A : B;
       await S.p.click("#arena-ende-zu");
       const zurueck = await warte(S.p, () => !document.querySelector("#hub").hidden && document.querySelector("#hub-waehrung") && /25/.test(document.querySelector("#hub-waehrung").textContent), null, 20000);
-      check(zurueck, "„Zur Startseite“: zurück im Hub, neben dem Profilbild stehen 25 Seelensplitter");
+      check(zurueck && /Arena/.test(await S.p.evaluate(() => (document.querySelector("#hub h1") || {}).textContent || "")), "„Zur Arena“: zurück in der Arena, neben dem Profilbild stehen 25 Seelensplitter");
       }
     }
   }

@@ -576,7 +576,7 @@
     ergebnisZeigen(Object.assign({ punkteLokal: a.punkte }, g), t);
   }
 
-  /* ---------- Ergebnis: Sieg oder Niederlage, Belohnungen, zurück zur Startseite ---------- */
+  /* ---------- Ergebnis: Sieg oder Niederlage, Belohnungen, zurück zur Arena ---------- */
   function schirm(html, sieg) {
     let e = $("#arena-ende"); if (!e) { e = document.createElement("div"); e.id = "arena-ende"; document.body.appendChild(e); }
     e.className = "arena-ende " + (sieg ? "sieg" : "niederlage"); e.hidden = false; e.innerHTML = `<div class="arena-ende-inhalt">${html}</div>`;
@@ -601,15 +601,16 @@
       : `${b.waehrung ? `<p class="arena-ende-lohn"><i>${ZEICHEN}</i> +${b.waehrung} ${WAEHRUNG}</p>` : ""}${xp}${b.angebot ? `<p class="arena-ende-lohn held">★ Ein neuer Held will sich dir anschließen!</p>` : ""}`;
     const e = schirm(`<div class="arena-ende-gegner">${g.host ? bildVon(g.host.name, "gross") : ""}<p class="arena-ende-eyebrow">${esc(g.host ? g.host.name : "")} gegen ${esc(g.gast ? g.gast.name : "")}</p>${g.gast ? bildVon(g.gast.name, "gross") : ""}</div><h1>${g.status === "abgebrochen" ? "Abgebrochen" : sieg ? "Sieg" : "Niederlage"}</h1>
       ${p ? `<p class="arena-ende-punkte">${p[1] != null ? p[1] : p["1"]} : ${p[2] != null ? p[2] : p["2"]}</p>` : ""}<p>${text}</p>${lohn}
-      <div class="knoepfe mitte"><button class="btn gross" id="arena-ende-zu">${b && b.angebot ? "Helden wählen" : "Zur Startseite"}</button></div>`, sieg && g.status !== "abgebrochen");
+      <div class="knoepfe mitte"><button class="btn gross" id="arena-ende-zu">${b && b.angebot ? "Helden wählen" : "Zur Arena"}</button></div>`, sieg && g.status !== "abgebrochen");
     if (kos()) kos().arena(g.id || (Z.kampf && Z.kampf.m && Z.kampf.m.id), e);
     if (window.ABRANG && g.status === "beendet") window.ABRANG.ergebnis(g.id || (Z.kampf && Z.kampf.m && Z.kampf.m.id), e); // Ranked: Punkte, Aufstieg, Abstieg
     $("#arena-ende-zu").onclick = async () => {
       e.hidden = true; e.innerHTML = ""; window.AB.arenaEnde(); Z.kampf = null; Z.match = null; Z.modus = null; await trennen();
       await pruefen(true); if (window.MYTHARA.waehrungZeigen) window.MYTHARA.waehrungZeigen(Z.waehrung);
       if (sm()) await sm().laden(true);
-      window.MYTHARA.zeigeHub();
-      if (b && b.angebot && sm() && sm().offeneBelohnung) sm().offeneBelohnung(() => window.MYTHARA.zeigeHub());
+      // Nach dem Kampf geht es zurück in die Arena, nicht ins Dorf. Mit Heldenangebot erst die Auswahl (über dem Dorf), danach die Arena.
+      if (b && b.angebot && sm() && sm().offeneBelohnung) { window.MYTHARA.zeigeHub(); sm().offeneBelohnung(() => zeigen()); }
+      else { window.MYTHARA.zeigeHub(); await zeigen(); } // zeigeHub schaltet vom Kampfbildschirm zurück, zeigen() öffnet darin die Arena
     };
   }
 

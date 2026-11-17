@@ -95,8 +95,8 @@ async function konto(b) {
       await A.p.waitForTimeout(250);
     }
     console.log(`  ${zuege} Züge in ${Math.round((Date.now() - start) / 1000)} s, zuletzt Runde ${runde}; Function: ${fn.n} Aufrufe, mittlere Antwortzeit ${fn.ms.length ? Math.round(fn.ms.reduce((a, x) => a + x, 0) / fn.ms.length) : "?"} ms, längste ${fn.ms.length ? Math.max(...fn.ms) : "?"} ms`);
-    const eA = await warte(A.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Startseite|Helden wählen/.test(e.textContent); }, null, 40000);
-    const eB = await warte(B.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Startseite|Helden wählen/.test(e.textContent); }, null, 40000);
+    const eA = await warte(A.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Arena|Helden wählen/.test(e.textContent); }, null, 40000);
+    const eB = await warte(B.p, () => { const e = document.querySelector("#arena-ende"); return e && !e.hidden && /Zur Arena|Helden wählen/.test(e.textContent); }, null, 40000);
     const tA = eA ? (await A.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "", tB = eB ? (await B.p.textContent("#arena-ende")).replace(/\s+/g, " ") : "";
     console.log("  A:", tA.slice(0, 200)); console.log("  B:", tB.slice(0, 200));
     check(eA && eB, "Der Kampf endet; beide Geräte zeigen das Ergebnis aus der Datenbank");

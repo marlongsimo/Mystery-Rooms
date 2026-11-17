@@ -2434,3 +2434,15 @@ button.xp-paket { cursor: pointer; } .xp-paket.an { border-color: #9fd9ff; box-s
 /* Auf der Startseite und im Dorf gibt es keine Kopfzeile (dort führt sie nirgends hin); im Abenteuer bleibt MYTHARA als Weg nach Hause */
 body:has(#mythara:not([hidden])) header.top, body:has(#hub:not([hidden])) header.top { display: none; }
 header.top { justify-content: flex-end; }
+
+/* Als App vom Startbildschirm (ohne Browserleiste): Der Inhalt beginnt unter der Statusleiste des Handys – auch dort, wo es keine
+   Kopfzeile gibt (Startseite, Dorf, Kampf). Oben fest verankerte Elemente rücken um denselben Betrag nach unten. */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  body { padding-top: env(safe-area-inset-top); }
+  header.top { padding-top: 8px; }
+  .toast { top: calc(14px + env(safe-area-inset-top)); }
+  .arena-uhr, .tut-skip { top: calc(10px + env(safe-area-inset-top)); }
+  body.kh-an .arena-uhr, body.kh-an .arena-aufgeben { top: calc(5px + env(safe-area-inset-top)); }
+  body.kh-an.kh-log #log { top: calc(60px + env(safe-area-inset-top)); }
+  .fx-zug { top: calc(90px + env(safe-area-inset-top)); }
+}

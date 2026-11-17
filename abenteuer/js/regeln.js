@@ -2298,6 +2298,15 @@
       if (v > 0) p = 1 - (1 - p) ** 2; else if (v < 0) p = p * p;
       return { p, art: "treffer", text: `${Math.round(p * 100)} % Treffer${v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : ""}` };
     }
+    if (a.art === "wolf") { // Graus Biss: sein eigener Angriffswert, gerechnet von dem Feld aus, auf das er läuft
+      const w = wolfVon(st, f), pl = w && lebt(w) ? wolfPlatz(st, f, w, z) : null, wd = FD.FIGUREN[f.fid] && FD.FIGUREN[f.fid].wolf;
+      if (!pl || !wd) return { p: null, art: null, text: "" };
+      const alt = { x: w.x, y: w.y }, spec = { nah: true }; w.x = pl.x; w.y = pl.y;
+      let v, rk; try { v = vorteil(st, w, z, spec).v; rk = rkEff(st, z, w, spec); } finally { w.x = alt.x; w.y = alt.y; }
+      let p = klemm((21 - (rk - wd.angriff[FD.altStufe(f.stufe) - 1])) / 20);
+      if (v > 0) p = 1 - (1 - p) ** 2; else if (v < 0) p = p * p;
+      return { p, art: "treffer", text: `${Math.round(p * 100)} % Treffer${v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : ""}` };
+    }
     if (a.art === "geschoss") return { p: 1, art: "sicher", text: "trifft sicher" };
     if (a.rettung && a.attr) {
       const p = klemm((SG(f, a.attr) - 1 - mod(z.werte[a.rettung])) / 20);

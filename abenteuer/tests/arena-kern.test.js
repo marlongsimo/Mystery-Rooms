@@ -94,4 +94,16 @@ for (const [seed, name] of [[4712, "Arena"], [4713, "Königsmord"], [4714, "Die 
     if (tm === 2 && aus < 2) { jetzt = st.arena.zugBis + 1; K.zeit(st, jetzt); aus++; } else K.zug(st, tm, { typ: "ende" }, jetzt); }
   check(!st.ende && st.arena.zeitaus[2] === 0, "Zieht das Team wieder selbst, beginnt die Zählung von vorn");
 }
+// Kaltstart: Eine frisch geladene Funktion bekommt einen laufenden Kampf aus der Datenbank, ohne ihn selbst angelegt zu haben
+{ const m = Object.assign(match(4720, "gruft"), { host_team: team(["tiergefaehrte", "duellant", "schattenmagier"], [4, 4, 4]), guest_team: team(["schattenmagier", "duellant", "lichtbringer"], [4, 4, 4]) });
+  const gespeichert = K.start(m, 0, 0, 0).st;
+  R.FD.STUFEN10.aktiv = false; const K2 = kern(R, D.KARTEN); // so startet die Funktion neu
+  check(R.FD.STUFEN10.aktiv === true, "Der Kern schaltet das Zehn-Stufen-Modell schon beim Laden ein (nicht erst beim Anlegen eines Kampfes)");
+  const st = gespeichert; let n = 0, biss = null, proz = null;
+  while (!st.ende && !biss && n++ < 400) { const a = R.aktiv(st), tm = R.teamVon(st, a);
+    if (a.fid === "tiergefaehrte") { const w = R.wolfVon(st, a), z = st.figuren.find((o) => o.fidA && R.lebt(o)); if (w && z) { const frei = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => ({ x: z.x + dx, y: z.y + dy })).find((p) => !st.figuren.some((o) => o !== w && o.x === p.x && o.y === p.y && R.lebt(o))); if (frei) { w.x = frei.x; w.y = frei.y; proz = R.chance(st, "wolf_befehl", z.id); const vor = st.log.length; K2.zug(st, tm, { typ: "aktion", aktion: "wolf_befehl", ziel: z.id }, 1000 + n); biss = st.log.slice(vor).map((l) => l.t).find((t) => /Biss/.test(t)) || null; } } }
+    if (!biss) K2.zug(st, tm, { typ: "ende" }, 1000 + n); }
+  check(Boolean(proz) && proz.p > 0.05 && proz.p <= 0.95 && /% Treffer/.test(proz.text), "Für Graus Biss gibt es eine Trefferchance: " + (proz && proz.text));
+  check(Boolean(biss) && !/undefined|NaN/.test(biss), "Nach einem Kaltstart würfelt Grau auf Stufe 4 mit seinem Angriffswert (kein \"undefined\"): " + biss);
+}
 console.log(ok ? "\nARENA-KERN IN ORDNUNG" : "\nARENA-KERN: FEHLER"); process.exit(ok ? 0 : 1);

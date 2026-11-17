@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Mythara – Edge Function „arena“: Der Server rechnet den Arena-Kampf. GEBAUTE DATEI – nicht von Hand ändern.
 // Quelle: abenteuer/server/*.js und abenteuer/js/{figuren,regeln}.js · bauen mit: node abenteuer/tools/arena-funktion-bauen.js
-// Stand der Regeln: regeln.js v82, figuren.js v30
+// Stand der Regeln: regeln.js v83, figuren.js v30
 
 /* ===== js/figuren.js ===== */
 /*
@@ -2766,6 +2766,15 @@
       if (v > 0) p = 1 - (1 - p) ** 2; else if (v < 0) p = p * p;
       return { p, art: "treffer", text: `${Math.round(p * 100)} % Treffer${v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : ""}` };
     }
+    if (a.art === "wolf") { // Graus Biss: sein eigener Angriffswert, gerechnet von dem Feld aus, auf das er läuft
+      const w = wolfVon(st, f), pl = w && lebt(w) ? wolfPlatz(st, f, w, z) : null, wd = FD.FIGUREN[f.fid] && FD.FIGUREN[f.fid].wolf;
+      if (!pl || !wd) return { p: null, art: null, text: "" };
+      const alt = { x: w.x, y: w.y }, spec = { nah: true }; w.x = pl.x; w.y = pl.y;
+      let v, rk; try { v = vorteil(st, w, z, spec).v; rk = rkEff(st, z, w, spec); } finally { w.x = alt.x; w.y = alt.y; }
+      let p = klemm((21 - (rk - wd.angriff[FD.altStufe(f.stufe) - 1])) / 20);
+      if (v > 0) p = 1 - (1 - p) ** 2; else if (v < 0) p = p * p;
+      return { p, art: "treffer", text: `${Math.round(p * 100)} % Treffer${v > 0 ? " (Vorteil)" : v < 0 ? " (Nachteil)" : ""}` };
+    }
     if (a.art === "geschoss") return { p: 1, art: "sicher", text: "trifft sicher" };
     if (a.rettung && a.attr) {
       const p = klemm((SG(f, a.attr) - 1 - mod(z.werte[a.rettung])) / 20);
@@ -3084,6 +3093,9 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
 
   function kern(R, KARTEN, botFabrik) {
     const fabrik = botFabrik || root.ABARENABOT, BOT = fabrik ? fabrik(R) : null;
+    // Arenakämpfe laufen immer im Zehn-Stufen-Modell. Das muss schon beim Laden gelten, nicht erst beim Anlegen eines Kampfes:
+    // Eine frisch gestartete Funktion rechnet sonst laufende Kämpfe mit dem alten Modell weiter (Stufe 4+ ohne Werte: "W20 + undefined").
+    if (R.FD && R.FD.STUFEN10) R.FD.STUFEN10.aktiv = true;
     // Bedenkzeit: vor dem ersten Schritt eines Zugs länger (manchmal deutlich), zwischen den Schritten kurz
     const denkZeit = () => 1800 + Math.random() * 3600 + (Math.random() < 0.15 ? 2500 + Math.random() * 4000 : 0), zwischenZeit = () => 700 + Math.random() * 1700;
     const modusVon = (seed) => LOS[Math.abs(Math.trunc(Number(seed) || 0)) % LOS.length];
@@ -3213,7 +3225,7 @@ const ARENA_KARTEN = {"TURM":{"name":"Der Glockenturm","b":12,"h":9,"bild":"img/
 
 
 /* ===== Stand der Regeln (für den Abgleich mit dem Spiel) ===== */
-const ARENA_REGELN_V = "82.30";
+const ARENA_REGELN_V = "83.30";
 
 /* ===== server/arena-funktion.js ===== */
 /*

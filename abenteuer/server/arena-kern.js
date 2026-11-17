@@ -22,6 +22,9 @@
 
   function kern(R, KARTEN, botFabrik) {
     const fabrik = botFabrik || root.ABARENABOT, BOT = fabrik ? fabrik(R) : null;
+    // Arenakämpfe laufen immer im Zehn-Stufen-Modell. Das muss schon beim Laden gelten, nicht erst beim Anlegen eines Kampfes:
+    // Eine frisch gestartete Funktion rechnet sonst laufende Kämpfe mit dem alten Modell weiter (Stufe 4+ ohne Werte: "W20 + undefined").
+    if (R.FD && R.FD.STUFEN10) R.FD.STUFEN10.aktiv = true;
     // Bedenkzeit: vor dem ersten Schritt eines Zugs länger (manchmal deutlich), zwischen den Schritten kurz
     const denkZeit = () => 1800 + Math.random() * 3600 + (Math.random() < 0.15 ? 2500 + Math.random() * 4000 : 0), zwischenZeit = () => 700 + Math.random() * 1700;
     const modusVon = (seed) => LOS[Math.abs(Math.trunc(Number(seed) || 0)) % LOS.length];

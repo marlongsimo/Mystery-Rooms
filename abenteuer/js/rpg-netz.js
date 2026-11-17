@@ -9,8 +9,8 @@
  *   • globaler Name window.RPGNetz
  *
  * Benötigt (in dieser Reihenfolge geladen):
- *   platform/multiplayer/vendor/supabase-js-2.45.4.js   → window.supabase
- *   platform/multiplayer/mp-config.js                   → window.MR_MULTIPLAYER_CONFIG
+ *   vendor/supabase-js-2.45.4.js                       → window.supabase
+ *   verbindung.js                                       → window.MR_MULTIPLAYER_CONFIG
  *
  * Verwendete Datenbankfunktionen (vorhanden in Supabase, Signaturen geprüft):
  *   create_game_session(p_game_slug, p_player_name, p_max_players)
@@ -60,7 +60,7 @@
 
   /* ---------- Sicherheitsprüfung des Schlüssels ---------- */
   function assertPublicKey(key) {
-    if (!key) throw new Error("Supabase ist nicht konfiguriert (platform/multiplayer/mp-config.js).");
+    if (!key) throw new Error("Supabase ist nicht konfiguriert (verbindung.js).");
     if (/^sb_secret_/i.test(key) || /service_role/i.test(key)) throw new Error("Im Browser darf nur der Publishable Key stehen – niemals ein Secret- oder Service-Role-Key.");
     if (/^eyJ/.test(key)) { // ältere JWT-Schlüssel: nur „anon“ ist zulässig
       try { const role = JSON.parse(atob(key.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).role; if (role !== "anon") throw 0; }

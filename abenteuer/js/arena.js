@@ -119,6 +119,8 @@
     : Z.verstoesse ? `<p class="arena-grenze arena-verwarnung" role="status"><b>Verwarnung: ${Z.verstoesse.n} von ${Z.verstoesse.max} Verstößen.</b> Du hast einen Kampf verloren, weil du dreimal in Folge deine Zugzeit verstreichen ließest. Beim dritten Mal innerhalb von 24 Stunden gibt es eine Stunde Zeitstrafe.</p>` : "");
   /** Während der Zeitstrafe sind die Suchknöpfe gesperrt (der Server lehnt die Suche ohnehin ab) */
   function sperreAnwenden() { if (!sperreAktiv()) return; document.querySelectorAll("[data-arena] .rang-spielen, [data-arena] [data-arena-art]").forEach((b) => { b.disabled = true; b.title = "Zeitstrafe: noch " + sperreRest(); }); }
+  /** „i“: Regeln und Modi als Fenster über der Seite (der Text steht unsichtbar auf der Seite bereit) */
+  function infoZeigen() { const t = $("#arena-info-text"); if (t && window.MYTHARA && window.MYTHARA.fenster) window.MYTHARA.fenster("Die Arena: Regeln und Modi", `<div class="arena-info im-fenster" id="arena-info-fenster">${t.innerHTML}</div>`); }
   function zeichneListe() {
     const L = Z.liste || {}, offen = L.offen || [], m = Z.match;
     if (!L.konto) return seite(`<h1 class="hub-gruss">Arena</h1><p class="hub-untertitel">${esc(Z.fehler || "Die Arena gibt es nur mit einem Spielerkonto: Hier treten deine eigenen Helden mit ihren Stufen an.")}</p>`);
@@ -127,11 +129,12 @@
         <div class="arena-kopf-rechts">${waehrungHtml()}<button class="btn ghost klein arena-info-knopf" id="arena-info" aria-label="Regeln und Modi" title="Regeln und Modi">i</button><button class="btn ghost klein" id="arena-neu-laden">↻ Aktualisieren</button></div></div>
       ${grenzeHtml()}
       <p class="note">Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
-      <div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
+      <div class="arena-info" id="arena-info-text" hidden>
         <h2>So läuft ein Kampf</h2>
         <ul><li>Du wählst drei deiner Helden. Die Durchschnittsstufen beider Teams dürfen höchstens eine Stufe auseinanderliegen.</li>
           <li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>
           <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
+          <li>Wer <b>dreimal in Folge</b> seine Zugzeit verstreichen lässt, gibt den Kampf zwangsweise auf. Das zählt als Verstoß: Beim dritten innerhalb von 24 Stunden gibt es <b>eine Stunde Zeitstrafe</b> (keine Gegnersuche). Freiwilliges Aufgeben ist kein Verstoß.</li>
           <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
           <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. Eine Tagesgrenze gibt es nicht.</li></ul>
         <h2>Die Modi</h2><div class="arena-modus-reihe vier">${LOS.map((k) => modusHtml(k)).join("")}</div></div>
@@ -141,7 +144,7 @@
       <h2 class="hub-zwischen">Offene Kämpfe</h2>
       ${offen.length ? `<ul class="arena-liste">${offen.map((o) => `<li><div><b>${esc(o.name)}</b><small>Durchschnittsstufe ${komma(o.schnitt)}</small></div><button class="btn klein" data-arena-bei="${o.id}" data-schnitt="${o.schnitt}" ${m ? "disabled" : ""}>Beitreten</button></li>`).join("")}</ul>`
         : `<p class="note">Gerade wartet niemand. Erstelle selbst einen Kampf – andere sehen ihn nach dem Aktualisieren.</p>`}`);
-    const inf = $("#arena-info"); if (inf) inf.onclick = () => { Z.infoAuf = !Z.infoAuf; $("#arena-info-text").hidden = !Z.infoAuf; };
+    const inf = $("#arena-info"); if (inf) inf.onclick = infoZeigen;
     const nl = $("#arena-neu-laden"); if (nl) nl.onclick = async () => { nl.disabled = true; await laden(); if (Z.match && Z.match.status !== "offen") return aufstellung(Z.match); zeichneListe(); };
     const er = $("#arena-erstellen"); if (er) er.onclick = () => heldenWahl({ titel: "Kampf erstellen", knopf: "Kampf erstellen", fertig: erstellen });
     const vw = $("#arena-verwerfen"); if (vw) vw.onclick = async () => { vw.disabled = true; try { await rpc("rpg_arena_cancel", { p_match_id: m.id }); } catch (e) { Z.fehler = e.message; } Z.match = null; meinMerken(null); zeigen(); };
@@ -165,13 +168,15 @@
     const held = (h) => { const d = F.FIGUREN[h.held] || { name: h.held, klasse: "krieger" };
       return `<div class="arena-held fest" style="--k:${F.KLASSEN[d.klasse].farbe}"><img src="${F.bild(h.held)}" alt=""><b>${esc(d.name)}</b>${F.meistertitel(h.held, h.stufe) ? `<small class="meister">♛ ${esc(F.meistertitel(h.held, h.stufe))}</small>` : ""}<em>Stufe ${h.stufe}</em></div>`; };
     const leer = `<div class="arena-held fest leer"><span>?</span><b>frei</b><em>&nbsp;</em></div>`;
-    const infoBlock = `<div class="arena-info" id="arena-info-text" ${Z.infoAuf ? "" : "hidden"}>
+    const infoBlock = `<div class="arena-info" id="arena-info-text" hidden>
         <h2>So läuft ein Kampf</h2>
         <ul><li>Du legst einmal dein Team aus drei Helden fest. Es gilt für jeden Kampf, bis du es änderst.</li>
           <li>„Gegner suchen“ verbindet dich mit einem anderen Suchenden, dessen Durchschnittsstufe höchstens eine Stufe von deiner entfernt ist.</li>
+          ${RG() ? `<li><b>Ranked</b> ist immer ein Duell. Zugeteilt wird nach Rang, nicht nach Heldenstufe. Ein Sieg bringt Rangpunkte, eine Niederlage kostet welche.</li>` : ""}
           ${SERVER ? `<li><b>Normal</b> ist immer ein Duell. In <b>Arcade</b> wird zwischen Arena, Königsmord und Horde gelost. Im <b>privaten Kampf</b> forderst du einen Freund heraus und wählst den Modus; er zählt nicht für Belohnungen und kennt keine Stufengrenze.</li>
           <li>Die Karte wird ausgelost. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>` : `<li>Karte, Monster und <b>Modus werden ausgelost</b>. Vor dem Start siehst du, welcher Modus gespielt wird und wie man gewinnt.</li>`}
           <li>Jeder Held hat <b>eine Minute Zugzeit</b>. Läuft sie ab, endet sein Zug.</li>
+          <li>Wer <b>dreimal in Folge</b> seine Zugzeit verstreichen lässt, gibt den Kampf zwangsweise auf. Das zählt als Verstoß: Beim dritten innerhalb von 24 Stunden gibt es <b>eine Stunde Zeitstrafe</b> (keine Gegnersuche). Freiwilliges Aufgeben ist kein Verstoß.</li>
           <li>Kontrollzauber wirken gegen Helden höchstens eine Runde; danach ist der Held zwei Runden dagegen gefeit.</li>
           <li>Belohnung: Erfahrung für deine Helden (bei einer Niederlage ein Drittel), bei einem Sieg ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG} und mit etwas Glück ein neuer Held. Eine Tagesgrenze gibt es nicht.</li></ul>
         <h2>Die Modi</h2><div class="arena-modus-reihe vier">${LOS.map((k) => modusHtml(k)).join("")}</div></div>`;
@@ -215,7 +220,7 @@
       <p class="note">${t ? `Gesucht wird ein Gegner mit Durchschnittsstufe ${komma(Math.max(1, t.schnitt - 1))} bis ${komma(Math.min(10, Number(t.schnitt) + 1))}. ` : ""}Ein Sieg bringt ${Z.modiDa ? "5 bis 25" : "25"} ${WAEHRUNG}, Erfahrung für deine Helden und mit etwas Glück einen neuen Helden.</p>
       ${infoBlock}`);
     Z.fehler = "";
-    const inf = $("#arena-info"); if (inf) inf.onclick = () => { Z.infoAuf = !Z.infoAuf; $("#arena-info-text").hidden = !Z.infoAuf; };
+    const inf = $("#arena-info"); if (inf) inf.onclick = infoZeigen;
     const ta = $("#arena-team-aendern"); if (ta) ta.onclick = () => heldenWahl({ titel: "Mein Team", knopf: "Team speichern", vorwahl: t ? t.team.map((h) => h.held) : [],
       fertig: async (team) => { Z.team = await rpc("rpg_arena_squad_set", { p_team: team }); Z.modus = null; zeigen(); } });
     const su = $("#arena-suchen"); if (su) su.onclick = () => suchen();

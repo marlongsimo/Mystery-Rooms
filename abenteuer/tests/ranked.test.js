@@ -124,6 +124,14 @@ const shot = async (p, n) => { if (process.env.SHOT_DIR) await p.screenshot({ pa
   await shot(H.p, "ranked-4-handy"); await H.p.click('[data-arena-tab="rangliste"]'); await H.p.waitForSelector(".rang-liste");
   check(await H.p.evaluate(() => document.querySelector(".rang-liste li").getBoundingClientRect().right <= innerWidth), "Handy: Die Rangliste passt in die Breite");
   check(!H.fehler.length, "keine Skriptfehler am Handy" + (H.fehler.length ? ": " + H.fehler.join(" | ") : ""));
+  // „i“: Regeln und Modi als Fenster über der Seite
+  { const I = await seite(b, { width: 390, height: 844 }); await I.p.click('.dorf-ort[data-hub="arena"]'); await I.p.waitForSelector("#arena-info"); const y0 = await I.p.evaluate(() => document.documentElement.scrollHeight);
+    await I.p.click("#arena-info"); await I.p.waitForSelector("#arena-info-fenster");
+    const inf = await I.p.evaluate(() => { const f = document.querySelector("#arena-info-fenster"), r = f.getBoundingClientRect(); return { text: f.textContent.replace(/\s+/g, " "), imBild: r.top >= 0 && r.left >= 0 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1, seiteVersteckt: document.querySelector("#arena-info-text").hidden, hoehe: document.documentElement.scrollHeight, zu: !!document.querySelector("#fenster-zu") }; });
+    check(/So gewinnst du/.test(inf.text) && /Zugzeit/.test(inf.text) && inf.imBild && inf.seiteVersteckt && inf.zu && Math.abs(inf.hoehe - y0) < 5, "„i“ in der Arena: Regeln und Modi öffnen sich als Fenster über der Seite – die Seite selbst wird nicht länger");
+    await I.p.click("#fenster-zu"); check(await I.p.evaluate(() => !document.querySelector("#arena-info-fenster") || document.querySelector("#arena-info-fenster").offsetParent === null), "… und lassen sich wieder schließen");
+    if (process.env.SHOT_DIR) { await I.p.click("#arena-info"); await I.p.waitForSelector("#arena-info-fenster"); await I.p.screenshot({ path: process.env.SHOT_DIR + "/arena-info.png" }); }
+    check(!I.fehler.length, "keine Skriptfehler beim Info-Fenster" + (I.fehler.length ? ": " + I.fehler.join(" | ") : "")); }
   // Zeitstrafe: Hinweis in der Arena, Suchknöpfe gesperrt
   DB.sperre = true; const Sp = await seite(b, { width: 1200, height: 950 }); await Sp.p.click('.dorf-ort[data-hub="arena"]'); await Sp.p.waitForSelector(".rang-karte"); await Sp.p.waitForTimeout(300);
   const sp = await Sp.p.evaluate(() => ({ text: (document.querySelector(".arena-sperre") || {}).textContent || "", ranked: document.querySelector(".rang-spielen").disabled }));

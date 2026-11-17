@@ -1770,6 +1770,7 @@ body.handy .sz-moment.mein { border-color: #d9b46a; box-shadow: 0 0 0 1px rgba(2
 .arena-info-knopf { width: 34px; height: 34px; padding: 0; border-radius: 50%; font: italic 700 17px Georgia, serif; }
 .arena-info { margin: 10px 0 16px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,.25); }
 .arena-info h2 { font: 600 16px var(--schrift-titel); color: #f6dc9c; margin: 4px 0 8px; }
+.arena-info.im-fenster { margin: 0; padding: 0; border: 0; background: none; max-height: min(70vh, 640px); overflow-y: auto; overscroll-behavior: contain; padding-right: 6px; }
 .arena-info ul { margin: 0 0 12px; padding-left: 20px; line-height: 1.5; font-size: 14px; }
 .arena-modus-reihe { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media (max-width: 760px) { .arena-modus-reihe { grid-template-columns: 1fr; } }

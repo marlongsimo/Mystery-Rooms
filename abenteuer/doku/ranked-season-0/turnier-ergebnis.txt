@@ -1,0 +1,42 @@
+
+Stufe 1
+1. Isolde (Krieger) + Vaelin (Zauberer) + Silra (Schurke) | gegen das Feld 77 % (95) | gegen die Top 24 60 % (138)
+2. Vaelin (Zauberer) + Seran (Kleriker) + Faye (Waldläufer) | gegen das Feld 75 % (92) | gegen die Top 24 57 % (138)
+3. Isolde (Krieger) + Vaelin (Zauberer) + Elara (Kleriker) | gegen das Feld 72 % (90) | gegen die Top 24 57 % (138)
+4. Isolde (Krieger) + Vaelin (Zauberer) + Faye (Waldläufer) | gegen das Feld 73 % (92) | gegen die Top 24 55 % (138)
+5. Vaelin (Zauberer) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 72 % (88) | gegen die Top 24 56 % (138)
+6. Ragnar (Krieger) + Vaelin (Zauberer) + Faye (Waldläufer) | gegen das Feld 70 % (88) | gegen die Top 24 55 % (138)
+7. Ragnar (Krieger) + Isolde (Krieger) + Vaelin (Zauberer) | gegen das Feld 69 % (85) | gegen die Top 24 56 % (138)
+8. Isolde (Krieger) + Vaelin (Zauberer) + Seran (Kleriker) | gegen das Feld 69 % (93) | gegen die Top 24 56 % (138)
+9. Ragnar (Krieger) + Vaelin (Zauberer) + Seran (Kleriker) | gegen das Feld 73 % (88) | gegen die Top 24 51 % (138)
+10. Vaelin (Zauberer) + Silra (Schurke) + Seran (Kleriker) | gegen das Feld 67 % (91) | gegen die Top 24 52 % (138)
+Helden (Ø Siegquote aller Teams mit ihm, Vorrunde): Faye 58, Vaelin 58, Isolde 57, Silra 54, Vex 53, Elara 52, Ragnar 52, Seran 52, Torvald 50, Darian 49, Brogar 47, Morwen 43, Lyra 43, Orin 42, Kael 42
+In den Top 10: Vaelin 10×, Isolde 5×, Seran 4×, Faye 4×, Ragnar 3×, Silra 2×, Elara 1×, Brogar 1×
+
+Stufe 5
+1. Isolde (Krieger) + Vex (Schurke) + Faye (Waldläufer) | gegen das Feld 80 % (99) | gegen die Top 24 65 % (138)
+2. Isolde (Krieger) + Darian (Schurke) + Faye (Waldläufer) | gegen das Feld 80 % (92) | gegen die Top 24 60 % (138)
+3. Vex (Schurke) + Elara (Kleriker) + Faye (Waldläufer) | gegen das Feld 77 % (93) | gegen die Top 24 63 % (138)
+4. Ragnar (Krieger) + Vex (Schurke) + Faye (Waldläufer) | gegen das Feld 73 % (88) | gegen die Top 24 65 % (138)
+5. Vex (Schurke) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 76 % (86) | gegen die Top 24 62 % (138)
+6. Darian (Schurke) + Elara (Kleriker) + Faye (Waldläufer) | gegen das Feld 76 % (97) | gegen die Top 24 55 % (138)
+7. Ragnar (Krieger) + Darian (Schurke) + Faye (Waldläufer) | gegen das Feld 76 % (92) | gegen die Top 24 54 % (138)
+8. Isolde (Krieger) + Lyra (Zauberer) + Faye (Waldläufer) | gegen das Feld 78 % (90) | gegen die Top 24 52 % (138)
+9. Vaelin (Zauberer) + Vex (Schurke) + Faye (Waldläufer) | gegen das Feld 72 % (93) | gegen die Top 24 54 % (138)
+10. Darian (Schurke) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 72 % (92) | gegen die Top 24 54 % (138)
+Helden (Ø Siegquote aller Teams mit ihm, Vorrunde): Faye 63, Vex 57, Elara 55, Isolde 55, Ragnar 54, Kael 52, Darian 52, Silra 50, Torvald 49, Brogar 49, Vaelin 48, Lyra 45, Seran 43, Orin 41, Morwen 39
+In den Top 10: Faye 10×, Vex 5×, Darian 4×, Isolde 3×, Elara 2×, Ragnar 2×, Brogar 2×, Lyra 1×, Vaelin 1×
+
+Stufe 10
+1. Vex (Schurke) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 92 % (92) | gegen die Top 24 72 % (138)
+2. Darian (Schurke) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 86 % (97) | gegen die Top 24 67 % (138)
+3. Morwen (Zauberer) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 86 % (97) | gegen die Top 24 61 % (138)
+4. Elara (Kleriker) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 85 % (89) | gegen die Top 24 59 % (138)
+5. Silra (Schurke) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 80 % (94) | gegen die Top 24 61 % (138)
+6. Vaelin (Zauberer) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 80 % (87) | gegen die Top 24 59 % (138)
+7. Ragnar (Krieger) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 81 % (88) | gegen die Top 24 58 % (138)
+8. Vex (Schurke) + Elara (Kleriker) + Brogar (Kleriker) | gegen das Feld 75 % (93) | gegen die Top 24 62 % (138)
+9. Ragnar (Krieger) + Vex (Schurke) + Brogar (Kleriker) | gegen das Feld 77 % (90) | gegen die Top 24 59 % (138)
+10. Isolde (Krieger) + Brogar (Kleriker) + Faye (Waldläufer) | gegen das Feld 77 % (87) | gegen die Top 24 57 % (138)
+Helden (Ø Siegquote aller Teams mit ihm, Vorrunde): Brogar 63, Faye 63, Morwen 59, Ragnar 54, Vex 54, Elara 53, Isolde 51, Vaelin 50, Silra 48, Kael 46, Darian 46, Torvald 44, Seran 43, Lyra 41, Orin 37
+In den Top 10: Brogar 10×, Faye 8×, Vex 3×, Elara 2×, Ragnar 2×, Darian 1×, Morwen 1×, Silra 1×, Vaelin 1×, Isolde 1×
